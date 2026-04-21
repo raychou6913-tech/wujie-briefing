@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>蕪解創意｜花生漫畫全角色宇宙 × 產品矩陣完整提案</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #1a1a2e;
-            --accent-color: #ffd60a;
-            --text-color: #f0f0f0;
-            --card-bg: #2b2b40;
-            --card-border: #444;
-            --header-height: 70px; /* Height of the sticky header */
+            --peanuts-yellow: #FFD700; /* Gold */
+            --peanuts-blue: #007bff;
+            --peanuts-red: #DC3545;
+            --peanuts-dark: #343A40;
+            --peanuts-light: #F8F9FA;
+            --text-color: #333;
+            --header-color: #212529;
+            --card-border-radius: 12px;
+            --transition-speed: 0.35s;
         }
 
         * {
@@ -24,33 +25,12 @@
         }
 
         body {
-            font-family: 'Noto Sans TC', 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Noto Sans TC', 'Montserrat', sans-serif;
             line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--peanuts-light);
             scroll-behavior: smooth;
         }
-
-        a {
-            color: var(--accent-color);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', 'Noto Sans TC', sans-serif;
-            color: var(--text-color);
-            margin-bottom: 0.5em;
-            font-weight: 600;
-        }
-
-        h1 { font-size: 2.5em; color: var(--accent-color); }
-        h2 { font-size: 2em; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.3em; margin-top: 1.5em; }
-        h3 { font-size: 1.5em; color: var(--accent-color); margin-top: 1.2em;}
-        h4 { font-size: 1.2em; }
 
         .container {
             max-width: 1200px;
@@ -58,20 +38,66 @@
             padding: 20px;
         }
 
-        /* Header */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--header-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        h1 { font-size: 2.8em; margin-top: 30px; }
+        h2 { font-size: 2.2em; margin-top: 40px; border-bottom: 3px solid var(--peanuts-yellow); padding-bottom: 10px; }
+        h3 { font-size: 1.8em; margin-top: 30px; }
+        h4 { font-size: 1.4em; margin-top: 25px; }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        strong {
+            font-weight: 700;
+        }
+
+        /* Navigation */
+        .fixed-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--peanuts-dark);
+            padding: 10px 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .fixed-nav .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
+        .fixed-nav a {
+            color: var(--peanuts-light);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .fixed-nav a:hover,
+        .fixed-nav a.active {
+            background-color: var(--peanuts-yellow);
+            color: var(--peanuts-dark);
+        }
+
+        /* Hero Section */
         .hero {
             position: relative;
-            height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             text-align: center;
-            background-size: cover;
-            background-position: center;
-            color: #fff;
-            padding: 20px;
-            transition: background-image 0.5s ease-in-out;
+            color: white;
+            padding: 150px 0 80px;
+            background: url('https://image.pollinations.ai/prompt/Peanuts%20Snoopy%20Charlie%20Brown%20all%20characters%20world%20travel%20colorful%20illustration?width=800&height=450&nologo=true&seed=101') no-repeat center center/cover;
+            margin-top: 60px; /* Space for fixed nav */
+            border-radius: var(--card-border-radius);
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
         .hero::before {
             content: '';
@@ -80,683 +106,622 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1;
+            background: rgba(0, 0, 0, 0.4);
         }
         .hero-content {
             position: relative;
-            z-index: 2;
+            z-index: 10;
         }
-        .hero-content h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
         }
-        .hero-content p {
-            font-size: 1.2em;
+        .hero p {
+            font-size: 1.3em;
+            color: var(--peanuts-light);
+            max-width: 800px;
+            margin: 0 auto 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        }
+        .hero .meta {
+            font-size: 1em;
             opacity: 0.9;
         }
 
-        /* Navigation */
-        .navbar {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            background-color: var(--bg-color);
-            border-bottom: 1px solid var(--card-border);
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .nav-list {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            padding: 0 20px;
-        }
-        .nav-list a {
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-            text-transform: uppercase;
-        }
-        .nav-list a:hover, .nav-list a.active {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-            text-decoration: none;
-        }
-
-        /* Card styles */
+        /* Card System */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
+            gap: 30px;
             margin-top: 30px;
             margin-bottom: 50px;
         }
 
-        .card-container {
-            background-color: var(--card-bg);
-            border-radius: 12px;
+        .card {
+            background-color: white;
+            border-radius: var(--card-border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, border 0.3s ease;
-            position: relative;
-            border: 2px solid transparent;
             cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
-        .card-container:hover {
+        .card:hover {
             transform: scale(1.02);
-            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 0 4px var(--peanuts-yellow), 0 8px 20px rgba(0, 0, 0, 0.15);
         }
-        .card-image-wrapper {
-            width: 100%;
-            height: 180px; /* Fixed height for consistent image display */
+
+        .card-header {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
             overflow: hidden;
-            border-bottom: 1px solid var(--card-border);
+            border-bottom: 1px solid #eee;
         }
-        .card-image {
+        .card-header img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        .card-container:hover .card-image {
-             transform: scale(1.05);
-        }
-        .card-header {
-            padding: 20px;
-            padding-bottom: 60px; /* Space for the expand button */
-            position: relative;
-        }
-        .card-title {
-            font-size: 1.4em;
-            margin-bottom: 8px;
-            color: var(--accent-color);
-        }
-        .card-summary {
-            font-size: 0.95em;
-            color: var(--text-color);
-            opacity: 0.8;
-            margin-bottom: 15px;
-        }
-        .expand-toggle {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .expand-toggle:hover {
-            background-color: #e0c200; /* Slightly darker yellow */
+            border-top-left-radius: var(--card-border-radius);
+            border-top-right-radius: var(--card-border-radius);
         }
 
         .card-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease-in-out;
-            padding: 0 20px;
-            color: var(--text-color);
-            opacity: 0.9;
-        }
-        .card-content h4 {
-            color: var(--accent-color);
-            margin-top: 1em;
-            margin-bottom: 0.5em;
-        }
-        .card-content ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        .card-content ul li {
-            padding-left: 1.2em;
-            position: relative;
-            margin-bottom: 0.5em;
-        }
-        .card-content ul li::before {
-            content: '•';
-            color: var(--accent-color);
-            position: absolute;
-            left: 0;
-        }
-        .card-content p {
-            margin-bottom: 1em;
-        }
-        .card-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1em;
-            margin-bottom: 1em;
-        }
-        .card-content th, .card-content td {
-            border: 1px solid var(--card-border);
-            padding: 10px;
-            text-align: left;
-        }
-        .card-content th {
-            background-color: rgba(var(--accent-color-rgb), 0.1);
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-        .card-content td {
-            background-color: rgba(43, 43, 64, 0.7);
-        }
-        .card-content.expanded {
-            max-height: 2000px; /* Arbitrarily large value for smooth transition */
-            padding-bottom: 20px;
-        }
-
-        /* Progress Bar Styles */
-        .progress-container {
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-        .progress-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .progress-label {
-            width: 150px;
-            flex-shrink: 0;
-            font-weight: bold;
-            color: var(--text-color);
-            margin-right: 15px;
-        }
-        .progress-bar-wrapper {
+            padding: 20px;
             flex-grow: 1;
-            background-color: #444;
-            height: 15px;
-            border-radius: 7px;
-            overflow: hidden;
-            position: relative;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: var(--accent-color);
-            width: 0;
-            transition: width 1s ease-out;
-            border-radius: 7px;
-        }
-        .progress-bar.animate {
-            width: var(--progress-width, 0%);
-        }
-        .progress-value {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--bg-color); /* Text color on the bar */
-            font-size: 0.8em;
-            font-weight: bold;
-            text-shadow: 0 0 3px rgba(0,0,0,0.5);
-        }
-        .progress-bar-label {
-            margin-left: 10px;
-            font-size: 0.9em;
-            color: var(--text-color);
-        }
-
-        /* Specific styles for Market Share chart (using flex for bars) */
-        .market-share-chart {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-            margin-bottom: 30px;
         }
-        .market-share-item {
-            display: flex;
-            align-items: center;
-            color: var(--text-color);
+        .card-content h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--header-color);
+            font-size: 1.3em;
         }
-        .market-share-label {
-            width: 120px;
-            font-weight: bold;
-        }
-        .market-share-bar-wrapper {
+        .card-content .summary {
+            font-size: 0.95em;
+            color: #555;
+            margin-bottom: 15px;
             flex-grow: 1;
-            background-color: #444;
-            height: 25px;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-        }
-        .market-share-bar {
-            height: 100%;
-            background-color: var(--accent-color);
-            width: 0;
-            transition: width 1s ease-out;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-        }
-        .market-share-bar.animate {
-            width: var(--share-width, 0%);
-        }
-        .market-share-value {
-            color: var(--bg-color);
-            font-weight: bold;
-            font-size: 0.9em;
-            text-shadow: 0 0 3px rgba(0,0,0,0.5);
         }
 
-        /* General tables */
+        .toggle-btn {
+            display: inline-block;
+            background-color: var(--peanuts-yellow);
+            color: var(--peanuts-dark);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            align-self: flex-start; /* Align button to start */
+            transition: background-color 0.2s ease, color 0.2s ease;
+            margin-top: auto; /* Push button to bottom */
+        }
+        .toggle-btn:hover {
+            background-color: #E6C200;
+        }
+
+        .card-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-speed) ease-out, padding var(--transition-speed) ease-out;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #f0f0f0;
+            border-bottom-left-radius: var(--card-border-radius);
+            border-bottom-right-radius: var(--card-border-radius);
+            padding: 0 20px; /* Initially no vertical padding */
+        }
+        .card.expanded .card-details {
+            max-height: 1000px; /* Sufficiently large value */
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        .card.expanded .toggle-btn {
+            background-color: var(--peanuts-dark);
+            color: var(--peanuts-yellow);
+        }
+
+        .card-details p, .card-details ul, .card-details table {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .card-details ul {
+            padding-left: 20px;
+        }
+        .card-details li {
+            margin-bottom: 5px;
+        }
+
+        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1em;
-            margin-bottom: 1em;
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
+            margin: 15px 0;
+            font-size: 0.9em;
         }
-        th, td {
-            padding: 12px 15px;
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
             text-align: left;
-            border-bottom: 1px solid var(--card-border);
-            color: var(--text-color);
         }
-        th {
-            background-color: rgba(var(--accent-color-rgb), 0.1);
-            color: var(--accent-color);
+        table th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        table tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Bar Chart */
+        .bar-chart-container {
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .bar-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.95em;
+        }
+        .bar-label {
+            width: 150px;
+            flex-shrink: 0;
+            font-weight: 500;
+            margin-right: 15px;
+        }
+        .bar-wrapper {
+            flex-grow: 1;
+            height: 25px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar {
+            height: 100%;
+            background-color: var(--peanuts-blue);
+            width: 0; /* Initial state for animation */
+            transition: width 1s ease-out;
+            border-radius: 5px;
+            position: relative;
+        }
+        .bar.animated {
+            /* Width will be set by JS */
+        }
+        .bar-percentage {
+            position: absolute;
+            right: 10px;
+            color: white;
+            font-weight: 600;
+            line-height: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Section Specific Styles */
+        #part-a .card-grid, #part-b .card-grid, #part-d .card-grid {
+            margin-top: 20px;
+        }
+
+        .note {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 0.95em;
+            color: #664d03;
+        }
+
+        .highlight-text {
+            color: var(--peanuts-red);
             font-weight: 700;
         }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        tbody tr:hover {
-            background-color: rgba(var(--accent-color-rgb), 0.05);
-        }
 
-        /* Utility classes */
-        .text-center { text-align: center; }
-        .text-accent { color: var(--accent-color); }
-        .mb-20 { margin-bottom: 20px; }
-        .mt-40 { margin-top: 40px; }
-
-        /* Mobile responsiveness */
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero {
-                height: 300px;
-            }
-            .hero-content h1 {
-                font-size: 2em;
-            }
-            .hero-content p {
-                font-size: 1em;
-            }
-            .navbar {
-                height: auto;
-                padding: 10px 0;
-            }
-            .nav-list {
+            .fixed-nav .container {
                 flex-wrap: wrap;
                 gap: 10px;
             }
-            .nav-list a {
-                padding: 8px 10px;
+            .fixed-nav a {
+                padding: 6px 10px;
                 font-size: 0.9em;
             }
+            .hero {
+                padding: 120px 0 60px;
+                margin-top: 80px; /* Adjust for potentially wrapped nav */
+            }
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            .hero p {
+                font-size: 1em;
+            }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.8em; }
+            h3 { font-size: 1.5em; }
             .card-grid {
                 grid-template-columns: 1fr;
             }
-            .progress-label {
+            .bar-label {
                 width: 100px;
             }
-            .market-share-label {
-                width: 90px;
+        }
+        @media (max-width: 480px) {
+            .fixed-nav a {
+                flex-grow: 1;
+                text-align: center;
             }
-            .card-title {
-                font-size: 1.2em;
+            .hero {
+                margin-top: 120px; /* Even more space for wrapped nav */
             }
-            .card-summary {
-                font-size: 0.9em;
-            }
-            .expand-toggle {
-                font-size: 0.8em;
-                padding: 6px 12px;
-                bottom: 15px;
-                right: 15px;
-            }
-            h1 { font-size: 2em; }
-            h2 { font-size: 1.6em; }
-            h3 { font-size: 1.3em; }
         }
     </style>
 </head>
 <body>
-    <div class="hero" style="background-image: url('https://image.pollinations.ai/prompt/Peanuts%20Snoopy%20Charlie%20Brown%20all%20characters%20world%20travel%20adventure%20colorful%20vibrant%20illustration?width=800&height=450&nologo=true&seed=101');">
+    <nav class="fixed-nav">
+        <div class="container">
+            <a href="#part-a">A. 情報席</a>
+            <a href="#part-b">B. 創意席</a>
+            <a href="#part-c">C. 業務席</a>
+            <a href="#part-d">D. 幕僚長研判</a>
+            <a href="#part-e">E. 財務席</a>
+        </div>
+    </nav>
+
+    <div class="hero">
         <div class="hero-content">
             <h1>蕪解創意｜花生漫畫全角色宇宙 × 產品矩陣完整提案</h1>
-            <p><strong>版本</strong>：V3.0 幕僚長統籌升級版 | <strong>日期</strong>：2026年4月21日</p>
-            <p><strong>發起人</strong>：Ray / 幕僚長統籌，情報×創意×業務三席聯合出品</p>
+            <p class="meta">
+                <strong>版本</strong>：V3.0 幕僚長統籌升級版 |
+                <strong>日期</strong>：2026年4月21日 |
+                <strong>發起人</strong>：Ray / 幕僚長統籌，情報×創意×業務三席聯合出品
+            </p>
         </div>
     </div>
 
-    <nav class="navbar">
-        <ul class="nav-list">
-            <li><a href="#intro">開場</a></li>
-            <li><a href="#part-a">情報席</a></li>
-            <li><a href="#part-b">創意席</a></li>
-            <li><a href="#part-c">業務席</a></li>
-            <li><a href="#part-d">幕僚長</a></li>
-            <li><a href="#part-e">財務席</a></li>
-        </ul>
-    </nav>
-
     <div class="container">
-        <section id="intro" class="mt-40">
-            <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">【幕僚長開場】為什麼要做這份升級提案</h3>
-                        <p class="card-summary">本次升級聚焦三件事：路人魚案例、花生宇宙系列矩陣、業務用數字說話。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <p>上一版提案完成了基本骨架，但老董提出了核心挑戰：</p>
-                        <p><strong>「全角色策略要更深，多系列要形成矩陣，業務要把話說清楚。」</strong></p>
-                        <p>本次升級聚焦三件事：</p>
-                        <ul>
-                            <li>用路人魚（海綿寶寶·比奇堡居民）的真實成功案例，反推花生漫畫的全角色爆款路徑</li>
-                            <li>把花生宇宙所有可用素材全部盤點，建立四大系列產品矩陣</li>
-                            <li>業務用數字說話：價位、市場、規模、佔比</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <section id="introduction">
+            <h2>【幕僚長開場】為什麼要做這份升級提案</h2>
+            <p>上一版提案完成了基本骨架，但老董提出了核心挑戰：<br>
+            <strong>「全角色策略要更深，多系列要形成矩陣，業務要把話說清楚。」</strong></p>
+            <p>本次升級聚焦三件事：</p>
+            <ul>
+                <li>用路人魚（海綿寶寶·比奇堡居民）的真實成功案例，反推花生漫畫的全角色爆款路徑</li>
+                <li>把花生宇宙所有可用素材全部盤點，建立四大系列產品矩陣</li>
+                <li>業務用數字說話：價位、市場、規模、佔比</li>
+            </ul>
         </section>
 
-        <section id="part-a" class="mt-40">
+        <section id="part-a">
             <h2>PART A｜情報席：路人魚解碼報告</h2>
+
+            <h3>A1 路人魚（海綿寶寶·比奇堡居民）成功的真正原因</h3>
+            <p><strong>正本清源</strong>：「路人魚」是《海綿寶寶》動畫中比奇堡的背景居民角色——那些在每一集反覆出現、有著誇張表情的無名魚類市民。他們不是主角，沒有名字，卻在 2020 年代成為盲盒市場的現象級爆款。這個案例對花生漫畫的啟示，遠比任何新 IP 都更直接。</p>
+
             <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20characters%20townspeople%20funny%20expressions%20collectible%20toy?width=800&height=450&nologo=true&seed=211" alt="SpongeBob Townspeople" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">A1 路人魚（海綿寶寶·比奇堡居民）解碼報告</h3>
-                        <p class="card-summary">分析路人魚爆紅的五大因素，並對比花生漫畫的獨特優勢。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20townspeople%20funny%20expressions%20toy%20collectible?width=800&height=450&nologo=true&seed=211" alt="路人魚">
                     </div>
                     <div class="card-content">
-                        <p><strong>正本清源</strong>：「路人魚」是《海綿寶寶》動畫中比奇堡的背景居民角色——那些在每一集反覆出現、有著誇張表情的無名魚類市民。他們不是主角，沒有名字，卻在 2020 年代成為盲盒市場的現象級爆款。這個案例對花生漫畫的啟示，遠比任何新 IP 都更直接。</p>
-                        <h4>路人魚為什麼會爆？</h4>
+                        <h4>① 「我認識這張臉！」的認知共鳴</h4>
+                        <p class="summary">全球超過20億人看過海綿寶寶，路人魚誇張表情刻入大腦。購買的是「與記憶重逢」情感。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-a1-1">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-a1-1">
                         <ul>
-                            <li><strong>① 「我認識這張臉！」的認知共鳴</strong>
-                                <ul>
-                                    <li>全球有超過 20 億人看過海綿寶寶。比奇堡路人魚的誇張表情早已刻入大腦</li>
-                                    <li>但在此之前，從來沒有人把他們做成「主角商品」</li>
-                                    <li>消費者購買動機：「這個我認識！他是那個在背景驚叫的那隻魚！」</li>
-                                    <li>這不是新 IP，是喚醒記憶——購買的是「與記憶重逢」的情感，不是「認識新角色」的好奇</li>
-                                </ul>
-                            </li>
-                            <li><strong>② 迷因（Meme）變商品：Z世代的購買語言</strong>
-                                <ul>
-                                    <li>比奇堡路人魚的誇張表情早已是網路迷因素材庫</li>
-                                    <li>「This is Fine」魚、「驚嚇路人魚」、「路人魚大叫」——每個梗都有數億次傳播</li>
-                                    <li>當這些迷因臉被做成實體公仔，購買行為本身就是一個「迷因行為」</li>
-                                    <li>社交媒體擴散邏輯：買到稀有款 → 曬圖說「我買到了那個 MEME！」→ 算法推流 → 更多人衝去買</li>
-                                </ul>
-                            </li>
-                            <li><strong>③ NPC 策略的顛覆性：配角成為主角</strong>
-                                <ul>
-                                    <li>傳統 IP 商品邏輯：主角 > 配角 > 背景角色（背景角色幾乎不做）</li>
-                                    <li>路人魚打破這個邏輯：<strong>背景角色才是最稀缺的商品</strong></li>
-                                    <li>稀缺性來自「大家都認識但誰也沒有」——比主角更難買到，更值得炫耀</li>
-                                    <li>消費者說的話：「我已經有海綿寶寶了，但這隻路人魚我從沒見過做成公仔！」</li>
-                                </ul>
-                            </li>
-                            <li><strong>④ 完整世界觀的集齊慾</strong>
-                                <ul>
-                                    <li>單一主角系列（只有海綿寶寶）無法觸發集齊慾</li>
-                                    <li>整個比奇堡生態系（幾十隻路人魚）= 永遠集不完的收藏坑</li>
-                                    <li>心理學：「接近完整」比「完全沒有」更讓人花錢——差一隻就是差一隻</li>
-                                    <li>業務端效益：渠道補單率極高，消費者自己追著問「還有哪幾款沒出？」</li>
-                                </ul>
-                            </li>
-                            <li><strong>⑤ 低門檻進入 × 高門檻完整</strong>
-                                <ul>
-                                    <li>第一隻：衝動購買（49-79 RMB，不貴）</li>
-                                    <li>全系列：長期投入（幾十款 = 幾千 RMB）</li>
-                                    <li>商業設計精髓：用低客單價引進門，用完整世界觀留住人</li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <h4>路人魚策略對花生漫畫的啟示</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>海綿寶寶生態</th>
-                                    <th>花生漫畫生態</th>
-                                    <th>策略對應</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>路人魚（比奇堡居民）</td>
-                                    <td>Snoopy 兄弟姐妹（Spike/Belle/Olaf 等）</td>
-                                    <td>「你認識 Snoopy，但你有這隻胖弟弟嗎？」</td>
-                                </tr>
-                                <tr>
-                                    <td>誇張表情迷因臉</td>
-                                    <td>Charlie Brown 哲學語錄 / Snoopy 白日夢表情</td>
-                                    <td>迷因化行銷，用熟悉的表情觸發記憶</td>
-                                </tr>
-                                <tr>
-                                    <td>路人魚大家族</td>
-                                    <td>小黃鳥 Woodstock + 5 個鳥友</td>
-                                    <td>「你有 Woodstock，但你認識他的朋友嗎？」</td>
-                                </tr>
-                                <tr>
-                                    <td>完整比奇堡世界</td>
-                                    <td>完整花生宇宙（30+角色）</td>
-                                    <td>永遠集不完的收藏坑</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <h4>花生漫畫的獨特優勢（路人魚沒有的）</h4>
-                        <ul>
-                            <li>比奇堡路人魚沒有名字，沒有故事。花生宇宙每個角色都有完整人格、台詞、故事弧</li>
-                            <li>這意味著：每個「配角」都可以有自己的包裝文案、角色卡、故事說明書</li>
-                            <li>消費者不只是買一隻公仔，是買一個角色的完整故事——這是更高維度的情感商品</li>
+                            <li>全球有超過 20 億人看過海綿寶寶。比奇堡路人魚的誇張表情早已刻入大腦</li>
+                            <li>但在此之前，從來沒有人把他們做成「主角商品」</li>
+                            <li>消費者購買動機：「這個我認識！他是那個在背景驚叫的那隻魚！」</li>
+                            <li>這不是新 IP，是喚醒記憶——購買的是「與記憶重逢」的情感，不是「認識新角色」的好奇</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
+                <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">A2 消費者口味轉變報告（2023-2026）</h3>
-                        <p class="card-summary">分析當前市場美學偏好、購買動機、使用場景等轉變，揭示蕪解機會點。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20townspeople%20funny%20expressions%20toy%20collectible?width=800&height=450&nologo=true&seed=211" alt="迷因變商品">
                     </div>
                     <div class="card-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>維度</th>
-                                    <th>2020年前</th>
-                                    <th>2026年現在</th>
-                                    <th>蕪解機會點</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>美學偏好</td>
-                                    <td>完美可愛、精緻甜美</td>
-                                    <td>醜萌、反差萌、個性怪</td>
-                                    <td>Snoopy 哲學感天然契合</td>
-                                </tr>
-                                <tr>
-                                    <td>使用場景</td>
-                                    <td>桌上擺件、家居裝飾</td>
-                                    <td>包包掛件、隨身攜帶</td>
-                                    <td>需要開發掛件系列</td>
-                                </tr>
-                                <tr>
-                                    <td>購買動機</td>
-                                    <td>「它長得好看」</td>
-                                    <td>「它讓我有感覺」</td>
-                                    <td>角色故事要說透</td>
-                                </tr>
-                                <tr>
-                                    <td>價格接受度</td>
-                                    <td>盲袋上限 49 RMB</td>
-                                    <td>盲袋主流 69-99 RMB</td>
-                                    <td>我方定價空間充裕</td>
-                                </tr>
-                                <tr>
-                                    <td>社交行為</td>
-                                    <td>私下收藏</td>
-                                    <td>公開曬收藏、曬開箱</td>
-                                    <td>UGC 設計要納入策略</td>
-                                </tr>
-                                <tr>
-                                    <td>IP 偏好</td>
-                                    <td>一線知名度即可</td>
-                                    <td>要有「故事性」和「深度」</td>
-                                    <td>花生漫畫 70 年故事深度無可取代</td>
-                                </tr>
-                                <tr>
-                                    <td>購買頻次</td>
-                                    <td>一次買完</td>
-                                    <td>系列追蹤、集齊癖</td>
-                                    <td>多系列矩陣設計</td>
-                                </tr>
-                                <tr>
-                                    <td>年齡層</td>
-                                    <td>兒童為主</td>
-                                    <td>25-35歲女性主力（佔比62%）</td>
-                                    <td>成人情緒消費市場</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <h4>② 迷因（Meme）變商品：Z世代的購買語言</h4>
+                        <p class="summary">路人魚誇張表情是網路迷因素材，做成公仔就是一個「迷因行為」，助推社交擴散。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-a1-2">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-a1-2">
+                        <ul>
+                            <li>比奇堡路人魚的誇張表情早已是網路迷因素材庫</li>
+                            <li>「This is Fine」魚、「驚嚇路人魚」、「路人魚大叫」——每個梗都有數億次傳播</li>
+                            <li>當這些迷因臉被做成實體公仔，購買行為本身就是一個「迷因行為」</li>
+                            <li>社交媒體擴散邏輯：買到稀有款 → 曬圖說「我買到了那個 MEME！」→ 算法推流 → 更多人衝去買</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20townspeople%20funny%20expressions%20toy%20collectible?width=800&height=450&nologo=true&seed=211" alt="NPC策略">
+                    </div>
+                    <div class="card-content">
+                        <h4>③ NPC 策略的顛覆性：配角成為主角</h4>
+                        <p class="summary">背景角色路人魚成為稀缺商品，打破傳統IP商品邏輯，創造「大家都認識但誰也沒有」的稀缺感。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-a1-3">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-a1-3">
+                        <ul>
+                            <li>傳統 IP 商品邏輯：主角 > 配角 > 背景角色（背景角色幾乎不做）</li>
+                            <li>路人魚打破這個邏輯：<strong class="highlight-text">背景角色才是最稀缺的商品</strong></li>
+                            <li>稀缺性來自「大家都認識但誰也沒有」——比主角更難買到，更值得炫耀</li>
+                            <li>消費者說的話：「我已經有海綿寶寶了，但這隻路人魚我從沒見過做成公仔！」</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20townspeople%20funny%20expressions%20toy%20collectible?width=800&height=450&nologo=true&seed=211" alt="集齊慾">
+                    </div>
+                    <div class="card-content">
+                        <h4>④ 完整世界觀的集齊慾</h4>
+                        <p class="summary">比奇堡生態系觸發長期集齊慾，消費者追問「還有哪幾款沒出？」，提高渠道補單率。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-a1-4">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-a1-4">
+                        <ul>
+                            <li>單一主角系列（只有海綿寶寶）無法觸發集齊慾</li>
+                            <li>整個比奇堡生態系（幾十隻路人魚）= 永遠集不完的收藏坑</li>
+                            <li>心理學：「接近完整」比「完全沒有」更讓人花錢——差一隻就是差一隻</li>
+                            <li>業務端效益：渠道補單率極高，消費者自己追著問「還有哪幾款沒出？」</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20townspeople%20funny%20expressions%20toy%20collectible?width=800&height=450&nologo=true&seed=211" alt="低門檻進入">
+                    </div>
+                    <div class="card-content">
+                        <h4>⑤ 低門檻進入 × 高門檻完整</h4>
+                        <p class="summary">單隻低價（49-79 RMB）吸引衝動購買，完整系列則需長期投入，商業設計精髓。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-a1-5">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-a1-5">
+                        <ul>
+                            <li>第一隻：衝動購買（49-79 RMB，不貴）</li>
+                            <li>全系列：長期投入（幾十款 = 幾千 RMB）</li>
+                            <li>商業設計精髓：用低客單價引進門，用完整世界觀留住人</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <h3 class="mt-40">A3 競品快照（市場定位分析）</h3>
+            <h3>A2 路人魚策略對花生漫畫的啟示</h3>
+            <h4>直接對應關係</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>海綿寶寶生態</th>
+                        <th>花生漫畫生態</th>
+                        <th>策略對應</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>路人魚（比奇堡居民）</td>
+                        <td>Snoopy 兄弟姐妹（Spike/Belle/Olaf 等）</td>
+                        <td>「你認識 Snoopy，但你有這隻胖弟弟嗎？」</td>
+                    </tr>
+                    <tr>
+                        <td>誇張表情迷因臉</td>
+                        <td>Charlie Brown 哲學語錄 / Snoopy 白日夢表情</td>
+                        <td>迷因化行銷，用熟悉的表情觸發記憶</td>
+                    </tr>
+                    <tr>
+                        <td>路人魚大家族</td>
+                        <td>小黃鳥 Woodstock + 5 個鳥友</td>
+                        <td>「你有 Woodstock，但你認識他的朋友嗎？」</td>
+                    </tr>
+                    <tr>
+                        <td>完整比奇堡世界</td>
+                        <td>完整花生宇宙（30+角色）</td>
+                        <td>永遠集不完的收藏坑</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>花生漫畫的獨特優勢（路人魚沒有的）</h4>
+            <ul>
+                <li>比奇堡路人魚沒有名字，沒有故事。花生宇宙每個角色都有完整人格、台詞、故事弧</li>
+                <li>這意味著：每個「配角」都可以有自己的包裝文案、角色卡、故事說明書</li>
+                <li>消費者不只是買一隻公仔，是買一個角色的完整故事——這是更高維度的情感商品</li>
+            </ul>
+
+            <h3>A3 消費者口味轉變報告（2023-2026）</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>維度</th>
+                        <th>2020年前</th>
+                        <th>2026年現在</th>
+                        <th>蕪解機會點</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>美學偏好</td>
+                        <td>完美可愛、精緻甜美</td>
+                        <td>有個性、有故事、有記憶點</td>
+                        <td>Snoopy 哲學感 + 角色深度</td>
+                    </tr>
+                    <tr>
+                        <td>最愛購買角色</td>
+                        <td>主角、明星角色</td>
+                        <td>配角、背景角色、意外之選</td>
+                        <td>Olaf、狗狗兄妹是最強潛力股</td>
+                    </tr>
+                    <tr>
+                        <td>使用場景</td>
+                        <td>桌上擺件、家居裝飾</td>
+                        <td>包包掛件、隨身攜帶、打卡拍照</td>
+                        <td>小黃鳥系列天生掛件體型</td>
+                    </tr>
+                    <tr>
+                        <td>購買動機</td>
+                        <td>「它長得好看」</td>
+                        <td>「這個我認識！這是那個 MEME！」</td>
+                        <td>花生梗圖文化需要主動運營</td>
+                    </tr>
+                    <tr>
+                        <td>社交行為</td>
+                        <td>私下收藏</td>
+                        <td>公開曬稀有款、曬完整套</td>
+                        <td>「你集齊了嗎？」是最強病毒句</td>
+                    </tr>
+                    <tr>
+                        <td>集齊慾觸發</td>
+                        <td>主角系列（3-5款即可滿足）</td>
+                        <td>完整生態系（20款以上才過癮）</td>
+                        <td>四大系列矩陣正是為此設計</td>
+                    </tr>
+                    <tr>
+                        <td>購買頻次</td>
+                        <td>一次買完</td>
+                        <td>長期追系列、等新款</td>
+                        <td>年度城市追加 5 款策略</td>
+                    </tr>
+                    <tr>
+                        <td>年齡層</td>
+                        <td>兒童為主</td>
+                        <td>25-35歲成人為主力（62%）</td>
+                        <td>職場情緒消費切入點</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>A4 競品快照（市場定位分析）</h3>
             <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20characters%20townspeople%20funny%20expressions%20collectible%20toy?width=800&height=450&nologo=true&seed=211" alt="競品A 路人魚/海綿寶寶" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">競品A：SpongeBob × 比奇堡路人魚系列</h4>
-                        <p class="card-summary">迷因認知與NPC稀缺性，對花生宇宙有直接啟示。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/SpongeBob%20Bikini%20Bottom%20background%20fish%20townspeople%20funny%20expressions%20toy%20collectible?width=800&height=450&nologo=true&seed=211" alt="競品A 路人魚">
                     </div>
                     <div class="card-content">
+                        <h4>競品A：SpongeBob × 比奇堡路人魚系列</h4>
+                        <p class="summary">迷因認知 × NPC稀缺性 × 完整世界觀。花生宇宙深度更勝，需善用故事性。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-comp-a">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-comp-a">
                         <ul>
-                            <li><strong>NPC策略解析</strong>：背景角色躍升主角，引爆稀缺性。</li>
-                            <li><strong>迷因轉商品機制</strong>：誇張表情融入商品，符合Z世代購買語言。</li>
-                            <li><strong>5大成功因素</strong>：認知共鳴、迷因擴散、NPC顛覆、集齊慾、低高門檻。</li>
-                            <li><strong>對蕪解的啟示</strong>：花生宇宙深度更甚，需發掘配角故事。</li>
+                            <li>定價：RMB 59-89 盲袋</li>
+                            <li>主打渠道：名創優品、潮玩集合店、電商</li>
+                            <li>核心武器：迷因認知 × NPC 稀缺性 × 完整世界觀</li>
+                            <li>對花生漫畫的啟示：花生宇宙深度 > 比奇堡，但我們還沒把故事說出來</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Labubu%20vinyl%20art%20toy%20collectible%20Pop%20Mart%20product%20photography%20dark%20background?width=800&height=450&nologo=true&seed=201" alt="競品B Labubu" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">競品B：Pop Mart × Labubu The Monsters</h4>
-                        <p class="card-summary">名人效應與醜萌美學的成功典範。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Labubu%20vinyl%20art%20toy%20collectible%20Pop%20Mart%20product%20photography?width=800&height=450&nologo=true&seed=201" alt="競品B Labubu">
                     </div>
                     <div class="card-content">
+                        <h4>競品B：Pop Mart × Labubu The Monsters</h4>
+                        <p class="summary">名人效應 × 醜萌美學 × 二手溢價。Snoopy IP護城河更深，難以複製。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-comp-b">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-comp-b">
                         <ul>
-                            <li><strong>定價結構</strong>：RMB 79 盲袋 / RMB 1099 大娃，分層滿足不同消費者。</li>
-                            <li><strong>名人效應機制</strong>：KOL（如Lisa）帶貨，快速建立潮流指標。</li>
-                            <li><strong>醜萌美學</strong>：非傳統可愛，反差萌吸引特定社群。</li>
-                            <li><strong>蕪解相對優勢</strong>：花生漫畫 IP 護城河深，故事底蘊強於獨立藝術家 IP。</li>
+                            <li>定價：RMB 79 盲袋 / RMB 1099 大娃</li>
+                            <li>主打渠道：Pop Mart 直營店、天貓旗艦店、機場快閃</li>
+                            <li>核心武器：名人效應（Lisa）× 醜萌美學 × 二手市場造勢</li>
+                            <li>對花生漫畫的啟示：授權 IP 比藝術家 IP 更難複製，Snoopy 護城河更深</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Chiikawa%20Japanese%20cute%20small%20character%20toy%20kawaii%20product%20photo?width=800&height=450&nologo=true&seed=202" alt="競品C Chiikawa" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">競品C：Chiikawa（ちいかわ）</h4>
-                        <p class="card-summary">療癒系 IP 的新星，需警惕語言壁壘。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Chiikawa%20Japanese%20cute%20character%20toy%20kawaii%20product%20photo?width=800&height=450&nologo=true&seed=202" alt="競品C Chiikawa">
                     </div>
                     <div class="card-content">
+                        <h4>競品C：Chiikawa（ちいかわ）</h4>
+                        <p class="summary">療癒策略 + 弱小共鳴 + 高頻更新。存在語言壁壘，蕪解可切入東南亞市場。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-comp-c">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-comp-c">
                         <ul>
-                            <li><strong>療癒策略</strong>：弱小可愛形象，提供情緒支持與共鳴。</li>
-                            <li><strong>語言壁壘分析</strong>：日本本土化強，東南亞滲透受限。</li>
-                            <li><strong>蕪解切入點</strong>：花生漫畫角色故事更具普世性，跨文化接受度高。</li>
+                            <li>定價：JPY 660-2200（約 RMB 33-110）</li>
+                            <li>主打渠道：便利店聯名、旗艦店、扭蛋</li>
+                            <li>核心武器：療癒系 + 弱小共鳴 + 高頻更新</li>
+                            <li>弱點：語言壁壘，東南亞滲透有限 → <strong class="highlight-text">蕪解切入點</strong></li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Mofusand%20cat%20sushi%20cute%20toy%20blind%20box%20product%20photography?width=800&height=450&nologo=true&seed=203" alt="競品D Mofusand" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">競品D：Mofusand（貓福珊迪）</h4>
-                        <p class="card-summary">我方熟悉渠道的對標參考，貓奴文化強力吸金。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Mofusand%20cat%20toy%20blind%20box%20product%20photography?width=800&height=450&nologo=true&seed=203" alt="競品D Mofusand">
                     </div>
                     <div class="card-content">
+                        <h4>競品D：Mofusand（貓福珊迪）</h4>
+                        <p class="summary">貓奴文化 × 食物主題 × 高辨識度。我方已有代理渠道，可對標自身執行能力。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-comp-d">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-comp-d">
                         <ul>
-                            <li><strong>渠道對標分析</strong>：與我方代理渠道重疊，可直接參照鋪貨策略與銷售數據。</li>
-                            <li><strong>定價參照</strong>：盲袋 RMB 59-89，為我方花生漫畫系列提供定價基準。</li>
+                            <li>定價：RMB 59-89 盲袋</li>
+                            <li>主打渠道：我方代理渠道（最熟悉的參照系）</li>
+                            <li>核心武器：貓奴文化 × 食物主題 × 高辨識度</li>
+                            <li>對我方意義：同渠道競品，定價對標基準</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Peanuts%20premium%20figurine%20product%20photography%20white%20background?width=800&height=450&nologo=true&seed=204" alt="競品E Snoopy官方" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">競品E：Snoopy × 日本 PEANUTS 官方</h4>
-                        <p class="card-summary">精品路線，為我方留下大眾盲盒市場空白點。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Peanuts%20premium%20figurine%20product%20photography?width=800&height=450&nologo=true&seed=204" alt="競品E Snoopy官方">
                     </div>
                     <div class="card-content">
+                        <h4>競品E：Snoopy × 日本 PEANUTS 官方</h4>
+                        <p class="summary">精品路線，不打大眾市場，我方最直接的空白切入點。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-comp-e">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-comp-e">
                         <ul>
-                            <li><strong>精品路線解析</strong>：高價位、限量發售，主打收藏與品牌高端形象。</li>
-                            <li><strong>市場空白點</strong>：官方不走大眾盲盒路線，不主打東南亞市場，是我方直接的切入機會。</li>
+                            <li>定價：JPY 1100-3300（RMB 55-165）</li>
+                            <li>主打渠道：日本官方 PEANUTS Cafe、授權精品店</li>
+                            <li>弱點：精品路線不做盲袋，不打東南亞大眾市場 → <strong class="highlight-text">我方最直接的空白切入點</strong></li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="part-b" class="mt-40">
+        <section id="part-b">
             <h2>PART B｜創意席：花生宇宙全角色盤點 × 四大產品矩陣</h2>
+
+            <h3>B1 全角色宇宙大盤點</h3>
+            <p>創意席完整清點花生漫畫可用素材，發現 IP 深度遠超一般認知。</p>
             <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Olaf%20chubby%20round%20beagle%20dog%20cute%20collectible%20toy%20white%20background?width=800&height=450&nologo=true&seed=401" alt="Olaf" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">B1 全角色宇宙大盤點</h3>
-                        <p class="card-summary">清點花生漫畫可用素材，挖掘明星角色、潛力股與隱藏寶藏。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Charlie%20Brown%20friends%20cute%20illustration?width=800&height=450&nologo=true&seed=101" alt="明星角色">
                     </div>
                     <div class="card-content">
                         <h4>第一梯隊：明星角色（全球知名度 90%+）</h4>
+                        <p class="summary">Snoopy, Charlie Brown, Woodstock, Lucy, Linus。核心主角，全系列核心。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-tier-1">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-tier-1">
                         <table>
                             <thead>
                                 <tr>
@@ -767,14 +732,51 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Snoopy</td><td>夢想家、愛幻想、不受現實限制</td><td>「我也想逃離現實活在幻想裡」</td><td>全系列核心，必做</td></tr>
-                                <tr><td>Charlie Brown</td><td>失敗者英雄、永恆樂觀主義</td><td>「明明做錯還是想撐下去」</td><td>情緒療癒主打</td></tr>
-                                <tr><td>Woodstock</td><td>無條件陪伴、忠實小跟班</td><td>「有人懂我就夠了」</td><td>小尺寸掛件爆款</td></tr>
-                                <tr><td>Lucy</td><td>控制欲、霸氣、內心孤獨</td><td>「表面強大內心gg」</td><td>反差萌路線</td></tr>
-                                <tr><td>Linus</td><td>智慧、不安全感、安全毯</td><td>「道理都懂，還是需要一條毯子」</td><td>配件聯名潛力</td></tr>
+                                <tr>
+                                    <td>Snoopy</td>
+                                    <td>夢想家、愛幻想、不受現實限制</td>
+                                    <td>「我也想逃離現實活在幻想裡」</td>
+                                    <td>全系列核心，必做</td>
+                                </tr>
+                                <tr>
+                                    <td>Charlie Brown</td>
+                                    <td>失敗者英雄、永恆樂觀主義</td>
+                                    <td>「明明做錯還是想撐下去」</td>
+                                    <td>情緒療癒主打</td>
+                                </tr>
+                                <tr>
+                                    <td>Woodstock</td>
+                                    <td>無條件陪伴、忠實小跟班</td>
+                                    <td>「有人懂我就夠了」</td>
+                                    <td>小尺寸掛件爆款</td>
+                                </tr>
+                                <tr>
+                                    <td>Lucy</td>
+                                    <td>控制欲、霸氣、內心孤獨</td>
+                                    <td>「表面強大內心gg」</td>
+                                    <td>反差萌路線</td>
+                                </tr>
+                                <tr>
+                                    <td>Linus</td>
+                                    <td>智慧、不安全感、安全毯</td>
+                                    <td>「道理都懂，還是需要一條毯子」</td>
+                                    <td>配件聯名潛力</td>
+                                </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Peanuts%20secondary%20characters%20illustration%20cute?width=800&height=450&nologo=true&seed=102" alt="潛力股角色">
+                    </div>
+                    <div class="card-content">
                         <h4>第二梯隊：潛力股角色（地區知名度 60-80%）</h4>
+                        <p class="summary">Sally, Schroeder, Franklin等。各有特色，可針對特定市場和聯名機會。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-tier-2">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-tier-2">
                         <table>
                             <thead>
                                 <tr>
@@ -784,15 +786,51 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Sally</td><td>選擇性努力、可愛碎碎念</td><td>台灣/日本女性市場共鳴</td></tr>
-                                <tr><td>Schroeder</td><td>藝術完美主義</td><td>音樂/文創 IP 聯名</td></tr>
-                                <tr><td>Franklin</td><td>冷靜理性、多元包容</td><td>DEI 敘事、年輕市場共鳴</td></tr>
-                                <tr><td>Peppermint Patty</td><td>運動型、不在乎外表</td><td>體育/戶外場景切入</td></tr>
-                                <tr><td>Marcie</td><td>學霸、眼鏡娘</td><td>學習/閱讀場景聯名</td></tr>
-                                <tr><td>Pigpen</td><td>不修邊幅、自得其樂</td><td>「髒髒包」潮流呼應</td></tr>
+                                <tr>
+                                    <td>Sally</td>
+                                    <td>選擇性努力、可愛碎碎念</td>
+                                    <td>台灣/日本女性市場共鳴</td>
+                                </tr>
+                                <tr>
+                                    <td>Schroeder</td>
+                                    <td>藝術完美主義</td>
+                                    <td>音樂/文創 IP 聯名</td>
+                                </tr>
+                                <tr>
+                                    <td>Franklin</td>
+                                    <td>冷靜理性、多元包容</td>
+                                    <td>DEI 敘事、年輕市場共鳴</td>
+                                </tr>
+                                <tr>
+                                    <td>Peppermint Patty</td>
+                                    <td>運動型、不在乎外表</td>
+                                    <td>體育/戶外場景切入</td>
+                                </tr>
+                                <tr>
+                                    <td>Marcie</td>
+                                    <td>學霸、眼鏡娘</td>
+                                    <td>學習/閱讀場景聯名</td>
+                                </tr>
+                                <tr>
+                                    <td>Pigpen</td>
+                                    <td>不修邊幅、自得其樂</td>
+                                    <td>「髒髒包」潮流呼應</td>
+                                </tr>
                             </tbody>
                         </table>
-                        <h4>第三梯隊：隱藏寶藏（知名度低但潛力大）</h4>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Fat%20chubby%20round%20beagle%20dog%20cute%20collectible%20toy?width=800&height=450&nologo=true&seed=401" alt="狗狗家族">
+                    </div>
+                    <div class="card-content">
+                        <h4>第三梯隊：隱藏寶藏 - 狗狗家族</h4>
+                        <p class="summary">Snoopy兄弟姐妹，Olaf胖弟為「醜萌爆款」高機率候選，具潛力開發個性系列。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-tier-3-dog">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-tier-3-dog">
                         <h5>狗狗家族（Snoopy 的兄弟姐妹）</h5>
                         <table>
                             <thead>
@@ -803,16 +841,51 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Spike</td><td>住沙漠、戴牛仔帽、比 Snoopy 更帥氣</td><td>西部/冒險系列，男性向</td></tr>
-                                <tr><td>Belle</td><td>Snoopy 的妹妹、最時尚的狗</td><td>時尚聯名，女性向</td></tr>
-                                <tr><td>Olaf</td><td>最圓最胖的弟弟，什麼都不在意</td><td>「躺平」療癒系，最易爆款</td>
+                                <tr>
+                                    <td>Spike</td>
+                                    <td>住沙漠、戴牛仔帽、比 Snoopy 更帥氣</td>
+                                    <td>西部/冒險系列，男性向</td>
                                 </tr>
-                                <tr><td>Marbles</td><td>Snoopy 弟弟，愛閱讀</td><td>文藝書店聯名</td></tr>
-                                <tr><td>Andy</td><td>毛茸茸弟弟、最像真狗</td><td>毛絨玩具升級版</td></tr>
+                                <tr>
+                                    <td>Belle</td>
+                                    <td>Snoopy 的妹妹、最時尚的狗</td>
+                                    <td>時尚聯名，女性向</td>
+                                </tr>
+                                <tr>
+                                    <td>Olaf</td>
+                                    <td>最圓最胖的弟弟，什麼都不在意</td>
+                                    <td>「躺平」療癒系，最易爆款</td>
+                                </tr>
+                                <tr>
+                                    <td>Marbles</td>
+                                    <td>Snoopy 弟弟，愛閱讀</td>
+                                    <td>文藝書店聯名</td>
+                                </tr>
+                                <tr>
+                                    <td>Andy</td>
+                                    <td>毛茸茸弟弟、最像真狗</td>
+                                    <td>毛絨玩具升級版</td>
+                                </tr>
                             </tbody>
                         </table>
-                        <p class="text-accent"><strong>情報席特別提示</strong>：Olaf（胖弟）= 下一個「醜萌爆款」高機率候選</p>
-                        <p>身形最圓、性格最無厘頭、沒什麼存在感但這就是他的魅力。對標：路人魚之所以爆，是因為它不是主角。Olaf 策略同理。</p>
+                        <div class="note">
+                            <strong>情報席特別提示</strong>：Olaf（胖弟）= 下一個「醜萌爆款」高機率候選<br>
+                            身形最圓、性格最無厘頭、沒什麼存在感但這就是他的魅力<br>
+                            對標：路人魚之所以爆，是因為它不是主角。Olaf 策略同理。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Woodstock%20yellow%20bird%20friends%20six%20birds%20cute%20tiny%20figurines?width=800&height=450&nologo=true&seed=402" alt="小黃鳥特攻隊">
+                    </div>
+                    <div class="card-content">
+                        <h4>第三梯隊：隱藏寶藏 - 小黃鳥特攻隊</h4>
+                        <p class="summary">Woodstock及其鳥友。全員純表情溝通，具跨語言、跨文化商品潛力，適合東南亞市場。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-tier-3-bird">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-tier-3-bird">
                         <h5>小黃鳥特攻隊（Woodstock + 朋友們）</h5>
                         <table>
                             <thead>
@@ -822,353 +895,501 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Woodstock</td><td>主角，只說鳥語，完全靠表情溝通</td></tr>
-                                <tr><td>Bill</td><td>話最多的鳥</td></tr>
-                                <tr><td>Conrad</td><td>最憂鬱的鳥</td></tr>
-                                <tr><td>Oliver</td><td>最樂觀的鳥</td></tr>
-                                <tr><td>Harriet</td><td>唯一女鳥，最後嫁給 Spike</td></tr>
-                                <tr><td>Fred</td><td>最謹慎的鳥</td></tr>
+                                <tr>
+                                    <td>Woodstock</td>
+                                    <td>主角，只說鳥語，完全靠表情溝通</td>
+                                </tr>
+                                <tr>
+                                    <td>Bill</td>
+                                    <td>話最多的鳥</td>
+                                </tr>
+                                <tr>
+                                    <td>Conrad</td>
+                                    <td>最憂鬱的鳥</td>
+                                </tr>
+                                <tr>
+                                    <td>Oliver</td>
+                                    <td>最樂觀的鳥</td>
+                                </tr>
+                                <tr>
+                                    <td>Harriet</td>
+                                    <td>唯一女鳥，最後嫁給 Spike</td>
+                                </tr>
+                                <tr>
+                                    <td>Fred</td>
+                                    <td>最謹慎的鳥</td>
+                                </tr>
                             </tbody>
                         </table>
-                        <p class="text-accent"><strong>創意席洞察</strong>：小黃鳥全員不說話，純靠表情 → 跨語言商品，東南亞市場無需在地化</p>
+                        <div class="note">
+                            <strong>創意席洞察</strong>：小黃鳥全員不說話，純靠表情 → 跨語言商品，東南亞市場無需在地化
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <h3 class="mt-40">B2 四大產品系列矩陣</h3>
+            <h3>B2 四大產品系列矩陣</h3>
+            <h4>矩陣設計邏輯</h4>
+            <pre><code>
+            高知名度
+                ↑
+  掛件小品   ← ┼ → 收藏大件
+                ↓
+            低知名度（開拓市場）
+            </code></pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>系列</th>
+                        <th>定位</th>
+                        <th>主力角色</th>
+                        <th>尺寸</th>
+                        <th>定價帶</th>
+                        <th>推出時序</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>系列一：世界旅人</td>
+                        <td>出行/文化 IP</td>
+                        <td>全人類角色 + Snoopy</td>
+                        <td>8cm</td>
+                        <td>RMB 79-99</td>
+                        <td>Y1 Q1 首發</td>
+                    </tr>
+                    <tr>
+                        <td>系列二：小黃鳥特攻隊</td>
+                        <td>掛件/日常陪伴</td>
+                        <td>Woodstock + 5鳥友</td>
+                        <td>5cm</td>
+                        <td>RMB 49-59</td>
+                        <td>Y1 Q2</td>
+                    </tr>
+                    <tr>
+                        <td>系列三：狗狗家族大集合</td>
+                        <td>療癒/收藏</td>
+                        <td>Snoopy 8兄妹</td>
+                        <td>8cm</td>
+                        <td>RMB 79-99</td>
+                        <td>Y1 Q3</td>
+                    </tr>
+                    <tr>
+                        <td>系列四：Snoopy 職業百態</td>
+                        <td>情緒消費/禮品</td>
+                        <td>Snoopy 單主角</td>
+                        <td>10cm</td>
+                        <td>RMB 99-129</td>
+                        <td>Y2 Q1</td>
+                    </tr>
+                </tbody>
+            </table>
+
             <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Charlie%20Brown%20world%20travel%20globe%20passport%20stamps%20adventure%20illustration?width=800&height=450&nologo=true&seed=301" alt="系列一世界旅人" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">系列一：世界旅人（SNOOPY GOES AROUND）</h4>
-                        <p class="card-summary">以全球城市為主題，將Snoopy和人類角色融入旅行場景。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Charlie%20Brown%20world%20travel%20globe%20passport%20stamps%20illustration?width=800&height=450&nologo=true&seed=301" alt="系列一：世界旅人">
                     </div>
                     <div class="card-content">
+                        <h4>系列一：世界旅人（SNOOPY GOES AROUND）</h4>
+                        <p class="summary">已完成提案，將Olaf、Spike加入特別城市款，隱藏款Snoopy攜行李箱。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-series-1">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-series-1">
                         <ul>
-                            <li><strong>定位</strong>：出行/文化 IP</li>
-                            <li><strong>主力角色</strong>：全人類角色 + Snoopy</li>
-                            <li><strong>規格尺寸</strong>：8cm 盲盒</li>
-                            <li><strong>定價</strong>：RMB 79-99</li>
-                            <li><strong>推出時程</strong>：Y1 Q1 首發</li>
-                            <li><strong>目標市場</strong>：全球旅行者、文化愛好者</li>
-                            <li><strong>完整角色清單</strong>：Snoopy、Charlie Brown、Lucy、Linus等，結合各地標誌性城市（如巴黎Snoopy咖啡師、紐約Charlie Brown計程車司機）。升級方向將Olaf、Spike加入「特別城市款」（Spike=拉斯維加斯，Olaf=首爾炸雞款）。</li>
+                            <li><strong>已完成提案</strong>，詳見上一版本</li>
+                            <li>升級方向：將 Olaf、Spike 加入「特別城市款」（Spike=拉斯維加斯，Olaf=首爾炸雞款）</li>
+                            <li>首發 10 城市 → 年度追加 5 城市 → 形成長青系列</li>
                             <li><strong>隱藏款設計</strong>：Snoopy 本人攜行李箱款（1/72機率）</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Woodstock%20yellow%20bird%20tiny%20cute%20friends%20squad%20Peanuts%20figurines?width=800&height=450&nologo=true&seed=302" alt="系列二小黃鳥" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">系列二：小黃鳥特攻隊（WOODSTOCK & SQUAD）</h4>
-                        <p class="card-summary">Woodstock及其鳥友們，主打跨文化表情溝通的包包掛件。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Woodstock%20yellow%20bird%20tiny%20cute%20friends%20Peanuts%20figurines?width=800&height=450&nologo=true&seed=302" alt="系列二：小黃鳥特攻隊">
                     </div>
                     <div class="card-content">
+                        <h4>系列二：小黃鳥特攻隊（WOODSTOCK & SQUAD）</h4>
+                        <p class="summary">全員不說話純表情溝通，5cm掛件版，6款常規+1款隱藏，機場免稅店首選。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-series-2">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-series-2">
                         <ul>
-                            <li><strong>定位</strong>：掛件/日常陪伴</li>
-                            <li><strong>主力角色</strong>：Woodstock + 5鳥友 (Bill, Conrad, Oliver, Harriet, Fred)</li>
-                            <li><strong>規格尺寸</strong>：5cm 包包掛件版 + 盲袋版</li>
-                            <li><strong>定價</strong>：RMB 49-59</li>
-                            <li><strong>推出時程</strong>：Y1 Q2</li>
-                            <li><strong>目標市場</strong>：東南亞、機場免稅店旅客、年輕女性</li>
-                            <li><strong>完整角色清單</strong>：Bill（碎碎念版）/ Conrad（憂鬱版）/ Oliver（開心版）/ Harriet（戀愛版）/ Fred（緊張版）/ Woodstock（夢遊版）。全員不說話，純靠表情溝通，跨語言。</li>
-                            <li><strong>隱藏款設計</strong>：集體合照迷你版 (Woodstock與5鳥友迷你模型同底座)</li>
+                            <li><strong>核心賣點</strong>：全員不說話，純表情溝通，跨語言、跨文化</li>
+                            <li><strong>規格</strong>：5cm 包包掛件版 + 盲袋版</li>
+                            <li><strong>6款常規 + 1款隱藏</strong>：Bill（碎碎念版）/ Conrad（憂鬱版）/ Oliver（開心版）/ Harriet（戀愛版）/ Fred（緊張版）/ Woodstock（夢遊版）/ 隱藏：集體合照迷你版</li>
+                            <li><strong>市場策略</strong>：機場免稅店首選（小尺寸、易攜帶、低客單風險低）</li>
+                            <li>視覺參考方向：<a href="https://source.unsplash.com/featured/?small,bird,yellow,cute,plush" target="_blank" rel="noopener noreferrer">Unsplash Reference</a> (For internal inspiration, actual images as provided by prompt)</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20beagle%20siblings%20family%20figurines%20collection%20cute%20product?width=800&height=450&nologo=true&seed=303" alt="系列三狗狗家族" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">系列三：狗狗家族大集合（THE BEAGLE FAMILY）</h4>
-                        <p class="card-summary">揭露Snoopy鮮為人知的兄弟姐妹，Olaf有望成為下一個醜萌爆款。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20beagle%20siblings%20family%20figurines%20cute%20product?width=800&height=450&nologo=true&seed=303" alt="系列三：狗狗家族大集合">
                     </div>
                     <div class="card-content">
+                        <h4>系列三：狗狗家族大集合（THE BEAGLE FAMILY）</h4>
+                        <p class="summary">主打Olaf胖弟，8款全員盲盒，Spike限定款，強化「原來Snoopy有這麼多兄弟妹？」的驚喜感。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-series-3">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-series-3">
                         <ul>
-                            <li><strong>定位</strong>：療癒/收藏</li>
-                            <li><strong>主力角色</strong>：Snoopy 8兄妹 (Snoopy, Spike, Belle, Olaf, Marbles, Andy, Molly, Rover)</li>
-                            <li><strong>規格尺寸</strong>：8cm 盲盒</li>
-                            <li><strong>定價</strong>：RMB 79-99 (Spike限定款RMB 99)</li>
-                            <li><strong>推出時程</strong>：Y1 Q3</li>
-                            <li><strong>目標市場</strong>：收藏愛好者、狗狗愛好者、「躺平」文化追隨者</li>
-                            <li><strong>完整角色清單</strong>：Snoopy、Spike (沙漠牛仔)、Belle (時尚淑女)、Olaf (圓胖可愛)、Marbles (閱讀學者)、Andy (毛絨真實)、Molly、Rover。</li>
-                            <li><strong>隱藏款設計</strong>：Snoopy + Olaf 兄弟組合款（兩隻在一個底座）</li>
+                            <li><strong>核心賣點</strong>：「原來 Snoopy 有這麼多兄弟妹？」的驚喜感</li>
+                            <li><strong>爆款主打</strong>：Olaf（胖弟，最圓最可愛）→ 對標 Labubu 的「醜萌」路線</li>
+                            <li><strong>8款全員</strong>：Snoopy + Spike + Belle + Olaf + Marbles + Andy + Molly + Rover</li>
+                            <li><strong>隱藏款</strong>：Snoopy + Olaf 兄弟組合款（兩隻在一個底座）</li>
+                            <li><strong>定價升級</strong>：Spike 限定款 RMB 99（因造型最複雜，牛仔帽+圍巾）</li>
+                            <li>視覺參考方向：<a href="https://source.unsplash.com/featured/?beagle,dog,figurine,cute,toy" target="_blank" rel="noopener noreferrer">Unsplash Reference</a> (For internal inspiration, actual images as provided by prompt)</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20pilot%20chef%20doctor%20work%20costume%20cute%20collectible?width=800&height=450&nologo=true&seed=304" alt="系列四職業百態" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">系列四：Snoopy 職業百態（SNOOPY AT WORK）</h4>
-                        <p class="card-summary">Snoopy化身職場角色，主打情緒消費與辦公室禮品市場。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20pilot%20chef%20doctor%20work%20costume%20cute%20collectible?width=800&height=450&nologo=true&seed=304" alt="系列四：Snoopy 職業百態">
                     </div>
                     <div class="card-content">
+                        <h4>系列四：Snoopy 職業百態（SNOOPY AT WORK）</h4>
+                        <p class="summary">情緒消費 × 辦公室禮品，受眾25-35歲職場白領，10款職業，文案主打陪伴。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-series-4">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-series-4">
                         <ul>
-                            <li><strong>定位</strong>：情緒消費/禮品</li>
-                            <li><strong>主力角色</strong>：Snoopy 單主角</li>
-                            <li><strong>規格尺寸</strong>：10cm 盲盒</li>
-                            <li><strong>定價</strong>：RMB 99-129</li>
-                            <li><strong>推出時程</strong>：Y2 Q1</li>
-                            <li><strong>目標市場</strong>：25-35歲職場白領、禮品市場</li>
-                            <li><strong>完整角色清單</strong>：飛行員（Snoopy 最經典造型）、廚師、律師、醫生、程式設計師、老師、音樂家、運動員、旅行者、創業者。</li>
-                            <li><strong>隱藏款設計</strong>：Snoopy 坐在辦公桌前打盹，上方有白日夢泡泡。</li>
+                            <li><strong>核心賣點</strong>：情緒消費 × 辦公室禮品 × 自我表達</li>
+                            <li><strong>受眾</strong>：25-35歲職場白領（午休去便利店看到就買）</li>
+                            <li><strong>10款職業</strong>：飛行員（Snoopy 最經典造型）/ 廚師 / 律師 / 醫生 / 程式設計師 / 老師 / 音樂家 / 運動員 / 旅行者 / 創業者</li>
+                            <li><strong>文案方向</strong>：「每個職業都需要一個 Snoopy 陪你撐過去」</li>
+                            <li><strong>禮品市場</strong>：職場送禮首選，附可客製化賀卡包裝</li>
+                            <li>視覺參考方向：<a href="https://source.unsplash.com/featured/?snoopy,peanuts,work,office,figurine" target="_blank" rel="noopener noreferrer">Unsplash Reference</a> (For internal inspiration, actual images as provided by prompt)</li>
                         </ul>
                     </div>
                 </div>
             </div>
+
+            <h3>B3 圖片素材策略（升級版）</h3>
+            <div class="note">
+                <strong>創意席聲明</strong>：本方案圖片分三個等級
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>等級</th>
+                        <th>說明</th>
+                        <th>使用場景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A級：官方授權參考圖</td>
+                        <td>花生官方PEANUTS.com圖庫</td>
+                        <td>提報版權方/合作方</td>
+                    </tr>
+                    <tr>
+                        <td>B級：競品市場真實照</td>
+                        <td>從各電商平台截圖（淘寶/天貓/京東）</td>
+                        <td>內部市場分析</td>
+                    </tr>
+                    <tr>
+                        <td>C級：風格氛圍板</td>
+                        <td>Unsplash/Pinterest 近似風格</td>
+                        <td>對外提案視覺參考</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>建議下一步</strong>：委託台灣設計事務所出3款實際角色草稿（費用估計 NTD 15,000-25,000），以A4設計稿形式提案版權方，成功率提升 60%。</p>
         </section>
 
-        <section id="part-c" class="mt-40">
+        <section id="part-c">
             <h2>PART C｜業務席：定價矩陣 × 市場優先級 × 銷售規模</h2>
-            <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">C1 價位策略：什麼價位最好推</h3>
-                        <p class="card-summary">分析各市場價格吸收力，建議主力定價策略。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <h4>市場吸收力測試結果 - 中國大陸市場</h4>
-                        <div class="progress-container" id="market-absorption-chart">
-                            <div class="progress-item">
-                                <span class="progress-label">RMB 39-49</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 78%;"></div>
-                                    <span class="progress-value">78%</span>
-                                </div>
-                                <span class="progress-bar-label">（衝動購買最高，毛利低）</span>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">RMB 59-79</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 65%;"></div>
-                                    <span class="progress-value">65%</span>
-                                </div>
-                                <span class="progress-bar-label">（主力甜蜜點，建議主力定價）</span>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">RMB 89-99</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 48%;"></div>
-                                    <span class="progress-value">48%</span>
-                                </div>
-                                <span class="progress-bar-label">（可接受，需包裝）</span>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">RMB 109-129</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 31%;"></div>
-                                    <span class="progress-value">31%</span>
-                                </div>
-                                <span class="progress-bar-label">（限定版才能守住）</span>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">RMB 139+</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 12%;"></div>
-                                    <span class="progress-value">12%</span>
-                                </div>
-                                <span class="progress-bar-label">（精品收藏市場）</span>
-                            </div>
-                        </div>
-                        <p class="text-accent"><strong>業務席建議主力定價</strong>：<strong>RMB 79（8cm 盲袋）/ RMB 49（5cm 掛件）</strong></p>
-                        <p>理由：競品 Pop Mart 主流 79 RMB，市場教育完成；Snoopy IP 加持可守住價格不被砍。</p>
-                        <h4>台灣市場</h4>
-                        <ul>
-                            <li>TWD 299-399（約 RMB 65-87）= 主力甜蜜點</li>
-                            <li>超商限定款 TWD 199 可以做（引流用）</li>
-                            <li>誠品/百貨精品館 TWD 499-699（精品包裝版）</li>
-                        </ul>
-                        <h4>東南亞市場（泰國/馬來西亞/新加坡）</h4>
-                        <ul>
-                            <li>泰國 THB 299-399（約 RMB 60-80）= 可接受</li>
-                            <li>新加坡 SGD 18-28（約 RMB 95-150）= 高端市場，走精品路線</li>
-                            <li>馬來西亞 MYR 45-65（約 RMB 72-105）= 中間帶</li>
-                        </ul>
-                    </div>
-                </div>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">C2 必爭市場：這幾個不拿下不行</h3>
-                        <p class="card-summary">評估各市場規模潛力與我方優勢，制定優先級矩陣。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <h4>市場優先級矩陣</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>優先級</th>
-                                    <th>市場</th>
-                                    <th>規模潛力</th>
-                                    <th>我方現有優勢</th>
-                                    <th>必爭理由</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>★★★★★</td><td>中國大陸</td><td>最大，500億盲盒市場</td><td>1000+終端、北京現金流</td><td>VAM 主戰場，不拿下沒有 IPO 故事</td></tr>
-                                <tr><td>★★★★☆</td><td>台灣</td><td>中等，但客單價高</td><td>總部所在，品牌形象地</td><td>自家主場，丟了沒臉談 IPO</td></tr>
-                                <tr><td>★★★★☆</td><td>泰國/曼谷</td><td>東南亞最大消費市場</td><td>Shawn 駐點，渠道打通中</td><td>Snoopy 亞洲授權，東南亞缺位要補</td></tr>
-                                <tr><td>★★★☆☆</td><td>新加坡</td><td>小但消費力強</td><td>無布局，需開發</td><td>高端渠道驗證市場，單店坪效高</td></tr>
-                                <tr><td>★★★☆☆</td><td>馬來西亞</td><td>中等，華人市場</td><td>部分渠道重疊</td><td>泰國打開後自然延伸</td></tr>
-                                <tr><td>★★☆☆☆</td><td>日本</td><td>超大市場但壁壘高</td><td>無渠道</td><td>長期布局，Y3 後評估</td></tr>
-                                <tr><td>★★☆☆☆</td><td>韓國</td><td>Snoopy 熱度高</td><td>無渠道</td><td>考慮韓國代理商合作模式</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <h3>C1 價位策略：什麼價位最好推</h3>
+            <h4>市場吸收力測試結果</h4>
+            <h5>中國大陸市場（最大單一市場）</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>價位帶</th>
+                        <th>購買轉化率</th>
+                        <th>備註</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>RMB 39-49</td>
+                        <td>78%（衝動購買最高）</td>
+                        <td>但毛利空間不足，只建議掛件小品</td>
+                    </tr>
+                    <tr>
+                        <td>RMB 59-79</td>
+                        <td>65%（主力甜蜜點）</td>
+                        <td><strong class="highlight-text">現在市場教育成熟，建議主力定價</strong></td>
+                    </tr>
+                    <tr>
+                        <td>RMB 89-99</td>
+                        <td>48%（可接受，需包裝）</td>
+                        <td>搭配大尺寸或特別版設計</td>
+                    </tr>
+                    <tr>
+                        <td>RMB 109-129</td>
+                        <td>31%（限定版才能守住）</td>
+                        <td>機場/高端渠道、隱藏款</td>
+                    </tr>
+                    <tr>
+                        <td>RMB 139+</td>
+                        <td>12%（精品收藏市場）</td>
+                        <td>大尺寸/聯名/簽名款</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>業務席建議主力定價</strong>：<strong class="highlight-text">RMB 79（8cm 盲袋）/ RMB 49（5cm 掛件）</strong><br>
+            理由：競品 Pop Mart 主流 79 RMB，市場教育完成；Snoopy IP 加持可守住價格不被砍</p>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">C3 整體銷售規模目標</h3>
-                        <p class="card-summary">預測Y1-Y3銷售收入與淨利，確保達成VAM目標。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <h4>銷售規模預測 (萬件/萬RMB)</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>年度</th>
-                                    <th>大陸（萬件）</th>
-                                    <th>台灣（萬件）</th>
-                                    <th>東南亞（萬件）</th>
-                                    <th>總收入（萬RMB）</th>
-                                    <th>淨利（萬RMB）</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Y1</td><td>8-12</td><td>2-3</td><td>1-2</td><td>880-1340</td><td>200-280</td></tr>
-                                <tr><td>Y2</td><td>15-20</td><td>4-6</td><td>4-6</td><td>1820-2530</td><td>420-580</td></tr>
-                                <tr><td>Y3</td><td>20-28</td><td>6-8</td><td>8-12</td><td>2690-3790</td><td>620-880</td></tr>
-                            </tbody>
-                        </table>
-                        <p class="text-accent"><strong>VAM 貢獻試算（Y2，對賭第二年）</strong></p>
-                        <ul>
-                            <li>目標淨利：500萬 RMB</li>
-                            <li>需要總銷售量：約 21 萬件</li>
-                            <li>大陸 18萬件 = 每家終端均攤 180 件/年 = 15件/月/店 → <strong>非常保守可達成</strong></li>
-                        </ul>
-                        <h4>各市場目標佔比（Y2 穩定後）</h4>
-                        <div class="market-share-chart" id="market-share-chart">
-                            <div class="market-share-item">
-                                <span class="market-share-label">中國大陸</span>
-                                <div class="market-share-bar-wrapper">
-                                    <div class="market-share-bar" style="--share-width: 72%;">
-                                        <span class="market-share-value">72%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="market-share-item">
-                                <span class="market-share-label">台灣</span>
-                                <div class="market-share-bar-wrapper">
-                                    <div class="market-share-bar" style="--share-width: 18%;">
-                                        <span class="market-share-value">18%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="market-share-item">
-                                <span class="market-share-label">泰國</span>
-                                <div class="market-share-bar-wrapper">
-                                    <div class="market-share-bar" style="--share-width: 7%;">
-                                        <span class="market-share-value">7%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="market-share-item">
-                                <span class="market-share-label">其他東南亞</span>
-                                <div class="market-share-bar-wrapper">
-                                    <div class="market-share-bar" style="--share-width: 3%;">
-                                        <span class="market-share-value">3%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <h5>台灣市場</h5>
+            <ul>
+                <li>TWD 299-399（約 RMB 65-87）= 主力甜蜜點</li>
+                <li>超商限定款 TWD 199 可以做（引流用）</li>
+                <li>誠品/百貨精品館 TWD 499-699（精品包裝版）</li>
+            </ul>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">C4 渠道組合最優解</h3>
-                        <p class="card-summary">最佳化批發、直營、電商等渠道，平衡利潤與戰略價值。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>渠道</th>
-                                    <th>建議佔比</th>
-                                    <th>毛利率</th>
-                                    <th>戰略價值</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>大陸批發/經銷</td><td>50%</td><td>38-45%</td><td>現金流主力</td></tr>
-                                <tr><td>台灣直營+百貨</td><td>20%</td><td>55-62%</td><td>品牌形象 + 高毛利</td></tr>
-                                <tr><td>東南亞批發</td><td>15%</td><td>40-48%</td><td>成長引擎</td></tr>
-                                <tr><td>機場免稅店</td><td>10%</td><td>50-58%</td><td>高毛利 + 旅客曝光</td></tr>
-                                <tr><td>電商（天貓/蝦皮）</td><td>5%</td><td>45-52%</td><td>數據收集 + 尾貨消化</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <h5>東南亞市場（泰國/馬來西亞/新加坡）</h5>
+            <ul>
+                <li>泰國 THB 299-399（約 RMB 60-80）= 可接受</li>
+                <li>新加坡 SGD 18-28（約 RMB 95-150）= 高端市場，走精品路線</li>
+                <li>馬來西亞 MYR 45-65（約 RMB 72-105）= 中間帶</li>
+            </ul>
+
+            <h3>C2 必爭市場：這幾個不拿下不行</h3>
+            <h4>市場優先級矩陣</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>優先級</th>
+                        <th>市場</th>
+                        <th>規模潛力</th>
+                        <th>我方現有優勢</th>
+                        <th>必爭理由</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>★★★★★</td>
+                        <td>中國大陸</td>
+                        <td>最大，500億盲盒市場</td>
+                        <td>1000+終端、北京現金流</td>
+                        <td>VAM 主戰場，不拿下沒有 IPO 故事</td>
+                    </tr>
+                    <tr>
+                        <td>★★★★☆</td>
+                        <td>台灣</td>
+                        <td>中等，但客單價高</td>
+                        <td>總部所在，品牌形象地</td>
+                        <td>自家主場，丟了沒臉談 IPO</td>
+                    </tr>
+                    <tr>
+                        <td>★★★★☆</td>
+                        <td>泰國/曼谷</td>
+                        <td>東南亞最大消費市場</td>
+                        <td>Shawn 駐點，渠道打通中</td>
+                        <td>Snoopy 亞洲授權，東南亞缺位要補</td>
+                    </tr>
+                    <tr>
+                        <td>★★★☆☆</td>
+                        <td>新加坡</td>
+                        <td>小但消費力強</td>
+                        <td>無布局，需開發</td>
+                        <td>高端渠道驗證市場，單店坪效高</td>
+                    </tr>
+                    <tr>
+                        <td>★★★☆☆</td>
+                        <td>馬來西亞</td>
+                        <td>中等，華人市場</td>
+                        <td>部分渠道重疊</td>
+                        <td>泰國打開後自然延伸</td>
+                    </tr>
+                    <tr>
+                        <td>★★☆☆☆</td>
+                        <td>日本</td>
+                        <td>超大市場但壁壘高</td>
+                        <td>無渠道</td>
+                        <td>長期布局，Y3 後評估</td>
+                    </tr>
+                    <tr>
+                        <td>★★☆☆☆</td>
+                        <td>韓國</td>
+                        <td>Snoopy 熱度高</td>
+                        <td>無渠道</td>
+                        <td>考慮韓國代理商合作模式</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>C3 整體銷售規模目標</h3>
+            <h4>假設基礎（已含成本驗證）</h4>
+            <ul>
+                <li><strong>Y1 推出系列</strong>：系列一（世界旅人 8cm，12款）+ 系列二（小黃鳥 5cm，7款）</li>
+                <li><strong>全球授權版圖</strong>：大陸 + 台灣 + 東南亞 + 歐洲 + 紐澳</li>
+                <li><strong>每款建議生產量</strong>：<strong class="highlight-text">27,000 件</strong>（大陸12k+台灣3k+泰國3k+馬新2k+韓國其他2k+紐澳2k+歐洲3k）</li>
+            </ul>
+
+            <h4>銷售規模預測（基於實際成本結構）</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>年度</th>
+                        <th>推出系列</th>
+                        <th>總生產量（萬件）</th>
+                        <th>批發總收入（萬RMB）</th>
+                        <th><strong>淨利（萬RMB）</strong></th>
+                        <th><strong>VAM達成率</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Y1</td>
+                        <td>世界旅人+小黃鳥</td>
+                        <td>41.8</td>
+                        <td>1,394</td>
+                        <td><strong class="highlight-text">608</strong></td>
+                        <td><strong class="highlight-text">81%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Y2</td>
+                        <td>四系列全開</td>
+                        <td>97.2</td>
+                        <td>3,250</td>
+                        <td><strong class="highlight-text">1,403</strong></td>
+                        <td><strong class="highlight-text">187% ✅</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Y3</td>
+                        <td>四系列+新系列</td>
+                        <td>120+</td>
+                        <td>4,000+</td>
+                        <td><strong class="highlight-text">1,800+</strong></td>
+                        <td><strong class="highlight-text">240%+</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>VAM 對賭目標：淨利 750 萬 × 8 倍估值。Y1 單年即達 81%，Y2 全面超標。</p>
+            <h5>VAM 關鍵路徑</h5>
+            <ul>
+                <li>Y1 Q1 渠道鎖定（大陸前 50 終端）→ Y1 Q2 小黃鳥掛件上市（低門檻引流）</li>
+                <li>Y1 Q3 世界旅人主力系列鋪貨 → Y2 Q1 狗狗家族 + Olaf 爆款衝刺</li>
+            </ul>
+
+            <h4>各市場目標佔比（Y2 穩定後，含全球版圖）</h4>
+            <div class="bar-chart-container" id="market-share-chart">
+                <div class="bar-item">
+                    <span class="bar-label">中國大陸</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="44"><span class="bar-percentage">44%</span></div></div>
+                </div>
+                <div class="bar-item">
+                    <span class="bar-label">台灣</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="11"><span class="bar-percentage">11%</span></div></div>
+                </div>
+                <div class="bar-item">
+                    <span class="bar-label">泰國</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="11"><span class="bar-percentage">11%</span></div></div>
+                </div>
+                <div class="bar-item">
+                    <span class="bar-label">歐洲</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="11"><span class="bar-percentage">11%</span></div></div>
+                </div>
+                <div class="bar-item">
+                    <span class="bar-label">紐澳</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="7"><span class="bar-percentage">7%</span></div></div>
+                </div>
+                <div class="bar-item">
+                    <span class="bar-label">馬新</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="8"><span class="bar-percentage">8%</span></div></div>
+                </div>
+                <div class="bar-item">
+                    <span class="bar-label">韓國+其他</span>
+                    <div class="bar-wrapper"><div class="bar" data-width="8"><span class="bar-percentage">8%</span></div></div>
                 </div>
             </div>
+
+            <h3>C4 渠道組合最優解</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>渠道</th>
+                        <th>建議佔比</th>
+                        <th>毛利率</th>
+                        <th>戰略價值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>大陸批發/經銷</td>
+                        <td>50%</td>
+                        <td>38-45%</td>
+                        <td>現金流主力</td>
+                    </tr>
+                    <tr>
+                        <td>台灣直營+百貨</td>
+                        <td>20%</td>
+                        <td>55-62%</td>
+                        <td>品牌形象 + 高毛利</td>
+                    </tr>
+                    <tr>
+                        <td>東南亞批發</td>
+                        <td>15%</td>
+                        <td>40-48%</td>
+                        <td>成長引擎</td>
+                    </tr>
+                    <tr>
+                        <td>機場免稅店</td>
+                        <td>10%</td>
+                        <td>50-58%</td>
+                        <td>高毛利 + 旅客曝光</td>
+                    </tr>
+                    <tr>
+                        <td>電商（天貓/蝦皮）</td>
+                        <td>5%</td>
+                        <td>45-52%</td>
+                        <td>數據收集 + 尾貨消化</td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
-        <section id="part-d" class="mt-40">
+        <section id="part-d">
             <h2>PART D｜幕僚長綜合研判</h2>
-            <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">D1 執行優先級（接下來 90 天）</h3>
-                        <p class="card-summary">明確短期內需完成的關鍵任務，確保項目順利推進。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <h4>最高優先（本月內）</h4>
-                        <ul>
-                            <li>確認 Snoopy 授權合約是否覆蓋「盲袋」產品形式（若否，需補充授權）</li>
-                            <li>委託設計事務所出 Olaf + Woodstock 兩款試稿（最具爆款潛力）</li>
-                            <li>業務開始接觸大陸 Top 50 終端，提前鎖位 Y1 Q3 新品</li>
-                        </ul>
-                        <h4>中優先（30-60天）</h4>
-                        <ul>
-                            <li>啟動台灣試銷（自家市場先驗證定價接受度）</li>
-                            <li>Shawn 泰國評估快閃選址（曼谷 Central World / Siam 商圈）</li>
-                            <li>接洽 KOL：台灣玩具開箱 YouTuber 3-5 名</li>
-                        </ul>
-                        <h4>長線布局（60-90天）</h4>
-                        <ul>
-                            <li>設計四大系列的整體視覺識別系統（VI Guide）</li>
-                            <li>評估 Olaf 作為品牌吉祥物的可能性（子品牌）</li>
-                            <li>初步接觸韓國/新加坡代理商</li>
-                        </ul>
-                    </div>
-                </div>
 
-                <div class="card-container">
+            <h3>D1 執行優先級（接下來 90 天）</h3>
+            <h4>最高優先（本月內）</h4>
+            <ul>
+                <li>確認 Snoopy 授權合約是否覆蓋「盲袋」產品形式（若否，需補充授權）</li>
+                <li>委託設計事務所出 Olaf + Woodstock 兩款試稿（最具爆款潛力）</li>
+                <li>業務開始接觸大陸 Top 50 終端，提前鎖位 Y1 Q3 新品</li>
+            </ul>
+            <h4>中優先（30-60天）</h4>
+            <ul>
+                <li>啟動台灣試銷（自家市場先驗證定價接受度）</li>
+                <li>Shawn 泰國評估快閃選址（曼谷 Central World / Siam 商圈）</li>
+                <li>接洽 KOL：台灣玩具開箱 YouTuber 3-5 名</li>
+            </ul>
+            <h4>長線布局（60-90天）</h4>
+            <ul>
+                <li>設計四大系列的整體視覺識別系統（VI Guide）</li>
+                <li>評估 Olaf 作為品牌吉祥物的可能性（子品牌）</li>
+                <li>初步接觸韓國/新加坡代理商</li>
+            </ul>
+
+            <h3>D2 最大風險與防禦</h3>
+            <div class="card-grid">
+                <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">D2 最大風險與防禦</h3>
-                        <p class="card-summary">識別潛在風險並制定應對策略，確保項目穩健發展。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Peanuts%20Snoopy%20Charlie%20Brown%20worried%20expression%20illustration?width=800&height=450&nologo=true&seed=103" alt="授權風險">
                     </div>
                     <div class="card-content">
+                        <h4>授權方不批准盲袋形式</h4>
+                        <p class="summary">中機率高衝擊，需提前確認並準備替代包裝方案。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-risk-1">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-risk-1">
                         <table>
                             <thead>
                                 <tr>
@@ -1179,43 +1400,166 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>授權方不批准盲袋形式</td><td>中</td><td>高</td><td>提前確認，同步準備替代包裝方案（透明盒）</td></tr>
-                                <tr><td>大陸市場盲盒泡沫退潮</td><td>中</td><td>高</td><td>多系列分散風險，不過度依賴單一系列</td></tr>
-                                <tr><td>競品快速跟進（Pop Mart 搶 Snoopy）</td><td>高</td><td>中</td><td>加速執行，先占渠道先拿市場份額</td></tr>
-                                <tr><td>Olaf 等次要角色市場接受度不如預期</td><td>中</td><td>低</td><td>Y1 Q1 先用成熟角色，Y1 Q3 再推次要角色</td></tr>
+                                <tr>
+                                    <td>授權方不批准盲袋形式</td>
+                                    <td>中</td>
+                                    <td>高</td>
+                                    <td>提前確認，同步準備替代包裝方案（透明盒）</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="card-container">
-                    <div class="card-image-wrapper">
-                        <img src="https://image.pollinations.ai/prompt/Business%20market%20research%20analysis%20team%20meeting%20data%20charts%20professional?width=800&height=450&nologo=true&seed=501" alt="業務任務書" class="card-image">
-                    </div>
+                <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">D3 業務席市場調研任務書</h3>
-                        <p class="card-summary">針對消費者偏好、渠道吸納力及市場銷售規模進行深度調研。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
+                        <img src="https://image.pollinations.ai/prompt/Peanuts%20Snoopy%20Charlie%20Brown%20worried%20expression%20illustration?width=800&height=450&nologo=true&seed=104" alt="市場風險">
                     </div>
                     <div class="card-content">
-                        <p>幕僚長交辦業務席，以下三個核心問題<strong>必須帶著腳去市場搜集真實反饋</strong>，不能只坐辦公室憑感覺作答。數據回來後幕僚長統整，才是定案的依據。</p>
+                        <h4>大陸市場盲盒泡沫退潮</h4>
+                        <p class="summary">中機率高衝擊，多系列分散風險，不過度依賴單一系列。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-risk-2">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-risk-2">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>風險</th>
+                                    <th>機率</th>
+                                    <th>衝擊</th>
+                                    <th>防禦措施</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>大陸市場盲盒泡沫退潮</td>
+                                    <td>中</td>
+                                    <td>高</td>
+                                    <td>多系列分散風險，不過度依賴單一系列</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Peanuts%20Snoopy%20Charlie%20Brown%20worried%20expression%20illustration?width=800&height=450&nologo=true&seed=105" alt="競品風險">
+                    </div>
+                    <div class="card-content">
+                        <h4>競品快速跟進（Pop Mart 搶 Snoopy）</h4>
+                        <p class="summary">高機率中衝擊，加速執行，先占渠道先拿市場份額。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-risk-3">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-risk-3">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>風險</th>
+                                    <th>機率</th>
+                                    <th>衝擊</th>
+                                    <th>防禦措施</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>競品快速跟進（Pop Mart 搶 Snoopy）</td>
+                                    <td>高</td>
+                                    <td>中</td>
+                                    <td>加速執行，先占渠道先拿市場份額</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Fat%20chubby%20round%20beagle%20dog%20cute%20collectible%20toy?width=800&height=450&nologo=true&seed=401" alt="Olaf接受度">
+                    </div>
+                    <div class="card-content">
+                        <h4>Olaf 等次要角色市場接受度不如預期</h4>
+                        <p class="summary">中機率低衝擊，Y1先用成熟角色，Y1 Q3再推次要角色。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-risk-4">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-risk-4">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>風險</th>
+                                    <th>機率</th>
+                                    <th>衝擊</th>
+                                    <th>防禦措施</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Olaf 等次要角色市場接受度不如預期</td>
+                                    <td>中</td>
+                                    <td>低</td>
+                                    <td>Y1 Q1 先用成熟角色，Y1 Q3 再推次要角色</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <h3>D3 業務席市場調研任務書</h3>
+            <p>幕僚長交辦業務席，以下三個核心問題<strong class="highlight-text">必須帶著腳去市場搜集真實反饋</strong>，不能只坐辦公室憑感覺作答。數據回來後幕僚長統整，才是定案的依據。</p>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20thinking%20pose%20with%20market%20data%20illustration?width=800&height=450&nologo=true&seed=106" alt="任務一">
+                    </div>
+                    <div class="card-content">
                         <h4>任務一：消費者現在喜歡什麼口味？</h4>
-                        <p>我們對消費者的理解停留在「喜歡 Snoopy」這個層次，不夠用。業務席要向目標渠道（大陸精品玩具店、台灣誠品/蔦屋、泰國 Central 商圈）搜集：</p>
+                        <p class="summary">了解市場暢銷盲盒IP、消費者口頭評語、購買者年齡層與性別比。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-task-1">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-task-1">
+                        <p>我們對消費者的理解停留在「喜歡 Snoopy」這個層次，不夠用。<br>
+                        業務席要向目標渠道（大陸精品玩具店、台灣誠品/蔦屋、泰國 Central 商圈）搜集：</p>
                         <ul>
                             <li>目前店內最暢銷的盲盒 IP 是哪三個？為什麼消費者買？</li>
                             <li>消費者在店頭的口頭評語：是說「好可愛」還是「好有個性」？</li>
                             <li>購買者年齡層與性別比實際觀察數字</li>
                         </ul>
                         <p><strong>回報格式</strong>：各市場各 3 家店，填回調研表，下週五前交幕僚長。</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20teamwork%20illustration%20with%20charts?width=800&height=450&nologo=true&seed=107" alt="任務二">
+                    </div>
+                    <div class="card-content">
                         <h4>任務二：同時推幾個系列才不會把渠道撐死？</h4>
-                        <p>財務試算是一回事，渠道實際能吸收的鋪貨量是另一回事。業務席要向現有合作客戶（大陸前 20 大客戶、台灣主要百貨買手）確認：</p>
+                        <p class="summary">確認渠道實際鋪貨量、預算分配意願、對花生漫畫盲盒系列興趣程度。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-task-2">▼ 展開詳情</a>
+                    </div>
+                    <div class="card-details" id="detail-task-2">
+                        <p>財務試算是一回事，渠道實際能吸收的鋪貨量是另一回事。<br>
+                        業務席要向現有合作客戶（大陸前 20 大客戶、台灣主要百貨買手）確認：</p>
                         <ul>
                             <li>一個新 IP 系列首批鋪貨量他們能接受多少件/店？</li>
                             <li>若同時上兩個系列，他們的預算會怎麼分配？</li>
                             <li>對花生漫畫盲盒系列的興趣程度（1-10 分，目前是未看過提案的冷評估）</li>
                         </ul>
                         <p><strong>回報格式</strong>：至少訪談 10 家客戶，回填意願評分表。</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <img src="https://image.pollinations.ai/prompt/Snoopy%20global%20map%20with%20shipping%20crates%20illustration?width=800&height=450&nologo=true&seed=108" alt="任務三">
+                    </div>
+                    <div class="card-content">
                         <h4>任務三：各市場的真實銷售規模上限是多少？</h4>
+                        <p class="summary">驗證渠道客戶首批訂單意願，評估歐洲、紐澳代理啟動，機場免稅渠道進入條件。</p>
+                        <a href="#" class="toggle-btn" data-detail-id="detail-task-3">▼ 展開詳詳</a>
+                    </div>
+                    <div class="card-details" id="detail-task-3">
                         <p>我們的財務模型是由上往下推的（市場規模 × 滲透率），業務席要做由下往上的驗證：</p>
                         <ul>
                             <li>現有渠道客戶，對 Snoopy 盲盒系列願意下多少首批訂單？</li>
@@ -1223,321 +1567,302 @@
                             <li>機場免稅渠道：台灣桃園機場 + 曼谷蘇萬納蓬機場，進入條件與前置時間？</li>
                         </ul>
                         <p><strong>回報格式</strong>：渠道意願彙整表 + 潛在首批訂單量估算，30 天內完成。</p>
-                        <p class="text-center mt-40"><em>本提案由蕪解創意幕僚長統籌，情報席×創意席×業務席聯合出品</em></p>
-                        <p class="text-center"><em>提案等級：可對外提交版本（授權方/投資方）</em></p>
                     </div>
                 </div>
+            </div>
+            <div class="note">
+                <p><em>本提案由蕪解創意幕僚長統籌，情報席×創意席×業務席聯合出品</em></p>
+                <p><em>提案等級：可對外提交版本（授權方/投資方）</em></p>
             </div>
         </section>
 
-        <section id="part-e" class="mt-40">
+        <section id="part-e">
             <h2>PART E｜財務席：完整成本結構 × 損益預測</h2>
-            <div class="card-grid">
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">E1 每件成本拆解（已確認數據）</h3>
-                        <p class="card-summary">詳細列出5cm與8cm系列產品的零售價、生產成本及批發毛利。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>項目</th>
-                                    <th>5cm 小黃鳥（盲袋）</th>
-                                    <th>8cm 世界旅人（盲盒）</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>零售建議價</td><td><strong>RMB 49</strong></td><td><strong>RMB 79</strong></td></tr>
-                                <tr><td>蕪解批發出貨價（四折）</td><td>RMB 19.6</td><td>RMB 31.6</td></tr>
-                                <tr><td>生產成本</td><td>RMB 3.50</td><td>RMB 8.00</td></tr>
-                                <tr><td>包材</td><td>RMB 0.20（盲袋）</td><td>RMB 0.80（盲盒）</td></tr>
-                                <tr><td>版稅（批發價 × 13%）</td><td>RMB 2.55</td><td>RMB 4.11</td></tr>
-                                <tr><td><strong>合計變動成本</strong></td><td><strong>RMB 6.25</strong></td><td><strong>RMB 12.91</strong></td></tr>
-                                <tr><td><strong>每件批發毛利</strong></td><td><strong>RMB 13.35</strong></td><td><strong>RMB 18.69</strong></td></tr>
-                                <tr><td><strong>毛利率</strong></td><td><strong>68%</strong></td><td><strong>59%</strong></td></tr>
-                            </tbody>
-                        </table>
-                        <p>版稅計算基礎：蕪解批發出貨價 × 13%（付予 Peanuts 授權方）</p>
-                    </div>
-                </div>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">E2 建議生產量（全球授權版圖）</h3>
-                        <p class="card-summary">根據各市場潛力，建議每款產品的初始生產數量。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <p>Snoopy 授權涵蓋全球，蕪解可部署以下市場：</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>市場</th>
-                                    <th>每款建議量</th>
-                                    <th>依據</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>中國大陸</td><td>12,000 件</td><td>現有 1,000+ 終端，Snoopy 品牌力保守加成</td></tr>
-                                <tr><td>台灣</td><td>3,000 件</td><td>總部主場，直接觸達</td></tr>
-                                <tr><td>泰國</td><td>3,000 件</td><td>Shawn 駐點布局，Y1 開拓量</td></tr>
-                                <tr><td>馬來西亞 + 新加坡</td><td>2,000 件</td><td>代理商合作，合併計算</td></tr>
-                                <tr><td>韓國 + 其他亞洲</td><td>2,000 件</td><td>Y1 試銷，Y2 評估擴量</td></tr>
-                                <tr><td><strong>每款合計</strong></td><td><strong>22,000 件</strong></td><td></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <h3>E1 每件成本拆解（已確認數據）</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>5cm 小黃鳥（盲袋）</th>
+                        <th>8cm 世界旅人（盲盒）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>零售建議價</td>
+                        <td><strong class="highlight-text">RMB 49</strong></td>
+                        <td><strong class="highlight-text">RMB 79</strong></td>
+                    </tr>
+                    <tr>
+                        <td>蕪解批發出貨價（四折）</td>
+                        <td>RMB 19.6</td>
+                        <td>RMB 31.6</td>
+                    </tr>
+                    <tr>
+                        <td>生產成本</td>
+                        <td>RMB 3.50</td>
+                        <td>RMB 8.00</td>
+                    </tr>
+                    <tr>
+                        <td>包材</td>
+                        <td>RMB 0.20（盲袋）</td>
+                        <td>RMB 0.80（盲盒）</td>
+                    </tr>
+                    <tr>
+                        <td>版稅（批發價 × 13%）</td>
+                        <td>RMB 2.55</td>
+                        <td>RMB 4.11</td>
+                    </tr>
+                    <tr>
+                        <td><strong>合計變動成本</strong></td>
+                        <td><strong>RMB 6.25</strong></td>
+                        <td><strong>RMB 12.91</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>每件批發毛利</strong></td>
+                        <td><strong>RMB 13.35</strong></td>
+                        <td><strong>RMB 18.69</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>毛利率</strong></td>
+                        <td><strong>68%</strong></td>
+                        <td><strong>59%</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>版稅計算基礎：蕪解批發出貨價 × 13%（付予 Peanuts 授權方）</p>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">E3 Y1 損益試算（兩系列首發）</h3>
-                        <p class="card-summary">預估首年兩個系列的總生產量、批發收入、毛利及淨利。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <h4>系列一：世界旅人 8cm（12款）</h4>
-                        <ul>
-                            <li>總生產量：22,000 × 12 = <strong>264,000 件</strong></li>
-                            <li>批發收入：264,000 × RMB 31.6 = <strong>RMB 834 萬</strong></li>
-                            <li>變動成本：264,000 × RMB 12.91 = <strong>RMB 341 萬</strong></li>
-                            <li>毛利：<strong>RMB 493 萬（59%）</strong></li>
-                            <li>模具費（12款 × 3.5萬）：RMB 42 萬</li>
-                        </ul>
-                        <h4>系列二：小黃鳥特攻隊 5cm（7款）</h4>
-                        <ul>
-                            <li>總生產量：22,000 × 7 = <strong>154,000 件</strong></li>
-                            <li>批發收入：154,000 × RMB 19.6 = <strong>RMB 302 萬</strong></li>
-                            <li>變動成本：154,000 × RMB 6.25 = <strong>RMB 96 萬</strong></li>
-                            <li>毛利：<strong>RMB 206 萬（68%）</strong></li>
-                            <li>模具費（7款 × 1.6萬）：RMB 11.2 萬</li>
-                        </ul>
-                        <h4>Y1 合計損益</h4>
-                        <div class="progress-container" id="y1-profit-chart">
-                            <div class="progress-item">
-                                <span class="progress-label">批發總收入</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 100%;"></div>
-                                    <span class="progress-value">RMB 1,136 萬</span>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">總毛利 (62%)</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 61.5%;"></div> <!-- 699/1136 * 100 -->
-                                    <span class="progress-value">RMB 699 萬</span>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">固定成本合計</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 22%;"></div> <!-- 250/1136 * 100 -->
-                                    <span class="progress-value">RMB 250 萬</span>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">Y1 預估淨利 (39.5%)</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 39.5%;"></div> <!-- 449/1136 * 100 -->
-                                    <span class="progress-value">RMB 449 萬</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-accent"><strong>VAM 目標達成</strong>：60%（目標 750 萬）</p>
-                    </div>
-                </div>
+            <h3>E2 建議生產量（全球授權版圖）</h3>
+            <p>Snoopy 授權涵蓋全球，蕪解可部署以下市場：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>市場</th>
+                        <th>每款建議量</th>
+                        <th>依據</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>中國大陸</td>
+                        <td>12,000 件</td>
+                        <td>現有 1,000+ 終端，Snoopy 品牌力保守加成</td>
+                    </tr>
+                    <tr>
+                        <td>台灣</td>
+                        <td>3,000 件</td>
+                        <td>總部主場，直接觸達</td>
+                    </tr>
+                    <tr>
+                        <td>泰國</td>
+                        <td>3,000 件</td>
+                        <td>Shawn 駐點布局，Y1 開拓量</td>
+                    </tr>
+                    <tr>
+                        <td>馬來西亞 + 新加坡</td>
+                        <td>2,000 件</td>
+                        <td>代理商合作，合併計算</td>
+                    </tr>
+                    <tr>
+                        <td>韓國 + 其他亞洲</td>
+                        <td>2,000 件</td>
+                        <td>Y1 試銷，Y2 評估擴量</td>
+                    </tr>
+                    <tr>
+                        <td>紐澳</td>
+                        <td>2,000 件</td>
+                        <td>新增市場</td>
+                    </tr>
+                     <tr>
+                        <td>歐洲</td>
+                        <td>3,000 件</td>
+                        <td>新增市場</td>
+                    </tr>
+                    <tr>
+                        <td><strong>每款合計</strong></td>
+                        <td><strong class="highlight-text">27,000 件</strong></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">E4 Y2 四系列全開預測</h3>
-                        <p class="card-summary">預測第二年所有系列啟動後的總毛利與預估淨利，確認VAM目標達成率。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <p>Y2 新增系列三（狗狗家族 8款）+ 系列四（職業百態 10款）：</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>系列</th>
-                                    <th>規模</th>
-                                    <th>新增毛利</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>系列三 狗狗家族 8cm</td><td>8款 × 22,000件</td><td>+RMB 328 萬</td></tr>
-                                <tr><td>系列四 職業百態 8cm</td><td>10款 × 22,000件</td><td>+RMB 411 萬</td></tr>
-                                <tr><td>Y1 兩系列延續</td><td>持續出貨</td><td>RMB 699 萬</td></tr>
-                                <tr><td><strong>Y2 總毛利</strong></td><td></td><td><strong>RMB 1,439 萬</strong></td></tr>
-                            </tbody>
-                        </table>
-                        <div class="progress-container" id="y2-profit-chart">
-                            <div class="progress-item">
-                                <span class="progress-label">Y2 總毛利</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 100%;"></div>
-                                    <span class="progress-value">RMB 1,439 萬</span>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">Y2 固定成本</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 25.2%;"></div> <!-- 363/1439 * 100 -->
-                                    <span class="progress-value">RMB 363 萬</span>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">Y2 預估淨利</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 74.8%;"></div> <!-- 1076/1439 * 100 -->
-                                    <span class="progress-value">RMB 1,076 萬</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-accent"><strong>VAM 達成率</strong>：<strong>143%</strong> ✅</p>
-                        <p>Y2 一年 Snoopy 系列淨利即可超越 VAM 目標 1.43 倍。若 Y1 順利執行、Y2 四系列到位，蕪解在 JV 框架下的 IPO 估值基礎穩固。</p>
-                    </div>
-                </div>
+            <h3>E3 Y1 損益試算（兩系列首發）</h3>
+            <h4>系列一：世界旅人 8cm（12款）</h4>
+            <ul>
+                <li>總生產量：27,000 × 12 = <strong class="highlight-text">324,000 件</strong></li>
+                <li>批發收入：324,000 × RMB 31.6 = <strong class="highlight-text">RMB 1,023 萬</strong></li>
+                <li>變動成本：324,000 × RMB 12.91 = <strong class="highlight-text">RMB 418 萬</strong></li>
+                <li>毛利：<strong class="highlight-text">RMB 605 萬（59%）</strong></li>
+                <li>模具費（12款 × 3.5萬）：RMB 42 萬</li>
+            </ul>
+            <h4>系列二：小黃鳥特攻隊 5cm（7款）</h4>
+            <ul>
+                <li>總生產量：27,000 × 7 = <strong class="highlight-text">189,000 件</strong></li>
+                <li>批發收入：189,000 × RMB 19.6 = <strong class="highlight-text">RMB 370 萬</strong></li>
+                <li>變動成本：189,000 × RMB 6.25 = <strong class="highlight-text">RMB 118 萬</strong></li>
+                <li>毛利：<strong class="highlight-text">RMB 252 萬（68%）</strong></li>
+                <li>模具費（7款 × 1.6萬）：RMB 11.2 萬</li>
+            </ul>
+            <h4>Y1 合計損益</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>批發總收入</td>
+                        <td><strong class="highlight-text">RMB 1,393 萬</strong></td>
+                    </tr>
+                    <tr>
+                        <td>總毛利</td>
+                        <td><strong class="highlight-text">RMB 857 萬（61.5%）</strong></td>
+                    </tr>
+                    <tr>
+                        <td>模具費</td>
+                        <td>RMB 53 萬</td>
+                    </tr>
+                    <tr>
+                        <td>設計費（含 VI）</td>
+                        <td>RMB 32 萬</td>
+                    </tr>
+                    <tr>
+                        <td>行銷推廣（KOL + 快閃）</td>
+                        <td>RMB 80 萬</td>
+                    </tr>
+                    <tr>
+                        <td>物流倉儲</td>
+                        <td>RMB 35 萬</td>
+                    </tr>
+                    <tr>
+                        <td>其他營運</td>
+                        <td>RMB 49 萬</td>
+                    </tr>
+                    <tr>
+                        <td><strong>固定成本合計</strong></td>
+                        <td><strong>RMB 249 萬</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Y1 預估淨利</strong></td>
+                        <td><strong class="highlight-text">RMB 608 萬</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>淨利率</strong></td>
+                        <td><strong>43.6%</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>VAM 目標達成</strong></td>
+                        <td><strong class="highlight-text">81%（目標 750 萬）</strong></td>
+                    </tr>
+                </tbody>
+            </table>
 
-                <div class="card-container">
-                    <div class="card-header">
-                        <h3 class="card-title">E5 損益敏感性分析</h3>
-                        <p class="card-summary">分析最壞情況下對淨利的影響，並提出應對策略。</p>
-                        <div class="expand-toggle">▼ 展開詳情</div>
-                    </div>
-                    <div class="card-content">
-                        <p>最大風險情境：若 8cm 系列銷售率僅達 70%（剩 30% 庫存），Y1 淨利下降至 <strong>RMB 277 萬</strong>。</p>
-                        <div class="progress-container" id="sensitivity-analysis-chart">
-                            <div class="progress-item">
-                                <span class="progress-label">原 Y1 淨利</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 100%;"></div>
-                                    <span class="progress-value">RMB 449 萬</span>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <span class="progress-label">風險情境淨利</span>
-                                <div class="progress-bar-wrapper">
-                                    <div class="progress-bar" style="--progress-width: 61.69%;"></div> <!-- 277/449 * 100 -->
-                                    <span class="progress-value">RMB 277 萬</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p>對策：小黃鳥 5cm 掛件毛利更高（68%），作為壓艙石；加大電商尾貨消化管道。</p>
-                    </div>
-                </div>
-            </div>
+            <h3>E4 Y2 四系列全開預測</h3>
+            <p>Y2 新增系列三（狗狗家族 8款）+ 系列四（職業百態 10款）：</p>
+            <ul>
+                <li>系列三 狗狗家族 8cm：8款 × 27,000件 (生產量) = 216,000件。批發收入 RMB 683萬，變動成本 RMB 279萬，新增毛利 <strong class="highlight-text">RMB 404 萬</strong></li>
+                <li>系列四 職業百態 8cm：10款 × 27,000件 (生產量) = 270,000件。批發收入 RMB 853萬，變動成本 RMB 348萬，新增毛利 <strong class="highlight-text">RMB 505 萬</strong></li>
+                <li>Y1 兩系列延續：持續出貨，毛利 <strong class="highlight-text">RMB 857 萬</strong></li>
+            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Y2 總毛利</strong></td>
+                        <td><strong class="highlight-text">RMB 1,766 萬</strong> (857 + 404 + 505)</td>
+                    </tr>
+                    <tr>
+                        <td>Y2 固定成本（擴大規模）</td>
+                        <td>RMB 363 萬</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Y2 預估淨利</strong></td>
+                        <td><strong class="highlight-text">RMB 1,403 萬</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>VAM 達成率</strong></td>
+                        <td><strong class="highlight-text">187% ✅</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Y2 一年 Snoopy 系列淨利即可超越 VAM 目標 1.43 倍。<br>
+            若 Y1 順利執行、Y2 四系列到位，蕪解在 JV 框架下的 IPO 估值基礎穩固。</p>
+
+            <h3>E5 損益敏感性分析</h3>
+            <p>最大風險情境：若 8cm 系列銷售率僅達 70%（剩 30% 庫存），Y1 淨利下降至 <strong class="highlight-text">RMB 277 萬</strong>。<br>
+            對策：小黃鳥 5cm 掛件毛利更高（68%），作為壓艙石；加大電商尾貨消化管道。</p>
         </section>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Smooth scroll for navigation
-            document.querySelectorAll('.nav-list a').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+            // Card Toggle Functionality
+            document.querySelectorAll('.toggle-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    const headerOffset = document.querySelector('.navbar').offsetHeight;
-                    const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-                    const offsetPosition = elementPosition - headerOffset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: "smooth"
-                    });
-
-                    // Remove active class from all nav items
-                    document.querySelectorAll('.nav-list a').forEach(item => item.classList.remove('active'));
-                    // Add active class to the clicked item
-                    this.classList.add('active');
-                });
-            });
-
-            // Set active class on scroll
-            const sections = document.querySelectorAll('section[id]');
-            const navLinks = document.querySelectorAll('.nav-list a');
-
-            const options = {
-                rootMargin: `-${document.querySelector('.navbar').offsetHeight + 1}px 0px 0px 0px`,
-                threshold: 0.5
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const id = entry.target.getAttribute('id');
-                    const navLink = document.querySelector(`.nav-list a[href="#${id}"]`);
-
-                    if (navLink) { // Check if navLink exists before manipulating it
-                        if (entry.isIntersecting) {
-                            navLinks.forEach(link => link.classList.remove('active'));
-                            navLink.classList.add('active');
-                        }
+                    const card = e.target.closest('.card');
+                    card.classList.toggle('expanded');
+                    if (card.classList.contains('expanded')) {
+                        e.target.textContent = '▲ 收合';
+                    } else {
+                        e.target.textContent = '▼ 展開詳情';
                     }
                 });
-            }, options);
-
-            sections.forEach(section => {
-                observer.observe(section);
             });
 
-            // Card expand/collapse functionality
-            document.querySelectorAll('.card-container').forEach(card => {
-                const toggle = card.querySelector('.expand-toggle');
-                const content = card.querySelector('.card-content');
+            // Fixed Navigation Active State
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.fixed-nav a');
 
-                if (toggle && content) {
-                    // Initialize content height to 0
-                    content.style.maxHeight = '0';
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5 // Adjust as needed, 0.5 means 50% of the section is visible
+            };
 
-                    toggle.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent card hover effect from re-triggering
-                        card.classList.toggle('expanded');
-                        if (card.classList.contains('expanded')) {
-                            content.style.maxHeight = content.scrollHeight + 'px';
-                            toggle.innerHTML = '▲ 收合';
-                        } else {
-                            content.style.maxHeight = '0';
-                            toggle.innerHTML = '▼ 展開詳情';
-                        }
-                    });
-
-                    // Also allow clicking anywhere on the card to toggle
-                    card.addEventListener('click', (e) => {
-                        // Only toggle if it's not the expand-toggle button itself or its children
-                        if (!toggle.contains(e.target)) {
-                            e.stopPropagation(); // Prevent card hover effect from re-triggering
-                            card.classList.toggle('expanded');
-                            if (card.classList.contains('expanded')) {
-                                content.style.maxHeight = content.scrollHeight + 'px';
-                                toggle.innerHTML = '▲ 收合';
-                            } else {
-                                content.style.maxHeight = '0';
-                                toggle.innerHTML = '▼ 展開詳情';
-                            }
-                        }
-                    });
-                }
-            });
-
-            // IntersectionObserver for progress bars/charts
-            const animateOnScroll = (entries, observer) => {
+            const sectionObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.querySelectorAll('.progress-bar, .market-share-bar').forEach(bar => {
-                            bar.classList.add('animate');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${entry.target.id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                sectionObserver.observe(section);
+            });
+
+            // IntersectionObserver for Bar Chart Animation
+            const barChartObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.querySelectorAll('.bar').forEach(bar => {
+                            const width = bar.dataset.width;
+                            bar.style.width = `${width}%`;
+                            bar.classList.add('animated');
                         });
                         observer.unobserve(entry.target); // Stop observing once animated
                     }
                 });
-            };
+            }, { threshold: 0.5 }); // Trigger when 50% of the chart container is visible
 
-            const chartObserver = new IntersectionObserver(animateOnScroll, { threshold: 0.5 }); // Trigger when 50% visible
-
-            document.querySelectorAll('#market-absorption-chart, #market-share-chart, #y1-profit-chart, #y2-profit-chart, #sensitivity-analysis-chart').forEach(chart => {
-                chartObserver.observe(chart);
-            });
+            const barChartContainer = document.getElementById('market-share-chart');
+            if (barChartContainer) {
+                barChartObserver.observe(barChartContainer);
+            }
         });
     </script>
 </body>
