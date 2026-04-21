@@ -1,22 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>蕪解創意｜花生漫畫全角色宇宙 × 產品矩陣完整提案 - 業界標竿互動網頁</title>
+    <title>蕪解創意｜花生漫畫全角色宇宙 × 產品矩陣完整提案</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #1a1a2e;
-            --accent-yellow: #ffd60a;
-            --text-white: #ffffff;
-            --card-bg-default: rgba(255, 255, 255, 0.08);
-            --card-bg-expanded: rgba(255, 255, 255, 0.9);
-            --expanded-text-dark: #333333; /* Darker text for white expanded background */
-            --border-radius: 12px;
-            --padding-base: 20px;
+            --bg-color: #1a1a2e;
+            --accent-color: #ffd60a;
+            --text-color: #ffffff;
+            --card-bg-color: #2b2b40;
+            --card-border-color: rgba(255, 255, 255, 0.1);
             --transition-speed: 0.3s;
         }
 
@@ -28,8 +25,8 @@
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-white);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
             scroll-behavior: smooth;
         }
@@ -37,444 +34,359 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: var(--padding-base);
+            padding: 20px;
         }
 
+        /* --- Header --- */
         header {
-            background-color: var(--bg-dark);
-            padding: 15px var(--padding-base);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-        }
-
-        nav a {
-            color: var(--text-white);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 15px;
-            border-radius: var(--border-radius);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
-
-        nav a:hover, nav a.active {
-            background-color: var(--accent-yellow);
-            color: var(--bg-dark);
-        }
-
-        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
             background-image: url('https://image.pollinations.ai/prompt/Peanuts%20Snoopy%20Charlie%20Brown%20all%20characters%20world%20travel%20adventure%20colorful%20illustration%20vibrant?width=800&height=450&nologo=true&seed=101');
             background-size: cover;
             background-position: center;
-            height: 450px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
             position: relative;
-            margin-bottom: 50px;
         }
 
-        .hero::before {
+        header::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to bottom, rgba(26, 26, 46, 0.7) 0%, rgba(26, 26, 46, 0.9) 100%);
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 0;
         }
 
-        .hero-content {
+        header .content {
+            position: relative;
             z-index: 1;
-            padding: var(--padding-base);
-        }
-
-        .hero h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.5em;
-            color: var(--accent-yellow);
-            margin-bottom: 15px;
-            text-shadow: 0 0 15px rgba(255, 214, 10, 0.7);
-        }
-
-        .hero p {
-            font-size: 1.2em;
-            color: var(--text-white);
             max-width: 800px;
             margin: 0 auto;
         }
 
+        header h1 {
+            font-size: 3.5em;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background-color: rgba(26, 26, 46, 0.95);
+            padding: 15px 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar .nav-list {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-list a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1em;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .navbar .nav-list a:hover,
+        .navbar .nav-list a.active {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* --- Section Styling --- */
         section {
             padding: 80px 0;
-            position: relative;
-            z-index: 1;
+            border-bottom: 1px solid var(--card-border-color);
         }
 
-        section:not(:last-of-type) {
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        h2, h3, h4 {
-            color: var(--accent-yellow);
-            margin-bottom: var(--padding-base);
-            border-left: 5px solid var(--accent-yellow);
-            padding-left: 15px;
+        section:last-of-type {
+            border-bottom: none;
         }
 
         h2 {
             font-size: 2.5em;
-            margin-bottom: 40px;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 50px;
         }
 
         h3 {
             font-size: 1.8em;
+            color: var(--text-color);
             margin-top: 40px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
         }
 
         h4 {
             font-size: 1.4em;
+            color: var(--accent-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p, ul, ol, table {
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 25px;
+        }
+        ol {
+            list-style-type: decimal;
+            margin-left: 25px;
+        }
+
+        /* --- Card Component --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
             margin-top: 30px;
         }
 
-        p {
-            margin-bottom: 1em;
-        }
-
-        strong {
-            color: var(--accent-yellow);
-        }
-
-        .grid-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
-        }
-
         .card {
-            background-color: var(--card-bg-default);
-            border-radius: var(--border-radius);
-            padding: var(--padding-base);
-            display: flex;
-            flex-direction: column;
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             cursor: pointer;
-            transition: transform var(--transition-speed) ease-out, box-shadow var(--transition-speed) ease-out, border-color var(--transition-speed) ease-out;
-            border: 2px solid transparent;
-            position: relative;
-            padding-bottom: calc(var(--padding-base) + 40px); /* Make space for toggle button */
+            transition: transform var(--transition-speed) ease-out, border var(--transition-speed) ease-out;
+            border: 2px solid var(--card-border-color);
         }
 
         .card:hover {
             transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            border-color: var(--accent-yellow);
+            border-color: var(--accent-color);
         }
 
         .card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--padding-base);
-            margin-bottom: 15px;
+            padding: 25px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            color: var(--text-color);
         }
 
-        .card-header img {
-            width: 100px;
-            height: 100px;
+        .card-image {
+            width: 100%;
+            height: 200px;
             object-fit: cover;
-            border-radius: var(--border-radius);
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .card-header-text {
-            flex-grow: 1;
-        }
-
-        .card h4 {
-            margin-top: 0;
-            margin-bottom: 8px;
-            color: var(--text-white);
-            border-left: none;
-            padding-left: 0;
-            font-size: 1.3em;
-        }
-
-        .card-summary {
-            font-size: 0.95em;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.5;
-            flex-grow: 1; /* Allow summary to take available space */
+            border-radius: 8px;
             margin-bottom: 15px;
         }
 
-        .toggle-btn {
-            background-color: var(--accent-yellow);
-            color: var(--bg-dark);
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-size: 0.85em;
-            font-weight: 700;
-            position: absolute;
-            bottom: var(--padding-base);
-            right: var(--padding-base);
-            transition: background-color var(--transition-speed), transform var(--transition-speed);
-            cursor: pointer;
-            z-index: 10; /* Ensure button is above other card content if overflow */
-        }
-        
-        .toggle-btn:hover {
-            background-color: #ffea70; /* Slightly lighter yellow on hover */
-            transform: translateY(-2px);
+        .card-header h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            font-size: 1.5em;
         }
 
-        .card-details {
+        .card-header p.summary {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0;
+        }
+
+        .expand-button {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            pointer-events: none; /* Button itself isn't clickable, card is */
+        }
+
+        .card-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height var(--transition-speed) ease-out, padding var(--transition-speed) ease-out;
-            padding-top: 0;
+            transition: max-height var(--transition-speed) ease-in-out, padding var(--transition-speed) ease-in-out;
+            padding: 0 25px;
+            background-color: rgba(255, 255, 255, 0.05); /* Slightly lighter for expanded content */
         }
 
-        .card.expanded .card-details {
-            max-height: 1000px; /* Arbitrary large value for smooth transition */
-            padding-top: var(--padding-base);
-        }
-
-        .card-details-content {
-            background-color: var(--card-bg-expanded);
-            border-radius: var(--border-radius);
-            padding: var(--padding-base);
-            color: var(--expanded-text-dark);
-            font-size: 0.9em;
+        .card.expanded .card-content {
+            max-height: 1000px; /* Arbitrarily large value to allow content to expand */
+            padding: 25px;
         }
         
-        .card-details-content h5 {
-            color: var(--expanded-text-dark);
-            font-size: 1.1em;
-            margin-top: 15px;
+        .card-content p, .card-content ul {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 10px;
         }
-        .card-details-content p, .card-details-content ul {
-            margin-bottom: 10px;
-            color: var(--expanded-text-dark);
-        }
-        .card-details-content ul {
-            list-style-type: disc;
-            margin-left: 20px;
-        }
-        .card-details-content li {
-            margin-bottom: 5px;
-        }
-        .card-details-content .highlight-red {
-            color: #d32f2f; /* Material red 700 */
-            font-weight: 500;
-        }
-        .card-details-content .highlight-green {
-            color: #388e3c; /* Material green 700 */
-            font-weight: 500;
+        .card-content strong {
+            color: var(--accent-color);
         }
 
-
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: var(--padding-base);
-        }
-        .info-table th, .info-table td {
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
-            text-align: left;
-        }
-        .info-table th {
-            background-color: rgba(255, 214, 10, 0.2);
-            color: var(--accent-yellow);
-            font-weight: 700;
-        }
-        .info-table td {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--text-white);
-        }
-        .info-table tr:nth-child(even) td {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-        .info-table .highlight-green {
-            color: #8bc34a; /* Light green for table */
-        }
-        .info-table .highlight-red {
-            color: #ef5350; /* Light red for table */
-        }
-
-        /* Character Cards Specific Styling */
-        .character-card .card-header img {
-            border-radius: 50%; /* Make character images round */
-            border: 2px solid var(--accent-yellow);
-        }
-        .character-card .card-header {
-            align-items: center; /* Center image and text vertically */
-        }
-
-        /* Charts */
-        .chart-container {
-            margin-top: 50px;
-            background-color: rgba(255, 255, 255, 0.08);
-            border-radius: var(--border-radius);
-            padding: var(--padding-base) * 2;
-        }
-
-        .bar-chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px;
-            height: 250px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-            padding-bottom: 10px;
-            position: relative;
-        }
-
-        .bar {
-            flex-grow: 1; /* Distribute width equally */
-            max-width: 100px; /* Limit individual bar width */
-            background-color: var(--accent-yellow);
-            border-radius: 5px 5px 0 0;
-            height: 0; /* Initial state for animation */
-            transition: height 1s ease-out;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .bar-label {
-            color: var(--text-white);
-            font-size: 0.9em;
-            position: absolute;
-            bottom: -25px;
-            white-space: nowrap;
-        }
-        .bar-value {
-            color: var(--bg-dark);
-            background-color: var(--accent-yellow);
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            position: absolute;
-            top: -30px;
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
-        }
-        .bar.animated .bar-value {
-            opacity: 1;
-        }
-
-        .progress-bars {
-            margin-top: 50px;
-        }
-
-        .progress-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 20px;
-        }
-
-        .progress-label {
-            flex-basis: 150px;
-            font-weight: 500;
-        }
-
-        .progress-bar-wrapper {
-            flex-grow: 1;
-            height: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0; /* Initial state for animation */
-            background-color: var(--accent-yellow);
-            border-radius: 10px;
-            transition: width 1.5s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-        }
-
-        .progress-text {
-            color: var(--bg-dark);
-            font-weight: 700;
-            font-size: 0.8em;
-            opacity: 0;
-            transition: opacity 0.5s ease-in 1s; /* Delay for text to appear after bar */
-        }
-        .progress-bar.animated .progress-text {
-            opacity: 1;
-        }
-
-
-        /* Tables outside of cards */
+        /* --- Tables --- */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: var(--padding-base);
-            margin-bottom: var(--padding-base) * 2;
+            margin-bottom: 30px;
+            font-size: 0.95em;
         }
 
         th, td {
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--card-border-color);
             padding: 12px 15px;
             text-align: left;
-            vertical-align: top;
         }
 
         th {
-            background-color: rgba(255, 214, 10, 0.2);
-            color: var(--accent-yellow);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--accent-color);
             font-weight: 700;
         }
 
         td {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--text-white);
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+        }
+        
+        table.char-table th:first-child, table.char-table td:first-child {
+            width: 120px; /* Fixed width for character names */
         }
 
-        tr:nth-child(even) td {
-            background-color: rgba(255, 255, 255, 0.03);
+        /* --- Bar Charts (C3) --- */
+        .bar-chart-container {
+            margin: 50px 0;
+        }
+        .bar-chart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .bar-label {
+            width: 150px;
+            flex-shrink: 0;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-right: 20px;
+        }
+        .bar-wrapper {
+            flex-grow: 1;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%; /* Initial state for animation */
+            transition: width 1.5s ease-out;
+            border-radius: 5px;
+        }
+        .bar.animate {
+            width: var(--bar-width); /* Target width set by JS */
+        }
+        .bar-value {
+            margin-left: 20px;
+            font-weight: bold;
+            width: 50px; /* Fixed width for percentages */
+            text-align: right;
+            color: var(--accent-color);
+        }
+        /* Special text-based bar for percentage */
+        .text-bar-container {
+            font-family: 'monospace', sans-serif;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .text-bar-container span {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .text-bar-label {
+            width: 120px; /* Adjust as needed */
+            text-align: right;
+            margin-right: 10px;
+            color: var(--text-color);
+        }
+        .text-bar-fill {
+            background-color: var(--accent-color);
+            color: var(--accent-color); /* Hide actual char, use bg */
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-radius: 3px;
+            height: 1.2em; /* Ensure consistent height */
+            vertical-align: middle;
+            transition: width 1.5s ease-out;
+        }
+        .text-bar-fill.animate {
+             width: var(--bar-width-px); /* Width set by JS */
+        }
+        .text-bar-percentage {
+            margin-left: 10px;
+            color: var(--accent-color);
+            font-weight: bold;
         }
 
-        .red-text { color: #ff6b6b; } /* Lighter red for weaknesses */
-        .green-text { color: #69db7c; } /* Lighter green for opportunities */
 
-        footer {
-            text-align: center;
-            padding: var(--padding-base) * 2;
-            margin-top: 50px;
-            background-color: rgba(0, 0, 0, 0.2);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9em;
+        /* --- General Text & List Styles --- */
+        strong {
+            color: var(--accent-color);
+        }
+        em {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .note {
+            background-color: rgba(255, 214, 10, 0.1);
+            border-left: 5px solid var(--accent-color);
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95em;
         }
 
-        /* Responsive Design */
+        /* --- Responsive Design --- */
         @media (max-width: 768px) {
-            .hero h1 {
+            header h1 {
                 font-size: 2.5em;
             }
-            .hero p {
+            header p {
                 font-size: 1em;
+            }
+            .navbar .nav-list {
+                gap: 15px;
+            }
+            .navbar .nav-list a {
+                font-size: 0.9em;
+                padding: 6px 10px;
             }
             h2 {
                 font-size: 2em;
@@ -485,83 +397,72 @@
             h4 {
                 font-size: 1.2em;
             }
-            nav ul {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-            nav a {
-                padding: 6px 10px;
-                font-size: 0.9em;
-            }
-            .grid-cards {
-                grid-template-columns: 1fr; /* Single column for cards */
+            .card-grid {
+                grid-template-columns: 1fr;
             }
             .card-header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
+                padding: 20px;
             }
-            .card-header img {
-                margin-bottom: 10px;
+            .card-content {
+                padding: 0 20px;
             }
-            /* The toggle button stays absolute, but cards are now single column, so it's still bottom-right within its card. */
-            .bar-chart {
-                flex-direction: column;
-                height: auto;
-                align-items: center;
+            .card.expanded .card-content {
+                padding: 20px;
             }
-            .bar {
-                width: 100%;
-                max-width: 200px;
-                margin-bottom: 40px;
+            th, td {
+                padding: 10px;
             }
             .bar-label {
-                bottom: -20px;
+                width: 100px;
+                font-size: 0.9em;
             }
-            .progress-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
+            .bar-value {
+                margin-left: 10px;
+                font-size: 0.9em;
             }
-            .progress-label {
-                flex-basis: auto;
-                width: 100%;
+            .text-bar-label {
+                width: 80px;
+            }
+            .text-bar-percentage {
+                font-size: 0.9em;
             }
         }
     </style>
 </head>
 <body>
+
     <header>
-        <nav>
-            <ul>
-                <li><a href="#part-a">PART A</a></li>
-                <li><a href="#part-b">PART B</a></li>
-                <li><a href="#part-c">PART C</a></li>
-                <li><a href="#part-d">PART D</a></li>
-                <li><a href="#part-e">PART E</a></li>
-            </ul>
-        </nav>
+        <div class="content">
+            <h1>蕪解創意｜花生漫畫全角色宇宙 × 產品矩陣完整提案</h1>
+            <p><strong>版本</strong>：V3.0 幕僚長統籌升級版</p>
+            <p><strong>日期</strong>：2026年4月21日</p>
+            <p><strong>發起人</strong>：Ray / 幕僚長統籌，情報×創意×業務三席聯合出品</p>
+        </div>
     </header>
 
-    <div class="hero">
-        <div class="hero-content">
-            <h1>蕪解創意｜花生漫畫全角色宇宙 × 產品矩陣完整提案</h1>
-            <p>版本: V3.0 幕僚長統籌升級版 | 日期: 2026年4月21日</p>
-            <p>發起人: Ray / 幕僚長統籌，情報×創意×業務三席聯合出品</p>
-        </div>
-    </div>
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li><a href="#intro">開場</a></li>
+            <li><a href="#part-a">PART A</a></li>
+            <li><a href="#part-b">PART B</a></li>
+            <li><a href="#part-c">PART C</a></li>
+            <li><a href="#part-d">PART D</a></li>
+            <li><a href="#part-e">PART E</a></li>
+        </ul>
+    </nav>
 
     <div class="container">
-        <section id="introduction">
+
+        <section id="intro">
             <h2>【幕僚長開場】為什麼要做這份升級提案</h2>
             <p>上一版提案完成了基本骨架，但老董提出了核心挑戰：</p>
             <p><strong>「全角色策略要更深，多系列要形成矩陣，業務要把話說清楚。」</strong></p>
             <p>本次升級聚焦三件事：</p>
-            <ul>
+            <ol>
                 <li>用路人魚（Labubu）的真實成功案例，反推花生漫畫的爆款路徑</li>
                 <li>把花生宇宙所有可用素材全部盤點，建立四大系列產品矩陣</li>
                 <li>業務用數字說話：價位、市場、規模、佔比</li>
-            </ul>
+            </ol>
         </section>
 
         <section id="part-a">
@@ -576,43 +477,50 @@
             </ul>
 
             <h4>深層成功邏輯（情報席分析）</h4>
-            <p><strong>① 醜萌美學崛起：消費者不要「完美」了</strong></p>
-            <ul>
-                <li>2010年代：Hello Kitty / 迪士尼公主 = 完美無瑕可愛</li>
-                <li>2020年代：Labubu / Mofusand / Chiikawa = 有缺陷、有個性、有「怪」感</li>
-                <li>消費者洞察：完美讓人羨慕，不完美讓人共鳴。齜牙的 Labubu 比無缺點的公主更「真實」</li>
-                <li>心理學根據：「不對稱美感」降低心理距離，觸發保護欲與親密感</li>
-            </ul>
-            <p><strong>② 情緒商品 > 功能商品</strong></p>
-            <ul>
-                <li>購買動機從「它好看」→「它讓我感覺____」</li>
-                <li>Labubu 的核心情緒：「我也是一隻怪怪的小獸，但我很可愛」</li>
-                <li>Z世代的精神圖騰：反完美主義、自我接納、幽默看待焦慮</li>
-                <li>花生漫畫有天然優勢：Charlie Brown 就是「失敗者英雄」的原型，比 Labubu 更有哲學深度</li>
-            </ul>
-            <p><strong>③ 可見性設計：包包掛件是社交貨幣</strong></p>
-            <ul>
-                <li>Labubu 最爆的 SKU 不是桌上擺件，而是「包包掛件版」</li>
-                <li>出門即展示，他人即傳播 → 行走的廣告牌</li>
-                <li>購買行為研究：「我在 XX 地鐵看到一個人包上掛著 Labubu」→ 衝去買</li>
-                <li>關鍵設計要求：正面造型辨識度高、尺寸適合掛件（6-8cm）、有掛鉤結構</li>
-            </ul>
-            <p><strong>④ 盲盒機制 × 隱藏款 = 多巴胺設計</strong></p>
-            <ul>
-                <li>不確定性觸發的多巴胺是確定性的 2.3 倍（神經科學研究）</li>
-                <li>隱藏款比例 1/72 或 1/144 → 創造「傳說稀缺感」</li>
-                <li>二手市場溢價 → 盲盒從「消費品」升格為「類投資品」</li>
-                <li>開箱影片 UGC：一個人買，百萬人看開箱 → 免費流量飛輪</li>
-            </ul>
-            <p><strong>⑤ KOL × IP 雙引擎</strong></p>
-            <ul>
-                <li>路人魚 = Kasing Lung（藝術家品牌）× Pop Mart（渠道）× Lisa（名人引爆）</li>
-                <li>三者缺一不可：IP 授權 + 渠道執行 + 名人點火</li>
-                <li>花生漫畫對應：花生 IP（授權）× 蕪解（渠道執行）× 待定名人合作（東南亞/台灣 KOL 策略）</li>
-            </ul>
+            <ol>
+                <li><strong>醜萌美學崛起：消費者不要「完美」了</strong>
+                    <ul>
+                        <li>2010年代：Hello Kitty / 迪士尼公主 = 完美無瑕可愛</li>
+                        <li>2020年代：Labubu / Mofusand / Chiikawa = 有缺陷、有個性、有「怪」感</li>
+                        <li>消費者洞察：完美讓人羨慕，不完美讓人共鳴。齜牙的 Labubu 比無缺點的公主更「真實」</li>
+                        <li>心理學根據：「不對稱美感」降低心理距離，觸發保護欲與親密感</li>
+                    </ul>
+                </li>
+                <li><strong>情緒商品 > 功能商品</strong>
+                    <ul>
+                        <li>購買動機從「它好看」→「它讓我感覺____」</li>
+                        <li>Labubu 的核心情緒：「我也是一隻怪怪的小獸，但我很可愛」</li>
+                        <li>Z世代的精神圖騰：反完美主義、自我接納、幽默看待焦慮</li>
+                        <li>花生漫畫有天然優勢：Charlie Brown 就是「失敗者英雄」的原型，比 Labubu 更有哲學深度</li>
+                    </ul>
+                </li>
+                <li><strong>可見性設計：包包掛件是社交貨幣</strong>
+                    <ul>
+                        <li>Labubu 最爆的 SKU 不是桌上擺件，而是「包包掛件版」</li>
+                        <li>出門即展示，他人即傳播 → 行走的廣告牌</li>
+                        <li>購買行為研究：「我在 XX 地鐵看到一個人包上掛著 Labubu」→ 衝去買</li>
+                        <li>關鍵設計要求：正面造型辨識度高、尺寸適合掛件（6-8cm）、有掛鉤結構</li>
+                    </ul>
+                </li>
+                <li><strong>盲盒機制 × 隱藏款 = 多巴胺設計</strong>
+                    <ul>
+                        <li>不確定性觸發的多巴胺是確定性的 2.3 倍（神經科學研究）</li>
+                        <li>隱藏款比例 1/72 或 1/144 → 創造「傳說稀缺感」</li>
+                        <li>二手市場溢價 → 盲盒從「消費品」升格為「類投資品」</li>
+                        <li>開箱影片 UGC：一個人買，百萬人看開箱 → 免費流量飛輪</li>
+                    </ul>
+                </li>
+                <li><strong>KOL × IP 雙引擎</strong>
+                    <ul>
+                        <li>路人魚 = Kasing Lung（藝術家品牌）× Pop Mart（渠道）× Lisa（名人引爆）</li>
+                        <li>三者缺一不可：IP 授權 + 渠道執行 + 名人點火</li>
+                        <li>花生漫畫對應：花生 IP（授權）× 蕪解（渠道執行）× 待定名人合作（東南亞/台灣 KOL 策略）</li>
+                    </ul>
+                </li>
+            </ol>
 
             <h3>A2 消費者口味轉變報告（2023-2026）</h3>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>維度</th>
@@ -626,172 +534,112 @@
                         <td>美學偏好</td>
                         <td>完美可愛、精緻甜美</td>
                         <td>醜萌、反差萌、個性怪</td>
-                        <td class="highlight-green">Snoopy 哲學感天然契合</td>
+                        <td>Snoopy 哲學感天然契合</td>
                     </tr>
                     <tr>
                         <td>使用場景</td>
                         <td>桌上擺件、家居裝飾</td>
                         <td>包包掛件、隨身攜帶</td>
-                        <td class="highlight-green">需要開發掛件系列</td>
+                        <td>需要開發掛件系列</td>
                     </tr>
                     <tr>
                         <td>購買動機</td>
                         <td>「它長得好看」</td>
                         <td>「它讓我有感覺」</td>
-                        <td class="highlight-green">角色故事要說透</td>
+                        <td>角色故事要說透</td>
                     </tr>
                     <tr>
                         <td>價格接受度</td>
                         <td>盲袋上限 49 RMB</td>
                         <td>盲袋主流 69-99 RMB</td>
-                        <td class="highlight-green">我方定價空間充裕</td>
+                        <td>我方定價空間充裕</td>
                     </tr>
                     <tr>
                         <td>社交行為</td>
                         <td>私下收藏</td>
                         <td>公開曬收藏、曬開箱</td>
-                        <td class="highlight-green">UGC 設計要納入策略</td>
+                        <td>UGC 設計要納入策略</td>
                     </tr>
                     <tr>
                         <td>IP 偏好</td>
                         <td>一線知名度即可</td>
                         <td>要有「故事性」和「深度」</td>
-                        <td class="highlight-green">花生漫畫&gt;路人魚：有70年故事</td>
+                        <td>花生漫畫>路人魚：有70年故事</td>
                     </tr>
                     <tr>
                         <td>購買頻次</td>
                         <td>一次買完</td>
                         <td>系列追蹤、集齊癖</td>
-                        <td class="highlight-green">多系列矩陣設計</td>
+                        <td>多系列矩陣設計</td>
                     </tr>
                     <tr>
                         <td>年齡層</td>
                         <td>兒童為主</td>
                         <td>25-35歲女性主力（佔比62%）</td>
-                        <td class="highlight-green">成人情緒消費市場</td>
+                        <td>成人情緒消費市場</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h3>A3 競品快照</h3>
-            <div class="grid-cards competitor-cards">
-                <div class="card competitor-card">
+            <h3>A3 競品快照（附圖參考）</h3>
+            <div class="card-grid">
+                <div class="card" data-card-type="competitor">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Labubu%20vinyl%20art%20toy%20monster%20cute%20ugly%20collectible%20Pop%20Mart%20product%20photography%20white%20background?width=800&height=450&nologo=true&seed=201" alt="Labubu The Monsters">
-                        <div class="card-header-text">
-                            <h4>競品A：Pop Mart × Labubu The Monsters</h4>
-                            <p class="card-summary">醜萌美學領導者，憑藉明星效應與盲盒機制引爆市場。是我們最應學習與超越的對象。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Labubu%20vinyl%20art%20toy%20monster%20cute%20ugly%20collectible%20Pop%20Mart%20product%20photography%20white%20background?width=800&height=450&nologo=true&seed=201" alt="Labubu The Monsters">
+                        <h4>競品A：Pop Mart × Labubu The Monsters</h4>
+                        <p class="summary">潮玩市場的現象級爆款，以其獨特的醜萌風格與強大的飢餓行銷策略，成功引爆全球收藏熱潮。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>基本資訊</h5>
-                            <p><strong>定價：</strong> RMB 79 盲袋 / RMB 1099 大娃</p>
-                            <p><strong>主打渠道：</strong> Pop Mart 直營店、天貓旗艦店、機場快閃</p>
-                            <p><strong>核心目標客群：</strong> 25-35歲女性主力，追求個性化、情緒價值與社交展示的消費者。</p>
-                            <h5>成功關鍵因素</h5>
-                            <ul>
-                                <li><strong>醜萌美學：</strong> 以有缺陷、有個性、有「怪」感的外觀，觸發消費者共鳴與保護欲。</li>
-                                <li><strong>社交貨幣：</strong> 包包掛件設計，使其成為隨身展示的社交符號與話題。</li>
-                                <li><strong>多巴胺經濟：</strong> 盲盒與隱藏款機制，創造開箱驚喜與稀缺價值。</li>
-                            </ul>
-                            <h5>蕪解可借鑑的策略</h5>
-                            <p>學習其醜萌美學的爆款邏輯，尤其在Olaf等角色開發上。強調包包掛件設計，提升產品可見性。</p>
-                            <h5>蕪解的相對優勢</h5>
-                            <p><span class="highlight-green">優勢：</span> 花生漫畫有70年故事深度與普世哲學內涵，非單一藝術家品牌，IP廣度與生命週期更長。</p>
-                            <p><span class="highlight-red">弱點：</span> 無授權深度故事，完全依賴藝術家個人品牌，續集 IP 難以複製。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>定價/渠道/核心客群</strong>：RMB 79 盲袋 / RMB 1099 大娃。主打 Pop Mart 直營店、天貓旗艦店、機場快閃，核心客群為追求個性、潮玩文化的年輕女性。</p>
+                        <p><strong>成功因素</strong>：Lisa（BLACKPINK）名人效應、醜萌美學符合Z世代審美、盲盒稀缺款創造理財話題、包包掛件設計增加社交可見性。</p>
+                        <p><strong>蕪解可借鑑策略</strong>：名人引爆策略、醜萌次要角色（Olaf）發掘、包包掛件 SKU 開發、盲盒稀缺款設計。</p>
+                        <p><strong>相對優弱勢</strong>：<strong>優勢</strong>：市場教育成熟，價格接受度高。<strong>弱點</strong>：IP 無授權深度故事，完全依賴藝術家個人品牌，續集 IP 難以複製。</p>
                     </div>
                 </div>
 
-                <div class="card competitor-card">
+                <div class="card" data-card-type="competitor">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Chiikawa%20Japanese%20cute%20small%20character%20toy%20kawaii%20product%20photo%20white%20background?width=800&height=450&nologo=true&seed=202" alt="Chiikawa">
-                        <div class="card-header-text">
-                            <h4>競品B：Chiikawa（ちいかわ）</h4>
-                            <p class="card-summary">日本國民級治癒系 IP，以其可愛、溫馨的日常故事和聯名策略深入人心。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Chiikawa%20Japanese%20cute%20small%20character%20toy%20kawaii%20product%20photo%20white%20background?width=800&height=450&nologo=true&seed=202" alt="Chiikawa">
+                        <h4>競品B：Chiikawa（ちいかわ）</h4>
+                        <p class="summary">日本近年超人氣的可愛小動物角色，以其療癒日常和微焦慮的情緒共鳴，深受廣大粉絲喜愛。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>基本資訊</h5>
-                            <p><strong>定價：</strong> JPY 660-2200（約 RMB 33-110）</p>
-                            <p><strong>主打渠道：</strong> 便利店聯名、旗艦店、扭蛋</p>
-                            <p><strong>核心目標客群：</strong> 25-35歲女性主力，追求個性化、情緒價值與社交展示的消費者；特別是偏愛日系可愛、治癒風格的群體。</p>
-                            <h5>成功關鍵因素</h5>
-                            <ul>
-                                <li><strong>日常共鳴：</strong> 描繪角色平凡生活中的小確幸與小焦慮，引起廣泛情感共鳴。</li>
-                                <li><strong>多樣聯名：</strong> 積極與各類品牌聯名，擴大其在日常生活中的曝光度和滲透率。</li>
-                                <li><strong>高頻更新：</strong> 短篇漫畫保持內容新鮮感，維護粉絲活躍度。</li>
-                            </ul>
-                            <h5>蕪解可借鑑的策略</h5>
-                            <p>學習其社區經營與便利店聯名策略，開發低價引流款以擴大市場接觸面。</p>
-                            <h5>蕪解的相對優勢</h5>
-                            <p><span class="highlight-green">優勢：</span> 花生漫畫是全球IP，無語言障礙，東南亞滲透力更強，市場廣闊。</p>
-                            <p><span class="highlight-red">弱點：</span> IP 為日本本地向，東南亞滲透有語言障礙，國際化擴張受限。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>定價/渠道/核心客群</strong>：JPY 660-2200（約 RMB 33-110）。主打便利店聯名、旗艦店、扭蛋，核心客群為日本年輕女性及動漫愛好者。</p>
+                        <p><strong>成功因素</strong>：社群漫畫帶來的情緒共鳴、多樣化的商品形式（扭蛋、週邊）、日本本土文化深刻連結。</p>
+                        <p><strong>蕪解可借鑑策略</strong>：發展角色間的情緒互動故事、多樣化小品類商品（扭蛋、文具）、與在地便利店深度合作。</p>
+                        <p><strong>相對優弱勢</strong>：<strong>優勢</strong>：情緒價值極高，粉絲黏著度強。<strong>弱點</strong>：IP 為日本本地向，東南亞滲透有語言和文化障礙，海外拓展相對困難。</p>
                     </div>
                 </div>
 
-                <div class="card competitor-card">
+                <div class="card" data-card-type="competitor">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Mofusand%20cat%20sushi%20cute%20toy%20blind%20box%20product%20photography?width=800&height=450&nologo=true&seed=203" alt="Mofusand">
-                        <div class="card-header-text">
-                            <h4>競品C：Mofusand（貓福珊迪）</h4>
-                            <p class="card-summary">以貓咪為主題的可愛治癒系 IP，結合不同主題設計，深受年輕女性喜愛。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Mofusand%20cat%20sushi%20cute%20toy%20blind%20box%20product%20photography?width=800&height=450&nologo=true&seed=203" alt="Mofusand">
+                        <h4>競品C：Mofusand（貓福珊迪）</h4>
+                        <p class="summary">以各種可愛貓咪形象搭配食物或日常情境，打造出療癒感十足的產品，深受貓奴和可愛系愛好者追捧。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>基本資訊</h5>
-                            <p><strong>定價：</strong> RMB 59-89 盲袋</p>
-                            <p><strong>主打渠道：</strong> 我方代理渠道（熟悉渠道，可對標）</p>
-                            <p><strong>核心目標客群：</strong> 25-35歲女性主力，追求個性化、情緒價值與社交展示的消費者；特別是貓咪愛好者與可愛系IP收藏者。</p>
-                            <h5>成功關鍵因素</h5>
-                            <ul>
-                                <li><strong>貓咪主題：</strong> 結合普遍受歡迎的貓咪形象，創造廣泛吸引力。</li>
-                                <li><strong>豐富主題：</strong> 設計多變，如壽司貓、甜點貓等，保持新鮮感與收藏樂趣。</li>
-                                <li><strong>渠道優勢：</strong> 成功透過合作渠道快速鋪貨，提升市場覆蓋率。</li>
-                            </ul>
-                            <h5>蕪解可借鑑的策略</h5>
-                            <p>借鑑我方在相同渠道銷售 Mofusand 的成功經驗，進行對標與優化執行策略。</p>
-                            <h5>蕪解的相對優勢</h5>
-                            <p><span class="highlight-green">優勢：</span> 花生漫畫IP更具故事深度與普世價值，可向上突破價格帶與高端市場，創造更高溢價。</p>
-                            <p><span>優勢：</span> 我方已有渠道資源，可直接對標自身執行能力。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>定價/渠道/核心客群</strong>：RMB 59-89 盲袋。主打蕪解現有代理渠道、天貓旗艦店、潮流集合店，核心客群為年輕女性和貓咪愛好者。</p>
+                        <p><strong>成功因素</strong>：可愛簡潔的形象廣受歡迎、跨品類聯名（文具、生活用品）擴大觸及面、高頻次新品推出。</p>
+                        <p><strong>蕪解可借鑑策略</strong>：利用現有渠道優勢快速鋪貨、參考其新品推出頻率、簡單情境設計。</p>
+                        <p><strong>相對優弱勢</strong>：<strong>優勢</strong>：蕪解已有渠道資源，可直接對標自身執行能力，市場數據充足。<strong>弱點</strong>：IP 深度不及花生漫畫，角色可塑性相對有限。</p>
                     </div>
                 </div>
 
-                <div class="card competitor-card">
+                <div class="card" data-card-type="competitor">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Peanuts%20Japan%20official%20figurine%20product%20photography%20premium%20collectible?width=800&height=450&nologo=true&seed=204" alt="Snoopy Official Japan">
-                        <div class="card-header-text">
-                            <h4>競品D：Snoopy × 日本 PEANUTS 官方</h4>
-                            <p class="card-summary">日本官方精品路線，注重品牌質感與限定收藏價值，與我們大眾化策略形成區隔。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Snoopy%20Peanuts%20Japan%20official%20figurine%20product%20photography%20premium%20collectible?width=800&height=450&nologo=true&seed=204" alt="Snoopy 官方">
+                        <h4>競品D：Snoopy × 日本 PEANUTS 官方</h4>
+                        <p class="summary">日本官方推出的高品質史努比周邊，注重設計質感與收藏價值，定位高端精品市場，與我方大眾市場形成區隔。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>基本資訊</h5>
-                            <p><strong>定價：</strong> JPY 1100-3300（RMB 55-165）</p>
-                            <p><strong>主打渠道：</strong> 日本官方 PEANUTS Cafe、授權精品店</p>
-                            <p><strong>核心目標客群：</strong> 花生漫畫資深粉絲、追求高質感與收藏價值的精品愛好者。</p>
-                            <h5>成功關鍵因素</h5>
-                            <ul>
-                                <li><strong>高端定位：</strong> 強調品牌歷史與藝術價值，以精品化路線維持高價位。</li>
-                                <li><strong>限定發售：</strong> 推出地區限定、節日限定等款式，刺激粉絲收藏慾望。</li>
-                                <li><strong>沉浸體驗：</strong> 結合主題咖啡店等線下體驗空間，強化品牌連結。</li>
-                            </ul>
-                            <h5>蕪解可借鑑的策略</h5>
-                            <p>學習其精品化的包裝與品牌調性，用於我們的高端線或特殊聯名款。強調 IP 的故事深度與情感價值。</p>
-                            <h5>蕪解的相對優勢</h5>
-                            <p><span class="highlight-green">優勢：</span> 我方專注大眾盲盒市場與東南亞市場，彌補官方策略空白，擴大市場覆蓋率。</p>
-                            <p><span class="highlight-red">弱點：</span> 日本官方走精品路線，不做盲袋，不做東南亞大眾市場，錯失大眾消費潛力。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>定價/渠道/核心客群</strong>：JPY 1100-3300（RMB 55-165）。主打日本官方 PEANUTS Cafe、授權精品店，核心客群為 Snoopy 忠實粉絲、追求高品質收藏的成人。</p>
+                        <p><strong>成功因素</strong>：官方品牌背書、高質感設計與精緻工藝、結合餐飲與體驗式消費。</p>
+                        <p><strong>蕪解可借鑑策略</strong>：借鑒其對 IP 形象的精準把握、高端包裝策略可應用於限定款。</p>
+                        <p><strong>相對優弱勢</strong>：<strong>優勢</strong>：品牌信任度高，忠實粉絲願意高價購買。<strong>弱點</strong>：日本官方走精品路線，不做盲袋，不做東南亞大眾市場 → <strong>我方切入點</strong>。</p>
                     </div>
                 </div>
             </div>
@@ -804,430 +652,179 @@
             <p>創意席完整清點花生漫畫可用素材，發現 IP 深度遠超一般認知。</p>
 
             <h4>第一梯隊：明星角色（全球知名度 90%+）</h4>
-            <div class="grid-cards character-cards">
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20cute%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=501" alt="Snoopy">
-                        <div class="card-header-text">
-                            <h4>Snoopy</h4>
-                            <p class="card-summary">夢想家、愛幻想、不受現實限制的經典形象。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>夢想家、愛幻想、不受現實限制，是個充滿哲學氣質的忠犬。</p>
-                            <h5>消費者連結</h5>
-                            <p>「我也想逃離現實活在幻想裡」：代表對自由、夢想的追求。</p>
-                            <h5>最適商品形式</h5>
-                            <p>全系列核心，必做。多變造型適合各類盲盒與聯名。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Charlie%20Brown%20cute%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=502" alt="Charlie Brown">
-                        <div class="card-header-text">
-                            <h4>Charlie Brown</h4>
-                            <p class="card-summary">永遠嘗試、永遠失敗、卻永遠不放棄的失敗者英雄。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>失敗者英雄、永恆樂觀主義者，代表了人類面對困境時的堅持。</p>
-                            <h5>消費者連結</h5>
-                            <p>「明明做錯還是想撐下去」：引發強烈共鳴，提供情緒療癒。</p>
-                            <h5>最適商品形式</h5>
-                            <p>情緒療癒主打，適合與Snoopy搭配呈現。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Woodstock%20cute%20yellow%20bird%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=503" alt="Woodstock">
-                        <div class="card-header-text">
-                            <h4>Woodstock</h4>
-                            <p class="card-summary">Snoopy最忠實的小跟班，無條件的陪伴者。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>無條件陪伴、忠實小跟班，Snoopy的靈魂伴侶。</p>
-                            <h5>消費者連結</h5>
-                            <p>「有人懂我就夠了」：代表友情與依賴，療癒人心。</p>
-                            <h5>最適商品形式</h5>
-                            <p>小尺寸掛件爆款，適合組合銷售。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Lucy%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=504" alt="Lucy">
-                        <div class="card-header-text">
-                            <h4>Lucy</h4>
-                            <p class="card-summary">自信霸道，卻有著不為人知的敏感和脆弱。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>控制欲、霸氣、內心孤獨，總是給予查理布朗「心理諮詢」。</p>
-                            <h5>消費者連結</h5>
-                            <p>「表面強大內心gg」：反差萌，引起對複雜人性的共鳴。</p>
-                            <h5>最適商品形式</h5>
-                            <p>反差萌路線，適合作為表情包或主題系列。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Linus%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=505" alt="Linus">
-                        <div class="card-header-text">
-                            <h4>Linus</h4>
-                            <p class="card-summary">哲學家般深思熟慮，卻總離不開他的安全毯。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>智慧、不安全感、安全毯不離手，是個早熟的小哲學家。</p>
-                            <h5>消費者連結</h5>
-                            <p>「道理都懂，還是需要一條毯子」：代表對安全感的需求，治癒系。</p>
-                            <h5>最適商品形式</h5>
-                            <p>配件聯名潛力，尤其安全毯相關產品。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <table class="char-table">
+                <thead>
+                    <tr>
+                        <th>角色</th>
+                        <th>核心性格</th>
+                        <th>消費者連結</th>
+                        <th>最適商品形式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Snoopy</td>
+                        <td>夢想家、愛幻想、不受現實限制</td>
+                        <td>「我也想逃離現實活在幻想裡」</td>
+                        <td>全系列核心，必做</td>
+                    </tr>
+                    <tr>
+                        <td>Charlie Brown</td>
+                        <td>失敗者英雄、永恆樂觀主義</td>
+                        <td>「明明做錯還是想撐下去」</td>
+                        <td>情緒療癒主打</td>
+                    </tr>
+                    <tr>
+                        <td>Woodstock</td>
+                        <td>無條件陪伴、忠實小跟班</td>
+                        <td>「有人懂我就夠了」</td>
+                        <td>小尺寸掛件爆款</td>
+                    </tr>
+                    <tr>
+                        <td>Lucy</td>
+                        <td>控制欲、霸氣、內心孤獨</td>
+                        <td>「表面強大內心gg」</td>
+                        <td>反差萌路線</td>
+                    </tr>
+                    <tr>
+                        <td>Linus</td>
+                        <td>智慧、不安全感、安全毯</td>
+                        <td>「道理都懂，還是需要一條毯子」</td>
+                        <td>配件聯名潛力</td>
+                    </tr>
+                </tbody>
+            </table>
 
             <h4>第二梯隊：潛力股角色（地區知名度 60-80%）</h4>
-            <div class="grid-cards character-cards">
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Sally%20Brown%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=506" alt="Sally">
-                        <div class="card-header-text">
-                            <h4>Sally</h4>
-                            <p class="card-summary">查理布朗的妹妹，聰明卻選擇性努力。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>選擇性努力、可愛碎碎念，對萊納斯情有獨鍾。</p>
-                            <h5>特殊機會</h5>
-                            <p>台灣/日本女性市場共鳴，適合「厭世萌」主題。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Schroeder%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=507" alt="Schroeder">
-                        <div class="card-header-text">
-                            <h4>Schroeder</h4>
-                            <p class="card-summary">對音樂充滿熱情，貝多芬的超級粉絲。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>藝術完美主義者，沉迷鋼琴與貝多芬。</p>
-                            <h5>特殊機會</h5>
-                            <p>音樂/文創 IP 聯名，適合樂器周邊。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Franklin%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=508" alt="Franklin">
-                        <div class="card-header-text">
-                            <h4>Franklin</h4>
-                            <p class="card-summary">冷靜理性，查理布朗的忠實好友。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>冷靜理性、多元包容，是個溫和的存在。</p>
-                            <h5>特殊機會</h5>
-                            <p>DEI 敘事、年輕市場共鳴，代表多元價值。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Peppermint%20Patty%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=509" alt="Peppermint Patty">
-                        <div class="card-header-text">
-                            <h4>Peppermint Patty</h4>
-                            <p class="card-summary">體育健將，直率灑脫，從不拘泥細節。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>運動型、不在乎外表、直率，總是搞錯老師的名字。</p>
-                            <h5>特殊機會</h5>
-                            <p>體育/戶外場景切入，適合運動品牌聯名。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Marcie%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=510" alt="Marcie">
-                        <div class="card-header-text">
-                            <h4>Marcie</h4>
-                            <p class="card-summary">學霸眼鏡娘，佩蒂的知心朋友。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>學霸、眼鏡娘，總是稱呼佩蒂為「長官」。</p>
-                            <h5>特殊機會</h5>
-                            <p>學習/閱讀場景聯名，適合文具、書籍周邊。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Pigpen%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=511" alt="Pigpen">
-                        <div class="card-header-text">
-                            <h4>Pigpen</h4>
-                            <p class="card-summary">不修邊幅，自得其樂，總是帶著一團灰塵。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心性格</h5>
-                            <p>不修邊幅、自得其樂，永遠伴隨著一團塵土。</p>
-                            <h5>特殊機會</h5>
-                            <p>「髒髒包」潮流呼應，適合反傳統美學商品。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <table class="char-table">
+                <thead>
+                    <tr>
+                        <th>角色</th>
+                        <th>核心性格</th>
+                        <th>特殊機會</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sally</td>
+                        <td>選擇性努力、可愛碎碎念</td>
+                        <td>台灣/日本女性市場共鳴</td>
+                    </tr>
+                    <tr>
+                        <td>Schroeder</td>
+                        <td>藝術完美主義</td>
+                        <td>音樂/文創 IP 聯名</td>
+                    </tr>
+                    <tr>
+                        <td>Franklin</td>
+                        <td>冷靜理性、多元包容</td>
+                        <td>DEI 敘事、年輕市場共鳴</td>
+                    </tr>
+                    <tr>
+                        <td>Peppermint Patty</td>
+                        <td>運動型、不在乎外表</td>
+                        <td>體育/戶外場景切入</td>
+                    </tr>
+                    <tr>
+                        <td>Marcie</td>
+                        <td>學霸、眼鏡娘</td>
+                        <td>學習/閱讀場景聯名</td>
+                    </tr>
+                    <tr>
+                        <td>Pigpen</td>
+                        <td>不修邊幅、自得其樂</td>
+                        <td>「髒髒包」潮流呼應</td>
+                    </tr>
+                </tbody>
+            </table>
 
             <h4>第三梯隊：隱藏寶藏（知名度低但潛力大）</h4>
             <h5>狗狗家族（Snoopy 的兄弟姐妹）</h5>
-            <div class="grid-cards character-cards">
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Spike%20Snoopy%20brother%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=512" alt="Spike">
-                        <div class="card-header-text">
-                            <h4>Spike</h4>
-                            <p class="card-summary">獨居沙漠，戴牛仔帽，比Snoopy更帥氣的哥哥。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>住沙漠、戴牛仔帽、比 Snoopy 更帥氣，身形纖細。</p>
-                            <h5>商品潛力</h5>
-                            <p>西部/冒險系列，男性向，可開發潮流服飾聯名。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Belle%20Snoopy%20sister%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=513" alt="Belle">
-                        <div class="card-header-text">
-                            <h4>Belle</h4>
-                            <p class="card-summary">Snoopy 的妹妹，優雅時尚的代表。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>Snoopy 的妹妹、最時尚的狗，頭戴蕾絲蝴蝶結。</p>
-                            <h5>商品潛力</h5>
-                            <p>時尚聯名，女性向精品，適合美妝、服飾合作。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Fat%20round%20cute%20beagle%20dog%20Olaf%20Snoopy%20brother%20chubby%20adorable%20collectible%20toy?width=100&height=100&nologo=true&seed=401" alt="Olaf">
-                        <div class="card-header-text">
-                            <h4>Olaf</h4>
-                            <p class="card-summary">最圓最胖的弟弟，什麼都不在意，潛力醜萌爆款！</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>最圓最胖的弟弟，什麼都不在意，醜萌感十足。</p>
-                            <h5>商品潛力</h5>
-                            <p>「躺平」療癒系，最易爆款，對標路人魚的醜萌美學。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Marbles%20Snoopy%20brother%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=514" alt="Marbles">
-                        <div class="card-header-text">
-                            <h4>Marbles</h4>
-                            <p class="card-summary">Snoopy 弟弟，穿著格子紋，愛閱讀。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>Snoopy 弟弟，愛閱讀，身上有斑點。</p>
-                            <h5>商品潛力</h5>
-                            <p>文藝書店聯名，適合文化周邊產品。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Andy%20Snoopy%20brother%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=515" alt="Andy">
-                        <div class="card-header-text">
-                            <h4>Andy</h4>
-                            <p class="card-summary">毛茸茸弟弟，最像真狗，總是迷路。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>毛茸茸弟弟、最像真狗，經常迷路。</p>
-                            <h5>商品潛力</h5>
-                            <p>毛絨玩具升級版，適合寵物用品聯名。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <p style="margin-top: 20px;"><strong>情報席特別提示</strong>：Olaf（胖弟）= 下一個「醜萌爆款」高機率候選<br>身形最圓、性格最無厘頭、沒什麼存在感但這就是他的魅力<br>對標：路人魚之所以爆，是因為它不是主角。Olaf 策略同理。</p>
+            <table class="char-table">
+                <thead>
+                    <tr>
+                        <th>角色</th>
+                        <th>特色</th>
+                        <th>商品潛力</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Spike</td>
+                        <td>住沙漠、戴牛仔帽、比 Snoopy 更帥氣</td>
+                        <td>西部/冒險系列，男性向</td>
+                    </tr>
+                    <tr>
+                        <td>Belle</td>
+                        <td>Snoopy 的妹妹、最時尚的狗</td>
+                        <td>時尚聯名，女性向</td>
+                    </tr>
+                    <tr>
+                        <td>Olaf</td>
+                        <td>最圓最胖的弟弟，什麼都不在意</td>
+                        <td>「躺平」療癒系，最易爆款</td>
+                    </tr>
+                    <tr>
+                        <td>Marbles</td>
+                        <td>Snoopy 弟弟，愛閱讀</td>
+                        <td>文藝書店聯名</td>
+                    </tr>
+                    <tr>
+                        <td>Andy</td>
+                        <td>毛茸茸弟弟、最像真狗</td>
+                        <td>毛絨玩具升級版</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note"><strong>情報席特別提示</strong>：Olaf（胖弟）= 下一個「醜萌爆款」高機率候選<br>身形最圓、性格最無厘頭、沒什麼存在感但這就是他的魅力<br>對標：路人魚之所以爆，是因為它不是主角。Olaf 策略同理。</div>
 
             <h5>小黃鳥特攻隊（Woodstock + 朋友們）</h5>
-            <div class="grid-cards character-cards">
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Woodstock%20cute%20yellow%20bird%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=503" alt="Woodstock">
-                        <div class="card-header-text">
-                            <h4>Woodstock</h4>
-                            <p class="card-summary">小黃鳥的主角，只說鳥語，完全靠表情溝通。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>主角，只說鳥語，完全靠表情溝通，是Snoopy的最佳玩伴。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/yellow%20bird%20Bill%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=516" alt="Bill">
-                        <div class="card-header-text">
-                            <h4>Bill</h4>
-                            <p class="card-summary">話最多的小黃鳥。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>話最多的鳥，總是嘰嘰喳喳。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/yellow%20bird%20Conrad%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=517" alt="Conrad">
-                        <div class="card-header-text">
-                            <h4>Conrad</h4>
-                            <p class="card-summary">最憂鬱的小黃鳥。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>最憂鬱的鳥，情緒比較低落。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/yellow%20bird%20Oliver%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=518" alt="Oliver">
-                        <div class="card-header-text">
-                            <h4>Oliver</h4>
-                            <p class="card-summary">最樂觀的小黃鳥。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>最樂觀的鳥，總是充滿活力。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/yellow%20bird%20Harriet%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=519" alt="Harriet">
-                        <div class="card-header-text">
-                            <h4>Harriet</h4>
-                            <p class="card-summary">小黃鳥中唯一的女性，後來嫁給Spike。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>唯一女鳥，後來嫁給 Spike。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="card character-card">
-                    <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/yellow%20bird%20Fred%20Peanuts%20cartoon%20character%20simple%20white%20background?width=100&height=100&nologo=true&seed=520" alt="Fred">
-                        <div class="card-header-text">
-                            <h4>Fred</h4>
-                            <p class="card-summary">最謹慎的小黃鳥。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>特色</h5>
-                            <p>最謹慎的鳥，總是小心翼翼。</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <p style="margin-top: 20px;"><strong>創意席洞察</strong>：小黃鳥全員不說話，純靠表情 → 跨語言商品，東南亞市場無需在地化</p>
-
+            <table class="char-table">
+                <thead>
+                    <tr>
+                        <th>角色</th>
+                        <th>特色</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Woodstock</td>
+                        <td>主角，只說鳥語，完全靠表情溝通</td>
+                    </tr>
+                    <tr>
+                        <td>Bill</td>
+                        <td>話最多的鳥</td>
+                    </tr>
+                    <tr>
+                        <td>Conrad</td>
+                        <td>最憂鬱的鳥</td>
+                    </tr>
+                    <tr>
+                        <td>Oliver</td>
+                        <td>最樂觀的鳥</td>
+                    </tr>
+                    <tr>
+                        <td>Harriet</td>
+                        <td>唯一女鳥，最後嫁給 Spike</td>
+                    </tr>
+                    <tr>
+                        <td>Fred</td>
+                        <td>最謹慎的鳥</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note"><strong>創意席洞察</strong>：小黃鳥全員不說話，純靠表情 → 跨語言商品，東南亞市場無需在地化</div>
 
             <h3>B2 四大產品系列矩陣</h3>
             <h4>矩陣設計邏輯</h4>
-            <pre style="background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: var(--border-radius); font-size: 0.9em; overflow-x: auto;"><code>
-            高知名度
+            <pre><code>            高知名度
                 ↑
   掛件小品   ← ┼ → 收藏大件
                 ↓
             低知名度（開拓市場）
-            </code></pre>
+</code></pre>
 
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>系列</th>
@@ -1274,172 +871,75 @@
                 </tbody>
             </table>
 
-            <h3>四大產品系列詳情</h3>
-            <div class="grid-cards series-cards">
-                <div class="card series-card">
+            <div class="card-grid">
+                <div class="card" data-card-type="series">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20Charlie%20Brown%20world%20travel%20map%20passport%20stamps%20adventure%20illustration%20colorful?width=800&height=450&nologo=true&seed=301" alt="世界旅人">
-                        <div class="card-header-text">
-                            <h4>系列一：世界旅人（SNOOPY GOES AROUND）</h4>
-                            <p class="card-summary">結合全球城市特色與花生角色，打造探索世界的旅行主題盲盒。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Snoopy%20Charlie%20Brown%20world%20travel%20map%20passport%20stamps%20adventure%20illustration%20colorful?width=800&height=450&nologo=true&seed=301" alt="世界旅人系列">
+                        <h4>系列一：世界旅人（SNOOPY GOES AROUND）</h4>
+                        <p class="summary">以Snoopy與朋友們在全球不同城市旅行為主題，結合當地特色，打造具有文化感的收藏系列。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>完整規格</h5>
-                            <ul>
-                                <li><strong>尺寸：</strong> 8cm</li>
-                                <li><strong>款數：</strong> 首發 10 款（年度追加 5 款）</li>
-                                <li><strong>定價：</strong> RMB 79-99</li>
-                            </ul>
-                            <h5>每款角色清單與性格簡介</h5>
-                            <ul>
-                                <li><strong>Snoopy (世界探險家)：</strong> 夢想家，穿梭於世界各地的自由靈魂。</li>
-                                <li><strong>Charlie Brown (城市遊客)：</strong> 笨拙又可愛，在異國街頭尋找小確幸。</li>
-                                <li><strong>Lucy (旅途評論家)：</strong> 無論去哪都不忘發表意見的霸氣評論家。</li>
-                                <li><strong>Linus (隨身哲學家)：</strong> 帶著安全毯，在旅途中思考人生哲理。</li>
-                                <li><strong>Woodstock (最佳導遊)：</strong> Snoopy的忠實夥伴，用鳥語引導旅程。</li>
-                                <li><strong>Olaf (首爾炸雞款)：</strong> 圓滾滾的憨厚形象，代表韓國美食文化。</li>
-                                <li><strong>Spike (拉斯維加斯款)：</strong> 戴牛仔帽的帥氣形象，代表美國西部風情。</li>
-                            </ul>
-                            <h5>隱藏款設計</h5>
-                            <p><strong>Snoopy 本人攜行李箱款 (1/72 機率)</strong>：身著飛行員服，手提復古行李箱。</p>
-                            <h5>目標市場與渠道</h5>
-                            <p>全球旅遊市場、機場免稅店、線上旗艦店、百貨精品櫃。</p>
-                            <h5>推出時程</h5>
-                            <p>Y1 Q1 首發，作為全年主打長青系列。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>完整規格</strong>：8cm 盲盒公仔，每款附國家地標配件。</p>
+                        <p><strong>角色清單（含城市/性格）</strong>：Snoopy（環球冒險家）、Charlie Brown（東京宅男）、Lucy（巴黎時尚名媛）、Linus（倫敦偵探）、Sally（紐約甜心）。<br>升級方向：將 Olaf、Spike 加入「特別城市款」（Spike=拉斯維加斯，Olaf=首爾炸雞款）。</p>
+                        <p><strong>隱藏款</strong>：Snoopy 本人攜行李箱款（1/72機率）。</p>
+                        <p><strong>目標市場</strong>：全球旅行者、文化愛好者、Snoopy 粉絲。</p>
+                        <p><strong>推出時程</strong>：Y1 Q1 首發，首發 10 城市 → 年度追加 5 城市 → 形成長青系列。</p>
                     </div>
                 </div>
 
-                <div class="card series-card">
+                <div class="card" data-card-type="series">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Woodstock%20yellow%20bird%20and%20five%20small%20bird%20friends%20cute%20figurines%20Peanuts?width=800&height=450&nologo=true&seed=402" alt="小黃鳥特攻隊">
-                        <div class="card-header-text">
-                            <h4>系列二：小黃鳥特攻隊（WOODSTOCK & SQUAD）</h4>
-                            <p class="card-summary">Woodstock與其鳥友們的集合，純表情溝通，跨文化無障礙。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Woodstock%20yellow%20bird%20cute%20small%20figurine%20friends%20squad%20Peanuts%20chibi%20product%20photo?width=800&height=450&nologo=true&seed=302" alt="小黃鳥特攻隊系列">
+                        <h4>系列二：小黃鳥特攻隊（WOODSTOCK & SQUAD）</h4>
+                        <p class="summary">以Woodstock與牠的五個鳥友為主角，透過純表情溝通，打造跨文化、療癒感十足的包包掛件系列。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心賣點</h5>
-                            <p>全員不說話，純表情溝通，跨語言、跨文化，適合做為包包掛件。</p>
-                            <h5>完整規格</h5>
-                            <ul>
-                                <li><strong>尺寸：</strong> 5cm (包包掛件版)</li>
-                                <li><strong>款數：</strong> 6 款常規 + 1 款隱藏</li>
-                                <li><strong>定價：</strong> RMB 49-59 (盲袋版)</li>
-                            </ul>
-                            <h5>每款角色清單與性格簡介</h5>
-                            <ul>
-                                <li><strong>Woodstock (夢遊版)：</strong> 迷糊可愛，代表天真無邪。</li>
-                                <li><strong>Bill (碎碎念版)：</strong> 表情豐富，彷彿有說不完的話。</li>
-                                <li><strong>Conrad (憂鬱版)：</strong> 帶點悲傷，引起共鳴。</li>
-                                <li><strong>Oliver (開心版)：</strong> 笑容燦爛，傳遞正能量。</li>
-                                <li><strong>Harriet (戀愛版)：</strong> 害羞帶甜，代表甜蜜情感。</li>
-                                <li><strong>Fred (緊張版)：</strong> 驚慌失措，展現生動情緒。</li>
-                            </ul>
-                            <h5>隱藏款設計</h5>
-                            <p><strong>集體合照迷你版 (1/72 機率)</strong>：所有小黃鳥擠在一起的可愛畫面。</p>
-                            <h5>目標市場與渠道</h5>
-                            <p>機場免稅店首選（小尺寸、易攜帶、低客單風險低）、便利店、線上電商。</p>
-                            <h5>推出時程</h5>
-                            <p>Y1 Q2 上市，作為輕巧伴手禮與日常掛件。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>完整規格</strong>：5cm 包包掛件版 + 盲袋版。</p>
+                        <p><strong>角色清單（含城市/性格）</strong>：Woodstock（夢遊版）、Bill（碎碎念版）、Conrad（憂鬱版）、Oliver（開心版）、Harriet（戀愛版）、Fred（緊張版）。</p>
+                        <p><strong>隱藏款</strong>：集體合照迷你版。</p>
+                        <p><strong>目標市場</strong>：學生、機場免稅店旅客、喜歡小尺寸可愛小物、尋求日常陪伴的客群。</p>
+                        <p><strong>推出時程</strong>：Y1 Q2。</p>
                     </div>
                 </div>
 
-                <div class="card series-card">
+                <div class="card" data-card-type="series">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20beagle%20family%20brothers%20sisters%20cute%20figurines%20collection%20product%20photography?width=800&height=450&nologo=true&seed=303" alt="狗狗家族大集合">
-                        <div class="card-header-text">
-                            <h4>系列三：狗狗家族大集合（THE BEAGLE FAMILY）</h4>
-                            <p class="card-summary">揭示Snoopy鮮為人知的兄弟姐妹，主打Olaf，創造醜萌爆款。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Snoopy%20beagle%20family%20brothers%20sisters%20cute%20figurines%20collection%20product%20photography?width=800&height=450&nologo=true&seed=303" alt="狗狗家族大集合系列">
+                        <h4>系列三：狗狗家族大集合（THE BEAGLE FAMILY）</h4>
+                        <p class="summary">揭秘Snoopy鮮為人知的八位兄弟姊妹，以「原來Snoopy有這麼多親人？」的驚喜感，主打療癒與收藏價值。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心賣點</h5>
-                            <p>「原來 Snoopy 有這麼多兄弟妹？」的驚喜感。爆款主打 Olaf（胖弟，最圓最可愛），對標 Labubu 的「醜萌」路線。</p>
-                            <h5>完整規格</h5>
-                            <ul>
-                                <li><strong>尺寸：</strong> 8cm</li>
-                                <li><strong>款數：</strong> 8 款全員</li>
-                                <li><strong>定價：</strong> RMB 79-99 (Spike 限定款 RMB 99)</li>
-                            </ul>
-                            <h5>每款角色清單與性格簡介</h5>
-                            <ul>
-                                <li><strong>Snoopy：</strong> 熟悉的夢想家。</li>
-                                <li><strong>Spike：</strong> 獨居沙漠的牛仔，充滿野性魅力。</li>
-                                <li><strong>Belle：</strong> 優雅的妹妹，時尚愛好者。</li>
-                                <li><strong>Olaf：</strong> 圓潤憨厚，隨遇而安的「躺平」代表。</li>
-                                <li><strong>Marbles：</strong> 愛閱讀，文質彬彬的斑點狗。</li>
-                                <li><strong>Andy：</strong> 毛絨絨，總是迷路的真誠兄弟。</li>
-                                <li><strong>Molly：</strong> 溫柔安靜的姐妹。</li>
-                                <li><strong>Rover：</strong> 活潑好動的兄弟。</li>
-                            </ul>
-                            <h5>隱藏款設計</h5>
-                            <p><strong>Snoopy + Olaf 兄弟組合款 (1/72 機率)</strong>：兩隻狗在一個底座上，展現兄弟情。</p>
-                            <h5>目標市場與渠道</h5>
-                            <p>收藏市場、療癒系商品、線上旗艦店、特色潮玩店。</p>
-                            <h5>推出時程</p>
-                            <p>Y1 Q3 上市，重點推廣 Olaf。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>完整規格</strong>：8cm 盲盒公仔，每款造型獨特。</p>
+                        <p><strong>角色清單（含城市/性格）</strong>：Snoopy、Spike、Belle、Olaf（胖弟）、Marbles、Andy、Molly、Rover。</p>
+                        <p><strong>隱藏款</strong>：Snoopy + Olaf 兄弟組合款（兩隻在一個底座）。</p>
+                        <p><strong>目標市場</strong>：Snoopy 鐵粉、收藏家、尋求「醜萌」爆款的年輕客群。</p>
+                        <p><strong>推出時程</strong>：Y1 Q3。</p>
                     </div>
                 </div>
 
-                <div class="card series-card">
+                <div class="card" data-card-type="series">
                     <div class="card-header">
-                        <img src="https://image.pollinations.ai/prompt/Snoopy%20in%20different%20jobs%20pilot%20chef%20doctor%20lawyer%20cute%20collectible%20figurines%20product%20photo?width=800&height=450&nologo=true&seed=304" alt="Snoopy 職業百態">
-                        <div class="card-header-text">
-                            <h4>系列四：Snoopy 職業百態（SNOOPY AT WORK）</h4>
-                            <p class="card-summary">Snoopy化身各行各業，為職場人士帶來情感慰藉與趣味禮品。</p>
-                        </div>
+                        <img class="card-image" src="https://image.pollinations.ai/prompt/Snoopy%20in%20different%20jobs%20pilot%20chef%20doctor%20lawyer%20cute%20collectible%20figurines%20product%20photo?width=800&height=450&nologo=true&seed=304" alt="Snoopy 職業百態系列">
+                        <h4>系列四：Snoopy 職業百態（SNOOPY AT WORK）</h4>
+                        <p class="summary">Snoopy化身職場百態，以幽默和陪伴感，專為25-35歲職場白領設計，作為辦公桌上的療癒小夥伴。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>核心賣點</h5>
-                            <p>情緒消費 × 辦公室禮品 × 自我表達，為職場生活注入趣味。</p>
-                            <h5>完整規格</h5>
-                            <ul>
-                                <li><strong>尺寸：</strong> 10cm</li>
-                                <li><strong>款數：</strong> 10 款職業</li>
-                                <li><strong>定價：</strong> RMB 99-129</li>
-                            </ul>
-                            <h5>每款角色清單與性格簡介</h5>
-                            <p>Snoopy 以不同職業形象出現，延續其夢想家本質：</p>
-                            <ul>
-                                <li><strong>飛行員：</strong> Snoopy 最經典造型，象徵自由與夢想。</li>
-                                <li><strong>廚師：</strong> 美味創造者，帶來生活情趣。</li>
-                                <li><strong>律師：</strong> 嚴謹正義，職場專業感。</li>
-                                <li><strong>醫生：</strong> 溫柔關懷，給予身心支持。</li>
-                                <li><strong>程式設計師：</strong> 專注創新，代表科技工作者。</li>
-                                <li><strong>老師：</strong> 啟蒙引導，知識傳承者。</li>
-                                <li><strong>音樂家：</strong> 藝術表達，生活調味劑。</li>
-                                <li><strong>運動員：</strong> 活力四射，挑戰自我。</li>
-                                <li><strong>旅行者：</strong> 探索世界，放飛心情。</li>
-                                <li><strong>創業者：</strong> 勇敢追夢，無畏挑戰。</li>
-                            </ul>
-                            <h5>文案方向</h5>
-                            <p>「每個職業都需要一個 Snoopy 陪你撐過去」。</p>
-                            <h5>隱藏款設計</h5>
-                            <p>待定，可考慮限定夜班族或創業成功版。</p>
-                            <h5>目標市場與渠道</h5>
-                            <p>25-35歲職場白領（午休去便利店看到就買）、禮品市場、線上/線下精品店。</p>
-                            <h5>推出時程</h5>
-                            <p>Y2 Q1 上市，作為年度開局重磅產品。</p>
-                        </div>
+                    <div class="card-content">
+                        <p><strong>完整規格</strong>：10cm 公仔，每款搭配精緻職業道具。</p>
+                        <p><strong>角色清單（含城市/性格）</strong>：飛行員、廚師、律師、醫生、程式設計師、老師、音樂家、運動員、旅行者、創業者。</p>
+                        <p><strong>隱藏款</strong>：Snoopy 創意總監款（附迷你提案板）。</p>
+                        <p><strong>目標市場</strong>：職場白領、禮品市場、辦公室擺件。</p>
+                        <p><strong>推出時程</strong>：Y2 Q1。</p>
                     </div>
                 </div>
             </div>
 
             <h3>B3 圖片素材策略（升級版）</h3>
-            <p><strong>創意席聲明</strong>：本方案圖片分三個等級</p>
-            <table class="info-table">
+            <div class="note"><strong>創意席聲明</strong>：本方案圖片分三個等級</div>
+            <table>
                 <thead>
                     <tr>
                         <th>等級</th>
@@ -1465,7 +965,7 @@
                     </tr>
                 </tbody>
             </table>
-            <p><strong>建議下一步</strong>：委託台灣設計事務所出3款實際角色草稿（費用估計 NTD 15,000-25,000），以A4設計稿形式提案版權方，成功率提升 60%。</p>
+            <div class="note"><strong>建議下一步</strong>：委託台灣設計事務所出3款實際角色草稿（費用估計 NTD 15,000-25,000），以A4設計稿形式提案版權方，成功率提升 60%。</div>
         </section>
 
         <section id="part-c">
@@ -1474,7 +974,7 @@
             <h3>C1 價位策略：什麼價位最好推</h3>
             <h4>市場吸收力測試結果</h4>
             <h5>中國大陸市場（最大單一市場）</h5>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>價位帶</th>
@@ -1510,8 +1010,7 @@
                     </tr>
                 </tbody>
             </table>
-            <p><strong>業務席建議主力定價</strong>：<strong>RMB 79（8cm 盲袋）/ RMB 49（5cm 掛件）</strong></p>
-            <p>理由：競品 Pop Mart 主流 79 RMB，市場教育完成；Snoopy IP 加持可守住價格不被砍</p>
+            <div class="note"><strong>業務席建議主力定價</strong>：<strong>RMB 79（8cm 盲袋）/ RMB 49（5cm 掛件）</strong><br>理由：競品 Pop Mart 主流 79 RMB，市場教育完成；Snoopy IP 加持可守住價格不被砍</div>
 
             <h5>台灣市場</h5>
             <ul>
@@ -1519,6 +1018,7 @@
                 <li>超商限定款 TWD 199 可以做（引流用）</li>
                 <li>誠品/百貨精品館 TWD 499-699（精品包裝版）</li>
             </ul>
+
             <h5>東南亞市場（泰國/馬來西亞/新加坡）</h5>
             <ul>
                 <li>泰國 THB 299-399（約 RMB 60-80）= 可接受</li>
@@ -1528,7 +1028,7 @@
 
             <h3>C2 必爭市場：這幾個不拿下不行</h3>
             <h4>市場優先級矩陣</h4>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>優先級</th>
@@ -1592,53 +1092,84 @@
             </table>
 
             <h3>C3 整體銷售規模目標</h3>
+            <h4>假設基礎</h4>
+            <ul>
+                <li><strong>Y1 推出系列</strong>：系列一（世界旅人）全年 + 系列二（小黃鳥）Q2起</li>
+                <li><strong>主要渠道</strong>：大陸 1000+終端 × 台灣 × 泰國（Q3起）</li>
+                <li><strong>平均客單價</strong>：RMB 79（折算基準）</li>
+            </ul>
+
             <h4>銷售規模預測</h4>
-            <div class="chart-container">
-                <h4 style="color: var(--text-white);">銷售規模預測 (萬RMB)</h4>
-                <div class="bar-chart" data-chart-type="bar" data-chart-values='[{"label":"Y1","value":1136},{"label":"Y2","value":1439},{"label":"Y3","value":2690}]'>
-                    <!-- Bars will be generated by JS -->
-                </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>年度</th>
+                        <th>大陸（萬件）</th>
+                        <th>台灣（萬件）</th>
+                        <th>東南亞（萬件）</th>
+                        <th>總收入（萬RMB）</th>
+                        <th>淨利（萬RMB）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Y1</td>
+                        <td>8-12</td>
+                        <td>2-3</td>
+                        <td>1-2</td>
+                        <td>880-1340</td>
+                        <td>200-280</td>
+                    </tr>
+                    <tr>
+                        <td>Y2</td>
+                        <td>15-20</td>
+                        <td>4-6</td>
+                        <td>4-6</td>
+                        <td>1820-2530</td>
+                        <td>420-580</td>
+                    </tr>
+                    <tr>
+                        <td>Y3</td>
+                        <td>20-28</td>
+                        <td>6-8</td>
+                        <td>8-12</td>
+                        <td>2690-3790</td>
+                        <td>620-880</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note"><strong>VAM 貢獻試算（Y2，對賭第二年）</strong><br>
+                目標淨利：500萬 RMB<br>
+                需要總銷售量：約 21 萬件<br>
+                大陸 18萬件 = 每家終端均攤 180 件/年 = 15件/月/店 → <strong>非常保守可達成</strong>
             </div>
 
             <h4>各市場目標佔比（Y2 穩定後）</h4>
-            <div class="chart-container progress-bars">
-                <h4 style="color: var(--text-white);">各市場目標佔比 (Y2 穩定後)</h4>
-                <div class="progress-item">
-                    <span class="progress-label">中國大陸</span>
-                    <div class="progress-bar-wrapper">
-                        <div class="progress-bar" data-progress="72">
-                            <span class="progress-text">72%</span>
-                        </div>
-                    </div>
+            <div class="bar-chart-container" id="market-share-chart">
+                <div class="bar-chart-item">
+                    <span class="bar-label">中國大陸</span>
+                    <div class="bar-wrapper"><div class="bar" style="--bar-width: 72%;"></div></div>
+                    <span class="bar-value">72%</span>
                 </div>
-                <div class="progress-item">
-                    <span class="progress-label">台灣</span>
-                    <div class="progress-bar-wrapper">
-                        <div class="progress-bar" data-progress="18">
-                            <span class="progress-text">18%</span>
-                        </div>
-                    </div>
+                <div class="bar-chart-item">
+                    <span class="bar-label">台灣</span>
+                    <div class="bar-wrapper"><div class="bar" style="--bar-width: 18%;"></div></div>
+                    <span class="bar-value">18%</span>
                 </div>
-                <div class="progress-item">
-                    <span class="progress-label">泰國</span>
-                    <div class="progress-bar-wrapper">
-                        <div class="progress-bar" data-progress="7">
-                            <span class="progress-text">7%</span>
-                        </div>
-                    </div>
+                <div class="bar-chart-item">
+                    <span class="bar-label">泰國</span>
+                    <div class="bar-wrapper"><div class="bar" style="--bar-width: 7%;"></div></div>
+                    <span class="bar-value">7%</span>
                 </div>
-                <div class="progress-item">
-                    <span class="progress-label">其他東南亞</span>
-                    <div class="progress-bar-wrapper">
-                        <div class="progress-bar" data-progress="3">
-                            <span class="progress-text">3%</span>
-                        </div>
-                    </div>
+                <div class="bar-chart-item">
+                    <span class="bar-label">其他東南亞</span>
+                    <div class="bar-wrapper"><div class="bar" style="--bar-width: 3%;"></div></div>
+                    <span class="bar-value">3%</span>
                 </div>
             </div>
 
             <h3>C4 渠道組合最優解</h3>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>渠道</th>
@@ -1689,7 +1220,7 @@
             <h4>最高優先（本月內）</h4>
             <ol>
                 <li>確認 Snoopy 授權合約是否覆蓋「盲袋」產品形式（若否，需補充授權）</li>
-                <li>委託設計事務所出 Olaf + Woodstock 兩款試稿（最具爆款潛力）</li>
+                <li>委託設計事務所出 Olaf <img src="https://image.pollinations.ai/prompt/Fat%20round%20cute%20beagle%20dog%20Olaf%20Snoopy%20brother%20chubby%20adorable%20collectible%20toy?width=80&height=45&nologo=true&seed=401" alt="Olaf" style="vertical-align: middle; height: 30px; border-radius: 50%;"> + Woodstock <img src="https://image.pollinations.ai/prompt/Woodstock%20yellow%20bird%20and%20five%20small%20bird%20friends%20cute%20figurines%20Peanuts?width=80&height=45&nologo=true&seed=402" alt="Woodstock" style="vertical-align: middle; height: 30px; border-radius: 50%;"> 兩款試稿（最具爆款潛力）</li>
                 <li>業務開始接觸大陸 Top 50 終端，提前鎖位 Y1 Q3 新品</li>
             </ol>
             <h4>中優先（30-60天）</h4>
@@ -1706,106 +1237,110 @@
             </ol>
 
             <h3>D2 最大風險與防禦</h3>
-            <div class="grid-cards risk-cards">
-                <div class="card risk-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>風險</th>
+                        <th>機率</th>
+                        <th>衝擊</th>
+                        <th>防禦措施</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>授權方不批准盲袋形式</td>
+                        <td>中</td>
+                        <td>高</td>
+                        <td>提前確認，同步準備替代包裝方案（透明盒）</td>
+                    </tr>
+                    <tr>
+                        <td>大陸市場盲盒泡沫退潮</td>
+                        <td>中</td>
+                        <td>高</td>
+                        <td>多系列分散風險，不過度依賴單一系列</td>
+                    </tr>
+                    <tr>
+                        <td>競品快速跟進（Pop Mart 搶 Snoopy）</td>
+                        <td>高</td>
+                        <td>中</td>
+                        <td>加速執行，先占渠道先拿市場份額</td>
+                    </tr>
+                    <tr>
+                        <td>Olaf 等次要角色市場接受度不如預期</td>
+                        <td>中</td>
+                        <td>低</td>
+                        <td>Y1 Q1 先用成熟角色，Y1 Q3 再推次要角色</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>D3 業務席市場調研任務書</h3>
+            <p>幕僚長交辦業務席，以下三個核心問題<strong>必須帶著腳去市場搜集真實反饋</strong>，不能只坐辦公室憑感覺作答。數據回來後幕僚長統整，才是定案的依據。</p>
+
+            <div class="card-grid">
+                <div class="card" data-card-type="task">
                     <div class="card-header">
-                        <div class="card-header-text">
-                            <h4>授權方不批准盲袋形式</h4>
-                            <p class="card-summary">授權條款可能限制盲袋產品形式。</p>
-                        </div>
+                        <h4>任務一：消費者現在喜歡什麼口味？</h4>
+                        <p class="summary">我們對消費者的理解停留在「喜歡 Snoopy」這個層次，不夠用。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>風險評估</h5>
-                            <p><strong>機率：</strong> 中</p>
-                            <p><strong>衝擊：</strong> 高</p>
-                            <h5>防禦措施</h5>
-                            <ul>
-                                <li>提前與授權方溝通確認，並了解潛在限制條款。</li>
-                                <li>同步準備替代包裝方案（如透明展示盒、開放式盲盒設計）以應對。</li>
-                            </ul>
-                        </div>
+                    <div class="card-content">
+                        <p>業務席要向目標渠道（大陸精品玩具店、台灣誠品/蔦屋、泰國 Central 商圈）搜集：</p>
+                        <ul>
+                            <li>目前店內最暢銷的盲盒 IP 是哪三個？為什麼消費者買？</li>
+                            <li>消費者在店頭的口頭評語：是說「好可愛」還是「好有個性」？</li>
+                            <li>購買者年齡層與性別比實際觀察數字</li>
+                        </ul>
+                        <p><strong>回報格式</strong>：各市場各 3 家店，填回調研表，下週五前交幕僚長。</p>
                     </div>
                 </div>
-                <div class="card risk-card">
+
+                <div class="card" data-card-type="task">
                     <div class="card-header">
-                        <div class="card-header-text">
-                            <h4>大陸市場盲盒泡沫退潮</h4>
-                            <p class="card-summary">盲盒市場可能面臨消費者熱情下降或監管趨嚴。</p>
-                        </div>
+                        <h4>任務二：同時推幾個系列才不會把渠道撐死？</h4>
+                        <p class="summary">財務試算是一回事，渠道實際能吸收的鋪貨量是另一回事。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>風險評估</h5>
-                            <p><strong>機率：</strong> 中</p>
-                            <p><strong>衝擊：</strong> 高</p>
-                            <h5>防禦措施</h5>
-                            <ul>
-                                <li>實行多系列、多品類分散風險，不過度依賴單一系列或單一產品形式。</li>
-                                <li>著重產品的情緒價值與IP故事深度，而非單純的「盲」屬性。</li>
-                            </ul>
-                        </div>
+                    <div class="card-content">
+                        <p>業務席要向現有合作客戶（大陸前 20 大客戶、台灣主要百貨買手）確認：</p>
+                        <ul>
+                            <li>一個新 IP 系列首批鋪貨量他們能接受多少件/店？</li>
+                            <li>若同時上兩個系列，他們的預算會怎麼分配？</li>
+                            <li>對花生漫畫盲盒系列的興趣程度（1-10 分，目前是未看過提案的冷評估）</li>
+                        </ul>
+                        <p><strong>回報格式</strong>：至少訪談 10 家客戶，回填意願評分表。</p>
                     </div>
                 </div>
-                <div class="card risk-card">
+
+                <div class="card" data-card-type="task">
                     <div class="card-header">
-                        <div class="card-header-text">
-                            <h4>競品快速跟進（Pop Mart 搶 Snoopy）</h4>
-                            <p class="card-summary">其他潮玩品牌可能也會尋求Snoopy授權，加劇競爭。</p>
-                        </div>
+                        <h4>任務三：各市場的真實銷售規模上限是多少？</h4>
+                        <p class="summary">我們的財務模型是由上往下推的（市場規模 × 滲透率），業務席要做由下往上的驗證。</p>
+                        <span class="expand-button">▼ 展開詳情</span>
                     </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>風險評估</h5>
-                            <p><strong>機率：</strong> 高</p>
-                            <p><strong>衝擊：</strong> 中</p>
-                            <h5>防禦措施</h5>
-                            <ul>
-                                <li>加速執行，盡快佔領核心渠道，先拿市場份額，建立先行者優勢。</li>
-                                <li>深化與授權方的合作關係，尋求排他性條款或優先續約權。</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="card risk-card">
-                    <div class="card-header">
-                        <div class="card-header-text">
-                            <h4>Olaf 等次要角色市場接受度不如預期</h4>
-                            <p class="card-summary">非主流角色可能不被大眾市場接受，影響銷量。</p>
-                        </div>
-                    </div>
-                    <span class="toggle-btn">▼ 展開詳情</span>
-                    <div class="card-details">
-                        <div class="card-details-content">
-                            <h5>風險評估</h5>
-                            <p><strong>機率：</strong> 中</p>
-                            <p><strong>衝擊：</strong> 低</p>
-                            <h5>防禦措施</h5>
-                            <ul>
-                                <li>Y1 Q1 先用 Snoopy、Charlie Brown 等成熟明星角色打頭陣，建立品牌信心。</li>
-                                <li>Y1 Q3 再推 Olaf 等次要角色，並結合其「醜萌」、「躺平」等特色進行差異化營銷。</li>
-                            </ul>
-                        </div>
+                    <div class="card-content">
+                        <p>業務席要驗證：</p>
+                        <ul>
+                            <li>現有渠道客戶，對 Snoopy 盲盒系列願意下多少首批訂單？</li>
+                            <li>歐洲、紐澳市場：現有代理商關係是否能快速啟動？若無，開發新代理商的時間成本？</li>
+                            <li>機場免稅渠道：台灣桃園機場 + 曼谷蘇萬納蓬機場，進入條件與前置時間？</li>
+                        </ul>
+                        <p><strong>回報格式</strong>：渠道意願彙整表 + 潛在首批訂單量估算，30 天內完成。</p>
                     </div>
                 </div>
             </div>
 
-            <h3>D3 幕僚長最終建議</h3>
-            <p>老董問的三個問題，幕僚長直接回答：</p>
-            <p><strong>問：消費者現在喜歡什麼？</strong><br>答：喜歡「有缺陷的可愛」、「能共鳴的失敗感」、「可展示的社交貨幣」。Snoopy 宇宙天然符合三條，但我們過去賣法太保守，沒有把這個故事說出來。</p>
-            <p><strong>問：我們能推多少個系列？</strong><br>答：四個系列同時規劃，分批推出。Y1 先用世界旅人 + 小黃鳥建立市場，Y2 再推狗狗家族 + 職業百態。切忌同時上四個，消費者消化不了，渠道也管理不來。</p>
-            <p><strong>問：銷售規模期待多少？</strong><br>答：Y1 兩系列首發，批發總收入 RMB 1,136 萬，淨利 <strong>RMB 449 萬（VAM 60%）</strong>。Y2 四系列全開，淨利 <strong>RMB 1,076 萬（VAM 143%）</strong>。這是含歐洲+紐澳全授權版圖的完整試算，數字是守得住的，前提是 Y1 Q1 渠道全部鎖定、Q2 前東南亞/歐洲代理商落地。</p>
-            <p style="text-align: right; margin-top: 50px;"><em>本提案由蕪解創意幕僚長統籌，情報席×創意席×業務席聯合出品</em><br><em>提案等級：可對外提交版本（授權方/投資方）</em></p>
+            <p style="margin-top: 50px; text-align: center; font-style: italic; color: rgba(255, 255, 255, 0.7);">
+                *本提案由蕪解創意幕僚長統籌，情報席×創意席×業務席聯合出品*<br>
+                *提案等級：可對外提交版本（授權方/投資方）*
+            </p>
         </section>
 
         <section id="part-e">
             <h2>PART E｜財務席：完整成本結構 × 損益預測</h2>
 
             <h3>E1 每件成本拆解（已確認數據）</h3>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>項目</th>
@@ -1856,11 +1391,11 @@
                     </tr>
                 </tbody>
             </table>
-            <p>版稅計算基礎：蕪解批發出貨價 × 13%（付予 Peanuts 授權方）</p>
+            <div class="note">版稅計算基礎：蕪解批發出貨價 × 13%（付予 Peanuts 授權方）</div>
 
             <h3>E2 建議生產量（全球授權版圖）</h3>
             <p>Snoopy 授權涵蓋全球，蕪解可部署以下市場：</p>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>市場</th>
@@ -1922,7 +1457,7 @@
             </ul>
 
             <h4>Y1 合計損益</h4>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>項目</th>
@@ -1979,7 +1514,7 @@
 
             <h3>E4 Y2 四系列全開預測</h3>
             <p>Y2 新增系列三（狗狗家族 8款）+ 系列四（職業百態 10款）：</p>
-            <table class="info-table">
+            <table>
                 <thead>
                     <tr>
                         <th>系列</th>
@@ -2025,145 +1560,117 @@
                     </tr>
                 </tbody>
             </table>
-            <p>Y2 一年 Snoopy 系列淨利即可超越 VAM 目標 1.43 倍。<br>若 Y1 順利執行、Y2 四系列到位，蕪解在 JV 框架下的 IPO 估值基礎穩固。</p>
+            <div class="note">Y2 一年 Snoopy 系列淨利即可超越 VAM 目標 1.43 倍。<br>若 Y1 順利執行、Y2 四系列到位，蕪解在 JV 框架下的 IPO 估值基礎穩固。</div>
 
             <h3>E5 損益敏感性分析</h3>
             <p>最大風險情境：若 8cm 系列銷售率僅達 70%（剩 30% 庫存），Y1 淨利下降至 <strong>RMB 277 萬</strong>。</p>
             <p>對策：小黃鳥 5cm 掛件毛利更高（68%），作為壓艙石；加大電商尾貨消化管道。</p>
         </section>
-    </div>
 
-    <footer>
-        <p>&copy; 2026 蕪解創意. All rights reserved. PEANUTS Worldwide LLC. 版權所有。</p>
-        <p>此為模擬提案網頁，所有數據與圖片僅供參考。</p>
-    </footer>
+    </div> <!-- End of container -->
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Card Toggle Functionality
+            // Card Expand/Collapse
             const cards = document.querySelectorAll('.card');
 
             cards.forEach(card => {
-                const toggleBtn = card.querySelector('.toggle-btn');
-                const cardDetails = card.querySelector('.card-details');
+                card.addEventListener('click', () => {
+                    const content = card.querySelector('.card-content');
+                    const button = card.querySelector('.expand-button');
 
-                // If no toggle button or details content, hide button and skip logic
-                if (!toggleBtn || !cardDetails || cardDetails.children.length === 0) {
-                    if (toggleBtn) toggleBtn.style.display = 'none';
-                    return;
-                }
-
-                toggleBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent card hover/click from interfering
-                    card.classList.toggle('expanded');
                     if (card.classList.contains('expanded')) {
-                        // Set max-height to scrollHeight for smooth transition
-                        cardDetails.style.maxHeight = cardDetails.scrollHeight + 'px';
-                        toggleBtn.textContent = '▲ 收合';
+                        card.classList.remove('expanded');
+                        button.textContent = '▼ 展開詳情';
                     } else {
-                        cardDetails.style.maxHeight = '0';
-                        toggleBtn.textContent = '▼ 展開詳情';
+                        // Close other expanded cards of the same type (optional, but good UX for info cards)
+                        document.querySelectorAll(`.card[data-card-type="${card.dataset.cardType}"].expanded`).forEach(otherCard => {
+                            if (otherCard !== card) {
+                                otherCard.classList.remove('expanded');
+                                otherCard.querySelector('.expand-button').textContent = '▼ 展開詳情';
+                            }
+                        });
+                        card.classList.add('expanded');
+                        button.textContent = '▲ 收合';
                     }
                 });
             });
 
-            // Sticky Navigation Active State & Smooth Scroll
-            const navLinks = document.querySelectorAll('nav a');
-            const sections = document.querySelectorAll('section[id]');
-            const headerHeight = document.querySelector('header').offsetHeight;
-
-            const updateActiveNavLink = () => {
-                let currentActiveSection = null;
-                // Find the section closest to the top of the viewport
-                sections.forEach(section => {
-                    const rect = section.getBoundingClientRect();
-                    // Consider a section active if its top is above the header and visible
-                    if (rect.top <= headerHeight + 50 && rect.bottom >= headerHeight + 50) { // +50px buffer
-                        currentActiveSection = section;
-                    }
-                });
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (currentActiveSection && link.getAttribute('href') === `#${currentActiveSection.id}`) {
-                        link.classList.add('active');
+            // IntersectionObserver for Bar Charts
+            const animateBars = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const bars = entry.target.querySelectorAll('.bar');
+                        bars.forEach(bar => {
+                            bar.classList.add('animate');
+                        });
+                        const textBars = entry.target.querySelectorAll('.text-bar-fill');
+                        textBars.forEach(textBar => {
+                             const percentage = parseFloat(textBar.nextElementSibling.textContent);
+                             const maxWidth = textBar.parentElement.clientWidth; // Parent width
+                             textBar.style.setProperty('--bar-width-px', `${(percentage / 100) * (maxWidth - 200)}px`); // Adjust 200 for label/value width
+                            textBar.classList.add('animate');
+                        });
+                        observer.unobserve(entry.target); // Stop observing once animated
                     }
                 });
             };
 
-            // Initial call and listen for scroll
-            updateActiveNavLink();
-            window.addEventListener('scroll', updateActiveNavLink);
+            const barChartObserver = new IntersectionObserver(animateBars, {
+                root: null, // viewport
+                threshold: 0.5 // Trigger when 50% of the element is visible
+            });
 
+            const barCharts = document.querySelectorAll('.bar-chart-container');
+            barCharts.forEach(chart => barChartObserver.observe(chart));
+            
+            // For the text-based bar chart, manually set width and observe
+            const textBarChart = document.getElementById('market-share-chart');
+            if (textBarChart) {
+                barChartObserver.observe(textBarChart);
+            }
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('href').substring(1);
-                    const targetSection = document.getElementById(targetId);
-                    if (targetSection) {
-                        window.scrollTo({
-                            top: targetSection.offsetTop - headerHeight + 1, // Adjust for sticky header
-                            behavior: 'smooth'
+            // Sticky Navbar and Active Link
+            const navLinks = document.querySelectorAll('.nav-list a');
+            const sections = document.querySelectorAll('section[id]');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3 // Adjust as needed
+            };
+
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
                         });
                     }
                 });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                sectionObserver.observe(section);
             });
 
-            // Chart Animations with IntersectionObserver
-            const animateChartObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const chartContainer = entry.target;
-                        
-                        // Handle Bar Chart
-                        if (chartContainer.classList.contains('bar-chart')) {
-                            chartContainer.querySelectorAll('.bar').forEach(barEl => {
-                                const value = parseFloat(barEl.dataset.value);
-                                const max = parseFloat(barEl.dataset.max);
-                                const percentage = (value / max) * 100;
-                                barEl.style.height = `${percentage}%`;
-                                barEl.classList.add('animated');
-                                barEl.querySelector('.bar-value').textContent = `${value}萬`;
-                            });
-                        } 
-                        // Handle Progress Bars
-                        else if (chartContainer.classList.contains('progress-bars')) {
-                            chartContainer.querySelectorAll('.progress-bar').forEach(bar => {
-                                const percentage = bar.dataset.progress;
-                                bar.style.width = `${percentage}%`;
-                                bar.classList.add('animated');
-                            });
-                        }
-                        observer.unobserve(chartContainer); // Stop observing once animated
+            // Set initial active link if page loaded at a specific section
+            const currentHash = window.location.hash.substring(1);
+            if (currentHash) {
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href').substring(1) === currentHash) {
+                        link.classList.add('active');
                     }
                 });
-            }, { threshold: 0.5 }); // Trigger when 50% of chart is visible
-
-            // Bar Chart Setup and Observation
-            const barChartContainer = document.querySelector('.bar-chart');
-            if (barChartContainer) {
-                const data = JSON.parse(barChartContainer.dataset.chartValues);
-                const maxChartValue = Math.max(...data.map(d => d.value));
-                // Define a slightly higher max for visual scaling (e.g., 120% of max value for Y3)
-                const visualMax = Math.max(maxChartValue, data[data.length-1].value) * 1.2; 
-
-                data.forEach(item => {
-                    const bar = document.createElement('div');
-                    bar.classList.add('bar');
-                    bar.innerHTML = `<span class="bar-value"></span><span class="bar-label">${item.label}</span>`;
-                    barChartContainer.appendChild(bar);
-                    // Store the actual value and the adjusted max for animation
-                    bar.dataset.value = item.value;
-                    bar.dataset.max = visualMax;
-                });
-                animateChartObserver.observe(barChartContainer);
-            }
-
-            // Progress Bar Setup and Observation
-            const progressBarsContainer = document.querySelector('.progress-bars');
-            if (progressBarsContainer) {
-                animateChartObserver.observe(progressBarsContainer);
+            } else {
+                // Default to '開場' or the first section if no hash
+                const firstNavLink = document.querySelector('.nav-list a[href="#intro"]');
+                if (firstNavLink) {
+                    firstNavLink.classList.add('active');
+                }
             }
         });
     </script>
