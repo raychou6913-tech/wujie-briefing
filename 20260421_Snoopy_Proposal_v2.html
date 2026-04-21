@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snoopy 新品開發完整提案 - 蕪解集團</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fafaf8; /* 米白 */
+            --text-color: #1c1c1e; /* 深炭灰 */
+            --accent-color: #c9a84c; /* 金色 */
+            --dark-bg: #1c1c1e; /* 深炭灰 */
+            --dark-text: #f0f0ed; /* 淺米白 */
+            --hero-overlay: rgba(28, 28, 30, 0.7);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            position: relative;
+            width: 100%;
+            height: 600px; /* Adjust as needed */
+            background-image: url('https://raychou6913-tech.github.io/wujie-briefing/hero_banner.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--hero-overlay);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: white;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        header .meta-info {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 10px;
+        }
+
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid rgba(28, 28, 30, 0.1);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: var(--accent-color);
+            margin: 15px auto 0;
+        }
+
+        h3 {
+            font-size: 1.8em;
+            color: var(--text-color);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        h4 {
+            font-size: 1.4em;
+            color: var(--text-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            line-height: 1.7;
+        }
+
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        th, td {
+            border: 1px solid rgba(28, 28, 30, 0.1);
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(28, 28, 30, 0.05);
+            font-weight: 600;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: rgba(28, 28, 30, 0.02);
+        }
+
+        .highlight-gold {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-images, .character-grid {
+            display: grid;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .product-images {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .character-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .character-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .character-card img {
+            width: 100%;
+            height: 250px; /* Fixed height for consistency */
+            object-fit: cover;
+            margin: 0;
+            border-bottom: 1px solid rgba(28, 28, 30, 0.05);
+        }
+
+        .character-card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .character-card h4 {
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .character-card p {
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .character-card .city {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .vam-contribution {
+            margin-top: 30px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            transition: width 1s ease-in-out;
+            width: var(--progress-width, 0%); /* CSS variable for animation */
+        }
+
+        .pitch-script blockquote {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            padding: 30px;
+            margin: 40px 0;
+            border-left: 8px solid var(--accent-color);
+            font-size: 1.2em;
+            line-height: 1.8;
+            border-radius: 0 8px 8px 0;
+            position: relative;
+        }
+        .pitch-script blockquote::before {
+            content: '“';
+            font-family: serif;
+            font-size: 6em;
+            color: var(--accent-color);
+            position: absolute;
+            left: 20px;
+            top: 0px;
+            opacity: 0.2;
+        }
+        .pitch-script blockquote p {
+            margin-bottom: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dark-section {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            padding: 60px 0;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        .dark-section h2, .dark-section h3, .dark-section h4 {
+            color: var(--accent-color);
+        }
+        .dark-section p, .dark-section li {
+            color: var(--dark-text);
+        }
+        .dark-section h2::after {
+            background-color: var(--accent-color);
+        }
+        .dark-section h3 {
+            border-left-color: var(--accent-color);
+        }
+
+        .numbered-list-gold ol {
+            list-style-type: none; /* Remove default numbering */
+            padding-left: 0;
+        }
+
+        .numbered-list-gold ol li {
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: var(--dark-text);
+        }
+
+        .numbered-list-gold ol li::before {
+            content: counter(list-item) ".";
+            counter-increment: list-item;
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 25px;
+            text-align: right;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.9em;
+            color: #777;
+            background-color: #f5f5f0;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5em;
+            }
+            h2 {
+                font-size: 2em;
+            }
+            h3 {
+                font-size: 1.5em;
+            }
+            h4 {
+                font-size: 1.2em;
+            }
+            .container {
+                padding: 15px;
+            }
+            .product-images, .character-grid {
+                grid-template-columns: 1fr;
+            }
+            .character-card img {
+                height: 200px;
+            }
+            .pitch-script blockquote {
+                padding: 20px;
+                font-size: 1em;
+            }
+            .pitch-script blockquote::before {
+                font-size: 4em;
+                left: 10px;
+            }
+            .numbered-list-gold ol li {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="hero-overlay">
+            <h1>【幕僚長決策報告】Snoopy 新品開發完整提案</h1>
+            <div class="meta-info">
+                <p>調用成員：10情報 × 11創意 × 09財務 × 12業務</p>
+                <p>產出日期：2026-04-21</p>
+                <p>授權範圍：12cm 以下任何尺寸</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section>
+            <h2>PART 1｜市場調研<span class="highlight-gold">【10號 情報】</span></h2>
+
+            <h3>1.1 Snoopy IP 全球熱度現況</h3>
+            <p>Snoopy（史努比）隸屬 Peanuts Worldwide，自 1950 年代誕生至今超過 70 年，是全球商業化最成熟的 IP 之一。</p>
+            <h4>市場熱度信號（2025–2026）：</h4>
+            <ul>
+                <li>小紅書搜索量：「史努比周邊」月均搜索量 <span class="highlight-gold">120 萬+</span>，持續增長</li>
+                <li>抖音話題「史努比」相關影片播放量累計破 <span class="highlight-gold">50 億</span></li>
+                <li>全球授權商品年收入 <span class="highlight-gold">$4 億美元</span>（Peanuts 官方數據）</li>
+                <li>台灣 / 香港市場：史努比咖啡廳、限定展覽持續引爆排隊人潮</li>
+                <li>東南亞：泰國 Central 百貨 Snoopy 快閃 <span class="highlight-gold">3 天售罄</span>，馬來西亞 Isetan 年度最暢銷 IP 周邊</li>
+            </ul>
+
+            <h3>1.2 競品分析</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>競品</th>
+                        <th>產品形態</th>
+                        <th>定價區間</th>
+                        <th>弱點</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>POP MART Snoopy 系列</td>
+                        <td>8–12cm 盲盒</td>
+                        <td>RMB 89–129/個</td>
+                        <td>設計較單一，缺乏文化在地化</td>
+                    </tr>
+                    <tr>
+                        <td>Miniso Snoopy</td>
+                        <td>毛絨/公仔</td>
+                        <td>RMB 39–79</td>
+                        <td>定位大眾，缺乏稀缺感</td>
+                    </tr>
+                    <tr>
+                        <td>日本正版扭蛋</td>
+                        <td>3–5cm</td>
+                        <td>JPY 300–500</td>
+                        <td>僅限日本，東南亞取得難度高</td>
+                    </tr>
+                    <tr>
+                        <td>現有大陸代工廠</td>
+                        <td>無品牌</td>
+                        <td>RMB 15–30</td>
+                        <td>無設計力，無品牌溢價</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><span class="highlight-gold">市場空白：</span> 目前市場缺少一個「具備東亞文化在地化設計 + 品牌化包裝 + 盲袋驚喜機制」的 Snoopy 公仔系列，這正是蕪解的切入點。</p>
+
+            <h3>1.3 目標受眾分析</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>受眾族群</th>
+                        <th>年齡</th>
+                        <th>購買動機</th>
+                        <th>渠道偏好</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>療癒系收藏者</td>
+                        <td>18–30 歲女性</td>
+                        <td>情感共鳴、打卡社群</td>
+                        <td>小紅書、潮玩店</td>
+                    </tr>
+                    <tr>
+                        <td>送禮需求者</td>
+                        <td>25–45 歲</td>
+                        <td>節慶禮品、客戶伴手禮</td>
+                        <td>百貨、便利店</td>
+                    </tr>
+                    <tr>
+                        <td>旅遊購物者</td>
+                        <td>20–40 歲</td>
+                        <td>城市限定、稀缺紀念</td>
+                        <td>機場免稅、景區</td>
+                    </tr>
+                    <tr>
+                        <td>親子市場</td>
+                        <td>25–40 歲家長</td>
+                        <td>親子共玩、收藏教育</td>
+                        <td>院線、家庭商場</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>PART 2｜核心創意提案<span class="highlight-gold">【11號 創意】</span></h2>
+
+            <h3>2.1 品牌概念：「Snoopy 世界旅人」系列</h3>
+            <h4>核心概念：</h4>
+            <p>讓 Snoopy 成為一個「帶著飛行員帽環遊世界的旅行者」，每座城市都是他的新冒險，每款公仔都是一張「城市靈魂明信片」。</p>
+            <h4>品牌 Slogan：</h4>
+            <p class="highlight-gold" style="font-size: 1.5em; text-align: center; margin: 30px 0;">"Snoopy Goes Around"</p>
+            <h4>為什麼這個概念贏：</h4>
+            <ul>
+                <li>Snoopy 本人設定就是夢想家與冒險者，高度契合「旅人」主題</li>
+                <li>城市限定設計天然創造稀缺感與收藏動力</li>
+                <li>一套 IP 可無限延伸至不同城市/文化，邏輯可複製</li>
+                <li>完美承接蕪解「跨市場複製能力」的商業敘事，對 JV 資方有說服力</li>
+            </ul>
+
+            <h3>2.2 產品規格定義（蕪解品牌標準）</h3>
+            <h4>主力品項｜8cm 城市旅人立姿公仔</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>規格項目</th>
+                        <th>規格內容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>尺寸</td>
+                        <td>8cm 立姿（符合 12cm 以下授權範圍）</td>
+                    </tr>
+                    <tr>
+                        <td>材質</td>
+                        <td>PVC + 水性環保漆</td>
+                    </tr>
+                    <tr>
+                        <td>造型特徵</td>
+                        <td>Snoopy 身穿各城市代表性服裝/配件，保留標誌性飛行員帽元素</td>
+                    </tr>
+                    <tr>
+                        <td>包裝形式</td>
+                        <td>獨立盲袋（不透明），附城市明信片一張</td>
+                    </tr>
+                    <tr>
+                        <td>每系列款數</td>
+                        <td>6 款正常款 + 1 款隱藏版（城市限定特殊配色）</td>
+                    </tr>
+                    <tr>
+                        <td>配件</td>
+                        <td>每款附小型場景配件（如：艾菲爾鐵塔、泰式佛塔、台北 101 模型）</td>
+                    </tr>
+                    <tr>
+                        <td>品牌標識</td>
+                        <td>底座印 UNIPOP × Snoopy，城市英文名</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>首發城市系列規劃</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>系列</th>
+                        <th>城市</th>
+                        <th>Snoopy 造型</th>
+                        <th>隱藏款</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Series 01</td>
+                        <td>🇹🇭 曼谷</td>
+                        <td>穿泰式傳統服裝 + 花環</td>
+                        <td>潑水節彩色版</td>
+                    </tr>
+                    <tr>
+                        <td>Series 02</td>
+                        <td>🇹🇼 台北</td>
+                        <td>穿原住民圖騰外套 + 珍奶</td>
+                        <td>台北 101 夜光版</td>
+                    </tr>
+                    <tr>
+                        <td>Series 03</td>
+                        <td>🇨🇳 上海</td>
+                        <td>穿旗袍造型 + 外灘建築</td>
+                        <td>霓虹燈特殊塗裝版</td>
+                    </tr>
+                    <tr>
+                        <td>Series 04</td>
+                        <td>🇲🇾 吉隆坡</td>
+                        <td>穿峇蒂服 + 雙子塔</td>
+                        <td>石油公司限定版</td>
+                    </tr>
+                    <tr>
+                        <td>Series 05</td>
+                        <td>🇯🇵 東京</td>
+                        <td>穿和服 + 富士山</td>
+                        <td>櫻花季粉色限定版</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="product-images">
+                <div>
+                    <h4>全系列合照</h4>
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/full_collection.jpg" alt="Snoopy 世界旅人全系列合照">
+                </div>
+                <div>
+                    <h4>包裝效果圖</h4>
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/blind_bag_packaging.jpg" alt="Snoopy 盲袋包裝效果圖">
+                </div>
+            </div>
+
+            <h4>加值產品線</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>品項</th>
+                        <th>尺寸</th>
+                        <th>形式</th>
+                        <th>定位</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>旅人粒粒公仔</td>
+                        <td>3cm</td>
+                        <td>UNIPOP 玻璃瓶裝</td>
+                        <td>裝可愛體驗延伸</td>
+                    </tr>
+                    <tr>
+                        <td>旅行組禮盒</td>
+                        <td>8cm×3入</td>
+                        <td>精裝行李箱造型禮盒</td>
+                        <td>節慶送禮主力</td>
+                    </tr>
+                    <tr>
+                        <td>城市明信片套組</td>
+                        <td>紙品</td>
+                        <td>6 款明信片 + 收藏冊</td>
+                        <td>低成本高毛利周邊</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>花生宇宙全員出動<span class="highlight-gold">｜城市靈魂明信片</span></h2>
+            <p style="text-align: center; margin-bottom: 40px;">Snoopy 系列的配角們同樣擁有獨特的魅力與故事。想像他們化身城市旅人，為每個角落注入生命。</p>
+            <div class="character-grid">
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/snoopy_bangkok.jpg" alt="Snoopy 曼谷">
+                    <div class="character-card-content">
+                        <h4>Snoopy</h4>
+                        <p class="city">🇹🇭 曼谷</p>
+                        <p>夢想家與冒險家，曼谷的熱帶風情是他新靈感的來源。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/charlie_newyork.jpg" alt="Charlie Brown 紐約">
+                    <div class="character-card-content">
+                        <h4>Charlie Brown</h4>
+                        <p class="city">🇺🇸 紐約</p>
+                        <p>善良而有些焦慮，紐約的多元文化讓他既興奮又手足無措。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/lucy_paris.jpg" alt="Lucy 巴黎">
+                    <div class="character-card-content">
+                        <h4>Lucy</h4>
+                        <p class="city">🇫🇷 巴黎</p>
+                        <p>意見領袖與自信女王，巴黎的時尚與藝術是她的舞台。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/schroeder_vienna.jpg" alt="Schroeder 維也納">
+                    <div class="character-card-content">
+                        <h4>Schroeder</h4>
+                        <p class="city">🇦🇹 維也納</p>
+                        <p>音樂天才，維也納的古典樂氛圍是他的精神歸宿。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/linus_london.jpg" alt="Linus 倫敦">
+                    <div class="character-card-content">
+                        <h4>Linus</h4>
+                        <p class="city">🇬🇧 倫敦</p>
+                        <p>哲學思考者，倫敦的歷史深沉與知性氣息讓他流連忘返。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/sally_tokyo.jpg" alt="Sally 東京">
+                    <div class="character-card-content">
+                        <h4>Sally</h4>
+                        <p class="city">🇯🇵 東京</p>
+                        <p>天真爛漫的妹妹，東京的繽紛流行文化讓她充滿好奇。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/franklin_seoul.jpg" alt="Franklin 首爾">
+                    <div class="character-card-content">
+                        <h4>Franklin</h4>
+                        <p class="city">🇰🇷 首爾</p>
+                        <p>冷靜而忠實的朋友，首爾的現代與傳統融合啟發他。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/woodstock_auckland.jpg" alt="Woodstock 奧克蘭">
+                    <div class="character-card-content">
+                        <h4>Woodstock</h4>
+                        <p class="city">🇳🇿 奧克蘭</p>
+                        <p>Snoopy 的忠實夥伴，奧克蘭的自然美景是他的樂園。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/peppermint_rio.jpg" alt="Peppermint Patty 里約">
+                    <div class="character-card-content">
+                        <h4>Peppermint Patty</h4>
+                        <p class="city">🇧🇷 里約</p>
+                        <p>運動健將，里約的陽光沙灘與熱情是她的主場。</p>
+                    </div>
+                </div>
+                <div class="character-card">
+                    <img src="https://raychou6913-tech.github.io/wujie-briefing/marcie_taipei.jpg" alt="Marcie 台北">
+                    <div class="character-card-content">
+                        <h4>Marcie</h4>
+                        <p class="city">🇹🇼 台北</p>
+                        <p>聰明而務實，台北的巷弄美食與人文風景讓她感到親切。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>PART 3｜定價與財務策略<span class="highlight-gold">【09號 財務】</span></h2>
+
+            <h3>3.1 成本結構估算</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>成本項目</th>
+                        <th>8cm 公仔</th>
+                        <th>3cm 粒粒公仔</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>開模費（一次性）</td>
+                        <td>RMB <span class="highlight-gold">3–5 萬/款</span></td>
+                        <td>RMB <span class="highlight-gold">1–2 萬/款</span></td>
+                    </tr>
+                    <tr>
+                        <td>生產成本（起訂 3000 個）</td>
+                        <td>RMB <span class="highlight-gold">18–25/個</span></td>
+                        <td>RMB <span class="highlight-gold">5–8/個</span></td>
+                    </tr>
+                    <tr>
+                        <td>包裝成本（盲袋+明信片）</td>
+                        <td>RMB <span class="highlight-gold">3–5/個</span></td>
+                        <td>RMB <span class="highlight-gold">1–2/個</span></td>
+                    </tr>
+                    <tr>
+                        <td>版稅（約 15% 批發價）</td>
+                        <td>依售價計算</td>
+                        <td>依售價計算</td>
+                    </tr>
+                    <tr>
+                        <td><strong>總成本估算</strong></td>
+                        <td><strong>RMB <span class="highlight-gold">25–35/個</span></strong></td>
+                        <td><strong>RMB <span class="highlight-gold">8–12/個</span></strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.2 定價策略</h3>
+            <h4>8cm 城市旅人公仔</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>通路</th>
+                        <th>建議售價</th>
+                        <th>毛利率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>直營快閃店 / 線上旗艦</td>
+                        <td>RMB <span class="highlight-gold">79–99/個</span></td>
+                        <td>約 <span class="highlight-gold">60–65%</span></td>
+                    </tr>
+                    <tr>
+                        <td>批發（潮玩連鎖/百貨）</td>
+                        <td>RMB <span class="highlight-gold">45–55/個</span>（供貨）</td>
+                        <td>約 <span class="highlight-gold">35–40%</span></td>
+                    </tr>
+                    <tr>
+                        <td>機場免稅</td>
+                        <td>RMB <span class="highlight-gold">99–129/個</span></td>
+                        <td>約 <span class="highlight-gold">60–70%</span></td>
+                    </tr>
+                    <tr>
+                        <td>禮盒裝（3入）</td>
+                        <td>RMB <span class="highlight-gold">228–268/套</span></td>
+                        <td>約 <span class="highlight-gold">55%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>3cm 粒粒公仔（UNIPOP 裝可愛）</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>通路</th>
+                        <th>建議售價</th>
+                        <th>毛利率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>裝可愛快閃體驗</td>
+                        <td>RMB <span class="highlight-gold">15–25/個</span>（散裝）</td>
+                        <td>約 <span class="highlight-gold">65%</span></td>
+                    </tr>
+                    <tr>
+                        <td>玻璃瓶套組（20個）</td>
+                        <td>RMB <span class="highlight-gold">268–328/瓶</span></td>
+                        <td>約 <span class="highlight-gold">55%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.3 VAM 貢獻試算</h3>
+            <p><strong>情境假設：Series 01 曼谷首發</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>指標</th>
+                        <th>數值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>首批生產量</td>
+                        <td><span class="highlight-gold">3,000 個</span></td>
+                    </tr>
+                    <tr>
+                        <td>預計售罄率</td>
+                        <td><span class="highlight-gold">80%</span>（2,400 個）</td>
+                    </tr>
+                    <tr>
+                        <td>平均售價（混合渠道）</td>
+                        <td>RMB <span class="highlight-gold">75/個</span></td>
+                    </tr>
+                    <tr>
+                        <td>總收入</td>
+                        <td>RMB <span class="highlight-gold">180,000</span></td>
+                    </tr>
+                    <tr>
+                        <td>總成本（生產+版稅+行銷）</td>
+                        <td>RMB <span class="highlight-gold">95,000</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>單系列淨利貢獻</strong></td>
+                        <td><strong>RMB <span class="highlight-gold">85,000</span></strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>全系列 5 城市 × 年度 2 輪 × 3 渠道擴展：</strong></p>
+            <p>保守估計年度淨利貢獻：<strong>RMB <span class="highlight-gold">80–120 萬</span></strong></p>
+            <p>占 VAM 目標 750 萬約 <span class="highlight-gold">11–16%</span></p>
+
+            <div class="vam-contribution">
+                <p>VAM 目標達成率：</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="--progress-width: 16%;">11% - 16%</div>
+                </div>
+            </div>
+
+            <h4>財務建議：</h4>
+            <p>此系列單獨無法達成 VAM，但作為「品牌建立 + 渠道開拓」的先鋒產品，結合 Snoopy Jazz Café POP UP 與節慶禮盒系列協同，整體 Snoopy IP 年度貢獻可達 <strong>RMB <span class="highlight-gold">200–280 萬</span></strong>，占 VAM 目標 <strong><span class="highlight-gold">27–37%</span></strong>。</p>
+        </section>
+
+        <section>
+            <h2>PART 4｜推廣與業務策略<span class="highlight-gold">【12號 業務】</span></h2>
+
+            <h3>4.1 上市路徑（Phase 1：曼谷首發）</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>時間軸</th>
+                        <th>行動</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>D-60</td>
+                        <td>完成樣品，拍攝開箱影片素材，寄樣給 Den</td>
+                    </tr>
+                    <tr>
+                        <td>D-45</td>
+                        <td>Den 引薦 Central / The Mall 買手，進行 B2B 提案</td>
+                    </tr>
+                    <tr>
+                        <td>D-30</td>
+                        <td>King Power 機場免稅洽談，以「泰國城市限定版」切入</td>
+                    </tr>
+                    <tr>
+                        <td>D-14</td>
+                        <td>小紅書 / 抖音 KOL 開箱影片提前釋出，製造期待感</td>
+                    </tr>
+                    <tr>
+                        <td>D-7</td>
+                        <td>曼谷快閃店開幕，UNIPOP「裝可愛」體驗同步啟動</td>
+                    </tr>
+                    <tr>
+                        <td>D+30</td>
+                        <td>依銷售數據決定是否加單，台北/上海系列同步啟動</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 40px;">
+                <h4>快閃店策略</h4>
+                <img src="https://raychou6913-tech.github.io/wujie-briefing/lifestyle_store.jpg" alt="Snoopy 城市旅人快閃店效果圖">
+                <p style="text-align: center; font-style: italic; color: #666;">模擬快閃店陳列，營造沉浸式城市旅人氛圍。</p>
+            </div>
+
+            <h3>4.2 社群推廣策略</h3>
+            <h4>核心玩法：「你是哪個城市的 Snoopy」</h4>
+            <ul>
+                <li>發起投票：下一個城市由粉絲票選</li>
+                <li>開箱挑戰：「我的隱藏款是什麼城市」</li>
+                <li>打卡機制：持 Snoopy 公仔在對應城市打卡，獲限定徽章</li>
+            </ul>
+            <h4>預計社群效益：</h4>
+            <ul>
+                <li>小紅書相關話題：目標 <span class="highlight-gold">500 萬瀏覽量</span>（對標裝可愛 1300 萬的 1/3）</li>
+                <li>抖音開箱影片：目標 <span class="highlight-gold">50 支 KOL 二次創作</span></li>
+            </ul>
+
+            <h3>4.3 B2B 英文 Pitch 腳本（老董可直接使用）</h3>
+            <div class="pitch-script">
+                <blockquote>
+                    <p>"Hi, I'm from WUJIE GROUP. We hold Southeast Asia distribution rights for Snoopy, and we've just launched an exclusive 'Snoopy World Traveler' series — 8cm collectible mini figures featuring Snoopy in local cultural costumes. The Bangkok edition features Snoopy in traditional Thai dress with a mini temple accessory. We've already proven this format with Disney TSUM TSUM, which generated 13 million views on Xiaohongshu. I'd love to show you our samples and discuss a partnership. Could we schedule 15 minutes this week?"</p>
+                </blockquote>
+            </div>
+        </section>
+    </main>
+
+    <section class="dark-section">
+        <div class="container">
+            <h2>PART 5｜幕僚長綜合研判</h2>
+
+            <h3>結論</h3>
+            <p><strong>建議立即執行「Snoopy 世界旅人 Series 01 曼谷版」</strong>，以此作為蕪解建立可複製跨國 IP 產品標準的第一個戰役。</p>
+
+            <h3>核心理由</h3>
+            <ul>
+                <li><strong>Den 的在地資源</strong>：曼谷是阻力最小的第一步，樣品到手即可引薦</li>
+                <li><strong>可複製性強</strong>：城市系列邏輯清晰，向 JV 資方展示「跨市場複製能力」最直觀</li>
+                <li><strong>UNIPOP 品牌升級</strong>：世界旅人系列讓 UNIPOP 從「裝可愛零售體驗」升級為「有故事的潮玩品牌」</li>
+            </ul>
+
+            <h3>⚠️ 紅隊挑戰</h3>
+            <ul>
+                <li>開模費 <span class="highlight-gold">3–5 萬/款 × 7 款 = 約 RMB 25–35 萬</span>一次性投入，需確認資金時間表</li>
+                <li>Peanuts 版權方對「文化在地化設計」的審批週期可能達 <span class="highlight-gold">60–90 天</span>，需提前送審</li>
+                <li>競品（POP MART）可能快速跟進，首發城市的速度至關重要</li>
+            </ul>
+
+            <h3>VAM 影響評估</h3>
+            <ul>
+                <li>單系列淨利貢獻：<span class="highlight-gold">RMB 85,000</span></li>
+                <li>Snoopy IP 年度整體貢獻（含 POP UP + 禮盒）：<span class="highlight-gold">RMB 200–280 萬</span></li>
+                <li>占 VAM 目標比例：<span class="highlight-gold">27–37%</span></li>
+            </ul>
+
+            <h3>建議下一步行動</h3>
+            <div class="numbered-list-gold">
+                <ol>
+                    <li><span class="highlight-gold">本週</span>：確認北京供應鏈廠商開模報價</li>
+                    <li><span class="highlight-gold">本週</span>：請 Bevis 設計 3 款曼谷版 Snoopy 造型草稿送審</li>
+                    <li><span class="highlight-gold">兩週內</span>：請 Den 安排 Central 買手會議</li>
+                    <li><span class="highlight-gold">一個月內</span>：樣品完成，攜帶實體樣品赴曼谷拜訪</li>
+                </ol>
+            </div>
+            <p><span class="highlight-gold">【是否需要 Ray 決策】<strong>是</strong></span>——開模費用核准 + Bevis 設計啟動時間表</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>*本提案由幕僚長統籌，10情報、11創意、09財務、12業務協同產出｜2026-04-21</p>
+    </footer>
+
+</body>
+</html>
