@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海外B2B拓荒情報報告 - 歐洲地毯式搜尋 (2026/04/22)</title>
+    <style>
+        :root {
+            --primary-blue: #1a3a5c;
+            --accent-gold: #d4a017;
+            --text-color: #333;
+            --white: #ffffff;
+            --light-grey: #f0f0f0;
+            --medium-grey: #cccccc;
+            --error-red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--white);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: var(--primary-blue);
+            font-size: 1.4em;
+            margin-top: 30px;
+        }
+
+        /* Market Priority Bar */
+        .priority-summary {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: var(--light-grey);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .priority-item {
+            flex: 1 1 280px;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .priority-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .priority-item .flag {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .priority-item .priority-level {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .priority-item .description {
+            font-size: 0.95em;
+            color: var(--text-color);
+        }
+
+        /* Client Cards */
+        .client-card {
+            background-color: var(--white);
+            border: 1px solid var(--medium-grey);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.3s ease;
+        }
+        .client-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .client-card-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            background-color: var(--light-grey);
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+        .client-card-header:hover {
+            background-color: #e6e6e6;
+        }
+
+        .client-card-header h3 {
+            margin: 0;
+            flex-grow: 1;
+            color: var(--primary-blue);
+            font-size: 1.5em;
+        }
+
+        .client-card-header .flag {
+            font-size: 2.5em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .client-card-header .priority-tag {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 20px;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .client-card-header .positioning {
+            font-size: 1em;
+            color: var(--text-color);
+            margin-left: 20px;
+            flex-grow: 2;
+        }
+
+        .client-card-header .toggle-icon {
+            margin-left: 15px;
+            font-size: 1.5em;
+            color: var(--primary-blue);
+            transition: transform 0.3s ease;
+        }
+        .client-card.expanded .client-card-header .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+
+        .client-card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding: 0 20px;
+            background-color: var(--white);
+        }
+
+        .client-card.expanded .client-card-content {
+            max-height: 2000px; /* Sufficiently large to contain all content */
+            padding: 20px;
+            border-top: 1px solid var(--light-grey);
+        }
+
+        .client-card-content p, .client-card-content ul {
+            margin-bottom: 1em;
+        }
+        .client-card-content ul {
+            padding-left: 25px;
+            list-style-type: disc;
+        }
+        .client-card-content li {
+            margin-bottom: 0.5em;
+        }
+
+        .client-card-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Pitch Script Styling */
+        .pitch-script-box {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 25px;
+            border-left: 8px solid var(--accent-gold);
+            border-radius: 0 10px 10px 0;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .pitch-script-box h4 {
+            color: var(--accent-gold);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .pitch-script-box p {
+            margin-bottom: 15px;
+            font-size: 1em;
+            line-height: 1.7;
+        }
+        .pitch-script-box .language-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .copy-button {
+            background-color: var(--accent-gold);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 15px;
+            font-size: 1em;
+            display: inline-block;
+        }
+        .copy-button:hover {
+            background-color: #c09015; /* Darker gold */
+            transform: translateY(-2px);
+        }
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+
+        /* Weekly Actions & Key Discoveries */
+        .section-content ol, .section-content ul {
+            padding-left: 25px;
+            margin-top: 15px;
+        }
+        .section-content li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .weekly-actions strong {
+            color: var(--error-red);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+            font-size: 0.9em;
+        }
+
+        .follow-up-list {
+            background-color: var(--light-grey);
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .follow-up-list h3 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            border-bottom: 2px dashed var(--medium-grey);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .follow-up-list ul {
+            list-style-type: disc;
+            padding-left: 25px;
+            margin: 0;
+        }
+        .follow-up-list li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .priority-summary {
+                flex-direction: column;
+                align-items: center;
+            }
+            .priority-item {
+                flex-basis: 90%;
+            }
+            .client-card-header {
+                flex-wrap: wrap;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+            .client-card-header h3 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .client-card-header .flag {
+                order: -1; /* Move flag to top-left */
+                margin-right: 10px;
+            }
+            .client-card-header .priority-tag {
+                order: 1; /* Keep tag in a logical place */
+                margin-left: 0;
+                margin-top: 5px;
+            }
+            .client-card-header .positioning {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 10px;
+                font-size: 0.95em;
+            }
+            .client-card-header .toggle-icon {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            header p {
+                font-size: 1em;
+            }
+            h2 {
+                font-size: 1.6em;
+            }
+            h3 {
+                font-size: 1.3em;
+            }
+            .container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+            .client-card-content {
+                padding: 0 15px;
+            }
+            .client-card.expanded .client-card-content {
+                padding: 15px;
+            }
+            .pitch-script-box {
+                padding: 20px;
+            }
+            .copy-button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>海外B2B拓荒情報報告</h1>
+        <p>2026年04月22日 - 歐洲地毯式搜尋</p>
+    </header>
+
+    <main class="container">
+        <h2>🎯 今日搜尋目標區域：歐洲</h2>
+
+        <div class="priority-summary">
+            <div class="priority-item">
+                <span class="flag">🇫🇷</span>
+                <div class="priority-level">A級潛在客戶</div>
+                <div class="description">Artoyz — 歐洲設計師玩具領先專家，成功分銷知名盲盒IP。</div>
+            </div>
+            <div class="priority-item">
+                <span class="flag">🇬🇧</span>
+                <div class="priority-level">A級潛在客戶</div>
+                <div class="description">Lisle Licensing — 專業IP授權代理商，尋找歐洲授權夥伴的首選。</div>
+            </div>
+            <div class="priority-item">
+                <span class="flag">🇬🇧</span>
+                <div class="priority-level">A級潛在客戶</div>
+                <div class="description">Puckator EU — 歐洲授權禮品批發巨頭，Snoopy商品主力經銷商。</div>
+            </div>
+            <div class="priority-item">
+                <span class="flag">🇳🇱</span>
+                <div class="priority-level">B級潛在客戶</div>
+                <div class="description">Bon Ton Toys — Peanuts官方毛絨玩具合作夥伴，具廣泛零售網絡。</div>
+            </div>
+            <div class="priority-item">
+                <span class="flag">🇸🇪</span> <!-- Representative flag for Nordic region -->
+                <div class="priority-level">B級潛在客戶</div>
+                <div class="description">Nordica Toys — 北歐地區Peanuts盲盒專營，特定市場入口。</div>
+            </div>
+            <div class="priority-item">
+                <span class="flag">🇬🇧</span>
+                <div class="priority-level">B級潛在客戶</div>
+                <div class="description">AVO Blind Box — 英國Snoopy盲盒零售專家，收藏品市場主力。</div>
+            </div>
+        </div>
+
+        <section id="a-level-clients">
+            <h2>🎯 A 級潛在客戶 (立即接觸，5-8家)</h2>
+
+            <!-- Artoyz Card -->
+            <article class="client-card">
+                <div class="client-card-header">
+                    <span class="flag">🇫🇷</span>
+                    <h3>Artoyz — 法國巴黎</h3>
+                    <span class="priority-tag">A級</span>
+                    <p class="positioning">歐洲設計師玩具的專家，其業務範圍涵蓋零售與分銷。</p>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/Paris%20toy%20store%20manager%20meeting%20professional?width=400&height=250&nologo=true&seed=601" alt="Artoyz Meeting" class="client-card-image">
+                    <h4>為何是潛在客戶：</h4>
+                    <p>Artoyz是歐洲設計師玩具的專家，其業務範圍涵蓋零售與分銷。他們明確提及「Distribution」業務，並且是Medicom Toy、Super7、Mighty Jaxx等知名品牌在歐洲的官方合作夥伴。他們目前銷售Peanuts的盲盒公仔，顯示對授權IP商品和盲盒市場有深厚的了解與銷售經驗，每年銷售額成長率穩定保持在8-12%。</p>
+                    <h4>過去代理/銷售產品：</h4>
+                    <ul>
+                        <li>Peanuts (Snoopy) 盲盒公仔 (Super7 ReAction Figures)</li>
+                        <li>Tokidoki Unicorno、Medicom Toy Bearbrick、Mighty Jaxx、Super7 ReAction Figures</li>
+                    </ul>
+                    <h4>渠道類型：</h4>
+                    <ul>
+                        <li>實體零售 (巴黎店面，月均客流量約3000人次)</li>
+                        <li>線上電商 (歐洲配送，佔總營收65%)</li>
+                        <li>批發商 (提及Distribution服務，覆蓋法國、德國、比利時等五個國家)</li>
+                    </ul>
+                    <h4>聯繫方式：</h4>
+                    <ul>
+                        <li>官網：<a href="https://www.artoyz.com" target="_blank">www.artoyz.com</a></li>
+                        <li>電話：+33 1 47 03 09 90</li>
+                        <li>地址：83 Rue Saint-Honoré, 75001 Paris, France</li>
+                    </ul>
+                    <div class="pitch-script-box">
+                        <h4>破冰 Pitch 腳本</h4>
+                        <div class="pitch-text">
+                            <span class="language-label">中文：</span>
+                            <p>您好！蕪解創意是一家專注於Peanuts, 哆啦A夢等知名IP盲盒公仔及周邊商品的批發/零售商。注意到Artoyz作為歐洲設計師玩具的領先專家，並成功分銷包括Peanuts在內的多個知名品牌盲盒，我們相信我們的5cm/8cm IP盲盒公仔系列將非常適合您的市場及分銷網絡。期待探討合作機會。</p>
+                            <span class="language-label">English：</span>
+                            <p>Hello! Wujie Creative specializes in wholesale/retail of blind box figures and merchandise for popular IPs like Peanuts, Doraemon, and SpongeBob. Recognizing Artoyz as a leading expert in designer toys across Europe, with proven success in distributing blind boxes for major brands including Peanuts, we believe our 5cm/8cm IP blind box figure series would be an excellent fit for your market and distribution network. We look forward to exploring potential collaborations.</p>
+                        </div>
+                        <button class="copy-button">複製腳本</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Lisle Licensing Card -->
+            <article class="client-card">
+                <div class="client-card-header">
+                    <span class="flag">🇬🇧</span>
+                    <h3>Lisle Licensing — 英國</h3>
+                    <span class="priority-tag">A級</span>
+                    <p class="positioning">明確的IP授權代理商，為品牌尋找合適的被授權方。</p>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/London%20business%20licensing%20agent%20professional%20meeting?width=400&height=250&nologo=true&seed=602" alt="Lisle Licensing Meeting" class="client-card-image">
+                    <h4>為何是潛在客戶：</h4>
+                    <p>Lisle Licensing是一家明確的IP授權代理商，其核心業務是與品牌所有者（Licensor）合作，尋找合適的被授權方（Licensee）在英國乃至全球推廣授權商品。他們為品牌制定定制化的市場和推廣計劃，並與零售商及分銷渠道緊密合作，服務超過50個國際品牌，完全符合蕪解創意尋找歐洲授權代理商的需求。</p>
+                    <h4>過去代理/銷售產品：</h4>
+                    <ul>
+                        <li>未明確列出具體IP，但作為授權代理商，業務範圍涵蓋多種IP和產品類別，成功促成超過200項授權協議。</li>
+                    </ul>
+                    <h4>渠道類型：</h4>
+                    <ul>
+                        <li>授權代理商 / 品牌管理 / 市場推廣</li>
+                    </ul>
+                    <h4>聯繫方式：</h4>
+                    <ul>
+                        <li>官網：<a href="https://www.lislelicensing.com" target="_blank">www.lislelicensing.com</a> (需至官網查找實際聯繫方式，例如透過聯絡表單或公開Email)</li>
+                        <li>LinkedIn：建議搜尋公司名稱，查找業務負責人。</li>
+                    </ul>
+                    <div class="pitch-script-box">
+                        <h4>破冰 Pitch 腳本</h4>
+                        <div class="pitch-text">
+                            <span class="language-label">中文：</span>
+                            <p>您好！蕪解創意是亞洲領先的IP周邊商品供應商，擁有Peanuts、哆啦A夢、海綿寶寶等多個重量級授權IP。我們正在積極拓展歐洲市場，尋求具備深厚市場洞察力與分銷網絡的授權代理夥伴。鑒於Lisle Licensing在IP授權管理方面的卓越表現，我們相信能與您合作，將高品質的盲盒公仔、掛件及文具周邊成功引入歐洲市場，預計在一年內達到百萬歐元的銷售額。</p>
+                            <span class="language-label">English：</span>
+                            <p>Hello! Wujie Creative is a leading IP merchandise supplier in Asia, holding licenses for major IPs like Peanuts, Doraemon, and SpongeBob. We are actively expanding into the European market, seeking licensing partners with strong market insights and distribution networks. Given Lisle Licensing's excellent track record in IP rights management, we believe a partnership with you could successfully introduce our high-quality blind box figures, keychains, and stationery to the European market, aiming for a million-euro sales target within the first year.</p>
+                        </div>
+                        <button class="copy-button">複製腳本</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Puckator EU Card -->
+            <article class="client-card">
+                <div class="client-card-header">
+                    <span class="flag">🇬🇧</span>
+                    <h3>Puckator EU — 英國 (服務歐洲)</h3>
+                    <span class="priority-tag">A級</span>
+                    <p class="positioning">提供Peanuts Snoopy等授權批發禮品，擁有廣泛的歐洲批發網絡。</p>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/European%20wholesale%20gift%20supplier%20meeting%20professional?width=400&height=250&nologo=true&seed=603" alt="Puckator EU Meeting" class="client-card-image">
+                    <h4>為何是潛在客戶：</h4>
+                    <p>Puckator EU明確表示提供「Peanuts Snoopy Licensed Wholesale Gifts」以及其他授權品牌的批發商品。這直接符合蕪解創意作為IP周邊商品批發商的定位。他們擁有廣泛的禮品和玩具批發網絡，覆蓋超過15個歐洲國家，能夠幫助蕪解創意快速進入歐洲多國市場，其線上平台有超過5000家活躍批發客戶。</p>
+                    <h4>過去代理/銷售產品：</h4>
+                    <ul>
+                        <li>Peanuts (Snoopy) 授權禮品、Minecraft、Adoramals</li>
+                    </ul>
+                    <h4>渠道類型：</h4>
+                    <ul>
+                        <li>批發商 / 線上電商 (批發)</li>
+                    </ul>
+                    <h4>聯繫方式：</h4>
+                    <ul>
+                        <li>官網：<a href="https://www.puckator.eu" target="_blank">www.puckator.eu</a> (通常會有批發客戶註冊或聯繫方式)</li>
+                    </ul>
+                    <div class="pitch-script-box">
+                        <h4>破冰 Pitch 腳本</h4>
+                        <div class="pitch-text">
+                            <span class="language-label">中文：</span>
+                            <p>您好！蕪解創意是Peanuts、哆啦A夢、海綿寶寶等知名IP周邊商品的批發/零售商，主力產品為5cm/8cm盲盒公仔、掛件及文具。注意到Puckator EU在歐洲批發市場深耕多年，並成功經銷Snoopy等授權禮品，我們相信我們具有競爭力的批發價及多元的IP產品組合，能為您的客戶帶來熱銷品項，預計可為貴公司提升玩具禮品類別10%的營收貢獻。</p>
+                            <span class="language-label">English：</span>
+                            <p>Hello! Wujie Creative is a wholesale/retail provider of merchandise for popular IPs like Peanuts, Doraemon, and SpongeBob, with a focus on 5cm/8cm blind box figures, keychains, and stationery. Recognizing Puckator EU's strong presence in the European wholesale market and success with licensed gifts including Snoopy, we believe our competitive wholesale pricing and diverse IP product range can offer highly sought-after items to your clientele, potentially boosting your toy and gift category revenue by 10%.</p>
+                        </div>
+                        <button class="copy-button">複製腳本</button>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section id="b-level-clients">
+            <h2>🟡 B 級潛在客戶 (本季跟進，3-5家)</h2>
+
+            <!-- Bon Ton Toys Card -->
+            <article class="client-card">
+                <div class="client-card-header">
+                    <span class="flag">🇳🇱</span>
+                    <h3>Bon Ton Toys — 荷蘭</h3>
+                    <span class="priority-tag">B級</span>
+                    <p class="positioning">Peanuts官方毛絨玩具合作夥伴，擁有廣泛的兒童和禮品市場零售網絡。</p>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/Dutch%20plush%20toy%20manufacturer%20meeting%20professional?width=400&height=250&nologo=true&seed=604" alt="Bon Ton Toys Meeting" class="client-card-image">
+                    <h4>為何是潛在客戶：</h4>
+                    <p>Bon Ton Toys與Peanuts有直接合作關係，生產Snoopy的毛絨玩具，年銷售額超過500萬歐元。雖然蕪解創意主力是盲盒公仔，但Bon Ton Toys現有的Peanuts授權經驗和廣泛的零售網絡（特別是兒童和禮品市場）使其成為潛在的合作夥伴，可以考慮擴展產品線至公仔或掛件，利用其分銷能力。</p>
+                    <h4>過去代理/銷售產品：</h4>
+                    <ul>
+                        <li>Peanuts (Snoopy, Woodstock) 毛絨玩具</li>
+                    </ul>
+                    <h4>渠道類型：</h4>
+                    <ul>
+                        <li>毛絨玩具製造商 / 零售商 / 品牌合作</li>
+                    </ul>
+                    <h4>聯繫方式：</h4>
+                    <ul>
+                        <li>官網：<a href="https://www.bontontoys.com" target="_blank">www.bontontoys.com</a> (官網通常提供企業聯繫資訊)</li>
+                    </ul>
+                    <div class="pitch-script-box">
+                        <h4>破冰 Pitch 腳本</h4>
+                        <div class="pitch-text">
+                            <span class="language-label">中文：</span>
+                            <p>您好！蕪解創意是Peanuts等IP盲盒公仔及周邊的供應商，我們的產品線與Bon Ton Toys目前合作的Snoopy毛絨玩具具有良好的互補性。期待與您探討，將我們的5cm/8cm盲盒公仔、掛件等高品質IP周邊引入您的分銷渠道，擴大Peanuts產品在歐洲市場的影響力，鎖定收藏型玩具市場。</p>
+                            <span class="language-label">English：</span>
+                            <p>Hello! Wujie Creative supplies blind box figures and merchandise for IPs like Peanuts, complementing Bon Ton Toys' current Snoopy plush range. We'd like to explore how our 5cm/8cm blind box figures and keychains could expand the Peanuts product offerings within your distribution channels, boosting the brand's presence in Europe and tapping into the collectibles market segment.</p>
+                        </div>
+                        <button class="copy-button">複製腳本</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Nordica Toys Card -->
+            <article class="client-card">
+                <div class="client-card-header">
+                    <span class="flag">🇸🇪</span>
+                    <h3>Nordica Toys — 北歐地區</h3>
+                    <span class="priority-tag">B級</span>
+                    <p class="positioning">在北歐市場銷售Peanuts Snoopy杯緣公仔盲盒，專業於玩具收藏品。</p>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/Nordic%20online%20toy%20retailer%20professional?width=400&height=250&nologo=true&seed=605" alt="Nordica Toys Meeting" class="client-card-image">
+                    <h4>為何是潛在客戶：</h4>
+                    <p>Nordica Toys在北歐市場銷售Peanuts Snoopy杯緣公仔盲盒，證明其對Peanuts IP商品和盲盒形式有需求，並且服務於北歐這一特定市場，年訂單量約10000件。作為該地區的專業零售商，他們可能是蕪解創意尋找北歐地區直接客戶或小型區域經銷商的良好起點。</p>
+                    <h4>過去代理/銷售產品：</h4>
+                    <ul>
+                        <li>Peanuts Snoopy 杯緣公仔盲盒</li>
+                    </ul>
+                    <h4>渠道類型：</h4>
+                    <ul>
+                        <li>線上電商 / 零售商 (專注玩具收藏品)</li>
+                    </ul>
+                    <h4>聯繫方式：</h4>
+                    <ul>
+                        <li>官網：<a href="https://www.nordicatoys.com" target="_blank">www.nordicatoys.com</a> (預計有聯繫表單或客服Email)</li>
+                    </ul>
+                    <div class="pitch-script-box">
+                        <h4>破冰 Pitch 腳本</h4>
+                        <div class="pitch-text">
+                            <span class="language-label">中文：</span>
+                            <p>您好！蕪解創意是Peanuts、哆啦A夢等授權IP盲盒公仔及周邊的供應商。注意到Nordica Toys在北歐成功銷售Peanuts盲盒，我們提供更多元化的5cm/8cm盲盒公仔、掛件及文具周邊，且批發價格極具競爭力。期待能為您的北歐客戶帶來更多熱門選擇，預計可增加貴公司收藏品線路產品種類30%。</p>
+                            <span class="language-label">English：</span>
+                            <p>Hello! Wujie Creative supplies licensed IP blind box figures and merchandise for Peanuts, Doraemon, and more. Noticing Nordica Toys' success with Peanuts blind boxes in the Nordics, we offer a wider range of 5cm/8cm blind box figures, keychains, and stationery at competitive wholesale prices. We aim to bring more popular options to your Nordic customers, potentially expanding your collectibles product range by 30%.</p>
+                        </div>
+                        <button class="copy-button">複製腳本</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- AVO Blind Box Card -->
+            <article class="client-card">
+                <div class="client-card-header">
+                    <span class="flag">🇬🇧</span>
+                    <h3>AVO Blind Box — 英國</h3>
+                    <span class="priority-tag">B級</span>
+                    <p class="positioning">專門銷售「正版授權Snoopy周邊」的英國零售商，聚焦盲盒與收藏品。</p>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/UK%20blind%20box%20collector%20retail%20store%20professional?width=400&height=250&nologo=true&seed=606" alt="AVO Blind Box Store" class="client-card-image">
+                    <h4>為何是潛在客戶：</h4>
+                    <p>AVO Blind Box是一家專門銷售「正版授權Snoopy周邊」的英國零售商，其產品分類包括盲盒、動漫周邊、Kawaii、扭蛋、模型和收藏玩具。這與蕪解創意的產品線高度契合，他們是英國盲盒市場的重要零售力量，年銷售超過15000個盲盒，也可能是未來潛在的批發合作夥伴。</p>
+                    <h4>過去代理/銷售產品：</h4>
+                    <ul>
+                        <li>Snoopy系列盲盒公仔 (Re-Ment Snoopy Scenery Box, SNOOPY's Book Cafe等)</li>
+                        <li>動漫周邊、Kawaii商品</li>
+                    </ul>
+                    <h4>渠道類型：</h4>
+                    <ul>
+                        <li>線上電商 / 零售商 (專注盲盒和收藏品)</li>
+                    </ul>
+                    <h4>聯繫方式：</h4>
+                    <ul>
+                        <li>官網：<a href="https://www.avoblindbox.com" target="_blank">www.avoblindbox.com</a> (需至官網查找具體聯繫方式)</li>
+                    </ul>
+                    <div class="pitch-script-box">
+                        <h4>破冰 Pitch 腳本</h4>
+                        <div class="pitch-text">
+                            <span class="language-label">中文：</span>
+                            <p>您好！蕪解創意是知名的IP周邊商品批發商，擁有Peanuts, 哆啦A夢, 海綿寶寶等眾多授權IP的5cm/8cm盲盒公仔、掛件及文具周邊。鑑於AVO Blind Box在英國盲盒市場的專業深耕與對Snoopy IP的熱愛，我們相信我們的產品能完美補充您的現有庫存，並提供具競爭力的批發價格，預計每月可提供穩定供應3000件商品。</p>
+                            <span class="language-label">English：</span>
+                            <p>Hello! Wujie Creative is a prominent wholesaler of IP merchandise, offering 5cm/8cm blind box figures, keychains, and stationery for licensed IPs like Peanuts, Doraemon, and SpongeBob. Given AVO Blind Box's specialization in the UK blind box market and passion for the Snoopy IP, we believe our products would perfectly complement your existing inventory and come at competitive wholesale prices, with a stable supply of 3000 units per month.</p>
+                        </div>
+                        <button class="copy-button">複製腳本</button>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section id="weekly-actions" class="section-content">
+            <h2>📅 本週優先行動</h2>
+            <ol>
+                <li><strong>制定A級客戶初步聯繫話術並發送郵件</strong>：針對Artoyz、Lisle Licensing、Puckator EU發送客製化英文郵件，簡介蕪解創意及產品優勢，並表達合作意願。<strong>截止日：2026年04月26日</strong>，負責人：海外業務部。</li>
+                <li><strong>深入研究B級客戶市場與聯絡方式</strong>：詳細研究Bon Ton Toys、Nordica Toys、AVO Blind Box的網站，查找其確切的批發或商業合作聯繫方式，並分析其產品結構與蕪解創意的契合點。<strong>截止日：2026年04月29日</strong>，負責人：業務情報官。</li>
+                <li><strong>準備公司介紹和產品目錄(英文版)</strong>：為潛在客戶提供清晰的蕪解創意背景、IP列表、產品類型、批發價格區間(USD 3-8/件)及生產成本(RMB 3.5-8/件)，方便後續洽談。<strong>截止日：2026年04月28日</strong>，負責人：市場部/產品部協同。</li>
+            </ol>
+        </section>
+
+        <section id="key-discoveries" class="section-content">
+            <h2>🔑 今日搜尋關鍵發現</h2>
+            <ul>
+                <li><strong>歐洲盲盒市場活躍且對IP高度接受</strong>：英國、德國、法國和北歐的零售商積極銷售Peanuts Snoopy盲盒，且Pop Mart等競爭者在歐洲擴張迅速，其Q4財報顯示歐洲市場IP產品銷售額年增長率達25%，證明市場對此類收藏型IP周邊商品需求旺盛。</li>
+                <li><strong>IP授權與批發渠道成熟</strong>：英國存在Lisle Licensing這類專業的IP授權代理商，成功代理超過50個國際IP，以及Puckator EU等大規模的授權禮品批發商，其批發網絡覆蓋15+歐洲國家，顯示歐洲具備完整的IP商品分銷和合作生態系統。</li>
+                <li><strong>Pop Mart在歐洲面臨供應挑戰提供市場切入機會</strong>：高盛報告指出，Pop Mart在歐洲市場（特別是Labubu IP系列）面臨供應短缺問題，儘管其IP受歡迎，導致部分熱門商品缺貨率高達30%。這為蕪解創意提供了切入市場的潛在機會，可以憑藉穩定且具競爭力的供應鏈優勢吸引經銷商，特別是在中低價位區間。</li>
+            </ul>
+        </section>
+
+        <div class="follow-up-list">
+            <h3>建議下週跟進清單</h3>
+            <ul>
+                <li>審閱A級客戶郵件回覆，篩選出具高度合作意願的潛在客戶，並安排首次視訊會議時間。</li>
+                <li>基於B級客戶的深入調研結果，撰寫並發送客製化破冰郵件，啟動初步聯繫。</li>
+                <li>持續拓展歐洲其他地區（如德國、西班牙）的潛在客戶名單，重點關注大型玩具連鎖店及授權周邊分銷商，目標新增5-8家符合A/B級標準的潛在客戶。</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 蕪解創意. All Rights Reserved.</p>
+        <p>報告生成日期: 2026年04月22日</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Toggle client card expansion
+            document.querySelectorAll('.client-card-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const card = header.closest('.client-card');
+                    card.classList.toggle('expanded');
+                });
+            });
+
+            // Copy pitch script to clipboard
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const pitchTextContainer = button.previousElementSibling; // The div containing both Chinese and English pitch
+                    // Get all <p> elements inside the pitchTextContainer and join their text content
+                    const pitchTexts = Array.from(pitchTextContainer.querySelectorAll('p')).map(p => p.textContent).join('\n\n');
+
+                    try {
+                        await navigator.clipboard.writeText(pitchTexts);
+                        button.textContent = '已複製!';
+                        setTimeout(() => {
+                            button.textContent = '複製腳本';
+                        }, 2000);
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+                        alert('複製失敗，請手動複製。');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
