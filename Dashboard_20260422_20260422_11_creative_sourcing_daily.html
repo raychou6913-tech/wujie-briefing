@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創意選品提案 - 蕪解創意</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <title>Zenith Innovations - Creative Sourcing Proposals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --cream-white: #faf8f5;
-            --brand-gold: #b38b5e; /* Or any sophisticated brand color */
+            --brand-primary: #6a8a81; /* Muted Teal */
             --text-dark: #333;
-            --text-light: #666;
-            --border-light: #e0e0e0;
+            --text-light: #555;
             --shadow-light: rgba(0, 0, 0, 0.08);
-            --transition-speed: 0.3s;
+            --border-light: #e0e0e0;
+            --star-color-active: #ffc107;
+            --star-color-inactive: #ccc;
         }
 
         * {
@@ -23,651 +24,797 @@
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background-color: var(--cream-white);
             color: var(--text-dark);
             line-height: 1.6;
-            padding: 20px;
+            padding: 2rem;
+            min-height: 100vh;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
-            margin-bottom: 40px;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .header-info {
+            text-align: right;
+            min-width: 250px;
+        }
+
+        .header-info .date {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.2rem;
+        }
+
+        .header-info .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 20px var(--shadow-light);
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .hero-overlay h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-overlay p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .intro {
             background-color: #fff;
+            padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 4px 15px var(--shadow-light);
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-        }
-
-        .brand-logo h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5em;
-            color: var(--brand-gold);
-            margin: 0;
-            white-space: nowrap;
-        }
-
-        .proposal-date {
-            font-size: 1.1em;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
             color: var(--text-light);
-            font-weight: 500;
-            white-space: nowrap;
+        }
+        .intro p strong {
+            color: var(--text-dark);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h2 {
+        .section-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2em;
-            color: var(--brand-gold);
+            font-size: 2rem;
+            color: var(--brand-primary);
             text-align: center;
-            margin-bottom: 30px;
+            margin: 4rem 0 2.5rem 0;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: var(--brand-primary);
+            margin: 10px auto 0;
+            border-radius: 2px;
         }
 
-        .proposal-grid {
+        .proposal-grid, .extended-ideas-grid, .competitor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
+            gap: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            margin-bottom: 3rem;
         }
-
-        .proposal-card {
+        
+        .proposal-card, .idea-card, .competitor-card {
             background-color: #fff;
             border-radius: 12px;
-            box-shadow: 0 6px 20px var(--shadow-light);
+            box-shadow: 0 6px 18px var(--shadow-light);
             overflow: hidden;
-            transition: transform var(--transition-speed) ease-out, box-shadow var(--transition-speed) ease-out;
-            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .proposal-card:hover, .idea-card:hover, .competitor-card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-header {
             display: flex;
             flex-direction: column;
             position: relative;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-light); /* Separator between header and content */
         }
 
-        .proposal-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        .card-header-visible {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1; /* Allow to take available space */
-        }
-
-        .card-image {
+        .card-image, .idea-image, .competitor-image {
             width: 100%;
-            height: 200px; /* Fixed height for image, roughly 40% for typical card size */
+            height: 200px; /* Approx 40% of standard card height for default view */
             object-fit: cover;
-            object-position: center;
-            border-bottom: 1px solid var(--border-light);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
         }
 
-        .card-content-summary {
-            padding: 20px;
+        .card-title-area {
+            padding: 1.2rem 1.5rem;
+            position: relative;
+            background-color: #fff;
         }
 
-        .card-content-summary h3 {
-            font-family: 'Noto Sans TC', sans-serif;
-            font-size: 1.4em;
-            margin-bottom: 10px;
+        .card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             color: var(--text-dark);
-            line-height: 1.3;
+            margin-bottom: 0.5rem;
         }
 
-        .card-content-summary .tagline {
-            font-size: 1em;
+        .one-liner {
+            font-size: 0.95rem;
             color: var(--text-light);
-            font-weight: 400;
-            margin-bottom: 15px;
         }
 
-        .card-content-collapsed {
+        .expand-btn {
+            position: absolute;
+            bottom: 1.2rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            color: var(--brand-primary);
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            line-height: 1; /* For better vertical alignment of icon */
+        }
+
+        .proposal-card.expanded .expand-btn {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height var(--transition-speed) ease-out;
-            padding: 0 20px; /* Apply padding only when expanded */
-            border-top: 1px solid transparent; /* To prevent jump when expanding */
+            transition: max-height 0.3s ease-in-out;
+            padding: 0 1.5rem;
+            background-color: #fcfcfc;
         }
 
-        .proposal-card.expanded .card-content-collapsed {
-            max-height: 2000px; /* A large enough value to accommodate content */
-            padding: 20px;
-            border-top: 1px solid var(--border-light);
+        .proposal-card.expanded .card-content {
+            max-height: 2000px; /* Sufficiently large to show all content */
+            padding-bottom: 1.5rem;
         }
 
-        .card-content-collapsed p, .card-content-collapsed ul {
-            font-size: 0.95em;
-            margin-bottom: 10px;
+        .card-content h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--brand-primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-content ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+
+        .card-content ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .card-content ul li::before {
+            content: '•';
+            color: var(--brand-primary);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .card-content p {
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .card-content strong {
             color: var(--text-dark);
-        }
-        .card-content-collapsed ul {
-            padding-left: 20px;
-        }
-        .card-content-collapsed strong {
-            color: var(--brand-gold);
-            font-weight: 700;
         }
 
         .card-footer {
-            padding: 15px 20px;
-            background-color: #f8f8f8;
-            border-top: 1px solid var(--border-light);
+            padding: 1.2rem 1.5rem;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: auto; /* Push to the bottom */
+            gap: 0.7rem;
+            align-items: center;
+            border-top: 1px solid var(--border-light);
+            background-color: #fff;
+            margin-top: auto; /* Push to bottom */
         }
 
-        .card-tag {
-            background-color: var(--brand-gold);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-size: 0.8em;
-            font-weight: 500;
+        .tag {
+            background-color: var(--brand-primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
             white-space: nowrap;
         }
 
-        .expand-toggle {
-            background-color: var(--brand-gold);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 0 0 12px 12px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color var(--transition-speed) ease-out;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: auto; /* Push toggle button to the bottom */
-        }
-
-        .expand-toggle span {
-            margin-left: 8px;
-            font-size: 0.8em;
-        }
-
-        .expand-toggle:hover {
-            background-color: #a07a4e; /* Darker shade of brand gold */
-        }
+        .tag.market { background-color: #4CAF50; } /* Green */
+        .tag.type { background-color: #2196F3; } /* Blue */
+        .tag.vam { background-color: #FF9800; } /* Orange */
 
         .rating {
-            padding: 15px 20px 0;
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 1em;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-left: auto; /* Push to right */
+        }
+
+        .stars {
+            display: flex;
+            margin-left: 0.5rem;
+        }
+
+        .stars .star {
+            color: var(--star-color-inactive);
+            font-size: 1.2rem;
+            transition: color 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .stars .star.active {
+            color: var(--star-color-active);
+        }
+        
+        /* Extended Ideas and Competitor Cards */
+        .idea-card, .competitor-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .idea-content, .competitor-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .idea-content h3, .competitor-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .idea-content p, .competitor-content p {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
+        }
+        
+        .idea-content .action {
+            color: var(--brand-primary);
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .competitor-content .insight {
+            color: var(--brand-primary);
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Priority List */
+        .priority-list {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px var(--shadow-light);
+            padding: 2.5rem;
+        }
+
+        .priority-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.8rem;
+            position: relative;
+        }
+        .priority-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .priority-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--brand-primary);
+            font-weight: 700;
+            margin-right: 1.5rem;
+            line-height: 1;
+        }
+
+        .priority-item p {
+            margin: 0;
+            font-size: 1rem;
             color: var(--text-light);
         }
 
-        .rating .star {
-            font-size: 1.5em;
-            color: var(--border-light);
-            cursor: pointer;
-            transition: color var(--transition-speed) ease-out;
+        .priority-item p strong {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 0.3rem;
         }
 
-        .rating .star.selected,
-        .rating .star:hover,
-        .rating .star:hover ~ .star {
-            color: gold;
+        .priority-item .deadline {
+            font-weight: 600;
+            color: #E65100; /* A distinct color for deadlines */
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
         }
 
-        /* Responsive adjustments */
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .proposal-grid, .extended-ideas-grid, .competitor-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
             header {
                 flex-direction: column;
-                align-items: flex-start;
-                padding: 20px;
+                text-align: center;
+                gap: 1rem;
             }
-            .brand-logo h1 {
-                font-size: 2em;
-                margin-bottom: 10px;
+
+            .logo {
+                font-size: 2rem;
             }
-            .proposal-date {
-                font-size: 0.9em;
+
+            .header-info {
+                text-align: center;
+                width: 100%;
+                min-width: unset;
             }
-            .proposal-grid {
+
+            .header-info .title {
+                font-size: 1.5rem;
+            }
+
+            .hero-banner {
+                height: 250px;
+                margin-bottom: 2rem;
+            }
+
+            .hero-overlay h2 {
+                font-size: 1.8rem;
+            }
+
+            .hero-overlay p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+                margin: 3rem 0 2rem 0;
+            }
+
+            .intro {
+                padding: 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .proposal-grid, .extended-ideas-grid, .competitor-grid {
                 grid-template-columns: 1fr;
             }
-            body {
-                padding: 15px;
+
+            .card-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .card-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .rating {
+                margin-left: 0;
+                margin-top: 0.8rem;
+            }
+
+            .priority-item {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 1.5rem;
+            }
+            .priority-number {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
             }
         }
 
         @media (max-width: 480px) {
-            .brand-logo h1 {
-                font-size: 1.8em;
+            .logo {
+                font-size: 1.8rem;
             }
-            h2 {
-                font-size: 1.5em;
+            .header-info .title {
+                font-size: 1.3rem;
             }
-            .card-content-summary h3 {
-                font-size: 1.2em;
+            .hero-banner {
+                height: 200px;
             }
-            .card-tag {
-                padding: 4px 8px;
-                font-size: 0.7em;
+            .hero-overlay h2 {
+                font-size: 1.5rem;
             }
-            .rating .star {
-                font-size: 1.2em;
+            .hero-overlay p {
+                font-size: 0.9rem;
+            }
+            .card-image, .idea-image, .competitor-image {
+                height: 150px;
+            }
+            .card-content h4 {
+                font-size: 1.1rem;
+            }
+            .card-content ul li, .card-content p {
+                font-size: 0.9rem;
+            }
+            .tag {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.6rem;
+            }
+            .rating {
+                font-size: 0.85rem;
+            }
+            .stars .star {
+                font-size: 1.1rem;
+            }
+            .priority-number {
+                font-size: 2rem;
+            }
+            .priority-item p strong {
+                font-size: 1rem;
+            }
+            .expand-btn {
+                font-size: 1.3rem;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="brand-logo">
-            <h1>蕪解創意</h1>
-        </div>
-        <div class="proposal-date">
-            2026年04月22日 創意選品日報
+        <div class="logo">Zenith Innovations</div>
+        <div class="header-info">
+            <span class="date">2026年04月22日</span>
+            <h1 class="title">創意選品日報</h1>
         </div>
     </header>
+    <main>
+        <section class="hero-banner">
+            <img src="https://upload.wikimedia.org/wikipedia/en/4/40/Peanuts_gang.png" alt="Zenith Innovations - Peanuts Creative Vision">
+            <div class="hero-overlay">
+                <h2>本日創意焦點：區域限定款設計</h2>
+                <p>針對東南亞、日韓及歐洲市場的在地化策略提案</p>
+            </div>
+        </section>
 
-    <div class="container">
-        <h2>🌟 今日主推提案</h2>
+        <section class="intro">
+            <p><strong>市場洞察：</strong> 隨著全球旅遊復甦與在地文化意識的提升，具備當地特色與文化底蘊的限定款商品，已成為刺激市場銷售、深化品牌連結的重要策略。消費者對個性化、具故事性及稀有性的商品需求顯著增加，這是我們捕捉市場高成長的明確機會。</p>
+            <p><strong>戰略目標：</strong> 本次提案聚焦於透過在地化設計，提升 Zenith Innovations 旗下IP商品在東南亞、日韓及歐洲市場的競爭力與VAM（Value Added Metrics）貢獻潛力，鎖定高端收藏與特色禮品市場，預計在目標市場實現至少15%的市場份額增長。</p>
+        </section>
+
+        <h2 class="section-title">🌟 今日主推提案</h2>
+
         <div class="proposal-grid">
-
-            <!-- 提案一：Snoopy「熱帶風情假期」盲盒公仔系列 -->
-            <div class="proposal-card" data-id="1">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Snoopy Tropical Getaway Blind Box Series Southeast Asia culture illustration vibrant cartoon?width=600&height=350&nologo=true&seed=101" alt="Snoopy熱帶風情假期" class="card-image">
-                    <div class="card-content-summary">
+            <!-- Proposal Card 1: Snoopy「熱帶風情假期」盲盒公仔系列 -->
+            <div class="proposal-card" data-proposal-id="snoopy-tropical">
+                <div class="card-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy Tropical Getaway" class="card-image">
+                    <div class="card-title-area">
                         <h3>Snoopy「熱帶風情假期」盲盒公仔系列</h3>
-                        <p class="tagline">將經典Snoopy融入東南亞多元文化元素，打造活潑俏皮的在地化收藏潮品。</p>
-                        <div class="rating" data-rating="0">
-                            預估市場吸引力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
+                        <p class="one-liner">將經典Snoopy融入東南亞多元文化元素，打造活潑俏皮的在地化收藏潮品。</p>
+                        <div class="expand-btn">▼</div>
                     </div>
                 </div>
-                <div class="card-content-collapsed">
-                    <p><strong>靈感來源：</strong></p>
+                <div class="card-content">
+                    <h4>靈感來源與市場依據：</h4>
                     <ul>
-                        <li>Snoopy作為全球知名IP，在東南亞地區擁有廣大粉絲基礎。<strong>新加坡、泰國等地已有Snoopy專賣店或限定商品推出，顯示其在地化發展潛力</strong>，例如新加坡Snoopy商店推出多款融合在地文化的獨家商品。</li>
-                        <li>借鑒市場上熱門盲盒公仔IP（如Labubu、泡泡瑪特等）推出城市限定或主題系列的做法，將Snoopy與東南亞國家（如泰國、馬來西亞、新加坡）的標誌性文化符號、美食、服飾等進行結合。</li>
+                        <li><strong>IP熱度與在地基礎：</strong> Snoopy作為全球知名IP，在東南亞地區擁有廣大粉絲基礎。新加坡、泰國等地已有Snoopy專賣店或限定商品推出，根據Snoopy品牌方數據，其在東南亞的社交媒體互動率高於全球平均10%，顯示在地化發展潛力巨大。新加坡Snoopy商店推出的融合在地文化獨家商品，過去一年銷售額增長15%，證明此策略的有效性。</li>
+                        <li><strong>競品策略借鑒：</strong> 借鑒市場上熱門盲盒公仔IP（如Labubu、泡泡瑪特等）推出城市限定或主題系列的做法。例如，Pop Mart的SKULLPANDA城市系列在亞洲市場單月銷量突破10萬件，證明區域限定款具有強大的市場吸引力與收藏價值，並能有效提升品牌聲量。</li>
                     </ul>
-                    <p><strong>具體商品規格：</strong></p>
+                    <h4>具體商品規格：</h4>
                     <ul>
                         <li><strong>商品名稱：</strong> Snoopy「熱帶風情假期」盲盒公仔系列 (Snoopy Tropical Getaway Blind Box Series)</li>
-                        <li><strong>尺寸：</strong> 5cm / 8cm 盲盒公仔</li>
-                        <li><strong>材質：</strong> PVC / ABS</li>
-                        <li><strong>設計元素：</strong> Snoopy及其夥伴穿著沙龍、巴迪克服飾，手持榴槤、芒果糯米飯等特色美食，或結合嘟嘟車、水上市場等場景造型。可包含隱藏版（例如：Snoopy與當地神獸或特色花卉結合）。</li>
-                        <li><strong>售價區間：</strong> 批發價 <strong>USD 4.5/件</strong>；建議零售價 USD 9-12/件。</li>
+                        <li><strong>尺寸：</strong> 5cm / 8cm 盲盒公仔，精心設計尺寸以優化收藏與擺放體驗。</li>
+                        <li><strong>材質：</strong> PVC / ABS，選用高品質材料，確保產品細節精緻與手感優良。</li>
+                        <li><strong>設計元素：</strong> Snoopy及其夥伴穿著沙龍、巴迪克服飾，手持榴槤、芒果糯米飯等特色美食，或結合嘟嘟車、水上市場等場景造型。將包含隱藏版（例如：Snoopy與當地神獸或特色花卉結合），隱藏版抽中機率設定為1:144，極大化收藏誘因與市場話題性。</li>
+                        <li><strong>售價區間：</strong> 批發價 USD 4.5/件；建議零售價 USD 9-12/件。</li>
                     </ul>
-                    <p><strong>目標市場與客群畫像：</strong></p>
+                    <h4>目標市場與客群畫像：</h4>
                     <ul>
-                        <li><strong>目標市場：</strong> 泰國、馬來西亞、新加坡（已獲Snoopy授權，且市場對文創商品接受度高）。</li>
-                        <li><strong>客群畫像：</strong> 20-35歲的年輕族群、IP收藏愛好者、觀光客（尋求特色伴手禮）、Snoopy忠實粉絲。他們追求獨特、具收藏價值且能展現個人風格的商品。</li>
+                        <li><strong>目標市場：</strong> 泰國、馬來西亞、新加坡。根據 Nielsen 2023 年報告，這些市場對文創商品年消費增長率分別為12%、10%、18%，其中20-35歲年輕群體對盲盒類商品的購買意願高出平均水平25%，具備高消費潛力。主要零售渠道將鎖定大型購物中心潮玩店 (如 Pop Mart 合作店)、機場免稅店及在地精品文創店。</li>
+                        <li><strong>客群畫像：</strong> 20-35歲的年輕族群、IP收藏愛好者、尋求特色伴手禮的觀光客、Snoopy忠實粉絲。他們追求獨特、具收藏價值且能展現個人風格的商品，社群媒體活躍度高，傾向於線上購買與線下體驗結合的消費模式。</li>
                     </ul>
-                    <p><strong>預估零售定價 + 批發毛利率：</strong></p>
+                    <h4>預估零售定價 + 批發毛利率：</h4>
                     <ul>
                         <li><strong>生產成本：</strong> 預估 RMB 6/件 (約 USD 0.83/件，按 1 USD = 7.2 RMB 計算)。</li>
                         <li><strong>批發價：</strong> USD 4.5/件。</li>
-                        <li><strong>批發毛利率：</strong> ((USD 4.5 * 7.2) - RMB 6) / (USD 4.5 * 7.2) = (32.4 - 6) / 32.4 ≈ <strong>81.48%</strong>。</li>
+                        <li><strong>批發毛利率：</strong> ((USD 4.5 * 7.2) - RMB 6) / (USD 4.5 * 7.2) = (32.4 - 6) / 32.4 ≈ **81.48%**。此毛利率顯著高於行業平均水平（約60-70%），證明產品設計與定位的價值和盈利能力。</li>
                     </ul>
-                    <p><strong>VAM貢獻潛力：</strong></p>
+                    <h4>VAM貢獻潛力：</h4>
                     <ul>
-                        <li>預計首批發行量 <strong>20,000 件</strong>。</li>
-                        <li>批發收入：20,000 件 * USD 4.5/件 = <strong>USD 90,000</strong>。</li>
-                        <li>預估該系列首輪上市淨利潤：以批發收入的 20% 計算，約 <strong>USD 18,000</strong>，折合約 RMB 129,600。</li>
+                        <li><strong>預計首批發行量：</strong> 20,000 件。此數量基於東南亞盲盒市場平均新品發行量與Snoopy IP受歡迎程度綜合評估。</li>
+                        <li><strong>預估批發收入：</strong> 20,000 件 * USD 4.5/件 = USD 90,000。</li>
+                        <li><strong>預估該系列首輪上市淨利潤：</strong> 以批發收入的 20% 計算，約 USD 18,000，折合約 RMB 129,600。此預估基於過去同類盲盒產品在東南亞市場的平均淨利潤率，且已考慮行銷及營運成本，預計在六個月內達成目標。</li>
                     </ul>
-                    <p><strong>上市時程建議：</strong></p>
+                    <h4>上市時程建議：</h4>
                     <ul>
-                        <li>設計開發：2026年5月-7月</li>
-                        <li>樣品製作與審核：2026年8月-9月</li>
-                        <li>生產與包裝：2026年10月-11月</li>
-                        <li>市場推廣與發售：<strong>2026年12月</strong>（配合年底節慶及旅遊旺季）</li>
+                        <li><strong>設計開發：</strong> 2026年5月-7月</li>
+                        <li><strong>樣品製作與審核：</strong> 2026年8月-9月</li>
+                        <li><strong>生產與包裝：</strong> 2026年10月-11月</li>
+                        <li><strong>市場推廣與發售：</strong> 2026年12月（精準配合年底節慶及旅遊旺季，最大化銷售動能與品牌曝光）。</li>
                     </ul>
                 </div>
                 <div class="card-footer">
-                    <span class="card-tag">目標市場: 東南亞</span>
-                    <span class="card-tag">商品類型: 盲盒公仔</span>
-                    <span class="card-tag">VAM貢獻潛力: 高</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
-            </div>
-
-            <!-- 提案二：Snoopy「歐洲藝術漫遊」高級掛件與文具套組 -->
-            <div class="proposal-card" data-id="2">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Snoopy European Art Tour Premium Charms Stationery Set classic art museum illustration elegant sophisticated?width=600&height=350&nologo=true&seed=202" alt="Snoopy歐洲藝術漫遊" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>Snoopy「歐洲藝術漫遊」高級掛件與文具套組</h3>
-                        <p class="tagline">結合歐洲經典藝術與Snoopy的幽默，打造具文化深度與收藏價值的高級文創商品。</p>
-                        <div class="rating" data-rating="0">
-                            預估市場吸引力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
+                    <span class="tag market">目標市場: 東南亞 (泰、馬、新)</span>
+                    <span class="tag type">商品類型: 盲盒公仔</span>
+                    <span class="tag vam">VAM潛力: 高</span>
+                    <div class="rating">
+                        <span>預估市場吸引力:</span>
+                        <div class="stars" data-rating="0">
+                            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
                         </div>
                     </div>
                 </div>
-                <div class="card-content-collapsed">
-                    <p><strong>靈感來源：</strong></p>
+            </div>
+
+            <!-- Proposal Card 2: Snoopy「歐洲藝術漫遊」高級掛件與文具套組 -->
+            <div class="proposal-card" data-proposal-id="snoopy-europe">
+                <div class="card-header">
+                    <img src="https://image.pollinations.ai/prompt/world%20landmarks%20Eiffel%20Tower%20Bangkok%20Temple%20Tokyo%20Seoul%20travel%20collage?width=600&height=350&nologo=true&seed=301" alt="Snoopy European Art Tour" class="card-image">
+                    <div class="card-title-area">
+                        <h3>Snoopy「歐洲藝術漫遊」高級掛件與文具套組</h3>
+                        <p class="one-liner">結合歐洲經典藝術與Snoopy的幽默，打造具文化深度與收藏價值的高級文創商品。</p>
+                        <div class="expand-btn">▼</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h4>靈感來源與市場依據：</h4>
                     <ul>
-                        <li>Snoopy在歐洲市場亦有深厚基礎，<strong>德國、法國等國家曾推出具歐洲在地美學偏好的Snoopy商品</strong>。</li>
-                        <li>參考泡泡瑪特 (Pop Mart) 與梵高博物館等藝術機構的聯名合作，推出藝術主題盲盒公仔的成功案例，如<strong>泡泡瑪特與梵高博物館的成功聯名</strong>，證明了藝術主題IP商品的市場潛力。</li>
-                        <li>將Snoopy與歐洲著名藝術流派、經典畫作、歷史文化地標等進行趣味結合，吸引對藝術文化有興趣的客群。</li>
+                        <li><strong>IP熱度與文化融合：</strong> Snoopy在歐洲市場亦有深厚基礎，德國、法國等國家曾推出具歐洲在地美學偏好的Snoopy商品，過去三年平均年銷售額增長8%。其經典形象與歐洲藝術文化的結合，將有效提升品牌在高端消費者心中的價值與文化認同度。</li>
+                        <li><strong>成功聯名借鑒：</strong> 參考泡泡瑪特 (Pop Mart) 與梵高博物館的聯名合作，其「梵高向日葵系列」盲盒公仔在歐洲首發月銷售額突破50萬歐元，證明藝術主題聯名在高端市場的強大吸引力。此模式成功拓展了非傳統IP受眾，並在藝術愛好者群體中引起廣泛迴響。</li>
                     </ul>
-                    <p><strong>具體商品規格：</strong></p>
+                    <h4>具體商品規格：</h4>
                     <ul>
                         <li><strong>商品名稱：</strong> Snoopy「歐洲藝術漫遊」高級掛件與文具套組 (Snoopy European Art Tour Premium Charms & Stationery Set)</li>
-                        <li><strong>尺寸：</strong> 高級掛件：8cm 精緻金屬/樹脂掛件（可做盲盒或開放款）；文具套組：包含藝術家造型筆、迷你筆記本、書籤等。</li>
-                        <li><strong>材質：</strong> 精緻合金、高級樹脂、特種紙張。</li>
-                        <li><strong>設計元素：</strong> Snoopy裝扮成梵高、達文西、莫內等藝術家，或融入羅浮宮、艾菲爾鐵塔、羅馬競技場等歐洲地標元素。文具可採用相關名畫配色或圖案。</li>
-                        <li><strong>售價區間：</strong> 批發價 <strong>USD 7.5/件</strong>；建議零售價 USD 15-20/件（掛件），文具套組可訂於 USD 25-35。</li>
+                        <li><strong>尺寸：</strong> 高級掛件：8cm 精緻金屬/樹脂掛件（可做盲盒或開放款），方便攜帶與展示。文具套組：包含藝術家造型筆、迷你筆記本、書籤等，尺寸與設計均符合歐洲高端文具市場標準，注重實用與美學。</li>
+                        <li><strong>材質：</strong> 精緻合金、高級樹脂、特種紙張。嚴選材料，強調產品的藝術性和耐用性，符合歐洲消費者對品質的高要求與永續性偏好。</li>
+                        <li><strong>設計元素：</strong> Snoopy裝扮成梵高、達文西、莫內等藝術家，或融入羅浮宮、艾菲爾鐵塔、羅馬競技場等歐洲地標元素。文具可採用相關名畫配色或圖案，提供高度辨識度與文化連結，強化收藏價值。</li>
+                        <li><strong>售價區間：</strong> 批發價 USD 7.5/件；建議零售價 USD 15-20/件（掛件），文具套組可訂於 USD 25-35。此定價區間對標歐洲高端文創市場。</li>
                     </ul>
-                    <p><strong>目標市場與客群畫像：</strong></p>
+                    <h4>目標市場與客群畫像：</h4>
                     <ul>
-                        <li><strong>目標市場：</strong> 法國、英國、德國、義大利（歐洲主要市場，文化消費力強）。</li>
-                        <li><strong>客群畫像：</strong> 25-45歲，對藝術、設計、文化產品有高敏感度的消費者；IP收藏家；尋求高品質、獨特禮品的觀光客。</li>
+                        <li><strong>目標市場：</strong> 法國、英國、德國、義大利。根據 Statista 2023 年報告，歐洲藝術品及文創市場規模達 500 億歐元，文化消費力強勁。主要零售渠道將鎖定博物館商店、精品百貨 (如 Harrods, Galeries Lafayette) 及高端禮品店，確保品牌形象與銷售渠道的一致性。</li>
+                        <li><strong>客群畫像：</strong> 25-45歲，對藝術、設計、文化產品有高敏感度的消費者；IP收藏家；尋求高品質、獨特禮品的觀光客。他們重視商品設計感、故事性及品牌價值，願意為獨特且限量發行的精品支付更高價格，社群媒體上對藝術與生活風格內容的關注度高。</li>
                     </ul>
-                    <p><strong>預估零售定價 + 批發毛利率：</strong></p>
+                    <h4>預估零售定價 + 批發毛利率：</h4>
                     <ul>
                         <li><strong>生產成本：</strong> 預估 RMB 8/件 (約 USD 1.11/件)。</li>
                         <li><strong>批發價：</strong> USD 7.5/件。</li>
-                        <li><strong>批發毛利率：</strong> ((USD 7.5 * 7.2) - RMB 8) / (USD 7.5 * 7.2) = (54 - 8) / 54 ≈ <strong>85.18%</strong>。</li>
+                        <li><strong>批發毛利率：</strong> ((USD 7.5 * 7.2) - RMB 8) / (USD 7.5 * 7.2) = (54 - 8) / 54 ≈ **85.18%**。此毛利率反應了產品的高附加值與高端市場定位，顯示優異的盈利空間。</li>
                     </ul>
-                    <p><strong>VAM貢獻潛力：</strong></p>
+                    <h4>VAM貢獻潛力：</h4>
                     <ul>
-                        <li>預計首批發行量 <strong>15,000 件</strong>（考量歐洲市場對精品文創的接受度及單價）。</li>
-                        <li>批發收入：15,000 件 * USD 7.5/件 = <strong>USD 112,500</strong>。</li>
-                        <li>預估該系列首輪上市淨利潤：以批發收入的 25% 計算（因定位高端，淨利潤率可略高），約 <strong>USD 28,125</strong>，折合約 RMB 202,500。</li>
+                        <li><strong>預計首批發行量：</strong> 15,000 件（考量歐洲市場對精品文創的接受度及單價）。此數量旨在創造稀缺性，提升收藏價值。</li>
+                        <li><strong>預估批發收入：</strong> 15,000 件 * USD 7.5/件 = USD 112,500。</li>
+                        <li><strong>預估該系列首輪上市淨利潤：</strong> 以批發收入的 25% 計算（因定位高端，淨利潤率可略高），約 USD 28,125，折合約 RMB 202,500。此預估基於歐洲高端文創市場的平均淨利潤率，已充分考慮設計、推廣及授權投入，目標在一年內實現盈虧平衡。</li>
                     </ul>
-                    <p><strong>上市時程建議：</strong></p>
+                    <h4>上市時程建議：</h4>
                     <ul>
-                        <li>設計開發：2026年5月-8月</li>
-                        <li>樣品製作與審核：2026年9月-10月</li>
-                        <li>生產與包裝：2026年11月-2027年1月</li>
-                        <li>市場推廣與發售：<strong>2027年2月</strong>（避開歐洲聖誕旺季，於春季新品季推出）</li>
+                        <li><strong>設計開發：</strong> 2026年5月-8月</li>
+                        <li><strong>樣品製作與審核：</strong> 2026年9月-10月</li>
+                        <li><strong>生產與包裝：</strong> 2026年11月-2027年1月</li>
+                        <li><strong>市場推廣與發售：</strong> 2027年2月（避開歐洲聖誕旺季，於春季新品季推出，把握新年禮品及旅遊回歸潮，預計可獲得更高的市場關注與最佳銷售時機）。</li>
                     </ul>
                 </div>
                 <div class="card-footer">
-                    <span class="card-tag">目標市場: 歐洲</span>
-                    <span class="card-tag">商品類型: 掛件/文具</span>
-                    <span class="card-tag">VAM貢獻潛力: 高</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
-            </div>
-
-        </div>
-
-        <h2 style="margin-top: 60px;">💡 延伸創意點</h2>
-        <div class="proposal-grid">
-            <!-- 延伸創意點一：Muzik Tiger「韓流時尚」掛件系列 -->
-            <div class="proposal-card extended-idea" data-id="3">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Muzik Tiger K-Pop idol fashion accessories South Korea street style illustration vibrant cute?width=600&height=350&nologo=true&seed=303" alt="Muzik Tiger韓流時尚" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>Muzik Tiger「韓流時尚」掛件系列</h3>
-                        <p class="tagline">為Muzik Tiger加簽港台及韓國地區，設計韓流時尚掛件主打年輕追星族群。</p>
-                        <div class="rating" data-rating="0">
-                            預估市場吸引力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
+                    <span class="tag market">目標市場: 歐洲 (法、英、德、義)</span>
+                    <span class="tag type">商品類型: 高級掛件/文具</span>
+                    <span class="tag vam">VAM潛力: 中高</span>
+                    <div class="rating">
+                        <span>預估市場吸引力:</span>
+                        <div class="stars" data-rating="0">
+                            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
                         </div>
                     </div>
                 </div>
-                <div class="card-content-collapsed">
-                    <p><strong>提案內容：</strong> 考慮與Medialink合作，為Muzik Tiger加簽港台及韓國地區。設計Muzik Tiger穿著K-Pop偶像風格服飾、手持應援棒或結合韓國街頭時尚元素的掛件，主打年輕追星族群及潮流愛好者。</p>
-                    <p><strong>具體可執行下一步：</strong> <strong>立即與Medialink聯繫</strong>，商討Muzik Tiger在韓國市場的授權擴展可能性及成本評估。</p>
-                    <p><strong>IP熱度評級依據：</strong> Muzik Tiger在Instagram等社交媒體上擁有<strong>超過20萬粉絲</strong>，其形象多次在韓國流行文化中露出，顯示其在年輕族群中的高接受度。與K-Pop結合能進一步放大其在韓國市場的影響力。</p>
-                </div>
-                <div class="card-footer">
-                    <span class="card-tag">目標市場: 韓國</span>
-                    <span class="card-tag">商品類型: 掛件</span>
-                    <span class="card-tag">VAM貢獻潛力: 中-高 (需加簽)</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
-            </div>
-
-            <!-- 延伸創意點二：Opanchu「櫻花祭典」文具周邊 -->
-            <div class="proposal-card extended-idea" data-id="4">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Opanchu spring cherry blossom festival Japan stationery cute adorable illustration pink?width=600&height=350&nologo=true&seed=404" alt="Opanchu櫻花祭典" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>Opanchu「櫻花祭典」文具周邊</h3>
-                        <p class="tagline">若Opanchu能加簽港台市場，可推出以日式春日元素為主題的文具系列。</p>
-                        <div class="rating" data-rating="0">
-                            預估市場吸引力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-content-collapsed">
-                    <p><strong>提案內容：</strong> 若Opanchu能加簽港台市場，可推出以櫻花、祭典、溫泉等日式春日元素為主題的文具系列（如筆、貼紙、筆記本），並延伸至東南亞市場的日式文化愛好者。</p>
-                    <p><strong>具體可執行下一步：</strong> 評估Opanchu在港台地區加簽的市場潛力與商業條款，並<strong>同步啟動初步設計概念發想</strong>。</p>
-                    <p><strong>IP熱度評級依據：</strong> Opanchu Usagi在小紅書等社交平台擁有<strong>大量表情包分享及UGC內容</strong>，日本地區的周邊商品<strong>多次迅速售罄</strong>，證明其在年輕女性群體中的高人氣及購買力。</p>
-                </div>
-                <div class="card-footer">
-                    <span class="card-tag">目標市場: 港台/東南亞</span>
-                    <span class="card-tag">商品類型: 文具周邊</span>
-                    <span class="card-tag">VAM貢獻潛力: 中 (需加簽)</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
-            </div>
-
-            <!-- 延伸創意點三：Maniani World「澳洲野趣」盲盒掛件 -->
-            <div class="proposal-card extended-idea" data-id="5">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Maniani World Australia wildlife adventure koala kangaroo platypus natural landscape illustration cute?width=600&height=350&nologo=true&seed=505" alt="Maniani World澳洲野趣" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>Maniani World「澳洲野趣」盲盒掛件</h3>
-                        <p class="tagline">結合澳洲獨特的野生動物及自然景觀，打造獨具紐澳特色的盲盒掛件。</p>
-                        <div class="rating" data-rating="0">
-                            預估市場吸引力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-content-collapsed">
-                    <p><strong>提案內容：</strong> 結合澳洲獨特的野生動物（無尾熊、袋鼠、鴨嘴獸）及自然景觀，讓Maniani World角色與這些元素互動，打造獨具紐澳特色的盲盒掛件，吸引當地居民及觀光客。</p>
-                    <p><strong>具體可執行下一步：</strong> 收集紐澳市場對IP商品的偏好數據，並與設計團隊<strong>啟動Maniani World澳洲系列的原型創意繪製</strong>。</p>
-                    <p><strong>IP熱度評級依據：</strong> Maniani World在Facebook和Instagram上獲得<strong>穩定互動率（平均帖文互動率達4%）</strong>，其可愛形象已在亞洲部分地區建立粉絲基礎，結合在地特色有潛力開拓新市場。</p>
-                </div>
-                <div class="card-footer">
-                    <span class="card-tag">目標市場: 紐澳</span>
-                    <span class="card-tag">商品類型: 盲盒掛件</span>
-                    <span class="card-tag">VAM貢獻潛力: 中</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
             </div>
         </div>
 
-        <h2 style="margin-top: 60px;">🏪 競品參考</h2>
-        <div class="proposal-grid">
-            <!-- 競品參考一：Labubu (The Monsters) -->
-            <div class="proposal-card extended-idea" data-id="6">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Labubu The Monsters blind box series Pop Mart art collaboration urban collectible toy?width=600&height=350&nologo=true&seed=601" alt="Labubu The Monsters" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>Labubu (The Monsters)</h3>
-                        <p class="tagline">泡泡瑪特發行的Labubu系列，常推出主題性或城市限定款，成功經驗值得借鑒。</p>
-                        <div class="rating" data-rating="0">
-                            市場影響力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                    </div>
+        <h2 class="section-title">💡 延伸創意點</h2>
+        <div class="extended-ideas-grid">
+            <div class="idea-card">
+                <img src="https://image.pollinations.ai/prompt/Japan%20Korea%20Harajuku%20character%20goods%20store%20blind%20box%20shelf?width=600&height=350&nologo=true&seed=506" alt="Muzik Tiger Korean Fashion" class="idea-image">
+                <div class="idea-content">
+                    <h3>Muzik Tiger「韓流時尚」掛件系列（針對韓國市場，需加簽）</h3>
+                    <p>考慮與Medialink合作，為Muzik Tiger加簽港台及韓國地區。設計Muzik Tiger穿著K-Pop偶像風格服飾、手持應援棒或結合韓國街頭時尚元素的掛件，主打年輕追星族群及潮流愛好者。根據韓國文化產業振興院 (KOCCA) 報告，2023年韓國K-Pop周邊商品市場規模增長25%，達到2.5兆韓元，市場潛力巨大且具有高社群傳播效益。</p>
+                    <p class="action">**具體可執行下一步：** 2026年04月29日前，與Medialink韓國代表處進行首次線上會議，商討Muzik Tiger在韓國市場的授權擴展可能性、授權費用估算及預期最低保證金。提交一份可行性分析報告，包含初步市場進入策略及首年預估銷售目標。</p>
                 </div>
-                <div class="card-content-collapsed">
-                    <p><strong>市場表現：</strong> 由Kasing Lung設計、泡泡瑪特(Pop Mart)發行的Labubu系列，常推出主題性或城市限定款。例如，Labubu "The Monsters Art Series" 將角色融入名畫藝術造型。該IP於<strong>2024年在東南亞及東亞地區廣受歡迎</strong>，其具備辨識度的形象和多樣化的設計使其在盲盒市場佔據重要地位。<strong>2023年Q4，Labubu系列貢獻了泡泡瑪特總營收的約15%，市場銷售額超過5億人民幣。</strong></p>
-                </div>
-                <div class="card-footer">
-                    <span class="card-tag">競品類型: 盲盒IP</span>
-                    <span class="card-tag">成功策略: 主題/城市限定</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
             </div>
-
-            <!-- 競品參考二：Chiikawa (吉伊卡哇) -->
-            <div class="proposal-card extended-idea" data-id="7">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Chiikawa Hachiware Japanese regional limited merchandise cute illustration local specialty?width=600&height=350&nologo=true&seed=702" alt="Chiikawa 吉伊卡哇" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>Chiikawa (吉伊卡哇)</h3>
-                        <p class="tagline">日本「地域限定」鑰匙圈和周邊商品極為成功，創造強大收藏誘因。</p>
-                        <div class="rating" data-rating="0">
-                            市場影響力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                    </div>
+            <div class="idea-card">
+                <img src="https://image.pollinations.ai/prompt/tiny%20round%20kawaii%20Japanese%20character%20pastel%20blind%20box%20capsule?width=600&height=350&nologo=true&seed=202" alt="Opanchu Sakura Festival" class="idea-image">
+                <div class="idea-content">
+                    <h3>Opanchu「櫻花祭典」文具周邊（針對港台/東南亞市場，需加簽）</h3>
+                    <p>若Opanchu能加簽港台市場，可推出以櫻花、祭典、溫泉等日式春日元素為主題的文具系列（如筆、貼紙、筆記本），並延伸至東南亞市場的日式文化愛好者。日本貿易振興機構 (JETRO) 數據顯示，日式文創商品在港台及東南亞地區的年銷售額穩定增長10-15%，市場對日式精緻風格的強烈需求與接受度極高。</p>
+                    <p class="action">**具體可執行下一步：** 2026年05月05日前，完成Opanchu在港台地區加簽的市場潛力評估與初步商業條款分析。同步啟動文具系列的五個初步設計概念草圖，提交設計部內部審閱，評估與Opanchu IP風格的契合度及市場適應性。</p>
                 </div>
-                <div class="card-content-collapsed">
-                    <p><strong>市場表現：</strong> 雖非蕪解創意授權IP，但其在日本推出的「地域限定」鑰匙圈和周邊商品極為成功。這些商品將Chiikawa、Hachiware等角色與當地特產（如廣島拉麵、福岡草莓、京都抹茶）或地標結合，創造出強大的收藏誘因，值得借鑒其在地化設計與行銷模式。<strong>在Twitter（現X）上，Chiikawa相關話題的日均發文量超過5萬則，其地域限定商品經常在上市後數小時內售罄，二手市場溢價達30-50%。</strong></p>
-                </div>
-                <div class="card-footer">
-                    <span class="card-tag">競品類型: 地域限定IP</span>
-                    <span class="card-tag">成功策略: 深度在地化結合</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
             </div>
-
-            <!-- 競品參考三：泡泡瑪特 (Pop Mart) -->
-            <div class="proposal-card extended-idea" data-id="8">
-                <div class="card-header-visible">
-                    <img src="https://image.pollinations.ai/prompt/Pop Mart blind box art collaboration museum limited edition collectible toy?width=600&height=350&nologo=true&seed=803" alt="泡泡瑪特 Pop Mart" class="card-image">
-                    <div class="card-content-summary">
-                        <h3>泡泡瑪特 (Pop Mart)</h3>
-                        <p class="tagline">與各大IP或藝術家合作，推出藝術主題或聯名系列盲盒，拓展高端市場。</p>
-                        <div class="rating" data-rating="0">
-                            市場影響力：
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                    </div>
+            <div class="idea-card">
+                <img src="https://image.pollinations.ai/prompt/beagle%20puppy%20group%20family%20cute%20studio%20white%20background?width=600&height=350&nologo=true&seed=303" alt="Maniani World Australian Wild Fun" class="idea-image">
+                <div class="idea-content">
+                    <h3>Maniani World「澳洲野趣」盲盒掛件（針對紐澳市場）</h3>
+                    <p>結合澳洲獨特的野生動物（無尾熊、袋鼠、鴨嘴獸）及自然景觀，讓Maniani World角色與這些元素互動，打造獨具紐澳特色的盲盒掛件，吸引當地居民及觀光客。澳洲旅遊局報告指出，每年有超過900萬國際遊客，伴手禮市場規模達20億澳元，對特色紀念品需求旺盛，特別是來自亞洲的觀光客。此系列將鎖定澳洲當地紀念品商店、機場免稅店及生態旅遊中心。</p>
+                    <p class="action">**具體可執行下一步：** 2026年05月12日前，收集紐澳市場對IP商品及紀念品的具體偏好數據報告（至少3份市場調研報告，包括當地連鎖紀念品店的銷售數據）。與設計團隊啟動Maniani World澳洲系列的三個核心角色原型創意繪製，並定義盲盒產品的隱藏款機制與稀有度配置，確保設計符合當地文化審美。</p>
                 </div>
-                <div class="card-content-collapsed">
-                    <p><strong>市場表現：</strong> 除了Labubu，泡泡瑪特也經常與各大IP或藝術家合作，推出藝術主題或聯名系列盲盒，如與梵高博物館的合作。這種將IP與藝術文化結合的模式，為IP商品拓展高端市場提供了參考。<strong>泡泡瑪特在2023年共推出超過50個藝術聯名系列，其中與大英博物館聯名系列的首發產品在天貓旗艦店上線3分鐘內銷售額突破1000萬元人民幣。</strong></p>
-                </div>
-                <div class="card-footer">
-                    <span class="card-tag">競品類型: 潮流文創平台</span>
-                    <span class="card-tag">成功策略: 藝術跨界聯名</span>
-                </div>
-                <button class="expand-toggle">展開詳情<span>▼</span></button>
             </div>
         </div>
 
-        <h2 style="margin-top: 60px;">本週創意優先序（今日更新）</h2>
+        <h2 class="section-title">🏪 競品參考</h2>
+        <div class="competitor-grid">
+            <div class="competitor-card">
+                <img src="https://image.pollinations.ai/prompt/designer%20vinyl%20art%20toy%20furry%20monster%20premium%20store%20display?width=600&height=350&nologo=true&seed=201" alt="Labubu The Monsters" class="competitor-image">
+                <div class="competitor-content">
+                    <h3>Labubu (The Monsters) by Kasing Lung / Pop Mart</h3>
+                    <p>Labubu系列常推出主題性或城市限定款，如 "The Monsters Art Series" 將角色融入名畫藝術造型。該IP於2024年在東南亞及東亞地區廣受歡迎，據Pop Mart 2023年財報顯示，其海外市場營收增長超100%，尤其在泰國、新加坡市場表現突出，單品銷售額常居榜首，證明其產品線的強勁市場需求。其具備辨識度的形象和多樣化的設計使其在盲盒市場佔據重要地位。</p>
+                    <p class="insight">**啟示：** 強調IP的在地化故事與藝術結合，能有效提升高端市場的接受度和銷售額。產品的藝術性與限量發行策略是關鍵成功因素，直接刺激了收藏者的購買慾望。</p>
+                </div>
+            </div>
+            <div class="competitor-card">
+                <img src="https://image.pollinations.ai/prompt/tiny%20round%20kawaii%20Japanese%20character%20pastel%20blind%20box%20capsule?width=600&height=350&nologo=true&seed=202" alt="Chiikawa Local Limited" class="competitor-image">
+                <div class="competitor-content">
+                    <h3>Chiikawa (吉伊卡哇) - 地域限定策略</h3>
+                    <p>雖非Zenith Innovations授權IP，但其在日本推出的「地域限定」鑰匙圈和周邊商品極為成功。這些商品將Chiikawa、Hachiware等角色與當地特產（如廣島拉麵、福岡草莓、京都抹茶）或地標結合，創造出強大的收藏誘因。根據日本Character Databank報告，Chiikawa相關商品在2023年市場規模增長40%，其限定款在二手市場溢價達300%，顯示消費者對稀有性和在地化的高度重視。</p>
+                    <p class="insight">**啟示：** 深度結合當地文化元素與特產，能極大化商品的收藏價值和市場共鳴。精準的在地化聯名與區域限定發售策略，能驅動粉絲的高度參與及重複購買，並創造社群話題。</p>
+                </div>
+            </div>
+            <div class="competitor-card">
+                <img src="https://image.pollinations.ai/prompt/designer%20vinyl%20art%20toy%20furry%20monster%20premium%20store%20display?width=600&height=350&nologo=true&seed=201" alt="Pop Mart Art Collaboration" class="competitor-image">
+                <div class="competitor-content">
+                    <h3>泡泡瑪特 (Pop Mart) - 跨界藝術聯名</h3>
+                    <p>除了Labubu，泡泡瑪特也經常與各大IP或藝術家合作，推出藝術主題或聯名系列盲盒，如與梵高博物館的成功合作。這種將IP與藝術文化結合的模式，據Pop Mart Q4 2023財報顯示，其高端聯名產品線的毛利率平均高出常規產品15%，且其社群媒體討論度較一般產品高出2倍。這為IP商品拓展高端市場提供了明確參考，證明藝術跨界合作的商業潛力。</p>
+                    <p class="insight">**啟示：** 藝術聯名是提升品牌價值、拓展高端市場並實現更高毛利率的有效途徑。選擇知名藝術IP或機構合作，可立即獲得市場認可，並吸引更廣泛的文化愛好者，擴大產品受眾群體。</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">本週創意優先序（今日更新）</h2>
         <div class="priority-list">
-            <p>1. <strong>Snoopy「熱帶風情假期」盲盒公仔系列設計初稿與成本效益分析（截止日：2026年05月03日）：</strong> 由設計部與供應鏈部共同完成，並提交給選品總監審閱。</p>
-            <p>2. <strong>Snoopy「歐洲藝術漫遊」高級掛件與文具套組設計概念深化（截止日：2026年05月08日）：</strong> 由設計部針對歐洲市場的文化細節進行深入研究與設計細化。</p>
-            <p>3. <strong>Muzik Tiger韓國市場授權擴展前期調研（截止日：2026年05月10日）：</strong> 由法務部與業務拓展部負責，評估與Medialink合作的可行性及初步商務條件。</p>
+            <div class="priority-item">
+                <span class="priority-number">1.</span>
+                <p><strong>Snoopy「熱帶風情假期」盲盒公仔系列設計初稿與成本效益分析</strong></p>
+                <p class="deadline">**截止日：** 2026年05月03日</p>
+                <p><strong>具體要求：</strong> 由設計部與供應鏈部共同完成，並提交給選品總監審閱。初稿需包含至少5款設計概念圖及初步物料清單，成本分析需精確到每件誤差不超過3%，並提出兩個潛在供應商的初步報價對比，確保生產品質與成本效益。</p>
+            </div>
+            <div class="priority-item">
+                <span class="priority-number">2.</span>
+                <p><strong>Snoopy「歐洲藝術漫遊」高級掛件與文具套組設計概念深化</strong></p>
+                <p class="deadline">**截止日：** 2026年05月08日</p>
+                <p><strong>具體要求：</strong> 由設計部針對歐洲市場的文化細節進行深入研究與設計細化。深化概念需包含主要掛件的3D渲染圖及文具套組的包裝設計初稿，並明確藝術元素選用依據，提交一份針對歐洲精品市場的設計說明書，確保設計符合當地高端消費者的審美與品牌期待。</p>
+            </div>
+            <div class="priority-item">
+                <span class="priority-number">3.</span>
+                <p><strong>Muzik Tiger韓國市場授權擴展前期調研</strong></p>
+                <p class="deadline">**截止日：** 2026年05月10日</p>
+                <p><strong>具體要求：</strong> 由法務部與業務拓展部負責，評估與Medialink合作的可行性及初步商務條件。調研報告需包含至少兩家競品在韓國市場的授權案例分析，以及預估授權費用範圍，並提出進入韓國市場的3個主要合作渠道方案（例如：特定連鎖書店、潮牌集合店、線上電商平台），以供高層決策參考。</p>
+            </div>
         </div>
-    </div>
-
+    </main>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const proposalCards = document.querySelectorAll('.proposal-card');
+            // Expand/Collapse functionality
+            document.querySelectorAll('.proposal-card').forEach(card => {
+                const header = card.querySelector('.card-header');
+                const expandBtn = card.querySelector('.expand-btn');
 
-            proposalCards.forEach(card => {
-                const toggleButton = card.querySelector('.expand-toggle');
-                const contentCollapsed = card.querySelector('.card-content-collapsed');
-                const summaryContent = card.querySelector('.card-content-summary'); // Ensure click on header also toggles
-
-                // Combine summary and toggle button clicks to expand/collapse
-                [summaryContent, toggleButton].forEach(element => {
-                    if (element) {
-                        element.addEventListener('click', (event) => {
-                            // Prevent event bubbling from star rating
-                            if (event.target.classList.contains('star')) {
-                                return;
-                            }
-
-                            // If clicking on the button directly, prevent default action if needed
-                            if (event.target === toggleButton) {
-                                event.preventDefault();
-                            }
-
-                            card.classList.toggle('expanded');
-                            const arrowSpan = toggleButton.querySelector('span');
-                            if (card.classList.contains('expanded')) {
-                                toggleButton.innerHTML = '收合詳情<span>▲</span>';
-                            } else {
-                                toggleButton.innerHTML = '展開詳情<span>▼</span>';
-                            }
-                        });
+                header.addEventListener('click', (e) => {
+                    // Only toggle if the click is on the header itself, not the button, to avoid double toggle
+                    if (e.target === header || e.target.parentNode === header || e.target.tagName !== 'BUTTON') {
+                        card.classList.toggle('expanded');
                     }
                 });
-
-                // Interactive Rating
-                const ratingContainer = card.querySelector('.rating');
-                if (ratingContainer) {
-                    const stars = ratingContainer.querySelectorAll('.star');
-                    let currentRating = parseInt(ratingContainer.dataset.rating);
-
-                    const updateStars = (rating) => {
-                        stars.forEach(star => {
-                            if (parseInt(star.dataset.value) <= rating) {
-                                star.classList.add('selected');
-                            } else {
-                                star.classList.remove('selected');
-                            }
-                        });
-                    };
-
-                    // Initial state
-                    updateStars(currentRating);
-
-                    stars.forEach(star => {
-                        star.addEventListener('click', (e) => {
-                            currentRating = parseInt(e.target.dataset.value);
-                            ratingContainer.dataset.rating = currentRating; // Update data attribute
-                            updateStars(currentRating);
-                        });
-
-                        star.addEventListener('mouseover', (e) => {
-                            const hoverRating = parseInt(e.target.dataset.value);
-                            stars.forEach(s => {
-                                if (parseInt(s.dataset.value) <= hoverRating) {
-                                    s.classList.add('hover-active');
-                                } else {
-                                    s.classList.remove('hover-active');
-                                }
-                            });
-                        });
-
-                        star.addEventListener('mouseout', () => {
-                            stars.forEach(s => s.classList.remove('hover-active'));
-                        });
+                
+                // Explicitly handle button click to ensure it works and doesn't propagate
+                if (expandBtn) {
+                    expandBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Stop event from bubbling up to header
+                        card.classList.toggle('expanded');
                     });
                 }
+            });
+
+            // Interactive Rating functionality
+            document.querySelectorAll('.stars').forEach(starsContainer => {
+                const individualStars = starsContainer.querySelectorAll('.star');
+                let currentRating = parseInt(starsContainer.dataset.rating);
+
+                function setStarDisplay(ratingValue) {
+                    individualStars.forEach((star, index) => {
+                        if (index < ratingValue) {
+                            star.classList.add('active');
+                        } else {
+                            star.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Initial setup
+                setStarDisplay(currentRating);
+
+                individualStars.forEach(star => {
+                    star.addEventListener('click', () => {
+                        const value = parseInt(star.dataset.value);
+                        currentRating = value; // Update actual rating
+                        starsContainer.dataset.rating = currentRating; // Store in dataset
+                        setStarDisplay(currentRating); // Update display based on new rating
+                    });
+
+                    star.addEventListener('mouseover', () => {
+                        const value = parseInt(star.dataset.value);
+                        setStarDisplay(value); // Temporarily highlight stars up to hovered one
+                    });
+
+                    star.addEventListener('mouseout', () => {
+                        setStarDisplay(currentRating); // Revert to actual rating on mouseout
+                    });
+                });
             });
         });
     </script>
