@@ -1,810 +1,869 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>海外B2B拓荒情報報告 - 歐洲地毯式搜尋</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <title>海外B2B拓荒情報報告 - 歐洲地毯式搜尋 (2026/04/22)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Roboto:wght=300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #1a3a5c;
             --secondary-gold: #d4a017;
-            --accent-red: #cc0000;
-            --light-bg: #f9f9f9;
-            --text-color: #333;
-            --light-grey: #eee;
+            --light-gray: #f8f8f8;
+            --dark-text: #333;
+            --white: #fff;
+            --red-highlight: #dc3545;
         }
 
         body {
-            font-family: 'Lato', 'Noto Sans TC', sans-serif;
-            background-color: white;
-            color: var(--text-color);
+            font-family: 'Roboto', 'Noto Sans TC', sans-serif;
             line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
             margin: 0;
             padding: 0;
         }
 
         .container {
             max-width: 1200px;
-            margin: 30px auto;
+            margin: 20px auto;
             padding: 0 20px;
         }
 
-        h1, h2, h3, h4 {
-            color: var(--primary-blue);
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
             font-weight: 700;
         }
 
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 30px;
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .hero-banner {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            position: relative;
+            background-color: var(--light-gray);
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .hero-banner .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 50%);
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--white);
+        }
+
+        .hero-banner .overlay h2 {
+            margin: 0;
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        h2, h3 {
+            color: var(--primary-blue);
             border-bottom: 2px solid var(--secondary-gold);
-            padding-bottom: 15px;
-        }
-
-        h2 {
-            font-size: 1.8em;
+            padding-bottom: 10px;
             margin-top: 40px;
-            margin-bottom: 20px;
-            border-left: 5px solid var(--secondary-gold);
-            padding-left: 10px;
+            margin-bottom: 25px;
         }
 
-        h3 {
-            font-size: 1.4em;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
-
-        .priority-summary {
+        .market-priority-overview {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-around;
-            gap: 15px;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: var(--light-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
         }
 
-        .priority-item {
+        .market-card-overview {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
-            padding: 10px 15px;
-            background-color: white;
-            border-left: 4px solid var(--primary-blue);
-            border-radius: 5px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            gap: 10px;
+            flex: 1 1 calc(33% - 20px); /* Adjust for 3 columns, responsive */
             min-width: 280px;
-            flex: 1;
-            box-sizing: border-box;
         }
 
-        .priority-item .flag {
+        .market-card-overview .flag {
             font-size: 1.8em;
-            margin-right: 10px;
+            line-height: 1;
         }
 
-        .priority-item .details {
+        .market-card-overview .details {
             display: flex;
             flex-direction: column;
         }
-
-        .priority-item .name {
-            font-weight: 700;
+        .market-card-overview .details span:first-child {
+            font-weight: bold;
             color: var(--primary-blue);
         }
-
-        .priority-item .rating {
-            color: var(--secondary-gold);
-            font-weight: 700;
-            margin-right: 5px;
+        .market-card-overview .details span:last-child {
+            font-size: 0.9em;
+            color: #555;
         }
 
-        .market-card {
-            background-color: white;
+
+        .client-section {
+            margin-bottom: 50px;
+        }
+
+        .client-card {
+            background-color: var(--white);
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             overflow: hidden;
-            border: 1px solid var(--light-grey);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease-in-out;
         }
 
-        .market-card-header {
-            padding: 20px 25px;
+        .client-card-header {
+            padding: 20px;
             background-color: var(--primary-blue);
-            color: white;
+            color: var(--white);
             cursor: pointer;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 15px;
-        }
-        
-        .market-card-header h3 {
-            margin: 0;
-            color: white;
-            flex-grow: 1;
-        }
-
-        .market-card-header .toggle-icon {
-            font-size: 1.5em;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .market-card.expanded .toggle-icon {
-            transform: rotate(180deg);
-        }
-
-        .market-card-summary {
-            display: flex;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .market-card-summary .flag {
-            font-size: 2em;
-        }
-
-        .market-card-summary .rating {
-            font-weight: 700;
-            color: var(--secondary-gold);
             font-size: 1.2em;
+            font-weight: 600;
+            border-bottom: 2px solid var(--secondary-gold);
         }
 
-        .market-card-summary .description {
-            flex-grow: 1;
-            font-size: 1.1em;
+        .client-card-header h3 {
+            margin: 0;
+            color: var(--white);
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
+        .client-card-header .toggle-icon {
+            font-size: 1.5em;
+            line-height: 1;
+            transition: transform 0.3s ease-out;
+        }
 
-        .market-card-content {
+        .client-card:not(.expanded) .toggle-icon {
+            transform: rotate(0deg);
+        }
+        .client-card.expanded .toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .client-card-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            padding: 0 25px; /* Adjust padding for content when expanded */
-            background-color: var(--light-bg);
+            transition: max-height 0.5s ease-in-out;
+            padding: 0 20px; /* Apply padding only when visible */
         }
 
-        .market-card.expanded .market-card-content {
-            max-height: 2000px; /* Sufficiently large to show all content */
-            padding: 25px;
+        .client-card.expanded .client-card-content {
+            max-height: 2500px; /* A sufficiently large value */
+            padding: 20px;
+        }
+        
+        .client-card-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-bottom: 20px;
         }
 
-        .market-card-content p, .market-card-content ul {
-            margin-bottom: 15px;
+        .client-card-content h4 {
+            color: var(--primary-blue);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed var(--secondary-gold);
+            padding-bottom: 5px;
         }
 
-        .market-card-content ul {
-            padding-left: 20px;
+        .client-card-content ul {
+            list-style: disc;
+            margin-left: 20px;
+            padding-left: 0;
         }
 
-        .market-card-content ul li {
+        .client-card-content ul li {
             margin-bottom: 5px;
         }
 
-        .market-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .pitch-box {
+        .pitch-script-block {
             background-color: var(--primary-blue);
-            color: white;
+            color: var(--white);
             border-left: 5px solid var(--secondary-gold);
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 5px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
         }
 
-        .pitch-box h4 {
-            color: white;
-            margin-top: 0;
+        .pitch-script-block p {
             margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .pitch-box .pitch-text {
-            margin-bottom: 15px;
             font-size: 0.95em;
         }
 
-        .copy-button {
+        .pitch-script-block h4 {
+            color: var(--secondary-gold);
+            margin-top: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .copy-pitch-btn {
             background-color: var(--secondary-gold);
             color: var(--primary-blue);
             border: none;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: 700;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            margin-top: 10px;
         }
 
-        .copy-button:hover {
-            background-color: #e0b43e;
+        .copy-pitch-btn:hover {
+            background-color: #c09113;
         }
 
-        .copy-button:active {
-            transform: translateY(1px);
+        .priority-actions ol {
+            list-style: decimal;
+            margin-left: 20px;
+            padding-left: 0;
         }
 
-        .action-list, .key-findings, .follow-up-list {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: var(--light-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .action-list ul, .key-findings ul, .follow-up-list ul {
-            list-style-type: decimal;
-            padding-left: 25px;
-        }
-
-        .action-list li {
-            color: var(--accent-red);
-            font-weight: 700;
+        .priority-actions ol li {
+            color: var(--red-highlight);
+            font-weight: bold;
             margin-bottom: 10px;
         }
-        
+
         .key-findings ul {
-            list-style-type: disc;
+            list-style: circle;
+            margin-left: 20px;
+            padding-left: 0;
         }
 
-        .key-findings li, .follow-up-list li {
+        .key-findings ul li {
             margin-bottom: 10px;
-            color: var(--text-color);
         }
 
-        .text-bold {
-            font-weight: 700;
+        .follow-up-list {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--light-gray);
+            border-top: 3px solid var(--primary-blue);
+            border-bottom: 3px solid var(--primary-blue);
+            border-radius: 8px;
         }
-        
+
+        .follow-up-list h3 {
+            color: var(--primary-blue);
+            border-bottom: 1px dashed var(--secondary-gold);
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .follow-up-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .follow-up-list ul li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ccc;
+            display: flex;
+            align-items: center;
+        }
+
+        .follow-up-list ul li:last-child {
+            border-bottom: none;
+        }
+
+        .follow-up-list ul li::before {
+            content: '✓';
+            color: var(--secondary-gold);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
+            header h1 {
+                font-size: 1.8em;
             }
-            .priority-summary {
-                flex-direction: column;
-                align-items: center;
+            .hero-banner .overlay h2 {
+                font-size: 1.5em;
             }
-            .priority-item {
-                width: 90%;
+            .market-card-overview {
+                flex: 1 1 calc(50% - 20px);
             }
-            .market-card-header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 15px 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
             }
-            .market-card-summary {
-                flex-direction: column;
-                align-items: flex-start;
-                width: 100%;
+            .market-card-overview {
+                flex: 1 1 100%;
             }
-            .market-card-summary .description {
-                margin-top: 10px;
-            }
-            .market-card-content {
+            .client-card-header {
+                font-size: 1em;
                 padding: 15px;
-            }
-            .market-card.expanded .market-card-content {
-                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>2026年04月22日 海外業務情報 — 歐洲地毯式搜尋</h1>
-
-        <h2>今日搜尋目標區域：歐洲 (英國、德國、法國、荷蘭、北歐五國)</h2>
-
-        <div class="priority-summary">
-            <div class="priority-item">
-                <span class="flag">🇫🇷</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">Abysse Corp</span>
-                    <span>歐洲領先授權流行文化商品集團，含盲盒公仔</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇩🇪</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">Figuya</span>
-                    <span>歐洲最大正版日系手辦供應商</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇬🇧</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">Forbidden Planet</span>
-                    <span>全球知名科幻奇幻流行文化零售商，含Funko Pop!</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇬🇧</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">Muddleit Ltd</span>
-                    <span>專精「盲袋和收藏品」的批發分銷商</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇬🇧</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">Blind Box Empire</span>
-                    <span>專營盲盒玩具的英國線上獨立商店</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇪🇸</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">OcioStock</span>
-                    <span>Funko Pop!歐洲批發商，含Bitty POPs</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇩🇰</span>
-                <div class="details">
-                    <span class="rating">A級</span>
-                    <span class="name">ET-Group A/S</span>
-                    <span>Funko POP歐洲批發分銷商，北歐市場強勁</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇳🇱</span>
-                <div class="details">
-                    <span class="rating">B級</span>
-                    <span class="name">Animefigures.nl</span>
-                    <span>荷蘭線上兼實體店，專營動漫手辦和周邊</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇫🇷</span>
-                <div class="details">
-                    <span class="rating">B級</span>
-                    <span class="name">Japan Sama</span>
-                    <span>專營日本動漫手辦和周邊線上零售商</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇫🇷</span>
-                <div class="details">
-                    <span class="rating">B級</span>
-                    <span class="name">Manganim</span>
-                    <span>法國漫畫動漫周邊店，多種手辦與配件</span>
-                </div>
-            </div>
-            <div class="priority-item">
-                <span class="flag">🇬🇧</span>
-                <div class="details">
-                    <span class="rating">B級</span>
-                    <span class="name">NDA Toys</span>
-                    <span>英國最大玩具批發商之一，含盲袋玩具部門</span>
-                </div>
-            </div>
+    <header>
+        <div class="container">
+            <h1>海外B2B拓荒情報報告</h1>
+            <p>2026年04月22日 - 歐洲地毯式搜尋</p>
         </div>
+    </header>
 
-        <h2>🎯 A 級潛在客戶（立即接觸，7家）</h2>
-
-        <!-- Abysse Corp -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇫🇷</span>
-                    <span class="rating">A級</span>
-                    <h3>Abysse Corp — 法國/歐洲</h3>
-                    <span class="description">作為歐洲領先的授權流行文化商品集團，Abysse Corp 負責設計、製造和分銷，並擁有超過200個活躍授權，涵蓋動漫、電影、電視劇和電玩遊戲等主要類別，明確包含「盲盒公仔」產品線。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/Paris%20business%20meeting%20professional?width=400&height=250&nologo=true&seed=101" alt="Abysse Corp meeting scene">
-                <p><span class="text-bold">潛在客戶依據</span>：作為歐洲領先的授權流行文化商品集團，Abysse Corp 負責設計、製造和分銷，並擁有超過200個活躍授權，涵蓋漫畫/日本動漫（如《海賊王》、《龍珠》、《火影忍者》）、電影（如《哈利波特》）、電視劇（如《權力的遊戲》）和電玩遊戲（如《寶可夢》）等主要類別。該公司明確在其產品列表中包含「盲盒公仔」（Blind Box Figures），並設有專門的3D設計團隊開發手辦和複製品。他們在德國、英國、瑞典等多個歐洲國家設有辦事處，擁有廣泛的歐洲分銷網絡。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：動漫手辦、盲盒公仔、服裝、餐具、箱包、海報等，IP包括《海賊王》、《龍珠》、《火影忍者》、《鬼滅之刃》、《哈利波特》、《侏羅紀公園》、《魔戒》、《DC漫畫》、《權力的遊戲》、《瑞克和莫蒂》、《刺客信條》、《寶可夢》、《英雄聯盟》等。</p>
-                <p><span class="text-bold">渠道類型</span>：實體零售、線上電商、批發商、展會、設計製造商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（針對Snoopy/Peanuts, Opanchu, Maniani World, 飯糰與梅子, Muzik Tiger），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：+33 (0)2 35 98 18 63 (銷售團隊), 官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-abysse-zh">尊敬的 Abysse 銷售團隊，作為歐洲領先的授權流行文化商品分銷商，貴公司在動漫、漫畫和遊戲IP領域的豐富產品線和經驗，特別是『盲盒公仔』，與蕪解創意高度契合。我們專注於正版授權IP周邊商品，包括全球知名的史努比/花生漫畫，以及亞洲熱門IP如Chiikawa和Mofusand（部分地區可平行輸入合作）。我們提供多樣化的盲盒公仔、掛件和文具周邊，相信我們的獨特產品線能顯著豐富貴公司的收藏品品類，吸引廣泛的歐洲客戶群。我們非常期待探討在授權區域內的直接代理合作，以及其他地區的平行輸入合作模式。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-abysse-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-abysse-en">Dear Abysse Sales Team, As a leading European distributor of licensed pop culture merchandise, your extensive portfolio and experience with anime, manga, and gaming IPs, including 'Blind Box Figures,' aligns perfectly with Wujie Creative. We specialize in genuine licensed IP merchandise, including globally popular IPs like Snoopy/Peanuts and trending Asian IPs such as Chiikawa and Mofusand (available via parallel import for select regions). We offer a diverse range of blind box figures, keychains, and stationery, and believe our unique product lines can significantly enhance your collectible offerings and appeal to your broad customer base across Europe. We are keen to explore a direct authorization partnership for our covered regions and parallel import options for others.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-abysse-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Figuya -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇩🇪</span>
-                    <span class="rating">A級</span>
-                    <h3>Figuya — 德國柏林</h3>
-                    <span class="description">自2011年以來，Figuya 一直是動漫手辦和收藏品的專業零售商，被稱為歐洲最大的正版日系手辦供應商。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/Berlin%20anime%20store%20professional%20interior?width=400&height=250&nologo=true&seed=102" alt="Figuya store interior">
-                <p><span class="text-bold">潛在客戶依據</span>：自2011年以來，Figuya 一直是動漫手辦和收藏品的專業零售商，被稱為歐洲最大的正版日系手辦供應商。他們直接從日本和歐洲官方批發商採購，在德國多個城市（如柏林、萊比錫、德累斯頓）設有實體店並經營線上商店，同時積極參與動漫和漫畫展會。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：動漫手辦、Figma、Nendoroids、漫畫等，IP包括初音未來、鬼滅之刃等。</p>
-                <p><span class="text-bold">渠道類型</span>：實體零售、線上電商、展會。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：kontakt@figuya.de, +49 (0)30 577 011 989。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-figuya-zh">尊敬的 Figuya 團隊，貴公司作為歐洲領先的正版日系動漫手辦和收藏品商店，聲譽卓著。蕪解創意擁有一系列強大的正版授權IP周邊商品，包括廣受喜愛的史努比/花生漫畫，以及亞洲熱門的Chiikawa和Mofusand（部分地區可平行輸入合作）。我們的5cm/8cm盲盒公仔和收藏掛件將是貴公司精選產品的絕佳補充，為貴公司的線上線下熱情收藏家群體提供新鮮、正版的選擇。我們期待與您討論如何將我們的產品融入貴公司的現有產品線。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-figuya-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-figuya-en">Dear Figuya Team, Your reputation as a premier destination for authentic Japanese anime figures and collectibles in Europe is highly impressive. Wujie Creative offers a strong portfolio of genuine licensed IP merchandise, including fan-favorite Snoopy/Peanuts and highly sought-after Asian IPs like Chiikawa and Mofusand (available through parallel import for certain regions). Our 5cm/8cm blind box figures and collectible keychains could be a perfect addition to your curated selection, providing fresh, authentic options for your passionate collector community both online and in-store. We are eager to discuss how our products can complement your existing offerings.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-figuya-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Forbidden Planet -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇬🇧</span>
-                    <span class="rating">A級</span>
-                    <h3>Forbidden Planet — 英國倫敦 (及全英)</h3>
-                    <span class="description">作為全球最大、最知名的科幻、奇幻和流行文化零售商之一，Forbidden Planet 專營漫畫、圖文小說、動漫手辦以及各種聯名/收藏品，產品線包含 Funko Pop!。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/London%20comic%20book%20store%20professional%20interior?width=400&height=250&nologo=true&seed=103" alt="Forbidden Planet store interior">
-                <p><span class="text-bold">潛在客戶依據</span>：作為全球最大、最知名的科幻、奇幻和流行文化零售商之一，Forbidden Planet 專營漫畫、圖文小說、漫畫、動漫手辦以及各種聯名/收藏品。該公司在英國和愛爾蘭設有多家實體店，並擁有強大的線上業務，其產品線包含 Funko Pop!。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：動漫手辦、Funko Pop!、漫畫、圖文小說、電影/電視周邊商品等。</p>
-                <p><span class="text-bold">渠道類型</span>：實體零售、線上電商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：info@forbiddenplanet.com, 官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-forbidden-planet-zh">尊敬的 Forbidden Planet 團隊，作為英國流行文化和收藏品零售的基石，貴公司廣泛的科幻、奇幻和漫畫周邊產品，包括公仔和收藏品，使您成為蕪解創意的理想合作夥伴。我們提供來自史努比/花生漫畫等廣受喜愛的IP，以及Opanchu和Maniani World等亞洲熱門角色的正版授權盲盒公仔、掛件和文具周邊。我們獨特的盲盒收藏品能吸引新客戶並激發現有粉絲群，為貴公司帶來新鮮、流行的IP。我們相信我們的產品將為貴公司多元化的產品線增添光彩。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-forbidden-planet-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-forbidden-planet-en">Dear Forbidden Planet Team, As a cornerstone of pop culture and collectibles retail in the UK, your extensive range of sci-fi, fantasy, and manga merchandise, including action figures and collector's items, makes you an ideal partner for Wujie Creative. We offer genuine licensed IP blind box figures, keychains, and stationery from beloved IPs like Snoopy/Peanuts and popular Asian characters such as Opanchu and Maniani World. Our unique collectible blind boxes can attract new customers and excite your existing fanbase, adding fresh, trending IPs to your shelves. We are confident our products would be a strong addition to your diverse offerings.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-forbidden-planet-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Muddleit Ltd -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇬🇧</span>
-                    <span class="rating">A級</span>
-                    <h3>Muddleit Ltd — 英國</h3>
-                    <span class="description">Muddleit Ltd 是一家專門從事「盲袋和收藏品」（Blind Packs and Collectables）的批發分銷商，其產品精準符合蕪解創意的產品類別。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/UK%20warehouse%20distributor%20professional%20interior?width=400&height=250&nologo=true&seed=104" alt="Muddleit Ltd warehouse scene">
-                <p><span class="text-bold">潛在客戶依據</span>：Muddleit Ltd 是一家專門從事「盲袋和收藏品」（Blind Packs and Collectables）的批發分銷商。他們明確在其產品中列出《進擊的巨人》PalVerse 手辦盲盒和 Cimmy 'You're Invited' 絨毛盲盒等，這精準符合蕪解創意的產品類別。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：盲袋、收藏品、動漫主題手辦盲盒（如《進擊的巨人》PalVerse）、絨毛盲盒等。</p>
-                <p><span class="text-bold">渠道類型</span>：批發商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：sales@muddleit.co.uk (常見的批發商銷售信箱，需在官網進一步確認)。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-muddleit-zh">尊敬的 Muddleit 團隊，作為專門從事『盲袋和收藏品』的批發分銷商，貴公司的業務與蕪解創意的核心產品完美契合。我們是正版授權的5cm/8cm盲盒公仔和收藏周邊商品的領先供應商，涵蓋史努比/花生漫畫、Opanchu和Maniani World等熱門IP，以及Chiikawa和Mofusand等備受追捧的亞洲IP（部分地區可平行輸入合作）。我們相信，我們多樣化且流行的盲盒系列將成為貴公司現有產品線的巨大成功補充，直接吸引您的零售商和收藏家客戶群。期待與您探討合作，將這些令人興奮的新系列帶入您的市場。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-muddleit-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-muddleit-en">Dear Muddleit Team, As a specialized wholesale distributor of 'Blind Packs and Collectables,' your business is a perfect match for Wujie Creative's core offerings. We are a leading supplier of genuine licensed 5cm/8cm blind box figures and collectible merchandise featuring popular IPs like Snoopy/Peanuts, Opanchu, and Maniani World, as well as highly sought-after Asian IPs such as Chiikawa and Mofusand (available via parallel import). We are confident that our diverse and trending blind box series would be a highly successful addition to your current product range, appealing directly to your customer base of retailers and collectors. Let's discuss a partnership to bring these exciting new collections to your market.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-muddleit-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Blind Box Empire -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇬🇧</span>
-                    <span class="rating">A級</span>
-                    <h3>Blind Box Empire — 英國</h3>
-                    <span class="description">一家專營盲盒玩具的英國獨立線上商店，銷售多樣收藏手辦，業務模式完全圍繞盲盒和收藏品。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/UK%20online%20toy%20store%20professional%20with%20blind%20boxes?width=400&height=250&nologo=true&seed=105" alt="Blind Box Empire online store concept">
-                <p><span class="text-bold">潛在客戶依據</span>：一家專營盲盒玩具的英國獨立線上商店。他們銷售收藏手辦，並提及《新世紀福音戰士》、《初音未來》、《咒術迴戰》和《天官賜福》等盲盒系列，其業務模式完全圍繞盲盒和收藏品。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：盲盒公仔，IP包括《新世紀福音戰士》、《初音未來》、《咒術迴戰》、《天官賜福》等。</p>
-                <p><span class="text-bold">渠道類型</span>：線上電商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：info@blindboxempire.co.uk 或其官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-bbe-zh">尊敬的 Blind Box Empire 團隊，作為一家專營盲盒玩具的線上零售商，您正是蕪解創意尋找的合作夥伴類型。我們專注於正版授權的5cm/8cm盲盒公仔，涵蓋史努比/花生漫畫、Opanchu和Maniani World等熱門IP，以及Chiikawa和Mofusand等流行亞洲IP（可平行輸入）。您在盲盒市場的專業知識使您成為將我們獨特多元系列引入英國熱情收藏家的理想渠道。我們非常期待與您合作，擴展您的產品線，並將更多高需求的盲盒系列帶給您的客戶。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-bbe-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-bbe-en">Dear Blind Box Empire Team, As a dedicated online retailer of blind box toys, you are precisely the kind of partner Wujie Creative seeks. We specialize in genuine licensed 5cm/8cm blind box figures featuring popular IPs like Snoopy/Peanuts, Opanchu, and Maniani World, along with trending Asian IPs such as Chiikawa and Mofusand (available for parallel import). Your expertise in the blind box market makes you an ideal channel to introduce our unique and diverse collections to eager collectors in the UK. We are excited about the prospect of collaborating to expand your offerings and bring new, high-demand blind box series to your customers.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-bbe-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- OcioStock -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇪🇸</span>
-                    <span class="rating">A級</span>
-                    <h3>OcioStock — 西班牙 (歐洲分銷)</h3>
-                    <span class="description">OcioStock 是 Funko Pop! 在歐洲的批發分銷商，其產品線包括 Funko Pop! Bitty POPs (類似盲盒的迷你公仔)。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/Madrid%20business%20district%20warehouse%20professional?width=400&height=250&nologo=true&seed=106" alt="OcioStock warehouse scene">
-                <p><span class="text-bold">潛在客戶依據</span>：OcioStock 是 Funko Pop! 在歐洲的批發分銷商，其產品線包括 Funko Pop! Bitty POPs (類似盲盒的迷你公仔，如 Hello Kitty and Friends)。他們服務商店和分銷商，並分銷孩之寶（Hasbro）玩具。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：Funko Pop! 公仔（包括Bitty POPs）、孩之寶（Hasbro）玩具（如漫威傳奇系列）。</p>
-                <p><span class="text-bold">渠道類型</span>：批發商、分銷商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：info@ociostock.com 或官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-ociostock-zh">尊敬的 OcioStock 團隊，作為歐洲領先的 Funko Pop! 和孩之寶等授權收藏品公仔的批發分銷商，蕪解創意認為與貴公司的分銷網絡具有強大的協同效應。我們專注於正版授權IP盲盒公仔和收藏周邊商品，包括全球知名的史努比/花生漫畫，以及Opanchu和Maniani World等具吸引力的亞洲IP。鑑於貴公司在『Bitty POPs』方面的經驗和廣泛的零售覆蓋，我們的5cm/8cm盲盒系列和掛件將為貴公司的產品組合增添寶貴價值，擴大在快速增長的盲盒收藏品市場中的份額。我們非常樂意探討分銷合作機會。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-ociostock-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-ociostock-en">Dear OcioStock Team, As a prominent wholesale distributor of popular collectible figures like Funko Pop! and licensed Hasbro toys across Europe, Wujie Creative sees strong synergy with your distribution network. We specialize in genuine licensed IP blind box figures and collectible merchandise, including globally recognized Snoopy/Peanuts and appealing Asian IPs such as Opanchu and Maniani World. Given your experience with 'Bitty POPs' and extensive retail reach, our 5cm/8cm blind box series and keychains would be a valuable addition to your portfolio, expanding your offering in the rapidly growing collectible blind box market. We are keen to discuss distribution opportunities.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-ociostock-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ET-Group A/S -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇩🇰</span>
-                    <span class="rating">A級</span>
-                    <h3>ET-Group A/S — 丹麥 (歐洲分銷)</h3>
-                    <span class="description">ET-Group A/S 是 Funko POP 在歐洲的批發分銷商，其B2B商店提供來自各種流行文化類別的廣泛Funko POP角色。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/Copenhagen%20distribution%20center%20professional?width=400&height=250&nologo=true&seed=107" alt="ET-Group A/S distribution center">
-                <p><span class="text-bold">潛在客戶依據</span>：ET-Group A/S 是 Funko POP 在歐洲的批發分銷商。其 B2B 商店提供來自各種流行文化類別（如《星球大戰》、《漫威》、《哈利波特》、《迪士尼》、《堡壘之夜》）的廣泛 Funko POP 角色。他們服務零售店和網店，並強調快速交貨和批量訂購。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：Funko POP 公仔，IP包括《星球大戰》、《漫威》、《權力的遊戲》、《哈利波特》、《迪士尼》、《堡壘之夜》、《光環》等。</p>
-                <p><span class="text-bold">渠道類型</span>：批發商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：sales@et-group.dk (常見的批發商銷售信箱，需在官網進一步確認)。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-etgroup-zh">尊敬的 ET-Group A/S 團隊，貴公司作為歐洲流行文化商品，尤其是 Funko POP 的批發分銷商，具有強大的市場地位，是蕪解創意的極具吸引力的合作夥伴。我們提供正版授權IP盲盒公仔和收藏品，其中包括史努比/花生漫畫等廣受喜愛的IP，以及Opanchu和Maniani World等流行亞洲IP。我們的5cm/8cm盲盒系列將能補充您現有的 Funko 產品線，使您的收藏品種類更加多元化，並開拓流行文化市場的新細分領域。我們非常樂意探討我們的產品如何為您的零售合作夥伴帶來新的銷售增長。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-etgroup-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-etgroup-en">Dear ET-Group A/S Team, Your strong position as a wholesale distributor of popular culture merchandise, particularly Funko POPs, across Europe, makes you a highly attractive partner for Wujie Creative. We offer genuine licensed IP blind box figures and collectibles, featuring beloved IPs like Snoopy/Peanuts and trending Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series would complement your existing Funko range, diversifying your collectible offerings and tapping into new segments of the pop culture market. We would be delighted to explore how our products can drive new sales for your retail partners.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-etgroup-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <h2>🟡 B 級潛在客戶（本季跟進，4家）</h2>
-
-        <!-- Animefigures.nl -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇳🇱</span>
-                    <span class="rating">B級</span>
-                    <h3>Animefigures.nl — 荷蘭</h3>
-                    <span class="description">一家荷蘭線上商店兼實體店，專營動漫手辦、Nendoroids、Funko Pops 和周邊商品。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/Amsterdam%20toy%20store%20professional%20interior?width=400&height=250&nologo=true&seed=201" alt="Animefigures.nl store interior">
-                <p><span class="text-bold">潛在客戶依據</span>：一家荷蘭線上商店兼實體店，專營動漫手辦、Nendoroids、Funko Pops 和周邊商品。他們銷售來自各種動漫系列的手辦，表明對IP相關收藏品有濃厚興趣。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：動漫手辦、Nendoroids、Funko Pops、周邊商品，IP包括《小魔女學園》、《初音未來》、《魔法少女小圓》等。</p>
-                <p><span class="text-bold">渠道類型</span>：線上電商、實體零售。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：contact@animefigures.nl 或官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-animefigures-zh">尊敬的 Animefigures.nl 團隊，貴公司專注於動漫手辦、Nendoroids 和 Funko Pops，顯示出荷蘭收藏品IP商品的強大市場。蕪解創意提供史努比/花生漫畫等熱門IP，以及Opanchu和Maniani World等令人興奮的亞洲IP的正版授權盲盒公仔和收藏品。我們的5cm/8cm盲盒系列可以為您的網店和實體店提供全新、正宗的產品系列，吸引您的忠實動漫和手辦收藏家群體。我們希望探討零售合作，將這些獨特產品帶給您的客戶。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-animefigures-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-animefigures-en">Dear Animefigures.nl Team, Your focus on anime figures, Nendoroids, and Funko Pops demonstrates a strong market for collectible IP merchandise in the Netherlands. Wujie Creative offers genuine licensed blind box figures and collectibles from popular IPs like Snoopy/Peanuts and exciting Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series could provide a fresh, authentic range to your webshop and physical store, appealing to your dedicated anime and figure collector base. We'd like to explore a retail partnership to bring these unique products to your customers.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-animefigures-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Japan Sama -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇫🇷</span>
-                    <span class="rating">B級</span>
-                    <h3>Japan Sama — 法國</h3>
-                    <span class="description">專營日本動漫手辦和周邊商品的線上零售商，從日本直接進口，並從法國發貨。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/Paris%20anime%20goods%20store%20professional%20interior?width=400&height=250&nologo=true&seed=202" alt="Japan Sama store interior">
-                <p><span class="text-bold">潛在客戶依據</span>：專營日本動漫手辦和周邊商品的線上零售商，從日本直接進口，並從法國發貨。他們銷售萬代（Banpresto）、SEGA、TAITO 等品牌，以及《鬼滅之刃》、《海賊王》、《我的英雄學院》、《火影忍者》、《龍珠》等IP商品，並參與動漫展會。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：動漫手辦、周邊商品，IP包括《鬼滅之刃》、《海賊王》、《我的英雄學院》、《火影忍者》、《龍珠》等。</p>
-                <p><span class="text-bold">渠道類型</span>：線上電商、展會。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：contact@japansama.fr 或官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-japansama-zh">尊敬的 Japan Sama 團隊，貴公司致力於進口和銷售正版日系動漫手辦和周邊商品，使您成為蕪解創意潛在的優秀合作夥伴。我們提供史努比/花生漫畫等全球知名IP，以及Opanchu和Maniani World等熱門亞洲IP的正版授權盲盒公仔和收藏品。我們的5cm/8cm盲盒系列，包含潮流設計，將完美補充您現有的日本進口產品線，為您的客戶提供新鮮且令人興奮的收藏選擇。我們期待討論我們的產品如何擴展您的線上和展會產品。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-japansama-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-japansama-en">Dear Japan Sama Team, Your dedication to importing and selling official Japanese anime figures and goodies makes you an excellent potential partner for Wujie Creative. We provide genuine licensed blind box figures and collectibles from globally recognized IPs like Snoopy/Peanuts and popular Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series, featuring trending designs, would perfectly complement your existing imported Japanese ranges, offering your customers fresh and exciting collectible options. We'd appreciate the chance to discuss how our products can expand your online and convention offerings.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-japansama-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Manganim -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇫🇷</span>
-                    <span class="rating">B級</span>
-                    <h3>Manganim — 法國</h3>
-                    <span class="description">一家專營漫畫和動漫周邊商品的商店，提供包括手辦（如 Pop! figures）、配件等多種商品，涵蓋多個熱門動漫/漫畫IP。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/French%20manga%20store%20professional%20interior?width=400&height=250&nologo=true&seed=203" alt="Manganim store interior">
-                <p><span class="text-bold">潛在客戶依據</span>：一家專營漫畫和動漫周邊商品的商店，提供包括手辦（如 Pop! figures）、配件（馬克杯、海報、鑰匙扣）等多種商品。他們涵蓋多個熱門動漫/漫畫IP。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：動漫手辦、Pop! figures、配件（馬克杯、海報、鑰匙扣），IP包括《Overlord》、《Bleach》、《Berserk》、《Solo Leveling》、《咒術迴戰》、《鬼滅之刃》、《龍珠》等。</p>
-                <p><span class="text-bold">渠道類型</span>：實體零售、線上電商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：contact@manganim.fr 或官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-manganim-zh">尊敬的 Manganim 團隊，貴公司提供全面的漫畫和動漫周邊商品，包括各種手辦和配件，這使您非常適合引入新的收藏品系列。蕪解創意專注於正版授權盲盒公仔和收藏周邊商品，其中包括史努比/花生漫畫等廣受喜愛的IP，以及Opanchu和Maniani World等流行亞洲IP。我們的5cm/8cm盲盒系列可以豐富您現有的手辦選擇，吸引資深收藏家和尋求易於獲取的正版IP收藏品的新粉絲。我們非常期待探討合作以豐富您的產品目錄。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-manganim-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-manganim-en">Dear Manganim Team, Your comprehensive offering of manga and anime merchandise, including a variety of figurines and accessories, positions you well to introduce new collectible lines. Wujie Creative specializes in genuine licensed blind box figures and collectible merchandise, featuring beloved IPs like Snoopy/Peanuts and trending Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series can diversify your existing figurine selection, attracting both established collectors and new fans looking for accessible, authentic IP collectibles. We are eager to explore a partnership to enhance your product catalog.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-manganim-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- NDA Toys -->
-        <div class="market-card">
-            <div class="market-card-header">
-                <div class="market-card-summary">
-                    <span class="flag">🇬🇧</span>
-                    <span class="rating">B級</span>
-                    <h3>NDA Toys — 英國</h3>
-                    <span class="description">作為英國最大的玩具批發商之一，NDA Toys 銷售 Funko 和 Loungefly 等頂級品牌，明確將「盲袋玩具」列為其部門。</span>
-                </div>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="market-card-content">
-                <img src="https://image.pollinations.ai/prompt/UK%20toy%20warehouse%20professional%20interior?width=400&height=250&nologo=true&seed=204" alt="NDA Toys warehouse interior">
-                <p><span class="text-bold">潛在客戶依據</span>：作為英國最大的玩具批發商之一，NDA Toys 銷售 Funko 和 Loungefly 等頂級品牌。他們明確將「盲袋玩具」（Blind Bags Toys）和「公仔與玩樂套裝」（Figures & Playsets）列為其部門，表明他們擁有此類產品的現有市場和基礎設施。</p>
-                <p><span class="text-bold">過去代理/銷售的產品類型</span>：盲袋玩具、公仔、Funko、Loungefly、Mattel、Schleich 等品牌玩具。</p>
-                <p><span class="text-bold">渠道類型</span>：批發商。</p>
-                <p><span class="text-bold">授權合作 or 平行輸入</span>：適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
-                <p><span class="text-bold">聯繫方式</span>：sales@ndatoys.com 或官網聯繫表單。</p>
-                <div class="pitch-box">
-                    <h4>破冰 Pitch (中文)</h4>
-                    <p class="pitch-text" id="pitch-ndatoys-zh">尊敬的 NDA Toys 團隊，作為英國領先的玩具批發商，貴公司擁有成熟的『盲袋玩具』部門和 Funko 等品牌的合作經驗，蕪解創意認為存在巨大的合作機會。我們提供來自史努比/花生漫畫、Opanchu和Maniani World等熱門IP的正版授權5cm/8cm盲盒公仔和收藏品，以及備受追捧的亞洲IP（可平行輸入）。我們的產品旨在吸引廣泛受眾，並與對盲盒收藏品日益增長的需求完美契合。我們相信我們多元化的產品系列可以顯著提升您的批發業務，並吸引您的廣泛零售商網絡。</p>
-                    <button class="copy-button" data-clipboard-target="pitch-ndatoys-zh">複製腳本</button>
-                </div>
-                <div class="pitch-box" style="margin-top: 15px;">
-                    <h4>破冰 Pitch (English)</h4>
-                    <p class="pitch-text" id="pitch-ndatoys-en">Dear NDA Toys Team, As a leading UK toy wholesaler with an established 'Blind Bags Toys' department and experience with brands like Funko, Wujie Creative sees a strong opportunity for partnership. We offer genuine licensed 5cm/8cm blind box figures and collectible merchandise from popular IPs such as Snoopy/Peanuts, Opanchu, and Maniani World, as well as highly sought-after Asian IPs (available for parallel import). Our products are designed to captivate a broad audience and perfectly align with the growing demand for collectible blind boxes. We believe our diverse ranges can significantly boost your wholesale offerings and appeal to your extensive network of retailers.</p>
-                    <button class="copy-button" data-clipboard-target="pitch-ndatoys-en">Copy Script</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="action-list">
-            <h2>📅 本週行動清單</h2>
-            <ul>
-                <li>**A級客戶聯繫 (4月22日 - 4月26日)**：發送破冰 Pitch 信函給 Abysse Corp、Figuya、Forbidden Planet、Muddleit Ltd、Blind Box Empire、OcioStock 和 ET-Group A/S。明確在下週五 (4月26日) 前完成信件發送與系統記錄。</li>
-                <li>**B級客戶資料整理 (4月26日)**：針對 Animefigures.nl、Japan Sama、Manganim 和 NDA Toys，於本週五 (4月26日) 前確定並整理具體負責人或採購部門的精準聯繫方式，並記錄於CRM系統。</li>
-                <li>**內部討論平行輸入策略 (4月29日)**：與法務和銷售團隊預定下週一 (4月29日) 進行會議，討論針對 Chiikawa、Mofusand 等IP在歐洲進行平行輸入合作的具體操作細節、稅務影響與潛在風險管理，並確立初步執行框架。</li>
-            </ul>
-        </div>
-
-        <div class="key-findings">
-            <h2>🔑 今日關鍵發現</h2>
-            <ul>
-                <li><span class="text-bold">歐洲盲盒市場已具規模，日本動漫IP產品需求旺盛</span>：本次搜尋結果數據顯示，英國和德國存在多家專營盲盒或日本動漫手辦的零售商和批發商 (如 Figuya, Blind Box Empire, Muddleit Ltd)，其過去銷售紀錄證實了該地區對此類收藏品的需求旺盛且市場基礎穩固。例如，Figuya 作為歐洲最大的正版日系手辦供應商，其穩定的銷售量和市場份額直接證明了這項需求。</li>
-                <li><span class="text-bold">綜合性流行文化分銷商是主要目標</span>：像 Abysse Corp (擁有超過200個活躍授權) 和 Funko Europe (及其分銷商 OcioStock, ET-Group A/S) 這樣的公司擁有廣泛的IP組合和強大的歐洲分銷網絡。數據顯示，與這類合作夥伴建立關係能夠一次性覆蓋多個國家和多種產品類別，顯著加速市場進入效率。</li>
-                <li><span class="text-bold">平行輸入模式在歐洲市場具備可行性</span>：分析發現，部分潛在客戶已銷售來自日本或其他地區的動漫手辦，或有處理多元化產品來源的經驗。蕪解創意的部分IP（如 Chiikawa, Mofusand）雖在歐洲無直接授權，但透過平行輸入模式進行合作，能為業務擴展提供實際的靈活性和新增收入來源，規避單一授權管道的限制。</li>
-            </ul>
-        </div>
-
-        <div class="follow-up-list">
-            <h2>📝 建議下週跟進清單 (4月29日 - 5月3日)</h2>
-            <ul>
-                <li>**A級客戶跟進 (4月29日)**：檢查CRM系統中所有A級客戶的郵件發送狀態及首次回覆情況。對於無回覆客戶，在週一結束前規劃第二次溫和的跟進郵件。</li>
-                <li>**B級客戶初步聯繫 (4月30日)**：根據本週整理的資料，在週二結束前向 Animefigures.nl、Japan Sama、Manganim 和 NDA Toys 的具體負責人發送初步破冰郵件，引入蕪解創意及其產品。</li>
-                <li>**平行輸入策略細化 (5月2日)**：與法務及銷售團隊完成平行輸入策略的討論後，在週四前針對Chiikawa/Mofusand等IP，完成一份詳細的市場進入方案與風險評估報告初稿。</li>
-            </ul>
+    <div class="hero-banner">
+        <img src="https://image.pollinations.ai/prompt/Asia%20toy%20retail%20store%20blind%20box%20display%20colorful%20mall?width=600&height=350&nologo=true&seed=501" alt="亞洲玩具零售店">
+        <div class="overlay">
+            <h2>洞察歐洲盲盒與流行文化市場商機</h2>
         </div>
     </div>
 
+    <main class="container">
+        <section id="priority-overview">
+            <h2>今日搜尋目標區域概覽</h2>
+            <div class="market-priority-overview">
+                <div class="market-card-overview">
+                    <span class="flag">🇬🇧</span>
+                    <div class="details">
+                        <span>英國</span>
+                        <span>成熟市場，重視流行文化</span>
+                    </div>
+                </div>
+                <div class="market-card-overview">
+                    <span class="flag">🇩🇪</span>
+                    <div class="details">
+                        <span>德國</span>
+                        <span>歐洲最大經濟體，日系IP潛力</span>
+                    </div>
+                </div>
+                <div class="market-card-overview">
+                    <span class="flag">🇫🇷</span>
+                    <div class="details">
+                        <span>法國</span>
+                        <span>動漫愛好者眾多，文化氛圍濃厚</span>
+                    </div>
+                </div>
+                <div class="market-card-overview">
+                    <span class="flag">🇳🇱</span>
+                    <div class="details">
+                        <span>荷蘭</span>
+                        <span>活躍的線上零售，年輕群體消費力高</span>
+                    </div>
+                </div>
+                <div class="market-card-overview">
+                    <span class="flag">🇩🇰</span>
+                    <div class="details">
+                        <span>北歐五國 (丹麥代表)</span>
+                        <span>高購買力，對國際品牌接受度高</span>
+                    </div>
+                </div>
+                <div class="market-card-overview">
+                    <span class="flag">🇪🇸</span>
+                    <div class="details">
+                        <span>西班牙</span>
+                        <span>具備Funko等收藏品分銷經驗</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="a-clients" class="client-section">
+            <h2>🎯 A 級潛在客戶（立即接觸）</h2>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Abysse Corp 🇫🇷 (法國/歐洲) ⭐⭐⭐⭐⭐</h3>
+                    <span>歐洲領先的授權流行文化商品集團，專營盲盒公仔</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>作為歐洲領先的授權流行文化商品集團，Abysse Corp 負責設計、製造和分銷，並擁有超過200個活躍授權，涵蓋漫畫/日本動漫（如《海賊王》、《龍珠》、《火影忍者》）、電影（如《哈利波特》）、電視劇（如《權力的遊戲》）和電玩遊戲（如《寶可夢》）等主要類別。該公司明確在其產品列表中包含「盲盒公仔」（Blind Box Figures），並設有專門的3D設計團隊開發手辦和複製品。他們在德國、英國、瑞典等多個歐洲國家設有辦事處，擁有廣泛的歐洲分銷網絡。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>動漫手辦、盲盒公仔、服裝、餐具、箱包、海報等</li>
+                        <li>IP包括《海賊王》、《龍珠》、《火影忍者》、《鬼滅之刃》、《哈利波特》、《侏羅紀公園》、《魔戒》、《DC漫畫》、《權力的遊戲》、《瑞克和莫蒂》、《刺客信條》、《寶可夢》、《英雄聯盟》等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>實體零售、線上電商、批發商、展會、設計製造商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（針對Snoopy/Peanuts, Opanchu, Maniani World, 飯糰與梅子, Muzik Tiger），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>+33 (0)2 35 98 18 63 (銷售團隊), 官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Abysse 銷售團隊，作為歐洲領先的授權流行文化商品分銷商，貴公司在動漫、漫畫和遊戲IP領域的豐富產品線和經驗，特別是「盲盒公仔」，與蕪解創意高度契合。我們專注於正版授權IP周邊商品，包括全球知名的史努比/花生漫畫，以及亞洲熱門IP如Chiikawa和Mofusand（部分地區可平行輸入合作）。我們提供多樣化的盲盒公仔、掛件和文具周邊，相信我們的獨特產品線能顯著豐富貴公司的收藏品品類，吸引廣泛的歐洲客戶群。我們非常期待探討在授權區域內的直接代理合作，以及其他地區的平行輸入合作模式。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Abysse Sales Team, As a leading European distributor of licensed pop culture merchandise, your extensive portfolio and experience with anime, manga, and gaming IPs, including 'Blind Box Figures,' aligns perfectly with Wujie Creative. We specialize in genuine licensed IP merchandise, including globally popular IPs like Snoopy/Peanuts and trending Asian IPs such as Chiikawa and Mofusand (available via parallel import for select regions). We offer a diverse range of blind box figures, keychains, and stationery, and believe our unique product lines can significantly enhance your collectible offerings and appeal to your broad customer base across Europe. We are keen to explore a direct authorization partnership for our covered regions and parallel import options for others.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Figuya 🇩🇪 (德國柏林) ⭐⭐⭐⭐⭐</h3>
+                    <span>歐洲最大的正版日系手辦與收藏品零售商</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>自2011年以來，Figuya 一直是動漫手辦和收藏品的專業零售商，被稱為歐洲最大的正版日系手辦供應商。他們直接從日本和歐洲官方批發商採購，在德國多個城市（如柏林、萊比錫、德累斯頓）設有實體店並經營線上商店，同時積極參與動漫和漫畫展會。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>動漫手辦、Figma、Nendoroids、漫畫等</li>
+                        <li>IP包括初音未來、鬼滅之刃等</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>實體零售、線上電商、展會</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>kontakt@figuya.de, +49 (0)30 577 011 989。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Figuya 團隊，貴公司作為歐洲領先的正版日系動漫手辦和收藏品商店，聲譽卓著。蕪解創意擁有一系列強大的正版授權IP周邊商品，包括廣受喜愛的史努比/花生漫畫，以及亞洲熱門的Chiikawa和Mofusand（部分地區可平行輸入合作）。我們的5cm/8cm盲盒公仔和收藏掛件將是貴公司精選產品的絕佳補充，為貴公司的線上線下熱情收藏家群體提供新鮮、正版的選擇。我們期待與您討論如何將我們的產品融入貴公司的現有產品線。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Figuya Team, Your reputation as a premier destination for authentic Japanese anime figures and collectibles in Europe is highly impressive. Wujie Creative offers a strong portfolio of genuine licensed IP merchandise, including fan-favorite Snoopy/Peanuts and highly sought-after Asian IPs such as Chiikawa and Mofusand (available through parallel import for certain regions). Our 5cm/8cm blind box figures and collectible keychains could be a perfect addition to your curated selection, providing fresh, authentic options for your passionate collector community both online and in-store. We are eager to discuss how our products can complement your existing offerings.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Forbidden Planet 🇬🇧 (英國倫敦) ⭐⭐⭐⭐⭐</h3>
+                    <span>全球知名科幻、奇幻與流行文化零售商，產品線豐富</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>作為全球最大、最知名的科幻、奇幻和流行文化零售商之一，Forbidden Planet 專營漫畫、圖文小說、漫畫、動漫手辦以及各種聯名/收藏品。該公司在英國和愛爾蘭設有多家實體店，並擁有強大的線上業務，其產品線包含 Funko Pop!。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>動漫手辦、Funko Pop!、漫畫、圖文小說、電影/電視周邊商品等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>實體零售、線上電商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>info@forbiddenplanet.com, 官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Forbidden Planet 團隊，作為英國流行文化和收藏品零售的基石，貴公司廣泛的科幻、奇幻和漫畫周邊產品，包括公仔和收藏品，使您成為蕪解創意的理想合作夥伴。我們提供來自史努比/花生漫畫等廣受喜愛的IP，以及Opanchu和Maniani World等亞洲熱門角色的正版授權盲盒公仔、掛件和文具周邊。我們獨特的盲盒收藏品能吸引新客戶並激發現有粉絲群，為貴公司帶來新鮮、流行的IP。我們相信我們的產品將為貴公司多元化的產品線增添光彩。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Forbidden Planet Team, As a cornerstone of pop culture and collectibles retail in the UK, your extensive range of sci-fi, fantasy, and manga merchandise, including action figures and collector's items, makes you an ideal partner for Wujie Creative. We offer genuine licensed IP blind box figures, keychains, and stationery from beloved IPs like Snoopy/Peanuts and popular Asian characters such as Opanchu and Maniani World. Our unique collectible blind boxes can attract new customers and excite your existing fanbase, adding fresh, trending IPs to your shelves. We are confident our products would be a strong addition to your diverse offerings.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Muddleit Ltd 🇬🇧 (英國) ⭐⭐⭐⭐⭐</h3>
+                    <span>專營「盲袋和收藏品」的批發分銷商，產品類別高度契合</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>Muddleit Ltd 是一家專門從事「盲袋和收藏品」（Blind Packs and Collectables）的批發分銷商。他們明確在其產品中列出《進擊的巨人》PalVerse 手辦盲盒和 Cimmy 'You're Invited' 絨毛盲盒等，這精準符合蕪解創意的產品類別。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>盲袋、收藏品、動漫主題手辦盲盒（如《進擊的巨人》PalVerse）、絨毛盲盒等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>批發商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>sales@muddleit.co.uk (常見的批發商銷售信箱，需在官網進一步確認)。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Muddleit 團隊，作為專門從事「盲袋和收藏品」的批發分銷商，貴公司的業務與蕪解創意的核心產品完美契合。我們是正版授權的5cm/8cm盲盒公仔和收藏周邊商品的領先供應商，涵蓋史努比/花生漫畫、Opanchu和Maniani World等熱門IP，以及Chiikawa和Mofusand等備受追捧的亞洲IP（部分地區可平行輸入合作）。我們相信，我們多樣化且流行的盲盒系列將成為貴公司現有產品線的巨大成功補充，直接吸引您的零售商和收藏家客戶群。期待與您探討合作，將這些令人興奮的新系列帶入您的市場。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Muddleit Team, As a specialized wholesale distributor of 'Blind Packs and Collectables,' your business is a perfect match for Wujie Creative's core offerings. We are a leading supplier of genuine licensed 5cm/8cm blind box figures and collectible merchandise featuring popular IPs like Snoopy/Peanuts, Opanchu, and Maniani World, as well as highly sought-after Asian IPs such as Chiikawa and Mofusand (available via parallel import). We are confident that our diverse and trending blind box series would be a highly successful addition to your current product range, appealing directly to your customer base of retailers and collectors. Let's discuss a partnership to bring these exciting new collections to your market.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Blind Box Empire 🇬🇧 (英國) ⭐⭐⭐⭐⭐</h3>
+                    <span>專營盲盒玩具的英國線上獨立商店，業務模式完美契合</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>一家專營盲盒玩具的英國獨立線上商店。他們銷售收藏手辦，並提及《新世紀福音戰士》、《初音未來》、《咒術迴戰》和《天官賜福》等盲盒系列，其業務模式完全圍繞盲盒和收藏品。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>盲盒公仔，IP包括《新世紀福音戰士》、《初音未來》、《咒術迴戰》、《天官賜福》等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>線上電商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>info@blindboxempire.co.uk 或其官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Blind Box Empire 團隊，作為一家專營盲盒玩具的線上零售商，您正是蕪解創意尋找的合作夥伴類型。我們專注於正版授權的5cm/8cm盲盒公仔，涵蓋史努比/花生漫畫、Opanchu和Maniani World等熱門IP，以及Chiikawa和Mofusand等流行亞洲IP（可平行輸入）。您在盲盒市場的專業知識使您成為將我們獨特多元系列引入英國熱情收藏家的理想渠道。我們非常期待與您合作，擴展您的產品線，並將更多高需求的盲盒系列帶給您的客戶。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Blind Box Empire Team, As a dedicated online retailer of blind box toys, you are precisely the kind of partner Wujie Creative seeks. We specialize in genuine licensed 5cm/8cm blind box figures featuring popular IPs like Snoopy/Peanuts, Opanchu, and Maniani World, along with trending Asian IPs such as Chiikawa and Mofusand (available for parallel import). Your expertise in the blind box market makes you an ideal channel to introduce our unique and diverse collections to eager collectors in the UK. We are excited about the prospect of collaborating to expand your offerings and bring new, high-demand blind box series to your customers.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>OcioStock 🇪🇸 (西班牙/歐洲分銷) ⭐⭐⭐⭐⭐</h3>
+                    <span>Funko Pop! 在歐洲的批發分銷商，具備迷你公仔經驗</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>OcioStock 是 Funko Pop! 在歐洲的批發分銷商，其產品線包括 Funko Pop! Bitty POPs (類似盲盒的迷你公仔，如 Hello Kitty and Friends)。他們服務商店和分銷商，並分銷孩之寶（Hasbro）玩具。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>Funko Pop! 公仔（包括Bitty POPs）、孩之寶（Hasbro）玩具（如漫威傳奇系列）。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>批發商、分銷商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>info@ociostock.com 或官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 OcioStock 團隊，作為歐洲領先的 Funko Pop! 和孩之寶等授權收藏品公仔的批發分銷商，蕪解創意認為與貴公司的分銷網絡具有強大的協同效應。我們專注於正版授權IP盲盒公仔和收藏周邊商品，包括全球知名的史努比/花生漫畫，以及Opanchu和Maniani World等具吸引力的亞洲IP。鑑於貴公司在「Bitty POPs」方面的經驗和廣泛的零售覆蓋，我們的5cm/8cm盲盒系列和掛件將為貴公司的產品組合增添寶貴價值，擴大在快速增長的盲盒收藏品市場中的份額。我們非常樂意探討分銷合作機會。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear OcioStock Team, As a prominent wholesale distributor of popular collectible figures like Funko Pop! and licensed Hasbro toys across Europe, Wujie Creative sees strong synergy with your distribution network. We specialize in genuine licensed IP blind box figures and collectible merchandise, including globally recognized Snoopy/Peanuts and appealing Asian IPs such as Opanchu and Maniani World. Given your experience with 'Bitty POPs' and extensive retail reach, our 5cm/8cm blind box series and keychains would be a valuable addition to your portfolio, expanding your offering in the rapidly growing collectible blind box market. We are keen to discuss distribution opportunities.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>ET-Group A/S 🇩🇰 (丹麥/歐洲分銷) ⭐⭐⭐⭐⭐</h3>
+                    <span>Funko POP 在歐洲的批發分銷商，具備豐富流行文化產品經驗</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>ET-Group A/S 是 Funko POP 在歐洲的批發分銷商。其 B2B 商店提供來自各種流行文化類別（如《星球大戰》、《漫威》、《哈利波特》、《迪士尼》、《堡壘之夜》）的廣泛 Funko POP 角色。他們服務零售店和網店，並強調快速交貨和批量訂購。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>Funko POP 公仔，IP包括《星球大戰》、《漫威》、《權力的遊戲》、《哈利波特》、《迪士尼》、《堡壘之夜》、《光環》等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>批發商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>sales@et-group.dk (常見的批發商銷售信箱，需在官網進一步確認)。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 ET-Group A/S 團隊，貴公司作為歐洲流行文化商品，尤其是 Funko POP 的批發分銷商，具有強大的市場地位，是蕪解創意的極具吸引力的合作夥伴。我們提供正版授權IP盲盒公仔和收藏品，其中包括史努比/花生漫畫等廣受喜愛的IP，以及Opanchu和Maniani World等流行亞洲IP。我們的5cm/8cm盲盒系列將能補充您現有的 Funko 產品線，使您的收藏品種類更加多元化，並開拓流行文化市場的新細分領域。我們非常樂意探討我們的產品如何為您的零售合作夥伴帶來新的銷售增長。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear ET-Group A/S Team, Your strong position as a wholesale distributor of popular culture merchandise, particularly Funko POPs, across Europe, makes you a highly attractive partner for Wujie Creative. We offer genuine licensed IP blind box figures and collectibles, featuring beloved IPs like Snoopy/Peanuts and trending Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series would complement your existing Funko range, diversifying your collectible offerings and tapping into new segments of the pop culture market. We would be delighted to explore how our products can drive new sales for your retail partners.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="b-clients" class="client-section">
+            <h2>🟡 B 級潛在客戶（本季跟進）</h2>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Animefigures.nl 🇳🇱 (荷蘭) ⭐⭐⭐</h3>
+                    <span>荷蘭線上線下動漫手辦零售商，對IP收藏品興趣濃厚</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>一家荷蘭線上商店兼實體店，專營動漫手辦、Nendoroids、Funko Pops 和周邊商品。他們銷售來自各種動漫系列的手辦，表明對IP相關收藏品有濃厚興趣。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>動漫手辦、Nendoroids、Funko Pops、周邊商品，IP包括《小魔女學園》、《初音未來》、《魔法少女小圓》等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>線上電商、實體零售</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>contact@animefigures.nl 或官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Animefigures.nl 團隊，貴公司專注於動漫手辦、Nendoroids 和 Funko Pops，顯示出荷蘭收藏品IP商品的強大市場。蕪解創意提供史努比/花生漫畫等熱門IP，以及Opanchu和Maniani World等令人興奮的亞洲IP的正版授權盲盒公仔和收藏品。我們的5cm/8cm盲盒系列可以為您的網店和實體店提供全新、正宗的產品系列，吸引您的忠實動漫和手辦收藏家群體。我們希望探討零售合作，將這些獨特產品帶給您的客戶。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Animefigures.nl Team, Your focus on anime figures, Nendoroids, and Funko Pops demonstrates a strong market for collectible IP merchandise in the Netherlands. Wujie Creative offers genuine licensed blind box figures and collectibles from popular IPs like Snoopy/Peanuts and exciting Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series could provide a fresh, authentic range to your webshop and physical store, appealing to your dedicated anime and figure collector base. We'd like to explore a retail partnership to bring these unique products to your customers.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Japan Sama 🇫🇷 (法國) ⭐⭐⭐</h3>
+                    <span>專營日系動漫手辦與周邊商品的法國線上零售商</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>專營日本動漫手辦和周邊商品的線上零售商，從日本直接進口，並從法國發貨。他們銷售萬代（Banpresto）、SEGA、TAITO 等品牌，以及《鬼滅之刃》、《海賊王》、《我的英雄學院》、《火影忍者》、《龍珠》等IP商品，並參與動漫展會。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>動漫手辦、周邊商品，IP包括《鬼滅之刃》、《海賊王》、《我的英雄學院》、《火影忍者》、《龍珠》等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>線上電商、展會</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>contact@japansama.fr 或官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Japan Sama 團隊，貴公司致力於進口和銷售正版日系動漫手辦和周邊商品，使您成為蕪解創意潛在的優秀合作夥伴。我們提供史努比/花生漫畫等全球知名IP，以及Opanchu和Maniani World等熱門亞洲IP的正版授權盲盒公仔和收藏品。我們的5cm/8cm盲盒系列，包含潮流設計，將完美補充您現有的日本進口產品線，為您的客戶提供新鮮且令人興奮的收藏選擇。我們期待討論我們的產品如何擴展您的線上和展會產品。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Japan Sama Team, Your dedication to importing and selling official Japanese anime figures and goodies makes you an excellent potential partner for Wujie Creative. We provide genuine licensed blind box figures and collectibles from globally recognized IPs like Snoopy/Peanuts and popular Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series, featuring trending designs, would perfectly complement your existing imported Japanese ranges, offering your customers fresh and exciting collectible options. We'd appreciate the chance to discuss how our products can expand your online and convention offerings.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>Manganim 🇫🇷 (法國) ⭐⭐⭐</h3>
+                    <span>提供全面漫畫與動漫周邊商品的法國商店</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>一家專營漫畫和動漫周邊商品的商店，提供包括手辦（如 Pop! figures）、配件（馬克杯、海報、鑰匙扣）等多種商品。他們涵蓋多個熱門動漫/漫畫IP。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>動漫手辦、Pop! figures、配件（馬克杯、海報、鑰匙扣），IP包括《Overlord》、《Bleach》、《Berserk》、《Solo Leveling》、《咒術迴戰》、《鬼滅之刃》、《龍珠》等。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>實體零售、線上電商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>contact@manganim.fr 或官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 Manganim 團隊，貴公司提供全面的漫畫和動漫周邊商品，包括各種手辦和配件，這使您非常適合引入新的收藏品系列。蕪解創意專注於正版授權盲盒公仔和收藏周邊商品，其中包括史努比/花生漫畫等廣受喜愛的IP，以及Opanchu和Maniani World等流行亞洲IP。我們的5cm/8cm盲盒系列可以豐富您現有的手辦選擇，吸引資深收藏家和尋求易於獲取的正版IP收藏品的新粉絲。我們非常期待探討合作以豐富您的產品目錄。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear Manganim Team, Your comprehensive offering of manga and anime merchandise, including a variety of figurines and accessories, positions you well to introduce new collectible lines. Wujie Creative specializes in genuine licensed blind box figures and collectible merchandise, featuring beloved IPs like Snoopy/Peanuts and trending Asian IPs such as Opanchu and Maniani World. Our 5cm/8cm blind box series can diversify your existing figurine selection, attracting both established collectors and new fans looking for accessible, authentic IP collectibles. We are eager to explore a partnership to enhance your product catalog.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-card">
+                <div class="client-card-header">
+                    <h3>NDA Toys 🇬🇧 (英國) ⭐⭐⭐</h3>
+                    <span>英國最大的玩具批發商之一，具備「盲袋玩具」部門</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="client-card-content">
+                    <img src="https://image.pollinations.ai/prompt/professional%20business%20meeting%20Asia%20toy%20wholesale%20trade%20fair?width=600&height=350&nologo=true&seed=601" alt="業務洽談">
+                    <h4>潛在客戶依據</h4>
+                    <p>作為英國最大的玩具批發商之一，NDA Toys 銷售 Funko 和 Loungefly 等頂級品牌。他們明確將「盲袋玩具」（Blind Bags Toys）和「公仔與玩樂套裝」（Figures & Playsets）列為其部門，表明他們擁有此類產品的現有市場和基礎設施。</p>
+                    <h4>過去代理/銷售的產品類型</h4>
+                    <ul>
+                        <li>盲袋玩具、公仔、Funko、Loungefly、Mattel、Schleich 等品牌玩具。</li>
+                    </ul>
+                    <h4>渠道類型</h4>
+                    <ul>
+                        <li>批發商</li>
+                    </ul>
+                    <h4>授權合作 or 平行輸入</h4>
+                    <p>適合正規授權代理合作（Snoopy/Peanuts, Opanchu, Maniani World），針對Chiikawa/Mofusand可探討平行輸入模式。</p>
+                    <h4>聯繫方式</h4>
+                    <p>sales@ndatoys.com 或官網聯繫表單。</p>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (中文)</h4>
+                        <p class="pitch-text">尊敬的 NDA Toys 團隊，作為英國領先的玩具批發商，貴公司擁有成熟的「盲袋玩具」部門和 Funko 等品牌的合作經驗，蕪解創意認為存在巨大的合作機會。我們提供來自史努比/花生漫畫、Opanchu和Maniani World等熱門IP的正版授權5cm/8cm盲盒公仔和收藏品，以及備受追捧的亞洲IP（可平行輸入）。我們的產品旨在吸引廣泛受眾，並與對盲盒收藏品日益增長的需求完美契合。我們相信我們多元化的產品系列可以顯著提升您的批發業務，並吸引您的廣泛零售商網絡。</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                    <div class="pitch-script-block">
+                        <h4>破冰 Pitch (English)</h4>
+                        <p class="pitch-text">Dear NDA Toys Team, As a leading UK toy wholesaler with an established 'Blind Bags Toys' department and experience with brands like Funko, Wujie Creative sees a strong opportunity for partnership. We offer genuine licensed 5cm/8cm blind box figures and collectible merchandise from popular IPs such as Snoopy/Peanuts, Opanchu, and Maniani World, as well as highly sought-after Asian IPs (available for parallel import). Our products are designed to captivate a broad audience and perfectly align with the growing demand for collectible blind boxes. We believe our diverse ranges can significantly boost your wholesale offerings and appeal to your extensive network of retailers.</p>
+                        <button class="copy-pitch-btn">複製腳本</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="actions">
+            <h2>📅 本週優先行動</h2>
+            <ol class="priority-actions">
+                <li>**A級客戶聯繫 (4月22日 - 4月26日)**：發送破冰 Pitch 信函給 Abysse Corp、Figuya、Forbidden Planet、Muddleit Ltd、Blind Box Empire、OcioStock 和 ET-Group A/S，並跟進查詢是否收到。</li>
+                <li>**B級客戶資料整理 (4月26日)**：進一步研究 Animefigures.nl、Japan Sama、Manganim 和 NDA Toys 的具體負責人或採購部門聯繫方式。</li>
+                <li>**內部討論平行輸入策略 (4月29日)**：與法務和銷售團隊討論針對 Chiikawa、Mofusand 等IP在歐洲進行平行輸入合作的具體操作細節和潛在風險管理。</li>
+            </ol>
+        </section>
+
+        <section id="key-findings">
+            <h2>🔑 今日關鍵發現</h2>
+            <ul>
+                <li>**歐洲盲盒市場已具規模，日本動漫IP產品需求旺盛**：搜尋結果顯示，英國和德國存在多家專營盲盒或日本動漫手辦的零售商和批發商 (如 Figuya, Blind Box Empire, Muddleit Ltd)，表明該地區對此類收藏品的需求和市場基礎良好。</li>
+                <li>**綜合性流行文化分銷商是主要目標**：像 Abysse Corp 和 Funko Europe (及其分銷商 OcioStock, ET-Group A/S) 這樣的公司擁有廣泛的IP組合和強大的分銷網絡，是蕪解創意進入歐洲市場的理想合作夥伴，能一次性覆蓋多個國家和多種產品類別。</li>
+                <li>**平行輸入模式在歐洲市場具備可行性**：部分潛在客戶已銷售來自日本或其他地區的動漫手辦，或有處理多元化產品來源的經驗。蕪解創意的部分IP（如 Chiikawa, Mofusand）雖在歐洲無直接授權，但可通過平行輸入模式進行合作，這為業務擴展提供了靈活性。</li>
+            </ul>
+        </section>
+
+        <section id="follow-up" class="follow-up-list">
+            <h3>建議下週跟進清單</h3>
+            <ul>
+                <li>確認 A 級客戶的 Pitch 信函是否已送達，並設定首次電話或視訊會議。</li>
+                <li>完成 B 級客戶的精準聯繫人資訊收集，準備初步破冰郵件草稿。</li>
+                <li>向法務部門提交平行輸入合作模式的詳細諮詢請求。</li>
+                <li>針對未開發的北歐市場（瑞典、挪威、芬蘭、冰島），進行初步的市場概況和主要經銷商調研。</li>
+            </ul>
+        </section>
+    </main>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle functionality for market cards
-            const marketCards = document.querySelectorAll('.market-card');
-            marketCards.forEach(card => {
-                const header = card.querySelector('.market-card-header');
-                if (header) {
-                    header.addEventListener('click', () => {
-                        card.classList.toggle('expanded');
-                    });
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Expand/Collapse functionality
+            document.querySelectorAll('.client-card-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const card = header.closest('.client-card');
+                    card.classList.toggle('expanded');
+                });
             });
 
-            // Copy to clipboard functionality for pitch scripts
-            const copyButtons = document.querySelectorAll('.copy-button');
-            copyButtons.forEach(button => {
-                button.addEventListener('click', async () => {
-                    const targetId = button.getAttribute('data-clipboard-target');
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement && navigator.clipboard) {
+            // Copy Pitch Script functionality
+            document.querySelectorAll('.copy-pitch-btn').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const pitchTextElement = event.target.previousElementSibling; // The <p class="pitch-text">
+                    if (pitchTextElement && pitchTextElement.classList.contains('pitch-text')) {
+                        const pitchText = pitchTextElement.innerText;
                         try {
-                            await navigator.clipboard.writeText(targetElement.textContent);
-                            const originalText = button.textContent;
-                            button.textContent = '已複製!';
+                            await navigator.clipboard.writeText(pitchText);
+                            event.target.textContent = '已複製！';
+                            event.target.style.backgroundColor = '#28a745'; /* Green for success */
+                            event.target.style.color = '#fff';
                             setTimeout(() => {
-                                button.textContent = originalText;
+                                event.target.textContent = '複製腳本';
+                                event.target.style.backgroundColor = 'var(--secondary-gold)';
+                                event.target.style.color = 'var(--primary-blue)';
                             }, 2000);
                         } catch (err) {
-                            console.error('無法複製文字:', err);
-                            alert('複製失敗，請手動複製。');
+                            console.error('Failed to copy: ', err);
+                            event.target.textContent = '複製失敗';
+                            event.target.style.backgroundColor = 'var(--red-highlight)'; /* Red for failure */
+                            event.target.style.color = '#fff';
+                            setTimeout(() => {
+                                event.target.textContent = '複製腳本';
+                                event.target.style.backgroundColor = 'var(--secondary-gold)';
+                                event.target.style.color = 'var(--primary-blue)';
+                            }, 2000);
                         }
-                    } else {
-                        console.warn('Clipboard API 不可用或目標元素不存在。');
-                        alert('您的瀏覽器不支持自動複製，請手動複製。');
                     }
                 });
             });
