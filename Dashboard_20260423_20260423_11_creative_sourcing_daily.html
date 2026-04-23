@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創意選品提案 Deck - Wujie Creative</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #8a6c5e; /* A warm, sophisticated brown */
+            --brand-secondary: #f0a202; /* A subtle, warm accent */
+            --cream-white: #faf8f5;
+            --text-dark: #333;
+            --text-light: #555;
+            --border-light: #eee;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --transition-duration: 0.3s;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--cream-white);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        header {
+            background-color: var(--brand-primary);
+            color: var(--cream-white);
+            padding: 25px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 10px var(--shadow-light);
+        }
+
+        .brand-logo h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2em;
+            margin: 0;
+            color: var(--cream-white);
+            letter-spacing: 1px;
+        }
+
+        .proposal-info {
+            text-align: right;
+        }
+
+        .proposal-info h2 {
+            font-size: 1.6em;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .proposal-info p {
+            margin: 5px 0 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        main {
+            width: 100%;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        .hero-banner {
+            width: 100%;
+            height: 350px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/en/4/40/Peanuts_gang.png');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 20px var(--shadow-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hero-banner h3 {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: var(--brand-primary);
+            font-size: 2.5em;
+            margin: 0;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        section {
+            margin-bottom: 50px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-light);
+        }
+
+        section h2 {
+            color: var(--brand-primary);
+            font-size: 2.2em;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--brand-secondary);
+            padding-bottom: 10px;
+            display: inline-block;
+            font-weight: 700;
+        }
+
+        .intro-text {
+            font-size: 1.1em;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .proposal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .proposal-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px var(--shadow-light);
+            overflow: hidden;
+            transition: transform var(--transition-duration) ease-out, box-shadow var(--transition-duration) ease-out;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-light);
+        }
+
+        .proposal-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .proposal-card-header {
+            position: relative;
+            height: 200px; /* Approximately 40% of a standard card height */
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .proposal-card-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .proposal-card-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .proposal-card h3 {
+            font-size: 1.6em;
+            color: var(--brand-primary);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .proposal-card .tagline {
+            font-style: italic;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .rating-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .rating-section span {
+            margin-right: 5px;
+        }
+
+        .stars {
+            display: flex;
+        }
+
+        .star {
+            color: #ddd; /* Empty star color */
+            font-size: 1.4em;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+            margin-right: 2px;
+        }
+
+        .star.selected,
+        .star.hovered {
+            color: var(--brand-secondary); /* Filled star color */
+        }
+        
+        .toggle-button {
+            display: block;
+            width: calc(100% - 50px); /* Adjust for padding */
+            padding: 12px 20px;
+            margin: 15px auto 0;
+            background-color: var(--brand-primary);
+            color: var(--cream-white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            align-self: flex-end; /* Push button to the bottom */
+        }
+
+        .toggle-button:hover {
+            background-color: #6a5349; /* Darker primary */
+        }
+
+        .expanded-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-duration) ease-out, opacity var(--transition-duration) ease-out;
+            padding-top: 0;
+            margin-top: 15px;
+            border-top: 1px solid var(--border-light);
+            opacity: 0;
+        }
+        
+        .proposal-card.expanded .expanded-content {
+            max-height: 1000px; /* Large enough to contain all content */
+            opacity: 1;
+            padding-top: 15px;
+        }
+
+        .expanded-content h4 {
+            color: var(--brand-primary);
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-size: 1.15em;
+            font-weight: 600;
+        }
+
+        .expanded-content p, .expanded-content ul {
+            font-size: 0.95em;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .expanded-content ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        .expanded-content ul li {
+            margin-bottom: 5px;
+        }
+
+        .highlight {
+            color: var(--brand-secondary);
+            font-weight: 500;
+        }
+        
+        .vam-contribution strong {
+            color: var(--brand-secondary);
+            font-size: 1.1em;
+        }
+
+        .card-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-light);
+            align-self: flex-end; /* Push labels to the bottom too */
+        }
+
+        .card-label {
+            background-color: #e8e8e8;
+            color: var(--text-dark);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        /* Specific label colors */
+        .card-label.market { background-color: #d1e7dd; color: #0f5132; } /* Greenish for market */
+        .card-label.type { background-color: #ffeeba; color: #664d03; }   /* Yellowish for type */
+        .card-label.vam { background-color: #f8d7da; color: #842029; }    /* Reddish for VAM */
+
+
+        /* Extension Ideas */
+        .extension-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .extension-item {
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: box-shadow var(--transition-duration) ease-in-out;
+        }
+
+        .extension-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .extension-item h4 {
+            color: var(--brand-primary);
+            font-size: 1.3em;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .extension-item p {
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .extension-item .next-steps {
+            font-weight: 500;
+            color: var(--brand-secondary);
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-light);
+        }
+
+        /* Competitor Reference */
+        .competitor-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .competitor-card {
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .competitor-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .competitor-card h4 {
+            color: var(--brand-primary);
+            font-size: 1.25em;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .competitor-card p {
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        /* Priority List */
+        .priority-list ol {
+            padding-left: 0; /* Remove default padding for ordered list */
+            list-style: none; /* Remove default list style */
+        }
+
+        .priority-list li {
+            background-color: #fcfcfc;
+            border: 1px solid var(--border-light);
+            border-left: 5px solid var(--brand-secondary);
+            border-radius: 10px;
+            padding: 18px 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-size: 1em;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .priority-list li strong {
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+        
+        .priority-list li span.deadline {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #777;
+            font-style: italic;
+        }
+
+        .priority-list li ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .priority-list li ul li {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            color: var(--text-light);
+        }
+        .priority-list li ul li strong {
+             color: var(--text-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .brand-logo h1 {
+                font-size: 1.8em;
+            }
+
+            .proposal-info {
+                text-align: center;
+            }
+
+            .proposal-info h2 {
+                font-size: 1.4em;
+            }
+
+            .hero-banner h3 {
+                font-size: 1.8em;
+                padding: 10px 20px;
+            }
+
+            main {
+                padding: 0 15px;
+                margin: 20px auto;
+            }
+
+            section {
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+
+            section h2 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            .proposal-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .proposal-card-header {
+                height: 180px;
+            }
+            
+            .proposal-card-content {
+                padding: 20px;
+            }
+
+            .proposal-card h3 {
+                font-size: 1.4em;
+            }
+
+            .rating-section, .tagline, .expanded-content p, .expanded-content ul, .card-labels {
+                font-size: 0.9em;
+            }
+
+            .toggle-button {
+                width: calc(100% - 40px);
+                padding: 10px 15px;
+            }
+
+            .competitor-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand-logo">
+            <h1>Wujie Creative</h1>
+        </div>
+        <div class="proposal-info">
+            <h2>創意選品提案 Deck</h2>
+            <p>2026年04月23日</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero-banner">
+            <h3>引領潮玩市場新趨勢</h3>
+        </div>
+
+        <section>
+            <h2>🌟 本日創意焦點：零售陳列 + 體驗行銷</h2>
+            <p class="intro-text">
+                在競爭激烈的 IP 周邊市場，單純的商品陳列已無法有效吸引消費者。今日報告將聚焦於如何透過創新的零售陳列與互動體驗，讓蕪解創意旗下的正版授權 IP 商品在眾多選擇中脫穎而出，不僅刺激消費者的購買慾望，更深化品牌與 IP 形象的連結，進而實現我們的 VAM 目標。
+            </p>
+        </section>
+
+        <section>
+            <h2>🎯 今日主推提案</h2>
+            <div class="proposal-grid">
+
+                <!-- 提案一 -->
+                <div class="proposal-card" data-proposal-id="1">
+                    <div class="proposal-card-header">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy 奇幻冒險系列盲盒">
+                    </div>
+                    <div class="proposal-card-content">
+                        <h3>IP主題情境盲盒專區</h3>
+                        <p class="tagline">將貨架轉化為沉浸式 IP 世界，提升消費者停留與購買意願。</p>
+
+                        <div class="rating-section">
+                            <span>預估市場吸引力：</span>
+                            <div class="stars" data-rating="0">
+                                <span class="star" data-value="1">&#9733;</span>
+                                <span class="star" data-value="2">&#9733;</span>
+                                <span class="star" data-value="3">&#9733;</span>
+                                <span class="star" data-value="4">&#9733;</span>
+                                <span class="star" data-value="5">&#9733;</span>
+                            </div>
+                        </div>
+                        
+                        <div class="expanded-content">
+                            <h4>靈感來源</h4>
+                            <p>觀察到 Pop Mart 等盲盒品牌在店鋪中常設置大型 IP 主題裝置藝術與陳列，營造出強烈的品牌氛圍。例如，Labubu 的某些系列會搭配特定情境裝置，讓收藏品更具生命力。迪士尼商店更是將 IP 情境化陳列的極致體現，讓顧客置身於魔法世界。</p>
+                            
+                            <h4>具體商品規格</h4>
+                            <ul>
+                                <li><strong>核心商品：</strong> 蕪解創意旗下 5cm/8cm 盲盒公仔（例如：Snoopy 奇幻冒險系列、Chiikawa 森林日常系列）。</li>
+                                <li><strong>陳列裝置：：</strong> 模組化設計，可根據零售空間大小彈性組合。材質以環保木材、壓克力搭配高解析度 IP 主題背板及地貼。可加入小型互動裝置（如按鈕發光、簡單音樂播放）。</li>
+                                <li><strong>示範 IP：：</strong> 首波主推 Snoopy/Peanuts（全球市場）與 Chiikawa（中國大陸市場）。</li>
+                            </ul>
+                            
+                            <h4>目標市場與客群畫像</h4>
+                            <ul>
+                                <li><strong>目標市場：：</strong> 中國大陸、台灣、香港、泰國、馬來西亞、新加坡、歐洲、紐澳等 IP 粉絲眾多的零售通路。</li>
+                                <li><strong>客群畫像：：</strong> 18-35 歲的年輕潮玩愛好者、IP 忠實粉絲、尋求新鮮購物體驗的消費者、家庭親子客群。</li>
+                            </ul>
+                            
+                            <h4>預估零售定價 + 批發毛利率</h4>
+                            <ul>
+                                <li><strong>盲盒公仔：</strong>
+                                    <ul>
+                                        <li>零售定價：<span class="highlight">RMB 79/件 (約 USD 10.82)</span></li>
+                                        <li>預估批發價：RMB 47.45/件 (約 USD 6.5) (按 40% 零售商毛利率計算)</li>
+                                        <li>預估生產成本：RMB 7/件 (以 8cm 公仔計)</li>
+                                        <li>批發毛利率 = <span class="highlight">85.2%</span></li>
+                                    </ul>
+                                </li>
+                                <li><strong>陳列裝置：：</strong> 作為行銷工具，初期以成本分攤或租賃模式與零售商合作。</li>
+                            </ul>
+                            
+                            <h4>VAM 貢獻潛力（具體數字估算）</h4>
+                            <p class="vam-contribution">
+                                假設於 Y1 在各主要銷售市場選定 50 個高潛力零售點推廣，每個點位平均每月可帶來 200 個盲盒的增量銷售。年度增量銷售總量：120,000 件。預估可為年度 VAM 目標貢獻約 <strong>人民幣 485.4 萬元增量毛利</strong>。
+                            </p>
+                            
+                            <h4>上市時程建議</h4>
+                            <p>2026 年 Q3 於中國大陸、香港、台灣市場啟動首批 10 個示範點的陳列區建置與測試，並同步評估東南亞市場的潛力通路。</p>
+                        </div>
+
+                        <button class="toggle-button">展開詳情 ▼</button>
+                        <div class="card-labels">
+                            <span class="card-label market">目標市場：亞洲, 歐洲, 紐澳</span>
+                            <span class="card-label type">商品類型：盲盒公仔, 店內裝置</span>
+                            <span class="card-label vam">VAM潛力：高</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提案二 -->
+                <div class="proposal-card" data-proposal-id="2">
+                    <div class="proposal-card-header">
+                        <img src="https://image.pollinations.ai/prompt/blind%20box%20toy%20unboxing%20surprise%20collectible%20figure%20colorful?width=600&height=350&nologo=true&seed=502" alt="盲盒開箱情境">
+                    </div>
+                    <div class="proposal-card-content">
+                        <h3>盲盒互動尋寶體驗</h3>
+                        <p class="tagline">讓購物成為一場 IP 冒險遊戲，透過遊戲化提高消費者參與度。</p>
+
+                        <div class="rating-section">
+                            <span>預估市場吸引力：</span>
+                            <div class="stars" data-rating="0">
+                                <span class="star" data-value="1">&#9733;</span>
+                                <span class="star" data-value="2">&#9733;</span>
+                                <span class="star" data-value="3">&#9733;</span>
+                                <span class="star" data-value="4">&#9733;</span>
+                                <span class="star" data-value="5">&#9733;</span>
+                            </div>
+                        </div>
+                        
+                        <div class="expanded-content">
+                            <h4>靈感來源</h4>
+                            <p>借鑒近年流行的「劇本殺」、「密室逃脫」等沉浸式遊戲體驗，以及 Pokémon GO 等 AR 互動遊戲概念。Chiikawa 在日本常舉辦結合插畫與解謎的快閃活動，吸引粉絲參與。透過遊戲化提高消費者參與度與停留時間。</p>
+                            
+                            <h4>具體商品規格</h4>
+                            <ul>
+                                <li><strong>核心商品：：</strong> 蕪解創意所有 IP 授權的 5cm/8cm 盲盒公仔。</li>
+                                <li><strong>配套商品：：</strong>
+                                    <ul>
+                                        <li><strong>「IP 尋寶任務日誌」：</strong> 一本輕薄的任務手冊（約 A5 尺寸，20-30 頁），內含 IP 背景故事、尋寶線索、貼紙、印章收集頁及商品折扣券。材質為再生紙，封面可選不同 IP 設計。</li>
+                                        <li><strong>店內尋寶元素：：</strong> 設有 IP 主題 QR Code 提示牌、隱藏式 IP 標誌或小公仔模型於店內各處。</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            
+                            <h4>目標市場與客群畫像</h4>
+                            <ul>
+                                <li><strong>目標市場：：</strong> 中國大陸、香港、台灣、泰國等具備大型購物中心或百貨公司的高人流區域。</li>
+                                <li><strong>客群畫像：：</strong> 喜歡互動遊戲的年輕族群、親子家庭、渴望新奇體驗的 IP 粉絲。</li>
+                            </ul>
+                            
+                            <h4>預估零售定價 + 批發毛利率</h4>
+                            <ul>
+                                <li><strong>盲盒公仔：：</strong> (同提案一) 零售定價 RMB 79/件，批發毛利率 85.2%。</li>
+                                <li><strong>IP 尋寶任務日誌：：</strong>
+                                    <ul>
+                                        <li>零售定價：<span class="highlight">RMB 19/本 (約 USD 2.6)</span></li>
+                                        <li>預估批發價：RMB 11.4/本 (約 USD 1.56) (按 40% 零售商毛利率計算)</li>
+                                        <li>預估生產成本：RMB 2.5/本</li>
+                                        <li>批發毛利率 = <span class="highlight">78.1%</span></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            
+                            <h4>VAM 貢獻潛力（具體數字估算）</h4>
+                            <p class="vam-contribution">
+                                假設 Y1 舉辦 20 場主題尋寶體驗活動，每場平均吸引 1,000 名參與者購買任務日誌，並平均每位參與者額外購買 1.5 個盲盒。預估可為年度 VAM 目標貢獻約 <strong>人民幣 139.15 萬元增量毛利</strong>。
+                            </p>
+                            
+                            <h4>上市時程建議</h4>
+                            <p>2026 年 Q3-Q4 於中國大陸、香港、台灣的主要購物中心或百貨公司合作，推出首波尋寶體驗活動，並依據反饋逐步優化與擴展至東南亞市場。</p>
+                        </div>
+
+                        <button class="toggle-button">展開詳情 ▼</button>
+                        <div class="card-labels">
+                            <span class="card-label market">目標市場：亞洲(高人流區)</span>
+                            <span class="card-label type">商品類型：盲盒公仔, 任務日誌, 體驗活動</span>
+                            <span class="card-label vam">VAM潛力：中高</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <h2>💡 延伸創意點</h2>
+            <ul class="extension-list">
+                <li class="extension-item">
+                    <h4>盲盒開箱體驗區</h4>
+                    <p>在零售店內設置專屬的開箱區域，配備 IP 主題背景牆、補光燈及手機支架，鼓勵消費者現場開箱並拍攝分享至社群媒體。</p>
+                    <p class="next-steps"><strong>具體可執行的下一步：</strong> 由創意選品部與市場部合作，設計 3 款不同 IP（Snoopy, Mofusand, Muzik Tiger）的開箱體驗區標準模組，並於 2026/05/20 前完成成本估算。</p>
+                </li>
+                <li class="extension-item">
+                    <h4>AR 互動商品導覽</h4>
+                    <p>在關鍵商品陳列架旁設置 QR Code，消費者掃描後可透過手機 AR 濾鏡，看到盲盒公仔在現實環境中的 3D 虛擬形象，或與 IP 角色進行趣味合影。</p>
+                    <p class="next-steps"><strong>具體可執行的下一步：</strong> 由數位創新組負責調研至少 3 家 AR 技術開發商，並於 2026/05/30 前提交一份初步的可行性分析報告。</p>
+                </li>
+                <li class="extension-item">
+                    <h4>期間限定 IP 快閃店中店</h4>
+                    <p>與大型連鎖店（如便利店、超市）合作，推出小型的 IP 快閃「店中店」模式，以限定商品或主題活動吸引人流。例如，針對 Opanchu 設計「打工人加油站」主題快閃。</p>
+                    <p class="next-steps"><strong>具體可執行的下一步：</strong> 由市場部與銷售部於 2026/06/15 前，針對 Opanchu 與 Maniani World 兩個 IP，完成兩份「快閃店中店」概念企劃書及潛在合作夥伴清單。</p>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>🏪 競品參考</h2>
+            <div class="competitor-list">
+                <div class="competitor-card">
+                    <img src="https://image.pollinations.ai/prompt/designer%20vinyl%20art%20toy%20furry%20monster%20premium%20store%20display?width=600&height=350&nologo=true&seed=201" alt="Pop Mart 店鋪展示">
+                    <h4>泡泡瑪特 (Pop Mart)</h4>
+                    <p>作為盲盒市場的領軍者，泡泡瑪特非常擅長通過其門店設計、大型 IP 裝置藝術以及主題性櫥窗陳列來吸引消費者。他們經常與知名藝術家和 IP 合作，將盲盒系列融入沉浸式的故事場景中，例如「Mega Space Molly」的宇宙主題空間。</p>
+                </div>
+                <div class="competitor-card">
+                    <img src="https://image.pollinations.ai/prompt/tiny%20round%20kawaii%20Japanese%20character%20pastel%20blind%20box%20capsule?width=600&height=350&nologo=true&seed=202" alt="Chiikawa 盲盒風格">
+                    <h4>吉伊卡哇 (Chiikawa) 官方快閃店</h4>
+                    <p>在日本及中國大陸市場，Chiikawa 的官方快閃店往往營造出高度還原漫畫情境的空間，提供豐富的拍照打卡點和限定商品，成功將線上人氣導流至線下實體店，創造粉絲的排隊熱潮。</p>
+                </div>
+                <div class="competitor-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy 專賣店">
+                    <h4>Sanrio/Snoopy 專賣店</h4>
+                    <p>這些經典 IP 的專賣店在全球範圍內都將品牌視覺與商品陳列緊密結合，通過色彩、燈光和道具，打造出充滿 IP 氛圍的購物環境，不僅販售商品，更販售一種 IP 生活風格。</p>
+                </div>
+                <div class="competitor-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/SpongeBob_SquarePants_character.png" alt="SpongeBob">
+                    <h4>迪士尼商店 (Disney Store)</h4>
+                    <p>迪士尼是體驗式零售的典範。其門店不僅是商品銷售點，更是 IP 故事的延伸，通過互動裝置、主題佈景和角色扮演活動，為顧客提供獨一無二的沉浸式體驗，極大地提升了商品的吸引力。</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>📅 本週創意優先序</h2>
+            <div class="priority-list">
+                <ol>
+                    <li>
+                        <strong>精準陳列策略研究與設計：</strong>
+                        <ul>
+                            <li><strong>WHO：</strong> 創意選品部、視覺設計組</li>
+                            <li><strong>WHAT：：</strong> 針對「IP主題情境盲盒專區」提案，完成 Snoopy「奇幻冒險」與 Chiikawa「森林日常」兩款概念設計圖（包含材質、尺寸、燈光與互動元素規劃）與初步成本估算。</li>
+                        </ul>
+                        <span class="deadline"><strong>BY WHEN：：</strong> 2026/05/08 (週五)</span>
+                    </li>
+                    <li>
+                        <strong>零售合作夥伴溝通方案擬定：</strong>
+                        <ul>
+                            <li><strong>WHO：：</strong> 市場部、銷售部、法務部</li>
+                            <li><strong>WHAT：：</strong> 針對「IP主題情境盲盒專區」與「盲盒互動尋寶體驗」兩提案，草擬初期零售合作夥伴溝通簡報，內容需包含提案價值、合作模式（費用分攤/利潤分享）、預期效益模型以及風險評估。</li>
+                        </ul>
+                        <span class="deadline"><strong>BY WHEN：：</strong> 2026/05/15 (下週五)</span>
+                    </li>
+                    <li>
+                        <strong>AR互動技術供應商初步篩選：</strong>
+                        <ul>
+                            <li><strong>WHO：：</strong> 數位創新組、創意選品部</li>
+                            <li><strong>WHAT：：</strong> 針對「AR互動商品導覽」點子，完成至少 3 家 AR 技術供應商（或具備 AR 濾鏡開發能力的行銷公司）的初步研究，包含其技術能力、過往案例、報價區間與合作模式，並進行技術可行性評估。</li>
+                        </ul>
+                        <span class="deadline"><strong>BY WHEN：：</strong> 2026/05/22 (再下週五)</span>
+                    </li>
+                </ol>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Expand/Collapse functionality
+            const proposalCards = document.querySelectorAll('.proposal-card');
+
+            proposalCards.forEach(card => {
+                const toggleButton = card.querySelector('.toggle-button');
+                const expandedContent = card.querySelector('.expanded-content');
+
+                toggleButton.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent parent card click from firing
+                    card.classList.toggle('expanded');
+                    if (card.classList.contains('expanded')) {
+                        toggleButton.textContent = '收合詳情 ▲';
+                    } else {
+                        toggleButton.textContent = '展開詳情 ▼';
+                    }
+                });
+
+                // Optional: Allow clicking anywhere on the visible card content (excluding button and stars) to toggle
+                const cardContent = card.querySelector('.proposal-card-content');
+                cardContent.addEventListener('click', (event) => {
+                    // Check if the click target is NOT the toggle button or part of the rating stars
+                    if (!toggleButton.contains(event.target) && !event.target.closest('.stars')) {
+                        event.stopPropagation(); // Prevent any parent handlers
+                        card.classList.toggle('expanded');
+                        if (card.classList.contains('expanded')) {
+                            toggleButton.textContent = '收合詳情 ▲';
+                        } else {
+                            toggleButton.textContent = '展開詳情 ▼';
+                        }
+                    }
+                });
+            });
+
+            // Interactive Rating functionality
+            const ratingSections = document.querySelectorAll('.rating-section');
+
+            ratingSections.forEach(section => {
+                const starsContainer = section.querySelector('.stars');
+                const stars = starsContainer.querySelectorAll('.star');
+                let currentRating = parseInt(starsContainer.dataset.rating); // Initial rating from data-rating
+
+                // Initialize stars based on currentRating (if any)
+                updateStars(currentRating);
+
+                stars.forEach(star => {
+                    star.addEventListener('mouseover', () => {
+                        highlightStars(star.dataset.value);
+                    });
+
+                    star.addEventListener('mouseout', () => {
+                        updateStars(currentRating); // Revert to current selected rating
+                    });
+
+                    star.addEventListener('click', (event) => {
+                        event.stopPropagation(); // Prevent card expansion when clicking stars
+                        currentRating = parseInt(star.dataset.value);
+                        starsContainer.dataset.rating = currentRating;
+                        updateStars(currentRating);
+                        // Optional: Provide immediate feedback
+                        // alert(`您給了 ${currentRating} 顆星！`);
+                    });
+                });
+
+                function highlightStars(value) {
+                    stars.forEach(star => {
+                        if (parseInt(star.dataset.value) <= value) {
+                            star.classList.add('hovered');
+                        } else {
+                            star.classList.remove('hovered');
+                        }
+                    });
+                }
+
+                function updateStars(rating) {
+                    stars.forEach(star => {
+                        if (parseInt(star.dataset.value) <= rating) {
+                            star.classList.add('selected');
+                            star.classList.remove('hovered');
+                        } else {
+                            star.classList.remove('selected', 'hovered');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
