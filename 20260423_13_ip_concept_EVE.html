@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>13號 IP概念｜SHRUG / 聳 — 2026.04.23 EVE</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d14;--card:#13131f;--border:#2a2a3e;
+  --gold:#F2C94C;--purple:#7b5ef8;--pink:#ff6ec7;
+  --text:#e0e0ec;--muted:#8888a8;--sand:#D4C5A9;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC','Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;}
+a{color:var(--purple);}
+h1{font-size:2.6em;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin:0.6em 0;}
+h2{font-size:1.5em;color:var(--gold);border-left:4px solid var(--gold);padding-left:14px;margin:2.5em 0 1em;letter-spacing:1px;}
+h3{font-size:1.15em;color:var(--sand);margin:1.8em 0 0.6em;}
+h4{font-size:1em;color:var(--text);margin:1.2em 0 0.4em;}
+p{margin:0.7em 0;color:#b0b0c8;}
+ul,ol{padding-left:1.5em;margin:0.7em 0;}
+li{margin:0.5em 0;color:#b0b0c8;}
+strong{color:var(--gold);}
+blockquote{border-left:3px solid var(--purple);padding:10px 18px;background:rgba(123,94,248,0.08);border-radius:0 8px 8px 0;margin:1em 0;color:#c8c0e8;font-style:italic;}
+hr{border:none;border-top:1px solid var(--border);margin:2em 0;}
+code{font-family:'Courier New',monospace;font-size:0.85em;color:#a0ff9f;background:#0a1a0a;padding:2px 6px;border-radius:4px;}
+pre{background:#090f09;border:1px solid #1a3a1a;border-radius:10px;padding:18px;overflow-x:auto;margin:1em 0;position:relative;}
+pre code{background:none;padding:0;color:#a8ffb0;font-size:0.88em;line-height:1.6;}
+
+/* Copy button */
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--purple);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:0.75em;cursor:pointer;opacity:0.8;transition:opacity 0.2s;}
+.copy-btn:hover{opacity:1;}
+.copy-btn.copied{background:#28a745;}
+
+/* Hero */
+.hero{width:100%;height:420px;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;border-radius:14px;margin-bottom:36px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,13,20,0.3) 0%,rgba(13,13,20,0.75) 100%);}
+.hero-inner{position:relative;z-index:1;text-align:center;padding:0 24px;}
+.hero-inner h1{font-size:3em;-webkit-text-fill-color:#fff;background:none;color:#fff;text-shadow:0 0 40px rgba(255,110,199,0.6);}
+.hero-inner .tagline{color:var(--gold);font-size:1.1em;margin-top:10px;font-weight:500;}
+.hero-inner .slot-badge{display:inline-block;margin-top:12px;padding:4px 16px;border:1px solid var(--purple);color:var(--purple);border-radius:20px;font-size:0.82em;}
+
+nav{position:sticky;top:0;background:rgba(13,13,20,0.95);backdrop-filter:blur(12px);z-index:1000;border-bottom:1px solid var(--border);padding:10px 0;}
+nav ul{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding:0 16px;}
+nav a{color:var(--muted);text-decoration:none;padding:5px 14px;border-radius:20px;font-size:0.85em;border:1px solid transparent;transition:all 0.2s;}
+nav a:hover{border-color:var(--gold);color:var(--gold);}
+
+.container{max-width:900px;margin:0 auto;padding:24px 20px;}
+.section{margin-bottom:48px;}
+
+.table-wrap{overflow-x:auto;margin:1.2em 0;}
+table{width:100%;border-collapse:collapse;font-size:0.9em;}
+th{background:#1a1a2e;color:var(--gold);padding:10px 14px;text-align:left;border:1px solid var(--border);}
+td{padding:9px 14px;border:1px solid var(--border);color:#b0b0c8;}
+tr:hover td{background:rgba(242,201,76,0.04);}
+
+/* Color swatch */
+.swatch{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:6px;vertical-align:middle;border:1px solid rgba(255,255,255,0.2);}
+
+/* Char cards */
+.char-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:1.5em 0;}
+.char-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.char-card img{width:100%;height:220px;object-fit:cover;}
+.char-card .body{padding:16px;}
+.char-card h3{margin-top:0;color:var(--pink);}
+
+/* Hook box */
+.hook-box{background:linear-gradient(135deg,rgba(255,110,199,0.08),rgba(123,94,248,0.08));border:1px solid var(--purple);border-radius:14px;padding:22px 26px;margin:1.5em 0;}
+.hook-box .hook-title{font-size:0.75em;color:var(--purple);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+.hook-main{font-size:1.6em;color:#fff;font-weight:700;line-height:1.3;margin-bottom:12px;}
+.hook-sub{color:var(--muted);font-size:0.9em;}
+
+/* Score cards */
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin:1.5em 0;}
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.score-num{font-size:2.2em;font-weight:700;color:var(--gold);line-height:1;}
+.score-label{font-size:0.78em;color:var(--muted);margin-top:6px;}
+.score-note{font-size:0.72em;color:#6868a0;margin-top:4px;}
+
+/* Competitor row */
+.comp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:1.5em 0;}
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;text-align:center;}
+.comp-card img{width:100%;height:120px;object-fit:cover;opacity:0.85;}
+.comp-card .comp-body{padding:12px;}
+.comp-card .comp-name{font-size:0.85em;font-weight:600;color:var(--muted);}
+.comp-card .comp-diff{font-size:0.75em;color:#6868a0;margin-top:4px;}
+
+/* Series expand */
+.expand-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:10px 0;cursor:pointer;transition:border-color 0.2s;}
+.expand-card:hover{border-color:var(--purple);}
+.expand-head{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+.expand-head .title{font-weight:600;color:var(--text);}
+.expand-head .arrow{color:var(--purple);transition:transform 0.25s;}
+.expand-card.open .arrow{transform:rotate(180deg);}
+.expand-body{max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s;}
+.expand-card.open .expand-body{max-height:800px;padding:0 20px 18px;}
+
+/* Recommend box */
+.rec-box{background:linear-gradient(135deg,rgba(40,167,69,0.1),rgba(0,0,0,0));border:1px solid #28a745;border-radius:12px;padding:20px 24px;margin:1.5em 0;}
+.rec-box h3{color:#28a745;margin-top:0;}
+
+@media(max-width:600px){
+  .char-grid,.comp-row{grid-template-columns:1fr;}
+  .hero-inner h1{font-size:2em;}
+  h1{font-size:1.8em;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <ul>
+    <li><a href="#intel">三閣整合</a></li>
+    <li><a href="#bible">角色Bible</a></li>
+    <li><a href="#hook">Visual Hook</a></li>
+    <li><a href="#spec">設計規格</a></li>
+    <li><a href="#prompts">咒語</a></li>
+    <li><a href="#series">系列潛力</a></li>
+    <li><a href="#score">自評</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <div class="hero" style="background-image:url('https://image.pollinations.ai/prompt/round%20cute%20egg-shaped%20character%20arms%20raised%20shrug%20pose%20zen%20peaceful%20neon%20dark%20background%20vibrant%20glowing%20concept%20art?width=800&height=450&nologo=true&seed=1401')">
+    <div class="hero-inner">
+      <h1>SHRUG / 聳</h1>
+      <div class="tagline">已接受一切的無能為力感——不是放棄，是開悟</div>
+      <div class="slot-badge">13號 Phase 1 ｜ EVE 大膽方向 ｜ 2026.04.23</div>
+    </div>
+  </div>
+
+  <!-- 三閣整合 -->
+  <section id="intel" class="section">
+    <h2>三閣情報整合</h2>
+    <div class="hook-box">
+      <div class="hook-title">差異化定位</div>
+      <div class="hook-main">Chiikawa 佔「焦慮的弱小」<br>Labubu 佔「混沌的能量」<br>SHRUG 進攻：<strong style="color:var(--pink)">「已接受一切的無能為力感」</strong></div>
+      <div class="hook-sub">10號信號：情緒認同購買取代角色認識購買，25-35歲佔比持續擴大<br>11號方向：市場空位在「不努力但也不痛苦」的存在狀態</div>
+    </div>
+  </section>
+
+  <!-- 角色 Bible -->
+  <section id="bible" class="section">
+    <h2>一、角色 Bible</h2>
+
+    <h3>IP 名稱</h3>
+    <p><strong>SHRUG / 聳 / Sǒng</strong></p>
+    <p>SHRUG（英文聳肩動作）= 全球通用的「我也不知道/無所謂/反正就這樣了」肢體語言。「聳」字有聲音感，中文圈跟著喊「我聳」自然成立。顏文字 <code>¯\_(ツ)_/¯</code> 本身就是品牌臉。</p>
+
+    <div class="char-grid">
+      <div class="char-card">
+        <img src="https://image.pollinations.ai/prompt/round%20egg-shaped%20creature%20stubby%20arms%20raised%20shrug%20gesture%20half-lidded%20zen%20eyes%20sandy%20beige%20color%20flat%202D%20illustration%20white%20background%20kawaii%20character%20design?width=800&height=450&nologo=true&seed=1402" alt="SHRUG 角色草稿">
+        <div class="body">
+          <h3>角色外形概念</h3>
+          <p>蛋形身體，頭身合一，雙臂永遠呈聳肩姿態，半瞇眼，沙米色啞光PVC。</p>
+        </div>
+      </div>
+      <div class="char-card">
+        <img src="https://image.pollinations.ai/prompt/expression%20sheet%20small%20round%20creature%206%20emotions%20happy%20sad%20angry%20surprised%20embarrassed%20sleeping%20cute%20flat%20illustration%20white%20background%20character%20design?width=800&height=450&nologo=true&seed=1403" alt="SHRUG 表情稿">
+        <div class="body">
+          <h3>表情設定稿（6種）</h3>
+          <p>無論哪種情緒，雙臂永遠保持聳肩——這是核心設計規則。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap"><table>
+      <tr><th>欄位</th><th>內容</th></tr>
+      <tr><td>角色類型</td><td>不明生物（刻意不定義物種，增加情感投射空間）</td></tr>
+      <tr><td>核心情感</td><td><strong>「接受一切的無能為力感」</strong>——做錯了？聳肩。被甩了？聳肩。被老闆罵了？聳肩。不是冷漠，是鋼鐵心理素質。</td></tr>
+      <tr><td>性格反差點</td><td>外形看起來是<strong>圓滾滾的可愛小東西</strong>，實際上卻是<strong>宇宙第一虛無主義者，但心情很好</strong></td></tr>
+      <tr><td>世界觀</td><td>好事發生——聳肩。壞事發生——聳肩。世界末日——聳肩，但順便拿了一杯飲料。</td></tr>
+      <tr><td>行為模式</td><td>雙臂永遠半舉，走路時左右搖晃。被問任何問題，先聳肩3秒，然後給出出乎意料的正確答案。</td></tr>
+      <tr><td>口頭禪</td><td>「…」（沉默三秒）然後聳肩。跨語言版：<code>¯\_(ツ)_/¯</code></td></tr>
+    </table></div>
+  </section>
+
+  <!-- Visual Hook -->
+  <section id="hook" class="section">
+    <h2>視覺記憶點（Visual Hook）</h2>
+    <div class="hook-box">
+      <div class="hook-title">核心 Visual Hook</div>
+      <div class="hook-main">雙臂永遠呈聳肩姿態，凍結在半空中<br>佔整體寬度的 80%</div>
+      <div class="hook-sub">從正面、側面、背面看都在聳肩。桌上擺著就是一個持續聳肩的存在。<br>對標 Labubu 的「尖牙」——這是 SHRUG 在3D公仔上最強的實體化動作。</div>
+    </div>
+    <ul>
+      <li><strong>次要記憶點</strong>：半瞇的眼睛——不是悲傷的下垂眼，是那種「我理解了一切之後」的平靜半閉眼；瞳孔極小的點，永遠帶著距離感</li>
+      <li><strong>商品化部位</strong>：聳肩雙臂建議做成可動關節——每個人的 SHRUG 聳得角度不一樣，增加互動感與個人化</li>
+    </ul>
+
+    <h3>競品對比</h3>
+    <div class="comp-row">
+      <div class="comp-card">
+        <img src="https://image.pollinations.ai/prompt/tiny%20white%20round%20Japanese%20kawaii%20character%20pastel%20blind%20box%20capsule%20toy?width=800&height=450&nologo=true&seed=202" alt="Chiikawa">
+        <div class="comp-body">
+          <div class="comp-name">Chiikawa</div>
+          <div class="comp-diff">焦慮的弱小 × 動態情緒<br><strong style="color:var(--gold)">SHRUG 差異：靜態的哲學</strong></div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <img src="https://image.pollinations.ai/prompt/designer%20vinyl%20art%20toy%20furry%20monster%20pink%20purple%20premium%20dark%20background%20store%20display?width=800&height=450&nologo=true&seed=201" alt="Labubu">
+        <div class="comp-body">
+          <div class="comp-name">Labubu</div>
+          <div class="comp-diff">混沌的能量 × 醜萌<br><strong style="color:var(--gold)">SHRUG 差異：平靜的接受</strong></div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <img src="https://image.pollinations.ai/prompt/creepy%20cute%20stuffed%20toy%20ugly%20teeth%20monster%20plush%20funny%20weird%20collectible?width=800&height=450&nologo=true&seed=1305" alt="Fuggler">
+        <div class="comp-body">
+          <div class="comp-name">Fuggler</div>
+          <div class="comp-diff">西方怪誕 × 毛絨恐怖<br><strong style="color:var(--gold)">SHRUG 差異：光滑PVC×東方禪意</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 設計規格 -->
+  <section id="spec" class="section">
+    <h2>設計規格</h2>
+    <div class="table-wrap"><table>
+      <tr><th>欄位</th><th>內容</th></tr>
+      <tr><td>風格定位</td><td><strong>反差萌</strong>——圓潤可愛的外形 × 虛無主義哲學內核</td></tr>
+      <tr><td>頭身比例</td><td><strong>1:1</strong>，圓形頭 = 圓形身體，分不清哪裡是脖子，整體像一顆大蛋</td></tr>
+      <tr><td>輪廓特徵</td><td>極度圓潤，無銳角，兩側各有突出短臂；底部略扁（站得穩）</td></tr>
+      <tr><td>主色</td><td><span class="swatch" style="background:#D4C5A9"></span><code>#D4C5A9</code> 溫暖沙米色 — 不搶眼，放哪裡都融合，象徵「無處不在的接受感」</td></tr>
+      <tr><td>輔色</td><td><span class="swatch" style="background:#3D3557"></span><code>#3D3557</code> 深靛紫 — 用於眼睛和陰影，帶來神秘感和深度</td></tr>
+      <tr><td>強調色</td><td><span class="swatch" style="background:#F2C94C"></span><code>#F2C94C</code> 芥末黃 — 用於腮紅小圓點和底座，意外的溫暖，製造衝突感</td></tr>
+      <tr><td>材質感目標</td><td><strong>啞光PVC</strong>——沙米色在啞光材質下質感最好，觸感「剛好」</td></tr>
+      <tr><td>對標IP參考</td><td>視覺上最接近 <strong>Chiikawa</strong> 的圓潤比例和柔和色系，但差異在於：Chiikawa 是動態的（在哭、在跑、在努力），SHRUG 是<strong>靜態的哲學</strong>——它不動，你看著它，你理解了什麼叫接受</td></tr>
+    </table></div>
+  </section>
+
+  <!-- 咒語 -->
+  <section id="prompts" class="section">
+    <h2>Gemini 概念草稿咒語（直接使用）</h2>
+    <p>以下兩條咒語可直接複製貼入 <strong>Gemini</strong> 或 <strong>DALL-E 3</strong>，點擊右上角複製按鈕。</p>
+
+    <h3>Prompt A｜角色概念草稿（正面站立）</h3>
+    <pre><code>A character concept sketch of SHRUG, a small round creature of unspecified species. The body is a perfect egg shape with no visible neck, head and body seamlessly merged into one smooth oval. The creature has two short stubby arms permanently raised in a shrug gesture, arms spread about 80% of the body width, slightly curved upward, as if frozen mid-shrug. The face features two very small dot pupils sitting in half-lidded almond-shaped eyes, giving a serene, zen-like expression — not sad, not happy, deeply at peace. No mouth visible. Small round cheek blushes in mustard yellow (#F2C94C). Body color is warm sandy beige (#D4C5A9). Eye shadows and depth in deep indigo (#3D3557). The creature stands upright on a slightly flat oval base. Full body, front view, clean 2D flat illustration, soft line art, white background, character design sheet style, no background, high detail, kawaii adjacent but with philosophical weight.</code></pre>
+    <p style="font-size:0.85em;color:var(--muted)">生成後選最能表達「聳肩凍結感」的版本，作為 Prompt B 的角色基準。</p>
+
+    <h3>Prompt B｜表情設定稿（6種情緒）</h3>
+    <pre><code>An expression sheet of SHRUG, a small round egg-shaped creature with no visible neck, two permanently raised stubby arms in shrug position. Body is warm sandy beige (#D4C5A9), small dot pupils in half-lidded eyes, deep indigo (#3D3557) eye area, mustard yellow (#F2C94C) cheek blushes. Show 6 emotions arranged in 2 rows of 3 columns: Row 1 — happy (tiny upward curved line mouth, same half-lidded eyes), sad (still half-lidded, single tiny tear, arms same shrug position), angry (slightly furrowed minimal brow, arms shrug even higher, cheeks flushed). Row 2 — surprised (eyes open slightly wider, still small pupils, mouth tiny O shape), embarrassed (eyes looking sideways, deeper cheek blush, arms shrug as if hiding), sleeping (eyes fully closed as two thin curved lines, small Zs floating). All emotions maintain the shrug arm position — it never stops shrugging. English emotion label under each face. 2D flat illustration, consistent style, white background, character design reference sheet, clean line art.</code></pre>
+    <p style="font-size:0.85em;color:var(--muted)">表情稿完成後，選「happy」或「sleeping」作為品牌標準臉，用於所有後續素材。</p>
+  </section>
+
+  <!-- 系列潛力 -->
+  <section id="series" class="section">
+    <h2>角色系列擴展潛力</h2>
+    <img src="https://image.pollinations.ai/prompt/series%20of%20round%20egg%20characters%20different%20poses%20shrug%20nod%20stare%20sigh%20collectible%20toy%20lineup%20white%20background%20flat%20design?width=800&height=450&nologo=true&seed=1404" alt="系列概念" style="width:100%;border-radius:12px;margin-bottom:20px;">
+
+    <div class="expand-card">
+      <div class="expand-head">
+        <span class="title">第二個角色：NODS / 點點</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="expand-body">
+        <p>SHRUG 的好友，對所有事情都猛點頭表示「嗯嗯」但其實完全沒在聽。</p>
+        <p><strong>Visual Hook</strong>：頭大到身體承受不住，永遠在輕微點頭晃動（做成搖頭娃娃形式）</p>
+      </div>
+    </div>
+
+    <div class="expand-card">
+      <div class="expand-head">
+        <span class="title">系列化邏輯：「無用的智者」</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="expand-body">
+        <p>每個角色代表一種「廢物但又說不出哪裡不對」的存在姿態：</p>
+        <ul>
+          <li>SHRUG（聳）— 接受一切</li>
+          <li>NODS（點）— 聽但沒在聽</li>
+          <li>BLANK（發）— 永遠在發呆</li>
+          <li>SIGH（嘆）— 不停嘆氣但沒有實際行動</li>
+          <li>STILL（定）— 完全不動，靜止即力量</li>
+        </ul>
+        <p>消費者買的是「今天的我是哪一種廢物」的心理選擇。</p>
+      </div>
+    </div>
+
+    <div class="expand-card">
+      <div class="expand-head">
+        <span class="title">隱藏款：SHRUG × 羅丹思想者</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="expand-body">
+        <p>羅丹思想者姿勢的 SHRUG——下巴放在聳起的手上，靜靜思考宇宙虛無。</p>
+        <p>機率：1/72。給看懂梗的人一個「哇」的發現感，跨藝術圈討論熱度。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 自評 -->
+  <section id="score" class="section">
+    <h2>13號自評</h2>
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="score-num">8.5</div>
+        <div class="score-label">商業潛力</div>
+        <div class="score-note">「接受一切」送禮理由天然成立</div>
+      </div>
+      <div class="score-card">
+        <div class="score-num">9</div>
+        <div class="score-label">差異化程度</div>
+        <div class="score-note">無人佔據「平靜虛無主義」象限</div>
+      </div>
+      <div class="score-card">
+        <div class="score-num">9</div>
+        <div class="score-label">視覺記憶點</div>
+        <div class="score-note">任何角度都在聳肩</div>
+      </div>
+      <div class="score-card">
+        <div class="score-num">7</div>
+        <div class="score-label">製作難度</div>
+        <div class="score-note">固定版本簡單，可動版需額外開模</div>
+      </div>
+      <div class="score-card">
+        <div class="score-num">9.5</div>
+        <div class="score-label">跨語言傳播</div>
+        <div class="score-note">¯\_(ツ)_/¯ 本身就是內容</div>
+      </div>
+    </div>
+
+    <div class="rec-box">
+      <h3>13號建議</h3>
+      <p>這個方向值得推進 Phase 2。最需要驗證的假設只有一個：<strong>聳肩的臂膀是否在3D實體上足夠有趣</strong>——建議先用 Prompt A 生成圖，確認臂膀比例在畫面中有足夠的視覺衝擊力，再決定是否縮短臂膀或誇大更多。如果圖出來感覺「還好」，那就往更誇張的方向推——聳肩的幅度要大到有點荒謬才對。</p>
+    </div>
+
+    <p style="text-align:center;margin-top:32px;font-size:0.78em;color:#44446a;">13號影子內閣出品 · Phase 1 角色設定 · 2026.04.23 EVE<br>下一步：用 Prompt A 生成圖 → 確認 Visual Hook → 進入 Phase 2</p>
+  </section>
+
+</div>
+
+<script>
+// Expand cards
+document.querySelectorAll('.expand-card').forEach(c=>{
+  c.addEventListener('click',()=>c.classList.toggle('open'));
+});
+
+// Copy prompts
+document.querySelectorAll('pre').forEach(pre=>{
+  const btn = document.createElement('button');
+  btn.className='copy-btn'; btn.textContent='複製';
+  btn.onclick = e => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.querySelector('code').innerText).then(()=>{
+      btn.textContent='✓ 已複製'; btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='複製';btn.classList.remove('copied');},2000);
+    });
+  };
+  pre.style.position='relative';
+  pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
