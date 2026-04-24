@@ -22,6 +22,10 @@ h1{font-size:20px;font-weight:700;color:#0f172a}
   <span style="font-size:13px;color:#64748b">你好，<span id="user-name" style="color:#6366f1;font-weight:700"></span></span>
   <a id="logout-btn" href="../login.html" style="font-size:12px;color:#94a3b8;text-decoration:none" onclick="localStorage.removeItem('wujie_session')">登出</a>
 </div>
+<div style="padding:16px 24px 4px;border-bottom:1px solid #e2e8f0;margin-bottom:4px">
+  <div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📢 公告板</div>
+  <div id="notice-board"><div style="color:#94a3b8;font-size:13px;padding:8px 0">公告載入中...</div></div>
+</div>
 <div style="padding:20px 24px 4px"><div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px">日常填報</div></div>
 <div class="grid"><a href="project.html" class="card" style="border-top:3px solid #6366f1">
               <div style="font-size:28px;margin-bottom:10px">📋</div>
@@ -128,6 +132,7 @@ h1{font-size:20px;font-weight:700;color:#0f172a}
 const _PROXY_IDX="https://feishu-proxy.raychou6913.workers.dev";
 const _AT_IDX="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _VL_TBL="tblUzRSQgKLhlttk";
+const _NB_TBL="tblPtgudsOOlmJAx";
 
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
@@ -138,6 +143,7 @@ const _VL_TBL="tblUzRSQgKLhlttk";
   }
   document.getElementById("user-name").textContent=s.name+"（"+s.dept+"）";
   _autoLogVisit(s);
+  _loadNotices(s);
 })();
 
 async function _autoLogVisit(s){
@@ -159,6 +165,98 @@ async function _autoLogVisit(s){
     const rd=await res.json();
     if(rd.code===0) localStorage.setItem(todayKey,"1");
   }catch(e){}
+}
+
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
+  if(typeof v==="object") return v.text||v.link||"";
+  return String(v);
+}
+
+async function _loadNotices(s){
+  const el=document.getElementById("notice-board");
+  try{
+    const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await r.json();
+    if(td.code!==0){el.innerHTML='<div style="color:#94a3b8;font-size:13px">公告載入失敗</div>';return;}
+    const tk=td.tenant_access_token;
+    window._nb_tk=tk;
+    const res=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_NB_TBL+"/records?page_size=50",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const data=await res.json();
+    const items=(data.data?.items||[]);
+    const notices=items
+      .filter(i=>_fv(i.fields,"有效")==="是")
+      .sort((a,b)=>_fv(b.fields,"發布日期").localeCompare(_fv(a.fields,"發布日期")))
+      .slice(0,5);
+    if(notices.length===0){
+      el.innerHTML='<div style="color:#94a3b8;font-size:13px;padding:6px 0">目前沒有公告</div>';
+      return;
+    }
+    const TYPE_COLOR={"重要公告":"#ef4444","一般通知":"#6366f1","作業提醒":"#f59e0b","分享連結":"#10b981"};
+    el.innerHTML=notices.map(n=>{
+      const f=n.fields||{};
+      const rid=n.record_id;
+      const title=_fv(f,"標題")||"(無標題)";
+      const content=_fv(f,"內容");
+      const type=_fv(f,"類型");
+      const date=_fv(f,"發布日期");
+      const pub=_fv(f,"發布人");
+      const readers=_fv(f,"已讀人員");
+      const link=_fv(f,"連結");
+      const tc=TYPE_COLOR[type]||"#64748b";
+      const done=localStorage.getItem("wj_read_"+rid)||readers.split(/[、,]/).map(x=>x.trim()).includes(s.name);
+      return `<div style="background:#fff;border:1px solid #e2e8f0;border-left:4px solid ${tc};border-radius:10px;padding:14px 16px;margin-bottom:10px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="background:${tc}18;color:${tc};font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px">${type||"通知"}</span>
+            <span style="font-size:15px;font-weight:700;color:#0f172a">${title}</span>
+          </div>
+          <span style="font-size:11px;color:#94a3b8;white-space:nowrap">${date} · ${pub}</span>
+        </div>
+        ${content?`<div style="font-size:13px;color:#475569;margin-bottom:8px;line-height:1.6;white-space:pre-wrap">${content}</div>`:""}
+        ${link?`<div style="margin-bottom:8px"><a href="${link}" target="_blank" style="font-size:12px;color:#6366f1">🔗 查看連結</a></div>`:""}
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+          <span style="font-size:11px;color:#94a3b8" id="rd_${rid}">已讀：${readers||"(尚無)"}</span>
+          ${done
+            ?`<span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`
+            :`<button id="btn_${rid}" onclick="_confirmRead('${rid}',this)" style="background:#6366f1;color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600">✓ 確認已讀</button>`
+          }
+        </div>
+      </div>`;
+    }).join("");
+  }catch(e){
+    el.innerHTML='<div style="color:#94a3b8;font-size:13px">公告載入失敗</div>';
+  }
+}
+
+async function _confirmRead(rid,btn){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||!window._nb_tk) return;
+  btn.disabled=true; btn.textContent="確認中...";
+  try{
+    const tk=window._nb_tk;
+    const rr=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_NB_TBL+"/records/"+rid,{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const rd=await rr.json();
+    const cur=_fv(rd.data?.record?.fields||{},"已讀人員");
+    const names=cur?cur.split(/[、,]/).map(x=>x.trim()).filter(Boolean):[];
+    if(!names.includes(s.name)) names.push(s.name);
+    const newStr=names.join("、");
+    await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_NB_TBL+"/records/"+rid,{
+      method:"PUT",
+      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"已讀人員":newStr}})
+    });
+    localStorage.setItem("wj_read_"+rid,"1");
+    btn.parentElement.innerHTML=`<span style="font-size:11px;color:#94a3b8">已讀：${newStr}</span><span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`;
+  }catch(e){
+    btn.textContent="✓ 確認已讀"; btn.disabled=false;
+  }
 }
 </script>
 </body></html>
