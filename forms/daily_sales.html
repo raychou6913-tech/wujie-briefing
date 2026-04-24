@@ -252,7 +252,7 @@ window.addEventListener("DOMContentLoaded",function(){
 
 
 _loadProjectSelect("proj-sel");
-const today=new Date().toISOString().split("T")[0];
+const _d=new Date();const today=_d.getFullYear()+"-"+String(_d.getMonth()+1).padStart(2,"0")+"-"+String(_d.getDate()).padStart(2,"0");
 document.getElementById("f-date").value=today;
 
 function calcSplit(){
@@ -302,7 +302,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     document.getElementById("res-msg").textContent="提交成功！";
     document.getElementById("res-sub").textContent="日報已同步至飛書";
     document.getElementById("frm").reset();
-    document.getElementById("f-date").value=new Date().toISOString().split("T")[0];
+    const _dd=new Date();document.getElementById("f-date").value=_dd.getFullYear()+"-"+String(_dd.getMonth()+1).padStart(2,"0")+"-"+String(_dd.getDate()).padStart(2,"0");
     _loadProjectSelect("proj-sel");
   }catch(err){
     res.className="result err"; res.style.display="block";

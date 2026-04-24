@@ -147,15 +147,16 @@ const _NB_TBL="tblPtgudsOOlmJAx";
 })();
 
 async function _autoLogVisit(s){
-  const todayKey="wj_v_"+new Date().toISOString().slice(0,10);
+  const now=new Date();
+  const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  const todayKey="wj_v_"+localDate;
   if(localStorage.getItem(todayKey)) return;
   try{
     const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
     const d=await r.json();
     if(d.code!==0) return;
     const tk=d.tenant_access_token;
-    const now=new Date();
-    const dateStr=now.toISOString().slice(0,10);
+    const dateStr=localDate;
     const timeStr=now.toTimeString().slice(0,8);
     const res=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_VL_TBL+"/records",{
       method:"POST",
