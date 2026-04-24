@@ -4,608 +4,519 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026年04月24日 IP 趨勢情報日報</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #0d0d0d;
-            --text-light: #e0e0e0;
-            --accent-neon-blue: #00FFFF;
-            --accent-neon-purple: #FF00FF;
+            --bg-color: #0d0d0d;
+            --text-color: #e0e0e0;
+            --accent-neon-blue: #00eaff;
+            --border-color: #333;
             --card-bg: #1a1a1a;
-            --border-glow: rgba(0, 255, 255, 0.6);
-            --red-hot: #FF3B30;
-            --yellow-warm: #FFD230;
-            --white-observe: #C0C0C0;
-            --transition-speed: 0.3s ease-out;
+            --red-level: #e74c3c;
+            --yellow-level: #f1c40f;
+            --white-level: #cccccc;
+            --action-tag-bg: #34495e;
+            --action-tag-text: #ecf0f1;
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
             margin: 0;
             padding: 0;
-            line-height: 1.6;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         .container {
-            width: 100%;
             max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            box-sizing: border-box;
         }
 
-        header {
+        /* Hero Banner */
+        .hero-banner {
             width: 100%;
+            background: linear-gradient(45deg, #1f0a2e, #0a1f2e);
+            color: white;
+            padding: 80px 20px;
             text-align: center;
-            padding-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(180deg, #1a1a1a 0%, var(--bg-dark) 100%);
         }
 
-        header img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-radius: 0; /* Hero banner image should not have rounded corners */
-            margin: 0;
-            display: block;
-            filter: brightness(0.7) contrast(1.1);
-        }
-
-        .hero-overlay {
+        .hero-banner::before {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(0deg, var(--bg-dark) 0%, rgba(13, 13, 13, 0.7) 30%, rgba(13, 13, 13, 0) 70%, var(--bg-dark) 100%);
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(0, 234, 255, 0.1) 0%, rgba(0, 234, 255, 0) 70%);
+            animation: pulse-glow 15s infinite alternate;
         }
 
-        h1 {
-            font-family: 'Orbitron', sans-serif;
+        @keyframes pulse-glow {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .hero-banner h1 {
             font-size: 3.5em;
-            color: var(--accent-neon-blue);
-            text-shadow: 0 0 15px var(--accent-neon-blue), 0 0 30px var(--accent-neon-blue);
-            margin: 20px 0 10px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px var(--accent-neon-blue);
             letter-spacing: 2px;
-            animation: pulse 2s infinite alternate;
+            position: relative;
+            z-index: 1;
         }
 
-        @keyframes pulse {
-            from {
-                text-shadow: 0 0 10px var(--accent-neon-blue), 0 0 20px var(--accent-neon-blue);
-            }
-            to {
-                text-shadow: 0 0 20px var(--accent-neon-blue), 0 0 40px var(--accent-neon-blue);
-            }
+        .hero-banner p {
+            font-size: 1.5em;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
         }
 
-        .report-subtitle {
-            font-size: 1.2em;
-            color: var(--text-light);
-            margin-top: 10px;
-        }
-
+        /* Section Titles */
         h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-neon-purple);
-            text-align: left;
+            color: var(--accent-neon-blue);
+            border-left: 5px solid var(--accent-neon-blue);
+            padding-left: 15px;
             margin-top: 40px;
             margin-bottom: 25px;
-            padding-left: 10px;
-            border-left: 5px solid var(--accent-neon-purple);
-            font-size: 2em;
-            letter-spacing: 1px;
+            font-size: 2.2em;
+            text-shadow: 0 0 8px rgba(0, 234, 255, 0.5);
+        }
+        h3 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.5em;
         }
 
-        .ip-card, .top3-item, .chief-analysis {
+        /* IP Card Styles */
+        .ip-card, .top3-item {
             background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
             transition: box-shadow 0.3s ease-in-out;
+            overflow: hidden; /* For max-height transition */
         }
 
-        .ip-card:hover {
-            box-shadow: 0 0 20px var(--border-glow), 0 0 40px rgba(0, 255, 255, 0.3);
-            border-color: var(--accent-neon-blue);
+        .ip-card:hover, .top3-item:hover {
+            box-shadow: 0 0 15px var(--accent-neon-blue);
         }
 
-        .ip-card-header {
+        .card-header, .top3-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            padding: 20px;
             cursor: pointer;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 15px;
+            position: relative;
+            background-color: #242424;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .ip-card-header h3 {
-            margin: 0;
-            font-size: 1.8em;
-            color: var(--accent-neon-blue);
-            letter-spacing: 0.5px;
-        }
-
-        .ip-card-header .summary {
+        .card-header .ip-name, .top3-header .ip-name {
             flex-grow: 1;
-            margin-left: 20px;
-            font-size: 1.1em;
-            color: var(--text-light);
+            margin: 0;
+            font-size: 1.3em;
+            color: var(--text-color);
         }
 
-        .hotness-level {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            margin-right: 10px;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        .card-header .ip-summary {
+            flex-grow: 1;
+            margin: 0 15px;
+            font-size: 1em;
+            color: #b0b0b0;
         }
 
-        .level-1 { background-color: var(--red-hot); box-shadow: 0 0 8px var(--red-hot); }
-        .level-2 { background-color: var(--yellow-warm); box-shadow: 0 0 8px var(--yellow-warm); }
-        .level-3 { background-color: var(--white-observe); box-shadow: 0 0 8px var(--white-observe); }
-
-        .toggle-btn {
+        .toggle-button {
             background: none;
             border: none;
             color: var(--accent-neon-blue);
-            font-size: 1.8em;
+            font-size: 1.5em;
             cursor: pointer;
-            padding: 0 10px;
-            transition: transform 0.3s;
+            margin-left: 15px;
+            transition: transform 0.3s ease;
         }
 
-        .ip-details, .top3-details {
+        .ip-card .toggle-button.expanded {
+            transform: rotate(180deg);
+        }
+        .top3-item .toggle-button.expanded {
+            transform: rotate(180deg);
+        }
+
+        .card-content, .top3-details {
             max-height: 0;
             overflow: hidden;
-            transition: max-height var(--transition-speed);
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding: 0 20px; /* Initially no padding */
         }
 
-        .ip-details.expanded, .top3-details.expanded {
-            max-height: 2000px; /* A large enough value to accommodate content */
+        .card-content.expanded, .top3-details.expanded {
+            max-height: 2000px; /* Sufficiently large for content */
+            padding: 20px;
         }
 
-        .ip-details p {
-            margin-bottom: 15px;
-            color: var(--text-light);
+        .card-content p, .card-content ul, .card-content li, .top3-details p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            color: #d0d0d0;
+        }
+        .card-content li {
+            margin-left: 20px;
         }
 
-        .ip-details img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 15px 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s ease-in-out;
+        /* Hotness Indicators */
+        .hotness-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
         }
-        .ip-details img:hover {
-            transform: scale(1.01);
-        }
+        .hotness-indicator.level-1 { background-color: var(--red-level); }
+        .hotness-indicator.level-2 { background-color: var(--yellow-level); }
+        .hotness-indicator.level-3 { background-color: var(--white-level); }
 
-        .impact-section, .actions-section {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            padding: 15px;
+        /* Suggested Actions */
+        .suggested-actions-container {
             margin-top: 20px;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        .impact-section h4, .actions-section h4 {
-            color: var(--accent-neon-purple);
-            font-size: 1.3em;
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 8px;
-        }
-
-        .suggested-actions {
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-top: 15px;
         }
-
         .action-tag {
-            background-color: var(--accent-neon-blue);
-            color: var(--bg-dark);
+            background-color: var(--action-tag-bg);
+            color: var(--action-tag-text);
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 0.9em;
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
             white-space: nowrap;
         }
-        
-        .action-tag strong {
-            color: var(--bg-dark);
-        }
 
-        /* TOP 3 Ranking Styles */
-        .top3-ranking {
-            margin-top: 50px;
+        /* TOP 3 Ranking */
+        .top3-list {
+            list-style: none;
+            padding: 0;
         }
-
-        .top3-item {
-            cursor: pointer;
+        .top3-list .top3-item {
             margin-bottom: 15px;
-            padding: 20px;
-            background-color: var(--card-bg);
-            border-left: 5px solid var(--accent-neon-blue);
-            transition: border-left 0.3s ease, box-shadow 0.3s ease;
+            background-color: #242424;
         }
-
-        .top3-item:hover {
-            border-left-color: var(--accent-neon-purple);
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+        .top3-list .top3-header {
+            background-color: #2d2d2d;
         }
-
-        .top3-item-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .top3-item-header h3 {
-            margin: 0;
+        .top3-list .rank {
             font-size: 1.5em;
-            color: var(--accent-neon-blue);
-        }
-
-        .top3-item-header .score {
-            font-size: 1.2em;
-            color: var(--accent-neon-purple);
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            color: var(--accent-neon-blue);
+            margin-right: 15px;
+            flex-shrink: 0;
         }
-        .top3-item-header .score .hotness-level {
-            width: 15px;
-            height: 15px;
-            margin-right: 0;
-            box-shadow: none; /* remove extra shadow from score hotness */
+        .top3-list .hotness-score {
+            font-weight: bold;
+            color: var(--yellow-level);
+            margin-left: auto;
+            margin-right: 15px;
+            flex-shrink: 0;
         }
-
-
         .top3-details {
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
-            padding-top: 15px;
-            margin-top: 15px;
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
         }
-
+        .top3-details.expanded {
+            max-height: 1000px;
+            padding: 20px;
+        }
         .top3-details p {
-            margin: 0 0 10px;
+            margin-bottom: 15px;
         }
 
-        .top3-details img {
+        /* General Content Styling */
+        p {
+            margin-bottom: 1em;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            padding-left: 0;
+        }
+        ul ul {
+            list-style-type: circle;
+            margin-left: 20px;
+        }
+        
+        /* Ensure images fit within their containers and retain original styles */
+        .card-content img, .top3-details img {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
-            margin-top: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            display: block; /* Avoid inline-block spacing issues */
+            margin: 8px 0; /* Retain original margin */
+            border-radius: 8px; /* Retain original border-radius */
         }
 
-        .chief-analysis {
-            border-left: 5px solid var(--accent-neon-blue);
-            margin-top: 50px;
-            background-color: #1a1a1a;
-            color: var(--text-light);
-            padding: 30px;
-        }
 
-        .chief-analysis h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-neon-blue);
-            border: none;
-            padding-left: 0;
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .chief-analysis p {
-            font-size: 1.1em;
-            line-height: 1.8;
-        }
-
-        /* Responsive adjustments */
+        /* Responsive Design */
         @media (max-width: 768px) {
-            h1 {
+            .hero-banner h1 {
                 font-size: 2.5em;
             }
-            .report-subtitle {
+            .hero-banner p {
+                font-size: 1.2em;
+            }
+            h2 {
+                font-size: 1.8em;
+                padding-left: 10px;
+            }
+            .card-header, .top3-header {
+                flex-wrap: wrap;
+                padding: 15px;
+            }
+            .card-header .ip-name, .top3-header .ip-name {
+                width: 100%;
+                font-size: 1.2em;
+                margin-bottom: 10px;
+            }
+            .card-header .ip-summary {
+                width: calc(100% - 40px); /* Adjust for indicator and button */
+                margin: 0;
+            }
+            .hotness-indicator {
+                order: -1;
+                margin-bottom: 10px;
+            }
+            .toggle-button {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                margin-left: 0;
+            }
+            .top3-list .hotness-score {
+                margin-left: 0;
+                margin-top: 5px;
+                width: 100%;
+                text-align: right;
+            }
+            .suggested-actions-container {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-banner h1 {
+                font-size: 2em;
+            }
+            .hero-banner p {
                 font-size: 1em;
             }
             h2 {
                 font-size: 1.5em;
             }
-            .ip-card-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .ip-card-header h3 {
-                font-size: 1.4em;
-                margin-bottom: 5px;
-            }
-            .ip-card-header .summary {
-                margin-left: 0;
-                font-size: 0.95em;
-                margin-top: 10px;
-            }
-            .toggle-btn {
-                position: absolute;
-                right: 15px;
-                top: 15px;
-            }
-            .ip-card, .top3-item, .chief-analysis {
-                padding: 15px;
+            .card-header .ip-name, .top3-header .ip-name {
+                font-size: 1.1em;
             }
             .action-tag {
-                padding: 6px 10px;
                 font-size: 0.8em;
-            }
-            .top3-item-header {
-                flex-wrap: wrap;
-            }
-            .top3-item-header h3 {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-            .top3-item-header .score {
-                width: 100%;
-                justify-content: flex-end;
+                padding: 6px 10px;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <img src="https://image.pollinations.ai/prompt/Asia%20toy%20retail%20store%20blind%20box%20display%20colorful%20shopping%20mall?width=600&height=350&nologo=true&seed=501" alt="Asia Retail">
-        <div class="hero-overlay">
-            <h1>IP TREND SCOUT REPORT</h1>
-            <p class="report-subtitle">2026年04月24日 IP 趨勢情報日報</p>
-            <p class="report-subtitle">本日重點主題：本週 IP 情報總回顧 + 下週觀察重點</p>
-        </div>
-    </header>
+    <div class="hero-banner">
+        <h1>IP 趨勢情報日報</h1>
+        <p>2026年04月24日：洞察市場先機，引領未來策略</p>
+    </div>
 
     <div class="container">
+        <img src="https://image.pollinations.ai/prompt/Asia%20toy%20retail%20store%20blind%20box%20display%20colorful%20shopping%20mall?width=600&height=350&nologo=true&seed=501" alt="Asia Retail" style="width:100%;border-radius:8px;margin:8px 0;">
+
+        <h2>本日重點主題：本週 IP 情報總回顧 + 下週觀察重點</h2>
+
         <h2>🔴 一級信號（立即需要關注）</h2>
         <div class="ip-card">
-            <div class="ip-card-header">
-                <span class="hotness-level level-1"></span>
-                <h3>吉伊卡哇 (Chiikawa)</h3>
-                <p class="summary">在東南亞及台灣市場熱度急遽攀升，品牌跨界活動頻繁，展現強勁跨區域潛力。</p>
-                <button class="toggle-btn" aria-expanded="false" aria-controls="chiikawa-details">▼</button>
+            <div class="card-header">
+                <div class="hotness-indicator level-1"></div>
+                <h3 class="ip-name">吉伊卡哇在東南亞及台灣市場熱度急遽攀升，品牌跨界活動頻繁。</h3>
+                <p class="ip-summary">TikTok數據顯示，關鍵詞「#吉伊卡哇」在泰國的週搜尋量增長35%，同時，2026台東熱氣球嘉年華宣布與吉伊卡哇合作推出無人機展演，預計自7月4日起正式登場。台北首家吉伊卡哇常設店也於2025年12月27日開幕，採預約制入場，顯示台灣市場對此IP的強勁需求。</p>
+                <button class="toggle-button">▼</button>
             </div>
-            <div class="ip-details" id="chiikawa-details">
-                <p>TikTok數據顯示，關鍵詞「#吉伊卡哇」在泰國的週搜尋量增長35%，同時，2026台東熱氣球嘉年華宣布與吉伊卡哇合作推出無人機展演，預計自7月4日起正式登場。台北首家吉伊卡哇常設店也於2025年12月27日開幕，採預約制入場，顯示台灣市場對此IP的強勁需求。</p>
-                <img src="https://image.pollinations.ai/prompt/tiny%20round%20kawaii%20Japanese%20character%20pastel%20blind%20box%20capsule%20toy?width=600&height=350&nologo=true&seed=202" alt="Chiikawa"> 
-                <img src="https://image.pollinations.ai/prompt/TikTok%20Instagram%20social%20media%20viral%20toy%20unboxing%20Gen%20Z%20smartphone%20trending?width=600&height=350&nologo=true&seed=701" alt="Social Media">
-                <div class="impact-section">
-                    <h4>對蕪解的影響：</h4>
-                    <p>吉伊卡哇在中國大陸有授權，但東南亞市場熱度爆發，且台灣市場需求顯著，顯示該IP具有極強的跨區域潛力。這對於蕪解在東南亞市場的拓展以及未來爭取港台地區加簽 Opanchu 等其他 IP 授權具有參考價值，同時也可能帶來新的合作機會。</p>
-                </div>
-                <div class="actions-section">
-                    <h4>建議行動及截止日：</h4>
-                    <div class="suggested-actions">
-                        <span class="action-tag"><strong>1.</strong> 啟動東南亞市場（泰國、馬來西亞、新加坡）吉伊卡哇社群聲量與銷售數據深入分析，評估潛在周邊市場規模，探討與當地經銷商合作機會。<strong>截止日期：2026年05月05日。</strong></span>
-                        <span class="action-tag"><strong>2.</strong> 研究吉伊卡哇在台灣市場的營銷策略和產品熱銷模式，為未來其他 IP 進入港台市場提供借鑒。<strong>截止日期：2026年05月10日。</strong></span>
-                    </div>
+            <div class="card-content">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Chiikawa_volume_1_cover.jpg/400px-Chiikawa_volume_1_cover.jpg" alt="Chiikawa" style="width:100%;border-radius:8px;margin:8px 0;"> <img src="https://image.pollinations.ai/prompt/TikTok%20Instagram%20social%20media%20viral%20toy%20unboxing%20Gen%20Z%20smartphone%20trending?width=600&height=350&nologo=true&seed=701" alt="Social Media" style="width:100%;border-radius:8px;margin:8px 0;">
+                <p><strong>對蕪解的影響：</strong> 吉伊卡哇在中國大陸有授權，但東南亞市場熱度爆發，且台灣市場需求顯著，顯示該IP具有極強的跨區域潛力。這對於蕪解在東南亞市場的拓展以及未來爭取港台地區加簽 Opanchu 等其他 IP 授權具有參考價值，同時也可能帶來新的合作機會。</p>
+                <div class="suggested-actions-container">
+                    <span class="action-tag">立即啟動泰國、馬來西亞、新加坡等東南亞市場吉伊卡哇社群媒體聲量與銷售數據深入分析，評估潛在周邊商品市場規模，並探討與當地經銷商的合作機會。截止日期：2026年05月05日。</span>
+                    <span class="action-tag">研究吉伊卡哇在台灣市場的營銷策略和產品熱銷模式，為未來其他 IP 進入港台市場提供借鑒。截止日期：2026年05月10日。</span>
                 </div>
             </div>
         </div>
 
         <div class="ip-card">
-            <div class="ip-card-header">
-                <span class="hotness-level level-1"></span>
-                <h3>Snoopy/Peanuts</h3>
-                <p class="summary">在全球，特別是歐洲及亞洲市場，透過多樣化聯名與主題活動，持續強化高端品牌形象與跨世代吸引力。</p>
-                <button class="toggle-btn" aria-expanded="false" aria-controls="snoopy-details">▼</button>
+            <div class="card-header">
+                <div class="hotness-indicator level-1"></div>
+                <h3 class="ip-name">Snoopy/Peanuts 在全球，特別是歐洲及亞洲市場，透過多樣化聯名與主題活動，持續強化高端品牌形象與跨世代吸引力。</h3>
+                <p class="ip-summary">隨著其75週年慶祝活動延續至2026年，Snoopy不斷推出與高端品牌的聯名系列，例如Kipling、Kith和Diadora，以及與Zara Home、Pop Mart的合作，這些合作有效提升了Snoopy的品牌價值和市場能見度。此外，"How Do You Do Snoopy? 75 Years: A Journey of Friendship Through Art"巡迴展覽繼台北、曼谷之後，也計劃於2026年在中國和韓國巡迴展出。</p>
+                <button class="toggle-button">▼</button>
             </div>
-            <div class="ip-details" id="snoopy-details">
-                <p>隨著其75週年慶祝活動延續至2026年，Snoopy不斷推出與高端品牌的聯名系列，例如Kipling、Kith和Diadora，以及與Zara Home、Pop Mart的合作，這些合作有效提升了Snoopy的品牌價值和市場能見度。此外，"How Do You Do Snoopy? 75 Years: A Journey of Friendship Through Art"巡迴展覽繼台北、曼谷之後，也計劃於2026年在中國和韓國巡迴展出。</p>
-                <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy">
-                <div class="impact-section">
-                    <h4>對蕪解的影響：</h4>
-                    <p>蕪解創意擁有 Snoopy/Peanuts 在全球20多個國家（涵蓋陸港澳台、東南亞、歐洲、澳紐、南美）的授權，排除日本與北美。Snoopy 透過高端聯名與藝術展覽鞏固其在時尚與文化領域的地位，有助於蕪解開發更高附加價值的周邊商品，如精緻盲盒、聯名文具等，並提升歐洲及其他市場的批發價格潛力。</p>
-                </div>
-                <div class="actions-section">
-                    <h4>建議行動及截止日：</h4>
-                    <div class="suggested-actions">
-                        <span class="action-tag"><strong>1.</strong> 檢視現有Snoopy/Peanuts周邊商品線，規劃開發2-3款具有藝術設計感或高端質感的盲盒公仔/掛件系列，目標批發價提升15%-20%，並探索在歐洲市場與精品零售商的合作機會。<strong>截止日期：2026年06月15日。</strong></span>
-                        <span class="action-tag"><strong>2.</strong> 針對Snoopy 75週年巡迴展在中國和韓國的行程，評估是否能配合推出限定商品或參與相關宣傳活動，以最大化市場曝光與銷售機會。<strong>截止日期：2026年05月20日。</strong></span>
-                    </div>
+            <div class="card-content">
+                <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy" style="width:100%;border-radius:8px;margin:8px 0;">
+                <p><strong>對蕪解的影響：</strong> 蕪解創意擁有 Snoopy/Peanuts 在全球20多個國家（涵蓋陸港澳台、東南亞、歐洲、澳紐、南美）的授權，排除日本與北美。Snoopy 透過高端聯名與藝術展覽鞏固其在時尚與文化領域的地位，有助於蕪解開發更高附加價值的周邊商品，如精緻盲盒、聯名文具等，並提升歐洲及其他市場的批發價格潛力。</p>
+                <div class="suggested-actions-container">
+                    <span class="action-tag">檢視現有Snoopy/Peanuts周邊商品線，規劃開發2-3款具有藝術設計感或高端質感的盲盒公仔/掛件系列，目標批發價提升15%-20%，並探索在歐洲市場與精品零售商的合作機會。截止日期：2026年06月15日。</span>
+                    <span class="action-tag">針對Snoopy 75週年巡迴展在中國和韓國的行程，評估是否能配合推出限定商品或參與相關宣傳活動，以最大化市場曝光與銷售機會。截止日期：2026年05月20日。</span>
                 </div>
             </div>
         </div>
 
         <h2>🟡 二級信號（本週需追蹤）</h2>
         <div class="ip-card">
-            <div class="ip-card-header">
-                <span class="hotness-level level-2"></span>
-                <h3>盲盒市場與泡泡瑪特</h3>
-                <p class="summary">盲盒市場競爭白熱化，領頭羊泡泡瑪特面臨IP依賴與稀缺性崩塌挑戰，同時也持續進行海外擴張與產品創新。</p>
-                <button class="toggle-btn" aria-expanded="false" aria-controls="blindbox-details">▼</button>
+            <div class="card-header">
+                <div class="hotness-indicator level-2"></div>
+                <h3 class="ip-name">盲盒市場競爭白熱化，領頭羊泡泡瑪特面臨IP依賴與稀缺性崩塌挑戰，同時也持續進行海外擴張與產品創新。</h3>
+                <p class="ip-summary">2026年2月的報告指出，泡泡瑪特過度依賴Labubu等單一IP，導致其二手市場價格崩盤，部分隱藏款跌幅超過90%。然而，泡泡瑪特在2025年海外增長超過370%，並計劃至2026年底前擴展全球市場，同時積極發展毛絨玩具和積木等新品類以降低對盲盒單品的依賴。2026年中國盲盒市場規模預計達到550億人民幣，消費者購買動機已從「隨機驚喜」轉向「收集愛好」與「情感慰藉」。</p>
+                <button class="toggle-button">▼</button>
             </div>
-            <div class="ip-details" id="blindbox-details">
-                <p>2026年2月的報告指出，泡泡瑪特過度依賴Labubu等單一IP，導致其二手市場價格崩盤，部分隱藏款跌幅超過90%。然而，泡泡瑪特在2025年海外增長超過370%，並計劃至2026年底前擴展全球市場，同時積極發展毛絨玩具和積木等新品類以降低對盲盒單品的依賴。2026年中國盲盒市場規模預計達到550億人民幣，消費者購買動機已從「隨機驚喜」轉向「收集愛好」與「情感慰藉」。</p>
-                <img src="https://image.pollinations.ai/prompt/designer%20vinyl%20art%20toy%20furry%20monster%20premium%20store%20display%20dark%20background?width=600&height=350&nologo=true&seed=201" alt="Labubu"> 
-                <img src="https://image.pollinations.ai/prompt/toy%20fair%20exhibition%20collectible%20figures%20display%20art%20fair%20booth%20professional?width=600&height=350&nologo=true&seed=503" alt="Toy Fair">
-                <div class="impact-section">
-                    <h4>對蕪解的影響：</h4>
-                    <p>盲盒市場的變化對蕪解是挑戰也是機遇。競爭加劇和泡泡瑪特的困境提醒我們 IP 多元化和產品創新的重要性。同時，消費者對「收集愛好」和「情感慰藉」的追求，契合蕪解提供正版授權 IP 周邊商品的定位。</p>
-                </div>
-                <div class="actions-section">
-                    <h4>下週追蹤：</h4>
-                    <div class="suggested-actions">
-                        <span class="action-tag">持續關注泡泡瑪特及其他主要盲盒品牌在產品創新、IP策略及海外市場的動向，特別是毛絨玩具和積木品類的表現，為蕪解的產品開發提供靈感。</span>
-                    </div>
+            <div class="card-content">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Pop_Mart_Labubu_The_Monsters_Exciting_Macaron.jpg/400px-Pop_Mart_Labubu_The_Monsters_Exciting_Macaron.jpg" alt="Labubu" style="width:100%;border-radius:8px;margin:8px 0;"> <img src="https://image.pollinations.ai/prompt/toy%20fair%20exhibition%20collectible%20figures%20display%20art%20fair%20booth%20professional?width=600&height=350&nologo=true&seed=503" alt="Toy Fair" style="width:100%;border-radius:8px;margin:8px 0;">
+                <p><strong>對蕪解的影響：</strong> 盲盒市場的變化對蕪解是挑戰也是機遇。競爭加劇和泡泡瑪特的困境提醒我們 IP 多元化和產品創新的重要性。同時，消費者對「收集愛好」和「情感慰藉」的追求，契合蕪解提供正版授權 IP 周邊商品的定位。</p>
+                <div class="suggested-actions-container">
+                    <span class="action-tag">下週追蹤：持續關注泡泡瑪特及其他主要盲盒品牌在產品創新、IP策略及海外市場的動向，特別是毛絨玩具和積木品類的表現，為蕪解的產品開發提供靈感。</span>
                 </div>
             </div>
         </div>
 
         <div class="ip-card">
-            <div class="ip-card-header">
-                <span class="hotness-level level-2"></span>
-                <h3>Mofusand 貓福珊迪</h3>
-                <p class="summary">持續推出新系列商品，並深化與潮流品牌的聯名合作，展現IP的產品延伸潛力與市場活躍度。</p>
-                <button class="toggle-btn" aria-expanded="false" aria-controls="mofusand-details">▼</button>
+            <div class="card-header">
+                <div class="hotness-indicator level-2"></div>
+                <h3 class="ip-name">Mofusand 貓福珊迪持續推出新系列商品，並深化與潮流品牌的聯名合作。</h3>
+                <p class="ip-summary">2026年4月18日，Mofusand推出「Kiramekko Nordic Kittens」吊飾系列，以北歐風格和變裝貓咪造型，主打療癒系設計，預計5月1日開賣。此外，潮宏基與mofusand的聯名珠寶系列也登陸馬來西亞，融合春日踏青、動物奇遇記等多樣化主題。</p>
+                <button class="toggle-button">▼</button>
             </div>
-            <div class="ip-details" id="mofusand-details">
-                <p>2026年4月18日，Mofusand推出「Kiramekko Nordic Kittens」吊飾系列，以北歐風格和變裝貓咪造型，主打療癒系設計，預計5月1日開賣。此外，潮宏基與mofusand的聯名珠寶系列也登陸馬來西亞，融合春日踏青、動物奇遇記等多樣化主題。</p>
-                <img src="https://image.pollinations.ai/prompt/orange%20cat%20sushi%20costume%20toy%20pastel%20pink%20packaging%20blind%20box%20kawaii?width=600&height=350&nologo=true&seed=203" alt="Mofusand">
-                <div class="impact-section">
-                    <h4>對蕪解的影響：</h4>
-                    <p>Mofusand 在中國大陸有授權。新系列的推出和跨界聯名，顯示其IP的產品延伸潛力與市場活躍度。這將有助於蕪解在中國大陸市場拓展Mofusand周邊品類，特別是在掛件和文具等主力商品上，可參考其「療癒系」和「變裝」概念進行創新設計。</p>
-                </div>
-                <div class="actions-section">
-                    <h4>下週追蹤：</h4>
-                    <div class="suggested-actions">
-                        <span class="action-tag">分析「Kiramekko Nordic Kittens」吊飾系列及其他Mofusand新品的市場反應，尤其是消費者對「療癒系」和「北歐風」設計的接受度，並評估在中國大陸市場開發類似主題盲盒或文具的可能性。</span>
-                    </div>
+            <div class="card-content">
+                <img src="https://spiralcute.com/characters/mofusand/en/img/main.jpg" alt="Mofusand" style="width:100%;border-radius:8px;margin:8px 0;">
+                <p><strong>對蕪解的影響：</strong> Mofusand 在中國大陸有授權。新系列的推出和跨界聯名，顯示其IP的產品延伸潛力與市場活躍度。這將有助於蕪解在中國大陸市場拓展Mofusand周邊品類，特別是在掛件和文具等主力商品上，可參考其「療癒系」和「變裝」概念進行創新設計。</p>
+                <div class="suggested-actions-container">
+                    <span class="action-tag">下週追蹤：分析「Kiramekko Nordic Kittens」吊飾系列及其他Mofusand新品的市場反應，尤其是消費者對「療癒系」和「北歐風」設計的接受度，並評估在中國大陸市場開發類似主題盲盒或文具的可能性。</span>
                 </div>
             </div>
         </div>
 
         <div class="ip-card">
-            <div class="ip-card-header">
-                <span class="hotness-level level-2"></span>
-                <h3>東南亞IP授權市場</h3>
-                <p class="summary">持續高速增長，泰國躍升為亞洲第三大授權商品零售集散地，為蕪解的IP周邊商品批發零售提供巨大潛力。</p>
-                <button class="toggle-btn" aria-expanded="false" aria-controls="southeast-asia-details">▼</button>
+            <div class="card-header">
+                <div class="hotness-indicator level-2"></div>
+                <h3 class="ip-name">東南亞IP授權市場持續高速增長，泰國躍升為亞洲第三大授權商品零售集散地。</h3>
+                <p class="ip-summary">根據Licensing International與IMARC Group最新報告，全球IP授權商品零售額於2025年已達3,560億美元，其中亞太區增速最快，泰國市場在2025年估計達到12.3億美元，較2022年成長超過41%。泰國政府透過「創意泰國4.0」政策框架，並撥付專項預算扶植本土IP，同時吸引迪士尼、Peanuts等國際品牌加速佈局。</p>
+                <button class="toggle-button">▼</button>
             </div>
-            <div class="ip-details" id="southeast-asia-details">
-                <p>根據Licensing International與IMARC Group最新報告，全球IP授權商品零售額於2025年已達3,560億美元，其中亞太區增速最快，泰國市場在2025年估計達到12.3億美元，較2022年成長超過41%。泰國政府透過「創意泰國4.0」政策框架，並撥付專項預算扶植本土IP，同時吸引迪士尼、Peanuts等國際品牌加速佈局。</p>
-                <img src="https://image.pollinations.ai/prompt/Asia%20toy%20retail%20store%20blind%20box%20display%20colorful%20shopping%20mall?width=600&height=350&nologo=true&seed=501" alt="Asia Retail">
-                <div class="impact-section">
-                    <h4>對蕪解的影響：</h4>
-                    <p>蕪解在泰國、馬來西亞、新加坡等東南亞國家有銷售市場。東南亞市場的快速成長，為蕪解的IP周邊商品批發零售提供巨大潛力，特別是針對 Opanchu（中國大陸、東南亞；港台可加簽）、Maniani World（台灣、中國大陸、泰國）等IP，應把握市場紅利。</p>
-                </div>
-                <div class="actions-section">
-                    <h4>下週追蹤：</h4>
-                    <div class="suggested-actions">
-                        <span class="action-tag">深入研究泰國及其他東南亞主要市場的消費者偏好、零售渠道變化及主要競爭者，並評估增加 Opanchu 及 Maniani World 在這些市場的推廣預算和產品線的機會。</span>
-                    </div>
+            <div class="card-content">
+                <img src="https://image.pollinations.ai/prompt/Asia%20toy%20retail%20store%20blind%20box%20display%20colorful%20shopping%20mall?width=600&height=350&nologo=true&seed=501" alt="Asia Retail" style="width:100%;border-radius:8px;margin:8px 0;">
+                <p><strong>對蕪解的影響：</strong> 蕪解在泰國、馬來西亞、新加坡等東南亞國家有銷售市場。東南亞市場的快速成長，為蕪解的IP周邊商品批發零售提供巨大潛力，特別是針對 Opanchu（中國大陸、東南亞；港台可加簽）、Maniani World（台灣、中國大陸、泰國）等IP，應把握市場紅利。</p>
+                <div class="suggested-actions-container">
+                    <span class="action-tag">下週追蹤：深入研究泰國及其他東南亞主要市場的消費者偏好、零售渠道變化及主要競爭者，並評估增加 Opanchu 及 Maniani World 在這些市場的推廣預算和產品線的機會。</span>
                 </div>
             </div>
         </div>
 
         <h2>⚪ 待觀察信號</h2>
         <div class="ip-card">
-            <div class="ip-card-header">
-                <span class="hotness-level level-3"></span>
-                <h3>香港國際授權展</h3>
-                <p class="summary">匯聚逾600個品牌與IP，強調「情緒經濟」及數碼化趨勢，台灣IP Showcase也積極搶攻國際商機。</p>
-                <button class="toggle-btn" aria-expanded="false" aria-controls="hk-licensing-details">▼</button>
+            <div class="card-header">
+                <div class="hotness-indicator level-3"></div>
+                <h3 class="ip-name">香港國際授權展匯聚逾600個品牌與IP，強調「情緒經濟」及數碼化趨勢，台灣IP Showcase也積極搶攻國際商機。</h3>
+                <p class="ip-summary">2026年香港國際授權展於4月27日開展，將展示藝術文化、動漫角色等600多個品牌與IP，並聚焦於「情緒經濟」和數碼化趨勢。台灣IP Showcase也集結多個潛力原創角色品牌參展，積極推動台灣原創IP的國際授權合作。</p>
+                <button class="toggle-button">▼</button>
             </div>
-            <div class="ip-details" id="hk-licensing-details">
-                <p>2026年香港國際授權展於4月27日開展，將展示藝術文化、動漫角色等600多個品牌與IP，並聚焦於「情緒經濟」和數碼化趨勢。台灣IP Showcase也集結多個潛力原創角色品牌參展，積極推動台灣原創IP的國際授權合作。</p>
-                <img src="https://image.pollinations.ai/prompt/toy%20fair%20exhibition%20collectible%20figures%20display%20art%20fair%20booth%20professional?width=600&height=350&nologo=true&seed=503" alt="Toy Fair"> 
-                <img src="https://image.pollinations.ai/prompt/viral%20collectible%20toy%20trending%20social%20media%20blind%20box%20young%20consumer?width=600&height=350&nologo=true&seed=702" alt="Trending Ip">
-                <div class="impact-section">
-                    <h4>對蕪解的影響：</h4>
-                    <p>香港授權展是了解亞洲市場趨勢及尋找潛在合作夥伴的重要平台。展會強調的「情緒經濟」與蕪解所提供的IP周邊商品能滿足消費者情感連結的本質相符。同時，台灣原創IP的積極出海也可能帶來新的合作機會。</p>
-                </div>
-                <div class="actions-section">
-                    <h4>下週觀察：</h4>
-                    <div class="suggested-actions">
-                        <span class="action-tag">密切關注香港國際授權展的重點趨勢、新興IP及主要參展商的動向，特別是與盲盒、掛件和文具相關的IP，以及潛在的授權合作機會。</span>
-                    </div>
+            <div class="card-content">
+                <img src="https://image.pollinations.ai/prompt/toy%20fair%20exhibition%20collectible%20figures%20display%20art%20fair%20booth%20professional?width=600&height=350&nologo=true&seed=503" alt="Toy Fair" style="width:100%;border-radius:8px;margin:8px 0;"> <img src="https://image.pollinations.ai/prompt/viral%20collectible%20toy%20trending%20social%20media%20blind%20box%20young%20consumer?width=600&height=350&nologo=true&seed=702" alt="Trending Ip" style="width:100%;border-radius:8px;margin:8px 0;">
+                <p><strong>對蕪解的影響：</strong> 香港授權展是了解亞洲市場趨勢及尋找潛在合作夥伴的重要平台。展會強調的「情緒經濟」與蕪解所提供的IP周邊商品能滿足消費者情感連結的本質相符。同時，台灣原創IP的積極出海也可能帶來新的合作機會。</p>
+                <div class="suggested-actions-container">
+                    <span class="action-tag">下週觀察：密切關注香港國際授權展的重點趨勢、新興IP及主要參展商的動向，特別是與盲盒、掛件和文具相關的IP，以及潛在的授權合作機會。</span>
                 </div>
             </div>
         </div>
 
-        <div class="top3-ranking">
-            <h2>本週 TOP 3 IP 熱度排行</h2>
-            <div class="top3-item" id="top3-chiikawa">
-                <div class="top3-item-header">
-                    <h3>1. 吉伊卡哇 (Chiikawa)</h3>
-                    <span class="score">熱度分數：9/10 <span class="hotness-level level-1"></span></span>
-                    <button class="toggle-btn" aria-expanded="false" aria-controls="top3-chiikawa-details">▼</button>
+        <h2>本週 TOP 3 IP 熱度排行</h2>
+        <ol class="top3-list">
+            <li class="top3-item">
+                <div class="top3-header">
+                    <span class="rank">1.</span>
+                    <span class="ip-name">吉伊卡哇 (Chiikawa)</span>
+                    <span class="hotness-score">熱度分數：9/10</span>
+                    <button class="toggle-button">▼</button>
                 </div>
-                <div class="top3-details" id="top3-chiikawa-details">
+                <div class="top3-details">
                     <p>評分依據：社群媒體（TikTok、小紅書）討論度及搜尋量激增，泰國週搜尋量增長35%，台灣首家常設店開幕及台東熱氣球嘉年華聯名。</p>
-                    <img src="https://image.pollinations.ai/prompt/tiny%20round%20kawaii%20Japanese%20character%20pastel%20blind%20box%20capsule%20toy?width=600&height=350&nologo=true&seed=202" alt="Chiikawa">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Chiikawa_volume_1_cover.jpg/400px-Chiikawa_volume_1_cover.jpg" alt="Chiikawa" style="width:100%;border-radius:8px;margin:8px 0;">
                 </div>
-            </div>
-            <div class="top3-item" id="top3-mofusand">
-                <div class="top3-item-header">
-                    <h3>2. Mofusand (貓福珊迪)</h3>
-                    <span class="score">熱度分數：8/10 <span class="hotness-level level-2"></span></span>
-                    <button class="toggle-btn" aria-expanded="false" aria-controls="top3-mofusand-details">▼</button>
+            </li>
+            <li class="top3-item">
+                <div class="top3-header">
+                    <span class="rank">2.</span>
+                    <span class="ip-name">Mofusand (貓福珊迪)</span>
+                    <span class="hotness-score">熱度分數：8/10</span>
+                    <button class="toggle-button">▼</button>
                 </div>
-                <div class="top3-details" id="top3-mofusand-details">
+                <div class="top3-details">
                     <p>評分依據：持續推出新系列（如Kiramekko Nordic Kittens吊飾系列，將於5月1日開賣），與潮流品牌聯名拓展市場（如潮宏基珠寶系列），保持穩定的粉絲互動與商品銷售。</p>
-                    <img src="https://image.pollinations.ai/prompt/orange%20cat%20sushi%20costume%20toy%20pastel%20pink%20packaging%20blind%20box%20kawaii?width=600&height=350&nologo=true&seed=203" alt="Mofusand">
+                    <img src="https://spiralcute.com/characters/mofusand/en/img/main.jpg" alt="Mofusand" style="width:100%;border-radius:8px;margin:8px 0;">
                 </div>
-            </div>
-            <div class="top3-item" id="top3-snoopy">
-                <div class="top3-item-header">
-                    <h3>3. Snoopy/Peanuts</h3>
-                    <span class="score">熱度分數：7/10 <span class="hotness-level level-2"></span></span>
-                    <button class="toggle-btn" aria-expanded="false" aria-controls="top3-snoopy-details">▼</button>
+            </li>
+            <li class="top3-item">
+                <div class="top3-header">
+                    <span class="rank">3.</span>
+                    <span class="ip-name">Snoopy/Peanuts</span>
+                    <span class="hotness-score">熱度分數：7/10</span>
+                    <button class="toggle-button">▼</button>
                 </div>
-                <div class="top3-details" id="top3-snoopy-details">
+                <div class="top3-details">
                     <p>評分依據：75週年慶祝活動持續，高端品牌聯名（Kipling, Kith, Diadora等）及藝術巡展（中國、韓國巡展計畫）提升品牌價值與曝光度。</p>
-                    <!-- Snoopy image already used in main content, strict rule not to add more, so reusing for consistency if needed or omitting if not strictly required per original content structure, but it's part of the TOP 3 description, so it can be here. Will use the same image as above-->
-                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy">
                 </div>
-            </div>
-        </div>
+            </li>
+        </ol>
 
-        <div class="chief-analysis">
-            <h2>幕僚長研判</h2>
+        <h2>幕僚長研判</h2>
+        <div class="ip-card" style="padding: 20px;">
             <p>本週IP市場在社群媒體帶動下呈現高度活力，特別是流量型IP如Chiikawa展現出強勁的跨區域擴散潛力，蕪解創意應立即啟動東南亞市場調研以把握其成長機會。面對盲盒市場日趨白熱化的競爭與泡泡瑪特面臨的挑戰，公司應聚焦Mofusand產品線的創新與差異化策略，同時加速Snoopy高端化佈局以提升產品附加值。此外，應密切關注Opanchu在東南亞的銷售表現及香港授權展的最新趨勢，為下半年市場拓展與產品開發提供依據。</p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const toggleElements = document.querySelectorAll('.ip-card-header, .top3-item-header');
+            const toggleCards = (cardSelector, headerSelector, contentSelector) => {
+                document.querySelectorAll(cardSelector).forEach(card => {
+                    const header = card.querySelector(headerSelector);
+                    const content = card.querySelector(contentSelector);
+                    const toggleButton = card.querySelector('.toggle-button');
 
-            toggleElements.forEach(header => {
-                const toggleBtn = header.querySelector('.toggle-btn');
-                const detailsId = toggleBtn.getAttribute('aria-controls');
-                const details = document.getElementById(detailsId);
-
-                header.addEventListener('click', (event) => {
-                    // Prevent click on button from propagating if button itself handles it
-                    if (event.target === toggleBtn) {
-                        return;
+                    if (header && content && toggleButton) {
+                        header.addEventListener('click', () => {
+                            content.classList.toggle('expanded');
+                            toggleButton.classList.toggle('expanded');
+                            if (content.classList.contains('expanded')) {
+                                toggleButton.textContent = '▲';
+                            } else {
+                                toggleButton.textContent = '▼';
+                            }
+                        });
                     }
-                    toggleContent(details, toggleBtn);
                 });
+            };
 
-                toggleBtn.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Stop event from propagating to header to avoid double-toggle
-                    toggleContent(details, toggleBtn);
-                });
-            });
+            // Apply toggle functionality to IP trend cards
+            toggleCards('.ip-card', '.card-header', '.card-content');
 
-            function toggleContent(detailsElement, buttonElement) {
-                const isExpanded = detailsElement.classList.toggle('expanded');
-                buttonElement.setAttribute('aria-expanded', isExpanded);
-                buttonElement.textContent = isExpanded ? '▲' : '▼';
-            }
+            // Apply toggle functionality to TOP 3 items
+            toggleCards('.top3-item', '.top3-header', '.top3-details');
         });
     </script>
 </body>
