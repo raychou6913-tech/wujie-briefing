@@ -168,6 +168,16 @@ function _projVal(selectId){
 
 function _dateToTs(v){ return v?new Date(v).getTime():null; }
 
+// 自動帶入填報人姓名
+window.addEventListener("DOMContentLoaded",function(){
+  const u=JSON.parse(localStorage.getItem("wujie_user")||"null");
+  if(!u) return;
+  ["f-who","f-owner"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&!el.value) el.value=u.name;
+  });
+});
+
 
 _loadProjectSelect("proj-sel");
 document.getElementById("frm").onsubmit=async(e)=>{
