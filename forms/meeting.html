@@ -2,25 +2,25 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🎨 設計送審填報 — 蕪解</title>
+<title>📋 會議記錄 — 蕪解</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
-.hdr{background:#ec489912;border-bottom:2px solid #ec4899;padding:18px 20px;display:flex;align-items:center;gap:12px}
+.hdr{background:#0ea5e912;border-bottom:2px solid #0ea5e9;padding:18px 20px;display:flex;align-items:center;gap:12px}
 .hdr-icon{font-size:26px}.hdr-title{font-size:19px;font-weight:700;color:#0f172a}
 .hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
 .wrap{max-width:620px;margin:24px auto;padding:0 14px}
 .card{background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 1px 4px #0000000a}
-.ctitle{font-size:12px;font-weight:700;color:#ec4899;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+.ctitle{font-size:12px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
 .f{margin-bottom:13px}
 .f label{display:block;font-size:13px;color:#64748b;margin-bottom:5px;font-weight:600}
 .f input,.f select,.f textarea{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;color:#0f172a;font-size:14px;outline:none;transition:border .15s}
-.f input:focus,.f select:focus,.f textarea:focus{border-color:#ec4899;background:#fff}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#0ea5e9;background:#fff}
 .f textarea{min-height:72px;resize:vertical}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.req{color:#ec4899}
+.req{color:#0ea5e9}
 .hint{font-size:11px;color:#94a3b8;margin-top:3px}
-.btn{width:100%;background:#ec4899;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .15s}
+.btn{width:100%;background:#0ea5e9;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .15s}
 .btn:hover{opacity:.88;transform:translateY(-1px)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .result{display:none;border-radius:12px;padding:20px;text-align:center;margin-top:14px;border:1px solid}
 .result.ok{background:#f0fdf4;border-color:#10b981;color:#166534}
@@ -29,80 +29,63 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .result-msg{font-size:15px;font-weight:700}
 .result-sub{font-size:12px;margin-top:4px;opacity:.8;word-break:break-all}
 .back{display:block;text-align:center;color:#64748b;font-size:15px;font-weight:500;margin-top:24px;text-decoration:none;padding:10px}
-.back:hover{color:#ec4899}
+.back:hover{color:#0ea5e9}
 @media(max-width:480px){.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="hdr">
-  <div class="hdr-icon">🎨</div>
-  <div><div class="hdr-title">設計送審填報</div>
+  <div class="hdr-icon">📋</div>
+  <div><div class="hdr-title">會議記錄</div>
   <div class="hdr-sub">蕪解創意 · 填報後即時同步管理儀表板</div></div>
 </div>
 <div class="wrap">
 <form id="frm">
 
-<div class="card">
-  <div class="ctitle">📋 關聯項目</div>
-  <div class="f">
-    <label>選擇項目</label>
-    <select id="proj-sel"><option value="">載入中...</option></select>
-    <div class="hint">選擇此填報對應的項目，系統將自動關聯</div>
-  </div>
-</div>
     <div class="card">
-      <div class="ctitle">設計資訊</div>
-      <div class="f"><label>設計名稱 <span class="req">*</span></label>
-        <input id="f-name" required placeholder="例：Snoopy 春季包裝 v2"></div>
-      <div class="f"><label>送審階段 <span class="req">*</span></label>
-        <select id="f-stage" required>
-          <option value="2D設計">1. 2D設計</option><option value="四視圖">2. 四視圖</option><option value="3D建模">3. 3D建模</option><option value="打樣送審">4. 打樣送審</option><option value="包裝設計">5. 包裝設計</option><option value="包裝送審">6. 包裝送審</option><option value="展架設計">7. 展架設計</option><option value="展架送審">8. 展架送審</option><option value="大貨樣送審">9. 大貨樣送審</option>
-        </select>
-        <div class="hint">選擇本次提交對應的送審步驟，每個階段各填一筆記錄</div>
-      </div>
+      <div class="ctitle">📋 基本資訊</div>
+      <div class="f"><label>會議標題 <span class="req">*</span></label>
+        <input id="f-title" required placeholder="例：2026 Q2 IP策略討論"></div>
       <div class="row2">
-        <div class="f"><label>IP品牌</label>
-          <select id="f-ip">
-            <option value="">請選擇</option>
-            <option>Snoopy</option><option>Mofusand</option><option>Chiikawa</option>
-            <option>Labubu</option><option>Fuggler</option><option>EVE點點</option><option>其他</option>
-          </select></div>
-        <div class="f"><label>是否外包</label>
-          <select id="f-outsource">
-            <option>內部製作</option><option>外包（已拍板）</option><option>外包（待確認）</option>
+        <div class="f"><label>日期 <span class="req">*</span></label>
+          <input id="f-date" type="date" required></div>
+        <div class="f"><label>地點 / 形式 <span class="req">*</span></label>
+          <select id="f-loc" required>
+            <option value="">— 請選擇 —</option>
+            <option>台北辦公室</option>
+            <option>北京辦公室</option>
+            <option>曼谷辦公室</option>
+            <option>線上視訊</option>
+            <option>其他</option>
           </select></div>
       </div>
       <div class="row2">
-        <div class="f"><label>設計師 / 供應商</label><input id="f-vendor" placeholder="名稱"></div>
-        <div class="f"><label>版本號</label><input id="f-ver" placeholder="v1.0"></div>
+        <div class="f"><label>出席人員 <span class="req">*</span></label>
+          <input id="f-attendees" required placeholder="例：Ray、安然、Shawn"></div>
+        <div class="f"><label>跟進負責人</label>
+          <select id="f-owner2">
+            <option value="">— 請選擇 —</option>
+            <option>Ray</option><option>安然</option><option>Shawn</option><option>Bevis</option><option>賴哥</option><option>木子</option><option>高維</option><option>董亮</option><option>德寶</option>
+          </select></div>
       </div>
     </div>
     <div class="card">
-      <div class="ctitle">送審進度</div>
-      <div class="row2">
-        <div class="f"><label>提交日期</label><input type="date" id="f-sub"></div>
-        <div class="f"><label>預計通過日</label><input type="date" id="f-app"></div>
-      </div>
-      <div class="row2">
-        <div class="f"><label>審核方</label><input id="f-rev" placeholder="例：Peanuts Worldwide"></div>
-        <div class="f"><label>審核狀態 <span class="req">*</span></label>
-          <select id="f-status" required>
-            <option>待提交</option><option>已提交</option><option>修改中</option>
-            <option>已通過</option><option>已拒絕</option>
-          </select></div>
-      </div>
-      <div class="f"><label>修改備註</label><textarea id="f-note" placeholder="審核意見、修改要求..."></textarea></div>
-      <div class="f"><label>填報人</label><input id="f-owner" placeholder="你的名字"></div>
+      <div class="ctitle">📝 會議內容</div>
+      <div class="f"><label>議題摘要 <span class="req">*</span></label>
+        <textarea id="f-agenda" required placeholder="本次討論的主要議題與背景說明..."></textarea></div>
+      <div class="f"><label>決議事項 <span class="req">*</span></label>
+        <textarea id="f-decisions" required placeholder="本次達成的決議，格式：1. 決議A；2. 決議B..."></textarea></div>
+      <div class="f"><label>行動項目（Action Items）</label>
+        <textarea id="f-actions" placeholder="格式：姓名 - 事項 - 截止日期，例：Ray - 確認合約條款 - 5/1"></textarea></div>
     </div>
     <div class="card">
-      <div class="ctitle">📎 設計圖附件</div>
-      <div class="f">
-        <label>上傳檔案（可多選）</label>
-        <input type="file" id="f-imgs" multiple accept="image/*,.pdf"
-          style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;color:#64748b;width:100%;font-size:13px;cursor:pointer">
-        <div class="hint">上傳設計稿、效果圖、版權方意見截圖等（JPG/PNG/PDF）</div>
+      <div class="ctitle">🗓 後續安排</div>
+      <div class="row2">
+        <div class="f"><label>下次會議日期</label>
+          <input id="f-next-date" type="date"></div>
+        <div class="f"><label>填報人</label>
+          <input id="f-who" placeholder="自動帶入登入者"></div>
       </div>
-      <div id="img-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
     </div>
 <button class="btn" type="submit" id="sbtn">提交</button>
 </form>
@@ -255,69 +238,45 @@ window.addEventListener("DOMContentLoaded",function(){
 });
 
 
-_loadProjectSelect("proj-sel");
-_bindImgPreview("f-imgs","img-preview");
-document.getElementById("frm").onsubmit=async(e)=>{
-  e.preventDefault();
-  const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
-  if(missing.length){
-    const res=document.getElementById("res");
-    res.className="result err"; res.style.display="block";
-    document.getElementById("res-icon").textContent="⚠️";
-    document.getElementById("res-msg").textContent="請填寫必填欄位";
-    document.getElementById("res-sub").textContent=missing.join("、");
-    return;
-  }
-  const btn=document.getElementById("sbtn");
-  const res=document.getElementById("res");
-  btn.disabled=true; btn.textContent="提交中...";
-  res.style.display="none";
-  try{
-    const tk=await _getToken();
-    const proj=_projVal("proj-sel");
-    const fields={...({
-      "設計名稱":     document.getElementById("f-name").value,
-      "送審階段":     document.getElementById("f-stage").value,
-      "IP品牌":       document.getElementById("f-ip").value,
-      "是否外包":     document.getElementById("f-outsource").value,
-      "設計師/供應商":document.getElementById("f-vendor").value,
-      "版本號":       document.getElementById("f-ver").value,
-      "提交日期":     _dateToTs(document.getElementById("f-sub").value),
-      "預計通過日":   _dateToTs(document.getElementById("f-app").value),
-      "審核方":       document.getElementById("f-rev").value,
-      "審核狀態":     document.getElementById("f-status").value,
-      "修改備註":     document.getElementById("f-note").value,
-      "填報人":       document.getElementById("f-owner").value,
-    })};
-    Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined)delete fields[k];});
-    if(proj) fields["項目關聯"]=proj;
-    const imgFiles=document.getElementById("f-imgs")?.files;
-    if(imgFiles&&imgFiles.length>0){
-      btn.textContent="上傳附件中...";
-      fields["設計圖附件"]=await _uploadImages(Array.from(imgFiles),tk);
+  const today=new Date();
+  document.getElementById("f-date").value=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+
+  document.getElementById("frm").onsubmit=async function(e){
+    e.preventDefault();
+    const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
+    if(missing.length){const res=document.getElementById("result");res.className="result err";res.style.display="block";document.getElementById("res-icon").textContent="⚠️";document.getElementById("res-msg").textContent="請填寫必填欄位";document.getElementById("res-sub").textContent=missing.join("、");return;}
+    const btn=document.getElementById("sbtn");
+    btn.disabled=true; btn.textContent="提交中...";
+    const res=document.getElementById("result"); res.style.display="none";
+    try{
+      await _post("meeting",{
+        "會議標題": document.getElementById("f-title").value.trim(),
+        "日期": _dateToTs(document.getElementById("f-date").value),
+        "地點/形式": document.getElementById("f-loc").value,
+        "出席人員": document.getElementById("f-attendees").value.trim(),
+        "議題摘要": document.getElementById("f-agenda").value.trim(),
+        "決議事項": document.getElementById("f-decisions").value.trim(),
+        "行動項目": document.getElementById("f-actions").value.trim()||null,
+        "跟進負責人": document.getElementById("f-owner2").value||null,
+        "下次會議日期": _dateToTs(document.getElementById("f-next-date").value)||null,
+        "填報人": document.getElementById("f-who").value.trim(),
+      });
+      res.className="result ok"; res.style.display="block";
+      document.getElementById("res-icon").textContent="✅";
+      document.getElementById("res-msg").textContent="會議記錄已儲存";
+      document.getElementById("res-sub").textContent="已同步至管理系統";
+      document.getElementById("frm").reset();
+      const nw=new Date();
+      document.getElementById("f-date").value=nw.getFullYear()+"-"+String(nw.getMonth()+1).padStart(2,"0")+"-"+String(nw.getDate()).padStart(2,"0");
+    }catch(err){
+      res.className="result err"; res.style.display="block";
+      document.getElementById("res-icon").textContent="❌";
+      document.getElementById("res-msg").textContent="提交失敗";
+      document.getElementById("res-sub").textContent=String(err);
+      console.error(err);
+    }finally{
+      btn.disabled=false; btn.textContent="提交";
     }
-    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["design"]+"/records",{
-      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields})
-    });
-    const d=await r.json();
-    if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
-    res.className="result ok"; res.style.display="block";
-    document.getElementById("res-icon").textContent="✅";
-    document.getElementById("res-msg").textContent="提交成功！";
-    document.getElementById("res-sub").textContent="資料已同步至飛書";
-    document.getElementById("frm").reset();
-    document.getElementById("img-preview").innerHTML="";
-    _loadProjectSelect("proj-sel");
-  }catch(err){
-    res.className="result err"; res.style.display="block";
-    document.getElementById("res-icon").textContent="❌";
-    document.getElementById("res-msg").textContent="提交失敗";
-    document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖回報管理員";
-    console.error(err);
-  }finally{
-    btn.disabled=false; btn.textContent="提交";
-  }
-};
+  };
 </script>
 </body></html>
