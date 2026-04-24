@@ -288,6 +288,8 @@ document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
+  const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
+  if(missing.length){res.className="result err";res.style.display="block";document.getElementById("res-icon").textContent="⚠️";document.getElementById("res-msg").textContent="請填寫必填欄位";document.getElementById("res-sub").textContent=missing.join("、");return;}
   btn.disabled=true; btn.textContent="提交中...";
   res.style.display="none";
   try{
