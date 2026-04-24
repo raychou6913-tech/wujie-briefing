@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蕪解創意週報 | 2026年4月17日 - 4月23日</title>
+    <style>
+        :root {
+            --color-gold: #d4a017;
+            --color-deep-blue: #1a3a5c;
+            --color-white: #ffffff;
+            --color-light-grey: #f8f8f8;
+            --color-medium-grey: #e0e0e0;
+            --color-text-dark: #333333;
+            --color-text-light: #555555;
+            --color-ip-info-bg: #e0e7ee; /* Lighter blue */
+            --color-creative-bg: #fdf5e6; /* Lighter gold */
+            --color-biz-dev-bg: #ffffff; /* White */
+        }
+
+        body {
+            font-family: "Segoe UI", "SF Pro Display", "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-light-grey);
+            color: var(--color-text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        header {
+            background-color: var(--color-deep-blue);
+            color: var(--color-white);
+            padding: 40px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8em;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.4em;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 2.2em;
+            color: var(--color-deep-blue);
+            margin-top: 40px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            position: relative;
+            padding-left: 20px;
+        }
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 80%;
+            background-color: var(--color-gold);
+            border-radius: 4px;
+        }
+
+        .card {
+            background-color: var(--color-white);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            border: 1px solid var(--color-medium-grey);
+        }
+
+        .card-header {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--color-white);
+            border-bottom: 1px solid transparent; /* default */
+        }
+        .card-header.collapsed {
+            border-bottom: 1px solid var(--color-medium-grey);
+        }
+        .card-header h2, .card-header h3 {
+            margin: 0;
+            font-size: 1.6em;
+            color: var(--color-deep-blue);
+            font-weight: 600;
+        }
+        .card-header p {
+            margin: 0;
+            color: var(--color-text-light);
+            font-size: 1.1em;
+        }
+        .card-header .icon {
+            font-size: 1.8em;
+            color: var(--color-deep-blue);
+            transition: transform 0.3s ease;
+        }
+        .card-header.expanded .icon {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            padding: 0 30px;
+        }
+
+        .card-content.expanded {
+            max-height: 2000px; /* Sufficiently large */
+            padding: 20px 30px;
+        }
+        .card-content ul {
+            padding-left: 25px;
+            margin-top: 0;
+            list-style: none; /* remove default bullet */
+        }
+        .card-content ul li {
+            position: relative;
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+        .card-content ul li:last-child {
+            margin-bottom: 0;
+        }
+        .card-content ul li::before {
+            content: '•'; /* custom bullet */
+            color: var(--color-gold);
+            font-size: 1.2em;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .card-content ol {
+            padding-left: 25px;
+            margin-top: 0;
+        }
+        .card-content ol li {
+            margin-bottom: 12px;
+        }
+        .card-content ol li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .static-card {
+            background-color: var(--color-white);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            padding: 25px 30px;
+            border: 1px solid var(--color-medium-grey);
+        }
+        .static-card h2 {
+            font-size: 1.8em;
+            color: var(--color-deep-blue);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-gold);
+            padding-bottom: 10px;
+        }
+        .static-card ol {
+            padding-left: 25px;
+            margin-top: 0;
+        }
+        .static-card ol li {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .static-card ol li strong {
+            color: var(--color-deep-blue);
+        }
+
+        /* Section Specific Styles */
+        .ip-info-section .card-header { background-color: var(--color-ip-info-bg); }
+        .ip-info-section .card-header h3 { color: var(--color-deep-blue); }
+        .ip-info-section .card-content { border-top: 1px solid var(--color-medium-grey); }
+
+        .creative-section .card-header { background-color: var(--color-creative-bg); }
+        .creative-section .card-header h3 { color: var(--color-gold); }
+        .creative-section .card-content { border-top: 1px solid var(--color-medium-grey); }
+
+        .biz-dev-section .card-header { background-color: var(--color-biz-dev-bg); }
+        .biz-dev-section .card-header h3 { color: var(--color-deep-blue); }
+        .biz-dev-section .card-content { border-top: 1px solid var(--color-medium-grey); }
+        .biz-dev-section .sub-card {
+            border: 1px solid var(--color-medium-grey);
+            border-radius: 8px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            background-color: var(--color-light-grey);
+        }
+        .biz-dev-section .sub-card-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            color: var(--color-deep-blue);
+            border-bottom: 1px solid transparent;
+        }
+        .biz-dev-section .sub-card-header.collapsed {
+            border-bottom: 1px solid var(--color-medium-grey);
+        }
+        .biz-dev-section .sub-card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            padding: 0 20px;
+        }
+        .biz-dev-section .sub-card-content.expanded {
+            max-height: 500px; /* Sufficiently large */
+            padding: 15px 20px;
+        }
+        .biz-dev-section .sub-card-content p {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: var(--color-text-light);
+        }
+        .biz-dev-section .sub-card-header .icon {
+            font-size: 1.2em;
+        }
+
+        /* Action Priority */
+        .action-priority-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--color-white);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border: 1px solid var(--color-medium-grey);
+        }
+        .action-priority-item:hover {
+            background-color: var(--color-light-grey);
+        }
+        .action-priority-number {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--color-white);
+            background-color: var(--color-gold);
+            padding: 15px 25px;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            min-width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .action-priority-content {
+            padding: 15px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .action-priority-title {
+            font-size: 1.25em;
+            font-weight: 600;
+            color: var(--color-deep-blue);
+            margin-bottom: 5px;
+        }
+        .action-priority-details {
+            font-size: 0.95em;
+            color: var(--color-text-light);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+        }
+        .action-priority-details.expanded {
+            max-height: 500px;
+            padding-top: 10px;
+        }
+        .action-priority-item .due-date {
+            font-weight: 600;
+            color: var(--color-gold);
+            margin-top: 8px;
+            font-size: 0.9em;
+            display: block;
+        }
+        .action-priority-item .due-date.overdue {
+            color: #e74c3c; /* Red for overdue */
+        }
+        .action-priority-arrow {
+            font-size: 1.5em;
+            color: var(--color-deep-blue);
+            margin-right: 20px;
+            transition: transform 0.3s ease;
+        }
+        .action-priority-item.expanded .action-priority-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* VAM Progress */
+        .vam-tracker {
+            background-color: var(--color-white);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            padding: 30px;
+            border: 1px solid var(--color-medium-grey);
+        }
+        .vam-tracker h2 {
+            font-size: 1.8em;
+            color: var(--color-deep-blue);
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+        }
+        .vam-tracker h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -10px;
+            width: 80px;
+            height: 3px;
+            background-color: var(--color-gold);
+            border-radius: 2px;
+        }
+
+        .progress-group {
+            margin-bottom: 25px;
+        }
+        .progress-group:last-child {
+            margin-bottom: 0;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--color-text-dark);
+            font-size: 1.1em;
+        }
+        .progress-bar-container {
+            background-color: var(--color-medium-grey);
+            border-radius: 5px;
+            height: 18px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--color-gold);
+            border-radius: 5px;
+            width: 0%; /* Initial state for animation */
+            transition: width 1.5s ease-out; /* Smooth fill animation */
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            box-sizing: border-box;
+            color: var(--color-white);
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .progress-bar-fill.y1 { background-color: var(--color-gold); }
+        .progress-bar-fill.y2 { background-color: var(--color-deep-blue); }
+
+        .vam-tracker .evaluation {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--color-medium-grey);
+        }
+        .vam-tracker .evaluation h3 {
+            font-size: 1.4em;
+            color: var(--color-deep-blue);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .vam-tracker .evaluation p {
+            font-size: 1.05em;
+            margin-bottom: 10px;
+            color: var(--color-text-light);
+        }
+        .vam-tracker .evaluation p strong {
+            color: var(--color-deep-blue);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2em; }
+            header p { font-size: 1em; }
+            .section-title { font-size: 1.8em; }
+            .card-header h2, .card-header h3 { font-size: 1.4em; }
+            .card-header p { font-size: 1em; }
+            .static-card h2 { font-size: 1.6em; }
+            .static-card ol li { font-size: 1em; }
+            .card-content { padding: 0 15px; }
+            .card-content.expanded { padding: 15px; }
+            .action-priority-item { flex-direction: column; align-items: stretch; }
+            .action-priority-number { border-radius: 10px 10px 0 0; min-width: unset; width: 100%; }
+            .action-priority-content { padding: 15px; }
+            .action-priority-arrow { margin-right: 0; margin-left: auto; padding-right: 15px; padding-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>蕪解創意週報</h1>
+        <p>2026年4月17日 - 4月23日</p>
+    </header>
+
+    <main>
+        <section class="static-card">
+            <h2>🏆 本週三大亮點</h2>
+            <ol>
+                <li>
+                    <strong>Chiikawa（吉伊卡哇）在中國大陸市場爆發式增長，遠超預期貢獻：</strong> 憑藉「電子布洛芬」效應，Chiikawa 盲盒開箱影片本週新增超 10 萬條，總播放量破 5 億次，隱藏款公仔二手溢價達 200%。深圳快閃店單日人流峰值 5,000 人次，平均客單價達 RMB 250，熱門產品持續補貨且限購。此高熱度直接驅動核心 IP 周邊商品銷售，對 Y1 淨利潤目標貢獻顯著。
+                </li>
+                <li>
+                    <strong>成功掃描並鎖定 3 個「一級信號」潛力新 IP：</strong> 趨勢雷達報告識別出 Zanmang Loopy（韓國）、Pickles the Frog（日本）和 Kogimyun（日本）為與蕪解現有能力高度契合的潛力標的，尤其 Zanmang Loopy 在亞洲年輕女性市場聲量飆升，極具 Mini 公仔化潛力，建議優先洽詢。
+                </li>
+                <li>
+                    <strong>Snoopy 全球資產價值深化與高客單價策略提案：</strong> 創意發動機報告圍繞 Snoopy 的全球版圖，提出「Snoopy Jazz Café POP UP」（高客單旗艦型）、「Snoopy x 節慶限定系列」（高周轉批發型）、「Snoopy 城市限定系列」（東南亞擴張型）等具體可複製的高價值提案，強化其 IPO 故事性與短期現金流貢獻。
+                </li>
+            </ol>
+        </section>
+
+        <h2 class="section-title">📡 IP 情報週結</h2>
+        <section class="ip-info-section card">
+            <div class="card-header" data-toggle="card-content-ip1">
+                <h3>本週最重要的3個IP趨勢信號</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-ip1" class="card-content">
+                <ul>
+                    <li>
+                        <strong>Chiikawa 中國大陸病毒式增長與潛在輿論風險並存：</strong> 熱度極高，但作者過往言論引起的抵制聲浪需高度警惕，可能影響品牌形象與授權方關係。
+                    </li>
+                    <li>
+                        <strong>韓國 IP 崛起與東南亞白地機會：</strong> Zanmang Loopy 等韓系角色 IP 在東南亞接受度快速追上日系，且授權費用相對合理；東南亞實體周邊商品供給嚴重不足。
+                    </li>
+                    <li>
+                        <strong>「真實感」與「用戶生成內容 (UGC)」驅動社群傳播：</strong> 消費者追求與品牌深度連結，開箱、體驗分享、二創故事等 UGC 內容互動率顯著高於官方，是 IP 病毒式傳播的關鍵。
+                    </li>
+                </ul>
+                <img src="https://assets-global.website-files.com/65207c40337c756f7e91421f/65207c40337c756f7e914264_IP-Image-01.webp" loading="lazy" width="700" alt="IP Trend Signal Image">
+            </div>
+        </section>
+
+        <section class="ip-info-section card">
+            <div class="card-header" data-toggle="card-content-ip2">
+                <h3>下週需持續追蹤的2項</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-ip2" class="card-content">
+                <ul>
+                    <li>Chiikawa 中國大陸社群輿情動態與負面聲量（已啟動 24 小時監測）。</li>
+                    <li>NewJeans Bunnies 衍生 IP 的版權重組進展，評估其高風險高回報潛力。</li>
+                </ul>
+            </div>
+        </section>
+
+        <h2 class="section-title">🎨 創意選品週結</h2>
+        <section class="creative-section card">
+            <div class="card-header" data-toggle="card-content-creative1">
+                <h3>本週最強2個提案</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-creative1" class="card-content">
+                <ul>
+                    <li>
+                        <strong>Snoopy Jazz Café POP UP：</strong> 以高客單價、高社群傳播力的沉浸式體驗，目標台灣首站，迅速貢獻 VAM 淨利。
+                    </li>
+                    <li>
+                        <strong>Maniani 首發盲盒系列：</strong> 利用盲盒驚喜感與收集機制，低成本快速引爆 Maniani 知名度，首發目標台灣，並擴展至泰國。
+                    </li>
+                </ul>
+                <img src="https://assets-global.website-files.com/65207c40337c756f7e91421f/65207c40337c756f7e914265_IP-Image-02.webp" loading="lazy" width="700" alt="Creative Selection Image">
+            </div>
+        </section>
+
+        <section class="creative-section card">
+            <div class="card-header" data-toggle="card-content-creative2">
+                <h3>進入執行階段的優先項目</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-creative2" class="card-content">
+                <ul>
+                    <li>
+                        <strong>Chiikawa 具中國文化元素的限定商品開發：</strong> 已在深圳快閃店推出舞龍舞獅限定版，加速更多本土化商品開發，強化在地連結，降低政治敏感度。
+                    </li>
+                    <li>
+                        <strong>針對 Mofusand 與 Opanchu 策劃 UGC 創意開箱挑戰：</strong> 利用「真實感」與「用戶生成內容」趨勢，在中國大陸與東南亞市場提升 IP 影響力。
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <h2 class="section-title">🌍 業務拓展週結</h2>
+        <section class="biz-dev-section card">
+            <div class="card-header" data-toggle="card-content-bizdev1">
+                <h3>本週地毯搜尋覆蓋區域</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-bizdev1" class="card-content">
+                <p>🇹🇭 泰國、🇲🇾 馬來西亞、🇸🇬 新加坡。</p>
+            </div>
+        </section>
+
+        <section class="biz-dev-section card">
+            <div class="card-header" data-toggle="card-content-bizdev2">
+                <h3>最優質的5家潛在客戶</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-bizdev2" class="card-content">
+                <div class="sub-card">
+                    <div class="sub-card-header" data-toggle="client-detail-1">
+                        1. Central Department Store (泰國)
+                        <span class="icon">&#9660;</span>
+                    </div>
+                    <div id="client-detail-1" class="sub-card-content">
+                        <p><strong>偏好：</strong>有話題性日韓 IP、獨家設計。</p>
+                    </div>
+                </div>
+                <div class="sub-card">
+                    <div class="sub-card-header" data-toggle="client-detail-2">
+                        2. King Power Duty Free (泰國)
+                        <span class="icon">&#9660;</span>
+                    </div>
+                    <div id="client-detail-2" class="sub-card-content">
+                        <p><strong>需求：</strong>泰國限定包裝設計、重視禮盒化。</p>
+                    </div>
+                </div>
+                <div class="sub-card">
+                    <div class="sub-card-header" data-toggle="client-detail-3">
+                        3. Isetan (馬來西亞)
+                        <span class="icon">&#9660;</span>
+                    </div>
+                    <div id="client-detail-3" class="sub-card-content">
+                        <p><strong>優勢：</strong>馬來西亞華人市場對日系 IP 認知度高。</p>
+                    </div>
+                </div>
+                <div class="sub-card">
+                    <div class="sub-card-header" data-toggle="client-detail-4">
+                        4. Miniso Thailand 區域採購
+                        <span class="icon">&#9660;</span>
+                    </div>
+                    <div id="client-detail-4" class="sub-card-content">
+                        <p><strong>特性：</strong>量大、標準化、價格敏感。</p>
+                    </div>
+                </div>
+                <div class="sub-card">
+                    <div class="sub-card-header" data-toggle="client-detail-5">
+                        5. Kinokuniya Singapore
+                        <span class="icon">&#9660;</span>
+                    </div>
+                    <div id="client-detail-5" class="sub-card-content">
+                        <p><strong>定位：</strong>作為新加坡旗艦市場的日系文化入口。</p>
+                    </div>
+                </div>
+                <img src="https://assets-global.website-files.com/65207c40337c756f7e91421f/65207c40337c756f7e914266_IP-Image-03.webp" loading="lazy" width="700" alt="Business Development Image">
+            </div>
+        </section>
+
+        <section class="biz-dev-section card">
+            <div class="card-header" data-toggle="card-content-bizdev3">
+                <h3>下週跟進名單</h3>
+                <span class="icon">&#9660;</span>
+            </div>
+            <div id="card-content-bizdev3" class="card-content">
+                <ul>
+                    <li>
+                        <strong>泰國市場：</strong> 優先透過 Den 在地資源引薦，鎖定百貨、免稅店、連鎖禮品店的 IP 周邊買手，使用 SNOOPY 作為敲門磚，利用提供的英文 Pitch 腳本進行接觸。
+                    </li>
+                    <li>
+                        <strong>馬來西亞市場：</strong> 鎖定日系 IP 專門零售商（如 Isetan），介紹 Chiikawa 和 Mofusand 的市場潛力。
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <h2 class="section-title">⚡ 下週行動優先序（TOP 5）</h2>
+        <section>
+            <div class="action-priority-item" data-toggle="action-detail-1">
+                <div class="action-priority-number">1</div>
+                <div class="action-priority-content">
+                    <div class="action-priority-title">Chiikawa 輿情監測與應對預案</div>
+                    <div id="action-detail-1" class="action-priority-details">
+                        <p>提交首份輿情分析報告與應對預案，並確保 24 小時監測機制持續運作。</p>
+                        <span class="due-date overdue">截止日：4月23日 (已過，需立即提交)</span>
+                    </div>
+                </div>
+                <span class="action-priority-arrow">&#9660;</span>
+            </div>
+            <div class="action-priority-item" data-toggle="action-detail-2">
+                <div class="action-priority-number">2</div>
+                <div class="action-priority-content">
+                    <div class="action-priority-title">加速 Chiikawa 中國文化限定商品開發</div>
+                    <div id="action-detail-2" class="action-priority-details">
+                        <p>至少 1 款預售在 5月15日前推出，強化本土化策略。</p>
+                        <span class="due-date">截止日：5月15日</span>
+                    </div>
+                </div>
+                <span class="action-priority-arrow">&#9660;</span>
+            </div>
+            <div class="action-priority-item" data-toggle="action-detail-3">
+                <div class="action-priority-number">3</div>
+                <div class="action-priority-content">
+                    <div class="action-priority-title">Mofusand & Opanchu UGC 活動方案設計</div>
+                    <div id="action-detail-3" class="action-priority-details">
+                        <p>完成中國大陸與東南亞市場的「創意開箱挑戰」或「IP情境故事」UGC 活動方案設計與合作網紅/KOL篩選。</p>
+                        <span class="due-date">截止日：5月5日</span>
+                    </div>
+                </div>
+                <span class="action-priority-arrow">&#9660;</span>
+            </div>
+            <div class="action-priority-item" data-toggle="action-detail-4">
+                <div class="action-priority-number">4</div>
+                <div class="action-priority-content">
+                    <div class="action-priority-title">泰國市場 B2B 業務初期拓展</div>
+                    <div id="action-detail-4" class="action-priority-details">
+                        <p>老董與安然協作，優先接觸泰國市場百貨、免稅店客戶，準備實體樣品，以 Snoopy 開門，並利用提供的 Pitch 腳本進行對接。</p>
+                    </div>
+                </div>
+                <span class="action-priority-arrow">&#9660;</span>
+            </div>
+            <div class="action-priority-item" data-toggle="action-detail-5">
+                <div class="action-priority-number">5</div>
+                <div class="action-priority-content">
+                    <div class="action-priority-title">評估 Zanmang Loopy 授權洽詢</div>
+                    <div id="action-detail-5" class="action-priority-details">
+                        <p>根據趨勢雷達建議，優先洽詢 Zanmang Loopy 的東南亞與大陸授權代理商，了解合作模式與費用。</p>
+                    </div>
+                </div>
+                <span class="action-priority-arrow">&#9660;</span>
+            </div>
+        </section>
+
+        <h2 class="section-title">📊 VAM 進度追蹤</h2>
+        <section class="vam-tracker">
+            <h2>VAM 進度追蹤</h2>
+            <div class="progress-group">
+                <div class="progress-label">
+                    <span>Y1 目標：RMB 608萬</span>
+                    <span>105%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill y1" style="width: 105%;">105%</div>
+                </div>
+            </div>
+
+            <div class="progress-group">
+                <div class="progress-label">
+                    <span>Y2 目標：RMB 1,403萬</span>
+                    <span>40%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill y2" style="width: 40%;">40%</div>
+                </div>
+            </div>
+
+            <div class="evaluation">
+                <h3>達標概率評估：</h3>
+                <p>
+                    <strong>Y1 目標：高度可能達成甚至超越。</strong> Chiikawa 在中國大陸的爆發式銷售增長，其極高的客單價與商品溢價，顯示其對 Y1 淨利潤的貢獻已遠超預期。雖然存在潛在輿論風險，但當前銷售熱度勢不可擋，且已啟動應對策略。Snoopy 高客單價提案與 Maniani 盲盒推動也將提供額外增長動能。
+                </p>
+                <p>
+                    <strong>Y2 目標：前景樂觀，需持續執行。</strong> 本週新 IP 掃描（Zanmang Loopy 等）、東南亞 B2B 拓荒計劃的啟動，以及 Snoopy 跨市場複製策略的規劃，為 Y2 乃至未來的持續增長奠定了堅實基礎。關鍵在於下週啟動的行動能否有效執行並轉化為實質業績。
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleElements = document.querySelectorAll('[data-toggle]');
+
+            toggleElements.forEach(el => {
+                el.addEventListener('click', () => {
+                    const targetId = el.dataset.toggle;
+                    const targetContent = document.getElementById(targetId);
+                    
+                    if (targetContent) {
+                        // Toggle 'expanded' class on content
+                        targetContent.classList.toggle('expanded');
+                        
+                        // Toggle 'expanded' class on header for icon rotation/border
+                        el.classList.toggle('expanded');
+
+                        // For card headers, ensure a border when collapsed
+                        if (el.classList.contains('card-header')) {
+                            el.classList.toggle('collapsed', !targetContent.classList.contains('expanded'));
+                        } else if (el.classList.contains('sub-card-header')) {
+                            el.classList.toggle('collapsed', !targetContent.classList.contains('expanded'));
+                        } else if (el.classList.contains('action-priority-item')) {
+                            // For action priority, the whole item gets expanded class
+                        }
+                    }
+                });
+            });
+
+            // Set initial states (collapsed by default, except main highlights and VAM)
+            // No need to explicitly collapse as max-height:0 is default for .card-content
+            // but for items where header also changes, we might want to set initial collapsed state
+            document.querySelectorAll('.card-header').forEach(header => {
+                 const targetId = header.dataset.toggle;
+                 const targetContent = document.getElementById(targetId);
+                 if (targetContent && !targetContent.classList.contains('expanded')) {
+                     header.classList.add('collapsed');
+                 }
+            });
+            document.querySelectorAll('.sub-card-header').forEach(header => {
+                 const targetId = header.dataset.toggle;
+                 const targetContent = document.getElementById(targetId);
+                 if (targetContent && !targetContent.classList.contains('expanded')) {
+                     header.classList.add('collapsed');
+                 }
+            });
+
+            // VAM Progress Bar Animation (initial state is 0%, then transitions to desired width)
+            const vamBars = document.querySelectorAll('.progress-bar-fill');
+            vamBars.forEach(bar => {
+                const width = bar.style.width; // Get the width set in style attribute (e.g., "105%")
+                // Trigger reflow to ensure transition works from 0%
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100); 
+            });
+
+        });
+    </script>
+</body>
+</html>
