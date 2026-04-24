@@ -125,6 +125,10 @@ h1{font-size:20px;font-weight:700;color:#0f172a}
             </a></div>
 <a class="dash" href="../dashboard.html">📊 查看管理儀表板</a>
 <script>
+const _PROXY_IDX="https://feishu-proxy.raychou6913.workers.dev";
+const _AT_IDX="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _VL_TBL="tblUzRSQgKLhlttk";
+
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){
@@ -133,6 +137,28 @@ h1{font-size:20px;font-weight:700;color:#0f172a}
     return;
   }
   document.getElementById("user-name").textContent=s.name+"（"+s.dept+"）";
+  _autoLogVisit(s);
 })();
+
+async function _autoLogVisit(s){
+  const todayKey="wj_v_"+new Date().toISOString().slice(0,10);
+  if(localStorage.getItem(todayKey)) return;
+  try{
+    const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const d=await r.json();
+    if(d.code!==0) return;
+    const tk=d.tenant_access_token;
+    const now=new Date();
+    const dateStr=now.toISOString().slice(0,10);
+    const timeStr=now.toTimeString().slice(0,8);
+    const res=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_VL_TBL+"/records",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"姓名":s.name,"部門":s.dept,"日期":dateStr,"時間":timeStr}})
+    });
+    const rd=await res.json();
+    if(rd.code===0) localStorage.setItem(todayKey,"1");
+  }catch(e){}
+}
 </script>
 </body></html>
