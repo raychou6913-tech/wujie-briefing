@@ -107,7 +107,10 @@ td input::placeholder{color:#cbd5e1}
     <div>
       <div class="q-company">蕪解創意有限公司</div>
       <div class="q-company-sub">WUJIE CREATIVE CO., LTD.</div>
-      <div style="font-size:11px;color:#94a3b8;margin-top:6px">📧 raychou6913@gmail.com</div>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:2px">
+        <input class="q-meta-field" id="q-contact-name" placeholder="負責人姓名" style="font-size:12px;color:#1e293b;font-weight:600">
+        <input class="q-meta-field" id="q-contact-info" placeholder="聯繫方式（電話 / WeChat / Email）" style="font-size:11px;color:#64748b">
+      </div>
     </div>
     <div class="q-title">
       <h2>報 價 單</h2>
@@ -260,6 +263,9 @@ document.getElementById("ctrl-valid").value=validDate;
 const yr=new Date().getFullYear();
 const mo=String(new Date().getMonth()+1).padStart(2,"0");
 document.getElementById("ctrl-no").value=`QT-${yr}${mo}-001`;
+// 自動帶入登入者姓名
+const _qs=JSON.parse(localStorage.getItem("wujie_session")||"null");
+if(_qs) document.getElementById("q-contact-name").value=_qs.name;
 sync();
 addRow(); addRow(); addRow();
 </script>
