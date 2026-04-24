@@ -42,16 +42,11 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="wrap">
 <form id="frm">
 
-<div class="card">
-  <div class="ctitle">📋 基本資訊</div>
-  <div class="f">
-    <label>選擇項目</label>
-    <input id="m-name" required placeholder="例：Chiikawa 台灣批發 Q2">
-    <div class="hint">請填入清楚的項目名稱，其他部門填報時會用此名稱關聯</div>
-  </div>
-</div>
     <div class="card">
-      <div class="ctitle">IP 與業務類型</div>
+      <div class="ctitle">📋 基本資訊</div>
+      <div class="f"><label>項目名稱 <span class="req">*</span></label>
+        <input id="m-name" required placeholder="例：Chiikawa 台灣批發 Q2">
+        <div class="hint">其他部門填報時會用此名稱關聯，請填清楚</div></div>
       <div class="row2">
         <div class="f"><label>IP 品牌</label>
           <select id="m-ip">
@@ -60,7 +55,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
             <option>Labubu</option><option>Fuggler</option><option>EVE點點</option><option>其他</option>
           </select></div>
         <div class="f"><label>業務類型</label>
-          <select id="m-type">
+          <select id="m-type" onchange="toggleBatchFields(this.value)">
             <option>批發</option><option>快閃店</option><option>代工</option>
             <option>設計服務</option><option>授權</option><option>其他</option>
           </select></div>
@@ -70,12 +65,53 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
           <select id="m-loc">
             <option>台北</option><option>北京</option><option>曼谷</option><option>跨地區</option>
           </select></div>
-        <div class="f"><label>負責人</label>
-          <input id="m-owner" placeholder="Shawn / Ray / 安然..."></div>
+        <div class="f"><label>版權對接人</label>
+          <input id="m-owner" placeholder="負責與版權方溝通的同事"></div>
       </div>
     </div>
+
+    <!-- 批發專屬：產品類別（批發時顯示）-->
+    <div class="card" id="batch-card">
+      <div class="ctitle">📦 批發商品資訊</div>
+      <div class="f"><label>產品類別（可複選）</label>
+        <div id="cat-boxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
+      </div>
+      <div class="f" id="spec-wrap" style="display:none">
+        <label>規格 / 尺寸說明</label>
+        <textarea id="m-spec" placeholder="例：公仔尺寸約 12cm，搪膠材質，附底座..."></textarea>
+      </div>
+    </div>
+
+    <!-- IP 授權資訊（所有業務類型）-->
     <div class="card">
-      <div class="ctitle">📅 時程</div>
+      <div class="ctitle">📜 IP 授權資訊</div>
+      <div class="row2">
+        <div class="f"><label>版權方</label>
+          <input id="m-licensor" placeholder="例：Peanuts Worldwide / 小賢工作室"></div>
+        <div class="f"><label>簽約狀態</label>
+          <select id="m-sign">
+            <option>洽談中</option><option>已簽署</option><option>待續約/待轉讓</option>
+            <option>已到期</option><option>已終止</option>
+          </select></div>
+      </div>
+      <div class="f"><label>授權地區範圍</label>
+        <input id="m-territory" placeholder="例：台灣、香港、澳門；或 全球"></div>
+      <div class="row2">
+        <div class="f"><label>保底金額</label>
+          <input type="number" id="m-mg" placeholder="0"></div>
+        <div class="f"><label>幣別</label>
+          <select id="m-cur"><option>TWD</option><option>CNY</option><option>USD</option><option>THB</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="f"><label>權利金（零售價 %）</label>
+          <input type="number" id="m-royal-retail" placeholder="例：12" step="0.1"></div>
+        <div class="f"><label>權利金（批發價 %）</label>
+          <input type="number" id="m-royal-wholesale" placeholder="例：18" step="0.1"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">📅 時程與狀態</div>
       <div class="row2">
         <div class="f"><label>開始日期</label><input type="date" id="m-start"></div>
         <div class="f"><label>截止日期</label><input type="date" id="m-end"></div>
@@ -186,44 +222,72 @@ function _projVal(selectId){
 function _dateToTs(v){ return v?new Date(v).getTime():null; }
 
 
-_loadProjectSelect("proj-sel");
-document.getElementById("frm").onsubmit=async(e)=>{
+const CATS=["公仔","絨毛玩偶","3C配件","文具周邊","服飾配件","家品","食品","其他"];
+const catBox=document.getElementById("cat-boxes");
+CATS.forEach(c=>{{
+  const lbl=document.createElement("label");
+  lbl.style.cssText="display:flex;align-items:center;gap:5px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px";
+  const cb=document.createElement("input"); cb.type="checkbox"; cb.value=c; cb.id="cat-"+c;
+  cb.onchange=()=>{{
+    const hasGfig=document.getElementById("cat-公仔")?.checked||document.getElementById("cat-絨毛玩偶")?.checked;
+    document.getElementById("spec-wrap").style.display=hasGfig?"block":"none";
+  }};
+  lbl.appendChild(cb); lbl.appendChild(document.createTextNode(c));
+  catBox.appendChild(lbl);
+}});
+
+function toggleBatchFields(type){{
+  document.getElementById("batch-card").style.display=(type==="批發"||type==="代工")?"block":"none";
+}}
+toggleBatchFields("批發");
+
+_loadProjectSelect&&_loadProjectSelect("proj-sel-dummy");
+
+document.getElementById("frm").onsubmit=async(e)=>{{
   e.preventDefault();
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
   btn.disabled=true; btn.textContent="提交中...";
   res.style.display="none";
-  try{
-    const proj=_projVal("proj-sel");
-    const fields={...({
-      "項目名稱": document.getElementById("m-name").value,
-      "IP品牌":   document.getElementById("m-ip").value,
-      "業務類型": document.getElementById("m-type").value,
-      "所在地":   document.getElementById("m-loc").value,
-      "負責人":   document.getElementById("m-owner").value,
-      "開始日期": _dateToTs(document.getElementById("m-start").value),
-      "截止日期": _dateToTs(document.getElementById("m-end").value),
-      "狀態":     document.getElementById("m-status").value,
-      "完成進度%":parseFloat(document.getElementById("m-pct").value)||0,
-      "備註":     document.getElementById("m-note").value,
-    })};
-    
+  try{{
+    const cats=[...document.querySelectorAll("#cat-boxes input:checked")].map(x=>x.value);
+    const fields={{
+      "項目名稱":    document.getElementById("m-name").value,
+      "IP品牌":      document.getElementById("m-ip").value,
+      "業務類型":    document.getElementById("m-type").value,
+      "所在地":      document.getElementById("m-loc").value,
+      "版權對接人":  document.getElementById("m-owner").value,
+      "版權方":      document.getElementById("m-licensor").value,
+      "簽約狀態":    document.getElementById("m-sign").value,
+      "授權地區範圍":document.getElementById("m-territory").value,
+      "保底金額":    parseFloat(document.getElementById("m-mg").value)||0,
+      "權利金_零售%":parseFloat(document.getElementById("m-royal-retail").value)||0,
+      "權利金_批發%":parseFloat(document.getElementById("m-royal-wholesale").value)||0,
+      "開始日期":    _dateToTs(document.getElementById("m-start").value),
+      "截止日期":    _dateToTs(document.getElementById("m-end").value),
+      "狀態":        document.getElementById("m-status").value,
+      "完成進度%":   parseFloat(document.getElementById("m-pct").value)||0,
+      "備註":        document.getElementById("m-note").value,
+    }};
+    if(cats.length) fields["產品類別"]=cats;
+    const spec=document.getElementById("m-spec")?.value;
+    if(spec) fields["規格尺寸說明"]=spec;
     await _post("project", fields);
     res.className="result ok"; res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
-    document.getElementById("res-msg").textContent="提交成功！";
-    document.getElementById("res-sub").textContent="資料已同步至飛書，儀表板將於下次排程更新";
+    document.getElementById("res-msg").textContent="項目已建立！";
+    document.getElementById("res-sub").textContent="接下來可至「預算編列」表單為此項目建立預算";
     document.getElementById("frm").reset();
-    _loadProjectSelect("proj-sel");
-  }catch(err){
+    toggleBatchFields("批發");
+  }}catch(err){{
     res.className="result err"; res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
     document.getElementById("res-msg").textContent="提交失敗";
-    document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖此錯誤並回報管理員";
+    document.getElementById("res-sub").textContent=err.message;
     console.error(err);
-  }finally{
+  }}finally{{
     btn.disabled=false; btn.textContent="提交";
-  }
-};
+  }}
+}};
 </script>
 </body></html>
