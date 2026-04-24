@@ -40,7 +40,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="topbar">
   <div>
     <div class="topbar-title">🏢 蕪解管理儀表板</div>
-    <div class="topbar-sub">最後更新：2026-04-25 01:53</div>
+    <div class="topbar-sub">最後更新：2026-04-25 02:09</div>
   </div>
   <div style="display:flex;gap:8px">
     <a href="forms/index.html"
@@ -551,29 +551,9 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="section">
   <div class="section-header">
     <span class="section-title">🎨 設計送審進度</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">更新設計 →</a>
+    <a class="section-link" href="forms/design.html">填報 →</a>
   </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>設計名稱</th><th>IP</th><th>類型</th><th>設計師</th><th>提交日</th><th>預計通過</th><th>狀態</th><th>版本</th></tr></thead>
-      <tbody><tr>
-          <td>【測試】Chiikawa 夏日海灘公仔 2D 稿</td>
-          <td><span style="color:#a78bfa">Chiikawa</span></td>
-          <td>—</td>
-          <td>Bevis</td>
-          <td>1776614400000</td>
-          <td>1777910400000</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已提交</span></td>
-          <td style="color:#94a3b8;font-size:12px">v1.0</td>
-        </tr><tr>
-          <td>【測試】Snoopy 快閃店主視覺 KV</td>
-          <td><span style="color:#a78bfa">Snoopy</span></td>
-          <td>—</td>
-          <td>Bangkok Creative Studio</td>
-          <td>1776182400000</td>
-          <td>1777305600000</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">修改中</span></td>
-          <td style="color:#94a3b8;font-size:12px">v2.1</td>
-        </tr></tbody></table></div></div>
+  <div class="section-body" id="design-body"><div style="color:#64748b;font-size:13px">載入中...</div></div>
 </div>
 
 <div class="section">
@@ -842,6 +822,72 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
       </div>`).join("")+
       '</div><div style="margin-top:12px;font-size:12px;color:#64748b">今日 <b style="color:#10b981">'+list.length+'</b> 人已上線</div>';
   }catch(e){el.innerHTML='<div style="color:#64748b;font-size:13px">無法載入出勤資料</div>';}
+})();
+
+// ── 設計送審 live（含圖片縮圖）────────────────────────────────
+(async function(){
+  const PROXY="https://feishu-proxy.raychou6913.workers.dev";
+  const AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+  const DT="tblTEoNLDvtYi4pX";
+  const STATUS_C={"待提交":"#64748b","已提交":"#6366f1","修改中":"#f59e0b","已通過":"#10b981","已拒絕":"#ef4444"};
+  const el=document.getElementById("design-body");
+  try{
+    const tr=await fetch(PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0){el.innerHTML='<div style="color:#ef4444;font-size:13px">Token 失敗</div>';return;}
+    const tk=td.tenant_access_token;
+    const res=await fetch(PROXY+"/open-apis/bitable/v1/apps/"+AT+"/tables/"+DT+"/records?page_size=50",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const data=await res.json();
+    const items=(data.data?.items||[]);
+    if(!items.length){el.innerHTML='<div style="color:#64748b;font-size:13px;padding:20px;text-align:center">📭 尚無設計送審資料</div>';return;}
+
+    function fv(f,k){const v=f[k];if(!v&&v!==0)return"";if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.text||x.name||""):String(x)).join("");return String(v);}
+
+    const rows=items.map(item=>{
+      const f=item.fields||{};
+      const status=fv(f,"審核狀態")||"待提交";
+      const sc=STATUS_C[status]||"#64748b";
+      // 附件縮圖
+      const atts=f["設計圖附件"];
+      let imgHtml="";
+      if(Array.isArray(atts)&&atts.length){
+        imgHtml='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">';
+        atts.forEach(a=>{
+          const url=a.tmp_url||a.url||"";
+          const name=a.name||"圖片";
+          if(url&&(a.type||"").startsWith("image")){
+            imgHtml+=`<a href="${url}" target="_blank" title="${name}">
+              <img src="${url}" alt="${name}" style="width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid #334155;cursor:pointer">
+            </a>`;
+          }else if(url){
+            imgHtml+=`<a href="${url}" target="_blank" style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:11px;color:#94a3b8;text-decoration:none">📎 ${name.slice(0,12)}</a>`;
+          }
+        });
+        imgHtml+='</div>';
+      }
+      return `<tr>
+        <td>
+          <div style="font-weight:600;color:#f1f5f9">${fv(f,"設計名稱")||"—"}</div>
+          ${imgHtml}
+        </td>
+        <td style="color:#a78bfa">${fv(f,"IP品牌")||"—"}</td>
+        <td style="color:#94a3b8">${fv(f,"送審階段")||"—"}</td>
+        <td style="color:#94a3b8">${fv(f,"設計師/供應商")||"—"}</td>
+        <td style="color:#64748b">${fv(f,"提交日期")||"—"}</td>
+        <td><span style="background:${sc};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">${status}</span></td>
+        <td style="color:#94a3b8;font-size:12px">${fv(f,"版本號")||"—"}</td>
+      </tr>`;
+    }).join("");
+
+    el.innerHTML=`<div style="overflow-x:auto"><table class="dt">
+      <thead><tr>
+        <th>設計名稱 / 圖片</th><th>IP</th><th>送審階段</th><th>設計師</th><th>提交日</th><th>狀態</th><th>版本</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  }catch(e){el.innerHTML='<div style="color:#64748b;font-size:13px">無法載入設計資料</div>';}
 })();
 </script>
 </body>
