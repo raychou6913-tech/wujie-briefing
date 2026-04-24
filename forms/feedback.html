@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>💬 使用體驗回報 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#6366f112;border-bottom:2px solid #6366f1;padding:18px 20px;display:flex;align-items:center;gap:12px}
+.hdr-icon{font-size:26px}.hdr-title{font-size:19px;font-weight:700;color:#0f172a}
+.hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
+.wrap{max-width:620px;margin:24px auto;padding:0 14px}
+.card{background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 1px 4px #0000000a}
+.ctitle{font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+.f{margin-bottom:13px}
+.f label{display:block;font-size:13px;color:#64748b;margin-bottom:5px;font-weight:600}
+.f input,.f select,.f textarea{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;color:#0f172a;font-size:14px;outline:none;transition:border .15s}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#6366f1;background:#fff}
+.f textarea{min-height:72px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.req{color:#6366f1}
+.hint{font-size:11px;color:#94a3b8;margin-top:3px}
+.btn{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .15s}
+.btn:hover{opacity:.88;transform:translateY(-1px)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.result{display:none;border-radius:12px;padding:20px;text-align:center;margin-top:14px;border:1px solid}
+.result.ok{background:#f0fdf4;border-color:#10b981;color:#166534}
+.result.err{background:#fef2f2;border-color:#ef4444;color:#991b1b}
+.result-icon{font-size:32px;margin-bottom:8px}
+.result-msg{font-size:15px;font-weight:700}
+.result-sub{font-size:12px;margin-top:4px;opacity:.8;word-break:break-all}
+.back{display:block;text-align:center;color:#64748b;font-size:15px;font-weight:500;margin-top:24px;text-decoration:none;padding:10px}
+.back:hover{color:#6366f1}
+@media(max-width:480px){.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-icon">💬</div>
+  <div><div class="hdr-title">使用體驗回報</div>
+  <div class="hdr-sub">蕪解創意 · 填報後即時同步管理儀表板</div></div>
+</div>
+<div class="wrap">
+<form id="frm">
+
+    <div class="card" style="border-color:#6366f1">
+      <div class="ctitle" style="color:#6366f1">💬 今天的使用體驗如何？</div>
+      <div class="f">
+        <label>整體滿意度 <span class="req" style="color:#6366f1">*</span></label>
+        <div id="star-row" style="display:flex;gap:8px;margin-top:4px">
+          <button type="button" class="star-btn" data-v="1" onclick="setStar(1)" style="flex:1;padding:12px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:20px;transition:all .15s">😤<br><span style="font-size:10px;color:#64748b">很差</span></button>
+          <button type="button" class="star-btn" data-v="2" onclick="setStar(2)" style="flex:1;padding:12px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:20px;transition:all .15s">😕<br><span style="font-size:10px;color:#64748b">不順</span></button>
+          <button type="button" class="star-btn" data-v="3" onclick="setStar(3)" style="flex:1;padding:12px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:20px;transition:all .15s">😐<br><span style="font-size:10px;color:#64748b">普通</span></button>
+          <button type="button" class="star-btn" data-v="4" onclick="setStar(4)" style="flex:1;padding:12px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:20px;transition:all .15s">🙂<br><span style="font-size:10px;color:#64748b">不錯</span></button>
+          <button type="button" class="star-btn" data-v="5" onclick="setStar(5)" style="flex:1;padding:12px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:20px;transition:all .15s">😄<br><span style="font-size:10px;color:#64748b">很好</span></button>
+        </div>
+        <input type="hidden" id="f-score" required>
+        <div class="hint" id="score-hint" style="color:#ef4444;display:none">請選擇滿意度評分</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">📋 今天用了哪些表單？</div>
+      <div class="f">
+        <label>使用的表單（可多選）</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="form-checks">
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="項目排期"> 項目排期</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="現金流"> 現金流</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="預算編列"> 預算編列</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="銷售進度"> 銷售進度</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="設計送審"> 設計送審</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="採購詢比價"> 採購詢比價</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="庫存物流"> 庫存物流</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="審批記錄"> 審批記錄</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="每日銷售快報"> 每日快報</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;border:1.5px solid transparent" onclick="this.style.borderColor=this.querySelector('input').checked?'#e2e8f0':'#6366f1'"><input type="checkbox" value="其他"> 其他</label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">🐛 問題 & 💡 建議</div>
+      <div class="f"><label>遇到的問題或卡關</label>
+        <textarea id="f-issue" placeholder="例：XX欄位填寫後提交失敗、不知道某表單在哪裡...（沒有可以不填）"></textarea></div>
+      <div class="f"><label>改善建議</label>
+        <textarea id="f-suggest" placeholder="例：希望新增某功能、某表單順序調整...（你的建議直接影響下次優化方向 🙏）"></textarea></div>
+      <div class="f"><label>填報人</label>
+        <input id="f-owner" placeholder="你的名字（自動帶入）"></div>
+    </div>
+<button class="btn" type="submit" id="sbtn">提交</button>
+</form>
+<div class="result" id="res">
+  <div class="result-icon" id="res-icon"></div>
+  <div class="result-msg" id="res-msg"></div>
+  <div class="result-sub" id="res-sub"></div>
+</div>
+<a class="back" href="index.html">← 返回填報中心</a>
+</div>
+<script>
+
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8"};
+
+async function _getToken(){
+  const r=await fetch(_PROXY+"/auth/token",{
+    method:"POST",headers:{"Content-Type":"application/json"},body:"{}"
+  });
+  if(!r.ok) throw new Error("Token HTTP "+r.status);
+  const d=await r.json();
+  if(d.code!==0) throw new Error("Token err: "+d.msg);
+  return d.tenant_access_token;
+}
+
+async function _post(tableKey,fields){
+  Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]===undefined) delete fields[k]; });
+  const tk=await _getToken();
+  const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES[tableKey]+"/records",{
+    method:"POST",
+    headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields})
+  });
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const d=await r.json();
+  if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
+  return d;
+}
+
+async function _getProjects(){
+  const tk=await _getToken();
+  const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["project"]+"/records?page_size=100",{
+    headers:{"Authorization":"Bearer "+tk}
+  });
+  const d=await r.json();
+  if(d.code!==0) return [];
+  return (d.data?.items||[]).map(rec=>{
+    const f=rec.fields||{};
+    const n=f["項目名稱"];
+    if(!n) return null;
+    const name=Array.isArray(n)?n[0]?.text||"":String(n);
+    return name;
+  }).filter(Boolean);
+}
+
+function _ts(dateStr){ return dateStr?new Date(dateStr).getTime():null; }
+
+async function _loadProjectSelect(selectId){
+  const sel=document.getElementById(selectId);
+  if(!sel) return;
+  try{
+    const list=await _getProjects();
+    sel.innerHTML='<option value="">— 選擇項目（選填）—</option>';
+    list.forEach(name=>{
+      const o=document.createElement("option");
+      o.value=name; o.textContent=name;
+      sel.appendChild(o);
+    });
+    const opt=document.createElement("option");
+    opt.value="__new__"; opt.textContent="＋ 新增項目（跳轉）";
+    sel.appendChild(opt);
+    sel.onchange=()=>{
+      if(sel.value==="__new__") window.open("project.html","_blank");
+    };
+  }catch(e){
+    sel.innerHTML='<option value="">（無法載入項目列表）</option>';
+    const txt=document.createElement("input");
+    txt.type="text"; txt.placeholder="請手動輸入項目名稱";
+    txt.style.cssText="width:100%;margin-top:6px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;color:#0f172a;font-size:14px";
+    txt.id=selectId+"_fallback";
+    sel.parentNode.appendChild(txt);
+  }
+}
+
+function _projVal(selectId){
+  const sel=document.getElementById(selectId);
+  const fb=document.getElementById(selectId+"_fallback");
+  if(fb) return fb.value.trim();
+  return sel?.value==="__new__"?"":sel?.value||"";
+}
+
+function _dateToTs(v){ return v?new Date(v).getTime():null; }
+
+async function _uploadImages(files,tk){
+  const res=[];
+  for(const f of files){
+    const fd=new FormData();
+    fd.append("file_name",f.name);
+    fd.append("parent_type","bitable_image");
+    fd.append("parent_node",_AT);
+    fd.append("size",String(f.size));
+    fd.append("file",f);
+    const r=await fetch(_PROXY+"/open-apis/drive/v1/medias/upload_all",{
+      method:"POST",headers:{"Authorization":"Bearer "+tk},body:fd
+    });
+    const d=await r.json();
+    if(d.code!==0) throw new Error("圖片上傳失敗："+f.name+" ("+d.msg+")");
+    res.push({file_token:d.data.file_token,name:f.name});
+  }
+  return res;
+}
+
+function _bindImgPreview(inputId,previewId){
+  const inp=document.getElementById(inputId);
+  if(!inp) return;
+  inp.addEventListener("change",function(){
+    const box=document.getElementById(previewId);
+    box.innerHTML="";
+    Array.from(this.files).forEach(f=>{
+      const wrap=document.createElement("div");
+      wrap.style.cssText="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px;width:90px;text-align:center;font-size:11px;color:#64748b;overflow:hidden;flex-shrink:0";
+      if(f.type.startsWith("image/")){
+        const img=document.createElement("img");
+        img.src=URL.createObjectURL(f);
+        img.style.cssText="width:78px;height:58px;object-fit:cover;border-radius:4px;margin-bottom:4px;display:block";
+        wrap.appendChild(img);
+      }
+      const nm=document.createElement("div");
+      nm.style.cssText="white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+      nm.textContent=f.name;
+      wrap.appendChild(nm);
+      box.appendChild(wrap);
+    });
+  });
+}
+
+// 登入驗證 + 自動帶入填報人
+window.addEventListener("DOMContentLoaded",function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){
+    localStorage.removeItem("wujie_session");
+    location.replace("../login.html");
+    return;
+  }
+  ["f-who","f-owner"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&!el.value) el.value=s.name;
+  });
+});
+
+
+let _fbScore=0;
+function setStar(v){
+  _fbScore=v;
+  document.getElementById("f-score").value=v;
+  document.getElementById("score-hint").style.display="none";
+  document.querySelectorAll(".star-btn").forEach(b=>{
+    const active=parseInt(b.dataset.v)===v;
+    b.style.background=active?"#6366f1":"#f8fafc";
+    b.style.borderColor=active?"#6366f1":"#e2e8f0";
+    b.style.color=active?"#fff":"inherit";
+    b.style.transform=active?"scale(1.05)":"scale(1)";
+  });
+}
+document.getElementById("frm").onsubmit=async(e)=>{
+  e.preventDefault();
+  if(!_fbScore){
+    document.getElementById("score-hint").style.display="block";
+    document.getElementById("star-row").scrollIntoView({behavior:"smooth"});
+    return;
+  }
+  const btn=document.getElementById("sbtn");
+  const res=document.getElementById("res");
+  btn.disabled=true; btn.textContent="提交中...";
+  res.style.display="none";
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"{}");
+  const now=new Date();
+  const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  const forms=[...document.querySelectorAll("#form-checks input:checked")].map(c=>c.value).join("、");
+  try{
+    await _post("feedback",{
+      "填報人":     s.name||document.getElementById("f-owner").value,
+      "部門":       s.dept||"",
+      "日期":       localDate,
+      "時間":       now.toTimeString().slice(0,8),
+      "整體滿意度": _fbScore,
+      "使用的表單": forms||"（未選擇）",
+      "遇到的問題": document.getElementById("f-issue").value||"無",
+      "改善建議":   document.getElementById("f-suggest").value||"無",
+      "心情":       _fbScore>=4?"😄 開心":_fbScore===3?"😐 普通":"😕 不順",
+    });
+    res.className="result ok"; res.style.display="block";
+    document.getElementById("res-icon").textContent="💙";
+    document.getElementById("res-msg").textContent="感謝你的回饋！";
+    document.getElementById("res-sub").textContent="你的意見將在明天早上整理成改善建議";
+    document.getElementById("frm").reset();
+    _fbScore=0;
+    document.querySelectorAll(".star-btn").forEach(b=>{b.style.background="#f8fafc";b.style.borderColor="#e2e8f0";b.style.color="inherit";});
+  }catch(err){
+    res.className="result err"; res.style.display="block";
+    document.getElementById("res-icon").textContent="❌";
+    document.getElementById("res-msg").textContent="提交失敗";
+    document.getElementById("res-sub").textContent=err.message;
+  }finally{
+    btn.disabled=false; btn.textContent="提交";
+  }
+};
+</script>
+</body></html>
