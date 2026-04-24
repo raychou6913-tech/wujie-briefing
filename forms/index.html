@@ -20,8 +20,59 @@ h1{font-size:20px;font-weight:700;color:#0f172a}
 <div class="hdr"><h1>🏢 蕪解填報中心</h1><p class="sub">選擇你的崗位表單，提交後即時同步至管理系統</p></div>
 <div id="user-bar" style="background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
   <span style="font-size:13px;color:#64748b">你好，<span id="user-name" style="color:#6366f1;font-weight:700"></span></span>
-  <a id="logout-btn" href="../login.html" style="font-size:12px;color:#94a3b8;text-decoration:none" onclick="localStorage.removeItem('wujie_session')">登出</a>
+  <button id="logout-btn" style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline" onclick="showFeedback()">登出</button>
 </div>
+
+<!-- ── 登出前問卷 Modal ── -->
+<div id="fb-modal" style="display:none;position:fixed;inset:0;background:#0008;z-index:9999;overflow-y:auto">
+  <div style="max-width:480px;margin:40px auto 24px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px #0004">
+    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:24px 24px 20px;color:#fff">
+      <div style="font-size:22px;margin-bottom:6px">👋 今天辛苦了！</div>
+      <div style="font-size:14px;opacity:.9">離開前花 30 秒留個感受，幫助系統持續變得更好</div>
+    </div>
+    <div style="padding:20px">
+      <div style="margin-bottom:18px">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:10px">今天整體使用體驗如何？</div>
+        <div id="star-row" style="display:flex;gap:8px">
+          <button class="star-btn" data-v="1" onclick="setStar(1)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😤<br><span style="font-size:10px;color:#64748b">很差</span></button>
+          <button class="star-btn" data-v="2" onclick="setStar(2)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😕<br><span style="font-size:10px;color:#64748b">不順</span></button>
+          <button class="star-btn" data-v="3" onclick="setStar(3)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😐<br><span style="font-size:10px;color:#64748b">普通</span></button>
+          <button class="star-btn" data-v="4" onclick="setStar(4)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">🙂<br><span style="font-size:10px;color:#64748b">不錯</span></button>
+          <button class="star-btn" data-v="5" onclick="setStar(5)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😄<br><span style="font-size:10px;color:#64748b">很好</span></button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px">今天用了哪些表單？（可多選）</div>
+        <div id="form-checks" style="display:flex;flex-wrap:wrap;gap:6px">
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="項目排期"> 項目排期</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="現金流"> 現金流</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="預算編列"> 預算編列</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="銷售進度"> 銷售進度</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="設計送審"> 設計送審</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="採購詢比價"> 採購詢比價</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="庫存物流"> 庫存物流</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="審批記錄"> 審批記錄</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="每日銷售快報"> 每日快報</label>
+          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="其他"> 其他</label>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:6px">遇到任何問題或卡關？</div>
+        <textarea id="fb-issue" placeholder="描述問題（沒有可以不填）" style="width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;resize:vertical;min-height:64px;outline:none;box-sizing:border-box"></textarea>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:6px">有什麼想改善的建議？</div>
+        <textarea id="fb-suggest" placeholder="你的建議對我們很重要 🙏" style="width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;resize:vertical;min-height:64px;outline:none;box-sizing:border-box"></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button id="fb-skip" onclick="doLogout()" style="flex:1;padding:12px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fff;color:#94a3b8;font-size:13px;cursor:pointer">跳過，直接登出</button>
+        <button id="fb-submit" onclick="submitFeedback()" style="flex:2;padding:12px;background:#6366f1;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">送出並登出 ✓</button>
+      </div>
+      <div id="fb-result" style="display:none;text-align:center;padding:10px;font-size:13px;color:#10b981;margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
 <div style="padding:16px 24px 4px;border-bottom:1px solid #e2e8f0;margin-bottom:4px">
   <div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📢 公告板</div>
   <div id="notice-board"><div style="color:#94a3b8;font-size:13px;padding:8px 0">公告載入中...</div></div>
@@ -133,6 +184,8 @@ const _PROXY_IDX="https://feishu-proxy.raychou6913.workers.dev";
 const _AT_IDX="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _VL_TBL="tblUzRSQgKLhlttk";
 const _NB_TBL="tblPtgudsOOlmJAx";
+const _TABLES_IDX={"feedback": "tbl68ofUGp7FTjx8"};
+
 
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
@@ -257,6 +310,76 @@ async function _confirmRead(rid,btn){
     btn.parentElement.innerHTML=`<span style="font-size:11px;color:#94a3b8">已讀：${newStr}</span><span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`;
   }catch(e){
     btn.textContent="✓ 確認已讀"; btn.disabled=false;
+  }
+}
+
+// ── 登出問卷 ────────────────────────────────────────────────
+let _fbScore=0;
+let _fbSession=null;
+
+function showFeedback(){
+  _fbSession=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  _fbScore=0;
+  document.querySelectorAll(".star-btn").forEach(b=>b.style.cssText=b.style.cssText.replace(/background:[^;]+/,"background:#f8fafc").replace(/border-color:[^;]+/,"border-color:#e2e8f0"));
+  document.getElementById("fb-issue").value="";
+  document.getElementById("fb-suggest").value="";
+  document.getElementById("fb-result").style.display="none";
+  document.getElementById("fb-submit").disabled=false;
+  document.getElementById("fb-submit").textContent="送出並登出 ✓";
+  document.querySelectorAll("#form-checks input").forEach(c=>c.checked=false);
+  document.getElementById("fb-modal").style.display="block";
+}
+
+function setStar(v){
+  _fbScore=v;
+  document.querySelectorAll(".star-btn").forEach(b=>{
+    const active=parseInt(b.dataset.v)===v;
+    b.style.background=active?"#6366f1":"#f8fafc";
+    b.style.borderColor=active?"#6366f1":"#e2e8f0";
+    b.style.color=active?"#fff":"inherit";
+  });
+}
+
+function doLogout(){
+  document.getElementById("fb-modal").style.display="none";
+  localStorage.removeItem("wujie_session");
+  location.replace("../login.html");
+}
+
+async function submitFeedback(){
+  const btn=document.getElementById("fb-submit");
+  const res=document.getElementById("fb-result");
+  btn.disabled=true; btn.textContent="送出中...";
+  const forms=[...document.querySelectorAll("#form-checks input:checked")].map(c=>c.value).join("、");
+  const now=new Date();
+  const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  const timeStr=now.toTimeString().slice(0,8);
+  const fields={
+    "填報人": _fbSession?.name||"",
+    "部門":   _fbSession?.dept||"",
+    "日期":   localDate,
+    "時間":   timeStr,
+    "整體滿意度": _fbScore||0,
+    "使用的表單": forms||"（未選擇）",
+    "遇到的問題": document.getElementById("fb-issue").value||"無",
+    "改善建議":   document.getElementById("fb-suggest").value||"無",
+    "心情":       _fbScore>=4?"😄 開心":_fbScore===3?"😐 普通":_fbScore>=1?"😕 不順":"（未評分）",
+  };
+  try{
+    const tr=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0) throw new Error("token");
+    const tk=td.tenant_access_token;
+    await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_TABLES_IDX["feedback"]+"/records",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    res.style.display="block"; res.textContent="✅ 謝謝你的回饋！3 秒後登出...";
+    setTimeout(doLogout, 3000);
+  }catch(e){
+    res.style.display="block"; res.style.color="#ef4444"; res.textContent="送出失敗，直接登出...";
+    setTimeout(doLogout, 2000);
   }
 }
 </script>
