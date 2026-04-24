@@ -30,6 +30,10 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 .result-sub{font-size:12px;margin-top:4px;opacity:.8;word-break:break-all}
 .back{display:block;text-align:center;color:#475569;font-size:12px;margin-top:18px;text-decoration:none}
 .back:hover{color:#6366f1}
+
+.cb-label{display:inline-flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px;transition:border-color .15s}
+.cb-label:hover{border-color:#6366f1}
+.cb-label input{accent-color:#6366f1;width:14px;height:14px}
 @media(max-width:480px){.row2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -70,24 +74,28 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
       </div>
     </div>
 
-    <!-- 批發專屬：產品類別（批發時顯示）-->
+    <!-- 批發/代工專屬：產品類別 -->
     <div class="card" id="batch-card">
       <div class="ctitle">📦 批發商品資訊</div>
-      <div class="f"><label>產品類別（可複選）</label>
-        <div id="cat-boxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
+      <div class="f">
+        <label>產品類別（可複選）</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+          <label class="cb-label"><input type="checkbox" class="pcat" value="公仔" onchange="toggleSpec()"> 公仔</label><label class="cb-label"><input type="checkbox" class="pcat" value="絨毛玩偶" onchange="toggleSpec()"> 絨毛玩偶</label><label class="cb-label"><input type="checkbox" class="pcat" value="3C配件"> 3C配件</label><label class="cb-label"><input type="checkbox" class="pcat" value="文具周邊"> 文具周邊</label><label class="cb-label"><input type="checkbox" class="pcat" value="服飾配件"> 服飾配件</label><label class="cb-label"><input type="checkbox" class="pcat" value="家品"> 家品</label><label class="cb-label"><input type="checkbox" class="pcat" value="食品"> 食品</label><label class="cb-label"><input type="checkbox" class="pcat" value="其他"> 其他</label>
+        </div>
       </div>
       <div class="f" id="spec-wrap" style="display:none">
         <label>規格 / 尺寸說明</label>
-        <textarea id="m-spec" placeholder="例：公仔尺寸約 12cm，搪膠材質，附底座..."></textarea>
+        <textarea id="m-spec" placeholder="例：公仔高約 12cm，搪膠材質，附底座；或 L碼 / M碼"></textarea>
+        <div class="hint">勾選公仔或絨毛玩偶後請填寫，後續可在「產品明細」中為每款產品補充詳情</div>
       </div>
     </div>
 
-    <!-- IP 授權資訊（所有業務類型）-->
+    <!-- IP 授權資訊 -->
     <div class="card">
       <div class="ctitle">📜 IP 授權資訊</div>
       <div class="row2">
         <div class="f"><label>版權方</label>
-          <input id="m-licensor" placeholder="例：Peanuts Worldwide / 小賢工作室"></div>
+          <input id="m-licensor" placeholder="例：Peanuts Worldwide"></div>
         <div class="f"><label>簽約狀態</label>
           <select id="m-sign">
             <option>洽談中</option><option>已簽署</option><option>待續約/待轉讓</option>
@@ -96,6 +104,10 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
       </div>
       <div class="f"><label>授權地區範圍</label>
         <input id="m-territory" placeholder="例：台灣、香港、澳門；或 全球"></div>
+      <div class="row2">
+        <div class="f"><label>授權開始日</label><input type="date" id="m-lic-start"></div>
+        <div class="f"><label>授權結束日</label><input type="date" id="m-lic-end"></div>
+      </div>
       <div class="row2">
         <div class="f"><label>保底金額</label>
           <input type="number" id="m-mg" placeholder="0"></div>
@@ -141,7 +153,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 
 const _AID="cli_a96188997ea49e15",_ASC="Bnd53bURDQmPC3yUHN4UMhfwT2UeobX1",_AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _BASE="https://open.feishu.cn/open-apis";
-const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe"};
+const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc"};
 
 async function _getToken(){
   const r=await fetch(_BASE+"/auth/v3/tenant_access_token/internal",{
@@ -222,36 +234,26 @@ function _projVal(selectId){
 function _dateToTs(v){ return v?new Date(v).getTime():null; }
 
 
-const CATS=["公仔","絨毛玩偶","3C配件","文具周邊","服飾配件","家品","食品","其他"];
-const catBox=document.getElementById("cat-boxes");
-CATS.forEach(c=>{{
-  const lbl=document.createElement("label");
-  lbl.style.cssText="display:flex;align-items:center;gap:5px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px";
-  const cb=document.createElement("input"); cb.type="checkbox"; cb.value=c; cb.id="cat-"+c;
-  cb.onchange=()=>{{
-    const hasGfig=document.getElementById("cat-公仔")?.checked||document.getElementById("cat-絨毛玩偶")?.checked;
-    document.getElementById("spec-wrap").style.display=hasGfig?"block":"none";
-  }};
-  lbl.appendChild(cb); lbl.appendChild(document.createTextNode(c));
-  catBox.appendChild(lbl);
-}});
-
-function toggleBatchFields(type){{
-  document.getElementById("batch-card").style.display=(type==="批發"||type==="代工")?"block":"none";
-}}
+function toggleSpec(){
+  const has=document.querySelector('.pcat[value="公仔"]:checked')||
+             document.querySelector('.pcat[value="絨毛玩偶"]:checked');
+  document.getElementById("spec-wrap").style.display=has?"block":"none";
+}
+function toggleBatchFields(type){
+  document.getElementById("batch-card").style.display=
+    (type==="批發"||type==="代工")?"block":"none";
+}
 toggleBatchFields("批發");
 
-_loadProjectSelect&&_loadProjectSelect("proj-sel-dummy");
-
-document.getElementById("frm").onsubmit=async(e)=>{{
+document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
   btn.disabled=true; btn.textContent="提交中...";
   res.style.display="none";
-  try{{
-    const cats=[...document.querySelectorAll("#cat-boxes input:checked")].map(x=>x.value);
-    const fields={{
+  try{
+    const cats=[...document.querySelectorAll(".pcat:checked")].map(x=>x.value);
+    const fields={
       "項目名稱":    document.getElementById("m-name").value,
       "IP品牌":      document.getElementById("m-ip").value,
       "業務類型":    document.getElementById("m-type").value,
@@ -260,6 +262,8 @@ document.getElementById("frm").onsubmit=async(e)=>{{
       "版權方":      document.getElementById("m-licensor").value,
       "簽約狀態":    document.getElementById("m-sign").value,
       "授權地區範圍":document.getElementById("m-territory").value,
+      "授權開始日":  _dateToTs(document.getElementById("m-lic-start").value),
+      "授權結束日":  _dateToTs(document.getElementById("m-lic-end").value),
       "保底金額":    parseFloat(document.getElementById("m-mg").value)||0,
       "權利金_零售%":parseFloat(document.getElementById("m-royal-retail").value)||0,
       "權利金_批發%":parseFloat(document.getElementById("m-royal-wholesale").value)||0,
@@ -268,7 +272,7 @@ document.getElementById("frm").onsubmit=async(e)=>{{
       "狀態":        document.getElementById("m-status").value,
       "完成進度%":   parseFloat(document.getElementById("m-pct").value)||0,
       "備註":        document.getElementById("m-note").value,
-    }};
+    };
     if(cats.length) fields["產品類別"]=cats;
     const spec=document.getElementById("m-spec")?.value;
     if(spec) fields["規格尺寸說明"]=spec;
@@ -276,18 +280,18 @@ document.getElementById("frm").onsubmit=async(e)=>{{
     res.className="result ok"; res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
     document.getElementById("res-msg").textContent="項目已建立！";
-    document.getElementById("res-sub").textContent="接下來可至「預算編列」表單為此項目建立預算";
+    document.getElementById("res-sub").textContent="接下來可至「新增產品」表單為此項目建立個別產品";
     document.getElementById("frm").reset();
     toggleBatchFields("批發");
-  }}catch(err){{
+  }catch(err){
     res.className="result err"; res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
     document.getElementById("res-msg").textContent="提交失敗";
     document.getElementById("res-sub").textContent=err.message;
     console.error(err);
-  }}finally{{
+  }finally{
     btn.disabled=false; btn.textContent="提交";
-  }}
-}};
+  }
+};
 </script>
 </body></html>
