@@ -257,9 +257,11 @@ document.getElementById("frm").onsubmit=async(e)=>{
   res.style.display="none";
   try{
     const budget=parseFloat(document.getElementById("f-budget").value)||0;
+    if(!budget){ alert("請填寫預算金額"); return; }
     const fields={
       "預算名稱":   document.getElementById("f-name").value,
       "類別":       document.getElementById("f-cat").value,
+      "預算性質":   document.getElementById("f-nature").value,
       "所在地":     document.getElementById("f-loc").value,
       "幣別":       document.getElementById("f-cur").value,
       "年度":       parseFloat(document.getElementById("f-year").value)||new Date().getFullYear(),

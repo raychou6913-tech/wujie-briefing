@@ -92,6 +92,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
           </select></div>
       </div>
       <div class="f"><label>修改備註</label><textarea id="f-note" placeholder="審核意見、修改要求..."></textarea></div>
+      <div class="f"><label>填報人</label><input id="f-owner" placeholder="你的名字"></div>
     </div>
     <div class="card">
       <div class="ctitle">📎 設計圖附件</div>
@@ -258,6 +259,15 @@ _loadProjectSelect("proj-sel");
 _bindImgPreview("f-imgs","img-preview");
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
+  const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
+  if(missing.length){
+    const res=document.getElementById("res");
+    res.className="result err"; res.style.display="block";
+    document.getElementById("res-icon").textContent="⚠️";
+    document.getElementById("res-msg").textContent="請填寫必填欄位";
+    document.getElementById("res-sub").textContent=missing.join("、");
+    return;
+  }
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
   btn.disabled=true; btn.textContent="提交中...";
@@ -277,7 +287,9 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "審核方":       document.getElementById("f-rev").value,
       "審核狀態":     document.getElementById("f-status").value,
       "修改備註":     document.getElementById("f-note").value,
+      "填報人":       document.getElementById("f-owner").value,
     })};
+    Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined)delete fields[k];});
     if(proj) fields["項目關聯"]=proj;
     const imgFiles=document.getElementById("f-imgs")?.files;
     if(imgFiles&&imgFiles.length>0){
@@ -289,7 +301,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       body:JSON.stringify({fields})
     });
     const d=await r.json();
-    if(d.code!==0) throw new Error(d.msg||"Feishu error "+d.code);
+    if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
     res.className="result ok"; res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
     document.getElementById("res-msg").textContent="提交成功！";

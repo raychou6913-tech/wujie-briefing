@@ -242,6 +242,15 @@ window.addEventListener("DOMContentLoaded",function(){
 _loadProjectSelect("proj-sel");
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
+  const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
+  if(missing.length){
+    const res=document.getElementById("res");
+    res.className="result err"; res.style.display="block";
+    document.getElementById("res-icon").textContent="⚠️";
+    document.getElementById("res-msg").textContent="請填寫必填欄位";
+    document.getElementById("res-sub").textContent=missing.join("、");
+    return;
+  }
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
   btn.disabled=true; btn.textContent="提交中...";
