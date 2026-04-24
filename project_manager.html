@@ -161,8 +161,9 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_ID="cli_a96188997ea49e15",APP_SECRET="Bnd53bURDQmPC3yUHN4UMhfwT2UeobX1",APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const FEISHU="https://open.feishu.cn/open-apis";
+const APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const FEISHU=PROXY+"/open-apis";
 const TABLES={"project": "tblYBjAlemYPuNGy", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "sales": "tblRtqmbO9TO3sYZ", "approval": "tblD6acV3m2ZXJHe"};
 
 let token="", projects=[], subtaskCache={}, editingId=null, currentFilter="全部";
@@ -179,9 +180,8 @@ const TYPE_COLOR={
 };
 
 async function getToken(){
-  const r=await fetch(FEISHU+"/auth/v3/tenant_access_token/internal",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({app_id:APP_ID,app_secret:APP_SECRET})
+  const r=await fetch(PROXY+"/auth/token",{
+    method:"POST",headers:{"Content-Type":"application/json"},body:"{}"
   });
   token=(await r.json()).tenant_access_token;
 }
