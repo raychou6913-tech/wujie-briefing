@@ -142,6 +142,8 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
     <div class="field"><label>預計收入</label><input type="number" id="m-rev" placeholder="0"></div>
     <div class="field"><label>預計支出</label><input type="number" id="m-exp" placeholder="0"></div>
   </div>
+  <div class="field"><label>當前關卡</label>
+    <select id="m-stage"><option>IP決策中</option><option>預算規劃</option><option>概念提案</option><option>跨部門確認</option><option>設計送審</option><option>採購詢價</option><option>預算確認</option><option>打樣/開模</option><option>市場收單</option><option>大貨生產</option><option>出貨物流</option><option>銷售推廣</option><option>已完成</option><option>已暫停</option></select></div>
   <div class="row2">
     <div class="field"><label>目前狀態</label>
       <select id="m-status">
@@ -165,6 +167,8 @@ const APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const FEISHU=PROXY+"/open-apis";
 const TABLES={"project": "tblYBjAlemYPuNGy", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "sales": "tblRtqmbO9TO3sYZ", "approval": "tblD6acV3m2ZXJHe"};
+const STAGES=["IP\u6c7a\u7b56\u4e2d", "\u9810\u7b97\u898f\u5283", "\u6982\u5ff5\u63d0\u6848", "\u8de8\u90e8\u9580\u78ba\u8a8d", "\u8a2d\u8a08\u9001\u5be9", "\u63a1\u8cfc\u8a62\u50f9", "\u9810\u7b97\u78ba\u8a8d", "\u6253\u6a23/\u958b\u6a21", "\u5e02\u5834\u6536\u55ae", "\u5927\u8ca8\u751f\u7522", "\u51fa\u8ca8\u7269\u6d41", "\u92b7\u552e\u63a8\u5ee3", "\u5df2\u5b8c\u6210", "\u5df2\u66ab\u505c"];
+const STAGE_IDX=Object.fromEntries(STAGES.map((s,i)=>[s,i]));
 
 let token="", projects=[], subtaskCache={}, editingId=null, currentFilter="全部";
 
@@ -262,6 +266,10 @@ function renderCard(p){
   const ip=fv(p,"IP品牌","—");
   const type=fv(p,"業務類型","—");
   const status=fv(p,"狀態","計劃中");
+  const stage=fv(p,"當前關卡","—");
+  const stageIdx=STAGE_IDX[stage]??-1;
+  const stageTotal=STAGES.length-2;
+  const stagePct=stageIdx>=0&&stageIdx<stageTotal?Math.round((stageIdx+1)/stageTotal*100):0;
   const pct=fn(p,"完成進度%");
   const rev=fn(p,"預計收入");
   const exp=fn(p,"預計支出");
@@ -286,6 +294,7 @@ function renderCard(p){
         <div class="proj-meta">${owner} · ${loc}${start?" · "+start:""}&nbsp;→&nbsp;${end||"未定"}</div>
       </div>
       <div class="proj-right">
+        <span class="badge" style="background:#0f172a;border:1px solid #334155;color:#94a3b8;font-size:10px" title="流程進度 ${stageIdx+1}/${stageTotal}">📍 ${stage}</span>
         <span class="badge" style="background:${stColor}22;color:${stColor}">${status}</span>
         <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openModal('${id}')" style="padding:4px 10px">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteProject('${id}','${name}')" style="padding:4px 10px">🗑</button>
@@ -388,6 +397,7 @@ function openModal(id=null){
       const e=fn(p,"截止日期"); document.getElementById("m-end").value=e?tsToDate(e):"";
       document.getElementById("m-rev").value=fn(p,"預計收入")||"";
       document.getElementById("m-exp").value=fn(p,"預計支出")||"";
+      document.getElementById("m-stage").value=fv(p,"當前關卡")||"IP決策中";
       document.getElementById("m-status").value=fv(p,"狀態")||"計劃中";
       document.getElementById("m-pct").value=fn(p,"完成進度%")||0;
       document.getElementById("m-note").value=fv(p,"備註");
@@ -402,6 +412,7 @@ function openModal(id=null){
     const today=new Date().toISOString().split("T")[0];
     document.getElementById("m-start").value=today;
     document.getElementById("m-end").value="";
+    document.getElementById("m-stage").value="IP決策中";
     document.getElementById("m-status").value="計劃中";
   }
   document.getElementById("overlay").classList.add("open");
@@ -429,6 +440,7 @@ async function saveProject(){
     "預計收入":  rev,
     "預計支出":  exp,
     "預計淨利":  rev-exp,
+    "當前關卡":  document.getElementById("m-stage").value,
     "狀態":      document.getElementById("m-status").value,
     "完成進度%": parseFloat(document.getElementById("m-pct").value)||0,
     "備註":      document.getElementById("m-note").value,
