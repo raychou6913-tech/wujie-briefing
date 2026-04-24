@@ -135,6 +135,7 @@ async function _getToken(){
 }
 
 async function _post(tableKey,fields){
+  Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]===undefined) delete fields[k]; });
   const tk=await _getToken();
   const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES[tableKey]+"/records",{
     method:"POST",
@@ -143,7 +144,7 @@ async function _post(tableKey,fields){
   });
   if(!r.ok) throw new Error("HTTP "+r.status);
   const d=await r.json();
-  if(d.code!==0) throw new Error(d.msg||"Feishu error "+d.code);
+  if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
   return d;
 }
 
