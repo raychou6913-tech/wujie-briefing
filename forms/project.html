@@ -90,6 +90,52 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       </div>
     </div>
 
+    <!-- 快閃店專屬資訊 -->
+    <div class="card" id="popup-card" style="display:none;border-top:3px solid #f59e0b">
+      <div class="ctitle" style="color:#f59e0b">🏪 快閃店專屬資訊</div>
+      <div class="f"><label>快閃店主題</label>
+        <input id="m-popup-theme" placeholder="例：Chiikawa 療癒星球 2026 台北站"></div>
+      <div class="row2">
+        <div class="f"><label>IP 快閃店現狀</label>
+          <select id="m-popup-ip-status">
+            <option>版權方尚無計畫（我方提案）</option>
+            <option>版權方已有官方計畫（洽談合作）</option>
+            <option>同品牌已有其他快閃店在運營</option>
+            <option>我方主導首次開設</option>
+          </select></div>
+        <div class="f"><label>投資結構</label>
+          <select id="m-invest-type" onchange="toggleInvestFields(this.value)">
+            <option>獨資（蕪解）</option>
+            <option>合資</option>
+            <option>代運營</option>
+          </select></div>
+      </div>
+      <div id="invest-detail" style="display:none">
+        <div class="f"><label>合資方（可多方，逗號分隔）</label>
+          <input id="m-partners" placeholder="例：有你共創、版權代理商名稱"></div>
+        <div class="f"><label>各方出資比例說明</label>
+          <textarea id="m-invest-split" placeholder="例：蕪解 40%（含技術股）/ 有你共創 60%；或 以產品入股說明..."></textarea></div>
+      </div>
+      <div id="agency-detail" style="display:none">
+        <div class="f"><label>代運營費結構</label>
+          <input id="m-agency-fee" placeholder="例：月費 5 萬 TWD；或 流水抽成 8%"></div>
+      </div>
+      <div class="f"><label>商品組成方式（可複選）</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+          <label class="cb-label"><input type="checkbox" class="pcomp" value="採購"> 採購</label>
+          <label class="cb-label"><input type="checkbox" class="pcomp" value="復刻"> 復刻（付設計費自找工廠）</label>
+          <label class="cb-label"><input type="checkbox" class="pcomp" value="寄售"> 寄售</label>
+          <label class="cb-label"><input type="checkbox" class="pcomp" value="自主開發"> 自主開發</label>
+        </div></div>
+      <div class="f"><label>IP 商品開發方</label>
+        <select id="m-dev-party">
+          <option>版權方開發</option><option>版權代理商開發</option>
+          <option>授權商開發</option><option>我方自主開發</option><option>混合（多方並行）</option>
+        </select></div>
+      <div class="f"><label>贊助收入預估</label>
+        <input type="number" id="m-sponsor" placeholder="商場/品牌贊助金額（無則填 0）"></div>
+    </div>
+
     <!-- IP 授權資訊 -->
     <div class="card">
       <div class="ctitle">📜 IP 授權資訊</div>
@@ -304,6 +350,12 @@ function toggleSpec(){
 function toggleBatchFields(type){
   document.getElementById("batch-card").style.display=
     (type==="批發"||type==="代工")?"block":"none";
+  document.getElementById("popup-card").style.display=
+    type==="快閃店"?"block":"none";
+}
+function toggleInvestFields(v){
+  document.getElementById("invest-detail").style.display=v==="合資"?"block":"none";
+  document.getElementById("agency-detail").style.display=v==="代運營"?"block":"none";
 }
 toggleBatchFields("批發");
 
@@ -339,6 +391,21 @@ document.getElementById("frm").onsubmit=async(e)=>{
     if(cats.length) fields["產品類別"]=cats;
     const spec=document.getElementById("m-spec")?.value;
     if(spec) fields["規格尺寸說明"]=spec;
+    if(fields["業務類型"]==="快閃店"){
+      const comps=[...document.querySelectorAll(".pcomp:checked")].map(x=>x.value);
+      fields["快閃店主題"]=document.getElementById("m-popup-theme").value;
+      fields["IP快閃店現狀"]=document.getElementById("m-popup-ip-status").value;
+      fields["投資結構"]=document.getElementById("m-invest-type").value;
+      if(comps.length) fields["商品組成方式"]=comps;
+      fields["IP商品開發方"]=document.getElementById("m-dev-party").value;
+      fields["贊助收入預估"]=parseFloat(document.getElementById("m-sponsor").value)||0;
+      const partners=document.getElementById("m-partners")?.value;
+      if(partners) fields["合資方"]=partners;
+      const split=document.getElementById("m-invest-split")?.value;
+      if(split) fields["出資比例說明"]=split;
+      const fee=document.getElementById("m-agency-fee")?.value;
+      if(fee) fields["代運營費結構"]=fee;
+    }
     await _post("project", fields);
     res.className="result ok"; res.style.display="block";
     document.getElementById("res-icon").textContent="✅";

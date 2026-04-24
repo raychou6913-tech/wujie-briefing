@@ -90,17 +90,10 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       </div>
     </div>
     <div class="card">
-      <div class="ctitle">📦 寄售結算（當日）</div>
-      <div class="row2">
-        <div class="f"><label>寄售銷售額</label>
-          <input type="number" id="f-consign-sales" placeholder="0" oninput="calcConsign()"></div>
-        <div class="f"><label>寄售分潤比例 (%)</label>
-          <input type="number" id="f-consign-rate" placeholder="例：30" step="0.1" oninput="calcConsign()"></div>
-      </div>
-      <div class="f"><label>當日應付寄售分潤</label>
-        <input type="number" id="f-consign-due" placeholder="自動計算" readonly
-          style="background:#f1f5f9;color:#64748b"></div>
-      <div class="hint">填寫寄售銷售額與分潤比例後自動計算，無寄售可留空</div>
+      <div class="ctitle">📦 寄售結算（當日匯總）</div>
+      <div class="f"><label>當日寄售銷售額總計</label>
+        <input type="number" id="f-consign-sales" placeholder="0（無寄售填 0 或留空）"></div>
+      <div class="hint">此處填所有寄售商品的當日銷售總額。各寄售方的個別分潤計算請至「寄售管理」填報。</div>
     </div>
     <div class="card">
       <div class="ctitle">📝 備註</div>
@@ -270,26 +263,25 @@ function calcSplit(){
   document.getElementById("split-hint").style.display=(sum>0&&Math.abs(sum-total)>1)?"block":"none";
 }
 
-function calcConsign(){
-  const sales=parseFloat(document.getElementById("f-consign-sales").value)||0;
-  const rate=parseFloat(document.getElementById("f-consign-rate").value)||0;
-  document.getElementById("f-consign-due").value=sales>0?(sales*rate/100).toFixed(0):"";
-}
-
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
+  const proj=_projVal("proj-sel");
+  if(!proj){
+    res.className="result err"; res.style.display="block";
+    document.getElementById("res-icon").textContent="⚠️";
+    document.getElementById("res-msg").textContent="請先選擇關聯項目";
+    document.getElementById("res-sub").textContent="每日銷售日報必須關聯到對應的快閃店項目";
+    return;
+  }
   btn.disabled=true; btn.textContent="提交中...";
   res.style.display="none";
   try{
-    const proj=_projVal("proj-sel");
     const total=parseFloat(document.getElementById("f-total").value)||0;
-    const consignSales=parseFloat(document.getElementById("f-consign-sales").value)||0;
-    const consignRate=parseFloat(document.getElementById("f-consign-rate").value)||0;
     const fields={
       "日期":         _dateToTs(document.getElementById("f-date").value),
-      "項目關聯":     proj||"",
+      "項目關聯":     proj,
       "填報人":       document.getElementById("f-owner").value,
       "日流水總額":   total,
       "幣別":         document.getElementById("f-cur").value,
@@ -298,9 +290,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "刷卡":         parseFloat(document.getElementById("f-card").value)||0,
       "行動支付":     parseFloat(document.getElementById("f-mobile").value)||0,
       "其他支付":     parseFloat(document.getElementById("f-other-pay").value)||0,
-      "寄售銷售額":   consignSales,
-      "寄售分潤比例": consignRate,
-      "當日寄售分潤": consignSales>0?Math.round(consignSales*consignRate/100):0,
+      "寄售銷售額":   parseFloat(document.getElementById("f-consign-sales").value)||0,
       "備註":         document.getElementById("f-note").value,
     };
     await _post("daily_sales", fields);
