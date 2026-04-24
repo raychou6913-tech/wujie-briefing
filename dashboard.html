@@ -40,7 +40,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="topbar">
   <div>
     <div class="topbar-title">🏢 蕪解管理儀表板</div>
-    <div class="topbar-sub">最後更新：2026-04-25 00:48</div>
+    <div class="topbar-sub">最後更新：2026-04-25 01:01</div>
   </div>
   <div style="display:flex;gap:8px">
     <a href="forms/index.html"
@@ -61,8 +61,8 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="kpi-bar">
   <div class="kpi">
     <div class="kpi-label">進行中項目</div>
-    <div class="kpi-value" style="color:#6366f1">12</div>
-    <div class="kpi-sub">共 12 個項目</div>
+    <div class="kpi-value" style="color:#6366f1">13</div>
+    <div class="kpi-sub">共 13 個項目</div>
   </div>
   <div class="kpi">
     <div class="kpi-label">銷售管道</div>
@@ -131,8 +131,8 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
   </div>
   <div class="section-body">
     <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span style="color:#94a3b8;font-size:13px">進行中 <b style="color:#10b981">12</b> 個</span>
-      <span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">其他 <b style="color:#6366f1">11</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">商品批發 <b style="color:#6366f1">1</b></span>
+      <span style="color:#94a3b8;font-size:13px">進行中 <b style="color:#10b981">13</b> 個</span>
+      <span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">其他 <b style="color:#6366f1">12</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">商品批發 <b style="color:#6366f1">1</b></span>
     </div>
     <div style="overflow-x:auto">
     <table class="dt">
@@ -272,6 +272,17 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
           <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
       <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
     </div><small style="color:#94a3b8">0%</small></td>
+        </tr>
+        <tr>
+          <td>測試</td>
+          <td><span style="color:#94a3b8">—</span></td>
+          <td>—</td>
+          <td><span style="color:#94a3b8">台北</span></td>
+          <td>—</td>
+          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
+          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
+      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
+    </div><small style="color:#94a3b8">0%</small></td>
         </tr></tbody>
     </table></div></div>
 </div>
@@ -396,7 +407,9 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
     const visitors={};
     items.forEach(item=>{
       const f=item.fields||{};
-      const d=typeof f["日期"]==="number"?new Date(f["日期"]).toISOString().slice(0,10):(f["日期"]||"");
+      const rawD=f["日期"];
+      const d=typeof rawD==="number"?new Date(rawD).toISOString().slice(0,10):
+               Array.isArray(rawD)?rawD.map(x=>x.text||String(x)).join(""):String(rawD||"");
       if(d===today){
         const name=Array.isArray(f["姓名"])?f["姓名"].map(x=>x.text||x).join(""):String(f["姓名"]||"");
         const dept=Array.isArray(f["部門"])?f["部門"].map(x=>x.text||x).join(""):String(f["部門"]||"");
