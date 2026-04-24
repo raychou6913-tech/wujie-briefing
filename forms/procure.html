@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🛒 採購詢比價填報 — 蕪解填報</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding:0 0 40px}
+.header{background:#f9731622;border-bottom:2px solid #f97316;padding:20px 24px;display:flex;align-items:center;gap:12px}
+.header-icon{font-size:28px}
+.header-title{font-size:20px;font-weight:700;color:#f1f5f9}
+.header-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.form-wrap{max-width:640px;margin:28px auto;padding:0 16px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:#f97316;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;color:#94a3b8;margin-bottom:6px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#f97316}
+.field textarea{min-height:80px;resize:vertical}
+.field select option{background:#1e293b}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;background:#f97316;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:8px}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.toast{display:none;background:#0f172a;border:1px solid #f97316;border-radius:12px;padding:20px 24px;text-align:center;margin-top:16px}
+.toast.show{display:block}
+.toast-icon{font-size:36px;margin-bottom:8px}
+.toast-msg{color:#f1f5f9;font-size:15px;font-weight:600}
+.toast-sub{color:#94a3b8;font-size:12px;margin-top:4px}
+.back{display:block;text-align:center;color:#64748b;font-size:12px;margin-top:20px;text-decoration:none}
+.back:hover{color:#f97316}
+.req{color:#f97316}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">🛒</div>
+  <div>
+    <div class="header-title">採購詢比價填報</div>
+    <div class="header-sub">蕪解創意 · 填報後直接同步至管理儀表板</div>
+  </div>
+</div>
+<div class="form-wrap">
+  <form id="form">
+    
+    <div class="card">
+      <div class="card-title">採購品項</div>
+      <div class="field"><label>採購品項 <span class="req">*</span></label>
+        <input type="text" id="f-item" required placeholder="商品名稱 / 規格"></div>
+      <div class="row">
+        <div class="field"><label>項目關聯</label><input type="text" id="f-proj" placeholder="對應哪個項目"></div>
+        <div class="field"><label>採購數量</label><input type="number" id="f-qty" placeholder="0"></div>
+      </div>
+      <div class="field"><label>規格說明</label>
+        <textarea id="f-spec" placeholder="尺寸、材質、顏色、MOQ 等..." style="min-height:60px"></textarea></div>
+    </div>
+    <div class="card">
+      <div class="card-title">比價資訊</div>
+      <div class="row">
+        <div class="field"><label>供應商 A</label><input type="text" id="f-va" placeholder="名稱"></div>
+        <div class="field"><label>A 報價</label><input type="number" id="f-pa" placeholder="0"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>供應商 B</label><input type="text" id="f-vb" placeholder="名稱（選填）"></div>
+        <div class="field"><label>B 報價</label><input type="number" id="f-pb" placeholder="0"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>供應商 C</label><input type="text" id="f-vc" placeholder="名稱（選填）"></div>
+        <div class="field"><label>C 報價</label><input type="number" id="f-pc" placeholder="0"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>議定價格</label><input type="number" id="f-agreed" placeholder="最終確認價"></div>
+        <div class="field"><label>幣別</label>
+          <select id="f-cur">
+            <option>TWD</option><option>CNY</option><option>THB</option><option>USD</option>
+          </select></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">進度</div>
+      <div class="row">
+        <div class="field"><label>採購狀態</label>
+          <select id="f-status">
+            <option>詢價中</option><option>比價中</option><option>議價中</option>
+            <option>已確認</option><option>已下單</option><option>已收貨</option><option>已取消</option>
+          </select></div>
+        <div class="field"><label>預計到貨日</label><input type="date" id="f-eta"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>負責人</label><input type="text" id="f-owner" placeholder="你的名字"></div>
+      </div>
+      <div class="field"><label>備註</label><textarea id="f-note" placeholder="付款條件、交期要求等..."></textarea></div>
+    </div>
+    <button class="btn" type="submit" id="btn">提交</button>
+  </form>
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="t-icon">✅</div>
+    <div class="toast-msg" id="t-msg">提交成功</div>
+    <div class="toast-sub" id="t-sub">資料已同步至管理儀表板</div>
+  </div>
+  <a class="back" href="../dashboard.html">← 返回管理儀表板</a>
+</div>
+<script>
+const APP_ID="cli_a96188997ea49e15",APP_SECRET="Bnd53bURDQmPC3yUHN4UMhfwT2UeobX1",APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh",TABLE_ID="tblae5v8pGMXleJZ";
+const FEISHU="https://open.feishu.cn/open-apis";
+
+async function getToken(){
+  const r=await fetch(FEISHU+"/auth/v3/tenant_access_token/internal",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({app_id:APP_ID,app_secret:APP_SECRET})
+  });
+  return (await r.json()).tenant_access_token;
+}
+
+function tsDate(val){
+  if(!val)return null;
+  return new Date(val).getTime();
+}
+
+function getFields(){
+  
+    const eta=document.getElementById("f-eta").value;
+    return {
+      "採購品項":  document.getElementById("f-item").value,
+      "項目關聯":  document.getElementById("f-proj").value,
+      "採購數量":  parseFloat(document.getElementById("f-qty").value)||0,
+      "規格說明":  document.getElementById("f-spec").value,
+      "供應商A":   document.getElementById("f-va").value,
+      "A報價":     parseFloat(document.getElementById("f-pa").value)||0,
+      "供應商B":   document.getElementById("f-vb").value,
+      "B報價":     parseFloat(document.getElementById("f-pb").value)||0,
+      "供應商C":   document.getElementById("f-vc").value,
+      "C報價":     parseFloat(document.getElementById("f-pc").value)||0,
+      "議定價格":  parseFloat(document.getElementById("f-agreed").value)||0,
+      "幣別":      document.getElementById("f-cur").value,
+      "採購狀態":  document.getElementById("f-status").value,
+      "預計到貨日":eta ? new Date(eta).getTime() : null,
+      "負責人":    document.getElementById("f-owner").value,
+      "備註":      document.getElementById("f-note").value,
+    };
+}
+
+document.getElementById("form").onsubmit=async(e)=>{
+  e.preventDefault();
+  const btn=document.getElementById("btn");
+  btn.disabled=true; btn.textContent="提交中...";
+  try{
+    const token=await getToken();
+    const fields=getFields();
+    const r=await fetch(FEISHU+"/bitable/v1/apps/"+APP_TOKEN+"/tables/"+TABLE_ID+"/records",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d=await r.json();
+    const toast=document.getElementById("toast");
+    toast.classList.add("show");
+    if(d.code===0){
+      document.getElementById("t-icon").textContent="✅";
+      document.getElementById("t-msg").textContent="提交成功！";
+      document.getElementById("t-sub").textContent="資料已同步，儀表板將於下次排程更新";
+      document.getElementById("form").reset();
+    }else{
+      document.getElementById("t-icon").textContent="❌";
+      document.getElementById("t-msg").textContent="提交失敗";
+      document.getElementById("t-sub").textContent=d.msg||"請聯繫管理員";
+    }
+  }catch(err){
+    alert("網路錯誤："+err.message);
+  }finally{
+    btn.disabled=false; btn.textContent="提交";
+  }
+};
+</script>
+</body>
+</html>

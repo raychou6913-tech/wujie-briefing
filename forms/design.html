@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎨 設計送審填報 — 蕪解填報</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding:0 0 40px}
+.header{background:#ec489922;border-bottom:2px solid #ec4899;padding:20px 24px;display:flex;align-items:center;gap:12px}
+.header-icon{font-size:28px}
+.header-title{font-size:20px;font-weight:700;color:#f1f5f9}
+.header-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.form-wrap{max-width:640px;margin:28px auto;padding:0 16px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:#ec4899;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;color:#94a3b8;margin-bottom:6px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#ec4899}
+.field textarea{min-height:80px;resize:vertical}
+.field select option{background:#1e293b}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;background:#ec4899;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:8px}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.toast{display:none;background:#0f172a;border:1px solid #ec4899;border-radius:12px;padding:20px 24px;text-align:center;margin-top:16px}
+.toast.show{display:block}
+.toast-icon{font-size:36px;margin-bottom:8px}
+.toast-msg{color:#f1f5f9;font-size:15px;font-weight:600}
+.toast-sub{color:#94a3b8;font-size:12px;margin-top:4px}
+.back{display:block;text-align:center;color:#64748b;font-size:12px;margin-top:20px;text-decoration:none}
+.back:hover{color:#ec4899}
+.req{color:#ec4899}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">🎨</div>
+  <div>
+    <div class="header-title">設計送審填報</div>
+    <div class="header-sub">蕪解創意 · 填報後直接同步至管理儀表板</div>
+  </div>
+</div>
+<div class="form-wrap">
+  <form id="form">
+    
+    <div class="card">
+      <div class="card-title">設計基本資訊</div>
+      <div class="field"><label>設計名稱 <span class="req">*</span></label>
+        <input type="text" id="f-name" required placeholder="例：Snoopy 春季包裝 v2"></div>
+      <div class="row">
+        <div class="field"><label>IP品牌</label>
+          <select id="f-ip">
+            <option value="">請選擇</option>
+            <option>Snoopy</option><option>Mofusand</option><option>Chiikawa</option>
+            <option>Labubu</option><option>Fuggler</option><option>其他</option>
+          </select></div>
+        <div class="field"><label>設計類型</label>
+          <select id="f-type">
+            <option>包裝設計</option><option>商品設計</option><option>行銷物料</option>
+            <option>展場設計</option><option>其他</option>
+          </select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>項目關聯</label><input type="text" id="f-proj" placeholder="對應哪個項目"></div>
+        <div class="field"><label>設計師 / 供應商</label><input type="text" id="f-vendor" placeholder="名稱"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">送審進度</div>
+      <div class="row">
+        <div class="field"><label>提交日期</label><input type="date" id="f-submit"></div>
+        <div class="field"><label>預計通過日</label><input type="date" id="f-approve"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>審核方</label><input type="text" id="f-reviewer" placeholder="例：Peanuts Worldwide"></div>
+        <div class="field"><label>審核狀態 <span class="req">*</span></label>
+          <select id="f-status" required>
+            <option>待提交</option><option>已提交</option><option>修改中</option>
+            <option>已通過</option><option>已拒絕</option>
+          </select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>版本號</label><input type="text" id="f-ver" placeholder="例：v1.0"></div>
+      </div>
+      <div class="field"><label>修改備註 / 說明</label>
+        <textarea id="f-note" placeholder="審核意見、修改要求、注意事項..."></textarea></div>
+    </div>
+    <button class="btn" type="submit" id="btn">提交</button>
+  </form>
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="t-icon">✅</div>
+    <div class="toast-msg" id="t-msg">提交成功</div>
+    <div class="toast-sub" id="t-sub">資料已同步至管理儀表板</div>
+  </div>
+  <a class="back" href="../dashboard.html">← 返回管理儀表板</a>
+</div>
+<script>
+const APP_ID="cli_a96188997ea49e15",APP_SECRET="Bnd53bURDQmPC3yUHN4UMhfwT2UeobX1",APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh",TABLE_ID="tblTEoNLDvtYi4pX";
+const FEISHU="https://open.feishu.cn/open-apis";
+
+async function getToken(){
+  const r=await fetch(FEISHU+"/auth/v3/tenant_access_token/internal",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({app_id:APP_ID,app_secret:APP_SECRET})
+  });
+  return (await r.json()).tenant_access_token;
+}
+
+function tsDate(val){
+  if(!val)return null;
+  return new Date(val).getTime();
+}
+
+function getFields(){
+  
+    const sub=document.getElementById("f-submit").value;
+    const app=document.getElementById("f-approve").value;
+    return {
+      "設計名稱":     document.getElementById("f-name").value,
+      "IP品牌":       document.getElementById("f-ip").value,
+      "設計類型":     document.getElementById("f-type").value,
+      "項目關聯":     document.getElementById("f-proj").value,
+      "設計師/供應商":document.getElementById("f-vendor").value,
+      "提交日期":     sub ? new Date(sub).getTime() : null,
+      "預計通過日":   app ? new Date(app).getTime() : null,
+      "審核方":       document.getElementById("f-reviewer").value,
+      "審核狀態":     document.getElementById("f-status").value,
+      "版本號":       document.getElementById("f-ver").value,
+      "修改備註":     document.getElementById("f-note").value,
+    };
+}
+
+document.getElementById("form").onsubmit=async(e)=>{
+  e.preventDefault();
+  const btn=document.getElementById("btn");
+  btn.disabled=true; btn.textContent="提交中...";
+  try{
+    const token=await getToken();
+    const fields=getFields();
+    const r=await fetch(FEISHU+"/bitable/v1/apps/"+APP_TOKEN+"/tables/"+TABLE_ID+"/records",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d=await r.json();
+    const toast=document.getElementById("toast");
+    toast.classList.add("show");
+    if(d.code===0){
+      document.getElementById("t-icon").textContent="✅";
+      document.getElementById("t-msg").textContent="提交成功！";
+      document.getElementById("t-sub").textContent="資料已同步，儀表板將於下次排程更新";
+      document.getElementById("form").reset();
+    }else{
+      document.getElementById("t-icon").textContent="❌";
+      document.getElementById("t-msg").textContent="提交失敗";
+      document.getElementById("t-sub").textContent=d.msg||"請聯繫管理員";
+    }
+  }catch(err){
+    alert("網路錯誤："+err.message);
+  }finally{
+    btn.disabled=false; btn.textContent="提交";
+  }
+};
+</script>
+</body>
+</html>

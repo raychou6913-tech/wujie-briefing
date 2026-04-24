@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📦 庫存 / 物流填報 — 蕪解填報</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding:0 0 40px}
+.header{background:#f59e0b22;border-bottom:2px solid #f59e0b;padding:20px 24px;display:flex;align-items:center;gap:12px}
+.header-icon{font-size:28px}
+.header-title{font-size:20px;font-weight:700;color:#f1f5f9}
+.header-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.form-wrap{max-width:640px;margin:28px auto;padding:0 16px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:#f59e0b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;color:#94a3b8;margin-bottom:6px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#f59e0b}
+.field textarea{min-height:80px;resize:vertical}
+.field select option{background:#1e293b}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;background:#f59e0b;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:8px}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.toast{display:none;background:#0f172a;border:1px solid #f59e0b;border-radius:12px;padding:20px 24px;text-align:center;margin-top:16px}
+.toast.show{display:block}
+.toast-icon{font-size:36px;margin-bottom:8px}
+.toast-msg{color:#f1f5f9;font-size:15px;font-weight:600}
+.toast-sub{color:#94a3b8;font-size:12px;margin-top:4px}
+.back{display:block;text-align:center;color:#64748b;font-size:12px;margin-top:20px;text-decoration:none}
+.back:hover{color:#f59e0b}
+.req{color:#f59e0b}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-icon">📦</div>
+  <div>
+    <div class="header-title">庫存 / 物流填報</div>
+    <div class="header-sub">蕪解創意 · 填報後直接同步至管理儀表板</div>
+  </div>
+</div>
+<div class="form-wrap">
+  <form id="form">
+    
+    <div class="card">
+      <div class="card-title">品項資訊</div>
+      <div class="row">
+        <div class="field"><label>品項名稱 <span class="req">*</span></label>
+          <input type="text" id="f-name" required placeholder="商品名稱"></div>
+        <div class="field"><label>IP品牌</label>
+          <select id="f-ip">
+            <option value="">請選擇</option>
+            <option>Snoopy</option><option>Mofusand</option><option>Chiikawa</option>
+            <option>Labubu</option><option>Fuggler</option><option>其他</option>
+          </select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>SKU編號</label><input type="text" id="f-sku" placeholder="選填"></div>
+        <div class="field"><label>所在倉庫</label>
+          <select id="f-wh">
+            <option>台北倉</option><option>北京倉</option><option>曼谷倉</option>
+            <option>在途</option><option>客戶倉</option>
+          </select></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">庫存數量</div>
+      <div class="row">
+        <div class="field"><label>現有庫存 <span class="req">*</span></label>
+          <input type="number" id="f-stock" required placeholder="0"></div>
+        <div class="field"><label>安全庫存（警戒線）</label>
+          <input type="number" id="f-safe" placeholder="0"></div>
+      </div>
+      <div class="field"><label>單位</label>
+        <select id="f-unit">
+          <option>件</option><option>箱</option><option>套</option><option>個</option>
+        </select></div>
+    </div>
+    <div class="card">
+      <div class="card-title">物流 / 報關狀態</div>
+      <div class="row">
+        <div class="field"><label>物流狀態</label>
+          <select id="f-log">
+            <option>待提貨</option><option>提貨中</option><option>已出倉</option>
+            <option>海關中</option><option>已到貨</option><option>異常</option>
+          </select></div>
+        <div class="field"><label>報關狀態</label>
+          <select id="f-customs">
+            <option>不需報關</option><option>未報關</option><option>報關中</option>
+            <option>已放行</option><option>扣押中</option>
+          </select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>物流單號</label><input type="text" id="f-track" placeholder="選填"></div>
+        <div class="field"><label>預計到達日</label><input type="date" id="f-eta"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>出貨對象</label><input type="text" id="f-dest" placeholder="客戶名稱"></div>
+        <div class="field"><label>負責人</label><input type="text" id="f-owner" placeholder="你的名字"></div>
+      </div>
+      <div class="field"><label>備註</label><textarea id="f-note" placeholder="特殊情況說明..."></textarea></div>
+    </div>
+    <button class="btn" type="submit" id="btn">提交</button>
+  </form>
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="t-icon">✅</div>
+    <div class="toast-msg" id="t-msg">提交成功</div>
+    <div class="toast-sub" id="t-sub">資料已同步至管理儀表板</div>
+  </div>
+  <a class="back" href="../dashboard.html">← 返回管理儀表板</a>
+</div>
+<script>
+const APP_ID="cli_a96188997ea49e15",APP_SECRET="Bnd53bURDQmPC3yUHN4UMhfwT2UeobX1",APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh",TABLE_ID="tblsmZ7S5cNiYN4Y";
+const FEISHU="https://open.feishu.cn/open-apis";
+
+async function getToken(){
+  const r=await fetch(FEISHU+"/auth/v3/tenant_access_token/internal",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({app_id:APP_ID,app_secret:APP_SECRET})
+  });
+  return (await r.json()).tenant_access_token;
+}
+
+function tsDate(val){
+  if(!val)return null;
+  return new Date(val).getTime();
+}
+
+function getFields(){
+  
+    const eta=document.getElementById("f-eta").value;
+    return {
+      "品項名稱":  document.getElementById("f-name").value,
+      "IP品牌":    document.getElementById("f-ip").value,
+      "SKU編號":   document.getElementById("f-sku").value,
+      "所在倉庫":  document.getElementById("f-wh").value,
+      "現有庫存":  parseFloat(document.getElementById("f-stock").value)||0,
+      "安全庫存":  parseFloat(document.getElementById("f-safe").value)||0,
+      "單位":      document.getElementById("f-unit").value,
+      "物流狀態":  document.getElementById("f-log").value,
+      "報關狀態":  document.getElementById("f-customs").value,
+      "物流單號":  document.getElementById("f-track").value,
+      "預計到達日":eta ? new Date(eta).getTime() : null,
+      "出貨對象":  document.getElementById("f-dest").value,
+      "負責人":    document.getElementById("f-owner").value,
+      "備註":      document.getElementById("f-note").value,
+    };
+}
+
+document.getElementById("form").onsubmit=async(e)=>{
+  e.preventDefault();
+  const btn=document.getElementById("btn");
+  btn.disabled=true; btn.textContent="提交中...";
+  try{
+    const token=await getToken();
+    const fields=getFields();
+    const r=await fetch(FEISHU+"/bitable/v1/apps/"+APP_TOKEN+"/tables/"+TABLE_ID+"/records",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d=await r.json();
+    const toast=document.getElementById("toast");
+    toast.classList.add("show");
+    if(d.code===0){
+      document.getElementById("t-icon").textContent="✅";
+      document.getElementById("t-msg").textContent="提交成功！";
+      document.getElementById("t-sub").textContent="資料已同步，儀表板將於下次排程更新";
+      document.getElementById("form").reset();
+    }else{
+      document.getElementById("t-icon").textContent="❌";
+      document.getElementById("t-msg").textContent="提交失敗";
+      document.getElementById("t-sub").textContent=d.msg||"請聯繫管理員";
+    }
+  }catch(err){
+    alert("網路錯誤："+err.message);
+  }finally{
+    btn.disabled=false; btn.textContent="提交";
+  }
+};
+</script>
+</body>
+</html>
