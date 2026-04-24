@@ -40,7 +40,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 <div class="topbar">
   <div>
     <div class="topbar-title">🏢 蕪解管理儀表板</div>
-    <div class="topbar-sub">最後更新：2026-04-24 21:33</div>
+    <div class="topbar-sub">最後更新：2026-04-25 00:48</div>
   </div>
   <div style="display:flex;gap:8px">
     <a href="forms/index.html"
@@ -88,6 +88,16 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
     <div class="kpi-label">銷售訂單</div>
     <div class="kpi-value" style="color:#f59e0b">0</div>
     <div class="kpi-sub">筆訂單</div>
+  </div>
+</div>
+
+<div class="section" id="att-section">
+  <div class="section-header">
+    <span class="section-title">✅ 今日出勤紀錄</span>
+    <span id="att-date" style="font-size:12px;color:#64748b"></span>
+  </div>
+  <div class="section-body" id="att-body">
+    <div style="color:#64748b;font-size:13px">載入中...</div>
   </div>
 </div>
 
@@ -363,6 +373,51 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
+})();
+
+(async function(){
+  const PROXY="https://feishu-proxy.raychou6913.workers.dev";
+  const AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+  const VL="tblUzRSQgKLhlttk";
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById("att-date").textContent=today;
+  const el=document.getElementById("att-body");
+  try{
+    const tr=await fetch(PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0){el.innerHTML='<div style="color:#ef4444;font-size:13px">Token 取得失敗</div>';return;}
+    const tk=td.tenant_access_token;
+    const res=await fetch(PROXY+"/open-apis/bitable/v1/apps/"+AT+"/tables/"+VL+"/records?page_size=200",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const data=await res.json();
+    if(data.code!==0){el.innerHTML='<div style="color:#ef4444;font-size:13px">資料載入失敗</div>';return;}
+    const items=data.data?.items||[];
+    const visitors={};
+    items.forEach(item=>{
+      const f=item.fields||{};
+      const d=typeof f["日期"]==="number"?new Date(f["日期"]).toISOString().slice(0,10):(f["日期"]||"");
+      if(d===today){
+        const name=Array.isArray(f["姓名"])?f["姓名"].map(x=>x.text||x).join(""):String(f["姓名"]||"");
+        const dept=Array.isArray(f["部門"])?f["部門"].map(x=>x.text||x).join(""):String(f["部門"]||"");
+        const time=Array.isArray(f["時間"])?f["時間"].map(x=>x.text||x).join(""):String(f["時間"]||"");
+        if(name&&(!visitors[name]||time<visitors[name].time))
+          visitors[name]={name,dept,time};
+      }
+    });
+    const list=Object.values(visitors).sort((a,b)=>a.time.localeCompare(b.time));
+    if(list.length===0){
+      el.innerHTML='<div style="color:#64748b;font-size:13px">今日尚無使用紀錄</div>';
+      return;
+    }
+    el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:10px">'+
+      list.map(v=>`<div style="background:#0f172a;border:1px solid #10b981;border-radius:10px;padding:10px 16px;min-width:130px">
+        <div style="font-size:14px;font-weight:700;color:#f1f5f9">${v.name}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">${v.dept}</div>
+        <div style="font-size:12px;color:#10b981;margin-top:6px">⏰ ${v.time}</div>
+      </div>`).join("")+
+      '</div><div style="margin-top:12px;font-size:12px;color:#64748b">今日 <b style="color:#10b981">'+list.length+'</b> 人已上線</div>';
+  }catch(e){el.innerHTML='<div style="color:#64748b;font-size:13px">無法載入出勤資料</div>';}
 })();
 </script>
 </body>
