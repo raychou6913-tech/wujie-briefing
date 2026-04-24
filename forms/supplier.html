@@ -177,6 +177,49 @@ function _projVal(selectId){
 
 function _dateToTs(v){ return v?new Date(v).getTime():null; }
 
+async function _uploadImages(files,tk){
+  const res=[];
+  for(const f of files){
+    const fd=new FormData();
+    fd.append("file_name",f.name);
+    fd.append("parent_type","bitable_image");
+    fd.append("parent_node",_AT);
+    fd.append("size",String(f.size));
+    fd.append("file",f);
+    const r=await fetch(_PROXY+"/open-apis/drive/v1/medias/upload_all",{
+      method:"POST",headers:{"Authorization":"Bearer "+tk},body:fd
+    });
+    const d=await r.json();
+    if(d.code!==0) throw new Error("圖片上傳失敗："+f.name+" ("+d.msg+")");
+    res.push({file_token:d.data.file_token,name:f.name});
+  }
+  return res;
+}
+
+function _bindImgPreview(inputId,previewId){
+  const inp=document.getElementById(inputId);
+  if(!inp) return;
+  inp.addEventListener("change",function(){
+    const box=document.getElementById(previewId);
+    box.innerHTML="";
+    Array.from(this.files).forEach(f=>{
+      const wrap=document.createElement("div");
+      wrap.style.cssText="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px;width:90px;text-align:center;font-size:11px;color:#94a3b8;overflow:hidden;flex-shrink:0";
+      if(f.type.startsWith("image/")){
+        const img=document.createElement("img");
+        img.src=URL.createObjectURL(f);
+        img.style.cssText="width:78px;height:58px;object-fit:cover;border-radius:4px;margin-bottom:4px;display:block";
+        wrap.appendChild(img);
+      }
+      const nm=document.createElement("div");
+      nm.style.cssText="white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+      nm.textContent=f.name;
+      wrap.appendChild(nm);
+      box.appendChild(wrap);
+    });
+  });
+}
+
 // 自動帶入填報人姓名
 window.addEventListener("DOMContentLoaded",function(){
   const u=JSON.parse(localStorage.getItem("wujie_user")||"null");
