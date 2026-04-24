@@ -266,7 +266,8 @@ const mo=String(new Date().getMonth()+1).padStart(2,"0");
 document.getElementById("ctrl-no").value=`QT-${yr}${mo}-001`;
 // 自動帶入登入者姓名
 const _qs=JSON.parse(localStorage.getItem("wujie_session")||"null");
-if(_qs) document.getElementById("q-contact-name").value=_qs.name;
+if(!_qs||Date.now()>_qs.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+else document.getElementById("q-contact-name").value=_qs.name;
 sync();
 addRow(); addRow(); addRow();
 </script>
