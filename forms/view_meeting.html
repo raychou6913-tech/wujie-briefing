@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📋 會議記錄查閱 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#0ea5e915;border-bottom:2px solid #0ea5e9;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-icon{font-size:26px}.hdr-title{font-size:19px;font-weight:700;color:#0f172a}
+.hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
+.hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn-add{background:#0ea5e9;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-back{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+.toolbar{padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border-bottom:1px solid #e2e8f0}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap input{width:100%;padding:9px 12px 9px 36px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;color:#0f172a;background:#f8fafc;outline:none}
+.search-wrap input:focus{border-color:#0ea5e9;background:#fff}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none}
+.filter-sel{padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;outline:none;cursor:pointer}
+.filter-sel:focus{border-color:#0ea5e9}
+.stat-bar{padding:8px 20px;background:#fff;border-bottom:1px solid #f1f5f9;font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
+.view-toggle{display:flex;gap:4px}
+.vbtn{background:#f1f5f9;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;color:#64748b}
+.vbtn.active{background:#0ea5e9;color:#fff}
+.wrap{padding:20px}
+#card-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.db-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px #0000000a;transition:transform .15s,box-shadow .15s}
+.db-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #00000010}
+.db-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.db-card-title{font-size:15px;font-weight:700;color:#0f172a;line-height:1.3}
+.db-card-sub{font-size:12px;color:#64748b;margin-top:2px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.db-card-body{font-size:13px;color:#475569;line-height:1.6;margin-top:8px}
+.db-card-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9}
+.db-card-footer{font-size:11px;color:#94a3b8;margin-top:8px}
+#table-view{overflow-x:auto;display:none}
+.dt{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px #0000000a}
+.dt th{background:#f8fafc;color:#64748b;font-weight:600;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;border-bottom:1px solid #e2e8f0}
+.dt td{padding:11px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle;color:#374151}
+.dt tr:last-child td{border-bottom:none}
+.dt tr:hover td{background:#f8fafc}
+.empty{text-align:center;padding:48px;color:#94a3b8;font-size:14px}
+@media(max-width:600px){#card-view{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-icon">📋</div>
+    <div><div class="hdr-title">會議記錄查閱</div>
+    <div class="hdr-sub" id="hdr-count">載入中...</div></div>
+  </div>
+  <div class="hdr-actions">
+    <a href="meeting.html" class="btn-add">＋ 新增資料</a>
+    <a href="index.html" class="btn-back">← 填報中心</a>
+  </div>
+</div>
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input id="search-box" placeholder="搜尋關鍵字..." oninput="applyFilter()">
+  </div>
+  <select class="filter-sel" data-field="地點/形式" onchange="applyFilter()">
+          <option value="">全部地點</option><option>台北辦公室</option><option>北京辦公室</option>
+          <option>曼谷辦公室</option><option>線上視訊</option></select>
+  <button class="btn-back" onclick="loadData()" style="white-space:nowrap">↻ 重新整理</button>
+</div>
+<div class="stat-bar">
+  <span id="stat-text">— 筆資料</span>
+  <div class="view-toggle">
+    <button class="vbtn active" id="btn-card" onclick="setView('card')">⊞ 卡片</button>
+    <button class="vbtn" id="btn-table" onclick="setView('table')">☰ 表格</button>
+  </div>
+</div>
+<div class="wrap">
+  <div id="card-view"><div class="empty">載入中...</div></div>
+  <div id="table-view">
+    <table class="dt">
+      <thead><tr><th>標題</th><th>日期</th><th>地點</th><th>出席</th><th>決議事項</th><th>行動項目</th><th>跟進</th></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l"};
+let allRecords=[];
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+})();
+async function loadData(){
+  document.getElementById("card-view").innerHTML='<div class="empty">載入中...</div>';
+  document.getElementById("table-body").innerHTML="";
+  document.getElementById("hdr-count").textContent="載入中...";
+  try{
+    const tr=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0)throw new Error("Token err");
+    const tk=td.tenant_access_token;
+    let items=[],pt=null;
+    do{
+      const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["meeting"]+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+      const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+      const d=await res.json();
+      if(d.code!==0)throw new Error("API err: "+d.msg);
+      items=items.concat(d.data?.items||[]);
+      pt=d.data?.has_more?d.data.page_token:null;
+    }while(pt);
+    allRecords=items;
+    document.getElementById("hdr-count").textContent="共 "+items.length+" 筆資料";
+    applyFilter();
+  }catch(e){
+    document.getElementById("card-view").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
+    document.getElementById("hdr-count").textContent="載入失敗";
+  }
+}
+function fv(f,k){
+  const v=f[k];
+  if(v===null||v===undefined||v==="")return"";
+  if(typeof v==="number"){if(v>1000000000000)return new Date(v).toLocaleDateString("zh-TW");return String(v);}
+  if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.text||x.name||""):String(x)).join("");
+  if(typeof v==="object")return v.text||v.name||String(v);
+  return String(v);
+}
+function applyFilter(){
+  const q=document.getElementById("search-box").value.trim().toLowerCase();
+  const filterVals={};
+  document.querySelectorAll(".filter-sel").forEach(s=>{if(s.dataset.field&&s.value)filterVals[s.dataset.field]=s.value;});
+  const sf=["\u6703\u8b70\u6a19\u984c", "\u51fa\u5e2d\u4eba\u54e1", "\u6c7a\u8b70\u4e8b\u9805", "\u884c\u52d5\u9805\u76ee"];
+  const filtered=allRecords.filter(item=>{
+    const f=item.fields||{};
+    if(q&&!sf.some(k=>fv(f,k).toLowerCase().includes(q)))return false;
+    for(const[k,v]of Object.entries(filterVals)){if(fv(f,k)!==v)return false;}
+    return true;
+  });
+  document.getElementById("stat-text").textContent=filtered.length+" / "+allRecords.length+" 筆";
+  const el=document.getElementById("card-view");
+  el.innerHTML=filtered.length?filtered.map(i=>cardHTML(i.fields||{})).join(""):'<div class="empty">😕 找不到符合的資料</div>';
+  const tb=document.getElementById("table-body");
+  tb.innerHTML=filtered.length?filtered.map(i=>rowHTML(i.fields||{})).join(""):'<tr><td colspan="99" class="empty">😕 找不到符合的資料</td></tr>';
+}
+function setView(v){
+  document.getElementById("card-view").style.display=v==="card"?"grid":"none";
+  document.getElementById("table-view").style.display=v==="table"?"block":"none";
+  document.getElementById("btn-card").className="vbtn"+(v==="card"?" active":"");
+  document.getElementById("btn-table").className="vbtn"+(v==="table"?" active":"");
+}
+
+function cardHTML(f){
+  const d=fv(f,"決議事項");
+  const a=fv(f,"行動項目");
+  return `<div class="db-card">
+    <div class="db-card-top">
+      <div><div class="db-card-title">${fv(f,"會議標題")||"—"}</div>
+      <div class="db-card-sub">${fv(f,"日期")||""} · ${fv(f,"地點/形式")||""}</div></div>
+    </div>
+    <div class="db-card-body">
+      <div style="font-size:12px;color:#64748b">👥 ${fv(f,"出席人員")||"—"}</div>
+      ${d?`<div style="margin-top:6px"><b style="font-size:11px;color:#10b981">決議：</b>${d.slice(0,100)}${d.length>100?"...":""}</div>`:""}
+      ${a?`<div style="margin-top:4px;font-size:12px;color:#f59e0b">⚡ ${a.slice(0,80)}${a.length>80?"...":""}</div>`:""}
+    </div>
+    <div class="db-card-footer">跟進：${fv(f,"跟進負責人")||"—"}</div>
+  </div>`;
+}
+function rowHTML(f){
+  return `<tr>
+    <td style="font-weight:600">${fv(f,"會議標題")||"—"}</td>
+    <td style="color:#64748b">${fv(f,"日期")||"—"}</td>
+    <td style="color:#64748b">${fv(f,"地點/形式")||"—"}</td>
+    <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${fv(f,"出席人員")||"—"}</td>
+    <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${fv(f,"決議事項")||"—"}</td>
+    <td style="font-size:12px;color:#f59e0b;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${fv(f,"行動項目")||"—"}</td>
+    <td style="color:#6366f1">${fv(f,"跟進負責人")||"—"}</td>
+  </tr>`;
+}
+loadData();
+</script>
+</body></html>
