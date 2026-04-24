@@ -59,7 +59,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
       <div class="hdr-sub">選擇你的部門與名字以進入系統</div>
     </div>
   </div>
-  <a class="hdr-ver" href="changelog.html">v1.5 更新記錄</a>
+  <a class="hdr-ver" href="changelog.html">v1.6 更新記錄</a>
 </div>
 
 <div class="ret-bar" id="ret-bar" style="display:none">
@@ -94,10 +94,12 @@ const COLORS= {"管理層": "#6366f1", "創意/設計": "#ec4899", "採購": "#f
 const ICONS = {"管理層": "👑", "創意/設計": "🎨", "採購": "🛒", "業務/銷售": "🎯", "倉庫/物流": "📦", "財務/行政": "💰", "電商/行銷": "📱"};
 let selDept=null, selName=null;
 
-const saved=JSON.parse(localStorage.getItem("wujie_user")||"null");
-if(saved&&saved.name){
-  document.getElementById("ret-bar").style.display="flex";
-  document.getElementById("ret-name").textContent=saved.name+"（"+saved.dept+"）";
+// v1.6+: redirect to login page
+const session=JSON.parse(localStorage.getItem("wujie_session")||"null");
+if(session&&Date.now()<session.expires){
+  location.replace(session.dept==="管理層"?"project_manager.html":"forms/index.html");
+} else {
+  location.replace("login.html");
 }
 
 function renderDepts(){
@@ -146,21 +148,9 @@ function selectName(name,el){
   document.getElementById("enter-wrap").style.display="block";
 }
 
-function enterSystem(){
-  if(!selDept||!selName) return;
-  localStorage.setItem("wujie_user",JSON.stringify({name:selName,dept:selDept,ts:Date.now()}));
-  location.href=selDept==="管理層"?"project_manager.html":"forms/index.html";
-}
-
-function continueUser(){
-  if(!saved) return;
-  location.href=saved.dept==="管理層"?"project_manager.html":"forms/index.html";
-}
-
-function switchUser(){
-  localStorage.removeItem("wujie_user");
-  document.getElementById("ret-bar").style.display="none";
-}
+function enterSystem(){ location.replace("login.html"); }
+function continueUser(){ location.replace("login.html"); }
+function switchUser(){ location.replace("login.html"); }
 
 renderDepts();
 </script>
