@@ -54,6 +54,12 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
       <div class="ctitle">設計資訊</div>
       <div class="f"><label>設計名稱 <span class="req">*</span></label>
         <input id="f-name" required placeholder="例：Snoopy 春季包裝 v2"></div>
+      <div class="f"><label>送審階段 <span class="req">*</span></label>
+        <select id="f-stage" required>
+          {"".join(f'<option value="{s}">{i+1}. {s}</option>' for i, s in enumerate(DESIGN_STAGES))}
+        </select>
+        <div class="hint">選擇本次提交對應的送審步驟，每個階段各填一筆記錄</div>
+      </div>
       <div class="row2">
         <div class="f"><label>IP品牌</label>
           <select id="f-ip">
@@ -61,10 +67,9 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
             <option>Snoopy</option><option>Mofusand</option><option>Chiikawa</option>
             <option>Labubu</option><option>Fuggler</option><option>EVE點點</option><option>其他</option>
           </select></div>
-        <div class="f"><label>設計類型</label>
-          <select id="f-type">
-            <option>包裝設計</option><option>商品設計</option><option>行銷物料</option>
-            <option>展場設計</option><option>其他</option>
+        <div class="f"><label>是否外包</label>
+          <select id="f-outsource">
+            <option>內部製作</option><option>外包（已拍板）</option><option>外包（待確認）</option>
           </select></div>
       </div>
       <div class="row2">
@@ -202,8 +207,9 @@ document.getElementById("frm").onsubmit=async(e)=>{
     const proj=_projVal("proj-sel");
     const fields={...({
       "設計名稱":     document.getElementById("f-name").value,
+      "送審階段":     document.getElementById("f-stage").value,
       "IP品牌":       document.getElementById("f-ip").value,
-      "設計類型":     document.getElementById("f-type").value,
+      "是否外包":     document.getElementById("f-outsource").value,
       "設計師/供應商":document.getElementById("f-vendor").value,
       "版本號":       document.getElementById("f-ver").value,
       "提交日期":     _dateToTs(document.getElementById("f-sub").value),

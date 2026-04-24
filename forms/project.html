@@ -128,6 +128,12 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
         <div class="f"><label>開始日期</label><input type="date" id="m-start"></div>
         <div class="f"><label>截止日期</label><input type="date" id="m-end"></div>
       </div>
+      <div class="f"><label>當前關卡</label>
+        <select id="m-stage">
+          <option>IP決策中</option><option>預算規劃</option><option>概念提案</option><option>跨部門確認</option><option>設計送審</option><option>採購詢價</option><option>預算確認</option><option>打樣/開模</option><option>市場收單</option><option>大貨生產</option><option>出貨物流</option><option>銷售推廣</option><option>已完成</option><option>已暫停</option>
+        </select>
+        <div class="hint">反映項目目前推進到哪個階段，每次更新時請同步調整</div>
+      </div>
       <div class="row2">
         <div class="f"><label>目前狀態</label>
           <select id="m-status">
@@ -276,6 +282,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "保底金額":    parseFloat(document.getElementById("m-mg").value)||0,
       "權利金_零售%":parseFloat(document.getElementById("m-royal-retail").value)||0,
       "權利金_批發%":parseFloat(document.getElementById("m-royal-wholesale").value)||0,
+      "當前關卡":    document.getElementById("m-stage").value,
       "開始日期":    _dateToTs(document.getElementById("m-start").value),
       "截止日期":    _dateToTs(document.getElementById("m-end").value),
       "狀態":        document.getElementById("m-status").value,
