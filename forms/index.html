@@ -6,230 +6,114 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:40px}
-.hdr{background:#fff;border-bottom:1px solid #e2e8f0;padding:20px 24px;text-align:center;box-shadow:0 1px 4px #0000000a}
-h1{font-size:20px;font-weight:700;color:#0f172a}
-.sub{font-size:13px;color:#64748b;margin-top:5px}
+.hdr{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 1px 4px #0000000a}
+.hdr-title{font-size:18px;font-weight:700;color:#0f172a}
+.hdr-nav{display:flex;align-items:center;gap:12px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;padding:24px}
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;text-decoration:none;display:block;transition:transform .15s,box-shadow .15s;box-shadow:0 1px 4px #0000000a}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 24px #00000012}
-.dash{display:block;text-align:center;margin:0 24px;padding:12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;color:#64748b;text-decoration:none;font-size:13px}
-.dash:hover{border-color:#6366f1;color:#6366f1}
+.sec-label{padding:20px 24px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
 </style>
 </head>
 <body>
-<div class="hdr"><h1>🏢 蕪解填報中心</h1><p class="sub">選擇你的崗位表單，提交後即時同步至管理系統</p></div>
-<div id="user-bar" style="background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-  <span style="font-size:13px;color:#64748b">你好，<span id="user-name" style="color:#6366f1;font-weight:700"></span></span>
-  <button id="logout-btn" style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline" onclick="showFeedback()">登出</button>
-</div>
-
-<!-- ── 登出前問卷 Modal ── -->
-<div id="fb-modal" style="display:none;position:fixed;inset:0;background:#0008;z-index:9999;overflow-y:auto">
-  <div style="max-width:480px;margin:40px auto 24px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px #0004">
-    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:24px 24px 20px;color:#fff">
-      <div style="font-size:22px;margin-bottom:6px">👋 今天辛苦了！</div>
-      <div style="font-size:14px;opacity:.9">離開前花 30 秒留個感受，幫助系統持續變得更好</div>
-    </div>
-    <div style="padding:20px">
-      <div style="margin-bottom:18px">
-        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:10px">今天整體使用體驗如何？</div>
-        <div id="star-row" style="display:flex;gap:8px">
-          <button class="star-btn" data-v="1" onclick="setStar(1)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😤<br><span style="font-size:10px;color:#64748b">很差</span></button>
-          <button class="star-btn" data-v="2" onclick="setStar(2)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😕<br><span style="font-size:10px;color:#64748b">不順</span></button>
-          <button class="star-btn" data-v="3" onclick="setStar(3)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😐<br><span style="font-size:10px;color:#64748b">普通</span></button>
-          <button class="star-btn" data-v="4" onclick="setStar(4)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">🙂<br><span style="font-size:10px;color:#64748b">不錯</span></button>
-          <button class="star-btn" data-v="5" onclick="setStar(5)" style="flex:1;padding:10px 4px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:18px;transition:all .15s">😄<br><span style="font-size:10px;color:#64748b">很好</span></button>
-        </div>
-      </div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px">今天用了哪些表單？（可多選）</div>
-        <div id="form-checks" style="display:flex;flex-wrap:wrap;gap:6px">
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="項目排期"> 項目排期</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="現金流"> 現金流</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="預算編列"> 預算編列</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="銷售進度"> 銷售進度</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="設計送審"> 設計送審</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="採購詢比價"> 採購詢比價</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="庫存物流"> 庫存物流</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="審批記錄"> 審批記錄</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="每日銷售快報"> 每日快報</label>
-          <label style="display:flex;align-items:center;gap:5px;background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer"><input type="checkbox" value="其他"> 其他</label>
-        </div>
-      </div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:6px">遇到任何問題或卡關？</div>
-        <textarea id="fb-issue" placeholder="描述問題（沒有可以不填）" style="width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;resize:vertical;min-height:64px;outline:none;box-sizing:border-box"></textarea>
-      </div>
-      <div style="margin-bottom:20px">
-        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:6px">有什麼想改善的建議？</div>
-        <textarea id="fb-suggest" placeholder="你的建議對我們很重要 🙏" style="width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;resize:vertical;min-height:64px;outline:none;box-sizing:border-box"></textarea>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button id="fb-skip" onclick="doLogout()" style="flex:1;padding:12px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fff;color:#94a3b8;font-size:13px;cursor:pointer">跳過，直接登出</button>
-        <button id="fb-submit" onclick="submitFeedback()" style="flex:2;padding:12px;background:#6366f1;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">送出並登出 ✓</button>
-      </div>
-      <div id="fb-result" style="display:none;text-align:center;padding:10px;font-size:13px;color:#10b981;margin-top:10px"></div>
-    </div>
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="../home.html" style="font-size:13px;color:#64748b;text-decoration:none">← 首頁</a>
+    <span class="hdr-title">📝 填報中心</span>
+  </div>
+  <div class="hdr-nav">
+    <span style="font-size:13px;color:#64748b">你好，<span id="user-name" style="color:#6366f1;font-weight:700"></span></span>
+    <button style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline" onclick="doLogout()">登出</button>
   </div>
 </div>
-
-<div style="padding:16px 24px 4px;border-bottom:1px solid #e2e8f0;margin-bottom:4px">
-  <div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📢 公告板</div>
-  <div id="notice-board"><div style="color:#94a3b8;font-size:13px;padding:8px 0">公告載入中...</div></div>
-</div>
-<div style="padding:20px 24px 4px"><div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px">日常填報</div></div>
-<div class="grid"><a href="feedback.html" class="card" style="border-top:3px solid #6366f1">
-                  <div style="font-size:28px;margin-bottom:10px">💬</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">使用體驗回報</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">遇到問題或有建議？填這裡，幫助系統更好用</div>
-                  <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
-                </a><a href="project.html" class="card" style="border-top:3px solid #6366f1">
-                  <div style="font-size:28px;margin-bottom:10px">📋</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增項目</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立新項目，填入 IP、業務類型、授權資訊</div>
-                  <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
-                </a><a href="product.html" class="card" style="border-top:3px solid #06b6d4">
-                  <div style="font-size:28px;margin-bottom:10px">🏷️</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增產品明細</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">選擇項目後建立個別產品，追蹤開發與銷售</div>
-                  <div style="font-size:11px;background:#06b6d418;color:#06b6d4;padding:3px 8px;border-radius:6px;display:inline-block">開發 / 業務</div>
-                </a><a href="budget.html" class="card" style="border-top:3px solid #8b5cf6">
-                  <div style="font-size:28px;margin-bottom:10px">💵</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">預算編列</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">選擇項目後逐條建立收入與支出預算</div>
-                  <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">財務 / 項目負責人</div>
-                </a><a href="cashflow.html" class="card" style="border-top:3px solid #10b981">
-                  <div style="font-size:28px;margin-bottom:10px">💰</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">現金流填報</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫辦公室本期收支與餘額</div>
-                  <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block">財務 / 各辦公室負責人</div>
-                </a><a href="sales.html" class="card" style="border-top:3px solid #6366f1">
-                  <div style="font-size:28px;margin-bottom:10px">🎯</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">銷售進度填報</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫訂單狀態、金額、帳期</div>
-                  <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / BD</div>
-                </a><a href="stock.html" class="card" style="border-top:3px solid #f59e0b">
-                  <div style="font-size:28px;margin-bottom:10px">📦</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">庫存 / 物流填報</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫庫存數量與出貨物流狀態</div>
-                  <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">倉庫 / 物流</div>
-                </a><a href="design.html" class="card" style="border-top:3px solid #ec4899">
-                  <div style="font-size:28px;margin-bottom:10px">🎨</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">設計送審填報</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">9步驟送審進度追蹤＋圖片上傳</div>
-                  <div style="font-size:11px;background:#ec489918;color:#ec4899;padding:3px 8px;border-radius:6px;display:inline-block">創意 / 設計師</div>
-                </a><a href="procure.html" class="card" style="border-top:3px solid #f97316">
-                  <div style="font-size:28px;margin-bottom:10px">🛒</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購詢比價</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫報價比較與議價結果＋附件上傳</div>
-                  <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block">採購負責人</div>
-                </a><a href="contract.html" class="card" style="border-top:3px solid #64748b">
-                  <div style="font-size:28px;margin-bottom:10px">📄</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">合約管理</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立合約摘要並上傳合約文件</div>
-                  <div style="font-size:11px;background:#64748b18;color:#64748b;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
-                </a><a href="approval.html" class="card" style="border-top:3px solid #ef4444">
-                  <div style="font-size:28px;margin-bottom:10px">🔔</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">審批申請</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">提交需要管理層審批的事項</div>
-                  <div style="font-size:11px;background:#ef444418;color:#ef4444;padding:3px 8px;border-radius:6px;display:inline-block">任何人</div>
-                </a><div class="card" style="border-top:3px solid #0ea5e9">
-                  <div style="font-size:28px;margin-bottom:10px">📋</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">會議記錄</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">記錄議題、決議事項、行動項目</div>
-                  <div style="font-size:11px;background:#0ea5e918;color:#0ea5e9;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">所有人</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_meeting.html" style="flex:1;text-align:center;background:#0ea5e918;color:#0ea5e9;border:1px solid #0ea5e940;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="meeting.html" style="flex:1;text-align:center;background:#0ea5e9;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div><a href="quote.html" class="card" style="border-top:3px solid #6366f1">
-                  <div style="font-size:28px;margin-bottom:10px">🧾</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">報價單生成器</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫後直接列印或存 PDF</div>
-                  <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / 管理層</div>
-                </a></div>
-<div style="padding:12px 24px 4px;border-top:1px solid #e2e8f0;margin-top:8px"><div style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.8px">🏪 快閃店專區</div></div>
+<div class="sec-label" style="color:#94a3b8">日常填報</div>
+<div class="grid"><a href="project.html" class="card" style="border-top:3px solid #6366f1">
+              <div style="font-size:28px;margin-bottom:10px">📋</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增項目</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立新項目，填入 IP、業務類型、授權資訊</div>
+              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
+            </a><a href="product.html" class="card" style="border-top:3px solid #06b6d4">
+              <div style="font-size:28px;margin-bottom:10px">🏷️</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增產品明細</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">選擇項目後建立個別產品，追蹤開發與銷售</div>
+              <div style="font-size:11px;background:#06b6d418;color:#06b6d4;padding:3px 8px;border-radius:6px;display:inline-block">開發 / 業務</div>
+            </a><a href="budget.html" class="card" style="border-top:3px solid #8b5cf6">
+              <div style="font-size:28px;margin-bottom:10px">💵</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">預算編列</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">選擇項目後逐條建立收入與支出預算</div>
+              <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">財務 / 項目負責人</div>
+            </a><a href="cashflow.html" class="card" style="border-top:3px solid #10b981">
+              <div style="font-size:28px;margin-bottom:10px">💰</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">現金流填報</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫辦公室本期收支與餘額</div>
+              <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block">財務 / 各辦公室負責人</div>
+            </a><a href="sales.html" class="card" style="border-top:3px solid #6366f1">
+              <div style="font-size:28px;margin-bottom:10px">🎯</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">銷售進度填報</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫訂單狀態、金額、帳期</div>
+              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / BD</div>
+            </a><a href="stock.html" class="card" style="border-top:3px solid #f59e0b">
+              <div style="font-size:28px;margin-bottom:10px">📦</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">庫存 / 物流填報</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫庫存數量與出貨物流狀態</div>
+              <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">倉庫 / 物流</div>
+            </a><a href="design.html" class="card" style="border-top:3px solid #ec4899">
+              <div style="font-size:28px;margin-bottom:10px">🎨</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">設計送審填報</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">9步驟送審進度追蹤＋圖片上傳</div>
+              <div style="font-size:11px;background:#ec489918;color:#ec4899;padding:3px 8px;border-radius:6px;display:inline-block">創意 / 設計師</div>
+            </a><a href="procure.html" class="card" style="border-top:3px solid #f97316">
+              <div style="font-size:28px;margin-bottom:10px">🛒</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購詢比價</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫報價比較與議價結果＋附件上傳</div>
+              <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block">採購負責人</div>
+            </a><a href="contract.html" class="card" style="border-top:3px solid #64748b">
+              <div style="font-size:28px;margin-bottom:10px">📄</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">合約管理</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立合約摘要並上傳合約文件</div>
+              <div style="font-size:11px;background:#64748b18;color:#64748b;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
+            </a><a href="approval.html" class="card" style="border-top:3px solid #ef4444">
+              <div style="font-size:28px;margin-bottom:10px">🔔</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">審批申請</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">提交需要管理層審批的事項</div>
+              <div style="font-size:11px;background:#ef444418;color:#ef4444;padding:3px 8px;border-radius:6px;display:inline-block">任何人</div>
+            </a><a href="meeting.html" class="card" style="border-top:3px solid #0ea5e9">
+              <div style="font-size:28px;margin-bottom:10px">📋</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">會議記錄</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">記錄議題、決議事項、行動項目</div>
+              <div style="font-size:11px;background:#0ea5e918;color:#0ea5e9;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
+            </a><a href="quote.html" class="card" style="border-top:3px solid #6366f1">
+              <div style="font-size:28px;margin-bottom:10px">🧾</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">報價單生成器</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫後直接列印或存 PDF</div>
+              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / 管理層</div>
+            </a><a href="feedback.html" class="card" style="border-top:3px solid #6366f1">
+              <div style="font-size:28px;margin-bottom:10px">💬</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">使用體驗回報</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">遇到問題或有建議？填這裡</div>
+              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
+            </a></div>
+<div class="sec-label" style="color:#f59e0b;border-top:1px solid #e2e8f0;margin-top:8px">🏪 快閃店專區</div>
 <div class="grid"><a href="daily_sales.html" class="card" style="border-top:3px solid #10b981">
-                  <div style="font-size:28px;margin-bottom:10px">📊</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">每日銷售快報</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫當日流水、支付方式、寄售結算</div>
-                  <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block">Shawn / 店長</div>
-                </a><a href="popup_venue.html" class="card" style="border-top:3px solid #f59e0b">
-                  <div style="font-size:28px;margin-bottom:10px">🏪</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店場地資訊</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">登記場地、租金模式、贊助金額</div>
-                  <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
-                </a><a href="consignment.html" class="card" style="border-top:3px solid #8b5cf6">
-                  <div style="font-size:28px;margin-bottom:10px">🤝</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">寄售管理</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">每日寄售銷售額與應付分潤計算</div>
-                  <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">Shawn / 賴哥</div>
-                </a><div class="card" style="border-top:3px solid #f59e0b">
-                  <div style="font-size:28px;margin-bottom:10px">📍</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店場地資料庫</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">城市/商圈/商場/客流/合作條件</div>
-                  <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">Shawn / Ray</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_venue_db.html" style="flex:1;text-align:center;background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b40;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="venue_db.html" style="flex:1;text-align:center;background:#f59e0b;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div></div>
-<div style="padding:12px 24px 4px;border-top:1px solid #e2e8f0;margin-top:8px"><div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px">主資料庫維護</div></div>
-<div class="grid"><div class="card" style="border-top:3px solid #a855f7">
-                  <div style="font-size:28px;margin-bottom:10px">📜</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">IP版權資料庫</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">版權方/代理商/授權地區/合約狀態</div>
-                  <div style="font-size:11px;background:#a855f718;color:#a855f7;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">Ray / 安然</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_ip_db.html" style="flex:1;text-align:center;background:#a855f718;color:#a855f7;border:1px solid #a855f740;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="ip_db.html" style="flex:1;text-align:center;background:#a855f7;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div><div class="card" style="border-top:3px solid #f97316">
-                  <div style="font-size:28px;margin-bottom:10px">🏭</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購供應商</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">供應商品類/報價/評分/聯絡資訊</div>
-                  <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">賴哥 / 木子</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_supplier.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="supplier.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div><div class="card" style="border-top:3px solid #10b981">
-                  <div style="font-size:28px;margin-bottom:10px">🤝</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">客戶名單</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">KA/流通渠道/電商/地區分類</div>
-                  <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">安然 / 董亮</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_customer.html" style="flex:1;text-align:center;background:#10b98118;color:#10b981;border:1px solid #10b98140;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="customer.html" style="flex:1;text-align:center;background:#10b981;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div><div class="card" style="border-top:3px solid #ec4899">
-                  <div style="font-size:28px;margin-bottom:10px">🎨</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">設計外包</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">外包設計師/工作室/專長/報價</div>
-                  <div style="font-size:11px;background:#ec489918;color:#ec4899;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">Bevis / Shawn</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_design_vendor.html" style="flex:1;text-align:center;background:#ec489918;color:#ec4899;border:1px solid #ec489940;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="design_vendor.html" style="flex:1;text-align:center;background:#ec4899;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div><div class="card" style="border-top:3px solid #0ea5e9">
-                  <div style="font-size:28px;margin-bottom:10px">🚢</div>
-                  <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">物流貨代報關行</div>
-                  <div style="font-size:12px;color:#64748b;margin-bottom:10px">服務類型/路線/報價/評分</div>
-                  <div style="font-size:11px;background:#0ea5e918;color:#0ea5e9;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:10px">高維 / Shawn</div>
-                  <div style="display:flex;gap:8px;margin-top:2px">
-                    <a href="view_logistics.html" style="flex:1;text-align:center;background:#0ea5e918;color:#0ea5e9;border:1px solid #0ea5e940;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看資料庫</a>
-                    <a href="logistics.html" style="flex:1;text-align:center;background:#0ea5e9;color:#fff;border-radius:7px;padding:7px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-                  </div>
-                </div></div>
-<a class="dash" href="../dashboard.html">📊 查看管理儀表板</a>
+              <div style="font-size:28px;margin-bottom:10px">📊</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">每日銷售快報</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫當日流水、支付方式、寄售結算</div>
+              <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block">Shawn / 店長</div>
+            </a><a href="popup_venue.html" class="card" style="border-top:3px solid #f59e0b">
+              <div style="font-size:28px;margin-bottom:10px">🏪</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店場地資訊</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">登記場地、租金模式、贊助金額</div>
+              <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
+            </a><a href="consignment.html" class="card" style="border-top:3px solid #8b5cf6">
+              <div style="font-size:28px;margin-bottom:10px">🤝</div>
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">寄售管理</div>
+              <div style="font-size:12px;color:#64748b;margin-bottom:8px">每日寄售銷售額與應付分潤計算</div>
+              <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">Shawn / 賴哥</div>
+            </a></div>
 <script>
 const _PROXY_IDX="https://feishu-proxy.raychou6913.workers.dev";
 const _AT_IDX="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _VL_TBL="tblUzRSQgKLhlttk";
-const _NB_TBL="tblPtgudsOOlmJAx";
-const _TABLES_IDX={"feedback": "tbl68ofUGp7FTjx8"};
-
-
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){
@@ -238,192 +122,26 @@ const _TABLES_IDX={"feedback": "tbl68ofUGp7FTjx8"};
     return;
   }
   document.getElementById("user-name").textContent=s.name+"（"+s.dept+"）";
-  _autoLogVisit(s);
-  _loadNotices(s);
+  _logVisit(s);
 })();
-
-async function _autoLogVisit(s){
+async function _logVisit(s){
   const now=new Date();
-  const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
-  const todayKey="wj_v_"+localDate;
-  if(localStorage.getItem(todayKey)) return;
+  const d=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  const k="wj_v_"+d;
+  if(localStorage.getItem(k)) return;
   try{
     const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const d=await r.json();
-    if(d.code!==0) return;
-    const tk=d.tenant_access_token;
-    const dateStr=localDate;
-    const timeStr=now.toTimeString().slice(0,8);
-    const res=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_VL_TBL+"/records",{
-      method:"POST",
-      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields:{"姓名":s.name,"部門":s.dept,"日期":dateStr,"時間":timeStr}})
+    const td=await r.json(); if(td.code!==0) return;
+    await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_VL_TBL+"/records",{
+      method:"POST",headers:{"Authorization":"Bearer "+td.tenant_access_token,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"姓名":s.name,"部門":s.dept,"日期":d,"時間":now.toTimeString().slice(0,8)}})
     });
-    const rd=await res.json();
-    if(rd.code===0) localStorage.setItem(todayKey,"1");
+    localStorage.setItem(k,"1");
   }catch(e){}
 }
-
-function _fv(f,k){
-  const v=f[k];
-  if(!v&&v!==0) return "";
-  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
-  if(typeof v==="object") return v.text||v.link||"";
-  return String(v);
-}
-
-async function _loadNotices(s){
-  const el=document.getElementById("notice-board");
-  try{
-    const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const td=await r.json();
-    if(td.code!==0){el.innerHTML='<div style="color:#94a3b8;font-size:13px">公告載入失敗</div>';return;}
-    const tk=td.tenant_access_token;
-    window._nb_tk=tk;
-    const res=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_NB_TBL+"/records?page_size=50",{
-      headers:{"Authorization":"Bearer "+tk}
-    });
-    const data=await res.json();
-    const items=(data.data?.items||[]);
-    const notices=items
-      .filter(i=>_fv(i.fields,"有效")==="是")
-      .sort((a,b)=>_fv(b.fields,"發布日期").localeCompare(_fv(a.fields,"發布日期")))
-      .slice(0,5);
-    if(notices.length===0){
-      el.innerHTML='<div style="color:#94a3b8;font-size:13px;padding:6px 0">目前沒有公告</div>';
-      return;
-    }
-    const TYPE_COLOR={"重要公告":"#ef4444","一般通知":"#6366f1","作業提醒":"#f59e0b","分享連結":"#10b981"};
-    el.innerHTML=notices.map(n=>{
-      const f=n.fields||{};
-      const rid=n.record_id;
-      const title=_fv(f,"標題")||"(無標題)";
-      const content=_fv(f,"內容");
-      const type=_fv(f,"類型");
-      const date=_fv(f,"發布日期");
-      const pub=_fv(f,"發布人");
-      const readers=_fv(f,"已讀人員");
-      const link=_fv(f,"連結");
-      const tc=TYPE_COLOR[type]||"#64748b";
-      const done=localStorage.getItem("wj_read_"+rid)||readers.split(/[、,]/).map(x=>x.trim()).includes(s.name);
-      return `<div style="background:#fff;border:1px solid #e2e8f0;border-left:4px solid ${tc};border-radius:10px;padding:14px 16px;margin-bottom:10px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <span style="background:${tc}18;color:${tc};font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px">${type||"通知"}</span>
-            <span style="font-size:15px;font-weight:700;color:#0f172a">${title}</span>
-          </div>
-          <span style="font-size:11px;color:#94a3b8;white-space:nowrap">${date} · ${pub}</span>
-        </div>
-        ${content?`<div style="font-size:13px;color:#475569;margin-bottom:8px;line-height:1.6;white-space:pre-wrap">${content}</div>`:""}
-        ${link?`<div style="margin-bottom:8px"><a href="${link}" target="_blank" style="font-size:12px;color:#6366f1">🔗 查看連結</a></div>`:""}
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-          <span style="font-size:11px;color:#94a3b8" id="rd_${rid}">已讀：${readers||"(尚無)"}</span>
-          ${done
-            ?`<span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`
-            :`<button id="btn_${rid}" onclick="_confirmRead('${rid}',this)" style="background:#6366f1;color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600">✓ 確認已讀</button>`
-          }
-        </div>
-      </div>`;
-    }).join("");
-  }catch(e){
-    el.innerHTML='<div style="color:#94a3b8;font-size:13px">公告載入失敗</div>';
-  }
-}
-
-async function _confirmRead(rid,btn){
-  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||!window._nb_tk) return;
-  btn.disabled=true; btn.textContent="確認中...";
-  try{
-    const tk=window._nb_tk;
-    const rr=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_NB_TBL+"/records/"+rid,{
-      headers:{"Authorization":"Bearer "+tk}
-    });
-    const rd=await rr.json();
-    const cur=_fv(rd.data?.record?.fields||{},"已讀人員");
-    const names=cur?cur.split(/[、,]/).map(x=>x.trim()).filter(Boolean):[];
-    if(!names.includes(s.name)) names.push(s.name);
-    const newStr=names.join("、");
-    await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_NB_TBL+"/records/"+rid,{
-      method:"PUT",
-      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields:{"已讀人員":newStr}})
-    });
-    localStorage.setItem("wj_read_"+rid,"1");
-    btn.parentElement.innerHTML=`<span style="font-size:11px;color:#94a3b8">已讀：${newStr}</span><span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`;
-  }catch(e){
-    btn.textContent="✓ 確認已讀"; btn.disabled=false;
-  }
-}
-
-// ── 登出問卷 ────────────────────────────────────────────────
-let _fbScore=0;
-let _fbSession=null;
-
-function showFeedback(){
-  _fbSession=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  _fbScore=0;
-  document.querySelectorAll(".star-btn").forEach(b=>b.style.cssText=b.style.cssText.replace(/background:[^;]+/,"background:#f8fafc").replace(/border-color:[^;]+/,"border-color:#e2e8f0"));
-  document.getElementById("fb-issue").value="";
-  document.getElementById("fb-suggest").value="";
-  document.getElementById("fb-result").style.display="none";
-  document.getElementById("fb-submit").disabled=false;
-  document.getElementById("fb-submit").textContent="送出並登出 ✓";
-  document.querySelectorAll("#form-checks input").forEach(c=>c.checked=false);
-  document.getElementById("fb-modal").style.display="block";
-}
-
-function setStar(v){
-  _fbScore=v;
-  document.querySelectorAll(".star-btn").forEach(b=>{
-    const active=parseInt(b.dataset.v)===v;
-    b.style.background=active?"#6366f1":"#f8fafc";
-    b.style.borderColor=active?"#6366f1":"#e2e8f0";
-    b.style.color=active?"#fff":"inherit";
-  });
-}
-
 function doLogout(){
-  document.getElementById("fb-modal").style.display="none";
   localStorage.removeItem("wujie_session");
-  location.replace("../login.html");
-}
-
-async function submitFeedback(){
-  const btn=document.getElementById("fb-submit");
-  const res=document.getElementById("fb-result");
-  btn.disabled=true; btn.textContent="送出中...";
-  const forms=[...document.querySelectorAll("#form-checks input:checked")].map(c=>c.value).join("、");
-  const now=new Date();
-  const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
-  const timeStr=now.toTimeString().slice(0,8);
-  const fields={
-    "填報人": _fbSession?.name||"",
-    "部門":   _fbSession?.dept||"",
-    "日期":   localDate,
-    "時間":   timeStr,
-    "整體滿意度": _fbScore||0,
-    "使用的表單": forms||"（未選擇）",
-    "遇到的問題": document.getElementById("fb-issue").value||"無",
-    "改善建議":   document.getElementById("fb-suggest").value||"無",
-    "心情":       _fbScore>=4?"😄 開心":_fbScore===3?"😐 普通":_fbScore>=1?"😕 不順":"（未評分）",
-  };
-  try{
-    const tr=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const td=await tr.json();
-    if(td.code!==0) throw new Error("token");
-    const tk=td.tenant_access_token;
-    await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_TABLES_IDX["feedback"]+"/records",{
-      method:"POST",
-      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields})
-    });
-    res.style.display="block"; res.textContent="✅ 謝謝你的回饋！3 秒後登出...";
-    setTimeout(doLogout, 3000);
-  }catch(e){
-    res.style.display="block"; res.style.color="#ef4444"; res.textContent="送出失敗，直接登出...";
-    setTimeout(doLogout, 2000);
-  }
+  location.replace("../home.html");
 }
 </script>
 </body></html>
