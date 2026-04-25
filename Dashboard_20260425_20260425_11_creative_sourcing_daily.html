@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年04月25日 創意選品日報 - 蕪解創意</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 品牌核心色彩定義 */
+        :root {
+            --primary-brand-color: #a87e68; /* 溫暖、高級的品牌主色 */
+            --secondary-brand-color: #c4a18f; /* 輔助色，提供層次感 */
+            --background-color: #faf8f5; /* 溫暖奶油白底 */
+            --text-color: #333;
+            --light-text-color: #666;
+            --border-color: #eee;
+            --card-bg-color: #ffffff;
+            --highlight-color: #e0b08e; /* 柔和的重點提示色 */
+            --star-color-active: #ffd700; /* 評分星星活躍色 */
+            --star-color-inactive: #ccc; /* 評分星星未選中色 */
+        }
+
+        /* 全局樣式設定 */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 內容容器 */
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* 頂部品牌 Header 區塊 */
+        header.brand-header {
+            background-color: var(--primary-brand-color);
+            color: #fff;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header.brand-header .logo-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        header.brand-header .logo-area img {
+            height: 40px;
+            filter: invert(100%) brightness(200%); /* 確保 Logo 在深色背景下可見 */
+        }
+
+        header.brand-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            margin: 0;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        header.brand-header p.date {
+            font-size: 1.1em;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        /* 標題樣式 */
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: var(--primary-brand-color);
+            border-bottom: 2px solid var(--secondary-brand-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 25px;
+        }
+
+        h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6em;
+            color: var(--text-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .section-intro {
+            font-size: 1.1em;
+            color: var(--light-text-color);
+            margin-bottom: 30px;
+            padding-left: 10px;
+            border-left: 3px solid var(--secondary-brand-color);
+        }
+
+        /* 提案卡片樣式 */
+        .proposal-card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+            border: 1px solid var(--border-color);
+        }
+
+        .proposal-card:hover {
+            transform: scale(1.02); /* 滑鼠懸停微縮放 */
+        }
+
+        .card-cover-image {
+            width: 100%;
+            height: 250px; /* 固定封面圖高度 */
+            object-fit: cover;
+            display: block;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .card-header-area {
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            cursor: pointer; /* 提示可點擊 */
+        }
+
+        .card-header-text {
+            flex-grow: 1;
+        }
+
+        .card-header-text h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.5em;
+            color: var(--primary-brand-color);
+            line-height: 1.3;
+        }
+
+        .card-header-text p {
+            margin: 0;
+            color: var(--light-text-color);
+            font-size: 1em;
+        }
+
+        .expand-button {
+            font-size: 1.8em;
+            color: var(--secondary-brand-color);
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 可展開內容區域 */
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out; /* max-height transition */
+            padding: 0 25px; /* 預設無 padding */
+        }
+
+        .card-content.expanded {
+            max-height: 3000px; /* 展開時足夠高的 max-height */
+            padding: 15px 25px 25px; /* 展開時的 padding */
+        }
+
+        .card-content p {
+            margin-bottom: 1em;
+        }
+
+        .card-content ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+
+        .card-content li {
+            margin-bottom: 0.5em;
+        }
+
+        .card-content img {
+            width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: block;
+            height: auto;
+            max-height: 300px; /* 限制內容圖片最大高度 */
+            object-fit: cover;
+        }
+
+        /* 卡片底部資訊區塊 */
+        .card-footer {
+            padding: 15px 25px 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .card-footer .tag {
+            background-color: var(--secondary-brand-color);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .card-footer .rating-area {
+            margin-left: auto; /* 將評分推向右側 */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            font-size: 1.5em;
+            color: var(--star-color-inactive);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star.selected, .star:hover {
+            color: var(--star-color-active);
+        }
+        /* 確保選中後的星星及其之前的星星保持高亮，後續星星保持未選中 */
+        .star.selected ~ .star {
+             color: var(--star-color-inactive);
+        }
+        .star:hover ~ .star { /* 滑鼠移出時，恢復到當前評分狀態 */
+            color: var(--star-color-inactive);
+        }
+
+        /* 內容中的小標題 */
+        .small-heading {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--primary-brand-color);
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        /* 內容中粗體字強調 */
+        p strong {
+            color: var(--primary-brand-color);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            header.brand-header h1 {
+                font-size: 1.8em;
+            }
+            .container {
+                margin: 10px auto;
+                padding: 0 15px;
+            }
+            .proposal-card {
+                margin-bottom: 20px;
+            }
+            .card-header-area {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+            .card-header-text h3 {
+                font-size: 1.3em;
+            }
+            .card-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px 20px;
+            }
+            .card-footer .rating-area {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+            .card-content {
+                padding: 0 20px;
+            }
+            .card-content.expanded {
+                padding: 10px 20px 20px;
+            }
+            .card-cover-image {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header.brand-header h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.6em;
+            }
+            h3 {
+                font-size: 1.4em;
+            }
+            .card-header-text h3 {
+                font-size: 1.1em;
+            }
+            .card-header-text p {
+                font-size: 0.9em;
+            }
+            .tag {
+                font-size: 0.8em;
+                padding: 5px 10px;
+            }
+            .star {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="brand-header">
+        <div class="logo-area">
+            <!-- 品牌 Logo 區塊：由於禁止新增圖片 URL，使用一個簡單的 SVG 資料圖片作為品牌 Logo 的視覺佔位符 -->
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0NSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0zMCw3MEw3MCwzMCIgc3Ryb2tlPSIjNDQ0IiBzdHJva2Utd2lkdGg9IjUiLz48cGF0aCBkPSJNMzAsMzB0MCw0MCIgc3Ryb2tlPSIjNDQ0IiBzdHJva2Utd2lkdGg9IjUiLz48L3N2Zz4=" alt="蕪解創意 Brand Logo" style="filter: invert(1) brightness(1);">
+            <h1>蕪解創意</h1>
+        </div>
+        <h1>創意選品日報</h1>
+        <p class="date">2026年04月25日</p>
+    </header>
+
+    <div class="container">
+        <h2>本日創意焦點：數位周邊（AR / 數位收藏品）與實體公仔結合新方向</h2>
+        <p class="section-intro">隨著數位科技的飛速發展和年輕一代消費習慣的轉變，單純的實體收藏品已不足以完全滿足市場需求。今日提案聚焦於如何將蕪解創意旗下強力 IP 的實體公仔，與 AR 互動體驗及數位收藏品概念結合，為產品線注入新的生命力，創造更高的附加價值與更豐富的用戶體驗，同時為公司 IPO 前的 VAM 目標貢獻潛力。</p>
+
+        <h2>🌟 今日主推提案</h2>
+
+        <!-- 提案卡片 1: Snoopy AR 世界旅人 系列盲盒公仔 -->
+        <div class="proposal-card">
+            <!-- 封面圖：每個提案的第一張圖片作為卡片封面 -->
+            <img src="https://image.pollinations.ai/prompt/blind%20box%20toy%20unboxing%20surprise%20collectible%20figure%20colorful%20packaging?width=600&height=350&nologo=true&seed=502" alt="盲盒公仔拆箱驚喜" class="card-cover-image">
+            <div class="card-header-area">
+                <div class="card-header-text">
+                    <h3>1. 「Snoopy AR 世界旅人」系列盲盒公仔</h3>
+                    <p>實體公仔與沉浸式 AR 互動結合，將史努比的環球冒險帶入現實世界。</p>
+                </div>
+                <!-- 展開/收合按鈕 -->
+                <div class="expand-button" role="button" aria-expanded="false" aria-controls="content-snoopy">▼</div>
+            </div>
+            <!-- 可展開內容 -->
+            <div class="card-content" id="content-snoopy">
+                <!-- 提案內容中的其餘圖片 -->
+                <p><img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="史努比" style="width:100%;border-radius:8px;margin:8px 0;"></p>
+                <p><img src="https://image.pollinations.ai/prompt/world%20landmarks%20Eiffel%20Tower%20Bangkok%20Temple%20Tokyo%20Seoul%20travel%20collage?width=600&height=350&nologo=true&seed=301" alt="世界地標旅遊拼貼" style="width:100%;border-radius:8px;margin:8px 0;"></p>
+                <p><img src="https://image.pollinations.ai/prompt/blind%20box%20toy%20unboxing%20surprise%20collectible%20figure%20colorful%20packaging?width=600&height=350&nologo=true&seed=502" alt="盲盒公仔拆箱驚喜" style="width:100%;border-radius:8px;margin:8px 0;"></p>
+
+                <h4 class="small-heading">靈感來源：</h4>
+                <p>全球範圍內對 Snoopy/Peanuts IP 的廣泛喜愛，以及其「世界旅人」等多元主題的延展性。結合當前 AR 技術在消費領域的成熟應用，為收藏者提供超越實體的互動體驗。</p>
+
+                <h4 class="small-heading">具體商品規格：</h4>
+                <ul>
+                    <li><strong>公仔尺寸/材質：</strong> 8cm PVC/ABS 材質精緻塗裝公仔，每款公仔設計為不同國家或城市的特色服飾及地標配件。</li>
+                    <li><strong>數位整合：：</strong> 每個盲盒內含一個獨特的 QR Code 或 NFC 晶片，掃描後可解鎖專屬的 AR 應用程式或 WebAR 體驗。</li>
+                    <li><strong>AR 體驗內容：</strong>
+                        <ul>
+                            <li><strong>AR 桌面寵物：</strong> 史努比虛擬形象可透過手機鏡頭出現在現實環境中，與用戶進行簡單互動（如跳舞、打招呼、與現實物品合影）。</li>
+                            <li><strong>「城市探索」濾鏡：：</strong> 解鎖與公仔主題城市相關的 AR 濾鏡，豐富社交媒體分享內容。</li>
+                            <li><strong>獨家數位收藏品：</strong> 首次拆盒可獲得一個該款公仔限定的「Snoopy 世界旅行護照」數位徽章（非區塊鏈 NFT，初期為應用內數位收藏品，預留升級區塊鏈 NFT 的可能性）。</li>
+                        </ul>
+                    </li>
+                    <li><strong>售價區間：</strong>
+                        <ul>
+                            <li><strong>預估生產成本：</strong> RMB 15/件 (含公仔本體 RMB 8 + AR 內容與晶片整合成本 RMB 7)。</li>
+                            <li><strong>預估批發價：</strong> USD 6/件。</li>
+                            <li><strong>預估零售定價：</strong> USD 18/件。</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="small-heading">目標市場與客群畫像：</h4>
+                <ul>
+                    <li><strong>市場：</strong> 歐洲、澳洲/紐西蘭、東南亞、香港、台灣、中國大陸。Snoopy 在這些地區擁有廣泛且忠實的粉絲基礎。</li>
+                    <li><strong>客群：</strong> 18-35歲，喜愛潮流玩具、熱衷於探索新科技的年輕消費者與收藏者；重視社交媒體分享與獨特互動體驗的 IP 粉絲。</li>
+                </ul>
+
+                <h4 class="small-heading">預估零售定價 + 批發毛利率：</h4>
+                <ul>
+                    <li><strong>零售定價：</strong> USD 18/件 (約 RMB 129.6/件)。</li>
+                    <li><strong>批發價：</strong> USD 6/件 (約 RMB 43.2/件)。</li>
+                    <li><strong>批發毛利率：</strong> (RMB 43.2 - RMB 15) / RMB 43.2 = 65.28%。</li>
+                </ul>
+
+                <h4 class="small-heading">VAM 貢獻潛力（具體數字估算）：</h4>
+                <ul>
+                    <li>預估首年全球銷量：200,000 件。</li>
+                    <li>預估首年批發銷售額：200,000 件 * USD 6/件 = USD 1,200,000 (約 RMB 8,640,000)。</li>
+                    <li>預估首年批發毛利貢獻：200,000 件 * (RMB 43.2 - RMB 15)/件 = RMB 5,640,000。</li>
+                    <li>此批發毛利貢獻將對 VAM 目標 (Y1 淨利 RMB 608萬) 有顯著支撐作用。</li>
+                </ul>
+
+                <h4 class="small-heading">上市時程建議：</h4>
+                <ul>
+                    <li><strong>概念驗證與技術合作夥伴鎖定：</strong> 2026年Q2</li>
+                    <li><strong>AR 內容開發與公仔設計定稿：：</strong> 2026年Q3</li>
+                    <li><strong>生產與品控：</strong> 2026年Q4</li>
+                    <li><strong>市場推廣與首發：：</strong> 2027年Q1 (春節/情人節檔期，利用其「旅行」主題)</li>
+                </ul>
+            </div>
+            <!-- 卡片底部標籤與評分區 -->
+            <div class="card-footer">
+                <span class="tag">目標市場：全球 (部分亞洲國家、歐洲、澳洲)</span>
+                <span class="tag">商品類型：AR 盲盒公仔</span>
+                <span class="tag">VAM 貢獻潛力：高</span>
+                <div class="rating-area">
+                    <span style="color: var(--light-text-color);">預估市場吸引力：</span>
+                    <div class="rating-stars" data-rating="0">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提案卡片 2: Chiikawa / Mofusand 數位潮玩勳章 系列盲盒 -->
+        <div class="proposal-card">
+            <!-- 封面圖：每個提案的第一張圖片作為卡片封面 -->
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Chiikawa_volume_1_cover.jpg/400px-Chiikawa_volume_1_cover.jpg" alt="吉伊卡哇封面" class="card-cover-image">
+            <div class="card-header-area">
+                <div class="card-header-text">
+                    <h3>2. 「Chiikawa / Mofusand 數位潮玩勳章」系列盲盒</h3>
+                    <p>實體公仔搭配獨一無二的區塊鏈數位收藏品 (NFT)，開啟新世代潮玩收藏體驗。</p>
+                </div>
+                <!-- 展開/收合按鈕 -->
+                <div class="expand-button" role="button" aria-expanded="false" aria-controls="content-chiikawa">▼</div>
+            </div>
+            <!-- 可展開內容 -->
+            <div class="card-content" id="content-chiikawa">
+                <!-- 提案內容中的其餘圖片 -->
+                <p><img src="https://spiralcute.com/characters/mofusand/en/img/main.jpg" alt="Mofusand" style="width:100%;border-radius:8px;margin:8px 0;"></p>
+                <p><img src="https://image.pollinations.ai/prompt/blind%20box%20toy%20unboxing%20surprise%20collectible%20figure%20colorful%20packaging?width=600&height=350&nologo=true&seed=502" alt="盲盒公仔拆箱驚喜" style="width:100%;border-radius:8px;margin:8px 0;"></p>
+
+                <h4 class="small-heading">靈感來源：</h4>
+                <p>Chiikawa 和 Mofusand 在中國大陸市場的超高人氣及社群活躍度。結合 NFT 區塊鏈技術在數位收藏品領域的興起，滿足年輕收藏者對獨特性、稀有性與數位資產所有權的追求。</p>
+
+                <h4 class="small-heading">具體商品規格：</h4>
+                <ul>
+                    <li><strong>公仔尺寸/材質：</strong> 5cm PVC 材質 Q 版盲盒公仔，每款設計為 Chiikawa 或 Mofusand 的經典形象或限定造型。</li>
+                    <li><strong>數位整合：：</strong> 每個盲盒內含一張獨立編號的卡片，卡片上印有可刮開的唯一密碼，用於兌換一個對應公仔的區塊鏈數位收藏品「潮玩勳章」(NFT)。</li>
+                    <li><strong>NFT 功能：</strong>
+                        <ul>
+                            <li>每個 NFT 勳章擁有獨特的 ID 和稀有度標籤，可在專屬平台（或合作的第三方 NFT 市場）進行展示、交易。</li>
+                            <li>可預留未來作為線上活動入場券、解鎖獨家數位內容（如桌面背景、表情包）的憑證。</li>
+                        </ul>
+                    </li>
+                    <li><strong>售價區間：</strong>
+                        <ul>
+                            <li><strong>預估生產成本：</strong> RMB 8/件 (含公仔本體 RMB 6 + NFT 鑄造與卡片成本 RMB 2)。</li>
+                            <li><strong>預估批發價：</strong> USD 4/件。</li>
+                            <li><strong>預估零售定價：</strong> USD 12/件。</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4 class="small-heading">目標市場與客群畫像：</h4>
+                <ul>
+                    <li><strong>市場：</strong> 中國大陸、香港、澳門。Chiikawa 和 Mofusand 在這些地區擁有龐大的粉絲基礎和高度的社群互動。</li>
+                    <li><strong>客群：</strong> 15-30歲，熱衷於社交媒體、對新潮事物敏感、追求獨特性和收藏價值、對加密貨幣及 NFT 有一定認知或好奇的年輕潮玩愛好者。</li>
+                </ul>
+
+                <h4 class="small-heading">預估零售定價 + 批發毛利率：</h4>
+                <ul>
+                    <li><strong>零售定價：：</strong> USD 12/件 (約 RMB 86.4/件)。</li>
+                    <li><strong>批發價：：</strong> USD 4/件 (約 RMB 28.8/件)。</li>
+                    <li><strong>批發毛利率：</strong> (RMB 28.8 - RMB 8) / RMB 28.8 = 72.22%。</li>
+                </ul>
+
+                <h4 class="small-heading">VAM 貢獻潛力（具體數字估算）：</h4>
+                <ul>
+                    <li>預估首年銷量：300,000 件。</li>
+                    <li>預估首年批發銷售額：300,000 件 * USD 4/件 = USD 1,200,000 (約 RMB 8,640,000)。</li>
+                    <li>預估首年批發毛利貢獻：300,000 件 * (RMB 28.8 - RMB 8)/件 = RMB 6,240,000。</li>
+                    <li>此批發毛利貢獻將顯著超越 Y1 淨利目標。</li>
+                </ul>
+
+                <h4 class="small-heading">上市時程建議：</h4>
+                <ul>
+                    <li><strong>NFT 平台合作/開發與合規性研究：</strong> 2026年Q2</li>
+                    <li><strong>公仔設計與 NFT 圖稿確認：：</strong> 2026年Q3</li>
+                    <li><strong>生產與品控：：</strong> 2026年Q4初期</li>
+                    <li><strong>市場預熱與首發：：</strong> 2026年Q4中旬 (抓住年底購物季與聖誕節檔期)</li>
+                </ul>
+            </div>
+            <!-- 卡片底部標籤與評分區 -->
+            <div class="card-footer">
+                <span class="tag">目標市場：中國大陸、香港、澳門</span>
+                <span class="tag">商品類型：NFT 盲盒公仔</span>
+                <span class="tag">VAM 貢獻潛力：極高</span>
+                <div class="rating-area">
+                    <span style="color: var(--light-text-color);">預估市場吸引力：</span>
+                    <div class="rating-stars" data-rating="0">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>💡 延伸創意點</h2>
+        <img src="https://image.pollinations.ai/prompt/toy%20fair%20exhibition%20collectible%20figures%20display%20art%20fair%20booth%20professional?width=600&height=350&nologo=true&seed=503" alt="玩具展覽收藏公仔陳列" style="width:100%;border-radius:8px;margin:15px 0;">
+        <ol>
+            <li><strong>「IP 虛擬形象衣櫥」：</strong> 授權 IP（如 Opanchu, Muzik Tiger）實體掛件或小公仔，附贈兌換碼，可為用戶在合作的元宇宙平台或虛擬社交 App 中解鎖該 IP 的獨家虛擬服飾或配件，豐富用戶的虛擬形象。</li>
+            <li><strong>「互動式數位故事書」：</strong> 購買 Maniani World 或飯糰與梅子主題的文具周邊（如筆記本、貼紙包），內含 QR Code 可連結至獨家互動式數位漫畫或短篇動畫，定期更新，提升內容粘性。</li>
+            <li><strong>「盲盒開箱 AR 驚喜」：</strong> 為現有盲盒產品線升級，在 App 中增加「AR 開箱」功能，用戶掃描公仔後，可觸發一段有趣的 AR 動畫，模擬公仔「跳出來」的驚喜感，並解鎖該公仔的專屬數位卡片。</li>
+        </ol>
+
+        <h2>🏪 競品參考</h2>
+        <ul>
+            <li>
+                <strong>泡泡瑪特 (Pop Mart) / Labubu：</strong> 作為盲盒潮玩市場的領軍者，泡泡瑪特在實體產品設計和營銷上極具優勢，其限量、稀有款策略引發社群狂熱。目前已開始探索數位收藏品領域，推出「潮玩宇宙」App，內含數位卡牌及部分 NFT 項目，但尚未與實體公仔深度綁定，有待進一步觀察其數位化戰略。
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Pop_Mart_Labubu_The_Monsters_Exciting_Macaron.jpg/400px-Pop_Mart_Labubu_The_Monsters_Exciting_Macaron.jpg" alt="Labubu" style="width:100%;border-radius:8px;margin:8px 0;">
+            </li>
+            <li>
+                <strong>Chiikawa (吉伊卡哇) 周邊：</strong> 在日本及亞洲市場擁有極高人氣，其周邊商品（包括盲盒、毛絨公仔、文具等）銷售火爆，社群互動熱烈。雖然其官方主要仍以實體商品為主，但粉絲自發的二次創作和數位分享已形成巨大聲量，顯示其 IP 具備強大的數位化潛力。
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Chiikawa_volume_1_cover.jpg/400px-Chiikawa_volume_1_cover.jpg" alt="Chiikawa" style="width:100%;border-radius:8px;margin:8px 0;">
+            </li>
+            <li>
+                <strong>Mofusand 周邊：：</strong> 以其可愛的貓咪形象迅速走紅，在中國大陸及港台地區市場表現出色，周邊產品銷量可觀。與 Chiikawa 類似，Mofusand 的高社群參與度也為其數位內容和收藏品的發展奠定基礎。
+                <img src="https://spiralcute.com/characters/mofusand/en/img/main.jpg" alt="Mofusand" style="width:100%;border-radius:8px;margin:8px 0;">
+            </li>
+            <li>
+                <strong>Fuggler：</strong> 以其獨特搞怪的形象在全球範圍內吸引了一批另類收藏者。這類產品雖然風格迥異，但都證明了市場對獨特、有故事的收藏品有需求。在數位領域，Fuggler 或可探索 AR 互動的「惡搞」玩法。
+                <img src="https://cdn.prod.website-files.com/6859485f457c5aca75304358/685aad28a6edbccf4855090c_full-collection.avif" alt="Fuggler" style="width:100%;border-radius:8px;margin:8px 0;">
+            </li>
+        </ul>
+
+        <h2>本週創意優先序（今日更新）</h2>
+        <ol>
+            <li><strong>「Snoopy AR 世界旅人」系列提案細化與潛在技術合作夥伴篩選：</strong> 責任人：研發部、BD 部；截止日：2026年05月10日</li>
+            <li><strong>「Chiikawa / Mofusand 數位潮玩勳章」系列合規性與 NFT 平台接入調研：：</strong> 責任人：法務部、市場部、研發部；截止日：2026年05月15日</li>
+            <li><strong>數位周邊用戶調研與競品分析深化：</strong> 針對目標客群對 AR 互動和數位收藏品的接受度、偏好進行詳細市場調研，並持續跟蹤競品在該領域的最新動態。責任人：市場部；截止日：2026年05月31日</li>
+        </ol>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 處理提案卡片的展開/收合功能
+            document.querySelectorAll('.proposal-card').forEach(card => {
+                const headerArea = card.querySelector('.card-header-area');
+                const content = card.querySelector('.card-content');
+                const expandButton = card.querySelector('.expand-button');
+
+                // 設置初始可訪問性屬性
+                expandButton.setAttribute('aria-expanded', 'false');
+                content.setAttribute('aria-hidden', 'true');
+
+                headerArea.addEventListener('click', () => {
+                    content.classList.toggle('expanded'); // 切換 'expanded' class
+                    const isExpanded = content.classList.contains('expanded');
+                    expandButton.textContent = isExpanded ? '▲' : '▼'; // 改變按鈕文字
+                    expandButton.setAttribute('aria-expanded', isExpanded); // 更新可訪問性屬性
+                    content.setAttribute('aria-hidden', !isExpanded); // 更新可訪問性屬性
+                });
+            });
+
+            // 處理市場吸引力評分功能 (點擊星星給分)
+            document.querySelectorAll('.rating-stars').forEach(starContainer => {
+                const stars = starContainer.querySelectorAll('.star');
+                let currentRating = parseInt(starContainer.dataset.rating) || 0; // 從 data 屬性讀取或預設為 0
+
+                // 根據當前評分更新星星顯示
+                function updateStarsDisplay(rating) {
+                    stars.forEach(star => {
+                        if (parseInt(star.dataset.value) <= rating) {
+                            star.classList.add('selected');
+                        } else {
+                            star.classList.remove('selected');
+                        }
+                    });
+                }
+
+                // 初始載入時設定星星狀態
+                updateStarsDisplay(currentRating);
+
+                stars.forEach(star => {
+                    // 點擊星星事件
+                    star.addEventListener('click', () => {
+                        const value = parseInt(star.dataset.value);
+                        currentRating = value; // 更新當前評分
+                        starContainer.dataset.rating = currentRating; // 將評分存儲到 data 屬性
+                        updateStarsDisplay(currentRating); // 更新星星顯示
+                        console.log(`市場吸引力評分: ${currentRating} 星`);
+                        // 在實際應用中，此處會將評分發送到後端
+                    });
+
+                    // 滑鼠懸停事件
+                    star.addEventListener('mouseover', () => {
+                        const value = parseInt(star.dataset.value);
+                        stars.forEach(s => {
+                            if (parseInt(s.dataset.value) <= value) {
+                                s.style.color = 'var(--star-color-active)'; // 高亮懸停及之前的星星
+                            } else {
+                                s.style.color = 'var(--star-color-inactive)'; // 未懸停的星星保持未選中色
+                            }
+                        });
+                    });
+
+                    // 滑鼠移出事件
+                    star.addEventListener('mouseout', () => {
+                        updateStarsDisplay(currentRating); // 恢復到當前選中的評分狀態
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
