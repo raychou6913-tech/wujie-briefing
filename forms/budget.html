@@ -29,15 +29,19 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .line-table input,.line-table select{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:7px 8px;color:#0f172a;font-size:13px;outline:none;width:100%}
 .line-table input:focus,.line-table select:focus{border-color:#8b5cf6;background:#fff}
 .line-table input[type=number]{text-align:right}
+.note-inp{font-size:12px!important;color:#64748b!important;padding:5px 8px!important}
 .del-btn{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:17px;padding:4px 6px;line-height:1;border-radius:6px}
 .del-btn:hover{color:#ef4444;background:#fef2f2}
+.copy-btn{background:none;border:none;color:#c4b5fd;cursor:pointer;font-size:14px;padding:4px 6px;line-height:1;border-radius:6px}
+.copy-btn:hover{color:#8b5cf6;background:#f5f3ff}
 .add-row-btn{background:#f5f3ff;border:1.5px dashed #c4b5fd;border-radius:8px;color:#7c3aed;font-size:13px;font-weight:600;cursor:pointer;padding:10px;width:100%;margin-top:8px;transition:background .15s}
 .add-row-btn:hover{background:#ede9fe}
-.total-bar{display:flex;gap:20px;align-items:center;padding:12px 14px;background:#f5f3ff;border-radius:10px;margin-top:12px;flex-wrap:wrap}
+.total-bar{display:flex;gap:16px;align-items:center;padding:12px 14px;background:#f5f3ff;border-radius:10px;margin-top:12px;flex-wrap:wrap}
 .total-item{font-size:13px;color:#64748b}
 .total-item b{color:#0f172a;font-size:15px}
 .total-item.income b{color:#10b981}
 .total-item.expense b{color:#f97316}
+.total-item.margin b{color:#8b5cf6}
 /* ── 版稅計算器 ── */
 .royal-box{background:#faf5ff;border:1px solid #ddd6fe;border-radius:10px;padding:12px 14px;margin-bottom:12px}
 .royal-box-title{font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px}
@@ -85,7 +89,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     </div>
   </div>
   <div class="row3">
-    <div class="f"><label>年度</label><input type="number" id="g-year" placeholder="2026" value="{}" id="g-year"></div>
+    <div class="f"><label>年度</label><input type="number" id="g-year" placeholder="2026"></div>
     <div class="f"><label>季度</label>
       <select id="g-quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>全年</option></select>
     </div>
@@ -93,8 +97,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       <select id="g-loc"><option>台北</option><option>北京</option><option>曼谷</option><option>全公司</option></select>
     </div>
   </div>
-  <div class="row2">
+  <div class="row3">
     <div class="f"><label>填報人</label><input id="g-who" placeholder="你的名字"></div>
+    <div class="f"><label>預設幣別（新列自動套用）</label>
+      <select id="g-defcur"><option>TWD</option><option>CNY</option><option>THB</option><option>USD</option></select>
+    </div>
     <div class="f"><label>整批備註（選填）</label><input id="g-note" placeholder="例：吉伊卡哇第一批完整預算"></div>
   </div>
 </div>
@@ -129,16 +136,18 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <th style="min-width:80px">性質</th>
         <th style="min-width:110px;text-align:right">金額</th>
         <th style="min-width:80px">幣別</th>
-        <th style="width:32px"></th>
+        <th style="min-width:160px">計算說明（選填）</th>
+        <th style="width:56px"></th>
       </tr></thead>
       <tbody id="line-tbody"></tbody>
     </table>
   </div>
   <button type="button" class="add-row-btn" onclick="addRow()">＋ 新增一筆明細</button>
   <div class="total-bar" id="total-bar">
-    <span class="total-item expense">支出預算合計：<b id="t-exp">0</b></span>
-    <span class="total-item income">收入預算合計：<b id="t-inc">0</b></span>
+    <span class="total-item expense">支出合計：<b id="t-exp">0</b></span>
+    <span class="total-item income">收入合計：<b id="t-inc">0</b></span>
     <span class="total-item">淨額：<b id="t-net">0</b></span>
+    <span class="total-item margin">毛利率：<b id="t-margin">—</b></span>
   </div>
 </div>
 
@@ -335,15 +344,19 @@ function _catOptions(selected){
 }
 function _dlId(idx){return 'dl-'+idx;}
 
-function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault){
+function _defCur(){return document.getElementById('g-defcur').value||'TWD';}
+
+function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault,noteDefault){
   const idx=++_rowIdx;
   const cat=catDefault||CATS[0];
   const dl=_dlId(idx);
+  const cur=curDefault||_defCur();
   const tbody=document.getElementById('line-tbody');
   const tr=document.createElement('tr');
   tr.id='row-'+idx;
+  const curOpts=['TWD','CNY','THB','USD'].map(c=>`<option${c===cur?' selected':''}>${c}</option>`).join('');
   tr.innerHTML=`
-    <td style="color:#94a3b8;font-size:12px;text-align:center" id="rn-${idx}">${tbody.rows.length+1}</td>
+    <td style="color:#94a3b8;font-size:12px;text-align:center">${tbody.rows.length+1}</td>
     <td><input list="${dl}" placeholder="請選擇或自填" value="${nameDefault||''}" oninput="updTotal()" id="nm-${idx}">
         <datalist id="${dl}">${(BN[cat]||[]).map(n=>`<option value="${n}">`).join('')}</datalist></td>
     <td><select onchange="_catChange(${idx},this)" id="cat-${idx}">${_catOptions(cat)}</select></td>
@@ -353,12 +366,27 @@ function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault){
         </select></td>
     <td><input type="number" min="0" step="0.01" placeholder="0" value="${amtDefault||''}"
          id="amt-${idx}" oninput="updTotal()" onfocus="_setRoyalTarget(${idx})" style="text-align:right"></td>
-    <td><select id="cur-${idx}"><option>TWD</option><option>CNY</option><option>THB</option><option>USD</option></select></td>
-    <td><button class="del-btn" type="button" onclick="delRow(${idx})" title="刪除此列">✕</button></td>`;
+    <td><select id="cur-${idx}">${curOpts}</select></td>
+    <td><input class="note-inp" placeholder="計算依據，如：1500箱×13件×¥100" value="${noteDefault||''}" id="rownote-${idx}"></td>
+    <td style="white-space:nowrap">
+      <button class="copy-btn" type="button" onclick="copyRow(${idx})" title="複製此列">⧉</button>
+      <button class="del-btn" type="button" onclick="delRow(${idx})" title="刪除此列">✕</button>
+    </td>`;
   tbody.appendChild(tr);
   _renum();
   updTotal();
   tr.querySelector('input[list]').focus();
+}
+
+function copyRow(idx){
+  addRow(
+    document.getElementById('cat-'+idx)?.value,
+    document.getElementById('nm-'+idx)?.value,
+    document.getElementById('nat-'+idx)?.value,
+    document.getElementById('amt-'+idx)?.value,
+    document.getElementById('cur-'+idx)?.value,
+    document.getElementById('rownote-'+idx)?.value
+  );
 }
 
 function _catChange(idx,sel){
@@ -404,6 +432,12 @@ function updTotal(){
   const nb=document.getElementById('t-net');
   nb.textContent=(net>=0?'+':'')+net.toLocaleString();
   nb.style.color=net>=0?'#10b981':'#ef4444';
+  const mb=document.getElementById('t-margin');
+  if(inc>0){
+    const pct=Math.round(net/inc*100);
+    mb.textContent=pct+'%';
+    mb.style.color=pct>=30?'#10b981':pct>=15?'#f59e0b':'#ef4444';
+  }else{mb.textContent='—';mb.style.color='#94a3b8';}
 }
 
 function _calcR(){
@@ -455,6 +489,8 @@ async function submitAll(){
       const id=tr.id.replace('row-','');
       const budget=parseFloat(document.getElementById('amt-'+id).value)||0;
       const name=document.getElementById('nm-'+id).value||document.getElementById('cat-'+id).value;
+      const rowNote=document.getElementById('rownote-'+id)?.value||'';
+      const noteStr="["+proj+"] "+(rowNote?rowNote+(gNote?' | '+gNote:''):gNote||who||"");
       const fields={
         "預算名稱":   name,
         "類別":       document.getElementById('cat-'+id).value,
@@ -467,7 +503,7 @@ async function submitAll(){
         "已使用金額": 0,
         "剩餘預算":   budget,
         "執行率%":    0,
-        "備註":       "["+proj+"] "+(gNote||who||""),
+        "備註":       noteStr,
       };
       if(batch)fields["批次"]=batch;
       return {fields};
@@ -482,7 +518,7 @@ async function submitAll(){
     res.className="result ok";res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
     document.getElementById("res-msg").textContent="成功提交 "+records.length+" 筆預算！";
-    document.getElementById("res-sub").textContent="項目「"+proj+"」的預算已全部寫入飛書";
+    document.getElementById("res-sub").innerHTML="項目「"+proj+"」的預算已全部寫入飛書 &nbsp;｜&nbsp; <a href='view_budget_summary.html' style='color:#8b5cf6;font-weight:700'>→ 查看預算總覽</a>";
     document.getElementById('line-tbody').innerHTML='';
     _rowIdx=0;_renum();updTotal();
     _loadProjectSelect('proj-sel',window._ctxTypeFilter||null);
