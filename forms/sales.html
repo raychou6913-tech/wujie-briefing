@@ -39,6 +39,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div><div class="hdr-title">銷售進度填報</div>
   <div class="hdr-sub">蕪解創意 · 填報後即時同步管理儀表板</div></div>
 </div>
+<div id="popup-mode-banner" style="display:none;background:#fff7ed;border-bottom:2px solid #f59e0b;padding:9px 20px;font-size:13px;font-weight:700;color:#92400e;letter-spacing:.2px">🏪 快閃店模式 — 項目選單已篩選為快閃店專屬項目</div>
 <div class="wrap">
 <form id="frm">
 
@@ -143,29 +144,33 @@ async function _post(tableKey,fields){
   return d;
 }
 
-async function _getProjects(){
+async function _getProjects(typeFilter){
   const tk=await _getToken();
   const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["project"]+"/records?page_size=100",{
     headers:{"Authorization":"Bearer "+tk}
   });
   const d=await r.json();
   if(d.code!==0) return [];
-  return (d.data?.items||[]).map(rec=>{
+  const items=(d.data?.items||[]).map(rec=>{
     const f=rec.fields||{};
     const n=f["項目名稱"];
     if(!n) return null;
     const name=Array.isArray(n)?n[0]?.text||"":String(n);
-    return name;
+    const tv=f["業務類型"];
+    const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
+    return {name,type};
   }).filter(Boolean);
+  if(typeFilter) return items.filter(p=>p.type===typeFilter).map(p=>p.name);
+  return items.map(p=>p.name);
 }
 
 function _ts(dateStr){ return dateStr?new Date(dateStr).getTime():null; }
 
-async function _loadProjectSelect(selectId){
+async function _loadProjectSelect(selectId,typeFilter){
   const sel=document.getElementById(selectId);
   if(!sel) return;
   try{
-    const list=await _getProjects();
+    const list=await _getProjects(typeFilter);
     sel.innerHTML='<option value="">— 選擇項目（選填）—</option>';
     list.forEach(name=>{
       const o=document.createElement("option");
@@ -254,8 +259,12 @@ window.addEventListener("DOMContentLoaded",function(){
   });
 });
 
+const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
+window._ctxTypeFilter=_isPopup?'快閃店':null;
+if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
-_loadProjectSelect("proj-sel");
+_loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
+
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
   const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
@@ -297,7 +306,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     document.getElementById("res-msg").textContent="提交成功！";
     document.getElementById("res-sub").textContent="資料已同步至飛書，儀表板將於下次排程更新";
     document.getElementById("frm").reset();
-    _loadProjectSelect("proj-sel");
+    _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
   }catch(err){
     res.className="result err"; res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
