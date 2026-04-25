@@ -58,7 +58,8 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <datalist id="f-name-list"></datalist></div>
       <div class="row2">
         <div class="f"><label>預算類別</label>
-          <select id="f-cat">
+          <select id="f-cat" onchange="_updBN()">
+            <option>生產製造</option><option>開發費用</option><option>版權費用</option>
             <option>採購</option><option>行銷</option><option>運營</option>
             <option>人事</option><option>差旅</option><option>展場</option>
             <option>物流</option><option>設計</option><option>其他支出</option>
@@ -69,6 +70,20 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <option>支出</option><option>收入</option>
           </select></div>
       </div>
+      <!-- 版權費用計算輔助 -->
+      <div id="royal-helper" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px">🧮 版權費計算器（選填，自動帶入金額）</div>
+        <div class="row2">
+          <div class="f"><label>零售價</label><input type="number" id="rh-retail" placeholder="單件零售價" oninput="_calcRoyal()"></div>
+          <div class="f"><label>版稅率 %</label><input type="number" id="rh-rate" placeholder="例：12" step="0.1" oninput="_calcRoyal()"></div>
+        </div>
+        <div class="row2">
+          <div class="f"><label>預計數量</label><input type="number" id="rh-qty" placeholder="件數" oninput="_calcRoyal()"></div>
+          <div class="f"><label>計算結果</label><input type="number" id="rh-result" readonly placeholder="0" style="background:#ede9fe;font-weight:700;color:#7c3aed"></div>
+        </div>
+        <div class="hint">版稅 = 零售價 × 版稅率% × 數量；點擊「帶入金額」填入預算金額</div>
+        <button type="button" onclick="_applyRoyal()" style="margin-top:8px;background:#8b5cf6;color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;cursor:pointer">帶入金額 →</button>
+      </div>
       <div class="row2">
         <div class="f"><label>預算金額 <span class="req">*</span></label>
           <input type="number" id="f-budget" required placeholder="0"></div>
@@ -77,6 +92,12 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <option>TWD</option><option>CNY</option><option>THB</option><option>USD</option>
           </select></div>
       </div>
+      <div class="f"><label>批次</label>
+        <select id="f-batch">
+          <option value="">— 不分批次 —</option>
+          <option>第一批</option><option>追加批-1</option><option>追加批-2</option>
+          <option>追加批-3</option><option>開發期（一次性）</option>
+        </select></div>
     </div>
     <div class="card">
       <div class="ctitle">期間</div>
@@ -110,7 +131,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7"};
+const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG"};
 
 async function _getToken(){
   const r=await fetch(_PROXY+"/auth/token",{
@@ -256,6 +277,9 @@ window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
 const _BN={
+  '生產製造':['模具費','打樣費','大貨生產費','包材費','品檢費','工廠備料費'],
+  '開發費用':['產品開發費','設計費','版費','3D建模費','樣品製作費'],
+  '版權費用':['版稅（按出貨計）','版稅（按零售計）','MG保底金','授權費','版權代理佣金'],
   '採購':['採購成本','商品進貨費','樣品費','原材料費','備貨金'],
   '行銷':['社群廣告費','KOL合作費','活動宣傳費','印刷品製作費','展覽宣傳費'],
   '運營':['辦公室租金','水電費','辦公用品','軟體訂閱費','雜支'],
@@ -279,8 +303,18 @@ function _updBN(){
   const cat=document.getElementById('f-cat').value;
   const dl=document.getElementById('f-name-list');
   dl.innerHTML=(_BN[cat]||[]).map(function(n){return '<option value="'+n+'">';}).join('');
+  document.getElementById('royal-helper').style.display=(cat==='版權費用')?'block':'none';
 }
-document.getElementById('f-cat').addEventListener('change',_updBN);
+function _calcRoyal(){
+  const retail=parseFloat(document.getElementById('rh-retail').value)||0;
+  const rate=parseFloat(document.getElementById('rh-rate').value)||0;
+  const qty=parseFloat(document.getElementById('rh-qty').value)||0;
+  document.getElementById('rh-result').value=Math.round(retail*rate/100*qty)||'';
+}
+function _applyRoyal(){
+  const v=document.getElementById('rh-result').value;
+  if(v)document.getElementById('f-budget').value=v;
+}
 _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
 if(_isPopup){
   document.getElementById("f-cat").innerHTML=
@@ -300,6 +334,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
   try{
     const budget=parseFloat(document.getElementById("f-budget").value)||0;
     if(!budget){ alert("請填寫預算金額"); return; }
+    const batch=document.getElementById("f-batch").value;
     const fields={
       "預算名稱":   document.getElementById("f-name").value,
       "類別":       document.getElementById("f-cat").value,
@@ -314,6 +349,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "執行率%":    0,
       "備註":       "["+proj+"] "+document.getElementById("f-note").value,
     };
+    if(batch)fields["批次"]=batch;
     await _post("budget", fields);
     res.className="result ok"; res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
