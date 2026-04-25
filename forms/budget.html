@@ -132,11 +132,13 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       <thead><tr>
         <th style="width:28px">#</th>
         <th style="min-width:160px">預算名稱</th>
-        <th style="min-width:130px">類別</th>
-        <th style="min-width:80px">性質</th>
-        <th style="min-width:110px;text-align:right">金額</th>
-        <th style="min-width:80px">幣別</th>
-        <th style="min-width:160px">計算說明（選填）</th>
+        <th style="min-width:120px">類別</th>
+        <th style="min-width:70px">性質</th>
+        <th style="min-width:90px;text-align:right">單價</th>
+        <th style="min-width:80px;text-align:right">數量</th>
+        <th style="min-width:110px;text-align:right">金額（自動）</th>
+        <th style="min-width:70px">幣別</th>
+        <th style="min-width:150px">計算說明（選填）</th>
         <th style="width:56px"></th>
       </tr></thead>
       <tbody id="line-tbody"></tbody>
@@ -346,7 +348,16 @@ function _dlId(idx){return 'dl-'+idx;}
 
 function _defCur(){return document.getElementById('g-defcur').value||'TWD';}
 
-function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault,noteDefault){
+function _autoAmt(idx){
+  const unit=parseFloat(document.getElementById('unit-'+idx)?.value)||0;
+  const qty=parseFloat(document.getElementById('qty-'+idx)?.value)||0;
+  if(unit&&qty){
+    document.getElementById('amt-'+idx).value=(unit*qty).toFixed(2);
+    updTotal();
+  }
+}
+
+function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault,noteDefault,unitDefault,qtyDefault){
   const idx=++_rowIdx;
   const cat=catDefault||CATS[0];
   const dl=_dlId(idx);
@@ -364,10 +375,14 @@ function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault,noteDefa
           <option${(natDefault||'支出')==='支出'?' selected':''}>支出</option>
           <option${natDefault==='收入'?' selected':''}>收入</option>
         </select></td>
+    <td><input type="number" min="0" step="0.01" placeholder="—" value="${unitDefault||''}"
+         id="unit-${idx}" oninput="_autoAmt(${idx})" style="text-align:right"></td>
+    <td><input type="number" min="0" step="1" placeholder="—" value="${qtyDefault||''}"
+         id="qty-${idx}" oninput="_autoAmt(${idx})" style="text-align:right"></td>
     <td><input type="number" min="0" step="0.01" placeholder="0" value="${amtDefault||''}"
-         id="amt-${idx}" oninput="updTotal()" onfocus="_setRoyalTarget(${idx})" style="text-align:right"></td>
+         id="amt-${idx}" oninput="updTotal()" onfocus="_setRoyalTarget(${idx})" style="text-align:right;font-weight:600;background:#fafaf5"></td>
     <td><select id="cur-${idx}">${curOpts}</select></td>
-    <td><input class="note-inp" placeholder="計算依據，如：1500箱×13件×¥100" value="${noteDefault||''}" id="rownote-${idx}"></td>
+    <td><input class="note-inp" placeholder="計算依據說明" value="${noteDefault||''}" id="rownote-${idx}"></td>
     <td style="white-space:nowrap">
       <button class="copy-btn" type="button" onclick="copyRow(${idx})" title="複製此列">⧉</button>
       <button class="del-btn" type="button" onclick="delRow(${idx})" title="刪除此列">✕</button>
@@ -385,7 +400,9 @@ function copyRow(idx){
     document.getElementById('nat-'+idx)?.value,
     document.getElementById('amt-'+idx)?.value,
     document.getElementById('cur-'+idx)?.value,
-    document.getElementById('rownote-'+idx)?.value
+    document.getElementById('rownote-'+idx)?.value,
+    document.getElementById('unit-'+idx)?.value,
+    document.getElementById('qty-'+idx)?.value
   );
 }
 
@@ -491,6 +508,8 @@ async function submitAll(){
       const name=document.getElementById('nm-'+id).value||document.getElementById('cat-'+id).value;
       const rowNote=document.getElementById('rownote-'+id)?.value||'';
       const noteStr="["+proj+"] "+(rowNote?rowNote+(gNote?' | '+gNote:''):gNote||who||"");
+      const unit=parseFloat(document.getElementById('unit-'+id)?.value)||null;
+      const qty=parseFloat(document.getElementById('qty-'+id)?.value)||null;
       const fields={
         "預算名稱":   name,
         "類別":       document.getElementById('cat-'+id).value,
@@ -505,6 +524,8 @@ async function submitAll(){
         "執行率%":    0,
         "備註":       noteStr,
       };
+      if(unit!==null)fields["單價"]=unit;
+      if(qty!==null)fields["數量"]=qty;
       if(batch)fields["批次"]=batch;
       return {fields};
     });
