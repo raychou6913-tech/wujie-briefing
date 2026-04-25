@@ -2,28 +2,28 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🚢 物流/貨代/報關行名錄 — 蕪解</title>
+<title>🎨 設計送審進度 — 蕪解</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
-.hdr{background:#0ea5e915;border-bottom:2px solid #0ea5e9;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr{background:#ec489915;border-bottom:2px solid #ec4899;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .hdr-left{display:flex;align-items:center;gap:12px}
 .hdr-icon{font-size:26px}.hdr-title{font-size:19px;font-weight:700;color:#0f172a}
 .hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
 .hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn-add{background:#0ea5e9;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-add{background:#ec4899;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-back{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
 .toolbar{padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border-bottom:1px solid #e2e8f0}
 .search-wrap{flex:1;min-width:200px;position:relative}
 .search-wrap input{width:100%;padding:9px 12px 9px 36px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;color:#0f172a;background:#f8fafc;outline:none}
-.search-wrap input:focus{border-color:#0ea5e9;background:#fff}
+.search-wrap input:focus{border-color:#ec4899;background:#fff}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none}
 .filter-sel{padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;outline:none;cursor:pointer}
-.filter-sel:focus{border-color:#0ea5e9}
+.filter-sel:focus{border-color:#ec4899}
 .stat-bar{padding:8px 20px;background:#fff;border-bottom:1px solid #f1f5f9;font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
 .view-toggle{display:flex;gap:4px}
 .vbtn{background:#f1f5f9;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:14px;color:#64748b}
-.vbtn.active{background:#0ea5e9;color:#fff}
+.vbtn.active{background:#ec4899;color:#fff}
 .wrap{padding:20px}
 #card-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
 .db-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px #0000000a;transition:transform .15s,box-shadow .15s}
@@ -54,12 +54,12 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <body>
 <div class="hdr">
   <div class="hdr-left">
-    <div class="hdr-icon">🚢</div>
-    <div><div class="hdr-title">物流/貨代/報關行名錄</div>
+    <div class="hdr-icon">🎨</div>
+    <div><div class="hdr-title">設計送審進度</div>
     <div class="hdr-sub" id="hdr-count">載入中...</div></div>
   </div>
   <div class="hdr-actions">
-    <a href="logistics.html" class="btn-add">＋ 新增資料</a>
+    <a href="design.html" class="btn-add">＋ 新增資料</a>
     <a href="db_browser.html" class="btn-back">← 資料庫</a>
   </div>
 </div>
@@ -68,9 +68,13 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <span class="search-icon">🔍</span>
     <input id="search-box" placeholder="搜尋關鍵字..." oninput="applyFilter()">
   </div>
-  <select class="filter-sel" data-field="服務類型" onchange="applyFilter()">
-          <option value="">全部類型</option><option>物流/快遞</option><option>貨代（國際）</option>
-          <option>報關行</option><option>倉儲</option><option>綜合（物流+報關）</option></select>
+  <select class="filter-sel" data-field="審核狀態" onchange="applyFilter()">
+          <option value="">全部狀態</option><option>待提交</option><option>已提交</option>
+          <option>修改中</option><option>已通過</option><option>已拒絕</option></select>
+        <select class="filter-sel" data-field="IP品牌" onchange="applyFilter()">
+          <option value="">全部 IP</option><option>Snoopy</option><option>Mofusand</option>
+          <option>Chiikawa</option><option>Labubu</option><option>Fuggler</option>
+          <option>EVE點點</option><option>其他</option></select>
   <button class="btn-back" onclick="loadData()" style="white-space:nowrap">↻ 重新整理</button>
 </div>
 <div class="stat-bar">
@@ -84,7 +88,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div id="card-view"><div class="empty">載入中...</div></div>
   <div id="table-view">
     <table class="dt">
-      <thead><tr><th>廠商</th><th>類型</th><th>服務地區</th><th>評分</th><th>聯絡人</th><th>對接</th></tr></thead>
+      <thead><tr><th>設計名稱</th><th>IP品牌</th><th>階段</th><th>狀態</th><th>版本</th><th>設計師</th><th>提交日期</th><th>附件</th></tr></thead>
       <tbody id="table-body"></tbody>
     </table>
   </div>
@@ -117,7 +121,7 @@ async function loadData(){
     const tk=td.tenant_access_token;
     let items=[],pt=null;
     do{
-      const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["logistics"]+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+      const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["design"]+"/records?page_size=100"+(pt?"&page_token="+pt:"");
       const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
       const d=await res.json();
       if(d.code!==0)throw new Error("API err: "+d.msg);
@@ -144,7 +148,7 @@ function applyFilter(){
   const q=document.getElementById("search-box").value.trim().toLowerCase();
   const filterVals={};
   document.querySelectorAll(".filter-sel").forEach(s=>{if(s.dataset.field&&s.value)filterVals[s.dataset.field]=s.value;});
-  const sf=["\u5ee0\u5546\u540d\u7a31", "\u670d\u52d9\u5730\u5340", "\u670d\u52d9\u985e\u578b"];
+  const sf=["\u8a2d\u8a08\u540d\u7a31", "IP\u54c1\u724c", "\u9001\u5be9\u968e\u6bb5", "\u8a2d\u8a08\u5e2b/\u4f9b\u61c9\u5546", "\u5be9\u6838\u65b9"];
   const filtered=allRecords.filter(item=>{
     const f=item.fields||{};
     if(q&&!sf.some(k=>fv(f,k).toLowerCase().includes(q)))return false;
@@ -226,31 +230,43 @@ function closeDetail(){
   document.getElementById("detail-modal").style.display="none";
 }
 
+const SD={"待提交":"#94a3b8","已提交":"#6366f1","修改中":"#f59e0b","已通過":"#10b981","已拒絕":"#ef4444"};
+const SS={"概念設計":"#a855f7","2D設計":"#3b82f6","包裝設計":"#f59e0b","立體設計":"#f97316","樣品確認":"#06b6d4","版權方提交":"#6366f1","版權方批准":"#10b981","量產確認":"#84cc16","印刷打樣":"#ec4899"};
 function cardHTML(f){
+  const st=fv(f,"審核狀態")||"—",sc=SD[st]||"#64748b";
+  const sg=fv(f,"送審階段")||"—",sgc=SS[sg]||"#64748b";
+  const hasImg=Array.isArray(f["設計圖附件"])&&f["設計圖附件"].length>0;
   return `<div class="db-card">
     <div class="db-card-top">
-      <div><div class="db-card-title">${fv(f,"廠商名稱")||"—"}</div>
-      <div class="db-card-sub">${fv(f,"服務類型")||""}</div></div>
-      <span style="font-size:15px">${fv(f,"合作評分")||"☆"}</span>
+      <div><div class="db-card-title">${fv(f,"設計名稱")||"—"}</div>
+      <div class="db-card-sub">${fv(f,"IP品牌")||""} · ${fv(f,"版本號")||"—"}</div></div>
+      <span class="badge" style="background:${sc};color:#fff">${st}</span>
     </div>
     <div class="db-card-body">
-      <div>🌏 地區：${fv(f,"服務地區")||"—"}</div>
-      ${fv(f,"運輸方式")?`<div style="font-size:12px;color:#94a3b8;margin-top:4px">${fv(f,"運輸方式").slice(0,80)}</div>`:""}
+      <div style="margin-bottom:6px"><span class="badge" style="background:${sgc}20;color:${sgc}">${sg}</span></div>
+      <div>👤 設計師：${fv(f,"設計師/供應商")||"—"}</div>
+      <div>🏢 審核方：${fv(f,"審核方")||"—"}</div>
+      ${fv(f,"修改備註")?`<div style="margin-top:6px;font-size:12px;color:#94a3b8">${fv(f,"修改備註").slice(0,60)}${fv(f,"修改備註").length>60?"...":""}</div>`:""}
     </div>
     <div class="db-card-row">
-      <span style="font-size:12px;color:#64748b">聯絡：${fv(f,"聯絡人")||"—"}</span>
-      <span style="font-size:12px;color:#6366f1">對接：${fv(f,"主要對接人")||"—"}</span>
+      <span style="font-size:12px;color:#64748b">提交：${fv(f,"提交日期")||"—"}</span>
+      ${hasImg?`<span style="font-size:12px;color:#ec4899">🖼 設計稿 ×${f["設計圖附件"].length}</span>`:`<span style="font-size:12px;color:#94a3b8">無附件</span>`}
     </div>
   </div>`;
 }
 function rowHTML(f){
+  const st=fv(f,"審核狀態")||"—",sc=SD[st]||"#64748b";
+  const sg=fv(f,"送審階段")||"—",sgc=SS[sg]||"#64748b";
+  const hasImg=Array.isArray(f["設計圖附件"])&&f["設計圖附件"].length>0;
   return `<tr>
-    <td style="font-weight:600">${fv(f,"廠商名稱")||"—"}</td>
-    <td>${fv(f,"服務類型")||"—"}</td>
-    <td style="color:#64748b">${fv(f,"服務地區")||"—"}</td>
-    <td>${fv(f,"合作評分")||"—"}</td>
-    <td style="color:#64748b">${fv(f,"聯絡人")||"—"}</td>
-    <td style="color:#6366f1">${fv(f,"主要對接人")||"—"}</td>
+    <td style="font-weight:600">${fv(f,"設計名稱")||"—"}</td>
+    <td>${fv(f,"IP品牌")||"—"}</td>
+    <td><span class="badge" style="background:${sgc}20;color:${sgc}">${sg}</span></td>
+    <td><span class="badge" style="background:${sc};color:#fff">${st}</span></td>
+    <td style="color:#64748b">${fv(f,"版本號")||"—"}</td>
+    <td style="color:#64748b">${fv(f,"設計師/供應商")||"—"}</td>
+    <td style="color:#64748b">${fv(f,"提交日期")||"—"}</td>
+    <td>${hasImg?`<span style="color:#ec4899">🖼 ${f["設計圖附件"].length}張</span>`:"—"}</td>
   </tr>`;
 }
 loadData();
