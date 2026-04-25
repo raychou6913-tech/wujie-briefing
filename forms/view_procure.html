@@ -66,7 +66,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <div class="toolbar">
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
-    <input id="search-box" placeholder="搜尋關鍵字..." oninput="applyFilter()">
+    <input id="search-box" placeholder="搜尋關鍵字..." oninput="_dbFilter()">
   </div>
   <select class="filter-sel" data-field="採購狀態" onchange="applyFilter()">
           <option value="">全部狀態</option><option>詢價中</option><option>比價完成</option>
@@ -78,6 +78,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="view-toggle">
     <button class="vbtn active" id="btn-card" onclick="setView('card')">⊞ 卡片</button>
     <button class="vbtn" id="btn-table" onclick="setView('table')">☰ 表格</button>
+    
   </div>
 </div>
 <div class="wrap">
@@ -88,12 +89,16 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       <tbody id="table-body"></tbody>
     </table>
   </div>
+  
 </div>
 <div id="detail-modal" onclick="if(event.target===this)closeDetail()">
   <div class="detail-box">
     <button onclick="closeDetail()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8;line-height:1">✕</button>
     <div style="font-size:17px;font-weight:700;margin-bottom:16px;padding-right:32px" id="detail-title">詳細資訊</div>
     <div id="detail-body"></div>
+    <div style="position:sticky;bottom:0;background:#fff;padding:12px 0 4px;margin-top:8px;border-top:1px solid #f1f5f9">
+      <button onclick="closeDetail()" style="width:100%;background:#f1f5f9;border:none;border-radius:8px;padding:10px;font-size:14px;color:#64748b;cursor:pointer;font-weight:500">關閉</button>
+    </div>
   </div>
 </div>
 <script>
@@ -140,6 +145,9 @@ function fv(f,k){
   if(typeof v==="object")return v.link||v.text||v.name||String(v);
   return String(v);
 }
+function _esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+let _dbFilterTimer=null;
+function _dbFilter(){clearTimeout(_dbFilterTimer);_dbFilterTimer=setTimeout(applyFilter,250);}
 function applyFilter(){
   const q=document.getElementById("search-box").value.trim().toLowerCase();
   const filterVals={};
@@ -163,13 +171,18 @@ function applyFilter(){
   document.querySelectorAll('#table-body tr').forEach((r,i)=>{
     if(_filteredRecs[i]){r.style.cursor='pointer';r.onclick=()=>openDetail(_filteredRecs[i].record_id);}
   });
+  
 }
 function setView(v){
   document.getElementById("card-view").style.display=v==="card"?"grid":"none";
   document.getElementById("table-view").style.display=v==="table"?"block":"none";
+  const tl=document.getElementById("timeline-view");if(tl)tl.style.display=v==="timeline"?"block":"none";
   document.getElementById("btn-card").className="vbtn"+(v==="card"?" active":"");
   document.getElementById("btn-table").className="vbtn"+(v==="table"?" active":"");
+  const tlb=document.getElementById("btn-timeline");if(tlb)tlb.className="vbtn"+(v==="timeline"?" active":"");
+  localStorage.setItem("wj_view_procure",v);
 }
+(function(){const sv=localStorage.getItem("wj_view_procure");if(sv&&document.getElementById("btn-"+sv))setView(sv);})();
 async function openDetail(rid){
   const rec=allRecords.find(r=>r.record_id===rid);
   if(!rec)return;
@@ -183,9 +196,11 @@ async function openDetail(rid){
     if(isAtt){
       attKeys.push(k);
       const sid="att_"+rid.replace(/[^a-z0-9]/gi,"_")+"_"+k.replace(/[^a-z0-9]/gi,"_");
-      html+=`<div class="df-row"><div class="df-key">${k}</div><div class="df-val" id="${sid}"><span style="color:#94a3b8;font-size:13px">載入圖片中...</span></div></div>`;
+      html+=`<div class="df-row"><div class="df-key">${_esc(k)}</div><div class="df-val" id="${sid}"><span style="color:#94a3b8;font-size:13px">載入圖片中...</span></div></div>`;
     }else{
-      html+=`<div class="df-row"><div class="df-key">${k}</div><div class="df-val">${fv(f,k)}</div></div>`;
+      const _val=fv(f,k);
+      const _disp=_val.startsWith("http")?`<a href="${_esc(_val)}" target="_blank" rel="noopener noreferrer" style="color:#6366f1;word-break:break-all">${_esc(_val.slice(0,80)+(_val.length>80?"…":""))}</a>`:_esc(_val);
+      html+=`<div class="df-row"><div class="df-key">${_esc(k)}</div><div class="df-val" style="white-space:pre-wrap">${_disp}</div></div>`;
     }
   }
   body.innerHTML=html||'<div style="color:#94a3b8;padding:20px 0;text-align:center">無資料</div>';
@@ -257,6 +272,7 @@ function rowHTML(f){
     <td style="color:#6366f1">${fv(f,"負責人")||"—"}</td>
   </tr>`;
 }
+
 loadData();
 </script>
 </body></html>

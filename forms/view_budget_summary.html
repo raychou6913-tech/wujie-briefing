@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>💵 項目預算總覽 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#8b5cf615;border-bottom:2px solid #8b5cf6;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-title{font-size:19px;font-weight:700;color:#0f172a}
+.hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
+.btn-back{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-back:hover{border-color:#8b5cf6;color:#8b5cf6}
+.btn-primary{background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.toolbar{padding:12px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border-bottom:1px solid #e2e8f0}
+.search-wrap{flex:1;min-width:180px;position:relative}
+.search-wrap input{width:100%;padding:9px 12px 9px 36px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;background:#f8fafc;outline:none}
+.search-wrap input:focus{border-color:#8b5cf6}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none}
+.filter-sel{padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;outline:none;cursor:pointer}
+.filter-sel:focus{border-color:#8b5cf6}
+.stat-bar{padding:8px 20px;background:#fff;border-bottom:1px solid #f1f5f9;font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:20px}
+.proj-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px #0000000a;cursor:pointer;transition:transform .15s,box-shadow .15s;border-top:3px solid #8b5cf6}
+.proj-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #00000010}
+.proj-name{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px}
+.budget-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.budget-label{color:#64748b}
+.budget-val{font-weight:600}
+.budget-income{color:#10b981}
+.budget-expense{color:#f97316}
+.budget-bar{margin:10px 0 4px;background:#f1f5f9;border-radius:6px;height:8px;overflow:hidden}
+.budget-fill{height:100%;border-radius:6px;background:#8b5cf6;transition:width .4s}
+.badge-sm{display:inline-block;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:600}
+.empty{text-align:center;padding:60px;color:#94a3b8;font-size:14px}
+#detail-modal{display:none;position:fixed;inset:0;background:#0009;z-index:9999;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.detail-box{background:#fff;border-radius:18px;max-width:700px;width:100%;margin:auto;padding:24px;position:relative}
+.dt{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.dt th{background:#f8fafc;color:#64748b;font-weight:600;padding:8px 12px;text-align:left;font-size:11px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+.dt td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.dt tr:last-child td{border-bottom:none}
+.dt tr:hover td{background:#faf5ff}
+.sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 16px}
+.sum-item{background:#f8fafc;border-radius:10px;padding:12px;text-align:center}
+.sum-num{font-size:18px;font-weight:700;color:#8b5cf6}
+.sum-lbl{font-size:11px;color:#64748b;margin-top:2px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.sum-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <div style="font-size:26px">💵</div>
+    <div><div class="hdr-title">項目預算總覽</div>
+    <div class="hdr-sub" id="hdr-sub">載入中...</div></div>
+  </div>
+  <a href="../progress_browser.html" class="btn-back">← 進度查閱</a>
+</div>
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input id="search-box" placeholder="搜尋項目名稱..." oninput="applyFilter()">
+  </div>
+  <select class="filter-sel" id="year-filter" onchange="applyFilter()">
+    <option value="">全部年度</option>
+  </select>
+  <select class="filter-sel" id="loc-filter" onchange="applyFilter()">
+    <option value="">全部地點</option><option>台北</option><option>北京</option><option>曼谷</option><option>全公司</option>
+  </select>
+  <button class="btn-primary" onclick="exportCSV()">⬇ 匯出全部 CSV</button>
+  <button class="btn-back" onclick="loadData()" style="white-space:nowrap">↻ 重新整理</button>
+</div>
+<div class="stat-bar">
+  <span id="stat-text">— 筆記錄</span>
+  <span id="stat-summary" style="color:#8b5cf6;font-weight:600"></span>
+</div>
+<div class="grid" id="grid"><div class="empty">載入中...</div></div>
+<div id="detail-modal" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-box">
+    <button onclick="closeDetail()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8">✕</button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px;padding-right:32px" id="d-title"></div>
+    <div id="d-sub" style="font-size:13px;color:#64748b;margin-bottom:12px"></div>
+    <div class="sum-grid" id="d-summary"></div>
+    <div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:4px">預算明細</div>
+    <div style="overflow-x:auto">
+      <table class="dt">
+        <thead><tr><th>預算名稱</th><th>類別</th><th>性質</th><th>金額</th><th>幣別</th><th>已使用</th><th>剩餘</th><th>執行率</th><th>季度</th></tr></thead>
+        <tbody id="d-table"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:#fff;padding:10px 0 4px;border-top:1px solid #f1f5f9">
+      <button class="btn-primary" onclick="exportProjectCSV(_curProj)" style="font-size:13px">⬇ 匯出此項目 CSV</button>
+      <button onclick="closeDetail()" style="background:#f1f5f9;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;color:#64748b">關閉</button>
+    </div>
+  </div>
+</div>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TBL="tblteo2QEO0jP8j9";
+let allRecords=[];
+let grouped={};
+let _curProj="";
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+})();
+function fv(f,k){
+  const v=f[k];
+  if(v===null||v===undefined||v==="")return"";
+  if(typeof v==="number")return String(v);
+  if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.link||x.text||x.name||""):String(x)).join("");
+  if(typeof v==="object")return v.link||v.text||v.name||"";
+  return String(v);
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function projName(f){
+  const note=fv(f,"備註")||"";
+  const m=note.match(/^\[([^\]]+)\]/);
+  return m?m[1]:("(無項目名稱)");
+}
+async function loadData(){
+  document.getElementById("grid").innerHTML='<div class="empty">載入中...</div>';
+  try{
+    const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await r.json();
+    if(td.code!==0)throw new Error("Token err");
+    const tk=td.tenant_access_token;
+    let items=[],pt=null;
+    do{
+      const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBL+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+      const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+      const d=await res.json();
+      if(d.code!==0)throw new Error(d.msg);
+      items=items.concat(d.data?.items||[]);
+      pt=d.data?.has_more?d.data.page_token:null;
+    }while(pt);
+    allRecords=items;
+    const years=[...new Set(items.map(i=>fv(i.fields,"年度")).filter(Boolean))].sort().reverse();
+    const sel=document.getElementById("year-filter");
+    years.forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y+"年";sel.appendChild(o);});
+    document.getElementById("hdr-sub").textContent="共 "+items.length+" 筆預算記錄";
+    applyFilter();
+  }catch(e){
+    document.getElementById("grid").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
+  }
+}
+function applyFilter(){
+  const q=(document.getElementById("search-box").value||"").trim().toLowerCase();
+  const yr=document.getElementById("year-filter").value;
+  const loc=document.getElementById("loc-filter").value;
+  const filtered=allRecords.filter(i=>{
+    const f=i.fields||{};
+    const pn=projName(f).toLowerCase();
+    if(q&&!pn.includes(q)&&!fv(f,"預算名稱").toLowerCase().includes(q))return false;
+    if(yr&&fv(f,"年度")!==yr)return false;
+    if(loc&&fv(f,"所在地")!==loc)return false;
+    return true;
+  });
+  grouped={};
+  let totalIncome=0,totalExpense=0;
+  for(const i of filtered){
+    const f=i.fields||{};
+    const pn=projName(f);
+    if(!grouped[pn])grouped[pn]=[];
+    grouped[pn].push(f);
+    const amt=parseFloat(fv(f,"預算金額"))||0;
+    if(fv(f,"預算性質")==="收入")totalIncome+=amt;else totalExpense+=amt;
+  }
+  document.getElementById("stat-text").textContent=filtered.length+" 筆 / "+Object.keys(grouped).length+" 個項目";
+  document.getElementById("stat-summary").textContent="收入預算 "+fmt(totalIncome)+" · 支出預算 "+fmt(totalExpense);
+  renderCards();
+}
+function fmt(n){
+  if(n>=1000000)return(n/1000000).toFixed(1)+"M";
+  if(n>=1000)return(n/1000).toFixed(0)+"K";
+  return Math.round(n).toLocaleString();
+}
+function renderCards(){
+  const projs=Object.keys(grouped).sort();
+  if(!projs.length){document.getElementById("grid").innerHTML='<div class="empty">😕 沒有符合的預算記錄</div>';return;}
+  let html="";
+  for(const pn of projs){
+    const items=grouped[pn];
+    let income=0,expense=0,used=0;
+    for(const f of items){
+      const amt=parseFloat(fv(f,"預算金額"))||0;
+      const u=parseFloat(fv(f,"已使用金額"))||0;
+      if(fv(f,"預算性質")==="收入")income+=amt;else expense+=amt;
+      used+=u;
+    }
+    const rate=expense>0?Math.min(100,Math.round(used/expense*100)):0;
+    const remaining=expense-used;
+    html+=`<div class="proj-card" onclick="openDetail('${esc(pn)}')">
+      <div class="proj-name">${esc(pn)}</div>
+      <div class="budget-row"><span class="budget-label">收入預算</span><span class="budget-val budget-income">${fmt(income)}</span></div>
+      <div class="budget-row"><span class="budget-label">支出預算</span><span class="budget-val budget-expense">${fmt(expense)}</span></div>
+      <div class="budget-row"><span class="budget-label">已使用</span><span class="budget-val" style="color:#0f172a">${fmt(used)}</span></div>
+      <div class="budget-bar"><div class="budget-fill" style="width:${rate}%;background:${rate>90?"#ef4444":rate>70?"#f59e0b":"#8b5cf6"}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8">
+        <span>執行率 ${rate}%</span>
+        <span>剩餘 ${fmt(remaining)}</span>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:#94a3b8">${items.length} 筆記錄</div>
+    </div>`;
+  }
+  document.getElementById("grid").innerHTML=html;
+}
+function openDetail(pn){
+  _curProj=pn;
+  const items=grouped[pn]||[];
+  document.getElementById("d-title").textContent=pn;
+  const yrs=[...new Set(items.map(f=>fv(f,"年度")).filter(Boolean))].sort().join("、");
+  const locs=[...new Set(items.map(f=>fv(f,"所在地")).filter(Boolean))].join("、");
+  document.getElementById("d-sub").textContent=(yrs?yrs+"年　":"")+locs;
+  let income=0,expense=0,used=0,remaining=0;
+  for(const f of items){
+    const amt=parseFloat(fv(f,"預算金額"))||0;
+    const u=parseFloat(fv(f,"已使用金額"))||0;
+    if(fv(f,"預算性質")==="收入")income+=amt;else expense+=amt;
+    used+=u;remaining+=(parseFloat(fv(f,"剩餘預算"))||0);
+  }
+  const rate=expense>0?Math.min(100,Math.round(used/expense*100)):0;
+  document.getElementById("d-summary").innerHTML=`
+    <div class="sum-item"><div class="sum-num" style="color:#10b981">${fmt(income)}</div><div class="sum-lbl">收入預算</div></div>
+    <div class="sum-item"><div class="sum-num" style="color:#f97316">${fmt(expense)}</div><div class="sum-lbl">支出預算</div></div>
+    <div class="sum-item"><div class="sum-num" style="color:#8b5cf6">${fmt(used)}</div><div class="sum-lbl">已使用</div></div>
+    <div class="sum-item"><div class="sum-num" style="color:${rate>90?"#ef4444":"#10b981"}">${fmt(remaining)}</div><div class="sum-lbl">剩餘預算</div></div>
+    <div class="sum-item"><div class="sum-num">${rate}%</div><div class="sum-lbl">執行率</div></div>
+    <div class="sum-item"><div class="sum-num" style="color:#6366f1">${items.length}</div><div class="sum-lbl">預算項目數</div></div>`;
+  const tbody=document.getElementById("d-table");
+  const INC_C="#10b981";const EXP_C="#f97316";
+  tbody.innerHTML=items.map(f=>{
+    const isInc=fv(f,"預算性質")==="收入";
+    const r2=parseFloat(fv(f,"執行率%"))||0;
+    return `<tr>
+      <td style="font-weight:600">${esc(fv(f,"預算名稱"))||"—"}</td>
+      <td style="color:#64748b">${esc(fv(f,"類別"))||"—"}</td>
+      <td><span style="background:${isInc?INC_C+"20":EXP_C+"20"};color:${isInc?INC_C:EXP_C};padding:2px 7px;border-radius:6px;font-size:11px;font-weight:600">${isInc?"收入":"支出"}</span></td>
+      <td style="text-align:right;font-weight:600">${fmt(parseFloat(fv(f,"預算金額"))||0)}</td>
+      <td style="color:#64748b">${esc(fv(f,"幣別"))}</td>
+      <td style="text-align:right;color:#475569">${fmt(parseFloat(fv(f,"已使用金額"))||0)}</td>
+      <td style="text-align:right;color:#10b981">${fmt(parseFloat(fv(f,"剩餘預算"))||0)}</td>
+      <td><div style="display:flex;align-items:center;gap:4px"><div style="background:#f1f5f9;border-radius:4px;height:6px;width:60px;overflow:hidden"><div style="width:${r2}%;background:${r2>90?"#ef4444":r2>70?"#f59e0b":"#8b5cf6"};height:100%"></div></div><span style="font-size:11px;color:#94a3b8">${r2}%</span></div></td>
+      <td style="color:#64748b">${esc(fv(f,"季度"))}</td>
+    </tr>`;
+  }).join("")||'<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:16px">無明細</td></tr>';
+  document.getElementById("detail-modal").style.display="flex";
+}
+function closeDetail(){document.getElementById("detail-modal").style.display="none";}
+function _buildCSV(rows){
+  const headers=["項目","預算名稱","類別","性質","預算金額","幣別","已使用","剩餘","執行率%","年度","季度","所在地","備註"];
+  const lines=[headers.join(",")];
+  for(const f of rows){
+    const cols=[projName(f),fv(f,"預算名稱"),fv(f,"類別"),fv(f,"預算性質"),fv(f,"預算金額"),fv(f,"幣別"),fv(f,"已使用金額"),fv(f,"剩餘預算"),fv(f,"執行率%"),fv(f,"年度"),fv(f,"季度"),fv(f,"所在地"),fv(f,"備註")];
+    lines.push(cols.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(","));
+  }
+  return "﻿"+lines.join("\n");
+}
+function exportCSV(){
+  const all=Object.values(grouped).flat();
+  const blob=new Blob([_buildCSV(all)],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="budget_all_"+new Date().toISOString().slice(0,10)+".csv";a.click();
+}
+function exportProjectCSV(pn){
+  const rows=grouped[pn]||[];
+  const blob=new Blob([_buildCSV(rows)],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="budget_"+pn.replace(/[^\w]/g,"_")+"_"+new Date().toISOString().slice(0,10)+".csv";a.click();
+}
+loadData();
+</script>
+</body></html>
