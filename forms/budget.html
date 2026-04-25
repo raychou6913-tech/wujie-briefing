@@ -6,120 +6,143 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
-.hdr{background:#8b5cf612;border-bottom:2px solid #8b5cf6;padding:18px 20px;display:flex;align-items:center;gap:12px}
+.hdr{background:#8b5cf615;border-bottom:2px solid #8b5cf6;padding:18px 20px;display:flex;align-items:center;gap:12px}
 .hdr-icon{font-size:26px}.hdr-title{font-size:19px;font-weight:700;color:#0f172a}
 .hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
-.wrap{max-width:620px;margin:24px auto;padding:0 14px}
-.card{background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 1px 4px #0000000a}
+.wrap{max-width:860px;margin:24px auto;padding:0 14px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 1px 4px #0000000a}
 .ctitle{font-size:12px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
-.f{margin-bottom:13px}
+.f{margin-bottom:12px}
 .f label{display:block;font-size:13px;color:#64748b;margin-bottom:5px;font-weight:600}
-.f input,.f select,.f textarea{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;color:#0f172a;font-size:14px;outline:none;transition:border .15s}
-.f input:focus,.f select:focus,.f textarea:focus{border-color:#8b5cf6;background:#fff}
-.f textarea{min-height:72px;resize:vertical}
+.f input,.f select,.f textarea{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;color:#0f172a;font-size:14px;outline:none;transition:border .15s}
+.f input:focus,.f select:focus{border-color:#8b5cf6;background:#fff}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .req{color:#8b5cf6}
 .hint{font-size:11px;color:#94a3b8;margin-top:3px}
-.btn{width:100%;background:#8b5cf6;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .15s}
+/* ── 明細表格 ── */
+.line-table{width:100%;border-collapse:collapse;font-size:13px}
+.line-table th{background:#f5f3ff;color:#7c3aed;font-weight:700;padding:8px 10px;text-align:left;font-size:11px;white-space:nowrap;border-bottom:2px solid #ddd6fe}
+.line-table td{padding:5px 4px;vertical-align:middle;border-bottom:1px solid #f1f5f9}
+.line-table tr:last-child td{border-bottom:none}
+.line-table input,.line-table select{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:7px 8px;color:#0f172a;font-size:13px;outline:none;width:100%}
+.line-table input:focus,.line-table select:focus{border-color:#8b5cf6;background:#fff}
+.line-table input[type=number]{text-align:right}
+.del-btn{background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:17px;padding:4px 6px;line-height:1;border-radius:6px}
+.del-btn:hover{color:#ef4444;background:#fef2f2}
+.add-row-btn{background:#f5f3ff;border:1.5px dashed #c4b5fd;border-radius:8px;color:#7c3aed;font-size:13px;font-weight:600;cursor:pointer;padding:10px;width:100%;margin-top:8px;transition:background .15s}
+.add-row-btn:hover{background:#ede9fe}
+.total-bar{display:flex;gap:20px;align-items:center;padding:12px 14px;background:#f5f3ff;border-radius:10px;margin-top:12px;flex-wrap:wrap}
+.total-item{font-size:13px;color:#64748b}
+.total-item b{color:#0f172a;font-size:15px}
+.total-item.income b{color:#10b981}
+.total-item.expense b{color:#f97316}
+/* ── 版稅計算器 ── */
+.royal-box{background:#faf5ff;border:1px solid #ddd6fe;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.royal-box-title{font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px}
+.royal-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
+.royal-row input{background:#fff;border:1.5px solid #ddd6fe;border-radius:7px;padding:7px 10px;color:#0f172a;font-size:13px;outline:none;width:100%}
+.royal-row input:focus{border-color:#8b5cf6}
+.royal-apply{background:#8b5cf6;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+/* ── Submit ── */
+.btn{width:100%;background:#8b5cf6;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:6px}
 .btn:hover{opacity:.88;transform:translateY(-1px)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .result{display:none;border-radius:12px;padding:20px;text-align:center;margin-top:14px;border:1px solid}
 .result.ok{background:#f0fdf4;border-color:#10b981;color:#166534}
 .result.err{background:#fef2f2;border-color:#ef4444;color:#991b1b}
-.result-icon{font-size:32px;margin-bottom:8px}
-.result-msg{font-size:15px;font-weight:700}
-.result-sub{font-size:12px;margin-top:4px;opacity:.8;word-break:break-all}
+.result-icon{font-size:32px;margin-bottom:8px}.result-msg{font-size:15px;font-weight:700}.result-sub{font-size:12px;margin-top:4px;opacity:.8}
 .back{display:block;text-align:center;color:#64748b;font-size:15px;font-weight:500;margin-top:24px;text-decoration:none;padding:10px}
 .back:hover{color:#8b5cf6}
-@media(max-width:480px){.row2{grid-template-columns:1fr}}
+@media(max-width:700px){.row4{grid-template-columns:1fr 1fr}.row3{grid-template-columns:1fr 1fr}.royal-row{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.row4{grid-template-columns:1fr}.row3{grid-template-columns:1fr}.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="hdr">
   <div class="hdr-icon">💵</div>
   <div><div class="hdr-title">預算編列</div>
-  <div class="hdr-sub">蕪解創意 · 填報後即時同步管理儀表板</div></div>
+  <div class="hdr-sub">蕪解創意 · 一次填入整個項目的所有預算明細</div></div>
 </div>
-<div id="popup-mode-banner" style="display:none;background:#fff7ed;border-bottom:2px solid #f59e0b;padding:9px 20px;font-size:13px;font-weight:700;color:#92400e;letter-spacing:.2px">🏪 快閃店模式 — 項目選單已篩選為快閃店專屬項目</div>
+<div id="popup-mode-banner" style="display:none;background:#fff7ed;border-bottom:2px solid #f59e0b;padding:9px 20px;font-size:13px;font-weight:700;color:#92400e">🏪 快閃店模式 — 類別已切換為快閃店專屬</div>
 <div class="wrap">
-<form id="frm">
 
-    <div class="card" style="border-color:#8b5cf6">
-      <div class="ctitle" style="color:#a78bfa">📋 關聯項目（必填）</div>
-      <div class="f">
-        <label>選擇項目 <span class="req" style="color:#8b5cf6">*</span></label>
-        <select id="proj-sel" required><option value="">載入中...</option></select>
-        <div class="hint">必須先選擇項目，才能編列該項目的預算</div>
-      </div>
+<!-- ① 項目基本資訊 -->
+<div class="card" style="border-top:3px solid #8b5cf6">
+  <div class="ctitle">📋 項目資訊（套用至所有明細）</div>
+  <div class="row2">
+    <div class="f">
+      <label>選擇項目 <span class="req">*</span></label>
+      <select id="proj-sel"><option value="">載入中...</option></select>
     </div>
-    <div class="card">
-      <div class="ctitle">預算明細</div>
-      <div class="f"><label>預算名稱 <span class="req">*</span></label>
-        <input id="f-name" required placeholder="請選擇或自填" list="f-name-list">
-        <datalist id="f-name-list"></datalist></div>
-      <div class="row2">
-        <div class="f"><label>預算類別</label>
-          <select id="f-cat" onchange="_updBN()">
-            <option>生產製造</option><option>開發費用</option><option>版權費用</option>
-            <option>採購</option><option>行銷</option><option>運營</option>
-            <option>人事</option><option>差旅</option><option>展場</option>
-            <option>物流</option><option>設計</option><option>其他支出</option>
-            <option>預計收入</option>
-          </select></div>
-        <div class="f"><label>預算性質</label>
-          <select id="f-nature">
-            <option>支出</option><option>收入</option>
-          </select></div>
-      </div>
-      <!-- 版權費用計算輔助 -->
-      <div id="royal-helper" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px;margin-bottom:12px">
-        <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px">🧮 版權費計算器（選填，自動帶入金額）</div>
-        <div class="row2">
-          <div class="f"><label>零售價</label><input type="number" id="rh-retail" placeholder="單件零售價" oninput="_calcRoyal()"></div>
-          <div class="f"><label>版稅率 %</label><input type="number" id="rh-rate" placeholder="例：12" step="0.1" oninput="_calcRoyal()"></div>
-        </div>
-        <div class="row2">
-          <div class="f"><label>預計數量</label><input type="number" id="rh-qty" placeholder="件數" oninput="_calcRoyal()"></div>
-          <div class="f"><label>計算結果</label><input type="number" id="rh-result" readonly placeholder="0" style="background:#ede9fe;font-weight:700;color:#7c3aed"></div>
-        </div>
-        <div class="hint">版稅 = 零售價 × 版稅率% × 數量；點擊「帶入金額」填入預算金額</div>
-        <button type="button" onclick="_applyRoyal()" style="margin-top:8px;background:#8b5cf6;color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;cursor:pointer">帶入金額 →</button>
-      </div>
-      <div class="row2">
-        <div class="f"><label>預算金額 <span class="req">*</span></label>
-          <input type="number" id="f-budget" required placeholder="0"></div>
-        <div class="f"><label>幣別</label>
-          <select id="f-cur">
-            <option>TWD</option><option>CNY</option><option>THB</option><option>USD</option>
-          </select></div>
-      </div>
-      <div class="f"><label>批次</label>
-        <select id="f-batch">
-          <option value="">— 不分批次 —</option>
-          <option>第一批</option><option>追加批-1</option><option>追加批-2</option>
-          <option>追加批-3</option><option>開發期（一次性）</option>
-        </select></div>
+    <div class="f">
+      <label>批次</label>
+      <select id="g-batch">
+        <option value="">— 不分批次 —</option>
+        <option>第一批</option><option>追加批-1</option><option>追加批-2</option>
+        <option>追加批-3</option><option>開發期（一次性）</option>
+      </select>
     </div>
-    <div class="card">
-      <div class="ctitle">期間</div>
-      <div class="row2">
-        <div class="f"><label>年度</label>
-          <input type="number" id="f-year" placeholder="2026"></div>
-        <div class="f"><label>季度</label>
-          <select id="f-quarter">
-            <option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>全年</option>
-          </select></div>
-      </div>
-      <div class="f"><label>所在地</label>
-        <select id="f-loc">
-          <option>台北</option><option>北京</option><option>曼谷</option><option>全公司</option>
-        </select></div>
-      <div class="f"><label>填報人</label>
-        <input id="f-owner" placeholder="你的名字"></div>
-      <div class="f"><label>備註</label>
-        <textarea id="f-note" placeholder="說明此預算項目的用途、依據..."></textarea></div>
+  </div>
+  <div class="row3">
+    <div class="f"><label>年度</label><input type="number" id="g-year" placeholder="2026" value="{}" id="g-year"></div>
+    <div class="f"><label>季度</label>
+      <select id="g-quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>全年</option></select>
     </div>
-<button class="btn" type="submit" id="sbtn">提交</button>
-</form>
+    <div class="f"><label>所在地</label>
+      <select id="g-loc"><option>台北</option><option>北京</option><option>曼谷</option><option>全公司</option></select>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="f"><label>填報人</label><input id="g-who" placeholder="你的名字"></div>
+    <div class="f"><label>整批備註（選填）</label><input id="g-note" placeholder="例：吉伊卡哇第一批完整預算"></div>
+  </div>
+</div>
+
+<!-- ② 版稅計算器 -->
+<div class="royal-box" id="royal-box" style="display:none">
+  <div class="royal-box-title">🧮 版稅計算器（計算後點「→ 帶入」填入所選列的金額）</div>
+  <div class="royal-row">
+    <div><label style="font-size:11px;color:#7c3aed;font-weight:600;display:block;margin-bottom:4px">零售價</label>
+      <input type="number" id="rh-retail" placeholder="單件售價" oninput="_calcR()"></div>
+    <div><label style="font-size:11px;color:#7c3aed;font-weight:600;display:block;margin-bottom:4px">版稅率 %</label>
+      <input type="number" id="rh-rate" placeholder="12" step="0.1" oninput="_calcR()"></div>
+    <div><label style="font-size:11px;color:#7c3aed;font-weight:600;display:block;margin-bottom:4px">數量</label>
+      <input type="number" id="rh-qty" placeholder="件數" oninput="_calcR()"></div>
+    <button class="royal-apply" type="button" onclick="_applyR()">→ 帶入</button>
+  </div>
+  <div style="margin-top:6px;font-size:12px;color:#7c3aed">計算結果：<b id="rh-result" style="font-size:14px">0</b></div>
+</div>
+
+<!-- ③ 預算明細表 -->
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div class="ctitle" style="margin:0">📊 預算明細（可多筆）</div>
+    <span id="row-count" style="font-size:12px;color:#94a3b8">0 筆</span>
+  </div>
+  <div style="overflow-x:auto">
+    <table class="line-table">
+      <thead><tr>
+        <th style="width:28px">#</th>
+        <th style="min-width:160px">預算名稱</th>
+        <th style="min-width:130px">類別</th>
+        <th style="min-width:80px">性質</th>
+        <th style="min-width:110px;text-align:right">金額</th>
+        <th style="min-width:80px">幣別</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody id="line-tbody"></tbody>
+    </table>
+  </div>
+  <button type="button" class="add-row-btn" onclick="addRow()">＋ 新增一筆明細</button>
+  <div class="total-bar" id="total-bar">
+    <span class="total-item expense">支出預算合計：<b id="t-exp">0</b></span>
+    <span class="total-item income">收入預算合計：<b id="t-inc">0</b></span>
+    <span class="total-item">淨額：<b id="t-net">0</b></span>
+  </div>
+</div>
+
+<button class="btn" id="sbtn" type="button" onclick="submitAll()">一鍵提交所有明細</button>
 <div class="result" id="res">
   <div class="result-icon" id="res-icon"></div>
   <div class="result-msg" id="res-msg"></div>
@@ -127,6 +150,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 </div>
 <a class="back" href="index.html">← 返回填報中心</a>
 </div>
+
 <script>
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
@@ -276,7 +300,10 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
-const _BN={
+const CATS_NORMAL=['生產製造','開發費用','版權費用','採購','行銷','運營','人事','差旅','展場','物流','設計','其他支出','預計收入'];
+const CATS_POPUP=['場地費','贊助收入','寄售分潤','展場布置','人員差旅','行銷推廣','物流倉儲','其他'];
+const CATS=_isPopup?CATS_POPUP:CATS_NORMAL;
+const BN={
   '生產製造':['模具費','打樣費','大貨生產費','包材費','品檢費','工廠備料費'],
   '開發費用':['產品開發費','設計費','版費','3D建模費','樣品製作費'],
   '版權費用':['版稅（按出貨計）','版稅（按零售計）','MG保底金','授權費','版權代理佣金'],
@@ -299,80 +326,186 @@ const _BN={
   '物流倉儲':['貨運費','倉儲費','包材費','報關費','最後一哩配送'],
   '其他':['雜費','應急備用金','未分類支出'],
 };
-function _updBN(){
-  const cat=document.getElementById('f-cat').value;
-  const dl=document.getElementById('f-name-list');
-  dl.innerHTML=(_BN[cat]||[]).map(function(n){return '<option value="'+n+'">';}).join('');
-  document.getElementById('royal-helper').style.display=(cat==='版權費用')?'block':'none';
+
+let _rowIdx=0;
+let _royalTargetRow=null;
+
+function _catOptions(selected){
+  return CATS.map(c=>`<option${c===selected?' selected':''}>${c}</option>`).join('');
 }
-function _calcRoyal(){
-  const retail=parseFloat(document.getElementById('rh-retail').value)||0;
-  const rate=parseFloat(document.getElementById('rh-rate').value)||0;
-  const qty=parseFloat(document.getElementById('rh-qty').value)||0;
-  document.getElementById('rh-result').value=Math.round(retail*rate/100*qty)||'';
+function _dlId(idx){return 'dl-'+idx;}
+
+function addRow(catDefault,nameDefault,natDefault,amtDefault,curDefault){
+  const idx=++_rowIdx;
+  const cat=catDefault||CATS[0];
+  const dl=_dlId(idx);
+  const tbody=document.getElementById('line-tbody');
+  const tr=document.createElement('tr');
+  tr.id='row-'+idx;
+  tr.innerHTML=`
+    <td style="color:#94a3b8;font-size:12px;text-align:center" id="rn-${idx}">${tbody.rows.length+1}</td>
+    <td><input list="${dl}" placeholder="請選擇或自填" value="${nameDefault||''}" oninput="updTotal()" id="nm-${idx}">
+        <datalist id="${dl}">${(BN[cat]||[]).map(n=>`<option value="${n}">`).join('')}</datalist></td>
+    <td><select onchange="_catChange(${idx},this)" id="cat-${idx}">${_catOptions(cat)}</select></td>
+    <td><select id="nat-${idx}" onchange="updTotal()">
+          <option${(natDefault||'支出')==='支出'?' selected':''}>支出</option>
+          <option${natDefault==='收入'?' selected':''}>收入</option>
+        </select></td>
+    <td><input type="number" min="0" step="0.01" placeholder="0" value="${amtDefault||''}"
+         id="amt-${idx}" oninput="updTotal()" onfocus="_setRoyalTarget(${idx})" style="text-align:right"></td>
+    <td><select id="cur-${idx}"><option>TWD</option><option>CNY</option><option>THB</option><option>USD</option></select></td>
+    <td><button class="del-btn" type="button" onclick="delRow(${idx})" title="刪除此列">✕</button></td>`;
+  tbody.appendChild(tr);
+  _renum();
+  updTotal();
+  tr.querySelector('input[list]').focus();
 }
-function _applyRoyal(){
-  const v=document.getElementById('rh-result').value;
-  if(v)document.getElementById('f-budget').value=v;
+
+function _catChange(idx,sel){
+  const cat=sel.value;
+  document.getElementById(_dlId(idx)).innerHTML=(BN[cat]||[]).map(n=>`<option value="${n}">`).join('');
+  const isRoyal=(cat==='版權費用');
+  document.getElementById('royal-box').style.display=isRoyal?'block':'none';
+  if(isRoyal)_royalTargetRow=idx;
+  updTotal();
 }
-_loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
-if(_isPopup){
-  document.getElementById("f-cat").innerHTML=
-    '<option>場地費</option><option>贊助收入</option><option>寄售分潤</option>'+
-    '<option>展場布置</option><option>人員差旅</option><option>行銷推廣</option>'+
-    '<option>物流倉儲</option><option>其他</option>';
+
+function _setRoyalTarget(idx){
+  const cat=document.getElementById('cat-'+idx)?.value;
+  if(cat==='版權費用'){_royalTargetRow=idx;document.getElementById('royal-box').style.display='block';}
 }
-_updBN();
-document.getElementById("frm").onsubmit=async(e)=>{
-  e.preventDefault();
-  const proj=_projVal("proj-sel");
-  if(!proj){ alert("請先選擇關聯項目"); return; }
-  const btn=document.getElementById("sbtn");
-  const res=document.getElementById("res");
-  btn.disabled=true; btn.textContent="提交中...";
-  res.style.display="none";
-  try{
-    const budget=parseFloat(document.getElementById("f-budget").value)||0;
-    if(!budget){ alert("請填寫預算金額"); return; }
-    const batch=document.getElementById("f-batch").value;
-    const fields={
-      "預算名稱":   document.getElementById("f-name").value,
-      "類別":       document.getElementById("f-cat").value,
-      "預算性質":   document.getElementById("f-nature").value,
-      "所在地":     document.getElementById("f-loc").value,
-      "幣別":       document.getElementById("f-cur").value,
-      "年度":       parseFloat(document.getElementById("f-year").value)||new Date().getFullYear(),
-      "季度":       document.getElementById("f-quarter").value,
-      "預算金額":   budget,
-      "已使用金額": 0,
-      "剩餘預算":   budget,
-      "執行率%":    0,
-      "備註":       "["+proj+"] "+document.getElementById("f-note").value,
-    };
-    if(batch)fields["批次"]=batch;
-    await _post("budget", fields);
-    res.className="result ok"; res.style.display="block";
-    document.getElementById("res-icon").textContent="✅";
-    document.getElementById("res-msg").textContent="預算已建立！";
-    document.getElementById("res-sub").textContent="項目「"+proj+"」新增一筆預算，可繼續新增其他項目";
-    document.getElementById("frm").reset();
-    _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
-    if(_isPopup){
-      document.getElementById("f-cat").innerHTML=
-        '<option>場地費</option><option>贊助收入</option><option>寄售分潤</option>'+
-        '<option>展場布置</option><option>人員差旅</option><option>行銷推廣</option>'+
-        '<option>物流倉儲</option><option>其他</option>';
+
+function delRow(idx){
+  const el=document.getElementById('row-'+idx);
+  if(el)el.remove();
+  _renum();updTotal();
+}
+
+function _renum(){
+  const rows=document.getElementById('line-tbody').rows;
+  for(let i=0;i<rows.length;i++){
+    const td=rows[i].querySelector('td:first-child');
+    if(td)td.textContent=i+1;
+  }
+  document.getElementById('row-count').textContent=rows.length+' 筆';
+}
+
+function updTotal(){
+  let exp=0,inc=0;
+  document.getElementById('line-tbody').querySelectorAll('tr').forEach(tr=>{
+    const id=tr.id.replace('row-','');
+    const amt=parseFloat(document.getElementById('amt-'+id)?.value)||0;
+    const nat=document.getElementById('nat-'+id)?.value;
+    if(nat==='收入')inc+=amt;else exp+=amt;
+  });
+  const net=inc-exp;
+  document.getElementById('t-exp').textContent=exp.toLocaleString();
+  document.getElementById('t-inc').textContent=inc.toLocaleString();
+  const nb=document.getElementById('t-net');
+  nb.textContent=(net>=0?'+':'')+net.toLocaleString();
+  nb.style.color=net>=0?'#10b981':'#ef4444';
+}
+
+function _calcR(){
+  const r=parseFloat(document.getElementById('rh-retail').value)||0;
+  const rt=parseFloat(document.getElementById('rh-rate').value)||0;
+  const q=parseFloat(document.getElementById('rh-qty').value)||0;
+  const v=Math.round(r*rt/100*q);
+  document.getElementById('rh-result').textContent=v.toLocaleString();
+  if(_royalTargetRow){const el=document.getElementById('amt-'+_royalTargetRow);if(el&&v){el.value=v;updTotal();}}
+}
+function _applyR(){
+  if(!_royalTargetRow){alert('請先點擊要帶入的金額欄位');return;}
+  const r=parseFloat(document.getElementById('rh-retail').value)||0;
+  const rt=parseFloat(document.getElementById('rh-rate').value)||0;
+  const q=parseFloat(document.getElementById('rh-qty').value)||0;
+  const v=Math.round(r*rt/100*q);
+  if(!v){alert('請先填寫版稅計算器的數值');return;}
+  const el=document.getElementById('amt-'+_royalTargetRow);
+  if(el){el.value=v;updTotal();}
+}
+
+async function submitAll(){
+  const proj=_projVal('proj-sel');
+  if(!proj){alert('請先選擇關聯項目');return;}
+  const rows=[...document.getElementById('line-tbody').rows];
+  if(!rows.length){alert('請至少新增一筆明細');return;}
+  // validate
+  for(const tr of rows){
+    const id=tr.id.replace('row-','');
+    const amt=parseFloat(document.getElementById('amt-'+id)?.value)||0;
+    if(!amt){
+      document.getElementById('amt-'+id).focus();
+      alert('第 '+tr.querySelector('td:first-child').textContent+' 筆：金額不能為 0');
+      return;
     }
-    _updBN();
+  }
+  const btn=document.getElementById('sbtn');
+  const res=document.getElementById('res');
+  btn.disabled=true;btn.textContent='提交中 (0/'+rows.length+')...';res.style.display='none';
+  try{
+    const tk=await _getToken();
+    const yr=parseFloat(document.getElementById('g-year').value)||new Date().getFullYear();
+    const qtr=document.getElementById('g-quarter').value;
+    const loc=document.getElementById('g-loc').value;
+    const who=document.getElementById('g-who').value;
+    const gNote=document.getElementById('g-note').value;
+    const batch=document.getElementById('g-batch').value;
+    const records=rows.map(tr=>{
+      const id=tr.id.replace('row-','');
+      const budget=parseFloat(document.getElementById('amt-'+id).value)||0;
+      const name=document.getElementById('nm-'+id).value||document.getElementById('cat-'+id).value;
+      const fields={
+        "預算名稱":   name,
+        "類別":       document.getElementById('cat-'+id).value,
+        "預算性質":   document.getElementById('nat-'+id).value,
+        "所在地":     loc,
+        "幣別":       document.getElementById('cur-'+id).value,
+        "年度":       yr,
+        "季度":       qtr,
+        "預算金額":   budget,
+        "已使用金額": 0,
+        "剩餘預算":   budget,
+        "執行率%":    0,
+        "備註":       "["+proj+"] "+(gNote||who||""),
+      };
+      if(batch)fields["批次"]=batch;
+      return {fields};
+    });
+    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["budget"]+"/records/batch_create",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({records})
+    });
+    const d=await r.json();
+    if(d.code!==0)throw new Error("["+d.code+"] "+(d.msg||"API error"));
+    res.className="result ok";res.style.display="block";
+    document.getElementById("res-icon").textContent="✅";
+    document.getElementById("res-msg").textContent="成功提交 "+records.length+" 筆預算！";
+    document.getElementById("res-sub").textContent="項目「"+proj+"」的預算已全部寫入飛書";
+    document.getElementById('line-tbody').innerHTML='';
+    _rowIdx=0;_renum();updTotal();
+    _loadProjectSelect('proj-sel',window._ctxTypeFilter||null);
   }catch(err){
-    res.className="result err"; res.style.display="block";
+    res.className="result err";res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
     document.getElementById("res-msg").textContent="提交失敗";
-    document.getElementById("res-sub").textContent=err.message;
+    document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖回報管理員";
     console.error(err);
   }finally{
-    btn.disabled=false; btn.textContent="提交";
+    btn.disabled=false;btn.textContent="一鍵提交所有明細";
   }
-};
+}
+
+// init
+_loadProjectSelect('proj-sel',window._ctxTypeFilter||null);
+document.getElementById('g-year').value=new Date().getFullYear();
+// start with 3 default rows
+addRow('生產製造');addRow('版權費用');addRow('預計收入');
+window.addEventListener('DOMContentLoaded',function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+  ["g-who"].forEach(id=>{const el=document.getElementById(id);if(el&&!el.value)el.value=s.name;});
+});
 </script>
 </body></html>
