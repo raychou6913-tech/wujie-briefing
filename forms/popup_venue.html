@@ -284,7 +284,7 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
-_loadProjectSelect("proj-sel");
+_loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
 function toggleRentFields(v){
   document.getElementById("rent-fixed").style.display=
     (v==="純租金"||v==="保底抽成取高"||v==="租金加抽成")?"block":"none";
@@ -330,7 +330,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     document.getElementById("res-msg").textContent="提交成功！";
     document.getElementById("res-sub").textContent="場地資訊已同步至飛書";
     document.getElementById("frm").reset();
-    _loadProjectSelect("proj-sel");
+    _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
   }catch(err){
     res.className="result err"; res.style.display="block";
     document.getElementById("res-icon").textContent="❌";

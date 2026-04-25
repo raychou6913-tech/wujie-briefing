@@ -54,7 +54,8 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div class="card">
       <div class="ctitle">預算明細</div>
       <div class="f"><label>預算名稱 <span class="req">*</span></label>
-        <input id="f-name" required placeholder="例：採購成本、展場佈置費、行銷費用"></div>
+        <input id="f-name" required placeholder="請選擇或自填" list="f-name-list">
+        <datalist id="f-name-list"></datalist></div>
       <div class="row2">
         <div class="f"><label>預算類別</label>
           <select id="f-cat">
@@ -254,6 +255,32 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
+const _BN={
+  '採購':['採購成本','商品進貨費','樣品費','原材料費','備貨金'],
+  '行銷':['社群廣告費','KOL合作費','活動宣傳費','印刷品製作費','展覽宣傳費'],
+  '運營':['辦公室租金','水電費','辦公用品','軟體訂閱費','雜支'],
+  '人事':['薪資費用','獎金','勞健保費用','外包人員費'],
+  '差旅':['機票費','住宿費','交通費','餐費','簽證費'],
+  '展場':['展位費','展場佈置費','道具費','設備租借費','施工費'],
+  '物流':['運費','倉儲費','報關費','包材費','最後一哩配送'],
+  '設計':['設計費','版費','修改費','外包設計費'],
+  '其他支出':['雜費','應急備用金','未分類支出'],
+  '預計收入':['批發銷售收入','零售銷售收入','代理佣金','授權金收入'],
+  '場地費':['場地租金','保證金','場地服務費','水電管理費','場地清潔費'],
+  '贊助收入':['品牌贊助金','展位贊助費','冠名贊助收入','媒體置換'],
+  '寄售分潤':['品牌方寄售分潤','代售商品分潤','寄售結算款'],
+  '展場布置':['展架製作費','道具費','裝飾材料費','施工費','燈光費'],
+  '人員差旅':['機票費','住宿費','日常差旅補貼','簽證費','交通費'],
+  '行銷推廣':['社群廣告投放','KOL合作費','印刷品製作','活動海報設計','公關費'],
+  '物流倉儲':['貨運費','倉儲費','包材費','報關費','最後一哩配送'],
+  '其他':['雜費','應急備用金','未分類支出'],
+};
+function _updBN(){
+  const cat=document.getElementById('f-cat').value;
+  const dl=document.getElementById('f-name-list');
+  dl.innerHTML=(_BN[cat]||[]).map(function(n){return '<option value="'+n+'">';}).join('');
+}
+document.getElementById('f-cat').addEventListener('change',_updBN);
 _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
 if(_isPopup){
   document.getElementById("f-cat").innerHTML=
@@ -261,6 +288,7 @@ if(_isPopup){
     '<option>展場布置</option><option>人員差旅</option><option>行銷推廣</option>'+
     '<option>物流倉儲</option><option>其他</option>';
 }
+_updBN();
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
   const proj=_projVal("proj-sel");
@@ -299,6 +327,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
         '<option>展場布置</option><option>人員差旅</option><option>行銷推廣</option>'+
         '<option>物流倉儲</option><option>其他</option>';
     }
+    _updBN();
   }catch(err){
     res.className="result err"; res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
