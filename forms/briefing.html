@@ -99,7 +99,11 @@ function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g
 function highlight(text,kw){
   if(!kw)return esc(text);
   const re=new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");
-  return esc(text).replace(re,m=>`<mark>${m}</mark>`);
+  const parts=text.split(re);
+  const matches=text.match(re)||[];
+  let result="";
+  parts.forEach((part,i)=>{result+=esc(part);if(matches[i])result+=`<mark>${esc(matches[i])}</mark>`;});
+  return result;
 }
 async function loadData(){
   document.getElementById("wrap").innerHTML='<div class="empty">載入中...</div>';
@@ -160,13 +164,17 @@ function renderPage(){
     return true;
   });
   const badge=document.getElementById("search-badge");
+  const _navIdx=_allDates.indexOf(_curDate);
+  document.getElementById("btn-prev").disabled=isSearch||(_navIdx===_allDates.length-1);
+  document.getElementById("btn-next").disabled=isSearch||(_navIdx===0);
+  document.getElementById("date-sel").disabled=isSearch;
   if(isSearch){
-    document.getElementById("hdr-sub").textContent="搜尋："+kw;
-    document.getElementById("stat-text").textContent="共 "+recs.length+" 則符合";
+    document.getElementById("hdr-sub").textContent="搜尋："+kw+(catF?" ／ "+catF:"");
+    document.getElementById("stat-text").textContent="共 "+recs.length+" 則符合"+(catF?"（欄目："+catF+"）":"");
     badge.style.display="inline-block";badge.textContent="搜尋模式";
   }else{
     document.getElementById("hdr-sub").textContent=_curDate+" 情報日報";
-    document.getElementById("stat-text").textContent="共 "+recs.length+" 則（"+_curDate+"）";
+    document.getElementById("stat-text").textContent="共 "+recs.length+" 則（"+_curDate+"）"+(catF?" ／ "+catF:"");
     badge.style.display="none";
   }
   const CATS=catF?[catF]:["產業趨勢","IP重要動態","產品創意","展會資訊"];
@@ -191,27 +199,29 @@ function renderPage(){
 function renderSection(cat,items,kw){
   let s=`<div class="section-hdr">
     <span class="section-icon">${CAT_ICON[cat]||"📌"}</span>
-    <span class="section-title">${cat}</span>
+    <span class="section-title">${esc(cat)}</span>
     <span class="section-count">${items.length} 則</span></div>`;
   for(const i of items){
     const f=i.fields||{};
     const title=fv(f,"標題")||"(無標題)";
     const summary=fv(f,"摘要")||"";
     const link=fv(f,"來源連結")||"";
-    const img=fv(f,"圖片連結")||"";
+    const imgRaw=fv(f,"圖片連結")||"";
+    const img=imgRaw.startsWith("http")?imgRaw:"";
     const imp=fv(f,"重要程度")||"";
     const ic=IMP_COLOR[imp]||"";
-    const dateTag=kw?`<span style="font-size:11px;color:#94a3b8;margin-right:6px">${fv(f,"日期")}</span>`:"";
+    const dateTag=kw?`<span style="font-size:11px;color:#94a3b8;margin-right:6px">${esc(fv(f,"日期"))}</span>`:"";
+    const safeLink=link.startsWith("http")?link:"";
     s+=`<div class="card">
       <div class="card-inner">
         ${img?`<img class="card-img" src="${img}" onerror="this.style.display='none'" alt="">`:
                `<div class="card-img-placeholder">${CAT_ICON[cat]||"📌"}</div>`}
         <div class="card-body">
-          <div class="card-title">${link?`<a href="${link}" target="_blank" style="color:#0f172a;text-decoration:none">${highlight(title,kw)}</a>`:highlight(title,kw)}</div>
+          <div class="card-title">${safeLink?`<a href="${safeLink}" target="_blank" rel="noopener noreferrer" style="color:#0f172a;text-decoration:none">${highlight(title,kw)}</a>`:highlight(title,kw)}</div>
           <div class="card-summary">${highlight(summary,kw)}</div>
           <div class="card-footer">
-            <div style="display:flex;align-items:center;gap:6px">${dateTag}${link?`<a class="card-link" href="${link}" target="_blank">🔗 查看來源</a>`:`<span></span>`}</div>
-            ${imp?`<span class="badge" style="background:${ic}20;color:${ic}">${imp}</span>`:""}
+            <div style="display:flex;align-items:center;gap:6px">${dateTag}${safeLink?`<a class="card-link" href="${safeLink}" target="_blank" rel="noopener noreferrer">🔗 查看來源</a>`:`<span></span>`}</div>
+            ${imp?`<span class="badge" style="background:${ic}20;color:${ic}">${esc(imp)}</span>`:""}
           </div>
         </div>
       </div></div>`;

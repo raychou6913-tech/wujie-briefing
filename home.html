@@ -209,17 +209,21 @@ async function _loadNotices(s){
 
 async function _confirmRead(rid,btn){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||!window._nb_tk) return;
-  btn.disabled=true; btn.textContent="確認中...";
+  if(!s)return;
+  btn.disabled=true;btn.textContent="確認中...";
   try{
-    const rr=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{headers:{"Authorization":"Bearer "+window._nb_tk}});
+    const tr=await fetch(_PROXY_HUB+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0)throw new Error("token");
+    const tk=td.tenant_access_token;
+    const rr=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{headers:{"Authorization":"Bearer "+tk}});
     const rd=await rr.json();
     const cur=_fv_hub(rd.data?.record?.fields||{},"已讀人員");
     const names=cur?cur.split(/[、,]/).map(x=>x.trim()).filter(Boolean):[];
-    if(!names.includes(s.name)) names.push(s.name);
+    if(!names.includes(s.name))names.push(s.name);
     const newStr=names.join("、");
     await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{
-      method:"PUT",headers:{"Authorization":"Bearer "+window._nb_tk,"Content-Type":"application/json"},
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
       body:JSON.stringify({fields:{"已讀人員":newStr}})});
     localStorage.setItem("wj_read_"+rid,"1");
     btn.parentElement.innerHTML=`<span style="font-size:11px;color:#94a3b8">已讀：${newStr}</span><span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`;
@@ -237,26 +241,30 @@ async function _loadBriefingPreview(){
     const tk=td.tenant_access_token;
     const res=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_BR_TBL_HUB+"/records?page_size=100",{headers:{"Authorization":"Bearer "+tk}});
     const data=await res.json();
-    const today=new Date().toISOString().slice(0,10);
+    const _tn=new Date();const today=_tn.getFullYear()+"-"+String(_tn.getMonth()+1).padStart(2,"0")+"-"+String(_tn.getDate()).padStart(2,"0");
     const items=(data.data?.items||[]).filter(i=>_fv_hub(i.fields,"日期")===today);
     if(!items.length){el.innerHTML='<p style="color:#94a3b8;font-size:13px;text-align:center;padding:16px">今日暫無情報，日報產出後將自動顯示</p>';return;}
     const CAT_ICON={"產業趨勢":"📊","IP重要動態":"🎌","產品創意":"🛍️","展會資訊":"🏟️"};
     const IMP_COLOR={"🔴 高":"#ef4444","🟡 中":"#f59e0b","🟢 低":"#10b981"};
-    const grouped={};
+    const grouped={};const groupedTotal={};
     for(const i of items){
       const cat=_fv_hub(i.fields,"欄目")||"其他";
+      groupedTotal[cat]=(groupedTotal[cat]||0)+1;
       if(!grouped[cat])grouped[cat]=[];
       if(grouped[cat].length<2)grouped[cat].push(i.fields);
     }
     let html="";
     for(const [cat,list] of Object.entries(grouped)){
-      html+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">${CAT_ICON[cat]||"📌"} ${cat}</div>`;
+      const total=groupedTotal[cat]||list.length;
+      const moreHint=total>list.length?`<span style="font-size:10px;color:#94a3b8;margin-left:4px">顯示 ${list.length}／共 ${total} 則</span>`:"";
+      html+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px">${CAT_ICON[cat]||"📌"} ${cat}${moreHint}</div>`;
       for(const f of list){
         const title=_fv_hub(f,"標題")||"(無標題)";
         const link=_fv_hub(f,"來源連結")||"";
+        const safeLink=link.startsWith("http")?link:"";
         const imp=_fv_hub(f,"重要程度")||"";
         const ic=IMP_COLOR[imp]||"#6366f1";
-        html+=`<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid ${ic}"><div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:3px">${title}</div>${link?`<a href="${link}" target="_blank" style="font-size:11px;color:#6366f1;text-decoration:none">🔗 查看來源</a>`:""}</div>`;
+        html+=`<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid ${ic}"><div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:3px">${title}</div>${safeLink?`<a href="${safeLink}" target="_blank" rel="noopener noreferrer" style="font-size:11px;color:#6366f1;text-decoration:none">🔗 查看來源</a>`:""}</div>`;
       }
       html+="</div>";
     }
