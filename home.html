@@ -16,7 +16,8 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .hero-name{font-size:22px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
 .hero-sub{font-size:14px;color:#64748b}
 .hero-date{font-size:12px;color:#475569;margin-top:6px}
-.nav-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:24px;max-width:800px;margin:0 auto}
+.nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:24px;max-width:700px;margin:0 auto}
+@media(min-width:700px){.nav-grid{grid-template-columns:repeat(4,1fr)}}
 .nav-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:28px 20px;text-align:center;text-decoration:none;display:block;transition:transform .15s,box-shadow .15s;box-shadow:0 1px 4px #0000000a;position:relative;overflow:hidden}
 .nav-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--c)}
 .nav-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px #00000015}
@@ -51,6 +52,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div class="nav-icon">📚</div>
     <div class="nav-title">資料庫</div>
     <div class="nav-desc">IP授權、供應商、客戶、場地、外包、物流</div>
+  </a>
+  <a href="forms/progress_browser.html" class="nav-card" style="--c:#8b5cf6">
+    <div class="nav-icon">📈</div>
+    <div class="nav-title">進度查閱</div>
+    <div class="nav-desc">庫存、銷售、採購、設計送審、每日快報</div>
   </a>
   <a href="dashboard.html" class="nav-card" style="--c:#10b981">
     <div class="nav-icon">📊</div>
@@ -118,53 +124,53 @@ const _VL_TBL_HUB="tblUzRSQgKLhlttk";
 const _NB_TBL_HUB="tblPtgudsOOlmJAx";
 const _FB_TBL_HUB="tbl68ofUGp7FTjx8";
 
-async function _autoLogVisit(s){{
+async function _autoLogVisit(s){
   const now=new Date();
   const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
   const todayKey="wj_v_"+localDate;
   if(localStorage.getItem(todayKey)) return;
-  try{{
-    const r=await fetch(_PROXY_HUB+"/auth/token",{{method:"POST",headers:{{"Content-Type":"application/json"}},body:"{{}}"}});
+  try{
+    const r=await fetch(_PROXY_HUB+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
     const d=await r.json();
     if(d.code!==0) return;
     const tk=d.tenant_access_token;
-    const res=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_VL_TBL_HUB+"/records",{{
+    const res=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_VL_TBL_HUB+"/records",{
       method:"POST",
-      headers:{{"Authorization":"Bearer "+tk,"Content-Type":"application/json"}},
-      body:JSON.stringify({{fields:{{"姓名":s.name,"部門":s.dept,"日期":localDate,"時間":now.toTimeString().slice(0,8)}}}})
-    }});
+      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"姓名":s.name,"部門":s.dept,"日期":localDate,"時間":now.toTimeString().slice(0,8)}})
+    });
     const rd=await res.json();
     if(rd.code===0) localStorage.setItem(todayKey,"1");
-  }}catch(e){{}}
-}}
+  }catch(e){}
+}
 
-function _fv_hub(f,k){{
+function _fv_hub(f,k){
   const v=f[k];
   if(!v&&v!==0) return "";
   if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
   if(typeof v==="object") return v.text||v.link||"";
   return String(v);
-}}
+}
 
-async function _loadNotices(s){{
+async function _loadNotices(s){
   const el=document.getElementById("notice-board");
   if(!el) return;
-  try{{
-    const r=await fetch(_PROXY_HUB+"/auth/token",{{method:"POST",headers:{{"Content-Type":"application/json"}},body:"{{}}"}});
+  try{
+    const r=await fetch(_PROXY_HUB+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
     const td=await r.json();
-    if(td.code!==0){{el.innerHTML='<p style="color:#94a3b8;font-size:13px">公告載入失敗</p>';return;}}
+    if(td.code!==0){el.innerHTML='<p style="color:#94a3b8;font-size:13px">公告載入失敗</p>';return;}
     const tk=td.tenant_access_token;
     window._nb_tk=tk;
-    const res=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records?page_size=50",{{headers:{{"Authorization":"Bearer "+tk}}}});
+    const res=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records?page_size=50",{headers:{"Authorization":"Bearer "+tk}});
     const data=await res.json();
     const notices=(data.data?.items||[])
       .filter(i=>_fv_hub(i.fields,"有效")==="是")
       .sort((a,b)=>_fv_hub(b.fields,"發布日期").localeCompare(_fv_hub(a.fields,"發布日期")))
       .slice(0,6);
-    if(!notices.length){{el.innerHTML='<p style="color:#94a3b8;font-size:13px;text-align:center;padding:16px">目前沒有公告</p>';return;}}
-    const TC={{"重要公告":"#ef4444","一般通知":"#6366f1","作業提醒":"#f59e0b","分享連結":"#10b981"}};
-    el.innerHTML=notices.map(n=>{{
-      const f=n.fields||{{}};
+    if(!notices.length){el.innerHTML='<p style="color:#94a3b8;font-size:13px;text-align:center;padding:16px">目前沒有公告</p>';return;}
+    const TC={"重要公告":"#ef4444","一般通知":"#6366f1","作業提醒":"#f59e0b","分享連結":"#10b981"};
+    el.innerHTML=notices.map(n=>{
+      const f=n.fields||{};
       const rid=n.record_id;
       const title=_fv_hub(f,"標題")||"(無標題)";
       const content=_fv_hub(f,"內容");
@@ -190,84 +196,84 @@ async function _loadNotices(s){{
           ${done?`<span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`:`<button id="btn_${rid}" onclick="_confirmRead('${rid}',this)" style="background:#6366f1;color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600">✓ 確認已讀</button>`}
         </div>
       </div>`;
-    }})).join("");
-  }}catch(e){{el.innerHTML='<p style="color:#94a3b8;font-size:13px">公告載入失敗</p>';}}
-}}
+    })).join("");
+  }catch(e){el.innerHTML='<p style="color:#94a3b8;font-size:13px">公告載入失敗</p>';}
+}
 
-async function _confirmRead(rid,btn){{
+async function _confirmRead(rid,btn){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||!window._nb_tk) return;
   btn.disabled=true; btn.textContent="確認中...";
-  try{{
-    const rr=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{{headers:{{"Authorization":"Bearer "+window._nb_tk}}}});
+  try{
+    const rr=await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{headers:{"Authorization":"Bearer "+window._nb_tk}});
     const rd=await rr.json();
-    const cur=_fv_hub(rd.data?.record?.fields||{{}},"已讀人員");
+    const cur=_fv_hub(rd.data?.record?.fields||{},"已讀人員");
     const names=cur?cur.split(/[、,]/).map(x=>x.trim()).filter(Boolean):[];
     if(!names.includes(s.name)) names.push(s.name);
     const newStr=names.join("、");
-    await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{{
-      method:"PUT",headers:{{"Authorization":"Bearer "+window._nb_tk,"Content-Type":"application/json"}},
-      body:JSON.stringify({{fields:{{"已讀人員":newStr}}}})}});
+    await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_NB_TBL_HUB+"/records/"+rid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+window._nb_tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"已讀人員":newStr}})});
     localStorage.setItem("wj_read_"+rid,"1");
     btn.parentElement.innerHTML=`<span style="font-size:11px;color:#94a3b8">已讀：${newStr}</span><span style="font-size:12px;color:#10b981;font-weight:600">✅ 已確認已讀</span>`;
-  }}catch(e){{btn.textContent="✓ 確認已讀";btn.disabled=false;}}
-}}
+  }catch(e){btn.textContent="✓ 確認已讀";btn.disabled=false;}
+}
 
 let _fbScore=0,_fbSess=null;
-function showFeedback(){{
+function showFeedback(){
   _fbSess=JSON.parse(localStorage.getItem("wujie_session")||"null");
   _fbScore=0;
-  document.querySelectorAll(".star-btn").forEach(b=>{{b.style.background="#f8fafc";b.style.borderColor="#e2e8f0";b.style.color="inherit";}});
-  ["fb-issue","fb-suggest"].forEach(id=>{{const el=document.getElementById(id);if(el)el.value="";}});
-  const fr=document.getElementById("fb-result");if(fr){{fr.style.display="none";}};
-  const fs=document.getElementById("fb-submit");if(fs){{fs.disabled=false;fs.textContent="送出並登出 ✓";}};
+  document.querySelectorAll(".star-btn").forEach(b=>{b.style.background="#f8fafc";b.style.borderColor="#e2e8f0";b.style.color="inherit";});
+  ["fb-issue","fb-suggest"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  const fr=document.getElementById("fb-result");if(fr){fr.style.display="none";};
+  const fs=document.getElementById("fb-submit");if(fs){fs.disabled=false;fs.textContent="送出並登出 ✓";};
   document.querySelectorAll("#form-checks input").forEach(c=>c.checked=false);
   document.getElementById("fb-modal").style.display="block";
-}}
-function setStar(v){{
+}
+function setStar(v){
   _fbScore=v;
-  document.querySelectorAll(".star-btn").forEach(b=>{{
+  document.querySelectorAll(".star-btn").forEach(b=>{
     const on=parseInt(b.dataset.v)===v;
     b.style.background=on?"#6366f1":"#f8fafc";
     b.style.borderColor=on?"#6366f1":"#e2e8f0";
     b.style.color=on?"#fff":"inherit";
-  }});
-}}
-function doLogout(){{
+  });
+}
+function doLogout(){
   document.getElementById("fb-modal").style.display="none";
   localStorage.removeItem("wujie_session");
   location.replace("login.html");
-}}
-async function submitFeedback(){{
+}
+async function submitFeedback(){
   const btn=document.getElementById("fb-submit");
   const res=document.getElementById("fb-result");
   btn.disabled=true;btn.textContent="送出中...";
   const forms=[...document.querySelectorAll("#form-checks input:checked")].map(c=>c.value).join("、");
   const now=new Date();
   const localDate=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
-  const fields={{
+  const fields={
     "填報人":_fbSess?.name||"","部門":_fbSess?.dept||"","日期":localDate,
     "時間":now.toTimeString().slice(0,8),"整體滿意度":_fbScore||0,
     "使用的表單":forms||"（未選擇）",
     "遇到的問題":document.getElementById("fb-issue")?.value||"無",
     "改善建議":document.getElementById("fb-suggest")?.value||"無",
     "心情":_fbScore>=4?"😄 開心":_fbScore===3?"😐 普通":_fbScore>=1?"😕 不順":"（未評分）",
-  }};
-  try{{
-    const tr=await fetch(_PROXY_HUB+"/auth/token",{{method:"POST",headers:{{"Content-Type":"application/json"}},body:"{{}}"}});
+  };
+  try{
+    const tr=await fetch(_PROXY_HUB+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
     const td=await tr.json();if(td.code!==0)throw new Error("token");
     const tk=td.tenant_access_token;
-    await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_FB_TBL_HUB+"/records",{{
-      method:"POST",headers:{{"Authorization":"Bearer "+tk,"Content-Type":"application/json"}},
-      body:JSON.stringify({{fields}})
-    }});
+    await fetch(_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_FB_TBL_HUB+"/records",{
+      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
     res.style.display="block";res.textContent="✅ 謝謝你的回饋！3 秒後登出...";
     setTimeout(doLogout,3000);
-  }}catch(e){{
+  }catch(e){
     res.style.display="block";res.style.color="#ef4444";res.textContent="送出失敗，直接登出...";
     setTimeout(doLogout,2000);
-  }}
-}}
+  }
+}
 
 
 (function(){
