@@ -121,6 +121,9 @@ const STAGES=["開發中","已接觸","跟進中","寄樣中","報價中","成�
 const STAGE_COLOR={"開發中":"#94a3b8","已接觸":"#6366f1","跟進中":"#f59e0b","寄樣中":"#f97316","報價中":"#8b5cf6","成交":"#10b981","收款中":"#0ea5e9","長期客戶":"#10b981","暫停/失效":"#ef4444"};
 const REGION_COLOR={"台灣":"#10b981","北京":"#ef4444","歐洲":"#6366f1","北美":"#f59e0b","泰國":"#f97316","東南亞":"#f97316","香港":"#8b5cf6"};
 let allCustomers=[], allLogs=[], _curId=null, _curRecId=null;
+function fv(f,k){const v=f[k];if(v===null||v===undefined||v==="")return"";if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.link||x.text||x.name||""):String(x)).join("");if(typeof v==="object")return v.link||v.text||v.name||"";return String(v);}
+function fd(f,k){const v=f[k];if(!v&&v!==0)return"";const n=typeof v==="number"?v:parseFloat(v);if(isNaN(n))return String(v).slice(0,10);return new Date(n).toISOString().slice(0,10);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
@@ -204,7 +207,7 @@ function render(){
       const handler=fv(f,"主要對接業務")||"";
       const amt=parseFloat(fv(f,"預估金額"))||0;
       const cur=fv(f,"預估幣別")||"";
-      const nextDate=fv(f,"下次跟進日期")||"";
+      const nextDate=fd(f,"下次跟進日期")||"";
       const rc=REGION_COLOR[region]||"#6366f1";
       const isOverdue=nextDate&&nextDate<today;
       cardsHtml+=`<div class="crm-card" onclick="openModal('${esc(r.record_id)}','${esc(name)}')" style="border-left-color:${sc}">
@@ -241,8 +244,8 @@ function openModal(recId, name){
       <div class="info-item"><label>聯絡方式</label><span>${esc(fv(f,"聯絡方式"))||"—"}</span></div>
       <div class="info-item"><label>主要業務</label><span>${esc(fv(f,"主要對接業務"))||"—"}</span></div>
       <div class="info-item"><label>預估金額</label><span>${fv(f,"預估金額")?parseFloat(fv(f,"預估金額")).toLocaleString()+" "+esc(fv(f,"預估幣別")):"—"}</span></div>
-      <div class="info-item"><label>最後聯絡</label><span>${esc(fv(f,"最後聯絡日期"))||"—"}</span></div>
-      <div class="info-item"><label>下次跟進</label><span>${esc(fv(f,"下次跟進日期"))||"—"}</span></div>
+      <div class="info-item"><label>最後聯絡</label><span>${fd(f,"最後聯絡日期")||"—"}</span></div>
+      <div class="info-item"><label>下次跟進</label><span>${fd(f,"下次跟進日期")||"—"}</span></div>
       ${fv(f,"備註")?`<div class="info-item" style="grid-column:1/-1"><label>備註</label><span>${esc(fv(f,"備註"))}</span></div>`:""}
     `;
   }
@@ -256,7 +259,7 @@ function openModal(recId, name){
   document.getElementById("m-logs").innerHTML=logs.map(r=>{
     const f=r.fields||{};
     return `<div class="log-item">
-      <div><span class="log-date">${esc(fv(f,"跟進日期"))||"—"}</span><span class="log-type">${esc(fv(f,"溝通類型"))||""}</span><span style="font-size:11px;color:#64748b;margin-left:6px">${esc(fv(f,"記錄人"))||""}</span></div>
+      <div><span class="log-date">${fd(f,"跟進日期")||"—"}</span><span class="log-type">${esc(fv(f,"溝通類型"))||""}</span><span style="font-size:11px;color:#64748b;margin-left:6px">${esc(fv(f,"記錄人"))||""}</span></div>
       <div class="log-content">${esc(fv(f,"溝通內容"))||"—"}</div>
       ${fv(f,"下次行動")?`<div class="log-next">→ ${esc(fv(f,"下次行動"))}</div>`:""}
     </div>`;

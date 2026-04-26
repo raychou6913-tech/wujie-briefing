@@ -106,6 +106,7 @@ function fv(f,k){
   if(typeof v==="object")return v.link||v.text||v.name||"";
   return String(v);
 }
+function fd(f,k){const v=f[k];if(!v&&v!==0)return"";const n=typeof v==="number"?v:parseFloat(v);if(isNaN(n))return String(v).slice(0,10);return new Date(n).toISOString().slice(0,10);}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 const STAGE_COLOR={"開發中":"#94a3b8","已接觸":"#6366f1","跟進中":"#f59e0b","寄樣中":"#f97316","報價中":"#8b5cf6","成交":"#10b981","收款中":"#0ea5e9","長期客戶":"#10b981","暫停/失效":"#ef4444"};
 const ACTIVE_STAGES=["已接觸","跟進中","寄樣中","報價中"];
@@ -132,7 +133,7 @@ async function loadData(){
       const stage=fv(f,"銷售階段")||"開發中";
       if(ACTIVE_STAGES.includes(stage))active++;
       if(stage==="成交"||stage==="長期客戶")closed++;
-      const nd=fv(f,"下次跟進日期");
+      const nd=fd(f,"下次跟進日期");
       if(nd&&nd<=today&&stage!=="暫停/失效"&&stage!=="長期客戶"){
         overdue++;
         needFollowUp.push({name:fv(f,"客戶名稱"),date:nd,handler:fv(f,"主要對接業務"),stage,isOverdue:nd<today});
