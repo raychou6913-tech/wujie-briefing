@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎯 CRM 客戶管理 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#0f172a;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-icon{font-size:28px}
+.hdr-title{font-size:19px;font-weight:700;color:#fff}
+.hdr-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.btn-back{background:#ffffff20;color:#fff;border:1px solid #ffffff30;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px 0}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-size:28px;font-weight:800;margin-bottom:4px}
+.stat-lbl{font-size:11px;color:#64748b;font-weight:600}
+.section{padding:20px 24px 0}
+.section-title{font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.action-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;text-decoration:none;display:block;transition:transform .15s,box-shadow .15s;border-top:3px solid var(--c)}
+.action-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px #00000012}
+.action-icon{font-size:30px;margin-bottom:10px}
+.action-title{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.action-desc{font-size:12px;color:#64748b;line-height:1.5}
+.followup-list{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+.fu-item{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px}
+.fu-item:last-child{border-bottom:none}
+.fu-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fu-name{font-size:13px;font-weight:700;flex:1}
+.fu-date{font-size:11px;color:#64748b}
+.fu-date.overdue{color:#ef4444;font-weight:700}
+.fu-handler{font-size:11px;background:#f1f5f9;padding:2px 7px;border-radius:5px}
+.empty{text-align:center;padding:32px;color:#94a3b8;font-size:13px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-icon">🎯</div>
+    <div>
+      <div class="hdr-title">CRM 客戶管理</div>
+      <div class="hdr-sub" id="hdr-sub">載入中...</div>
+    </div>
+  </div>
+  <a href="home.html" class="btn-back">← 首頁</a>
+</div>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-num" id="s-total" style="color:#6366f1">—</div><div class="stat-lbl">總客戶數</div></div>
+  <div class="stat-card"><div class="stat-num" id="s-active" style="color:#f97316">—</div><div class="stat-lbl">進行中</div></div>
+  <div class="stat-card"><div class="stat-num" id="s-overdue" style="color:#ef4444">—</div><div class="stat-lbl">逾期跟進</div></div>
+  <div class="stat-card"><div class="stat-num" id="s-closed" style="color:#10b981">—</div><div class="stat-lbl">已成交</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">⚡ 快速入口</div>
+  <div class="action-grid">
+    <a href="forms/view_crm_kanban.html" class="action-card" style="--c:#6366f1">
+      <div class="action-icon">🎯</div>
+      <div class="action-title">銷售看板</div>
+      <div class="action-desc">9 階段管道視圖，快速掌握每筆客戶進度</div>
+    </a>
+    <a href="forms/followup.html" class="action-card" style="--c:#f97316">
+      <div class="action-icon">📝</div>
+      <div class="action-title">新增跟進記錄</div>
+      <div class="action-desc">記錄電話、郵件、拜訪、報價等溝通內容</div>
+    </a>
+    <a href="forms/customer.html" class="action-card" style="--c:#10b981">
+      <div class="action-icon">➕</div>
+      <div class="action-title">新增客戶</div>
+      <div class="action-desc">建立新客戶資料並設定初始銷售階段</div>
+    </a>
+    <a href="forms/view_customer.html" class="action-card" style="--c:#f59e0b">
+      <div class="action-icon">🤝</div>
+      <div class="action-title">客戶名單</div>
+      <div class="action-desc">列表 / 卡片瀏覽，支援搜尋篩選</div>
+    </a>
+    <a href="forms/view_prospects.html" class="action-card" style="--c:#8b5cf6">
+      <div class="action-icon">🌏</div>
+      <div class="action-title">海外潛在客戶</div>
+      <div class="action-desc">歐洲、北美、東南亞開發名單</div>
+    </a>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px">
+  <div class="section-title">📅 需跟進提醒 <span style="font-size:11px;font-weight:400;color:#94a3b8">（今日及逾期）</span></div>
+  <div class="followup-list" id="fu-list"><div class="empty">載入中...</div></div>
+</div>
+
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _CUST="tblXMXDGZKw8KOsl";
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
+})();
+function fv(f,k){
+  const v=f[k];
+  if(v===null||v===undefined||v==="")return"";
+  if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.link||x.text||x.name||""):String(x)).join("");
+  if(typeof v==="object")return v.link||v.text||v.name||"";
+  return String(v);
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+const STAGE_COLOR={"開發中":"#94a3b8","已接觸":"#6366f1","跟進中":"#f59e0b","寄樣中":"#f97316","報價中":"#8b5cf6","成交":"#10b981","收款中":"#0ea5e9","長期客戶":"#10b981","暫停/失效":"#ef4444"};
+const ACTIVE_STAGES=["已接觸","跟進中","寄樣中","報價中"];
+
+async function loadData(){
+  try{
+    const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await r.json();
+    const tk=td.tenant_access_token;
+    let items=[],pt=null;
+    do{
+      const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_CUST+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+      const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+      const d=await res.json();
+      items=items.concat(d.data?.items||[]);
+      pt=d.data?.has_more?d.data.page_token:null;
+    }while(pt);
+
+    const today=new Date().toISOString().slice(0,10);
+    let active=0,overdue=0,closed=0;
+    const needFollowUp=[];
+    items.forEach(r=>{
+      const f=r.fields||{};
+      const stage=fv(f,"銷售階段")||"開發中";
+      if(ACTIVE_STAGES.includes(stage))active++;
+      if(stage==="成交"||stage==="長期客戶")closed++;
+      const nd=fv(f,"下次跟進日期");
+      if(nd&&nd<=today&&stage!=="暫停/失效"&&stage!=="長期客戶"){
+        overdue++;
+        needFollowUp.push({name:fv(f,"客戶名稱"),date:nd,handler:fv(f,"主要對接業務"),stage,isOverdue:nd<today});
+      }
+    });
+    document.getElementById("s-total").textContent=items.length;
+    document.getElementById("s-active").textContent=active;
+    document.getElementById("s-overdue").textContent=overdue;
+    document.getElementById("s-closed").textContent=closed;
+    document.getElementById("hdr-sub").textContent=`共 ${items.length} 客戶 ｜ 進行中 ${active} ｜ 逾期 ${overdue}`;
+
+    needFollowUp.sort((a,b)=>a.date.localeCompare(b.date));
+    if(!needFollowUp.length){
+      document.getElementById("fu-list").innerHTML=`<div class="empty">🎉 今日無逾期跟進</div>`;
+      return;
+    }
+    document.getElementById("fu-list").innerHTML=needFollowUp.slice(0,10).map(c=>{
+      const sc=STAGE_COLOR[c.stage]||"#64748b";
+      return `<div class="fu-item">
+        <div class="fu-dot" style="background:${sc}"></div>
+        <div class="fu-name">${esc(c.name)}</div>
+        <span class="fu-date ${c.isOverdue?"overdue":""}">${c.isOverdue?"⚠️ ":""}${esc(c.date)}</span>
+        ${c.handler?`<span class="fu-handler">${esc(c.handler)}</span>`:""}
+      </div>`;
+    }).join("")+(needFollowUp.length>10?`<div style="text-align:center;padding:10px;font-size:12px;color:#6366f1"><a href="forms/view_crm_kanban.html" style="color:#6366f1">查看全部 ${needFollowUp.length} 筆 ›</a></div>`:"");
+  }catch(e){
+    document.getElementById("fu-list").innerHTML=`<div class="empty">⚠️ 載入失敗：${e.message}</div>`;
+  }
+}
+loadData();
+</script>
+</body></html>
