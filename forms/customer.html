@@ -82,9 +82,27 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       <div class="f"><label>採購品類偏好</label>
         <textarea id="f-pref" placeholder="例：偏好公仔類、不接受食品類，主要賣日韓 IP..."></textarea></div>
       <div class="f"><label>主要對接業務（我方）</label>
-        <select id="f-handler">
-          <option>Ray</option><option>安然</option><option>Shawn</option><option>Bevis</option><option>賴哥</option><option>木子</option><option>高維</option><option>董亮</option><option>德寶</option>
-        </select></div>
+        <select id="f-handler">{staff_options()}</select></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">銷售進度</div>
+      <div class="row2">
+        <div class="f"><label>銷售階段</label>
+          <select id="f-stage">
+            <option>開發中</option><option>已接觸</option><option>跟進中</option>
+            <option>寄樣中</option><option>報價中</option><option>成交</option>
+            <option>收款中</option><option>長期客戶</option><option>暫停/失效</option>
+          </select></div>
+        <div class="f"><label>預估金額</label>
+          <div style="display:flex;gap:6px">
+            <input id="f-est-amt" type="number" placeholder="0" style="flex:1">
+            <select id="f-est-cur" style="width:80px"><option>CNY</option><option>TWD</option><option>USD</option><option>THB</option><option>HKD</option></select>
+          </div></div>
+      </div>
+      <div class="row2">
+        <div class="f"><label>最後聯絡日期</label><input id="f-last-contact" type="date"></div>
+        <div class="f"><label>下次跟進日期</label><input id="f-next-follow" type="date"></div>
+      </div>
     </div>
     <div class="card">
       <div class="ctitle">其他</div>
@@ -104,7 +122,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG"};
+const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG", "follow_up": "tblyO9Cz2nUx6q46"};
 
 async function _getToken(){
   const r=await fetch(_PROXY+"/auth/token",{
@@ -278,6 +296,11 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "合作狀態":    document.getElementById("f-status").value,
       "品類偏好":    document.getElementById("f-pref").value,
       "主要對接業務":document.getElementById("f-handler").value,
+      "銷售階段":    document.getElementById("f-stage").value,
+      "預估金額":    parseFloat(document.getElementById("f-est-amt").value)||null,
+      "預估幣別":    document.getElementById("f-est-cur").value,
+      "最後聯絡日期":document.getElementById("f-last-contact").value||null,
+      "下次跟進日期":document.getElementById("f-next-follow").value||null,
       "備註":        document.getElementById("f-note").value,
     })};
     if(proj) fields["項目關聯"]=proj;

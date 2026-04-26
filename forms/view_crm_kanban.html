@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎯 CRM 銷售看板 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.hdr{background:#0f172a;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.hdr-title{font-size:17px;font-weight:700;color:#fff}
+.hdr-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.btn-back{background:#ffffff20;color:#fff;border:1px solid #ffffff30;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;text-decoration:none}
+.toolbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex-shrink:0}
+.filter-sel{padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;background:#f8fafc;outline:none;cursor:pointer}
+.filter-sel:focus{border-color:#6366f1}
+.stat-bar{background:#fff;border-bottom:1px solid #f1f5f9;padding:6px 16px;font-size:11px;color:#64748b;flex-shrink:0}
+.board{flex:1;display:flex;gap:0;overflow-x:auto;padding:12px 16px;gap:10px;align-items:flex-start}
+.col{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;min-width:200px;width:200px;flex-shrink:0;display:flex;flex-direction:column;max-height:100%}
+.col-hdr{padding:10px 12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;border-radius:12px 12px 0 0}
+.col-hdr-name{font-size:12px;font-weight:700}
+.col-badge{font-size:11px;background:#fff;border-radius:10px;padding:2px 7px;font-weight:700}
+.col-body{padding:8px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:7px}
+.crm-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;cursor:pointer;transition:box-shadow .15s;border-left:3px solid transparent}
+.crm-card:hover{box-shadow:0 3px 12px #0000001a}
+.crm-card-name{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px}
+.crm-card-sub{font-size:11px;color:#64748b;margin-bottom:6px}
+.crm-card-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.crm-tag{font-size:10px;padding:2px 6px;border-radius:5px;font-weight:600}
+.amt{font-size:11px;color:#10b981;font-weight:700}
+.overdue{color:#ef4444!important;font-weight:700}
+/* 彈窗 */
+.overlay{display:none;position:fixed;inset:0;background:#00000060;z-index:100;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-hdr{padding:18px 20px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:16px;font-weight:700}
+.modal-body{padding:16px 20px;overflow-y:auto;flex:1}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#64748b;padding:4px 8px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.info-item label{font-size:11px;color:#94a3b8;font-weight:600;display:block;margin-bottom:2px}
+.info-item span{font-size:13px;color:#0f172a}
+.stage-sel{width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:12px;outline:none}
+.stage-sel:focus{border-color:#6366f1}
+.log-item{border-left:3px solid #e2e8f0;padding:8px 12px;margin-bottom:8px;background:#f8fafc;border-radius:0 8px 8px 0}
+.log-date{font-size:11px;color:#94a3b8}
+.log-type{font-size:11px;background:#6366f120;color:#6366f1;padding:1px 6px;border-radius:4px;font-weight:600;margin-left:6px}
+.log-content{font-size:13px;color:#374151;margin-top:4px;line-height:1.5}
+.log-next{font-size:11px;color:#f59e0b;margin-top:3px}
+.btn-add-log{background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600;width:100%;margin-top:8px}
+.btn-add-log:hover{background:#4f46e5}
+.empty-col{text-align:center;padding:20px;color:#cbd5e1;font-size:12px}
+@media(max-width:600px){.col{min-width:160px;width:160px}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="hdr-title">🎯 CRM 銷售看板</div>
+    <div class="hdr-sub" id="stat-sub">載入中...</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="followup.html" style="background:#6366f1;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;text-decoration:none;font-weight:600">＋ 跟進記錄</a>
+    <a href="customer.html" style="background:#10b981;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;text-decoration:none;font-weight:600">＋ 新客戶</a>
+    <a href="../home.html" class="btn-back">← 首頁</a>
+  </div>
+</div>
+<div class="toolbar">
+  <select class="filter-sel" id="f-region" onchange="render()">
+    <option value="">全部地區</option>
+    <option>台灣</option><option>北京</option><option>上海</option><option>廣州/深圳</option>
+    <option>香港</option><option>泰國</option><option>東南亞</option>
+    <option>歐洲</option><option>北美</option><option>其他</option>
+  </select>
+  <select class="filter-sel" id="f-handler" onchange="render()">
+    <option value="">全部業務</option>
+    <option>Ray</option><option>安然</option><option>Shawn</option>
+    <option>Den</option><option>Meaw</option><option>董亮</option><option>德寶</option>
+  </select>
+  <select class="filter-sel" id="f-type" onchange="render()">
+    <option value="">全部類型</option>
+    <option>KA大客戶</option><option>流通渠道商</option><option>電商平台</option>
+    <option>零售門店</option><option>展覽/快閃</option><option>海外經銷商</option>
+  </select>
+  <input class="filter-sel" id="f-search" type="search" placeholder="🔍 搜尋客戶名稱..." oninput="render()" style="min-width:160px">
+</div>
+<div class="stat-bar" id="stat-bar">載入中...</div>
+<div class="board" id="board">
+  <div style="text-align:center;padding:60px;color:#94a3b8;font-size:14px;width:100%">載入中...</div>
+</div>
+
+<!-- 客戶詳情彈窗 -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="m-name">—</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-grid" id="m-info"></div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#94a3b8;font-weight:600;display:block;margin-bottom:4px">更新銷售階段</label>
+        <select class="stage-sel" id="m-stage" onchange="updateStage()">
+          <option>開發中</option><option>已接觸</option><option>跟進中</option>
+          <option>寄樣中</option><option>報價中</option><option>成交</option>
+          <option>收款中</option><option>長期客戶</option><option>暫停/失效</option>
+        </select>
+      </div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#0f172a">跟進記錄</div>
+      <div id="m-logs"><div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px">載入中...</div></div>
+      <a id="m-add-log" href="followup.html" class="btn-add-log" style="display:block;text-align:center;text-decoration:none">＋ 新增跟進記錄</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _CUST="tblXMXDGZKw8KOsl";
+const _FUPL="tblyO9Cz2nUx6q46";
+const STAGES=["開發中","已接觸","跟進中","寄樣中","報價中","成交","收款中","長期客戶","暫停/失效"];
+const STAGE_COLOR={"開發中":"#94a3b8","已接觸":"#6366f1","跟進中":"#f59e0b","寄樣中":"#f97316","報價中":"#8b5cf6","成交":"#10b981","收款中":"#0ea5e9","長期客戶":"#10b981","暫停/失效":"#ef4444"};
+const REGION_COLOR={"台灣":"#10b981","北京":"#ef4444","歐洲":"#6366f1","北美":"#f59e0b","泰國":"#f97316","東南亞":"#f97316","香港":"#8b5cf6"};
+let allCustomers=[], allLogs=[], _curId=null, _curRecId=null;
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+})();
+
+function fv(f,k){
+  const v=f[k];
+  if(v===null||v===undefined||v==="")return"";
+  if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.link||x.text||x.name||""):String(x)).join("");
+  if(typeof v==="object")return v.link||v.text||v.name||"";
+  return String(v);
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+async function loadData(){
+  try{
+    const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await r.json();
+    if(td.code!==0)throw new Error("Token err");
+    const tk=td.tenant_access_token;
+    const [custs, logs] = await Promise.all([
+      fetchAll(tk, _CUST),
+      fetchAll(tk, _FUPL),
+    ]);
+    allCustomers=custs;
+    allLogs=logs;
+    render();
+  }catch(e){
+    document.getElementById("board").innerHTML=`<div style="text-align:center;padding:60px;color:#ef4444">⚠️ 載入失敗：${e.message}</div>`;
+  }
+}
+
+async function fetchAll(tk, tbl){
+  let items=[],pt=null;
+  do{
+    const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tbl+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+    const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+    const d=await res.json();
+    if(d.code!==0)throw new Error(d.msg);
+    items=items.concat(d.data?.items||[]);
+    pt=d.data?.has_more?d.data.page_token:null;
+  }while(pt);
+  return items;
+}
+
+function render(){
+  const regionF=document.getElementById("f-region").value;
+  const handlerF=document.getElementById("f-handler").value;
+  const typeF=document.getElementById("f-type").value;
+  const kw=(document.getElementById("f-search").value||"").toLowerCase().trim();
+  let recs=allCustomers.filter(i=>{
+    const f=i.fields||{};
+    if(regionF&&fv(f,"所在地區")!==regionF)return false;
+    if(handlerF&&fv(f,"主要對接業務")!==handlerF)return false;
+    if(typeF&&fv(f,"客戶類型")!==typeF)return false;
+    if(kw&&!fv(f,"客戶名稱").toLowerCase().includes(kw))return false;
+    return true;
+  });
+  const grouped={};
+  STAGES.forEach(s=>grouped[s]=[]);
+  recs.forEach(r=>{
+    const stage=fv(r.fields,"銷售階段")||"開發中";
+    if(grouped[stage])grouped[stage].push(r);
+    else grouped["開發中"].push(r);
+  });
+  const total=recs.length;
+  const active=recs.filter(r=>!["暫停/失效","長期客戶"].includes(fv(r.fields,"銷售階段"))).length;
+  document.getElementById("stat-sub").textContent=`共 ${total} 客戶 ｜ 活躍 ${active} 筆`;
+  document.getElementById("stat-bar").textContent=`顯示 ${total} 筆客戶`;
+  const today=new Date().toISOString().slice(0,10);
+  let html="";
+  STAGES.forEach(stage=>{
+    const cards=grouped[stage]||[];
+    const sc=STAGE_COLOR[stage]||"#64748b";
+    let cardsHtml=cards.length===0?`<div class="empty-col">暫無客戶</div>`:"";
+    cards.forEach(r=>{
+      const f=r.fields||{};
+      const name=fv(f,"客戶名稱")||"—";
+      const region=fv(f,"所在地區")||"";
+      const handler=fv(f,"主要對接業務")||"";
+      const amt=parseFloat(fv(f,"預估金額"))||0;
+      const cur=fv(f,"預估幣別")||"";
+      const nextDate=fv(f,"下次跟進日期")||"";
+      const rc=REGION_COLOR[region]||"#6366f1";
+      const isOverdue=nextDate&&nextDate<today;
+      cardsHtml+=`<div class="crm-card" onclick="openModal('${esc(r.record_id)}','${esc(name)}')" style="border-left-color:${sc}">
+        <div class="crm-card-name">${esc(name)}</div>
+        <div class="crm-card-sub">${esc(region)}${handler?" · "+esc(handler):""}</div>
+        ${amt?`<div class="amt">¥${amt.toLocaleString()} ${esc(cur)}</div>`:""}</div>
+        ${nextDate?`<div class="crm-card-row"><span class="${isOverdue?"overdue":""}">📅 ${esc(nextDate)}</span></div>`:""}</div>`;
+    });
+    html+=`<div class="col">
+      <div class="col-hdr" style="background:${sc}18;border-bottom-color:${sc}30">
+        <span class="col-hdr-name" style="color:${sc}">${esc(stage)}</span>
+        <span class="col-badge" style="color:${sc};border:1px solid ${sc}40">${cards.length}</span>
+      </div>
+      <div class="col-body">${cardsHtml}</div>
+    </div>`;
+  });
+  document.getElementById("board").innerHTML=html;
+}
+
+function openModal(recId, name){
+  _curRecId=recId;
+  _curId=name;
+  document.getElementById("m-name").textContent=name;
+  document.getElementById("overlay").classList.add("open");
+  const cust=allCustomers.find(r=>r.record_id===recId);
+  if(cust){
+    const f=cust.fields||{};
+    const stage=fv(f,"銷售階段")||"開發中";
+    document.getElementById("m-stage").value=stage;
+    document.getElementById("m-info").innerHTML=`
+      <div class="info-item"><label>客戶類型</label><span>${esc(fv(f,"客戶類型"))||"—"}</span></div>
+      <div class="info-item"><label>所在地區</label><span>${esc(fv(f,"所在地區"))||"—"}</span></div>
+      <div class="info-item"><label>聯絡人</label><span>${esc(fv(f,"聯絡人"))||"—"}</span></div>
+      <div class="info-item"><label>聯絡方式</label><span>${esc(fv(f,"聯絡方式"))||"—"}</span></div>
+      <div class="info-item"><label>主要業務</label><span>${esc(fv(f,"主要對接業務"))||"—"}</span></div>
+      <div class="info-item"><label>預估金額</label><span>${fv(f,"預估金額")?parseFloat(fv(f,"預估金額")).toLocaleString()+" "+esc(fv(f,"預估幣別")):"—"}</span></div>
+      <div class="info-item"><label>最後聯絡</label><span>${esc(fv(f,"最後聯絡日期"))||"—"}</span></div>
+      <div class="info-item"><label>下次跟進</label><span>${esc(fv(f,"下次跟進日期"))||"—"}</span></div>
+      ${fv(f,"備註")?`<div class="info-item" style="grid-column:1/-1"><label>備註</label><span>${esc(fv(f,"備註"))}</span></div>`:""}
+    `;
+  }
+  document.getElementById("m-add-log").href=`followup.html?client=${encodeURIComponent(name)}`;
+  const logs=allLogs.filter(r=>fv(r.fields,"客戶名稱")===name)
+    .sort((a,b)=>{const da=fv(a.fields,"跟進日期"),db=fv(b.fields,"跟進日期");return db.localeCompare(da);});
+  if(!logs.length){
+    document.getElementById("m-logs").innerHTML=`<div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px">暫無跟進記錄</div>`;
+    return;
+  }
+  document.getElementById("m-logs").innerHTML=logs.map(r=>{
+    const f=r.fields||{};
+    return `<div class="log-item">
+      <div><span class="log-date">${esc(fv(f,"跟進日期"))||"—"}</span><span class="log-type">${esc(fv(f,"溝通類型"))||""}</span><span style="font-size:11px;color:#64748b;margin-left:6px">${esc(fv(f,"記錄人"))||""}</span></div>
+      <div class="log-content">${esc(fv(f,"溝通內容"))||"—"}</div>
+      ${fv(f,"下次行動")?`<div class="log-next">→ ${esc(fv(f,"下次行動"))}</div>`:""}
+    </div>`;
+  }).join("");
+}
+
+function closeModal(){
+  document.getElementById("overlay").classList.remove("open");
+  _curRecId=null;
+}
+
+async function updateStage(){
+  if(!_curRecId)return;
+  const stage=document.getElementById("m-stage").value;
+  try{
+    const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await r.json();
+    const tk=td.tenant_access_token;
+    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_CUST+"/records/"+_curRecId,{
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"銷售階段":stage}})
+    });
+    const cust=allCustomers.find(r=>r.record_id===_curRecId);
+    if(cust)(cust.fields||{})["銷售階段"]=stage;
+    render();
+  }catch(e){alert("更新失敗："+e.message);}
+}
+
+loadData();
+</script>
+</body></html>
