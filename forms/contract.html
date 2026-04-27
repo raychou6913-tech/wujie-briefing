@@ -90,10 +90,37 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     </div>
     <div class="card">
       <div class="ctitle">授權範圍（此合約覆蓋範圍）</div>
-      <div class="f"><label>授權品類</label>
-        <input id="f-cats" placeholder="例：公仔、絨毛玩偶、3C配件、文具周邊"></div>
-      <div class="f"><label>授權地區</label>
-        <input id="f-region" placeholder="例：台灣、香港、澳門；或 全球"></div>
+      <div class="f">
+        <label>授權品類</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px" id="cats-chips-contract">
+          <button type="button" class="range-chip" data-val="公仔">公仔</button>
+          <button type="button" class="range-chip" data-val="絨毛玩偶">絨毛玩偶</button>
+          <button type="button" class="range-chip" data-val="3C配件">3C配件</button>
+          <button type="button" class="range-chip" data-val="文具周邊">文具周邊</button>
+          <button type="button" class="range-chip" data-val="服飾配件">服飾配件</button>
+          <button type="button" class="range-chip" data-val="家品">家品</button>
+          <button type="button" class="range-chip" data-val="食品">食品</button>
+          <button type="button" class="range-chip" data-val="美妝">美妝</button>
+          <button type="button" class="range-chip" data-val="玩具遊戲">玩具遊戲</button>
+        </div>
+        <input id="f-cats" placeholder="手動補充其他品類，或直接輸入（逗號分隔）">
+        <div class="hint">點選上方快捷選項，或直接在欄位輸入；提交時會自動合併</div>
+      </div>
+      <div class="f">
+        <label>授權地區</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px" id="region-chips-contract">
+          <button type="button" class="range-chip" data-val="台灣">台灣</button>
+          <button type="button" class="range-chip" data-val="香港">香港</button>
+          <button type="button" class="range-chip" data-val="澳門">澳門</button>
+          <button type="button" class="range-chip" data-val="中國大陸">中國大陸</button>
+          <button type="button" class="range-chip" data-val="泰國">泰國</button>
+          <button type="button" class="range-chip" data-val="東南亞">東南亞</button>
+          <button type="button" class="range-chip" data-val="日本">日本</button>
+          <button type="button" class="range-chip" data-val="全球">全球</button>
+        </div>
+        <input id="f-region" placeholder="手動補充其他地區，或直接輸入">
+        <div class="hint">點選上方快捷選項，或直接在欄位輸入；提交時會自動合併</div>
+      </div>
     </div>
     <div class="card">
       <div class="ctitle">金額與期間</div>
@@ -423,6 +450,31 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
+// ── range chips (cats + region) ──────────────────────────────
+(function(){
+  function initChips(wrapId, inputId){
+    const wrap=document.getElementById(wrapId);
+    if(!wrap) return;
+    wrap.querySelectorAll(".range-chip").forEach(btn=>{
+      btn.onclick=()=>{
+        btn.classList.toggle("chip-on");
+        btn.style.background=btn.classList.contains("chip-on")?"#6366f1":"#f8fafc";
+        btn.style.color=btn.classList.contains("chip-on")?"#fff":"inherit";
+        btn.style.borderColor=btn.classList.contains("chip-on")?"#6366f1":"#e2e8f0";
+      };
+    });
+    // expose helper to get merged value
+    wrap._getMerged=()=>{
+      const chips=[...wrap.querySelectorAll(".range-chip.chip-on")].map(b=>b.dataset.val);
+      const manual=(document.getElementById(inputId)?.value||"").split(/[,，、]+/).map(s=>s.trim()).filter(Boolean);
+      const all=[...chips,...manual.filter(v=>!chips.includes(v))];
+      return all.join("、");
+    };
+  }
+  initChips("cats-chips-contract","f-cats");
+  initChips("region-chips-contract","f-region");
+})();
+
 _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
 _loadIpSelect("f-ip");
 _bindImgPreview("f-imgs","img-preview");
@@ -453,8 +505,8 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "對方公司":     document.getElementById("f-party").value,
       "我方簽署人":   document.getElementById("f-signer").value,
       "對方聯絡人":   document.getElementById("f-contact").value,
-      "授權品類":     document.getElementById("f-cats").value,
-      "授權地區":     document.getElementById("f-region").value,
+      "授權品類":     (document.getElementById("cats-chips-contract")?._getMerged?.()||document.getElementById("f-cats").value),
+      "授權地區":     (document.getElementById("region-chips-contract")?._getMerged?.()||document.getElementById("f-region").value),
       "合約金額":     parseFloat(document.getElementById("f-amount").value)||0,
       "幣別":         document.getElementById("f-cur").value,
       "簽署日期":     _dateToTs(document.getElementById("f-sign").value),
