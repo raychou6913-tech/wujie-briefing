@@ -176,7 +176,10 @@ async function _getIpBrands(){
     const f=rec.fields||{};
     const nv=f["IP名稱"]; const name=Array.isArray(nv)?nv[0]?.text||"":String(nv||"");
     const lv=f["版權方"]; const licensor=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
-    return name?{name,licensor}:null;
+    const av=f["版權代理商"]; const agent=Array.isArray(av)?av[0]?.text||"":String(av||"");
+    // cascadeLicensor = 代理商（若有）, 否則原廠；合約版權方需與此一致
+    const cascadeLicensor=agent||licensor;
+    return name?{name,licensor,agent,cascadeLicensor}:null;
   }).filter(Boolean);
   return _ipCache;
 }
@@ -196,7 +199,11 @@ async function _loadIpSelect(selectId){
     });
     const other=document.createElement("option"); other.value="其他"; other.textContent="其他";
     sel.appendChild(other);
-    if(prev) sel.value=prev;
+    // re-apply IP from linked project select if already chosen
+    const projSel=document.getElementById("f-proj");
+    const projIp=projSel?.options[projSel.selectedIndex]?.dataset?.ip;
+    if(projIp) sel.value=projIp;
+    else if(prev) sel.value=prev;
     const _syncLicensor=()=>{
       const chosen=sel.options[sel.selectedIndex];
       ["f-licensor","m-licensor"].forEach(id=>{
