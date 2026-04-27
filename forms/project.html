@@ -708,7 +708,11 @@ async function _loadContractsByLicensor(licensorName){
     const o=document.createElement("option");
     o.value=l; o.textContent=l; sel.appendChild(o);
   });
+  const addOpt=document.createElement("option");
+  addOpt.value="__new_licensor__"; addOpt.textContent="＋ 新增版權方（跳轉）";
+  sel.appendChild(addOpt);
   sel.onchange=()=>{
+    if(sel.value==="__new_licensor__"){window.open("ip_db.html","_blank");sel.selectedIndex=0;return;}
     const step2=document.getElementById("step2-card");
     step2.style.display=sel.value?"block":"none";
     _resetDownstream();
