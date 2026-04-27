@@ -62,10 +62,6 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <div class="f"><label>日期 <span class="req">*</span></label>
           <input type="date" id="f-date" required></div>
       </div>
-      <div class="f"><label>幣別</label>
-        <select id="f-cur">
-          <option>TWD</option><option>CNY</option><option>THB</option><option>USD</option>
-        </select></div>
     </div>
     <div class="card">
       <div class="ctitle">本期金流</div>
@@ -143,10 +139,19 @@ async function _getProjects(typeFilter){
     const name=Array.isArray(n)?n[0]?.text||"":String(n);
     const tv=f["業務類型"];
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
-    return {name,type};
+    const iv=f["IP品牌"];
+    const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
+    return {name,type,ip};
   }).filter(Boolean);
-  if(typeFilter) return items.filter(p=>p.type===typeFilter).map(p=>p.name);
-  return items.map(p=>p.name);
+  if(typeFilter) return items.filter(p=>p.type===typeFilter);
+  return items;
+}
+
+// 從項目名稱快速查 IP（_getProjects 結果快取）
+let _projCache=null;
+async function _getProjMeta(name){
+  if(!_projCache) _projCache=await _getProjects(null);
+  return _projCache.find(p=>p.name===name)||null;
 }
 
 function _ts(dateStr){ return dateStr?new Date(dateStr).getTime():null; }
@@ -278,7 +283,6 @@ document.getElementById("frm").onsubmit=async(e)=>{
     const fields={...({
       "辦公室":     document.getElementById("f-office").value,
       "日期":       _dateToTs(document.getElementById("f-date").value),
-      "幣別":       document.getElementById("f-cur").value,
       "期初餘額":   parseFloat(document.getElementById("f-open").value)||0,
       "本期收入":   parseFloat(document.getElementById("f-in").value)||0,
       "本期支出":   parseFloat(document.getElementById("f-out").value)||0,

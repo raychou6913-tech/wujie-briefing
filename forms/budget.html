@@ -206,10 +206,19 @@ async function _getProjects(typeFilter){
     const name=Array.isArray(n)?n[0]?.text||"":String(n);
     const tv=f["業務類型"];
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
-    return {name,type};
+    const iv=f["IP品牌"];
+    const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
+    return {name,type,ip};
   }).filter(Boolean);
-  if(typeFilter) return items.filter(p=>p.type===typeFilter).map(p=>p.name);
-  return items.map(p=>p.name);
+  if(typeFilter) return items.filter(p=>p.type===typeFilter);
+  return items;
+}
+
+// 從項目名稱快速查 IP（_getProjects 結果快取）
+let _projCache=null;
+async function _getProjMeta(name){
+  if(!_projCache) _projCache=await _getProjects(null);
+  return _projCache.find(p=>p.name===name)||null;
 }
 
 function _ts(dateStr){ return dateStr?new Date(dateStr).getTime():null; }
@@ -549,8 +558,6 @@ async function submitAll(){
         "季度":       qtr,
         "預算金額":   budget,
         "已使用金額": 0,
-        "剩餘預算":   budget,
-        "執行率%":    0,
         "備註":       noteStr,
       };
       if(unit!==null)fields["單價"]=unit;
