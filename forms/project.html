@@ -460,6 +460,8 @@ async function _loadContractSelect(selectId,ipFilter){
       o.dataset.status=c.status; o.dataset.cats=c.cats; o.dataset.region=c.region;
       o.dataset.amount=c.amount||0; o.dataset.cur=c.cur||"TWD";
       o.dataset.startTs=c.startTs||""; o.dataset.endTs=c.endTs||"";
+      o.dataset.royalRetail=c.royalRetail||0; o.dataset.royalWholesale=c.royalWholesale||0;
+      o.dataset.flatFee=c.flatFee||0;
       sel.appendChild(o);
     });
     if(list.length===0){
@@ -831,6 +833,9 @@ document.getElementById("frm").onsubmit=async(e)=>{
     ["所在地", document.getElementById("m-loc").value],
     ["授權品類", cats.join("、")||"—"],
     ["保底金(MG)", (document.getElementById("m-mg").value?document.getElementById("m-mg").value+" "+cur:"—")],
+    ["權利金(零售%)", (()=>{const v=parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalRetail||0);return v?v+"%":"—";})()],
+    ["權利金(批發%)", (()=>{const v=parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalWholesale||0);return v?v+"%":"—";})()],
+    ["一次性授權費", (()=>{const v=parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.flatFee||0);return v?v+" "+cur:"—";})()],
   ],async()=>{
   const btn=document.getElementById("sbtn");
   btn.disabled=true; btn.textContent="提交中...";
@@ -849,6 +854,8 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "授權地區範圍":document.getElementById("m-territory").value,
       "保底金額":    parseFloat(document.getElementById("m-mg").value)||0,
       "幣別":        cur,
+      "權利金_零售%": parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalRetail||0)||0,
+      "權利金_批發%": parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalWholesale||0)||0,
       "狀態":        document.getElementById("m-status").value,
       "備註":        document.getElementById("m-note").value,
     };
