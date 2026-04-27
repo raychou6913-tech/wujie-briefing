@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>系統使用說明 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:60px}
+/* Header */
+.hdr{background:#0f172a;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-size:17px;font-weight:700;color:#f1f5f9}
+.btn-back{color:#94a3b8;text-decoration:none;font-size:13px}
+.btn-back:hover{color:#f1f5f9}
+/* Intro */
+.intro{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);padding:28px 24px;text-align:center}
+.intro h1{font-size:24px;font-weight:800;color:#f1f5f9;margin-bottom:8px}
+.intro p{font-size:14px;color:#64748b;max-width:480px;margin:0 auto}
+/* Role tabs */
+.tabs-wrap{background:#fff;border-bottom:2px solid #e2e8f0;padding:0 20px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px #0000000a}
+.role-tab{display:inline-block;padding:14px 18px;font-size:13px;font-weight:600;color:#64748b;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.role-tab:hover{color:var(--rc)}
+.role-tab.active{color:var(--rc);border-bottom-color:var(--rc)}
+/* Role hero */
+.role-hero{padding:20px 24px}
+/* Section */
+.section-block{padding:20px 24px}
+.section-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:#0f172a;margin-bottom:16px}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+.section-sub{font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px}
+/* Flow */
+.flow-row{display:flex;align-items:center;flex-wrap:wrap;gap:0}
+.flow-step-wrap{display:flex;align-items:center}
+.flow-arrow{font-size:22px;padding:0 8px;color:#cbd5e1;flex-shrink:0}
+.flow-step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 14px;border:1.5px solid #e2e8f0;border-radius:14px;width:152px;text-decoration:none;transition:transform .12s,box-shadow .12s;position:relative;gap:4px}
+.flow-step:hover{transform:translateY(-3px);box-shadow:0 8px 24px #00000015}
+.flow-num{width:26px;height:26px;border-radius:50%;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:2px;flex-shrink:0}
+.flow-icon{font-size:26px;margin:2px 0}
+.flow-title{font-size:13px;font-weight:700;color:#0f172a;line-height:1.3}
+.flow-desc{font-size:11px;color:#64748b;line-height:1.4;margin-top:2px}
+.flow-goto{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;margin-top:6px}
+@media(max-width:600px){
+  .flow-row{flex-direction:column;align-items:flex-start}
+  .flow-step-wrap{flex-direction:column;align-items:flex-start;width:100%}
+  .flow-step{flex-direction:row;width:100%;text-align:left;gap:12px;padding:12px 14px}
+  .flow-arrow{transform:rotate(90deg);margin:4px 0 4px 16px}
+  .flow-num{flex-shrink:0}
+  .flow-icon{font-size:22px;flex-shrink:0}
+  .flow-goto{margin-top:0}
+}
+/* Routine cards */
+.routine-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.r-card{background:#fff;border-radius:12px;padding:14px;text-decoration:none;display:block;box-shadow:0 1px 4px #0000000a;transition:transform .12s,box-shadow .12s}
+.r-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px #00000012}
+.r-title{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.r-desc{font-size:12px;color:#64748b;line-height:1.5}
+.freq-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;white-space:nowrap}
+/* Divider */
+.section-block+.section-block{border-top:1px solid #e2e8f0}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <a href="home.html" class="btn-back">← 首頁</a>
+  <div class="hdr-title">📖 系統使用說明</div>
+  <div></div>
+</div>
+<div class="intro">
+  <h1>根據你的崗位找到操作流程</h1>
+  <p>選擇下方你的角色，查看對應的啟動流程與日常操作說明。每個步驟都可以直接點擊跳轉。</p>
+</div>
+<div class="tabs-wrap">
+<button class="role-tab active" data-role="shawn" style="--rc:#6366f1" onclick="switchRole('shawn')">👑 Shawn</button>
+<button class="role-tab " data-role="sales" style="--rc:#10b981" onclick="switchRole('sales')">🎯 業務 / BD</button>
+<button class="role-tab " data-role="design" style="--rc:#ec4899" onclick="switchRole('design')">🎨 設計 / 創意</button>
+<button class="role-tab " data-role="warehouse" style="--rc:#f97316" onclick="switchRole('warehouse')">📦 倉庫 / 物流</button>
+<button class="role-tab " data-role="finance" style="--rc:#8b5cf6" onclick="switchRole('finance')">💰 財務</button>
+<button class="role-tab " data-role="all" style="--rc:#64748b" onclick="switchRole('all')">🌐 所有人</button>
+
+</div>
+
+<div id="panel-shawn" class="role-panel" style="display:block">
+  <div class="role-hero" style="background:linear-gradient(135deg,#6366f118 0%,#6366f108 100%);border-bottom:2px solid #6366f130">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:42px">👑</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#0f172a">Shawn</div>
+        <div style="font-size:13px;color:#64748b;margin-top:2px">Shawn</div>
+        <div style="font-size:12px;color:#6366f1;font-weight:600;margin-top:4px">項目建立 · 預算審批 · 全局掌控</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#6366f1">①</span>
+      項目啟動流程
+      <span class="section-sub">首次建立項目時，按順序執行</span>
+    </div>
+    <div class="flow-row"><div class="flow-step-wrap">
+  <a href="forms/project.html" class="flow-step" style="border-color:#6366f120;background:#6366f108">
+    <div class="flow-num" style="background:#6366f1;color:#fff">1</div>
+    <div class="flow-icon">📋</div>
+    <div class="flow-title">新增項目</div>
+    <div class="flow-desc">填入 IP 品牌、業務類型、授權資訊與截止日</div>
+    <div class="flow-goto" style="background:#6366f118;color:#6366f1">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#6366f1">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/budget.html" class="flow-step" style="border-color:#6366f120;background:#6366f108">
+    <div class="flow-num" style="background:#6366f1;color:#fff">2</div>
+    <div class="flow-icon">💵</div>
+    <div class="flow-title">編列預算</div>
+    <div class="flow-desc">為項目逐條建立預算，金額全程含稅</div>
+    <div class="flow-goto" style="background:#6366f118;color:#6366f1">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#6366f1">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/view_supplier.html" class="flow-step" style="border-color:#6366f120;background:#6366f108">
+    <div class="flow-num" style="background:#6366f1;color:#fff">3</div>
+    <div class="flow-icon">🏭</div>
+    <div class="flow-title">核准供應商</div>
+    <div class="flow-desc">審核安然＋躍明送來的新供應商申請</div>
+    <div class="flow-goto" style="background:#6366f118;color:#6366f1">前往 →</div>
+  </a>
+  
+</div></div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#6366f1">⚡</span>
+      日常操作
+      <span class="section-sub">依頻率執行，點卡片直接跳轉填報</span>
+    </div>
+    <div class="routine-grid"><a href="forms/approval.html" class="r-card" style="border-left:4px solid #ef4444">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🔔</span>
+    <span class="freq-badge" style="background:#ef444418;color:#ef4444">有新申請時</span>
+  </div>
+  <div class="r-title">審批申請</div>
+  <div class="r-desc">查看並處理待審批事項</div>
+</a><a href="forms/view_project.html" class="r-card" style="border-left:4px solid #6366f1">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">📊</span>
+    <span class="freq-badge" style="background:#6366f118;color:#6366f1">每週</span>
+  </div>
+  <div class="r-title">項目進度總覽</div>
+  <div class="r-desc">所有項目狀態、設計送審進度、時間線</div>
+</a><a href="forms/view_budget_summary.html" class="r-card" style="border-left:4px solid #8b5cf6">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">💰</span>
+    <span class="freq-badge" style="background:#8b5cf618;color:#8b5cf6">每週</span>
+  </div>
+  <div class="r-title">預算執行狀況</div>
+  <div class="r-desc">各項目預算使用率與費用明細</div>
+</a><a href="forms/expense.html" class="r-card" style="border-left:4px solid #f97316">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🧾</span>
+    <span class="freq-badge" style="background:#f9731618;color:#f97316">隨時</span>
+  </div>
+  <div class="r-title">費用申請</div>
+  <div class="r-desc">確認各同仁提交的費用申請</div>
+</a></div>
+  </div>
+</div>
+<div id="panel-sales" class="role-panel" style="display:none">
+  <div class="role-hero" style="background:linear-gradient(135deg,#10b98118 0%,#10b98108 100%);border-bottom:2px solid #10b98130">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:42px">🎯</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#0f172a">業務 / BD</div>
+        <div style="font-size:13px;color:#64748b;margin-top:2px">Ray / Bevis / 賴哥</div>
+        <div style="font-size:12px;color:#10b981;font-weight:600;margin-top:4px">客戶跟進 · 訂單填報 · 合約管理</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#10b981">①</span>
+      項目啟動流程
+      <span class="section-sub">首次建立項目時，按順序執行</span>
+    </div>
+    <div class="flow-row"><div class="flow-step-wrap">
+  <a href="forms/view_project.html" class="flow-step" style="border-color:#10b98120;background:#10b98108">
+    <div class="flow-num" style="background:#10b981;color:#fff">1</div>
+    <div class="flow-icon">📋</div>
+    <div class="flow-title">確認項目已建立</div>
+    <div class="flow-desc">確認 Shawn 已建立項目與預算再開始填報</div>
+    <div class="flow-goto" style="background:#10b98118;color:#10b981">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#10b981">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/customer.html" class="flow-step" style="border-color:#10b98120;background:#10b98108">
+    <div class="flow-num" style="background:#10b981;color:#fff">2</div>
+    <div class="flow-icon">🤝</div>
+    <div class="flow-title">建立客戶資料</div>
+    <div class="flow-desc">在客戶資料庫新增合作或開發中客戶</div>
+    <div class="flow-goto" style="background:#10b98118;color:#10b981">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#10b981">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/contract.html" class="flow-step" style="border-color:#10b98120;background:#10b98108">
+    <div class="flow-num" style="background:#10b981;color:#fff">3</div>
+    <div class="flow-icon">📄</div>
+    <div class="flow-title">建立合約</div>
+    <div class="flow-desc">有合約時上傳並建立合約摘要</div>
+    <div class="flow-goto" style="background:#10b98118;color:#10b981">前往 →</div>
+  </a>
+  
+</div></div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#10b981">⚡</span>
+      日常操作
+      <span class="section-sub">依頻率執行，點卡片直接跳轉填報</span>
+    </div>
+    <div class="routine-grid"><a href="forms/sales.html" class="r-card" style="border-left:4px solid #10b981">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🎯</span>
+    <span class="freq-badge" style="background:#10b98118;color:#10b981">每次更新</span>
+  </div>
+  <div class="r-title">銷售進度填報</div>
+  <div class="r-desc">填寫訂單金額、帳期、交貨日與回款</div>
+</a><a href="forms/followup.html" class="r-card" style="border-left:4px solid #6366f1">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">📋</span>
+    <span class="freq-badge" style="background:#6366f118;color:#6366f1">每次接觸</span>
+  </div>
+  <div class="r-title">客戶跟進記錄</div>
+  <div class="r-desc">記錄每次拜訪、通話或提案的結果</div>
+</a><a href="forms/approval.html" class="r-card" style="border-left:4px solid #ef4444">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🔔</span>
+    <span class="freq-badge" style="background:#ef444418;color:#ef4444">需要時</span>
+  </div>
+  <div class="r-title">審批申請</div>
+  <div class="r-desc">遇到需要管理層批准的事項時提交</div>
+</a><a href="forms/meeting.html" class="r-card" style="border-left:4px solid #0ea5e9">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">📋</span>
+    <span class="freq-badge" style="background:#0ea5e918;color:#0ea5e9">每次開會</span>
+  </div>
+  <div class="r-title">會議記錄</div>
+  <div class="r-desc">記錄重要會議議題與行動項目</div>
+</a></div>
+  </div>
+</div>
+<div id="panel-design" class="role-panel" style="display:none">
+  <div class="role-hero" style="background:linear-gradient(135deg,#ec489918 0%,#ec489908 100%);border-bottom:2px solid #ec489930">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:42px">🎨</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#0f172a">設計 / 創意</div>
+        <div style="font-size:13px;color:#64748b;margin-top:2px">木子 / 高維 / Bevis</div>
+        <div style="font-size:12px;color:#ec4899;font-weight:600;margin-top:4px">設計送審 · 進度追蹤 · 廠商管理</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#ec4899">①</span>
+      項目啟動流程
+      <span class="section-sub">首次建立項目時，按順序執行</span>
+    </div>
+    <div class="flow-row"><div class="flow-step-wrap">
+  <a href="forms/view_project.html" class="flow-step" style="border-color:#ec489920;background:#ec489908">
+    <div class="flow-num" style="background:#ec4899;color:#fff">1</div>
+    <div class="flow-icon">📋</div>
+    <div class="flow-title">確認項目已建立</div>
+    <div class="flow-desc">設計工作啟動前確認 Shawn 已建立項目</div>
+    <div class="flow-goto" style="background:#ec489918;color:#ec4899">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#ec4899">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/design.html" class="flow-step" style="border-color:#ec489920;background:#ec489908">
+    <div class="flow-num" style="background:#ec4899;color:#fff">2</div>
+    <div class="flow-icon">🎨</div>
+    <div class="flow-title">建立設計送審記錄</div>
+    <div class="flow-desc">每個送審階段各填一筆，附上設計稿圖片</div>
+    <div class="flow-goto" style="background:#ec489918;color:#ec4899">前往 →</div>
+  </a>
+  
+</div></div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#ec4899">⚡</span>
+      日常操作
+      <span class="section-sub">依頻率執行，點卡片直接跳轉填報</span>
+    </div>
+    <div class="routine-grid"><a href="forms/design.html" class="r-card" style="border-left:4px solid #ec4899">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🎨</span>
+    <span class="freq-badge" style="background:#ec489918;color:#ec4899">每個階段</span>
+  </div>
+  <div class="r-title">設計送審填報</div>
+  <div class="r-desc">更新每個送審階段的審核狀態與修改備註</div>
+</a><a href="forms/view_design.html" class="r-card" style="border-left:4px solid #64748b">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">👁</span>
+    <span class="freq-badge" style="background:#64748b18;color:#64748b">隨時</span>
+  </div>
+  <div class="r-title">查看設計進度</div>
+  <div class="r-desc">查看所有項目的送審記錄與附件</div>
+</a><a href="forms/design_vendor.html" class="r-card" style="border-left:4px solid #f59e0b">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🏭</span>
+    <span class="freq-badge" style="background:#f59e0b18;color:#f59e0b">首次合作</span>
+  </div>
+  <div class="r-title">設計廠商管理</div>
+  <div class="r-desc">新增首次合作的外包設計廠商</div>
+</a><a href="forms/meeting.html" class="r-card" style="border-left:4px solid #0ea5e9">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">📋</span>
+    <span class="freq-badge" style="background:#0ea5e918;color:#0ea5e9">每次開會</span>
+  </div>
+  <div class="r-title">會議記錄</div>
+  <div class="r-desc">記錄設計評審、修改決議</div>
+</a></div>
+  </div>
+</div>
+<div id="panel-warehouse" class="role-panel" style="display:none">
+  <div class="role-hero" style="background:linear-gradient(135deg,#f9731618 0%,#f9731608 100%);border-bottom:2px solid #f9731630">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:42px">📦</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#0f172a">倉庫 / 物流</div>
+        <div style="font-size:13px;color:#64748b;margin-top:2px">德寶 / 春雷</div>
+        <div style="font-size:12px;color:#f97316;font-weight:600;margin-top:4px">庫存更新 · 出入貨 · 採購填報</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#f97316">①</span>
+      項目啟動流程
+      <span class="section-sub">首次建立項目時，按順序執行</span>
+    </div>
+    <div class="flow-row"><div class="flow-step-wrap">
+  <a href="forms/view_project.html" class="flow-step" style="border-color:#f9731620;background:#f9731608">
+    <div class="flow-num" style="background:#f97316;color:#fff">1</div>
+    <div class="flow-icon">📋</div>
+    <div class="flow-title">確認項目已建立</div>
+    <div class="flow-desc">倉庫操作前確認項目存在，才能正確關聯</div>
+    <div class="flow-goto" style="background:#f9731618;color:#f97316">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#f97316">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/view_supplier.html" class="flow-step" style="border-color:#f9731620;background:#f9731608">
+    <div class="flow-num" style="background:#f97316;color:#fff">2</div>
+    <div class="flow-icon">🏭</div>
+    <div class="flow-title">確認供應商已核准</div>
+    <div class="flow-desc">費用/採購時需先確認供應商已通過審核</div>
+    <div class="flow-goto" style="background:#f9731618;color:#f97316">前往 →</div>
+  </a>
+  
+</div></div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#f97316">⚡</span>
+      日常操作
+      <span class="section-sub">依頻率執行，點卡片直接跳轉填報</span>
+    </div>
+    <div class="routine-grid"><a href="forms/stock.html" class="r-card" style="border-left:4px solid #f97316">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">📦</span>
+    <span class="freq-badge" style="background:#f9731618;color:#f97316">每次異動</span>
+  </div>
+  <div class="r-title">庫存 / 物流填報</div>
+  <div class="r-desc">每次收貨、出貨、盤點後更新庫存狀態</div>
+</a><a href="forms/procure.html" class="r-card" style="border-left:4px solid #f97316">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🛒</span>
+    <span class="freq-badge" style="background:#f9731618;color:#f97316">每次採購</span>
+  </div>
+  <div class="r-title">採購詢比價</div>
+  <div class="r-desc">填寫供應商報價比較與議定結果</div>
+</a><a href="forms/view_stock.html" class="r-card" style="border-left:4px solid #64748b">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">👁</span>
+    <span class="freq-badge" style="background:#64748b18;color:#64748b">隨時</span>
+  </div>
+  <div class="r-title">查看庫存狀況</div>
+  <div class="r-desc">查看各倉庫現有庫存與物流追蹤</div>
+</a><a href="forms/expense.html" class="r-card" style="border-left:4px solid #8b5cf6">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🧾</span>
+    <span class="freq-badge" style="background:#8b5cf618;color:#8b5cf6">有費用時</span>
+  </div>
+  <div class="r-title">費用申請</div>
+  <div class="r-desc">倉庫相關費用（倉租、物流費）申請</div>
+</a></div>
+  </div>
+</div>
+<div id="panel-finance" class="role-panel" style="display:none">
+  <div class="role-hero" style="background:linear-gradient(135deg,#8b5cf618 0%,#8b5cf608 100%);border-bottom:2px solid #8b5cf630">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:42px">💰</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#0f172a">財務</div>
+        <div style="font-size:13px;color:#64748b;margin-top:2px">楊子</div>
+        <div style="font-size:12px;color:#8b5cf6;font-weight:600;margin-top:4px">費用申請 · 現金流 · 預算總覽</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#8b5cf6">①</span>
+      項目啟動流程
+      <span class="section-sub">首次建立項目時，按順序執行</span>
+    </div>
+    <div class="flow-row"><div class="flow-step-wrap">
+  <a href="forms/view_budget_summary.html" class="flow-step" style="border-color:#8b5cf620;background:#8b5cf608">
+    <div class="flow-num" style="background:#8b5cf6;color:#fff">1</div>
+    <div class="flow-icon">📋</div>
+    <div class="flow-title">確認預算已建立</div>
+    <div class="flow-desc">查看各項目預算是否已由 Shawn 編列完成</div>
+    <div class="flow-goto" style="background:#8b5cf618;color:#8b5cf6">前往 →</div>
+  </a>
+  
+</div></div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#8b5cf6">⚡</span>
+      日常操作
+      <span class="section-sub">依頻率執行，點卡片直接跳轉填報</span>
+    </div>
+    <div class="routine-grid"><a href="forms/cashflow.html" class="r-card" style="border-left:4px solid #10b981">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">💰</span>
+    <span class="freq-badge" style="background:#10b98118;color:#10b981">每月底</span>
+  </div>
+  <div class="r-title">現金流填報</div>
+  <div class="r-desc">填寫辦公室本期收支與帳戶餘額</div>
+</a><a href="forms/view_budget_summary.html" class="r-card" style="border-left:4px solid #8b5cf6">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">💰</span>
+    <span class="freq-badge" style="background:#8b5cf618;color:#8b5cf6">每週</span>
+  </div>
+  <div class="r-title">預算執行總覽</div>
+  <div class="r-desc">查看各項目預算使用率，追蹤超支風險</div>
+</a><a href="forms/expense.html" class="r-card" style="border-left:4px solid #f97316">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🧾</span>
+    <span class="freq-badge" style="background:#f9731618;color:#f97316">有費用時</span>
+  </div>
+  <div class="r-title">費用申請</div>
+  <div class="r-desc">申請各項支出費用，系統自動對照預算</div>
+</a><a href="forms/view_supplier.html" class="r-card" style="border-left:4px solid #ef4444">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🔔</span>
+    <span class="freq-badge" style="background:#ef444418;color:#ef4444">有申請時</span>
+  </div>
+  <div class="r-title">供應商審核</div>
+  <div class="r-desc">協助審核新增供應商申請</div>
+</a></div>
+  </div>
+</div>
+<div id="panel-all" class="role-panel" style="display:none">
+  <div class="role-hero" style="background:linear-gradient(135deg,#64748b18 0%,#64748b08 100%);border-bottom:2px solid #64748b30">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:42px">🌐</div>
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#0f172a">所有人</div>
+        <div style="font-size:13px;color:#64748b;margin-top:2px">全體同仁</div>
+        <div style="font-size:12px;color:#64748b;font-weight:600;margin-top:4px">費用申請 · 審批 · 會議記錄</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#64748b">①</span>
+      項目啟動流程
+      <span class="section-sub">首次建立項目時，按順序執行</span>
+    </div>
+    <div class="flow-row"><div class="flow-step-wrap">
+  <a href="login.html" class="flow-step" style="border-color:#64748b20;background:#64748b08">
+    <div class="flow-num" style="background:#64748b;color:#fff">1</div>
+    <div class="flow-icon">🔑</div>
+    <div class="flow-title">登入系統</div>
+    <div class="flow-desc">使用公司分配的帳號登入</div>
+    <div class="flow-goto" style="background:#64748b18;color:#64748b">前往 →</div>
+  </a>
+  <div class="flow-arrow" style="color:#64748b">→</div>
+</div><div class="flow-step-wrap">
+  <a href="forms/index.html" class="flow-step" style="border-color:#64748b20;background:#64748b08">
+    <div class="flow-num" style="background:#64748b;color:#fff">2</div>
+    <div class="flow-icon">📝</div>
+    <div class="flow-title">進入填報中心</div>
+    <div class="flow-desc">選擇對應項目後再進行填報</div>
+    <div class="flow-goto" style="background:#64748b18;color:#64748b">前往 →</div>
+  </a>
+  
+</div></div>
+  </div>
+  <div class="section-block">
+    <div class="section-title">
+      <span class="section-num" style="background:#64748b">⚡</span>
+      日常操作
+      <span class="section-sub">依頻率執行，點卡片直接跳轉填報</span>
+    </div>
+    <div class="routine-grid"><a href="forms/expense.html" class="r-card" style="border-left:4px solid #f97316">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🧾</span>
+    <span class="freq-badge" style="background:#f9731618;color:#f97316">有費用時</span>
+  </div>
+  <div class="r-title">費用申請</div>
+  <div class="r-desc">申請任何與項目相關的費用支出</div>
+</a><a href="forms/approval.html" class="r-card" style="border-left:4px solid #ef4444">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">🔔</span>
+    <span class="freq-badge" style="background:#ef444418;color:#ef4444">需要時</span>
+  </div>
+  <div class="r-title">審批申請</div>
+  <div class="r-desc">提交需要管理層批准的事項</div>
+</a><a href="forms/meeting.html" class="r-card" style="border-left:4px solid #0ea5e9">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">📋</span>
+    <span class="freq-badge" style="background:#0ea5e918;color:#0ea5e9">每次開會</span>
+  </div>
+  <div class="r-title">會議記錄</div>
+  <div class="r-desc">記錄議題、決議事項、行動項目</div>
+</a><a href="forms/feedback.html" class="r-card" style="border-left:4px solid #64748b">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+    <span style="font-size:22px">💬</span>
+    <span class="freq-badge" style="background:#64748b18;color:#64748b">隨時</span>
+  </div>
+  <div class="r-title">使用回報</div>
+  <div class="r-desc">遇到問題或有建議時填寫</div>
+</a></div>
+  </div>
+</div>
+<script>
+function switchRole(rid){
+  document.querySelectorAll(".role-panel").forEach(p=>p.style.display="none");
+  document.querySelectorAll(".role-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("panel-"+rid).style.display="block";
+  document.querySelector('[data-role="'+rid+'"]').classList.add("active");
+}
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){location.replace("login.html");return;}
+  // 根據登入者自動跳到對應 tab
+  const nm=s.name||"";
+  if(nm==="Shawn")switchRole("shawn");
+  else if(["楊子"].includes(nm))switchRole("finance");
+  else if(["木子","高維","Bevis"].includes(nm))switchRole("design");
+  else if(["德寶","春雷"].includes(nm))switchRole("warehouse");
+  else if(["Ray","賴哥","安然"].includes(nm))switchRole("sales");
+})();
+</script>
+</body></html>
