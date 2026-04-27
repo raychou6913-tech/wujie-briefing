@@ -178,6 +178,13 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <div><div style="font-size:14px;font-weight:700;color:#0f172a">預算編列</div>
             <div style="font-size:12px;color:#64748b;margin-top:2px">為項目逐條建立預算（含稅）</div></div>
           </div>
+        </a><a href="view_budget_summary.html"
+          class="pcard" style="border-left:4px solid #8b5cf6">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">📊</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">查看預算總覽</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">查看所有項目預算執行率與明細</div></div>
+          </div>
         </a><a href="supplier.html"
           class="pcard" style="border-left:4px solid #f97316">
           <div style="display:flex;align-items:center;gap:10px">
@@ -292,8 +299,10 @@ async function _loadProjects(){
     });
     const db=await rb.json();
     (db.data?.items||[]).forEach(item=>{
-      const pn=item.fields?.["項目關聯"];
-      const n=Array.isArray(pn)?pn[0]?.text||"":String(pn||"");
+      const rawNote=item.fields?.["備註"];
+      const note=Array.isArray(rawNote)?rawNote.map(x=>typeof x==="object"?x.text||"":String(x)).join(""):String(rawNote||"");
+      const m=note.match(/^\[([^\]]+)\]/);
+      const n=m?m[1]:"";
       if(n) _budgetCache[n]=(_budgetCache[n]||0)+1;
     });
     items.forEach(item=>{
