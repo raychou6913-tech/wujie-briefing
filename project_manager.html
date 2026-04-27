@@ -42,11 +42,6 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .prog-row{display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:4px}
 .prog-bar{background:#f1f5f9;border-radius:4px;height:8px}
 .prog-fill{height:8px;border-radius:4px;transition:width .4s}
-/* ── financials ── */
-.proj-fin{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 20px 16px}
-.fin-cell{background:#f8fafc;border-radius:8px;padding:10px;text-align:center;border:1px solid #f1f5f9}
-.fin-label{font-size:10px;color:#94a3b8;margin-bottom:2px}
-.fin-val{font-size:14px;font-weight:700}
 /* ── subtasks ── */
 .subtasks{border-top:1px solid #e2e8f0;display:none}
 .subtasks.open{display:block}
@@ -76,7 +71,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .toast{position:fixed;bottom:24px;right:24px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 20px;font-size:13px;color:#0f172a;z-index:999;display:none;animation:fadeIn .2s;box-shadow:0 4px 20px #00000015}
 .toast.show{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media(max-width:600px){.row2{grid-template-columns:1fr}.proj-fin{grid-template-columns:1fr 1fr 1fr}.proj-header{grid-template-columns:1fr auto}}
+@media(max-width:600px){.row2{grid-template-columns:1fr}.proj-header{grid-template-columns:1fr auto}}
 </style>
 </head>
 <body>
@@ -265,8 +260,10 @@ function renderCard(p){
   const status=fv(p,"狀態","計劃中");
   const stage=fv(p,"當前關卡","—");
   const stageIdx=STAGE_IDX[stage]??-1;
-  const stageTotal=STAGES.length-2;
-  const stagePct=stageIdx>=0&&stageIdx<stageTotal?Math.round((stageIdx+1)/stageTotal*100):0;
+  const stageTotal=STAGES.length-2;  // 排除「已完成」「已暫停」
+  const isFinished=stage==="已完成"||stage==="已暫停";
+  const stagePct=isFinished?100:stageIdx>=0?Math.round((stageIdx+1)/stageTotal*100):0;
+  const stageLabel=isFinished?stage:(stageIdx>=0?`第 ${stageIdx+1} 關 / ${stageTotal} 關`:"未設定");
   const cur=fv(p,"幣別","");
   const owner=fv(p,"負責人","—");
   const loc=fv(p,"所在地","—");
@@ -293,7 +290,7 @@ function renderCard(p){
       </div>
     </div>
     <div class="proj-progress">
-      <div class="prog-row"><span>流程進度</span><span style="color:#6366f1;font-weight:600">第 ${stageIdx+1} 關 / ${stageTotal} 關</span></div>
+      <div class="prog-row"><span>流程進度</span><span style="color:#6366f1;font-weight:600">${stageLabel}</span></div>
       <div class="prog-bar"><div class="prog-fill" style="width:${stagePct}%;background:#6366f1"></div></div>
     </div>
     <div class="subtasks" id="sub-${id}">
