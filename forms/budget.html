@@ -281,11 +281,14 @@ async function _getContracts(ipFilter){
     _contractCache=(d.data?.items||[]).map(rec=>{
       const f=rec.fields||{};
       const _t=v=>Array.isArray(v)?v[0]?.text||"":String(v||"");
+      const _n=v=>{const r=parseFloat(_t(v));return isNaN(r)?0:r;};
       const name=_t(f["合約名稱"]);
       if(!name) return null;
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["版權方"]),
-        status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"])
+        status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
+        amount:_n(f["合約金額"]), cur:_t(f["幣別"])||"TWD",
+        startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
       };
     }).filter(Boolean);
   }
@@ -305,6 +308,8 @@ async function _loadContractSelect(selectId,ipFilter){
       o.value=c.name; o.textContent=c.name+statusLabel;
       o.dataset.ip=c.ip; o.dataset.licensor=c.licensor;
       o.dataset.status=c.status; o.dataset.cats=c.cats; o.dataset.region=c.region;
+      o.dataset.amount=c.amount||0; o.dataset.cur=c.cur||"TWD";
+      o.dataset.startTs=c.startTs||""; o.dataset.endTs=c.endTs||"";
       sel.appendChild(o);
     });
     if(list.length===0){

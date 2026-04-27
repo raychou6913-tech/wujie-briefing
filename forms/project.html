@@ -57,29 +57,36 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div class="card">
       <div class="ctitle">📋 基本資訊</div>
       <div class="f"><label>項目名稱 <span class="req">*</span></label>
-        <input id="m-name" required placeholder="例：Chiikawa 台灣批發 Q2">
+        <input id="m-name" required placeholder="例：加菲貓公仔 台灣批發 Q2">
         <div class="hint">其他部門填報時會用此名稱關聯，請填清楚</div></div>
       <div class="row2">
-        <div class="f"><label>IP 品牌</label>
-          <input id="m-ip" list="ip-brand-list" placeholder="例：Chiikawa、Snoopy、Mofusand（可自由填寫）">
-          <datalist id="ip-brand-list">
-            <option value="Snoopy"><option value="Mofusand"><option value="Chiikawa">
-            <option value="Labubu"><option value="Fuggler"><option value="EVE點點">
-          </datalist></div>
+        <div class="f"><label>IP 品牌 <span class="req">*</span></label>
+          <select id="m-ip" required><option value="">載入中…</option></select></div>
+        <div class="f"><label>依附合約 <span style="font-size:10px;color:#94a3b8">（選 IP 後載入）</span></label>
+          <select id="m-contract"><option value="">— 先選 IP 品牌 —</option></select>
+          <span id="contract-status-badge" style="display:none;margin-top:4px;font-size:11px;padding:2px 10px;border-radius:12px;font-weight:700"></span>
+        </div>
+      </div>
+      <!-- Gate：上游資料缺失時顯示 -->
+      <div id="m-gate" style="display:none;background:#fff7ed;border:1.5px solid #f59e0b;border-radius:10px;padding:14px 16px;margin:8px 0">
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px" id="m-gate-title"></div>
+        <div style="font-size:12px;color:#78350f;margin-bottom:10px" id="m-gate-msg"></div>
+        <a id="m-gate-link" href="#" target="_blank"
+          style="display:inline-block;background:#f59e0b;color:#fff;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;text-decoration:none">前往補齊 →</a>
+      </div>
+      <div class="row2">
         <div class="f"><label>業務類型</label>
           <select id="m-type" onchange="toggleBatchFields(this.value)">
             <option>批發</option><option>快閃店</option><option>代工</option>
             <option>設計服務</option><option>授權</option><option>其他</option>
           </select></div>
-      </div>
-      <div class="row2">
         <div class="f"><label>所在地</label>
           <select id="m-loc">
             <option>台北</option><option>北京</option><option>曼谷</option><option>跨地區</option>
           </select></div>
-        <div class="f"><label>版權對接人</label>
-          <input id="m-owner" placeholder="負責與版權方溝通的同事" list="team-list"></div>
       </div>
+      <div class="f"><label>版權對接人</label>
+        <input id="m-owner" placeholder="負責與版權方溝通的同事" list="team-list"></div>
     </div>
 
     <!-- 批發/代工專屬：產品類別 -->
@@ -144,27 +151,25 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <input type="number" id="m-sponsor" placeholder="商場/品牌贊助金額（無則填 0）"></div>
     </div>
 
-    <!-- IP 授權資訊 -->
+    <!-- IP 授權資訊（選合約後自動帶入，可手動修改） -->
     <div class="card">
-      <div class="ctitle">📜 IP 授權資訊</div>
+      <div class="ctitle">📜 IP 授權資訊 <span style="font-size:10px;font-weight:400;color:#94a3b8;text-transform:none">選合約後自動帶入，可手動調整</span></div>
       <div class="row2">
         <div class="f"><label>版權方</label>
-          <input id="m-licensor" placeholder="例：Peanuts Worldwide" list="licensor-list"></div>
-        <div class="f"><label>簽約狀態</label>
-          <select id="m-sign">
-            <option>洽談中</option><option>已簽署</option><option>待續約/待轉讓</option>
-            <option>已到期</option><option>已終止</option>
-          </select></div>
+          <input id="m-licensor" placeholder="選合約後自動帶入" list="licensor-list"></div>
+        <div class="f"><label>合約狀態</label>
+          <input id="m-sign" placeholder="選合約後自動帶入" readonly
+            style="background:#f1f5f9;color:#64748b;cursor:default"></div>
       </div>
       <div class="f"><label>授權地區範圍</label>
-        <input id="m-territory" placeholder="例：台灣、香港、澳門；或 全球"></div>
+        <input id="m-territory" placeholder="選合約後自動帶入"></div>
       <div class="row2">
         <div class="f"><label>授權開始日</label><input type="date" id="m-lic-start"></div>
         <div class="f"><label>授權結束日</label><input type="date" id="m-lic-end"></div>
       </div>
       <div class="row2">
         <div class="f"><label>保底金額</label>
-          <input type="number" id="m-mg" placeholder="0"></div>
+          <input type="number" id="m-mg" placeholder="選合約後自動帶入"></div>
         <div class="f"><label>幣別</label>
           <select id="m-cur"><option>TWD</option><option>CNY</option><option>USD</option><option>THB</option></select></div>
       </div>
@@ -337,11 +342,14 @@ async function _getContracts(ipFilter){
     _contractCache=(d.data?.items||[]).map(rec=>{
       const f=rec.fields||{};
       const _t=v=>Array.isArray(v)?v[0]?.text||"":String(v||"");
+      const _n=v=>{const r=parseFloat(_t(v));return isNaN(r)?0:r;};
       const name=_t(f["合約名稱"]);
       if(!name) return null;
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["版權方"]),
-        status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"])
+        status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
+        amount:_n(f["合約金額"]), cur:_t(f["幣別"])||"TWD",
+        startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
       };
     }).filter(Boolean);
   }
@@ -361,6 +369,8 @@ async function _loadContractSelect(selectId,ipFilter){
       o.value=c.name; o.textContent=c.name+statusLabel;
       o.dataset.ip=c.ip; o.dataset.licensor=c.licensor;
       o.dataset.status=c.status; o.dataset.cats=c.cats; o.dataset.region=c.region;
+      o.dataset.amount=c.amount||0; o.dataset.cur=c.cur||"TWD";
+      o.dataset.startTs=c.startTs||""; o.dataset.endTs=c.endTs||"";
       sel.appendChild(o);
     });
     if(list.length===0){
@@ -521,6 +531,84 @@ if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
   }
 })();
 
+// ── Gate & cascade ───────────────────────────────────────────
+function _setGate(show,title,msg,link){
+  const g=document.getElementById("m-gate");
+  const btn=document.getElementById("sbtn");
+  g.style.display=show?"block":"none";
+  if(show){
+    document.getElementById("m-gate-title").textContent=title;
+    document.getElementById("m-gate-msg").textContent=msg;
+    document.getElementById("m-gate-link").href=link;
+    if(btn) btn.disabled=true;
+  } else { if(btn) btn.disabled=false; }
+}
+function _tsToDate(ts){if(!ts||ts==="0")return"";return new Date(Number(ts)).toISOString().slice(0,10);}
+async function _loadContracts(ipName){
+  const sel=document.getElementById("m-contract");
+  const badge=document.getElementById("contract-status-badge");
+  sel.innerHTML="<option value=''>載入中…</option>";
+  if(!ipName){sel.innerHTML="<option value=''>— 先選 IP 品牌 —</option>";badge.style.display="none";return;}
+  const all=await _getContracts(null);
+  const list=all.filter(c=>c.ip===ipName);
+  if(list.length===0){
+    sel.innerHTML="<option value=''>（此 IP 尚無合約）</option>";
+    badge.style.display="none";
+    _setGate(true,"⚠️ 需要先建立合約",
+      "「"+ipName+"」目前沒有任何合約記錄。請先在合約管理中建立對應合約（任何狀態皆可），才能建立項目。",
+      "contract.html"); return;
+  }
+  _setGate(false);
+  sel.innerHTML="<option value=''>— 選擇依附合約 —</option>";
+  list.forEach(c=>{
+    const o=document.createElement("option");
+    o.value=c.name; o.textContent=c.name+(c.status?" ["+c.status+"]":"");
+    Object.assign(o.dataset,{licensor:c.licensor,status:c.status,region:c.region,
+      amount:c.amount,cur:c.cur,startTs:c.startTs,endTs:c.endTs});
+    sel.appendChild(o);
+  });
+  const _sync=()=>{
+    const ch=sel.options[sel.selectedIndex];
+    if(!ch?.value){badge.style.display="none";return;}
+    const s=ch.dataset.status||"";
+    const safe=["已簽署","執行中"];
+    badge.style.display="inline-block"; badge.textContent=s;
+    badge.style.cssText="display:inline-block;margin-top:4px;font-size:11px;padding:2px 10px;border-radius:12px;font-weight:700;"+
+      (safe.includes(s)?"background:#f0fdf4;color:#166534;border:1px solid #10b981":"background:#fff7ed;color:#92400e;border:1px solid #f59e0b");
+    // auto-fill IP授權資訊 from contract
+    const _sv=(id,v)=>{const el=document.getElementById(id);if(el&&v)el.value=v;};
+    _sv("m-licensor",ch.dataset.licensor);
+    document.getElementById("m-sign").value=s||"";
+    _sv("m-territory",ch.dataset.region);
+    _sv("m-lic-start",_tsToDate(ch.dataset.startTs));
+    _sv("m-lic-end",_tsToDate(ch.dataset.endTs));
+    if(ch.dataset.amount&&ch.dataset.amount!=="0") _sv("m-mg",ch.dataset.amount);
+    const curSel=document.getElementById("m-cur");
+    if(curSel&&ch.dataset.cur)[...curSel.options].forEach(o=>{if(o.value===ch.dataset.cur)o.selected=true;});
+  };
+  sel.onchange=_sync; _sync();
+}
+(async()=>{
+  const brands=await _getIpBrands();
+  const sel=document.getElementById("m-ip");
+  if(brands.length===0){
+    sel.innerHTML="<option value=''>（版權方資料庫尚無資料）</option>";
+    _setGate(true,"⚠️ 需要先建立版權方資料",
+      "版權方資料庫目前是空的。請先新增 IP 資料，才能建立項目。",
+      "ip_db.html"); return;
+  }
+  sel.innerHTML="<option value=''>— 選擇 IP 品牌 —</option>";
+  brands.forEach(ip=>{
+    const o=document.createElement("option");
+    o.value=ip.name; o.textContent=ip.name; sel.appendChild(o);
+  });
+  sel.onchange=()=>_loadContracts(sel.value);
+  // 若 URL 有 ip 參數，自動選入
+  const urlIp=new URLSearchParams(location.search).get("ip");
+  if(urlIp){sel.value=urlIp;}
+  _loadContracts(sel.value);
+})();
+
 function toggleSpec(){
   const has=document.querySelector('.pcat[value="公仔"]:checked')||
              document.querySelector('.pcat[value="絨毛玩偶"]:checked');
@@ -549,10 +637,15 @@ document.getElementById("frm").onsubmit=async(e)=>{
   btn.disabled=true; btn.textContent="提交中...";
   res.style.display="none";
   try{
+    const ipVal=document.getElementById("m-ip").value;
+    const contractVal=document.getElementById("m-contract").value;
+    if(!ipVal){res.className="result err";res.style.display="block";document.getElementById("res-icon").textContent="⚠️";document.getElementById("res-msg").textContent="請先選擇 IP 品牌";btn.disabled=false;btn.textContent="提交";return;}
+    if(!contractVal){res.className="result err";res.style.display="block";document.getElementById("res-icon").textContent="⚠️";document.getElementById("res-msg").textContent="請選擇依附的合約";document.getElementById("res-sub").textContent="若此 IP 尚無合約，請先至「合約管理」建立一筆";btn.disabled=false;btn.textContent="提交";return;}
     const cats=[...document.querySelectorAll(".pcat:checked")].map(x=>x.value);
     const fields={
       "項目名稱":    document.getElementById("m-name").value,
-      "IP品牌":      document.getElementById("m-ip").value,
+      "合約名稱":    contractVal,
+      "IP品牌":      ipVal,
       "業務類型":    document.getElementById("m-type").value,
       "所在地":      document.getElementById("m-loc").value,
       "版權對接人":  document.getElementById("m-owner").value,
