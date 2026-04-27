@@ -344,10 +344,12 @@ async function _loadIpSelect(selectId){
     other.value="__new_ip__"; other.textContent="＋ 新增 IP / 版權方資訊";
     other.style.cssText="color:#6366f1;font-weight:700";
     sel.appendChild(other);
-    // re-apply IP from linked project select if already chosen
+    // re-apply IP from linked project select, URL param, or previous value
     const projSel=document.getElementById("f-proj");
     const projIp=projSel?.options[projSel.selectedIndex]?.dataset?.ip;
+    const urlIp=new URLSearchParams(location.search).get("ip");
     if(projIp) sel.value=projIp;
+    else if(urlIp) sel.value=urlIp;
     else if(prev) sel.value=prev;
     const _syncLicensor=()=>{
       if(sel.value==="__new_ip__"){
@@ -589,6 +591,30 @@ if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
       if(sel.value==="__manual__"||!sel.value){inp.value="";inp.focus();}
       else inp.value=sel.value;
     };
+    // ── URL ?licensor= 自動帶入版權方、對方公司、IP ──
+    const urlLicensor=new URLSearchParams(location.search).get("licensor");
+    if(urlLicensor){
+      // 填入版權方欄位
+      const licEl=document.getElementById("f-licensor");
+      if(licEl) licEl.value=urlLicensor;
+      // 填入對方公司
+      if(names.includes(urlLicensor)){
+        sel.value=urlLicensor;
+        document.getElementById("f-party").value=urlLicensor;
+      } else {
+        document.getElementById("f-party").value=urlLicensor;
+      }
+      // 嘗試比對 IP 品牌（cascadeLicensor 匹配）
+      const matched=brands.find(b=>b.cascadeLicensor===urlLicensor||b.licensor===urlLicensor||b.agent===urlLicensor);
+      if(matched){
+        const ipSel=document.getElementById("f-ip");
+        if(ipSel){
+          // 等 _loadIpSelect 非同步完成後再 set value
+          const _trySetIp=()=>{ if(ipSel.querySelector('option[value="'+matched.name+'"]')) ipSel.value=matched.name; };
+          _trySetIp(); setTimeout(_trySetIp,800);
+        }
+      }
+    }
   })();
 })();
 

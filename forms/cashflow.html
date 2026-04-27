@@ -257,10 +257,12 @@ async function _loadIpSelect(selectId){
     other.value="__new_ip__"; other.textContent="＋ 新增 IP / 版權方資訊";
     other.style.cssText="color:#6366f1;font-weight:700";
     sel.appendChild(other);
-    // re-apply IP from linked project select if already chosen
+    // re-apply IP from linked project select, URL param, or previous value
     const projSel=document.getElementById("f-proj");
     const projIp=projSel?.options[projSel.selectedIndex]?.dataset?.ip;
+    const urlIp=new URLSearchParams(location.search).get("ip");
     if(projIp) sel.value=projIp;
+    else if(urlIp) sel.value=urlIp;
     else if(prev) sel.value=prev;
     const _syncLicensor=()=>{
       if(sel.value==="__new_ip__"){
