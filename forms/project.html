@@ -140,7 +140,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <input type="hidden" id="m-cur" value="TWD">
 
     <!-- 批發/代工專屬資訊 -->
-    <div class="card" id="batch-card">
+    <div class="card" id="batch-card" style="display:none">
       <div class="ctitle">📦 批發／代工補充資訊</div>
       <div class="f">
         <label>規格 / 尺寸說明</label>
@@ -571,12 +571,18 @@ function _setGate2(show,title,msg,link){
 function _tsToDate(ts){if(!ts||ts==="0")return"";return new Date(Number(ts)).toISOString().slice(0,10);}
 
 // ── Step 3: 授權品類 chips ────────────────────────────────────
+function _initStep4Type(){
+  const typeEl=document.getElementById("m-type");
+  if(_isPopup&&typeEl) typeEl.value="快閃店";
+  toggleBatchFields(typeEl?.value||"批發");
+}
 function _buildCatsChips(catsStr){
   const wrap=document.getElementById("cats-chips");
   wrap.innerHTML="";
   if(!catsStr){
     wrap.innerHTML="<span style='font-size:12px;color:#94a3b8'>（此合約未填寫授權品類，請手動填寫）</span>";
     document.getElementById("step4-card").style.display="block";
+    _initStep4Type();
     return;
   }
   const items=catsStr.split(/[,，、]+/).map(s=>s.trim()).filter(Boolean);
@@ -592,8 +598,9 @@ function _buildCatsChips(catsStr){
       btn.style.background=active?"#6366f1":"#f8fafc";
       btn.style.color=active?"#fff":"inherit";
       btn.style.borderColor=active?"#6366f1":"#e2e8f0";
-      document.getElementById("step4-card").style.display=
-        document.querySelectorAll("#cats-chips .chip-active").length>0?"block":"none";
+      const anyActive=document.querySelectorAll("#cats-chips .chip-active").length>0;
+      document.getElementById("step4-card").style.display=anyActive?"block":"none";
+      if(anyActive) _initStep4Type();
     };
     wrap.appendChild(btn);
   });
@@ -700,11 +707,7 @@ function toggleInvestFields(v){
   document.getElementById("invest-detail").style.display=v==="合資"?"block":"none";
   document.getElementById("agency-detail").style.display=v==="代運營"?"block":"none";
 }
-toggleBatchFields("批發");
-if(_isPopup){
-  document.getElementById("m-type").value="快閃店";
-  toggleBatchFields("快閃店");
-}
+// batch/popup cards only show after step4 becomes visible (triggered from _buildCatsChips / chip onclick)
 
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
