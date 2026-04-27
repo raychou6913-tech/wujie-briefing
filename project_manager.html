@@ -534,8 +534,12 @@ async function populateLicensorSelect(selectedLicensor="", selectedContract=""){
   licensors.forEach(l=>{
     const o=document.createElement("option"); o.value=l; o.textContent=l; sel.appendChild(o);
   });
+  const addOpt=document.createElement("option");
+  addOpt.value="__new_licensor__"; addOpt.textContent="＋ 新增版權方（跳轉）";
+  sel.appendChild(addOpt);
   if(selectedLicensor) sel.value=selectedLicensor;
   sel.onchange=()=>{
+    if(sel.value==="__new_licensor__"){window.open("forms/ip_db.html","_blank");sel.selectedIndex=0;return;}
     const step2=document.getElementById("m-step2");
     step2.style.display=sel.value?"block":"none";
     _setGate2(false);
