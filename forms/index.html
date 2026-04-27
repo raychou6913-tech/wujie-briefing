@@ -5,14 +5,34 @@
 <title>蕪解填報中心</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:40px}
-.hdr{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 1px 4px #0000000a}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:60px}
+.hdr{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 1px 4px #0000000a;position:sticky;top:0;z-index:10}
 .hdr-title{font-size:18px;font-weight:700;color:#0f172a}
-.hdr-nav{display:flex;align-items:center;gap:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;padding:24px}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;text-decoration:none;display:block;transition:transform .15s,box-shadow .15s;box-shadow:0 1px 4px #0000000a}
-.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px #00000012}
-.sec-label{padding:20px 24px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+/* 項目選擇區 */
+.proj-zone{margin:20px 20px 0;background:#fff;border-radius:16px;border:2px solid #6366f1;padding:20px;box-shadow:0 2px 12px #6366f110}
+.proj-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#6366f1;margin-bottom:8px}
+.proj-sel{width:100%;padding:11px 14px;border:1.5px solid #c7d2fe;border-radius:10px;font-size:15px;background:#f8f7ff;color:#0f172a;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236366f1' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.proj-sel:focus{border-color:#6366f1}
+.budget-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;background:#f1f5f9;color:#64748b}
+.budget-badge.ok{background:#f0fdf4;color:#16a34a}
+.budget-badge.warn{background:#fef9c3;color:#92400e}
+/* 動作卡片 */
+.sec{padding:16px 20px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8}
+.sec.blue{color:#6366f1}
+.sec.orange{color:#f97316}
+.sec.gray{color:#94a3b8}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;padding:8px 20px}
+.pcard{background:#fff;border-radius:12px;padding:14px 16px;text-decoration:none;display:block;transition:transform .12s,box-shadow .12s;box-shadow:0 1px 4px #0000000a}
+.pcard:hover:not([style*="pointer-events:none"]){transform:translateY(-2px);box-shadow:0 6px 20px #00000012}
+/* 摺疊區 */
+.collapse-hdr{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#fff8;border-radius:12px;margin:8px 20px 0;border:1px solid #e2e8f0;font-size:13px;font-weight:700;color:#64748b;user-select:none}
+.collapse-hdr:hover{background:#f8fafc}
+.collapse-body{display:none}
+.collapse-body.open{display:block}
+/* 未選項目提示 */
+.no-proj-hint{margin:12px 20px;padding:12px 16px;background:#f8f7ff;border-radius:10px;border:1px dashed #c7d2fe;font-size:13px;color:#6366f1;display:flex;align-items:center;gap:8px}
+/* 管理員區隱藏 */
+.admin-zone{display:none}
 </style>
 </head>
 <body>
@@ -21,154 +41,320 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <a href="../home.html" style="font-size:13px;color:#64748b;text-decoration:none">← 首頁</a>
     <span class="hdr-title">📝 填報中心</span>
   </div>
-  <div class="hdr-nav">
+  <div style="display:flex;align-items:center;gap:12px">
     <span style="font-size:13px;color:#64748b">你好，<span id="user-name" style="color:#6366f1;font-weight:700"></span></span>
     <button style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline" onclick="doLogout()">登出</button>
   </div>
 </div>
-<div class="sec-label" style="color:#94a3b8">批發 / ODM / OEM 業務</div>
-<div class="grid"><a href="project.html" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">📋</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增項目</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立新項目，填入 IP、業務類型、授權資訊（Shawn 負責）</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">Shawn</div>
-            </a><a href="project_request.html" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">📝</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">申請新增項目</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">向 Shawn 提交新項目申請，審核後由 Shawn 建立</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
-            </a><a href="product.html" class="card" style="border-top:3px solid #06b6d4">
-              <div style="font-size:28px;margin-bottom:10px">🏷️</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增產品明細</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">選擇項目後建立個別產品，追蹤開發與銷售</div>
-              <div style="font-size:11px;background:#06b6d418;color:#06b6d4;padding:3px 8px;border-radius:6px;display:inline-block">開發 / 業務</div>
-            </a><a href="budget.html" class="card" style="border-top:3px solid #8b5cf6">
-              <div style="font-size:28px;margin-bottom:10px">💵</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">預算編列</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">選擇項目後逐條建立預算（Shawn 負責）</div>
-              <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">Shawn</div>
-            </a><a href="expense.html" class="card" style="border-top:3px solid #f97316">
-              <div style="font-size:28px;margin-bottom:10px">🧾</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">費用申請</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">依項目申請費用，自動對照預算金額（含稅）</div>
-              <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
-            </a><a href="cashflow.html" class="card" style="border-top:3px solid #10b981">
-              <div style="font-size:28px;margin-bottom:10px">💰</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">現金流填報</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫辦公室本期收支與餘額</div>
-              <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block">財務 / 各辦公室負責人</div>
-            </a><a href="sales.html" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">🎯</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">銷售進度填報</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫訂單狀態、金額、帳期</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / BD</div>
-            </a><a href="stock.html" class="card" style="border-top:3px solid #f59e0b">
-              <div style="font-size:28px;margin-bottom:10px">📦</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">庫存 / 物流填報</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫庫存數量與出貨物流狀態</div>
-              <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">倉庫 / 物流</div>
-            </a><a href="design.html" class="card" style="border-top:3px solid #ec4899">
-              <div style="font-size:28px;margin-bottom:10px">🎨</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">設計送審填報</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">9步驟送審進度追蹤＋圖片上傳</div>
-              <div style="font-size:11px;background:#ec489918;color:#ec4899;padding:3px 8px;border-radius:6px;display:inline-block">創意 / 設計師</div>
-            </a><a href="procure.html" class="card" style="border-top:3px solid #f97316">
-              <div style="font-size:28px;margin-bottom:10px">🛒</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購詢比價</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫報價比較與議價結果＋附件上傳</div>
-              <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block">採購負責人</div>
-            </a><a href="contract.html" class="card" style="border-top:3px solid #64748b">
-              <div style="font-size:28px;margin-bottom:10px">📄</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">合約管理</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立合約摘要並上傳合約文件</div>
-              <div style="font-size:11px;background:#64748b18;color:#64748b;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
-            </a><a href="approval.html" class="card" style="border-top:3px solid #ef4444">
-              <div style="font-size:28px;margin-bottom:10px">🔔</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">審批申請</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">提交需要管理層審批的事項</div>
-              <div style="font-size:11px;background:#ef444418;color:#ef4444;padding:3px 8px;border-radius:6px;display:inline-block">任何人</div>
-            </a><a href="meeting.html" class="card" style="border-top:3px solid #0ea5e9">
-              <div style="font-size:28px;margin-bottom:10px">📋</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">會議記錄</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">記錄議題、決議事項、行動項目</div>
-              <div style="font-size:11px;background:#0ea5e918;color:#0ea5e9;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
-            </a><a href="quote.html" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">🧾</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">報價單生成器</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫後直接列印或存 PDF</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / 管理層</div>
-            </a><a href="feedback.html" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">💬</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">使用體驗回報</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">遇到問題或有建議？填這裡</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">所有人</div>
-            </a></div>
-<div class="sec-label" style="color:#f59e0b;border-top:1px solid #e2e8f0;margin-top:8px">🏪 快閃店專區</div>
-<div class="grid"><a href="project.html?ctx=popup" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">📋</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">新增快閃店項目</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">建立快閃店項目，自動切換至快閃店填報模式</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
-            </a><a href="daily_sales.html?ctx=popup" class="card" style="border-top:3px solid #10b981">
-              <div style="font-size:28px;margin-bottom:10px">📊</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">每日銷售快報</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">填寫當日流水、支付方式、寄售結算</div>
-              <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block">Shawn / 店長</div>
-            </a><a href="popup_venue.html?ctx=popup" class="card" style="border-top:3px solid #f59e0b">
-              <div style="font-size:28px;margin-bottom:10px">🏪</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店場地資訊</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">登記場地、租金模式、贊助金額</div>
-              <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">Ray / 安然 / Shawn</div>
-            </a><a href="consignment.html?ctx=popup" class="card" style="border-top:3px solid #8b5cf6">
-              <div style="font-size:28px;margin-bottom:10px">🤝</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">寄售管理</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">每日寄售銷售額與應付分潤計算</div>
-              <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">Shawn / 賴哥</div>
-            </a><a href="budget.html?ctx=popup" class="card" style="border-top:3px solid #8b5cf6">
-              <div style="font-size:28px;margin-bottom:10px">💵</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店預算</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">預算類別自動切換為快閃店專屬選項</div>
-              <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block">財務 / 項目負責人</div>
-            </a><a href="sales.html?ctx=popup" class="card" style="border-top:3px solid #6366f1">
-              <div style="font-size:28px;margin-bottom:10px">🎯</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店銷售</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">項目選單只顯示快閃店類型項目</div>
-              <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block">業務 / BD</div>
-            </a><a href="stock.html?ctx=popup" class="card" style="border-top:3px solid #f59e0b">
-              <div style="font-size:28px;margin-bottom:10px">📦</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店庫存</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">預設倉庫為曼谷倉</div>
-              <div style="font-size:11px;background:#f59e0b18;color:#f59e0b;padding:3px 8px;border-radius:6px;display:inline-block">倉庫 / 物流</div>
-            </a><a href="procure.html?ctx=popup" class="card" style="border-top:3px solid #f97316">
-              <div style="font-size:28px;margin-bottom:10px">🛒</div>
-              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店採購</div>
-              <div style="font-size:12px;color:#64748b;margin-bottom:8px">項目選單只顯示快閃店類型項目</div>
-              <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block">採購負責人</div>
-            </a></div>
+
+<!-- Step 1: 選擇項目 -->
+<div class="proj-zone">
+  <div class="proj-label">Step 1 — 選擇要填報的項目</div>
+  <select id="proj-main" class="proj-sel">
+    <option value="">載入中...</option>
+  </select>
+  <div id="budget-status" class="budget-badge" style="display:none"></div>
+  <div id="proj-new-hint" style="margin-top:10px;font-size:12px;color:#64748b;display:none">
+    沒有你的項目？<a href="project_request.html" style="color:#6366f1;font-weight:600">申請新增 →</a>
+    （管理員請直接點下方「新增項目」）
+  </div>
+</div>
+
+<!-- Step 2: 本項目填報 -->
+<div id="no-proj-hint" class="no-proj-hint">
+  <span style="font-size:18px">👆</span> 先選擇項目，對應的填報選項就會在這裡出現
+</div>
+<div id="proj-actions" style="display:none">
+  <div class="sec blue">Step 2 — 本項目填報</div>
+  <div class="card-grid"><a id="pc-expense" href="#" onclick="goForm('expense.html');return false;"
+          class="pcard" style="border-left:4px solid #f97316;opacity:.45;pointer-events:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🧾</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">費用申請</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">依預算申請費用，系統自動核對預算與 MG 保底金</div></div>
+          </div>
+        </a><a id="pc-sales" href="#" onclick="goForm('sales.html');return false;"
+          class="pcard" style="border-left:4px solid #6366f1;opacity:.45;pointer-events:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🎯</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">銷售填報</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">填寫訂單金額、帳期與回款進度</div></div>
+          </div>
+        </a><a id="pc-stock" href="#" onclick="goForm('stock.html');return false;"
+          class="pcard" style="border-left:4px solid #f59e0b;opacity:.45;pointer-events:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">📦</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">庫存 / 物流</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">填寫庫存數量與出入貨物流狀態</div></div>
+          </div>
+        </a><a id="pc-design" href="#" onclick="goForm('design.html');return false;"
+          class="pcard" style="border-left:4px solid #ec4899;opacity:.45;pointer-events:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🎨</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">設計送審</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">9 步驟送審流程追蹤＋圖片上傳</div></div>
+          </div>
+        </a><a id="pc-procure" href="#" onclick="goForm('procure.html');return false;"
+          class="pcard" style="border-left:4px solid #f97316;opacity:.45;pointer-events:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🛒</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">採購詢比價</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">填寫供應商報價比較與議價結果</div></div>
+          </div>
+        </a><a id="pc-product" href="#" onclick="goForm('product.html');return false;"
+          class="pcard" style="border-left:4px solid #06b6d4;opacity:.45;pointer-events:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🏷️</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">新增產品</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">建立本項目的個別產品明細</div></div>
+          </div>
+        </a></div>
+</div>
+
+<!-- 通用操作 -->
+<div class="sec gray" style="margin-top:16px">一次性 / 通用操作</div>
+<div class="card-grid"><a href="approval.html"
+          class="pcard" style="border-left:4px solid #ef4444">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">🔔</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">審批申請</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">提交需要管理層審批的事項</div></div>
+          </div>
+        </a><a href="meeting.html"
+          class="pcard" style="border-left:4px solid #0ea5e9">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">📋</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">會議記錄</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">記錄議題、決議事項、行動項目</div></div>
+          </div>
+        </a><a href="contract.html"
+          class="pcard" style="border-left:4px solid #64748b">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">📄</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">合約管理</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">建立合約摘要並上傳合約文件</div></div>
+          </div>
+        </a><a href="cashflow.html"
+          class="pcard" style="border-left:4px solid #10b981">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">💰</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">現金流填報</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">填寫辦公室本期收支與餘額</div></div>
+          </div>
+        </a><a href="quote.html"
+          class="pcard" style="border-left:4px solid #6366f1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">🧾</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">報價單生成器</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">填寫後直接列印或存 PDF</div></div>
+          </div>
+        </a><a href="feedback.html"
+          class="pcard" style="border-left:4px solid #94a3b8">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">💬</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">使用回報</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">遇到問題或建議？填這裡</div></div>
+          </div>
+        </a></div>
+
+<!-- 管理員操作 -->
+<div id="admin-zone" class="admin-zone">
+  <div class="sec orange" style="margin-top:16px">管理員操作（Shawn / 超管）</div>
+  <div class="card-grid"><a href="project.html"
+          class="pcard" style="border-left:4px solid #6366f1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">📋</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">新增項目</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">建立新項目，填入 IP、業務類型與授權資訊</div></div>
+          </div>
+        </a><a href="budget.html"
+          class="pcard" style="border-left:4px solid #8b5cf6">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">💵</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">預算編列</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">為項目逐條建立預算（含稅）</div></div>
+          </div>
+        </a><a href="supplier.html"
+          class="pcard" style="border-left:4px solid #f97316">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">🏭</span>
+            <div><div style="font-size:14px;font-weight:700;color:#0f172a">供應商申請</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">提交新供應商，需安然＋躍明審核後才可使用</div></div>
+          </div>
+        </a></div>
+</div>
+
+<!-- 快閃店（摺疊） -->
+<div class="collapse-hdr" onclick="togglePopup(this)">
+  <span>🏪 快閃店專區</span><span id="popup-arrow">▶</span>
+</div>
+<div id="popup-body" class="collapse-body">
+  <div class="card-grid" style="padding-top:10px"><a href="daily_sales.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #10b981">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">📊</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">每日銷售快報</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">填寫當日流水、支付方式、寄售結算</div></div>
+          </div>
+        </a><a href="popup_venue.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #f59e0b">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">🏪</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">快閃店場地</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">登記場地、租金模式、贊助金額</div></div>
+          </div>
+        </a><a href="consignment.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #8b5cf6">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">🤝</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">寄售管理</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">每日寄售銷售額與應付分潤計算</div></div>
+          </div>
+        </a><a href="budget.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #8b5cf6">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">💵</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">快閃店預算</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">預算類別自動切換為快閃店專屬選項</div></div>
+          </div>
+        </a><a href="sales.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #6366f1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">🎯</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">快閃店銷售</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">項目選單只顯示快閃店類型</div></div>
+          </div>
+        </a><a href="stock.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #f59e0b">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">📦</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">快閃店庫存</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">預設倉庫為曼谷倉</div></div>
+          </div>
+        </a><a href="procure.html?ctx=popup"
+          class="pcard" style="border-left:4px solid #f97316">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">🛒</span>
+            <div><div style="font-size:13px;font-weight:700;color:#0f172a">快閃店採購</div>
+            <div style="font-size:12px;color:#64748b;margin-top:1px">項目選單只顯示快閃店類型</div></div>
+          </div>
+        </a></div>
+</div>
+
 <script>
 const _PROXY_IDX="https://feishu-proxy.raychou6913.workers.dev";
 const _AT_IDX="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _PROJ_TBL="tblYBjAlemYPuNGy";
+const _BUDGET_TBL="tblteo2QEO0jP8j9";
 const _VL_TBL="tblUzRSQgKLhlttk";
+
+let _sess=null;
+let _budgetCache={};  // projName -> count
+
 (function(){
-  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){
+  _sess=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!_sess||Date.now()>_sess.expires){
     localStorage.removeItem("wujie_session");
     location.replace("../login.html");
     return;
   }
-  document.getElementById("user-name").textContent=s.name+"（"+s.dept+"）";
-  _logVisit(s);
+  document.getElementById("user-name").textContent=_sess.name+"（"+_sess.dept+"）";
+  // 管理員顯示
+  const isAdmin=_sess.role==="超級管理員"||_sess.name==="Shawn";
+  if(isAdmin) document.getElementById("admin-zone").style.display="block";
+  _loadProjects();
+  _logVisit(_sess);
 })();
+
+async function _getToken(){
+  const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  return d.tenant_access_token;
+}
+
+async function _loadProjects(){
+  const sel=document.getElementById("proj-main");
+  try{
+    const tk=await _getToken();
+    const r=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_PROJ_TBL+"/records?page_size=200",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const d=await r.json();
+    sel.innerHTML='<option value="">— 請選擇項目 —</option>';
+    const items=(d.data?.items||[]);
+    // 同時載入預算筆數快取
+    const rb=await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_BUDGET_TBL+"/records?page_size=500",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const db=await rb.json();
+    (db.data?.items||[]).forEach(item=>{
+      const pn=item.fields?.["項目關聯"];
+      const n=Array.isArray(pn)?pn[0]?.text||"":String(pn||"");
+      if(n) _budgetCache[n]=(_budgetCache[n]||0)+1;
+    });
+    items.forEach(item=>{
+      const f=item.fields||{};
+      const nf=f["項目名稱"];
+      const name=Array.isArray(nf)?nf[0]?.text||"":String(nf||"");
+      if(!name) return;
+      const o=document.createElement("option");
+      o.value=name; o.textContent=name;
+      sel.appendChild(o);
+    });
+    document.getElementById("proj-new-hint").style.display="block";
+    sel.onchange=()=>onProjChange(sel.value);
+  }catch(e){
+    sel.innerHTML='<option value="">（無法載入，請重整）</option>';
+  }
+}
+
+function onProjChange(projName){
+  const hint=document.getElementById("no-proj-hint");
+  const actions=document.getElementById("proj-actions");
+  const badge=document.getElementById("budget-status");
+  if(!projName){
+    hint.style.display="flex"; actions.style.display="none"; badge.style.display="none";
+    // 鎖定所有項目填報卡片
+    document.querySelectorAll(".pcard[id^='pc-']").forEach(el=>{el.style.opacity=".45";el.style.pointerEvents="none";});
+    return;
+  }
+  hint.style.display="none"; actions.style.display="block";
+  // 解鎖卡片
+  document.querySelectorAll(".pcard[id^='pc-']").forEach(el=>{el.style.opacity="1";el.style.pointerEvents="";});
+  // 預算狀態徽章
+  const cnt=_budgetCache[projName]||0;
+  badge.style.display="inline-flex";
+  if(cnt>0){
+    badge.className="budget-badge ok";
+    badge.innerHTML="✅ 預算已建立（"+cnt+" 筆）";
+  }else{
+    badge.className="budget-badge warn";
+    badge.innerHTML="⚠️ 尚無預算記錄 — 請請 Shawn 先編列預算";
+  }
+}
+
+function goForm(page){
+  const proj=document.getElementById("proj-main").value;
+  if(!proj) return;
+  location.href=page+"?proj="+encodeURIComponent(proj);
+}
+
+function togglePopup(hdr){
+  const body=document.getElementById("popup-body");
+  const arrow=document.getElementById("popup-arrow");
+  const open=body.classList.toggle("open");
+  arrow.textContent=open?"▼":"▶";
+}
+
 async function _logVisit(s){
   const now=new Date();
   const d=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
   const k="wj_v_"+d;
   if(localStorage.getItem(k)) return;
   try{
-    const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const td=await r.json(); if(td.code!==0) return;
+    const tk=await _getToken();
     await fetch(_PROXY_IDX+"/open-apis/bitable/v1/apps/"+_AT_IDX+"/tables/"+_VL_TBL+"/records",{
-      method:"POST",headers:{"Authorization":"Bearer "+td.tenant_access_token,"Content-Type":"application/json"},
+      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
       body:JSON.stringify({fields:{"姓名":s.name,"部門":s.dept,"日期":d,"時間":now.toTimeString().slice(0,8)}})
     });
     localStorage.setItem(k,"1");

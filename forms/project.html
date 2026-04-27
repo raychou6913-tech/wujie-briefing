@@ -54,11 +54,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <div class="hint">其他部門填報時會用此名稱關聯，請填清楚</div></div>
       <div class="row2">
         <div class="f"><label>IP 品牌</label>
-          <select id="m-ip">
-            <option value="">請選擇</option>
-            <option>Snoopy</option><option>Mofusand</option><option>Chiikawa</option>
-            <option>Labubu</option><option>Fuggler</option><option>EVE點點</option><option>其他</option>
-          </select></div>
+          <input id="m-ip" list="ip-brand-list" placeholder="例：Chiikawa、Snoopy、Mofusand（可自由填寫）">
+          <datalist id="ip-brand-list">
+            <option value="Snoopy"><option value="Mofusand"><option value="Chiikawa">
+            <option value="Labubu"><option value="Fuggler"><option value="EVE點點">
+          </datalist></div>
         <div class="f"><label>業務類型</label>
           <select id="m-type" onchange="toggleBatchFields(this.value)">
             <option>批發</option><option>快閃店</option><option>代工</option>
@@ -288,6 +288,12 @@ async function _loadProjectSelect(selectId,typeFilter){
     sel.onchange=()=>{
       if(sel.value==="__new__") window.open("project.html","_blank");
     };
+    // URL param 自動帶入項目（從填報中心點擊卡片跳轉時使用）
+    const urlProj=new URLSearchParams(location.search).get("proj");
+    if(urlProj){
+      const found=[...sel.options].find(o=>o.value===urlProj);
+      if(found){sel.value=urlProj;sel.dispatchEvent(new Event("change"));}
+    }
   }catch(e){
     sel.innerHTML='<option value="">（無法載入項目列表）</option>';
     const txt=document.createElement("input");
@@ -295,6 +301,8 @@ async function _loadProjectSelect(selectId,typeFilter){
     txt.style.cssText="width:100%;margin-top:6px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;color:#0f172a;font-size:14px";
     txt.id=selectId+"_fallback";
     sel.parentNode.appendChild(txt);
+    const urlProj=new URLSearchParams(location.search).get("proj");
+    if(urlProj) txt.value=urlProj;
   }
 }
 

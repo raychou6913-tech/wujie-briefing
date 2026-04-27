@@ -164,6 +164,12 @@ async function _loadProjectSelect(selectId,typeFilter){
     sel.onchange=()=>{
       if(sel.value==="__new__") window.open("project.html","_blank");
     };
+    // URL param 自動帶入項目（從填報中心點擊卡片跳轉時使用）
+    const urlProj=new URLSearchParams(location.search).get("proj");
+    if(urlProj){
+      const found=[...sel.options].find(o=>o.value===urlProj);
+      if(found){sel.value=urlProj;sel.dispatchEvent(new Event("change"));}
+    }
   }catch(e){
     sel.innerHTML='<option value="">（無法載入項目列表）</option>';
     const txt=document.createElement("input");
@@ -171,6 +177,8 @@ async function _loadProjectSelect(selectId,typeFilter){
     txt.style.cssText="width:100%;margin-top:6px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;color:#0f172a;font-size:14px";
     txt.id=selectId+"_fallback";
     sel.parentNode.appendChild(txt);
+    const urlProj=new URLSearchParams(location.search).get("proj");
+    if(urlProj) txt.value=urlProj;
   }
 }
 
