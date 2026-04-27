@@ -141,20 +141,13 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div class="field"><label>開始日期</label><input type="date" id="m-start"></div>
     <div class="field"><label>截止日期</label><input type="date" id="m-end"></div>
   </div>
-  <div class="row2">
-    <div class="field"><label>預計收入</label><input type="number" id="m-rev" placeholder="0"></div>
-    <div class="field"><label>預計支出</label><input type="number" id="m-exp" placeholder="0"></div>
-  </div>
   <div class="field"><label>當前關卡</label>
     <select id="m-stage"><option>IP決策中</option><option>預算規劃</option><option>概念提案</option><option>跨部門確認</option><option>設計送審</option><option>採購詢價</option><option>預算確認</option><option>打樣/開模</option><option>市場收單</option><option>大貨生產</option><option>出貨物流</option><option>銷售推廣</option><option>已完成</option><option>已暫停</option></select></div>
-  <div class="row2">
-    <div class="field"><label>目前狀態</label>
-      <select id="m-status">
-        <option>計劃中</option><option>進行中</option><option>已延遲</option>
-        <option>已完成</option><option>已取消</option>
-      </select></div>
-    <div class="field"><label>完成進度 (%)</label><input type="number" id="m-pct" min="0" max="100" placeholder="0"></div>
-  </div>
+  <div class="field"><label>目前狀態</label>
+    <select id="m-status">
+      <option>計劃中</option><option>進行中</option><option>已延遲</option>
+      <option>已完成</option><option>已取消</option>
+    </select></div>
   <div class="field"><label>備註 / 項目說明</label><textarea id="m-note" placeholder="項目背景、目標、注意事項..."></textarea></div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeModal()">取消</button>
@@ -237,21 +230,14 @@ async function loadProjects(){
 
 function renderStats(){
   const active=projects.filter(p=>fv(p,"狀態")==="進行中").length;
-  const totalRev=projects.reduce((s,p)=>s+fn(p,"預計收入"),0);
-  const totalExp=projects.reduce((s,p)=>s+fn(p,"預計支出"),0);
-  const totalNet=totalRev-totalExp;
+  const delayed=projects.filter(p=>fv(p,"狀態")==="已延遲").length;
   document.getElementById("stats").innerHTML=`
     <div class="stat"><div class="stat-label">總項目</div>
       <div class="stat-val" style="color:#6366f1">${projects.length}</div></div>
     <div class="stat"><div class="stat-label">進行中</div>
       <div class="stat-val" style="color:#10b981">${active}</div></div>
-    <div class="stat"><div class="stat-label">預計總收入</div>
-      <div class="stat-val" style="color:#10b981">${totalRev.toLocaleString()}</div>
-      <div class="stat-sub">各幣別合計</div></div>
-    <div class="stat"><div class="stat-label">預計總支出</div>
-      <div class="stat-val" style="color:#f59e0b">${totalExp.toLocaleString()}</div></div>
-    <div class="stat"><div class="stat-label">預計淨利</div>
-      <div class="stat-val" style="color:${totalNet>=0?"#10b981":"#ef4444"}">${totalNet.toLocaleString()}</div></div>
+    <div class="stat"><div class="stat-label">已延遲</div>
+      <div class="stat-val" style="color:#ef4444">${delayed}</div></div>
   `;
 }
 
@@ -281,10 +267,6 @@ function renderCard(p){
   const stageIdx=STAGE_IDX[stage]??-1;
   const stageTotal=STAGES.length-2;
   const stagePct=stageIdx>=0&&stageIdx<stageTotal?Math.round((stageIdx+1)/stageTotal*100):0;
-  const pct=fn(p,"完成進度%");
-  const rev=fn(p,"預計收入");
-  const exp=fn(p,"預計支出");
-  const net=rev-exp;
   const cur=fv(p,"幣別","");
   const owner=fv(p,"負責人","—");
   const loc=fv(p,"所在地","—");
@@ -293,7 +275,6 @@ function renderCard(p){
   const ipColor=IP_COLOR[ip]||"#64748b";
   const stColor=STATUS_COLOR[status]||"#64748b";
   const tyColor=TYPE_COLOR[type]||"#64748b";
-  const progColor=pct<30?"#ef4444":pct<70?"#f59e0b":"#10b981";
   return `<div class="proj-card" id="card-${id}">
     <div class="proj-header" onclick="toggleSubtasks('${id}','${name}')">
       <div>
@@ -312,13 +293,8 @@ function renderCard(p){
       </div>
     </div>
     <div class="proj-progress">
-      <div class="prog-row"><span>完成進度</span><span style="color:${progColor};font-weight:600">${pct}%</span></div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${progColor}"></div></div>
-    </div>
-    <div class="proj-fin">
-      <div class="fin-cell"><div class="fin-label">預計收入</div><div class="fin-val" style="color:#10b981">${cur} ${rev.toLocaleString()}</div></div>
-      <div class="fin-cell"><div class="fin-label">預計支出</div><div class="fin-val" style="color:#f59e0b">${cur} ${exp.toLocaleString()}</div></div>
-      <div class="fin-cell"><div class="fin-label">預計淨利</div><div class="fin-val" style="color:${net>=0?"#10b981":"#ef4444"}">${cur} ${net.toLocaleString()}</div></div>
+      <div class="prog-row"><span>流程進度</span><span style="color:#6366f1;font-weight:600">第 ${stageIdx+1} 關 / ${stageTotal} 關</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${stagePct}%;background:#6366f1"></div></div>
     </div>
     <div class="subtasks" id="sub-${id}">
       <div class="st-tabs" id="tabs-${id}">
@@ -406,19 +382,13 @@ function openModal(id=null){
       document.getElementById("m-cur").value=fv(p,"幣別")||"TWD";
       const s=fn(p,"開始日期"); document.getElementById("m-start").value=s?tsToDate(s):"";
       const e=fn(p,"截止日期"); document.getElementById("m-end").value=e?tsToDate(e):"";
-      document.getElementById("m-rev").value=fn(p,"預計收入")||"";
-      document.getElementById("m-exp").value=fn(p,"預計支出")||"";
       document.getElementById("m-stage").value=fv(p,"當前關卡")||"IP決策中";
       document.getElementById("m-status").value=fv(p,"狀態")||"計劃中";
-      document.getElementById("m-pct").value=fn(p,"完成進度%")||0;
       document.getElementById("m-note").value=fv(p,"備註");
     }
   } else {
     document.getElementById("m-name").value="";
     document.getElementById("m-ip").value="";
-    document.getElementById("m-rev").value="";
-    document.getElementById("m-exp").value="";
-    document.getElementById("m-pct").value="0";
     document.getElementById("m-note").value="";
     const today=new Date().toISOString().split("T")[0];
     document.getElementById("m-start").value=today;
@@ -437,8 +407,6 @@ function closeModal(){
 async function saveProject(){
   const name=document.getElementById("m-name").value.trim();
   if(!name){ alert("請填入項目名稱"); return; }
-  const rev=parseFloat(document.getElementById("m-rev").value)||0;
-  const exp=parseFloat(document.getElementById("m-exp").value)||0;
   const fields={
     "項目名稱":  name,
     "IP品牌":    document.getElementById("m-ip").value,
@@ -448,12 +416,8 @@ async function saveProject(){
     "幣別":      document.getElementById("m-cur").value,
     "開始日期":  dateToTs(document.getElementById("m-start").value),
     "截止日期":  dateToTs(document.getElementById("m-end").value),
-    "預計收入":  rev,
-    "預計支出":  exp,
-    "預計淨利":  rev-exp,
     "當前關卡":  document.getElementById("m-stage").value,
     "狀態":      document.getElementById("m-status").value,
-    "完成進度%": parseFloat(document.getElementById("m-pct").value)||0,
     "備註":      document.getElementById("m-note").value,
   };
   await getToken();
