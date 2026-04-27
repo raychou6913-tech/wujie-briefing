@@ -171,6 +171,52 @@ async function _getProjMeta(name){
 
 function _ts(dateStr){ return dateStr?new Date(dateStr).getTime():null; }
 
+let _ipCache=null;
+async function _getIpBrands(){
+  if(_ipCache) return _ipCache;
+  const tk=await _getToken();
+  const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["ip_db"]+"/records?page_size=100",{
+    headers:{"Authorization":"Bearer "+tk}
+  });
+  const d=await r.json();
+  if(d.code!==0) return [];
+  _ipCache=(d.data?.items||[]).map(rec=>{
+    const f=rec.fields||{};
+    const nv=f["IP名稱"]; const name=Array.isArray(nv)?nv[0]?.text||"":String(nv||"");
+    const lv=f["版權方"]; const licensor=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
+    return name?{name,licensor}:null;
+  }).filter(Boolean);
+  return _ipCache;
+}
+
+async function _loadIpSelect(selectId){
+  const sel=document.getElementById(selectId);
+  if(!sel) return;
+  try{
+    const list=await _getIpBrands();
+    const prev=sel.value;
+    sel.innerHTML='<option value="">— 選擇 IP 品牌 —</option>';
+    list.forEach(ip=>{
+      const o=document.createElement("option");
+      o.value=ip.name; o.textContent=ip.name;
+      if(ip.licensor) o.dataset.licensor=ip.licensor;
+      sel.appendChild(o);
+    });
+    const other=document.createElement("option"); other.value="其他"; other.textContent="其他";
+    sel.appendChild(other);
+    if(prev) sel.value=prev;
+    const _syncLicensor=()=>{
+      const chosen=sel.options[sel.selectedIndex];
+      ["f-licensor","m-licensor"].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.value=chosen?.dataset?.licensor||"";
+      });
+    };
+    sel.addEventListener("change",_syncLicensor);
+    _syncLicensor();
+  }catch(e){}
+}
+
 async function _loadProjectSelect(selectId,typeFilter){
   const sel=document.getElementById(selectId);
   if(!sel) return;
