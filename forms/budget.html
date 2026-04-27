@@ -746,7 +746,9 @@ async function submitAll(){
     }
   }
   // Build summary for confirm
-  const _totalAmt=rows.reduce((s,tr)=>{const id=tr.id.replace('row-','');return s+(parseFloat(document.getElementById('amt-'+id)?.value)||0);},0);
+  let _totalExp=0,_totalInc=0;
+  rows.forEach(tr=>{const id=tr.id.replace('row-','');const amt=parseFloat(document.getElementById('amt-'+id)?.value)||0;const nat=document.getElementById('nat-'+id)?.value;if(nat==='收入')_totalInc+=amt;else _totalExp+=amt;});
+  const _totalNet=_totalInc-_totalExp;
   const _yr=document.getElementById('g-year').value;
   const _qtr=document.getElementById('g-quarter').value;
   const _loc=document.getElementById('g-loc').value;
@@ -755,7 +757,9 @@ async function submitAll(){
     ["年度 / 季度", _yr+" "+_qtr],
     ["所在地", _loc],
     ["明細筆數", rows.length+" 筆"],
-    ["金額合計（估）", _totalAmt.toLocaleString()],
+    ["支出合計（估）", _totalExp.toLocaleString()],
+    ["收入合計（估）", _totalInc.toLocaleString()],
+    ["預計淨利（估）", (_totalNet>=0?"+":"")+_totalNet.toLocaleString()],
     ["填報人", document.getElementById('g-who').value],
   ];
   _showConfirm("確認提交預算",_crows,async()=>{
