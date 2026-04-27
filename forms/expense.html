@@ -234,7 +234,9 @@ async function _getProjects(typeFilter){
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
     const iv=f["IP品牌"];
     const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
-    return {name,type,ip};
+    const lv=f["所在地"];
+    const loc=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
+    return {name,type,ip,loc};
   }).filter(Boolean);
   if(typeFilter) return items.filter(p=>p.type===typeFilter);
   return items;
@@ -394,6 +396,7 @@ async function _loadProjectSelect(selectId,typeFilter){
       const o=document.createElement("option");
       o.value=proj.name; o.textContent=proj.name;
       if(proj.ip) o.dataset.ip=proj.ip;
+      if(proj.loc) o.dataset.loc=proj.loc;
       sel.appendChild(o);
     });
     const opt=document.createElement("option");
@@ -407,6 +410,12 @@ async function _loadProjectSelect(selectId,typeFilter){
     sel.onchange=()=>{
       if(sel.value==="__new__"){ window.open("project.html","_blank"); return; }
       _fillIp();
+      const chosen=sel.options[sel.selectedIndex];
+      const locEl=document.getElementById("g-loc");
+      if(locEl&&chosen&&chosen.dataset.loc){
+        const opt=[...locEl.options].find(o=>o.value===chosen.dataset.loc);
+        if(opt) locEl.value=chosen.dataset.loc;
+      }
     };
     // URL param 自動帶入項目（從填報中心點擊卡片跳轉時使用）
     const urlProj=new URLSearchParams(location.search).get("proj");
