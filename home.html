@@ -68,6 +68,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div class="nav-title">管理儀表板</div>
     <div class="nav-desc">財務、項目、銷售、庫存總覽（管理層）</div>
   </a>
+  <a href="admin.html" class="nav-card" id="admin-card" style="--c:#64748b;display:none">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-title">系統管理</div>
+    <div class="nav-desc">權限設定、角色管理</div>
+  </a>
 </div>
 <div class="notice-wrap">
   <div class="notice-hdr">📢 公告與分享</div>
@@ -344,6 +349,10 @@ async function submitFeedback(){
   const days=["日","一","二","三","四","五","六"];
   document.getElementById("hero-date").textContent=
     now.getFullYear()+"年"+(now.getMonth()+1)+"月"+now.getDate()+"日（週"+days[now.getDay()]+"）";
+  if(s.role==="超級管理員"||s.role==="總部管理中心"){
+    const ac=document.getElementById("admin-card");
+    if(ac) ac.style.display="block";
+  }
   _autoLogVisit(s);
   _loadNotices(s);
   _loadBriefingPreview();

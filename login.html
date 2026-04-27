@@ -55,11 +55,13 @@ body{background:linear-gradient(135deg,#f0f4ff 0%,#faf5ff 100%);display:flex;ali
 </div>
 <script>
 const PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _ROLES_TBL="tblEj5GSDYUrKGY9";
 
 // 已登入直接跳轉
 const _s=JSON.parse(localStorage.getItem("wujie_session")||"null");
 if(_s&&Date.now()<_s.expires){
-  location.replace("home.html");
+  location.replace(_s.dept==="管理層"?"project_manager.html":"forms/index.html");
 }
 
 document.getElementById("username").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("password").focus();});
@@ -68,6 +70,29 @@ document.getElementById("password").addEventListener("keydown",e=>{if(e.key==="E
 function togglePw(){
   const inp=document.getElementById("password");
   inp.type=inp.type==="password"?"text":"password";
+}
+
+async function fetchRole(name){
+  try{
+    const tr=await fetch(PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0) return "一般員工";
+    const tk=td.tenant_access_token;
+    const url=PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_ROLES_TBL+"/records?page_size=100";
+    const rr=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+    const rd=await rr.json();
+    if(rd.code!==0) return "一般員工";
+    const items=rd.data?.items||[];
+    for(const item of items){
+      const f=item.fields||{};
+      const n=Array.isArray(f["姓名"])?f["姓名"][0]?.text||"":String(f["姓名"]||"");
+      if(n===name){
+        const rv=f["角色"];
+        return Array.isArray(rv)?rv[0]?.text||"一般員工":String(rv||"一般員工");
+      }
+    }
+  }catch(e){}
+  return "一般員工";
 }
 
 async function doLogin(){
@@ -86,8 +111,10 @@ async function doLogin(){
     });
     const d=await r.json();
     if(!d.ok){errEl.textContent=d.msg||"帳號或密碼錯誤";errEl.style.display="block";return;}
+    btn.textContent="讀取權限...";
+    const role=await fetchRole(d.name);
     localStorage.setItem("wujie_session",JSON.stringify({
-      name:d.name,dept:d.dept,username,
+      name:d.name,dept:d.dept,username,role,
       expires:Date.now()+(remember?30:1)*86400000,
       loginTime:Date.now()
     }));

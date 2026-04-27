@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚙️ 系統管理 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#1e293b;padding:16px 24px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-icon{font-size:26px}.hdr-title{font-size:19px;font-weight:700;color:#f1f5f9}
+.hdr-sub{font-size:13px;color:#94a3b8;margin-top:2px}
+.wrap{max-width:800px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 1px 4px #0000000a}
+.ctitle{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:#f8fafc;border-bottom:2px solid #e2e8f0;padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfd}
+.role-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.role-super{background:#fef3c7;color:#92400e}
+.role-mgr{background:#dbeafe;color:#1e40af}
+.role-staff{background:#f0fdf4;color:#166534}
+select.role-sel{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:5px 10px;font-size:13px;color:#0f172a;cursor:pointer}
+select.role-sel:focus{border-color:#6366f1;outline:none}
+.save-btn{background:#6366f1;color:#fff;border:none;border-radius:7px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.save-btn:hover{background:#4f46e5}
+.save-btn:disabled{opacity:.4;cursor:not-allowed}
+.tag-saved{font-size:11px;color:#10b981;margin-left:6px;display:none}
+.back{display:block;text-align:center;color:#64748b;font-size:15px;font-weight:500;margin-top:24px;text-decoration:none;padding:10px}
+.back:hover{color:#6366f1}
+.notice{background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-icon">⚙️</div>
+    <div><div class="hdr-title">系統管理</div><div class="hdr-sub">權限設定 · 角色管理</div></div>
+  </div>
+  <span style="color:#94a3b8;font-size:13px" id="current-user"></span>
+</div>
+<div class="wrap">
+  <div id="no-perm" class="notice" style="display:none">⛔ 此頁面僅限超級管理員或總部管理中心人員查看。</div>
+  <div id="main-content" style="display:none">
+    <div class="card">
+      <div class="ctitle">成員角色一覽</div>
+      <div id="role-notice-readonly" class="notice" style="display:none;background:#dbeafe;border-color:#93c5fd;color:#1e40af">您的角色為「總部管理中心」，可查看所有人員角色，但無法修改。僅超級管理員（Ray）可調整角色。</div>
+      <table id="role-table">
+        <thead><tr><th>姓名</th><th>部門</th><th>角色</th><th id="th-action" style="display:none">操作</th></tr></thead>
+        <tbody id="role-tbody"><tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:30px">載入中...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<a href="../home.html" class="back">← 首頁</a>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _ROLES_TBL="tblEj5GSDYUrKGY9";
+const ROLE_OPTIONS=["超級管理員","總部管理中心","一般員工"];
+
+const _sess=JSON.parse(localStorage.getItem("wujie_session")||"null");
+if(!_sess||Date.now()>_sess.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+
+document.getElementById("current-user").textContent=(_sess?.name||"")+" · "+(_sess?.role||"一般員工");
+
+const myRole=_sess?.role||"一般員工";
+const canEdit=myRole==="超級管理員";
+const canView=myRole==="超級管理員"||myRole==="總部管理中心";
+
+if(!canView){
+  document.getElementById("no-perm").style.display="block";
+}else{
+  document.getElementById("main-content").style.display="block";
+  if(!canEdit) document.getElementById("role-notice-readonly").style.display="block";
+  if(canEdit) document.getElementById("th-action").style.display="";
+  loadRoles();
+}
+
+async function _getToken(){
+  const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  if(d.code!==0) throw new Error("Token err");
+  return d.tenant_access_token;
+}
+
+async function loadRoles(){
+  const tbody=document.getElementById("role-tbody");
+  try{
+    const tk=await _getToken();
+    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_ROLES_TBL+"/records?page_size=100",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const d=await r.json();
+    if(d.code!==0)throw new Error(d.msg);
+    const items=d.data?.items||[];
+    if(!items.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px">無資料</td></tr>';return;}
+    tbody.innerHTML="";
+    items.sort((a,b)=>{
+      const ra=String(a.fields?.["角色"]||"");
+      const rb=String(b.fields?.["角色"]||"");
+      const ord=["超級管理員","總部管理中心","一般員工"];
+      return (ord.indexOf(ra)||99)-(ord.indexOf(rb)||99);
+    });
+    items.forEach(item=>{
+      const f=item.fields||{};
+      const rid=item.record_id;
+      const name=Array.isArray(f["姓名"])?f["姓名"][0]?.text||"":String(f["姓名"]||"");
+      const dept=String(f["部門"]||"");
+      const role=Array.isArray(f["角色"])?f["角色"][0]?.text||"一般員工":String(f["角色"]||"一般員工");
+      const roleClass=role==="超級管理員"?"role-super":role==="總部管理中心"?"role-mgr":"role-staff";
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td style="font-weight:600">${name}</td>
+        <td style="color:#64748b">${dept}</td>
+        <td><span class="role-badge ${roleClass}" id="badge-${rid}">${role}</span></td>
+        ${canEdit?`<td>
+          <select class="role-sel" id="sel-${rid}" onchange="onRoleChange('${rid}','${name}')">
+            ${ROLE_OPTIONS.map(r=>`<option value="${r}"${r===role?" selected":""}>${r}</option>`).join("")}
+          </select>
+          <button class="save-btn" id="btn-${rid}" disabled onclick="saveRole('${rid}')">儲存</button>
+          <span class="tag-saved" id="ok-${rid}">✓ 已儲存</span>
+        </td>`:"<td></td>"}`;
+      tbody.appendChild(tr);
+    });
+  }catch(e){
+    tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:#ef4444;padding:24px">載入失敗：${e.message}</td></tr>`;
+  }
+}
+
+function onRoleChange(rid,name){
+  const btn=document.getElementById("btn-"+rid);
+  if(btn) btn.disabled=false;
+  const ok=document.getElementById("ok-"+rid);
+  if(ok) ok.style.display="none";
+}
+
+async function saveRole(rid){
+  const sel=document.getElementById("sel-"+rid);
+  const btn=document.getElementById("btn-"+rid);
+  const ok=document.getElementById("ok-"+rid);
+  const badge=document.getElementById("badge-"+rid);
+  const newRole=sel.value;
+  btn.disabled=true; btn.textContent="儲存中...";
+  try{
+    const tk=await _getToken();
+    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_ROLES_TBL+"/records/"+rid,{
+      method:"PUT",
+      headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"角色":newRole}})
+    });
+    const d=await r.json();
+    if(d.code!==0) throw new Error(d.msg);
+    const roleClass=newRole==="超級管理員"?"role-super":newRole==="總部管理中心"?"role-mgr":"role-staff";
+    badge.className="role-badge "+roleClass;
+    badge.textContent=newRole;
+    ok.style.display="inline";
+    btn.textContent="儲存";
+  }catch(e){
+    alert("儲存失敗："+e.message);
+    btn.disabled=false; btn.textContent="儲存";
+  }
+}
+</script>
+</body></html>
