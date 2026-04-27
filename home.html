@@ -26,6 +26,16 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .nav-desc{font-size:12px;color:#64748b;line-height:1.5}
 .notice-wrap{max-width:800px;margin:0 auto;padding:0 24px 32px}
 .notice-hdr{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.iter-badge{display:inline-flex;align-items:center;gap:7px;background:#ffffff0d;border:1px solid #ffffff1a;border-radius:24px;padding:7px 16px;cursor:pointer;transition:all .2s;margin-top:14px;user-select:none}
+.iter-badge:hover{background:#ffffff1a;border-color:#ffffff35;transform:scale(1.03)}
+.iter-dot{width:8px;height:8px;background:#10b981;border-radius:50%;flex-shrink:0;animation:iter-pulse 2.4s ease-in-out infinite}
+.iter-num{font-size:20px;font-weight:800;color:#f1f5f9;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.iter-label{font-size:12px;color:#94a3b8;letter-spacing:.3px}
+.iter-divider{width:1px;height:14px;background:#ffffff20;margin:0 2px}
+.iter-reveal{max-width:460px;margin:10px auto 0;font-size:12px;color:#64748b;line-height:1.7;display:none;background:#ffffff08;border:1px solid #ffffff10;border-radius:12px;padding:12px 16px;text-align:left}
+.iter-reveal.show{display:block;animation:fade-in .25s ease}
+@keyframes iter-pulse{0%,100%{box-shadow:0 0 0 0 #10b98155}60%{box-shadow:0 0 0 6px #10b98100}}
+@keyframes fade-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:540px){.nav-grid{grid-template-columns:1fr}.nav-card{padding:20px 16px}}
 </style>
 </head>
@@ -41,6 +51,19 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="hero-name">歡迎回來，<span id="hero-name">—</span></div>
   <div class="hero-sub" id="hero-dept"></div>
   <div class="hero-date" id="hero-date"></div>
+  <div class="iter-badge" onclick="toggleIterReveal()" title="點擊看看">
+    <span class="iter-dot"></span>
+    <span class="iter-label">系統迭代</span>
+    <span class="iter-divider"></span>
+    <span class="iter-num">52</span>
+    <span class="iter-label">次</span>
+  </div>
+  <div class="iter-reveal" id="iter-reveal">
+    🤫 這個數字不是手動填的<br>
+    本系統共 <b style="color:#f1f5f9">25 個填報表單</b> + <b style="color:#f1f5f9">18 個資料總覽</b> + <b style="color:#f1f5f9">7 個核心頁面</b><br>
+    每新增一個功能模組，這個數字就自動 +1<br>
+    <span style="color:#475569;font-size:11px;margin-top:4px;display:block">🤖 × 👤 &nbsp;蕪解人機共創系統・自我計數</span>
+  </div>
 </div>
 <div class="nav-grid">
   <a href="forms/index.html" class="nav-card" style="--c:#6366f1">
@@ -343,7 +366,10 @@ async function submitFeedback(){
   }
 }
 
-
+function toggleIterReveal(){
+  const el=document.getElementById("iter-reveal");
+  el.classList.toggle("show");
+}
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");return;}
