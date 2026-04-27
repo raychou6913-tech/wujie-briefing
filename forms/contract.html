@@ -97,7 +97,12 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
           </select></div>
       </div>
       <div class="f"><label>對方公司 / 機構 <span class="req">*</span></label>
-        <input id="f-party" required placeholder="合約對方全名（可與版權方相同）"></div>
+        <select id="f-party-sel">
+          <option value="">— 從版權方資料庫選取 —</option>
+          <option value="__manual__">✏️ 手動輸入其他</option>
+        </select>
+        <input id="f-party" required placeholder="直接輸入，或從上方選取後自動填入" style="margin-top:6px">
+        <div class="hint">版權方 / 代理商名單自動從資料庫載入</div></div>
       <div class="row2">
         <div class="f"><label>我方簽署人</label>
           <select id="f-signer">
@@ -561,6 +566,24 @@ if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
   }
   initChips("cats-chips-contract","f-cats");
   initChips("region-chips-contract","f-region");
+  // ── 對方公司下拉：從 ip_db 載入版權方 + 代理商 ──
+  (async()=>{
+    const brands=await _getIpBrands(null).catch(()=>[]);
+    const names=[...new Set(brands.flatMap(b=>[b.licensor,b.agent].filter(Boolean)))].sort();
+    const sel=document.getElementById("f-party-sel");
+    if(!sel||!names.length) return;
+    const placeholder=sel.options[0];
+    const manualOpt=sel.options[sel.options.length-1];
+    sel.innerHTML="";
+    sel.appendChild(placeholder);
+    names.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;sel.appendChild(o);});
+    sel.appendChild(manualOpt);
+    sel.onchange=()=>{
+      const inp=document.getElementById("f-party");
+      if(sel.value==="__manual__"||!sel.value){inp.value="";inp.focus();}
+      else inp.value=sel.value;
+    };
+  })();
 })();
 
 _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
