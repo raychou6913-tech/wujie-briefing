@@ -235,7 +235,9 @@ async function _loadIpSelect(selectId){
       if(ip.licensor) o.dataset.licensor=ip.licensor;
       sel.appendChild(o);
     });
-    const other=document.createElement("option"); other.value="其他"; other.textContent="其他";
+    const other=document.createElement("option");
+    other.value="__new_ip__"; other.textContent="＋ 新增 IP / 版權方資訊";
+    other.style.cssText="color:#6366f1;font-weight:700";
     sel.appendChild(other);
     // re-apply IP from linked project select if already chosen
     const projSel=document.getElementById("f-proj");
@@ -243,6 +245,10 @@ async function _loadIpSelect(selectId){
     if(projIp) sel.value=projIp;
     else if(prev) sel.value=prev;
     const _syncLicensor=()=>{
+      if(sel.value==="__new_ip__"){
+        window.open("ip_db.html","_blank");
+        sel.selectedIndex=0; return;
+      }
       const chosen=sel.options[sel.selectedIndex];
       ["f-licensor","m-licensor"].forEach(id=>{
         const el=document.getElementById(id);
