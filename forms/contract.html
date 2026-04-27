@@ -33,6 +33,27 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .back{display:block;text-align:center;color:#64748b;font-size:15px;font-weight:500;margin-top:24px;text-decoration:none;padding:10px}
 .back:hover{color:#64748b}
 @media(max-width:480px){.row2{grid-template-columns:1fr}}
+#_confirm-ov,#_result-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+#_confirm-ov.show,#_result-ov.show{display:flex}
+#_confirm-box{background:#fff;border-radius:16px;padding:26px 24px 20px;max-width:440px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#_confirm-ttl{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:4px}
+#_confirm-sub{font-size:12px;color:#94a3b8;margin-bottom:14px}
+#_confirm-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
+#_confirm-tbl tr{border-bottom:1px solid #f1f5f9}
+#_confirm-tbl td{padding:8px 4px;vertical-align:top}
+#_confirm-tbl td:first-child{color:#64748b;width:38%;font-weight:500;padding-right:12px;white-space:nowrap}
+#_confirm-tbl td:last-child{color:#0f172a;font-weight:600;word-break:break-word}
+._cbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+._cbtns button{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s}
+#_conf-no{background:#f1f5f9;color:#475569}
+#_conf-yes{background:#64748b;color:#fff}
+#_conf-yes:hover{opacity:.85}
+#_result-box{background:#fff;border-radius:16px;padding:30px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.r-icon{font-size:44px;margin-bottom:10px}
+.r-title{font-size:18px;font-weight:700;color:#1e293b;margin-bottom:6px}
+.r-rid{font-size:11px;color:#94a3b8;margin-bottom:20px;font-family:monospace}
+#_res-view{display:block;padding:11px;background:#64748b;color:#fff;border-radius:9px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px}
+#_res-again{width:100%;padding:11px;background:#f1f5f9;color:#475569;border:none;border-radius:9px;cursor:pointer;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -184,6 +205,21 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 </div>
 <a class="back" href="index.html">← 返回填報中心</a>
 </div>
+<!-- confirm modal -->
+<div id="_confirm-ov"><div id="_confirm-box">
+  <div id="_confirm-ttl">確認送出</div>
+  <div id="_confirm-sub">請確認以下資料正確無誤</div>
+  <table id="_confirm-tbl"></table>
+  <div class="_cbtns"><button id="_conf-no">返回修改</button><button id="_conf-yes">確認送出</button></div>
+</div></div>
+<!-- result overlay -->
+<div id="_result-ov"><div id="_result-box">
+  <div class="r-icon">✅</div>
+  <div class="r-title">提交成功！</div>
+  <div class="r-rid">Record: <span id="_res-rid"></span></div>
+  <a id="_res-view" target="_blank">查看提交記錄 →</a>
+  <button id="_res-again">再填一筆</button>
+</div></div>
 <script>
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
@@ -212,6 +248,26 @@ async function _post(tableKey,fields){
   const d=await r.json();
   if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
   return d;
+}
+
+function _showConfirm(title,rows,onConfirm){
+  const ov=document.getElementById("_confirm-ov");
+  if(!ov){onConfirm();return;}
+  document.getElementById("_confirm-ttl").textContent=title;
+  document.getElementById("_confirm-tbl").innerHTML=rows.filter(([,v])=>v).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+  ov.classList.add("show");
+  document.getElementById("_conf-no").onclick=()=>ov.classList.remove("show");
+  document.getElementById("_conf-yes").onclick=()=>{ov.classList.remove("show");onConfirm();};
+}
+function _showResult(rid,viewPage,onReset){
+  const ov=document.getElementById("_result-ov");
+  if(!ov)return;
+  const ridEl=document.getElementById("_res-rid");
+  if(ridEl) ridEl.textContent=rid||"";
+  const vl=document.getElementById("_res-view");
+  if(vl){if(viewPage&&rid){vl.href=viewPage+"?rid="+rid;vl.style.display="block";}else{vl.style.display="none";}}
+  document.getElementById("_res-again").onclick=()=>{ov.classList.remove("show");if(onReset)onReset();};
+  ov.classList.add("show");
 }
 
 async function _getProjects(typeFilter){
@@ -521,14 +577,15 @@ document.getElementById("frm").onsubmit=async(e)=>{
     document.getElementById("res-sub").textContent=missing.join("、");
     return;
   }
-  const btn=document.getElementById("sbtn");
-  const res=document.getElementById("res");
-  btn.disabled=true; btn.textContent="提交中...";
-  res.style.display="none";
-  try{
-    const tk=await _getToken();
-    const proj=_projVal("proj-sel");
-    const fields={...({
+  _showConfirm("確認送出",[["\u5408\u7d04\u540d\u7a31",String((document.getElementById('f-name').value)||"")],["\u7248\u6b0a\u65b9",String((document.getElementById('f-licensor').value)||"")],["IP \u54c1\u724c",String((document.getElementById('f-ip').value)||"")],["\u5408\u7d04\u985e\u578b",String((document.getElementById('f-type').value)||"")],["\u5408\u7d04\u72c0\u614b",String((document.getElementById('f-status').value)||"")],["\u6388\u6b0a\u54c1\u985e",String((document.getElementById('cats-chips-contract')?._getMerged?.()||document.getElementById('f-cats').value)||"")],["\u6388\u6b0a\u5730\u5340",String((document.getElementById('region-chips-contract')?._getMerged?.()||document.getElementById('f-region').value)||"")],["\u4fdd\u5e95\u91d1 MG",String(((document.getElementById('f-amount').value?document.getElementById('f-amount').value+' '+document.getElementById('f-cur').value:'—'))||"")],["\u4e00\u6b21\u6027\u6388\u6b0a\u8cbb",String(((document.getElementById('f-flat-fee').value?document.getElementById('f-flat-fee').value+' '+document.getElementById('f-cur').value:'—'))||"")],["\u7c3d\u7f72 / \u5230\u671f",String((document.getElementById('f-sign').value+'  →  '+document.getElementById('f-exp').value)||"")]],async()=>{
+    const btn=document.getElementById("sbtn");
+    const res=document.getElementById("res");
+    btn.disabled=true; btn.textContent="提交中...";
+    res.style.display="none";
+    try{
+      const tk=await _getToken();
+      const proj=_projVal("proj-sel");
+      const fields={...({
       "IP品牌":       document.getElementById("f-ip").value,
       "版權方":       document.getElementById("f-licensor").value,
       "合約名稱":     document.getElementById("f-name").value,
@@ -551,35 +608,35 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "特殊條款":     document.getElementById("f-notes").value,
       "負責人":       document.getElementById("f-owner").value,
     })};
-    Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined)delete fields[k];});
-    if(proj) fields["項目關聯"]=proj;
-    const imgFiles=document.getElementById("f-imgs")?.files;
-    if(imgFiles&&imgFiles.length>0){
-      btn.textContent="上傳附件中...";
-      fields["合約文件"]=await _uploadImages(Array.from(imgFiles),tk);
+      Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined)delete fields[k];});
+      if(proj) fields["項目關聯"]=proj;
+      const imgFiles=document.getElementById("f-imgs")?.files;
+      if(imgFiles&&imgFiles.length>0){
+        btn.textContent="上傳附件中...";
+        fields["合約文件"]=await _uploadImages(Array.from(imgFiles),tk);
+      }
+      const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["contract"]+"/records",{
+        method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+        body:JSON.stringify({fields})
+      });
+      const d=await r.json();
+      if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
+      const _rid=d.data?.record?.record_id||"";
+      _showResult(_rid,"view_contract.html",()=>{
+        document.getElementById("frm").reset();
+        document.getElementById("img-preview").innerHTML="";
+        _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
+      });
+    }catch(err){
+      res.className="result err"; res.style.display="block";
+      document.getElementById("res-icon").textContent="❌";
+      document.getElementById("res-msg").textContent="提交失敗";
+      document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖回報管理員";
+      console.error(err);
+    }finally{
+      btn.disabled=false; btn.textContent="提交";
     }
-    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["contract"]+"/records",{
-      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields})
-    });
-    const d=await r.json();
-    if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
-    res.className="result ok"; res.style.display="block";
-    document.getElementById("res-icon").textContent="✅";
-    document.getElementById("res-msg").textContent="提交成功！";
-    document.getElementById("res-sub").textContent="資料已同步至飛書";
-    document.getElementById("frm").reset();
-    document.getElementById("img-preview").innerHTML="";
-    _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
-  }catch(err){
-    res.className="result err"; res.style.display="block";
-    document.getElementById("res-icon").textContent="❌";
-    document.getElementById("res-msg").textContent="提交失敗";
-    document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖回報管理員";
-    console.error(err);
-  }finally{
-    btn.disabled=false; btn.textContent="提交";
-  }
+  });
 };
 </script>
 </body></html>

@@ -39,6 +39,27 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .range-chip{padding:5px 13px;border-radius:20px;border:2px solid #e2e8f0;background:#f8fafc;font-size:13px;cursor:pointer;transition:all .15s;color:#475569}
 .range-chip:hover{border-color:#6366f1;color:#6366f1}
 @media(max-width:480px){.row2{grid-template-columns:1fr}}
+#_confirm-ov,#_result-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+#_confirm-ov.show,#_result-ov.show{display:flex}
+#_confirm-box{background:#fff;border-radius:16px;padding:26px 24px 20px;max-width:440px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#_confirm-ttl{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:4px}
+#_confirm-sub{font-size:12px;color:#94a3b8;margin-bottom:14px}
+#_confirm-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
+#_confirm-tbl tr{border-bottom:1px solid #f1f5f9}
+#_confirm-tbl td{padding:8px 4px;vertical-align:top}
+#_confirm-tbl td:first-child{color:#64748b;width:38%;font-weight:500;padding-right:12px;white-space:nowrap}
+#_confirm-tbl td:last-child{color:#0f172a;font-weight:600;word-break:break-word}
+._cbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+._cbtns button{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s}
+#_conf-no{background:#f1f5f9;color:#475569}
+#_conf-yes{background:#6366f1;color:#fff}
+#_conf-yes:hover{opacity:.85}
+#_result-box{background:#fff;border-radius:16px;padding:30px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.r-icon{font-size:44px;margin-bottom:10px}
+.r-title{font-size:18px;font-weight:700;color:#1e293b;margin-bottom:6px}
+.r-rid{font-size:11px;color:#94a3b8;margin-bottom:20px;font-family:monospace}
+#_res-view{display:block;padding:11px;background:#6366f1;color:#fff;border-radius:9px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px}
+#_res-again{width:100%;padding:11px;background:#f1f5f9;color:#475569;border:none;border-radius:9px;cursor:pointer;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -239,6 +260,21 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 </div>
 <a class="back" href="index.html">← 返回填報中心</a>
 </div>
+<!-- confirm modal -->
+<div id="_confirm-ov"><div id="_confirm-box">
+  <div id="_confirm-ttl">確認送出</div>
+  <div id="_confirm-sub">請確認以下資料正確無誤</div>
+  <table id="_confirm-tbl"></table>
+  <div class="_cbtns"><button id="_conf-no">返回修改</button><button id="_conf-yes">確認送出</button></div>
+</div></div>
+<!-- result overlay -->
+<div id="_result-ov"><div id="_result-box">
+  <div class="r-icon">✅</div>
+  <div class="r-title">提交成功！</div>
+  <div class="r-rid">Record: <span id="_res-rid"></span></div>
+  <a id="_res-view" target="_blank">查看提交記錄 →</a>
+  <button id="_res-again">再填一筆</button>
+</div></div>
 <script>
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
@@ -267,6 +303,26 @@ async function _post(tableKey,fields){
   const d=await r.json();
   if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
   return d;
+}
+
+function _showConfirm(title,rows,onConfirm){
+  const ov=document.getElementById("_confirm-ov");
+  if(!ov){onConfirm();return;}
+  document.getElementById("_confirm-ttl").textContent=title;
+  document.getElementById("_confirm-tbl").innerHTML=rows.filter(([,v])=>v).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+  ov.classList.add("show");
+  document.getElementById("_conf-no").onclick=()=>ov.classList.remove("show");
+  document.getElementById("_conf-yes").onclick=()=>{ov.classList.remove("show");onConfirm();};
+}
+function _showResult(rid,viewPage,onReset){
+  const ov=document.getElementById("_result-ov");
+  if(!ov)return;
+  const ridEl=document.getElementById("_res-rid");
+  if(ridEl) ridEl.textContent=rid||"";
+  const vl=document.getElementById("_res-view");
+  if(vl){if(viewPage&&rid){vl.href=viewPage+"?rid="+rid;vl.style.display="block";}else{vl.style.display="none";}}
+  document.getElementById("_res-again").onclick=()=>{ov.classList.remove("show");if(onReset)onReset();};
+  ov.classList.add("show");
 }
 
 async function _getProjects(typeFilter){
@@ -738,27 +794,40 @@ function toggleInvestFields(v){
 
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
-  const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
+  const ipVal=document.getElementById("m-ip").value;
+  const contractVal=document.getElementById("m-contract").value;
+  if(!document.getElementById("m-licensor-sel").value){
+    res.className="result err";res.style.display="block";
+    document.getElementById("res-icon").textContent="⚠️";
+    document.getElementById("res-msg").textContent="請先選擇版權方";
+    document.getElementById("res-sub").textContent="";
+    return;
+  }
+  if(!contractVal){
+    res.className="result err";res.style.display="block";
+    document.getElementById("res-icon").textContent="⚠️";
+    document.getElementById("res-msg").textContent="請選擇依附的合約";
+    document.getElementById("res-sub").textContent="若此版權方尚無合約，請先至「合約管理」建立一筆";
+    return;
+  }
+  const licText=document.getElementById("m-licensor-sel").options[document.getElementById("m-licensor-sel").selectedIndex]?.text||"";
+  const typeVal=document.getElementById("m-type").value;
+  const cats=[...document.querySelectorAll("#cats-chips .chip-active")].map(b=>b.dataset.cat);
+  const cur=document.getElementById("m-cur").value;
+  _showConfirm("確認建立項目",[
+    ["版權方", licText],
+    ["合約", contractVal],
+    ["項目名稱", document.getElementById("m-name").value],
+    ["業務類型", typeVal],
+    ["所在地", document.getElementById("m-loc").value],
+    ["授權品類", cats.join("、")||"—"],
+    ["保底金(MG)", (document.getElementById("m-mg").value?document.getElementById("m-mg").value+" "+cur:"—")],
+  ],async()=>{
+  const btn=document.getElementById("sbtn");
   btn.disabled=true; btn.textContent="提交中...";
   res.style.display="none";
   try{
-    const ipVal=document.getElementById("m-ip").value;
-    const contractVal=document.getElementById("m-contract").value;
-    if(!document.getElementById("m-licensor-sel").value){
-      res.className="result err";res.style.display="block";
-      document.getElementById("res-icon").textContent="⚠️";
-      document.getElementById("res-msg").textContent="請先選擇版權方";
-      btn.disabled=false;btn.textContent="提交";return;
-    }
-    if(!contractVal){
-      res.className="result err";res.style.display="block";
-      document.getElementById("res-icon").textContent="⚠️";
-      document.getElementById("res-msg").textContent="請選擇依附的合約";
-      document.getElementById("res-sub").textContent="若此版權方尚無合約，請先至「合約管理」建立一筆";
-      btn.disabled=false;btn.textContent="提交";return;
-    }
-    const cats=[...document.querySelectorAll("#cats-chips .chip-active")].map(b=>b.dataset.cat);
     const cur=document.getElementById("m-cur").value;
     const fields={
       "項目名稱":    document.getElementById("m-name").value,
@@ -801,17 +870,16 @@ document.getElementById("frm").onsubmit=async(e)=>{
       const fee=document.getElementById("m-agency-fee")?.value;
       if(fee) fields["代運營費結構"]=fee;
     }
-    await _post("project", fields);
-    res.className="result ok"; res.style.display="block";
-    document.getElementById("res-icon").textContent="✅";
-    document.getElementById("res-msg").textContent="項目已建立！";
-    document.getElementById("res-sub").textContent="接下來可至「新增產品」表單為此項目建立個別產品";
-    document.getElementById("frm").reset();
-    _resetDownstream();
-    document.getElementById("step2-card").style.display="none";
-    document.getElementById("m-licensor-sel").selectedIndex=0;
-    document.getElementById("m-contract").innerHTML="<option value=''>— 先選版權方 —</option>";
-    document.getElementById("cats-chips").innerHTML="";
+    const d=await _post("project", fields);
+    const _rid=d?.data?.record?.record_id||"";
+    _showResult(_rid,"view_project.html",()=>{
+      document.getElementById("frm").reset();
+      _resetDownstream();
+      document.getElementById("step2-card").style.display="none";
+      document.getElementById("m-licensor-sel").selectedIndex=0;
+      document.getElementById("m-contract").innerHTML="<option value=''>— 先選版權方 —</option>";
+      document.getElementById("cats-chips").innerHTML="";
+    });
   }catch(err){
     res.className="result err"; res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
@@ -821,6 +889,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
   }finally{
     btn.disabled=false; btn.textContent="提交";
   }
+  }); // end _showConfirm
 };
 </script>
 </body></html>

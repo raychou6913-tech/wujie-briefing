@@ -33,6 +33,27 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .back{display:block;text-align:center;color:#64748b;font-size:15px;font-weight:500;margin-top:24px;text-decoration:none;padding:10px}
 .back:hover{color:#f97316}
 @media(max-width:480px){.row2{grid-template-columns:1fr}}
+#_confirm-ov,#_result-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+#_confirm-ov.show,#_result-ov.show{display:flex}
+#_confirm-box{background:#fff;border-radius:16px;padding:26px 24px 20px;max-width:440px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#_confirm-ttl{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:4px}
+#_confirm-sub{font-size:12px;color:#94a3b8;margin-bottom:14px}
+#_confirm-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
+#_confirm-tbl tr{border-bottom:1px solid #f1f5f9}
+#_confirm-tbl td{padding:8px 4px;vertical-align:top}
+#_confirm-tbl td:first-child{color:#64748b;width:38%;font-weight:500;padding-right:12px;white-space:nowrap}
+#_confirm-tbl td:last-child{color:#0f172a;font-weight:600;word-break:break-word}
+._cbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+._cbtns button{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:opacity .15s}
+#_conf-no{background:#f1f5f9;color:#475569}
+#_conf-yes{background:#f97316;color:#fff}
+#_conf-yes:hover{opacity:.85}
+#_result-box{background:#fff;border-radius:16px;padding:30px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.r-icon{font-size:44px;margin-bottom:10px}
+.r-title{font-size:18px;font-weight:700;color:#1e293b;margin-bottom:6px}
+.r-rid{font-size:11px;color:#94a3b8;margin-bottom:20px;font-family:monospace}
+#_res-view{display:block;padding:11px;background:#f97316;color:#fff;border-radius:9px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px}
+#_res-again{width:100%;padding:11px;background:#f1f5f9;color:#475569;border:none;border-radius:9px;cursor:pointer;font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -132,6 +153,21 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 </div>
 <a class="back" href="index.html">← 返回填報中心</a>
 </div>
+<!-- confirm modal -->
+<div id="_confirm-ov"><div id="_confirm-box">
+  <div id="_confirm-ttl">確認送出</div>
+  <div id="_confirm-sub">請確認以下資料正確無誤</div>
+  <table id="_confirm-tbl"></table>
+  <div class="_cbtns"><button id="_conf-no">返回修改</button><button id="_conf-yes">確認送出</button></div>
+</div></div>
+<!-- result overlay -->
+<div id="_result-ov"><div id="_result-box">
+  <div class="r-icon">✅</div>
+  <div class="r-title">提交成功！</div>
+  <div class="r-rid">Record: <span id="_res-rid"></span></div>
+  <a id="_res-view" target="_blank">查看提交記錄 →</a>
+  <button id="_res-again">再填一筆</button>
+</div></div>
 <script>
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
@@ -160,6 +196,26 @@ async function _post(tableKey,fields){
   const d=await r.json();
   if(d.code!==0) throw new Error("["+d.code+"] "+(d.msg||"API error"));
   return d;
+}
+
+function _showConfirm(title,rows,onConfirm){
+  const ov=document.getElementById("_confirm-ov");
+  if(!ov){onConfirm();return;}
+  document.getElementById("_confirm-ttl").textContent=title;
+  document.getElementById("_confirm-tbl").innerHTML=rows.filter(([,v])=>v).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+  ov.classList.add("show");
+  document.getElementById("_conf-no").onclick=()=>ov.classList.remove("show");
+  document.getElementById("_conf-yes").onclick=()=>{ov.classList.remove("show");onConfirm();};
+}
+function _showResult(rid,viewPage,onReset){
+  const ov=document.getElementById("_result-ov");
+  if(!ov)return;
+  const ridEl=document.getElementById("_res-rid");
+  if(ridEl) ridEl.textContent=rid||"";
+  const vl=document.getElementById("_res-view");
+  if(vl){if(viewPage&&rid){vl.href=viewPage+"?rid="+rid;vl.style.display="block";}else{vl.style.display="none";}}
+  document.getElementById("_res-again").onclick=()=>{ov.classList.remove("show");if(onReset)onReset();};
+  ov.classList.add("show");
 }
 
 async function _getProjects(typeFilter){
