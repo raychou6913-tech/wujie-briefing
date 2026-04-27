@@ -7,6 +7,11 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+/* ── breadcrumb ── */
+.breadcrumb{background:#fff;border-bottom:1px solid #f1f5f9;padding:6px 24px;font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.breadcrumb a{color:#64748b;text-decoration:none}.breadcrumb a:hover{color:#6366f1}.breadcrumb .sep{color:#cbd5e1;margin:0 1px}.breadcrumb .cur{color:#0f172a;font-weight:600}
+.contract-badge-ok{background:#f0fdf4;color:#166534;border:1px solid #10b981}
+.contract-badge-warn{background:#fff7ed;color:#92400e;border:1px solid #f59e0b}
 /* ── topbar ── */
 .topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:200;box-shadow:0 1px 4px #0000000a}
 .tb-title{font-size:17px;font-weight:700;color:#0f172a}
@@ -76,6 +81,10 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 </head>
 <body>
 
+<div class="breadcrumb">
+  <a href="home.html">🏠 首頁</a><span class="sep">›</span>
+  <span class="cur">📋 項目管理中心</span>
+</div>
 <div class="topbar">
   <div class="tb-title">📋 項目管理中心</div>
   <div class="tb-actions">
@@ -107,14 +116,28 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <span id="modal-title-text">新增項目</span>
     <button class="close-btn" onclick="closeModal()">✕</button>
   </div>
+  <div class="field"><label>案件名稱 *</label><input id="m-name" placeholder="例：Snoopy 公仔 2026 Q2"></div>
   <div class="row2">
-    <div class="field"><label>項目名稱 *</label><input id="m-name" placeholder="例：Chiikawa 批發 Q2"></div>
     <div class="field"><label>IP品牌</label>
-      <select id="m-ip">
-        <option value="">請選擇</option>
-        <option>Snoopy</option><option>Mofusand</option><option>Chiikawa</option>
-        <option>Labubu</option><option>Fuggler</option><option>EVE點點</option><option>其他</option>
-      </select></div>
+      <select id="m-ip"><option value="">— 選擇 IP 品牌 —</option></select></div>
+    <div class="field"><label>依附合約 <span style="font-size:10px;color:#94a3b8">（選 IP 後載入）</span></label>
+      <select id="m-contract"><option value="">— 先選 IP 品牌 —</option></select>
+      <span id="contract-status-badge" style="display:none;margin-top:4px;font-size:11px;padding:2px 10px;border-radius:12px;font-weight:700"></span>
+    </div>
+  </div>
+  <!-- 上游缺資料時的 blocking gate -->
+  <div id="m-gate" style="display:none;background:#fff7ed;border:1.5px solid #f59e0b;border-radius:10px;padding:14px 16px;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px" id="m-gate-title"></div>
+    <div style="font-size:12px;color:#78350f;margin-bottom:10px" id="m-gate-msg"></div>
+    <a id="m-gate-link" href="#" target="_blank"
+      style="display:inline-block;background:#f59e0b;color:#fff;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;text-decoration:none">
+      前往補齊 →
+    </a>
+  </div>
+  <div id="m-contract-info" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:12px;color:#475569;margin-bottom:10px;line-height:1.8">
+    <span id="m-info-licensor"></span><br>
+    <span id="m-info-cats"></span><br>
+    <span id="m-info-region"></span>
   </div>
   <div class="row2">
     <div class="field"><label>業務類型</label>
@@ -153,7 +176,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 const APP_TOKEN="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const FEISHU=PROXY+"/open-apis";
-const TABLES={"project": "tblYBjAlemYPuNGy", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "sales": "tblRtqmbO9TO3sYZ", "approval": "tblD6acV3m2ZXJHe"};
+const TABLES={"project": "tblYBjAlemYPuNGy", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "sales": "tblRtqmbO9TO3sYZ", "approval": "tblD6acV3m2ZXJHe", "ip_db": "tblHPNUTdcFa7tqs"};
 const STAGES=["IP\u6c7a\u7b56\u4e2d", "\u9810\u7b97\u898f\u5283", "\u6982\u5ff5\u63d0\u6848", "\u8de8\u90e8\u9580\u78ba\u8a8d", "\u8a2d\u8a08\u9001\u5be9", "\u63a1\u8cfc\u8a62\u50f9", "\u9810\u7b97\u78ba\u8a8d", "\u6253\u6a23/\u958b\u6a21", "\u5e02\u5834\u6536\u55ae", "\u5927\u8ca8\u751f\u7522", "\u51fa\u8ca8\u7269\u6d41", "\u92b7\u552e\u63a8\u5ee3", "\u5df2\u5b8c\u6210", "\u5df2\u66ab\u505c"];
 const STAGE_IDX=Object.fromEntries(STAGES.map((s,i)=>[s,i]));
 
@@ -165,12 +188,19 @@ const STAGE_IDX=Object.fromEntries(STAGES.map((s,i)=>[s,i]));
   if(el) el.textContent=s.name+"（"+s.dept+"）";
 })();
 
-let token="", projects=[], subtaskCache={}, editingId=null, currentFilter="全部";
+let token="", projects=[], subtaskCache={}, editingId=null, currentFilter="全部", ipBrands=[];
 
-const IP_COLOR={
+const IP_COLOR_BASE={
   "Snoopy":"#f59e0b","Mofusand":"#ec4899","Chiikawa":"#6366f1",
   "Labubu":"#10b981","Fuggler":"#8b5cf6","EVE點點":"#06b6d4","其他":"#64748b"
 };
+const _IP_PALETTE=["#0ea5e9","#d946ef","#f97316","#84cc16","#14b8a6","#e11d48","#7c3aed"];
+function getIpColor(name){
+  if(IP_COLOR_BASE[name]) return IP_COLOR_BASE[name];
+  let h=0; for(let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))&0xffffffff;
+  return _IP_PALETTE[Math.abs(h)%_IP_PALETTE.length];
+}
+const IP_COLOR=new Proxy(IP_COLOR_BASE,{get:(t,k)=>t[k]||getIpColor(k)});
 const STATUS_COLOR={
   "計劃中":"#6366f1","進行中":"#10b981","已延遲":"#ef4444","已完成":"#64748b","已取消":"#374151"
 };
@@ -183,6 +213,21 @@ async function getToken(){
     method:"POST",headers:{"Content-Type":"application/json"},body:"{}"
   });
   token=(await r.json()).tenant_access_token;
+}
+
+async function loadIpBrands(){
+  if(ipBrands.length) return ipBrands;
+  if(!token) await getToken();
+  const r=await fetch(FEISHU+`/bitable/v1/apps/${APP_TOKEN}/tables/${TABLES.ip_db}/records?page_size=100`,
+    {headers:{"Authorization":"Bearer "+token}});
+  const d=await r.json();
+  ipBrands=(d.data?.items||[]).map(rec=>{
+    const f=rec.fields||{};
+    const nv=f["IP名稱"]; const name=Array.isArray(nv)?nv[0]?.text||"":String(nv||"");
+    const lv=f["版權方"]; const licensor=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
+    return name?{name,licensor}:null;
+  }).filter(Boolean);
+  return ipBrands;
 }
 
 async function fetchAll(tableKey){
@@ -359,15 +404,120 @@ function renderSubtask(id,type){
   body.innerHTML=`<table class="st-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
 }
 
+// ── contracts helper ─────────────────────────────────────────
+let contractsCache=null;
+async function fetchContracts(){
+  if(contractsCache) return contractsCache;
+  if(!token) await getToken();
+  const r=await fetch(FEISHU+`/bitable/v1/apps/${APP_TOKEN}/tables/${TABLES.contract}/records?page_size=200`,
+    {headers:{"Authorization":"Bearer "+token}});
+  const d=await r.json();
+  const t=v=>Array.isArray(v)?v[0]?.text||"":String(v||"");
+  contractsCache=(d.data?.items||[]).map(rec=>{
+    const f=rec.fields||{};
+    const name=t(f["合約名稱"]); if(!name) return null;
+    return {name,ip:t(f["IP品牌"]),licensor:t(f["版權方"]),
+            status:t(f["合約狀態"]),cats:t(f["授權品類"]),region:t(f["授權地區"])};
+  }).filter(Boolean);
+  return contractsCache;
+}
+
+function _setGate(show, title="", msg="", link="", linkLabel="前往補齊 →"){
+  const gate=document.getElementById("m-gate");
+  const saveBtn=document.querySelector(".modal .btn-primary");
+  gate.style.display=show?"block":"none";
+  if(show){
+    document.getElementById("m-gate-title").textContent=title;
+    document.getElementById("m-gate-msg").textContent=msg;
+    const a=document.getElementById("m-gate-link");
+    a.href=link; a.textContent=linkLabel;
+    if(saveBtn) saveBtn.disabled=true;
+  } else {
+    if(saveBtn) saveBtn.disabled=false;
+  }
+}
+
+async function loadContractsForIp(ipName, selectedContract=""){
+  const sel=document.getElementById("m-contract");
+  const badge=document.getElementById("contract-status-badge");
+  const info=document.getElementById("m-contract-info");
+  sel.innerHTML='<option value="">載入中…</option>';
+  const all=await fetchContracts();
+  const list=ipName?all.filter(c=>c.ip===ipName):[];
+
+  if(!ipName){
+    sel.innerHTML='<option value="">— 先選 IP 品牌 —</option>';
+    badge.style.display="none"; info.style.display="none";
+    return;
+  }
+  if(list.length===0){
+    sel.innerHTML='<option value="">（此 IP 尚無合約）</option>';
+    badge.style.display="none"; info.style.display="none";
+    _setGate(true,
+      "⚠️ 需要先建立合約",
+      "「"+ipName+"」目前沒有任何合約記錄。請先在合約管理中建立對應合約（任何狀態皆可），才能新增案件。",
+      "forms/contract.html","前往合約管理 →");
+    return;
+  }
+  _setGate(false);
+  sel.innerHTML='<option value="">— 選擇合約（可跨狀態）—</option>';
+  list.forEach(c=>{
+    const o=document.createElement("option");
+    o.value=c.name; o.textContent=c.name+(c.status?" ["+c.status+"]":"");
+    o.dataset.licensor=c.licensor; o.dataset.status=c.status;
+    o.dataset.cats=c.cats; o.dataset.region=c.region;
+    sel.appendChild(o);
+  });
+  if(selectedContract) sel.value=selectedContract;
+  const syncInfo=()=>{
+    const ch=sel.options[sel.selectedIndex];
+    const s=ch?.dataset?.status||"";
+    if(!ch?.value){badge.style.display="none"; info.style.display="none"; return;}
+    const safe=["已簽署","執行中"];
+    badge.style.display="inline-block"; badge.textContent=s;
+    badge.style.cssText="display:inline-block;margin-top:4px;font-size:11px;padding:2px 10px;border-radius:12px;font-weight:700;"+
+      (safe.includes(s)?"background:#f0fdf4;color:#166534;border:1px solid #10b981":"background:#fff7ed;color:#92400e;border:1px solid #f59e0b");
+    info.style.display="block";
+    document.getElementById("m-info-licensor").textContent="版權方："+(ch.dataset.licensor||"—");
+    document.getElementById("m-info-cats").textContent="授權品類："+(ch.dataset.cats||"—");
+    document.getElementById("m-info-region").textContent="授權地區："+(ch.dataset.region||"—");
+  };
+  sel.onchange=syncInfo; syncInfo();
+}
+
+// ── IP品牌 select helper ──────────────────────────────────────
+async function populateIpSelect(selectedVal="", selectedContract=""){
+  const sel=document.getElementById("m-ip");
+  const brands=await loadIpBrands();
+  if(brands.length===0){
+    sel.innerHTML='<option value="">（版權方資料庫尚無資料）</option>';
+    _setGate(true,
+      "⚠️ 需要先建立版權方資料",
+      "版權方資料庫目前是空的。請先新增至少一筆 IP 資料，才能建立合約與案件。",
+      "forms/ip_db.html","前往版權方資料庫 →");
+    return;
+  }
+  _setGate(false);
+  sel.innerHTML='<option value="">— 選擇 IP 品牌 —</option>';
+  brands.forEach(ip=>{
+    const o=document.createElement("option");
+    o.value=ip.name; o.textContent=ip.name; o.dataset.licensor=ip.licensor||"";
+    sel.appendChild(o);
+  });
+  if(selectedVal) sel.value=selectedVal;
+  sel.onchange=()=>loadContractsForIp(sel.value,"");
+  await loadContractsForIp(sel.value, selectedContract);
+}
+
 // ── Modal CRUD ────────────────────────────────────────────────
 function openModal(id=null){
   editingId=id;
-  document.getElementById("modal-title-text").textContent=id?"編輯項目":"新增項目";
+  document.getElementById("modal-title-text").textContent=id?"編輯案件":"新增案件";
   if(id){
     const p=projects.find(x=>x.record_id===id);
     if(p){
       document.getElementById("m-name").value=fv(p,"項目名稱");
-      document.getElementById("m-ip").value=fv(p,"IP品牌");
+      populateIpSelect(fv(p,"IP品牌"), fv(p,"合約名稱"));
       document.getElementById("m-type").value=fv(p,"業務類型");
       document.getElementById("m-loc").value=fv(p,"所在地");
       document.getElementById("m-owner").value=fv(p,"負責人");
@@ -379,7 +529,7 @@ function openModal(id=null){
     }
   } else {
     document.getElementById("m-name").value="";
-    document.getElementById("m-ip").value="";
+    populateIpSelect("");
     document.getElementById("m-note").value="";
     const today=new Date().toISOString().split("T")[0];
     document.getElementById("m-start").value=today;
@@ -397,10 +547,17 @@ function closeModal(){
 
 async function saveProject(){
   const name=document.getElementById("m-name").value.trim();
-  if(!name){ alert("請填入項目名稱"); return; }
+  if(!name){ alert("請填入案件名稱"); return; }
+  const ipVal=document.getElementById("m-ip").value;
+  if(!ipVal){ alert("請先選擇 IP 品牌"); return; }
+  const contractSel=document.getElementById("m-contract");
+  if(!contractSel.value){ alert("請選擇依附的合約。\n\n若此 IP 尚無合約，請先至「合約管理」建立一筆（任何狀態皆可）。"); return; }
+  const contractChosen=contractSel.options[contractSel.selectedIndex];
   const fields={
     "項目名稱":  name,
-    "IP品牌":    document.getElementById("m-ip").value,
+    "合約名稱":  contractSel.value||"",
+    "IP品牌":    document.getElementById("m-ip").value||(contractChosen?.dataset?.ip||""),
+    "版權方":    contractChosen?.dataset?.licensor||"",
     "業務類型":  document.getElementById("m-type").value,
     "所在地":    document.getElementById("m-loc").value,
     "負責人":    document.getElementById("m-owner").value,
