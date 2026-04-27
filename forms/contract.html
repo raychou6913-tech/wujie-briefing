@@ -50,18 +50,19 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <div class="wrap">
 <form id="frm">
 
-<div class="card">
-  <div class="ctitle">📋 關聯項目</div>
-  <div class="f">
-    <label>選擇項目</label>
-    <select id="proj-sel"><option value="">載入中...</option></select>
-    <div class="hint">選擇此填報對應的項目，系統將自動關聯</div>
-  </div>
-</div>
+    <div class="card">
+      <div class="ctitle">第一層連動：版權方 & IP</div>
+      <div class="f"><label>IP 品牌 <span class="req">*</span></label>
+        <select id="f-ip" required><option value="">載入中…</option></select>
+        <div class="hint">從版權方資料庫選擇，選後自動帶入版權方名稱</div></div>
+      <div class="f"><label>版權方</label>
+        <input id="f-licensor" placeholder="選 IP 後自動帶入" readonly
+          style="background:#f1f5f9;color:#64748b;cursor:default"></div>
+    </div>
     <div class="card">
       <div class="ctitle">合約基本資訊</div>
       <div class="f"><label>合約名稱 <span class="req">*</span></label>
-        <input id="f-name" required placeholder="例：Chiikawa 2026 台灣授權合約"></div>
+        <input id="f-name" required placeholder="例：Chiikawa 2026 台灣 IP 授權合約"></div>
       <div class="row2">
         <div class="f"><label>合約類型</label>
           <select id="f-type">
@@ -75,7 +76,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
           </select></div>
       </div>
       <div class="f"><label>對方公司 / 機構 <span class="req">*</span></label>
-        <input id="f-party" required placeholder="合約對方全名"></div>
+        <input id="f-party" required placeholder="合約對方全名（可與版權方相同）"></div>
       <div class="row2">
         <div class="f"><label>我方簽署人</label>
           <select id="f-signer">
@@ -86,6 +87,13 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       </div>
       <div class="f"><label>填報人</label>
         <input id="f-owner" placeholder="你的名字"></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">授權範圍（此合約覆蓋範圍）</div>
+      <div class="f"><label>授權品類</label>
+        <input id="f-cats" placeholder="例：公仔、絨毛玩偶、3C配件、文具周邊"></div>
+      <div class="f"><label>授權地區</label>
+        <input id="f-region" placeholder="例：台灣、香港、澳門；或 全球"></div>
     </div>
     <div class="card">
       <div class="ctitle">金額與期間</div>
@@ -233,6 +241,71 @@ async function _loadIpSelect(selectId){
   }catch(e){}
 }
 
+let _contractCache=null;
+async function _getContracts(ipFilter){
+  if(!_contractCache){
+    const tk=await _getToken();
+    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["contract"]+"/records?page_size=200",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const d=await r.json();
+    if(d.code!==0){_contractCache=[];return [];}
+    _contractCache=(d.data?.items||[]).map(rec=>{
+      const f=rec.fields||{};
+      const _t=v=>Array.isArray(v)?v[0]?.text||"":String(v||"");
+      const name=_t(f["合約名稱"]);
+      if(!name) return null;
+      return {
+        name, ip:_t(f["IP品牌"]), licensor:_t(f["版權方"]),
+        status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"])
+      };
+    }).filter(Boolean);
+  }
+  return ipFilter?_contractCache.filter(c=>c.ip===ipFilter):_contractCache;
+}
+
+async function _loadContractSelect(selectId,ipFilter){
+  const sel=document.getElementById(selectId);
+  if(!sel) return;
+  try{
+    const list=await _getContracts(ipFilter);
+    const prev=sel.value;
+    sel.innerHTML='<option value="">— 選擇合約 —</option>';
+    list.forEach(c=>{
+      const o=document.createElement("option");
+      const statusLabel=c.status?" ["+c.status+"]":"";
+      o.value=c.name; o.textContent=c.name+statusLabel;
+      o.dataset.ip=c.ip; o.dataset.licensor=c.licensor;
+      o.dataset.status=c.status; o.dataset.cats=c.cats; o.dataset.region=c.region;
+      sel.appendChild(o);
+    });
+    if(list.length===0){
+      const empty=document.createElement("option"); empty.disabled=true;
+      empty.textContent="（尚無此 IP 的合約）"; sel.appendChild(empty);
+    }
+    if(prev) sel.value=prev;
+    const _syncContract=()=>{
+      const ch=sel.options[sel.selectedIndex];
+      const _set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+      _set("f-ip",ch?.dataset?.ip||""); _set("m-ip",ch?.dataset?.ip||"");
+      _set("f-licensor",ch?.dataset?.licensor||""); _set("m-licensor",ch?.dataset?.licensor||"");
+      _set("f-cats",ch?.dataset?.cats||""); _set("m-cats",ch?.dataset?.cats||"");
+      _set("f-contract-region",ch?.dataset?.region||"");
+      const badge=document.getElementById("contract-status-badge");
+      if(badge&&ch?.dataset?.status){
+        const s=ch.dataset.status;
+        const safe=["已簽署","執行中"];
+        badge.style.display="inline-block";
+        badge.textContent=s;
+        badge.style.cssText+=";padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;"+
+          (safe.includes(s)?"background:#f0fdf4;color:#166534;border:1px solid #10b981":"background:#fff7ed;color:#92400e;border:1px solid #f59e0b");
+      }else if(badge){badge.style.display="none";}
+    };
+    sel.addEventListener("change",_syncContract);
+    _syncContract();
+  }catch(e){}
+}
+
 async function _loadProjectSelect(selectId,typeFilter){
   const sel=document.getElementById(selectId);
   if(!sel) return;
@@ -367,19 +440,23 @@ document.getElementById("frm").onsubmit=async(e)=>{
     const tk=await _getToken();
     const proj=_projVal("proj-sel");
     const fields={...({
-      "合約名稱":    document.getElementById("f-name").value,
-      "合約類型":    document.getElementById("f-type").value,
-      "合約狀態":    document.getElementById("f-status").value,
-      "對方公司":    document.getElementById("f-party").value,
-      "我方簽署人":  document.getElementById("f-signer").value,
-      "對方聯絡人":  document.getElementById("f-contact").value,
-      "合約金額":    parseFloat(document.getElementById("f-amount").value)||0,
-      "幣別":        document.getElementById("f-cur").value,
-      "簽署日期":    _dateToTs(document.getElementById("f-sign").value),
-      "到期日期":    _dateToTs(document.getElementById("f-exp").value),
-      "主要條款摘要":document.getElementById("f-terms").value,
-      "特殊條款":    document.getElementById("f-notes").value,
-      "負責人":      document.getElementById("f-owner").value,
+      "IP品牌":       document.getElementById("f-ip").value,
+      "版權方":       document.getElementById("f-licensor").value,
+      "合約名稱":     document.getElementById("f-name").value,
+      "合約類型":     document.getElementById("f-type").value,
+      "合約狀態":     document.getElementById("f-status").value,
+      "對方公司":     document.getElementById("f-party").value,
+      "我方簽署人":   document.getElementById("f-signer").value,
+      "對方聯絡人":   document.getElementById("f-contact").value,
+      "授權品類":     document.getElementById("f-cats").value,
+      "授權地區":     document.getElementById("f-region").value,
+      "合約金額":     parseFloat(document.getElementById("f-amount").value)||0,
+      "幣別":         document.getElementById("f-cur").value,
+      "簽署日期":     _dateToTs(document.getElementById("f-sign").value),
+      "到期日期":     _dateToTs(document.getElementById("f-exp").value),
+      "主要條款摘要": document.getElementById("f-terms").value,
+      "特殊條款":     document.getElementById("f-notes").value,
+      "負責人":       document.getElementById("f-owner").value,
     })};
     Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined)delete fields[k];});
     if(proj) fields["項目關聯"]=proj;

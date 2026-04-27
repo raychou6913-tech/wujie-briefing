@@ -70,22 +70,19 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <input id="f-agent-contact" placeholder="姓名 + 聯絡方式"></div>
     </div>
     <div class="card">
-      <div class="ctitle">授權範圍</div>
-      <div class="f"><label>授權地區</label>
-        <input id="f-territory" placeholder="例：台灣、香港、澳門；或 全球"></div>
-      <div class="f"><label>授權品類（已取得）</label>
-        <textarea id="f-cats" placeholder="例：公仔、絨毛玩偶、3C配件（描述已授權的品類範圍）"></textarea></div>
+      <div class="ctitle">關係備注</div>
       <div class="row2">
-        <div class="f"><label>合約狀態</label>
-          <select id="f-status">
-            <option>洽談中</option><option>已簽署</option><option>待續約</option>
-            <option>已到期</option><option>未接觸</option>
-          </select></div>
         <div class="f"><label>主對接人（我方）</label>
           <select id="f-handler">
             <option>Ray</option><option>安然</option><option>Shawn</option><option>Bevis</option><option>賴哥</option><option>木子</option><option>高維</option><option>董亮</option><option>德寶</option>
           </select></div>
+        <div class="f"><label>合作關係</label>
+          <select id="f-status">
+            <option>洽談中</option><option>合作中</option><option>暫停合作</option>
+            <option>已終止</option><option>未接觸</option>
+          </select></div>
       </div>
+      <div class="hint" style="margin-top:0;padding:0 0 4px">授權品類與授權地區請在「合約管理」逐筆填寫，以對應各版本合約</div>
     </div>
     <div class="card">
       <div class="ctitle">備注</div>
@@ -205,6 +202,71 @@ async function _loadIpSelect(selectId){
     };
     sel.addEventListener("change",_syncLicensor);
     _syncLicensor();
+  }catch(e){}
+}
+
+let _contractCache=null;
+async function _getContracts(ipFilter){
+  if(!_contractCache){
+    const tk=await _getToken();
+    const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["contract"]+"/records?page_size=200",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const d=await r.json();
+    if(d.code!==0){_contractCache=[];return [];}
+    _contractCache=(d.data?.items||[]).map(rec=>{
+      const f=rec.fields||{};
+      const _t=v=>Array.isArray(v)?v[0]?.text||"":String(v||"");
+      const name=_t(f["合約名稱"]);
+      if(!name) return null;
+      return {
+        name, ip:_t(f["IP品牌"]), licensor:_t(f["版權方"]),
+        status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"])
+      };
+    }).filter(Boolean);
+  }
+  return ipFilter?_contractCache.filter(c=>c.ip===ipFilter):_contractCache;
+}
+
+async function _loadContractSelect(selectId,ipFilter){
+  const sel=document.getElementById(selectId);
+  if(!sel) return;
+  try{
+    const list=await _getContracts(ipFilter);
+    const prev=sel.value;
+    sel.innerHTML='<option value="">— 選擇合約 —</option>';
+    list.forEach(c=>{
+      const o=document.createElement("option");
+      const statusLabel=c.status?" ["+c.status+"]":"";
+      o.value=c.name; o.textContent=c.name+statusLabel;
+      o.dataset.ip=c.ip; o.dataset.licensor=c.licensor;
+      o.dataset.status=c.status; o.dataset.cats=c.cats; o.dataset.region=c.region;
+      sel.appendChild(o);
+    });
+    if(list.length===0){
+      const empty=document.createElement("option"); empty.disabled=true;
+      empty.textContent="（尚無此 IP 的合約）"; sel.appendChild(empty);
+    }
+    if(prev) sel.value=prev;
+    const _syncContract=()=>{
+      const ch=sel.options[sel.selectedIndex];
+      const _set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+      _set("f-ip",ch?.dataset?.ip||""); _set("m-ip",ch?.dataset?.ip||"");
+      _set("f-licensor",ch?.dataset?.licensor||""); _set("m-licensor",ch?.dataset?.licensor||"");
+      _set("f-cats",ch?.dataset?.cats||""); _set("m-cats",ch?.dataset?.cats||"");
+      _set("f-contract-region",ch?.dataset?.region||"");
+      const badge=document.getElementById("contract-status-badge");
+      if(badge&&ch?.dataset?.status){
+        const s=ch.dataset.status;
+        const safe=["已簽署","執行中"];
+        badge.style.display="inline-block";
+        badge.textContent=s;
+        badge.style.cssText+=";padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;"+
+          (safe.includes(s)?"background:#f0fdf4;color:#166534;border:1px solid #10b981":"background:#fff7ed;color:#92400e;border:1px solid #f59e0b");
+      }else if(badge){badge.style.display="none";}
+    };
+    sel.addEventListener("change",_syncContract);
+    _syncContract();
   }catch(e){}
 }
 
@@ -347,9 +409,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "版權方聯絡人":document.getElementById("f-contact").value,
       "聯絡方式":    document.getElementById("f-contact-info").value,
       "代理商聯絡人":document.getElementById("f-agent-contact").value,
-      "授權地區":    document.getElementById("f-territory").value,
-      "授權品類":    document.getElementById("f-cats").value,
-      "合約狀態":    document.getElementById("f-status").value,
+      "合作關係":    document.getElementById("f-status").value,
       "主對接人":    document.getElementById("f-handler").value,
       "備註":        document.getElementById("f-note").value,
     })};
