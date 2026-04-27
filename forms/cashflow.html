@@ -162,23 +162,30 @@ async function _loadProjectSelect(selectId,typeFilter){
   try{
     const list=await _getProjects(typeFilter);
     sel.innerHTML='<option value="">— 選擇項目（選填）—</option>';
-    list.forEach(name=>{
+    list.forEach(proj=>{
       const o=document.createElement("option");
-      o.value=name; o.textContent=name;
+      o.value=proj.name; o.textContent=proj.name;
+      if(proj.ip) o.dataset.ip=proj.ip;
       sel.appendChild(o);
     });
     const opt=document.createElement("option");
     opt.value="__new__"; opt.textContent="＋ 新增項目（跳轉）";
     sel.appendChild(opt);
+    const _fillIp=()=>{
+      const chosen=sel.options[sel.selectedIndex];
+      const ipEl=document.getElementById("f-ip");
+      if(ipEl && chosen && chosen.dataset.ip) ipEl.value=chosen.dataset.ip;
+    };
     sel.onchange=()=>{
-      if(sel.value==="__new__") window.open("project.html","_blank");
+      if(sel.value==="__new__"){ window.open("project.html","_blank"); return; }
+      _fillIp();
     };
     // URL param 自動帶入項目（從填報中心點擊卡片跳轉時使用）
     const urlProj=new URLSearchParams(location.search).get("proj");
     if(urlProj){
       const found=[...sel.options].find(o=>o.value===urlProj);
       if(found){sel.value=urlProj;sel.dispatchEvent(new Event("change"));}
-    }
+    } else _fillIp();
   }catch(e){
     sel.innerHTML='<option value="">（無法載入項目列表）</option>';
     const txt=document.createElement("input");
