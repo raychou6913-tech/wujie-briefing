@@ -331,7 +331,8 @@ async function loadSuppliers(){
     (d.data?.items||[]).forEach(item=>{
       const f=item.fields||{};
       const n=Array.isArray(f["供應商名稱"])?f["供應商名稱"][0]?.text||"":String(f["供應商名稱"]||"");
-      if(n){const o=document.createElement("option");o.value=n;o.textContent=n;sel.appendChild(o);}
+      const status=Array.isArray(f["審核狀態"])?f["審核狀態"][0]?.text||"":String(f["審核狀態"]||"");
+      if(n&&status==="已核准"){const o=document.createElement("option");o.value=n;o.textContent=n;sel.appendChild(o);}
     });
     const add=document.createElement("option");
     add.value="__new__"; add.textContent="＋ 找不到？前往申請新增供應商";

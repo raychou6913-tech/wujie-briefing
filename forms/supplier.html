@@ -244,27 +244,19 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
-_loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
-
+_loadProjectSelect("proj-sel",null);
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
-  const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
-  if(missing.length){
-    const res=document.getElementById("res");
-    res.className="result err"; res.style.display="block";
-    document.getElementById("res-icon").textContent="⚠️";
-    document.getElementById("res-msg").textContent="請填寫必填欄位";
-    document.getElementById("res-sub").textContent=missing.join("、");
-    return;
-  }
+  const name=document.getElementById("f-name").value.trim();
+  if(!name){alert("請填寫供應商名稱");return;}
+  const sess=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  const applicant=sess?.name||"";
   const btn=document.getElementById("sbtn");
   const res=document.getElementById("res");
-  btn.disabled=true; btn.textContent="提交中...";
-  res.style.display="none";
+  btn.disabled=true;btn.textContent="提交中...";res.style.display="none";
   try{
-    const proj=_projVal("proj-sel");
-    const fields={...({
-      "供應商名稱":  document.getElementById("f-name").value,
+    await _post("supplier",{
+      "供應商名稱":  name,
       "所在地區":    document.getElementById("f-region").value,
       "合作評分":    document.getElementById("f-rating").value,
       "聯絡人":      document.getElementById("f-contact").value,
@@ -275,23 +267,30 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "過去報價記錄":document.getElementById("f-quote").value,
       "主要對接人":  document.getElementById("f-handler").value,
       "備註":        document.getElementById("f-note").value,
-    })};
-    if(proj) fields["項目關聯"]=proj;
-    await _post("supplier", fields);
-    res.className="result ok"; res.style.display="block";
+      "審核狀態":    "審核中",
+      "申請人":      applicant,
+    });
+    await _post("approval",{
+      "審批標題":  "新增供應商："+name,
+      "審批類型":  "新增供應商申請",
+      "申請人":    applicant,
+      "申請說明":  "品類："+document.getElementById("f-cats").value+"　地區："+document.getElementById("f-region").value,
+      "審批人":    "安然、躍明",
+      "審批狀態":  "待審批",
+    });
+    res.className="result ok";res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
-    document.getElementById("res-msg").textContent="提交成功！";
-    document.getElementById("res-sub").textContent="資料已同步至飛書，儀表板將於下次排程更新";
+    document.getElementById("res-msg").textContent="供應商申請已提交！";
+    document.getElementById("res-sub").textContent="已通知安然、躍明審核，核准後即可在費用申請中選用";
     document.getElementById("frm").reset();
-    _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
   }catch(err){
-    res.className="result err"; res.style.display="block";
+    res.className="result err";res.style.display="block";
     document.getElementById("res-icon").textContent="❌";
     document.getElementById("res-msg").textContent="提交失敗";
-    document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖此錯誤並回報管理員";
+    document.getElementById("res-sub").textContent=err.message+" ｜ 請截圖回報管理員";
     console.error(err);
   }finally{
-    btn.disabled=false; btn.textContent="提交";
+    btn.disabled=false;btn.textContent="提交";
   }
 };
 </script>
