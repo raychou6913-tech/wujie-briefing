@@ -72,10 +72,20 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <div class="f"><label>幣別</label>
           <select id="f-cur"><option>TWD</option><option>CNY</option><option>THB</option><option>USD</option></select></div>
       </div>
-      <div class="f"><label>送審對象</label>
-        <select id="f-approver">
-          <option>Ray</option><option>安然</option><option>Shawn</option><option>Bevis</option><option>賴哥</option><option>木子</option><option>高維</option><option>董亮</option><option>德寶</option>
-        </select></div>
+      <div class="f">
+        <label>送審對象 <span class="req">*</span></label>
+        <div class="hint" style="margin-bottom:8px">可勾選多位，提交後系統將 Email 通知所選主管</div>
+        <div id="approver-boxes" style="display:flex;flex-wrap:wrap;gap:10px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:normal;color:#0f172a">
+            <input type="checkbox" value="Ray" style="width:16px;height:16px;accent-color:#ef4444"> Ray（CEO）</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:normal;color:#0f172a">
+            <input type="checkbox" value="安然" style="width:16px;height:16px;accent-color:#ef4444"> 安然（GM）</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:normal;color:#0f172a">
+            <input type="checkbox" value="Shawn" style="width:16px;height:16px;accent-color:#ef4444"> Shawn（COO）</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:normal;color:#0f172a">
+            <input type="checkbox" value="躍明" style="width:16px;height:16px;accent-color:#ef4444"> 躍明（財務）</label>
+        </div>
+      </div>
     </div>
 <button class="btn" type="submit" id="sbtn">提交</button>
 </form>
@@ -237,6 +247,11 @@ if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
 _loadProjectSelect("proj-sel",window._ctxTypeFilter||null);
 
+      document.getElementById("submit-btn").addEventListener("click",function(e){
+        const checked=document.querySelectorAll("#approver-boxes input:checked");
+        if(!checked.length){e.preventDefault();alert("請至少勾選一位送審對象");return false;}
+      },true);
+    
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
   const missing=[...document.querySelectorAll("#frm [required]")].filter(el=>!el.value.trim()).map(el=>el.closest(".f")?.querySelector("label")?.textContent?.replace("*","").trim()||el.id);
@@ -262,7 +277,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "申請說明": document.getElementById("f-desc").value,
       "金額":     parseFloat(document.getElementById("f-amount").value)||0,
       "幣別":     document.getElementById("f-cur").value,
-      "審批人":   document.getElementById("f-approver").value,
+      "審批人":   Array.from(document.querySelectorAll("#approver-boxes input:checked")).map(cb=>cb.value).join("、"),
       "審批狀態": "待審批",
     })};
     if(proj) fields["項目關聯"]=proj;
