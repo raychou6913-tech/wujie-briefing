@@ -80,6 +80,10 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
           </select></div>
       </div>
       <div class="hint" style="margin-top:-6px;margin-bottom:10px">所有金額均含稅</div>
+      <div id="mg-pool" style="display:none;margin-top:4px;padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px">
+        <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:8px">🏦 版權資金池（MG保底金追蹤）</div>
+        <div id="mg-pool-body" style="font-size:13px;color:#64748b">載入中...</div>
+      </div>
     </div>
     <div class="card">
       <div class="ctitle">供應商 & 付款條件</div>
@@ -276,11 +280,22 @@ _loadProjectSelect("proj-sel", window._ctxTypeFilter||null);
   document.getElementById("f-date").value=d;
 })();
 
-// 選項目後載入預算對照 + 供應商
+// 選項目後載入預算對照；若類別為版權費用則同時載入MG資金池
 document.getElementById("proj-sel").addEventListener("change",function(){
   const proj=this.value;
-  if(proj&&proj!=="__new__") loadBudgetRef(proj);
-  else document.getElementById("budget-ref").style.display="none";
+  if(proj&&proj!=="__new__"){
+    loadBudgetRef(proj);
+    if(document.getElementById("f-cat").value==="版權費用") loadMGPool(proj);
+  } else {
+    document.getElementById("budget-ref").style.display="none";
+    document.getElementById("mg-pool").style.display="none";
+  }
+});
+// 切換費用類別時控制MG資金池顯示
+document.getElementById("f-cat").addEventListener("change",function(){
+  const proj=document.getElementById("proj-sel").value;
+  if(this.value==="版權費用"&&proj&&proj!=="__new__") loadMGPool(proj);
+  else document.getElementById("mg-pool").style.display="none";
 });
 
 async function loadBudgetRef(projName){
@@ -317,6 +332,69 @@ async function loadBudgetRef(projName){
     body.innerHTML="<span style='color:#ef4444;font-size:12px'>載入失敗</span>";
   }
 }
+
+async function loadMGPool(projName){
+  const box=document.getElementById("mg-pool");
+  const body=document.getElementById("mg-pool-body");
+  box.style.display="block";
+  body.innerHTML="<span style='color:#94a3b8'>載入中...</span>";
+  try{
+    const tk=await _getToken();
+    // 1. 取項目MG保底金
+    const rp=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["project"]+"/records?page_size=200",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const dp=await rp.json();
+    let mg=0,mgCur="CNY";
+    (dp.data?.items||[]).forEach(item=>{
+      const f=item.fields||{};
+      const n=Array.isArray(f["項目名稱"])?f["項目名稱"][0]?.text||"":String(f["項目名稱"]||"");
+      if(n===projName){
+        mg=parseFloat(f["保底金額"]||0);
+        mgCur=Array.isArray(f["幣別"])?f["幣別"][0]?.text||"CNY":String(f["幣別"]||"CNY");
+      }
+    });
+    // 2. 取該項目已有版權費用合計
+    const re=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["expense"]+"/records?page_size=500",{
+      headers:{"Authorization":"Bearer "+tk}
+    });
+    const de=await re.json();
+    let used=0;
+    (de.data?.items||[]).forEach(item=>{
+      const f=item.fields||{};
+      const pn=Array.isArray(f["關聯項目"])?f["關聯項目"][0]?.text||"":String(f["關聯項目"]||"");
+      const cat=Array.isArray(f["費用類別"])?f["費用類別"][0]?.text||"":String(f["費用類別"]||"");
+      if(pn===projName&&cat==="版權費用") used+=parseFloat(f["實際金額"]||0);
+    });
+    const remaining=mg-used;
+    const curAmt=parseFloat(document.getElementById("f-amount").value)||0;
+    const afterThis=used+curAmt;
+    const overMG=mg>0&&afterThis>mg;
+    const pct=mg>0?Math.min(100,(used/mg*100)).toFixed(1):0;
+    const bar=mg>0?`<div style="background:#fecaca;border-radius:4px;height:6px;margin:6px 0"><div style="background:${overMG?"#ef4444":"#f97316"};width:${pct}%;height:100%;border-radius:4px;transition:width .3s"></div></div>`:"";
+    const statusLabel=mg<=0?"（項目未設MG保底金）":overMG?
+      `<span style="background:#fef2f2;color:#dc2626;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700">⚠️ 超出MG，需補繳</span>`:
+      `<span style="background:#f0fdf4;color:#16a34a;padding:3px 8px;border-radius:6px;font-size:12px;font-weight:700">✅ 抵扣MG範圍內</span>`;
+    body.innerHTML=`
+      <table style="width:100%;font-size:12px;border-collapse:collapse">
+        <tr><td style="padding:3px 0;color:#64748b;width:110px">MG保底金</td>
+            <td style="padding:3px 0;font-weight:700;color:#dc2626">${mg>0?mg.toLocaleString()+" "+mgCur:"未設定"}</td></tr>
+        <tr><td style="padding:3px 0;color:#64748b">已累計版權費用</td>
+            <td style="padding:3px 0;color:#f97316;font-weight:600">${used.toLocaleString()} ${mgCur}</td></tr>
+        <tr><td style="padding:3px 0;color:#64748b">剩餘可用</td>
+            <td style="padding:3px 0;font-weight:700;color:${remaining<0?"#ef4444":"#16a34a"}">${remaining.toLocaleString()} ${mgCur}</td></tr>
+      </table>
+      ${bar}
+      <div style="margin-top:6px">${statusLabel}</div>`;
+  }catch(e){
+    body.innerHTML="<span style='color:#ef4444;font-size:12px'>載入失敗："+e.message+"</span>";
+  }
+}
+// 輸入金額時即時刷新MG狀態
+document.getElementById("f-amount").addEventListener("input",function(){
+  const proj=document.getElementById("proj-sel").value;
+  if(document.getElementById("f-cat").value==="版權費用"&&proj&&proj!=="__new__") loadMGPool(proj);
+});
 
 async function loadSuppliers(){
   const sel=document.getElementById("f-supplier");
@@ -371,6 +449,10 @@ document.getElementById("frm").onsubmit=async(e)=>{
     if(supplier&&supplier!=="__new__") fields["供應商"]=supplier;
     if(paymethod) fields["付款方式"]=paymethod;
     if(payterm) fields["帳期（天）"]=parseInt(payterm);
+    if(document.getElementById("f-cat").value==="版權費用"){
+      const mgBody=document.getElementById("mg-pool-body")?.textContent||"";
+      fields["MG狀態"]=mgBody.includes("超出MG")?"超出MG補繳":"抵扣MG";
+    }
     await _post("expense", fields);
     res.className="result ok";res.style.display="block";
     document.getElementById("res-icon").textContent="✅";
