@@ -531,12 +531,13 @@ async function populateLicensorSelect(selectedLicensor="", selectedContract=""){
   // unique cascadeLicensors (agent if exists, else licensor)
   const licensors=[...new Set(brands.map(b=>b.cascadeLicensor||b.licensor).filter(Boolean))];
   sel.innerHTML='<option value="">— 選擇版權方 —</option>';
+  const addOpt=document.createElement("option");
+  addOpt.value="__new_licensor__"; addOpt.textContent="＋ 新增版權方";
+  addOpt.style.cssText="color:#6366f1;font-weight:700";
+  sel.appendChild(addOpt);
   licensors.forEach(l=>{
     const o=document.createElement("option"); o.value=l; o.textContent=l; sel.appendChild(o);
   });
-  const addOpt=document.createElement("option");
-  addOpt.value="__new_licensor__"; addOpt.textContent="＋ 新增版權方（跳轉）";
-  sel.appendChild(addOpt);
   if(selectedLicensor) sel.value=selectedLicensor;
   sel.onchange=()=>{
     if(sel.value==="__new_licensor__"){window.open("forms/ip_db.html","_blank");sel.selectedIndex=0;return;}
