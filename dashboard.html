@@ -204,10 +204,13 @@ async function loadAll(){
     const projMap={};  // projName → {income, cost, type, loc}
     budgets.forEach(i=>{
       const f=i.fields||{};
-      const proj=_fv(f,"項目關聯");
-      const nature=_fv(f,"性質");   // 收入 or 支出
-      const amt=_num(_fv(f,"金額合計")||_fv(f,"金額")||"0");
-      if(!proj) return;
+      // Project name is stored as [projName] in 備註 field
+      const note=_fv(f,"備註")||"";
+      const m=note.match(/^\[([^\]]+)\]/);
+      const proj=m?m[1]:"";
+      const nature=_fv(f,"預算性質");   // 收入 or 支出
+      const amt=_num(_fv(f,"預算金額")||"0");
+      if(!proj||!nature) return;
       if(!projMap[proj]) projMap[proj]={income:0,cost:0,type:"",loc:""};
       if(nature==="收入"){ totalIncome+=amt; projMap[proj].income+=amt; }
       else { totalDirectCost+=amt; projMap[proj].cost+=amt; }
@@ -229,8 +232,8 @@ async function loadAll(){
     const overheadByType={};
     expenses.forEach(i=>{
       const f=i.fields||{};
-      const proj=_fv(f,"關聯項目")||_fv(f,"項目關聯");
-      const amt=_num(_fv(f,"實際金額")||_fv(f,"金額")||"0");
+      const proj=_fv(f,"關聯項目");
+      const amt=_num(_fv(f,"實際金額")||"0");
       const cat=_fv(f,"費用類別");
       if(proj===OVERHEAD_PROJ||!proj){
         overhead+=amt;
