@@ -487,7 +487,7 @@ window.addEventListener("DOMContentLoaded",function(){
     location.replace("../login.html");
     return;
   }
-  ["f-who","f-owner"].forEach(id=>{
+  ["f-who","f-owner","g-who"].forEach(id=>{
     const el=document.getElementById(id);
     if(el&&!el.value) el.value=s.name;
   });
@@ -519,6 +519,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     const tk=await _getToken();
     const proj=_projVal("proj-sel");
     const fields={...({
+      "項目關聯":     _projVal("proj-sel"),
       "設計名稱":     document.getElementById("f-name").value,
       "送審階段":     document.getElementById("f-stage").value,
       "IP品牌":       document.getElementById("f-ip").value,

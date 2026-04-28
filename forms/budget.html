@@ -508,7 +508,7 @@ window.addEventListener("DOMContentLoaded",function(){
     location.replace("../login.html");
     return;
   }
-  ["f-who","f-owner"].forEach(id=>{
+  ["f-who","f-owner","g-who"].forEach(id=>{
     const el=document.getElementById(id);
     if(el&&!el.value) el.value=s.name;
   });
@@ -830,6 +830,7 @@ async function submitAll(){
 // init
 _loadProjectSelect('proj-sel',window._ctxTypeFilter||null);
 document.getElementById('g-year').value=new Date().getFullYear();
+(function(){const m=new Date().getMonth();const q=m<3?"Q1":m<6?"Q2":m<9?"Q3":"Q4";document.getElementById('g-quarter').value=q;})();
 // start with 3 default rows
 addRow('生產製造');addRow('版權費用');addRow('預計收入');
 window.addEventListener('DOMContentLoaded',function(){
