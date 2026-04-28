@@ -95,7 +95,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div id="card-view"><div class="empty">載入中...</div></div>
   <div id="table-view">
     <table class="dt">
-      <thead><tr><th>合約名稱</th><th>類型</th><th>對方公司</th><th>狀態</th><th>我方簽署人</th><th>到期日</th><th>金額</th></tr></thead>
+      <thead><tr><th>合約名稱</th><th>類型</th><th>對方公司</th><th>狀態</th><th>我方聯絡人</th><th>我方簽約公司</th><th>到期日</th><th>金額</th></tr></thead>
       <tbody id="table-body"></tbody>
     </table>
   </div>
@@ -167,7 +167,7 @@ function applyFilter(){
   const q=document.getElementById("search-box").value.trim().toLowerCase();
   const filterVals={};
   document.querySelectorAll(".filter-sel").forEach(s=>{if(s.dataset.field&&s.value)filterVals[s.dataset.field]=s.value;});
-  const sf=["\u5408\u7d04\u540d\u7a31", "\u5c0d\u65b9\u516c\u53f8", "\u5408\u7d04\u985e\u578b", "\u6211\u65b9\u7c3d\u7f72\u4eba"];
+  const sf=["\u5408\u7d04\u540d\u7a31", "\u5c0d\u65b9\u516c\u53f8", "\u5408\u7d04\u985e\u578b", "\u6211\u65b9\u806f\u7d61\u4eba", "\u6211\u65b9\u7c3d\u7d04\u516c\u53f8"];
   const filtered=allRecords.filter(item=>{
     const f=item.fields||{};
     if(q&&!sf.some(k=>fv(f,k).toLowerCase().includes(q)))return false;
@@ -276,7 +276,7 @@ function cardHTML(f){
       <span class="badge" style="background:${sc};color:#fff">${status}</span>
     </div>
     <div class="db-card-body">
-      <div>👤 我方：${fv(f,"我方簽署人")||"—"}</div>
+      <div>👤 我方：${fv(f,"我方聯絡人")||fv(f,"我方簽署人")||"—"}${fv(f,"我方簽約公司")?" ("+fv(f,"我方簽約公司")+")":""}</div>
       <div style="margin-top:4px">${_expTag(f)}</div>
     </div>
     <div class="db-card-row">
@@ -293,7 +293,8 @@ function rowHTML(f){
     <td>${fv(f,"合約類型")||"—"}</td>
     <td>${fv(f,"對方公司")||"—"}</td>
     <td><span class="badge" style="background:${sc};color:#fff">${status}</span></td>
-    <td style="color:#6366f1">${fv(f,"我方簽署人")||"—"}</td>
+    <td style="color:#6366f1">${fv(f,"我方聯絡人")||fv(f,"我方簽署人")||"—"}</td>
+    <td>${fv(f,"我方簽約公司")||"—"}</td>
     <td>${_expTag(f)}</td>
     <td style="text-align:right;color:#64748b">${fv(f,"合約金額")||"—"} ${fv(f,"幣別")||""}</td>
   </tr>`;

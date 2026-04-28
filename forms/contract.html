@@ -104,15 +104,22 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <input id="f-party" required placeholder="直接輸入，或從上方選取後自動填入" style="margin-top:6px">
         <div class="hint">版權方 / 代理商名單自動從資料庫載入</div></div>
       <div class="row2">
-        <div class="f"><label>我方簽署人</label>
+        <div class="f"><label>我方簽約公司</label>
+          <select id="f-our-company">
+            <option value="">— 請選擇 —</option>
+            <option>蕪解HK</option><option>蕪解SZ</option><option>蕪解BJ</option><option>UJ BKK</option>
+          </select></div>
+        <div class="f"><label>我方聯絡人</label>
           <select id="f-signer">
             <option>Ray</option><option>安然</option><option>Shawn</option><option>Bevis</option><option>賴哥</option><option>木子</option><option>高維</option><option>董亮</option><option>德寶</option>
           </select></div>
+      </div>
+      <div class="row2">
         <div class="f"><label>對方聯絡人</label>
           <input id="f-contact" placeholder="姓名 + 聯絡方式"></div>
+        <div class="f"><label>填報人</label>
+          <input id="f-owner" placeholder="你的名字"></div>
       </div>
-      <div class="f"><label>填報人</label>
-        <input id="f-owner" placeholder="你的名字"></div>
     </div>
     <div class="card">
       <div class="ctitle">授權範圍（此合約覆蓋範圍）</div>
@@ -242,7 +249,7 @@ async function _getToken(){
 }
 
 async function _post(tableKey,fields){
-  Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]===undefined) delete fields[k]; });
+  Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]===undefined||fields[k]==="") delete fields[k]; });
   const tk=await _getToken();
   const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES[tableKey]+"/records",{
     method:"POST",
@@ -643,7 +650,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     document.getElementById("res-sub").textContent=missing.join("、");
     return;
   }
-  _showConfirm("確認送出",[["\u5408\u7d04\u540d\u7a31",String((document.getElementById('f-name').value)||"")],["\u7248\u6b0a\u65b9",String((document.getElementById('f-licensor').value)||"")],["IP \u54c1\u724c",String((document.getElementById('f-ip').value)||"")],["\u5408\u7d04\u985e\u578b",String((document.getElementById('f-type').value)||"")],["\u5408\u7d04\u72c0\u614b",String((document.getElementById('f-status').value)||"")],["\u6388\u6b0a\u54c1\u985e",String((document.getElementById('cats-chips-contract')?._getMerged?.()||document.getElementById('f-cats').value)||"")],["\u6388\u6b0a\u5730\u5340",String((document.getElementById('region-chips-contract')?._getMerged?.()||document.getElementById('f-region').value)||"")],["\u4fdd\u5e95\u91d1 MG",String(((document.getElementById('f-amount').value?document.getElementById('f-amount').value+' '+document.getElementById('f-cur').value:'—'))||"")],["\u4e00\u6b21\u6027\u6388\u6b0a\u8cbb",String(((document.getElementById('f-flat-fee').value?document.getElementById('f-flat-fee').value+' '+document.getElementById('f-cur').value:'—'))||"")],["\u7c3d\u7f72 / \u5230\u671f",String((document.getElementById('f-sign').value+'  →  '+document.getElementById('f-exp').value)||"")]],async()=>{
+  _showConfirm("確認送出",[["\u5408\u7d04\u540d\u7a31",String((document.getElementById('f-name').value)||"")],["\u7248\u6b0a\u65b9",String((document.getElementById('f-licensor').value)||"")],["IP \u54c1\u724c",String((document.getElementById('f-ip').value)||"")],["\u5408\u7d04\u985e\u578b",String((document.getElementById('f-type').value)||"")],["\u5408\u7d04\u72c0\u614b",String((document.getElementById('f-status').value)||"")],["\u6211\u65b9\u7c3d\u7d04\u516c\u53f8",String((document.getElementById('f-our-company').value)||"")],["\u6211\u65b9\u806f\u7d61\u4eba",String((document.getElementById('f-signer').value)||"")],["\u6388\u6b0a\u54c1\u985e",String((document.getElementById('cats-chips-contract')?._getMerged?.()||document.getElementById('f-cats').value)||"")],["\u6388\u6b0a\u5730\u5340",String((document.getElementById('region-chips-contract')?._getMerged?.()||document.getElementById('f-region').value)||"")],["\u4fdd\u5e95\u91d1 MG",String(((document.getElementById('f-amount').value?document.getElementById('f-amount').value+' '+document.getElementById('f-cur').value:'—'))||"")],["\u7c3d\u7f72 / \u5230\u671f",String((document.getElementById('f-sign').value+'  →  '+document.getElementById('f-exp').value)||"")]],async()=>{
     const btn=document.getElementById("sbtn");
     const res=document.getElementById("res");
     btn.disabled=true; btn.textContent="提交中...";
@@ -658,7 +665,8 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "合約類型":     document.getElementById("f-type").value,
       "合約狀態":     document.getElementById("f-status").value,
       "對方公司":     document.getElementById("f-party").value,
-      "我方簽署人":   document.getElementById("f-signer").value,
+      "我方簽約公司": document.getElementById("f-our-company").value,
+      "我方聯絡人":   document.getElementById("f-signer").value,
       "對方聯絡人":   document.getElementById("f-contact").value,
       "授權品類":     (document.getElementById("cats-chips-contract")?._getMerged?.()||document.getElementById("f-cats").value),
       "授權地區":     (document.getElementById("region-chips-contract")?._getMerged?.()||document.getElementById("f-region").value),
@@ -674,7 +682,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "特殊條款":     document.getElementById("f-notes").value,
       "負責人":       document.getElementById("f-owner").value,
     })};
-      Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined)delete fields[k];});
+      Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]===undefined||fields[k]==="")delete fields[k];});
       if(proj) fields["項目關聯"]=proj;
       const imgFiles=document.getElementById("f-imgs")?.files;
       if(imgFiles&&imgFiles.length>0){

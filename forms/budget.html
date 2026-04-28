@@ -198,7 +198,7 @@ async function _getToken(){
 }
 
 async function _post(tableKey,fields){
-  Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]===undefined) delete fields[k]; });
+  Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]===undefined||fields[k]==="") delete fields[k]; });
   const tk=await _getToken();
   const r=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES[tableKey]+"/records",{
     method:"POST",
