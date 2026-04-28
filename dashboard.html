@@ -1,2362 +1,381 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>蕪解管理儀表板</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📊 管理儀表板 — 蕪解</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:48px}
 .topbar{background:#1e293b;border-bottom:1px solid #334155;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
 .topbar-title{font-size:18px;font-weight:700;color:#f1f5f9;letter-spacing:.5px}
-.topbar-sub{font-size:12px;color:#64748b}
-.kpi-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:20px 24px 0}
-.kpi{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;}
-.kpi-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
-.kpi-value{font-size:26px;font-weight:700;color:#f1f5f9;margin:4px 0}
-.kpi-sub{font-size:12px;color:#94a3b8}
-.section{margin:20px 24px;background:#1e293b;border:1px solid #334155;border-radius:16px;overflow:hidden}
-.section-header{padding:16px 20px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center}
-.section-title{font-size:15px;font-weight:600;color:#f1f5f9}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.btn-sm{padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+/* KPI 卡 */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:20px 24px}
+.kpi{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--c)}
+.kpi-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:700;color:#f1f5f9;font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:12px;color:#94a3b8;margin-top:4px}
+/* VAM 進度條 */
+.vam-section{margin:0 24px 20px;background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px 24px}
+.vam-title{font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:14px}
+.vam-bar-bg{background:#0f172a;border-radius:8px;height:16px;overflow:hidden;margin:8px 0}
+.vam-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#10b981,#6ee7b7);transition:width 1s ease}
+.vam-nums{display:flex;justify-content:space-between;font-size:12px;margin-top:6px}
+/* 區塊 */
+.section{margin:0 24px 20px;background:#1e293b;border:1px solid #334155;border-radius:16px;overflow:hidden}
+.section-hdr{padding:14px 20px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center}
+.section-title{font-size:14px;font-weight:700;color:#f1f5f9}
 .section-link{font-size:12px;color:#6366f1;text-decoration:none}
 .section-body{padding:20px}
 .dt{width:100%;border-collapse:collapse;font-size:13px}
-.dt th{background:#0f172a;color:#94a3b8;font-weight:500;padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
-.dt td{padding:10px 12px;border-bottom:1px solid #1e293b;vertical-align:middle}
+.dt th{background:#0f172a;color:#94a3b8;font-size:11px;font-weight:600;padding:8px 12px;text-align:left;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.dt td{padding:9px 12px;border-bottom:1px solid #0f172a30;vertical-align:middle}
+.dt tr:last-child td{border-bottom:none}
 .dt tr:hover td{background:#0f172a33}
-.cf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.cf-card{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
-.cf-empty{border-style:dashed;opacity:.5}
-.cf-title{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.cf-amount{font-size:24px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
-.cf-sub{font-size:13px;margin-bottom:8px}
-.cf-row{display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-top:8px}
-.cf-date{font-size:11px;color:#475569;margin-top:8px}
-.footer{text-align:center;padding:24px;color:#334155;font-size:12px}
-@media(max-width:600px){.kpi-bar{grid-template-columns:1fr 1fr}.section{margin:12px}}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
+.proj-row-bar{height:6px;border-radius:3px;margin-top:4px}
+.loc-pill{font-size:10px;padding:1px 7px;border-radius:10px;background:#334155;color:#94a3b8}
+/* 損益明細 grid */
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.pl-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px 16px}
+.pl-label{font-size:11px;color:#64748b;margin-bottom:6px}
+.pl-num{font-size:20px;font-weight:700}
+.loading-msg{text-align:center;color:#64748b;padding:40px;font-size:14px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:1fr 1fr}.section{margin:0 12px 16px}.kpi-grid{padding:12px}}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div>
-    <div class="topbar-title">🏢 蕪解管理儀表板</div>
-    <div class="topbar-sub">最後更新：2026-04-27 13:00</div>
+    <div class="topbar-title">📊 管理儀表板</div>
+    <div style="font-size:12px;color:#64748b;margin-top:2px" id="refresh-time">資料載入中...</div>
   </div>
-  <div style="display:flex;gap:8px">
-    <a href="forms/index.html"
-       style="background:#6366f1;color:#fff;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px">
-      📝 填報中心
-    </a>
-    <a href="project_manager.html"
-       style="background:#1e293b;color:#94a3b8;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;border:1px solid #334155">
-      📋 項目管理
-    </a>
-    <a href="B2B_Prospect_Tracker.html"
-       style="background:#1e293b;color:#94a3b8;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;border:1px solid #334155">
-      B2B 客戶追蹤
-    </a>
+  <div class="topbar-actions">
+    <button class="btn-sm" style="background:#334155;color:#94a3b8" onclick="loadAll()">↻ 重新整理</button>
+    <a href="home.html" class="btn-sm" style="background:#6366f1;color:#fff">← 首頁</a>
   </div>
 </div>
 
-<div class="kpi-bar">
-  <div class="kpi">
+<!-- KPI 卡 -->
+<div class="kpi-grid">
+  <div class="kpi" style="--c:#10b981">
+    <div class="kpi-label">全年預計淨利</div>
+    <div class="kpi-value" id="kpi-net">—</div>
+    <div class="kpi-sub" id="kpi-net-sub">讀取中...</div>
+  </div>
+  <div class="kpi" style="--c:#6366f1">
+    <div class="kpi-label">全年預計毛利</div>
+    <div class="kpi-value" id="kpi-gross">—</div>
+    <div class="kpi-sub" id="kpi-gross-sub">收入 − 直接成本</div>
+  </div>
+  <div class="kpi" style="--c:#f97316">
+    <div class="kpi-label">固定成本合計</div>
+    <div class="kpi-value" id="kpi-overhead">—</div>
+    <div class="kpi-sub">薪資 / 租金 / 運營</div>
+  </div>
+  <div class="kpi" style="--c:#f59e0b">
+    <div class="kpi-label">對賭完成度</div>
+    <div class="kpi-value" id="kpi-vam-pct">—</div>
+    <div class="kpi-sub">目標 ¥8,000,000</div>
+  </div>
+  <div class="kpi" style="--c:#8b5cf6">
     <div class="kpi-label">進行中項目</div>
-    <div class="kpi-value" style="color:#6366f1">23</div>
-    <div class="kpi-sub">共 23 個項目</div>
+    <div class="kpi-value" id="kpi-proj">—</div>
+    <div class="kpi-sub" id="kpi-proj-sub">批發 / 快閃店</div>
   </div>
-  <div class="kpi">
-    <div class="kpi-label">銷售管道</div>
-    <div class="kpi-value" style="color:#10b981">1,759,000</div>
-    <div class="kpi-sub">已確認 1,084,000</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">待處理審批</div>
-    <div class="kpi-value" style="color:#ef4444">2</div>
-    <div class="kpi-sub">件待審批</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">低庫存警示</div>
-    <div class="kpi-value" style="color:#64748b">0</div>
-    <div class="kpi-sub">個品項低於安全庫存</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">執行中合約</div>
-    <div class="kpi-value" style="color:#8b5cf6">2</div>
-    <div class="kpi-sub">份合約</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">銷售訂單</div>
-    <div class="kpi-value" style="color:#f59e0b">5</div>
-    <div class="kpi-sub">筆訂單</div>
+  <div class="kpi" style="--c:#06b6d4">
+    <div class="kpi-label">快閃店本月流水</div>
+    <div class="kpi-value" id="kpi-daily">—</div>
+    <div class="kpi-sub" id="kpi-daily-sub">當月累計</div>
   </div>
 </div>
 
-<div class="section" id="att-section">
-  <div class="section-header">
-    <span class="section-title">✅ 今日出勤紀錄</span>
-    <span id="att-date" style="font-size:12px;color:#64748b"></span>
+<!-- VAM 進度條 -->
+<div class="vam-section">
+  <div class="vam-title">🏦 對賭淨利進度 — 目標 ¥8,000,000</div>
+  <div class="vam-bar-bg"><div class="vam-bar-fill" id="vam-bar" style="width:0%"></div></div>
+  <div class="vam-nums">
+    <span id="vam-current" style="color:#10b981;font-weight:700">¥0</span>
+    <span style="color:#64748b">目標 ¥8,000,000</span>
   </div>
-  <div class="section-body" id="att-body">
-    <div style="color:#64748b;font-size:13px">載入中...</div>
-  </div>
+  <div id="vam-breakdown" style="margin-top:12px;font-size:12px;color:#64748b"></div>
 </div>
 
+<!-- 損益分解 -->
 <div class="section">
-  <div class="section-header">
-    <span class="section-title">💰 三辦公室現金流</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">更新資料 →</a>
-  </div>
-  <div class="section-body"><div class="cf-grid">
-        <div class="cf-card">
-          <div class="cf-title">台北</div>
-          <div class="cf-amount">TWD 1,972,000</div>
-          <div class="cf-sub" style="color:#10b981">可用約 169 天</div>
-          <div class="cf-row">
-            <span>↑ 收入 320,000</span>
-            <span>↓ 支出 198,000</span>
-          </div>
-          <div class="cf-date">更新：2026-04-24</div>
-        </div>
-        <div class="cf-card">
-          <div class="cf-title">北京</div>
-          <div class="cf-amount">CNY 517,700</div>
-          <div class="cf-sub" style="color:#f59e0b">可用約 74 天</div>
-          <div class="cf-row">
-            <span>↑ 收入 125,000</span>
-            <span>↓ 支出 87,300</span>
-          </div>
-          <div class="cf-date">更新：2026-04-24</div>
-        </div>
-        <div class="cf-card">
-          <div class="cf-title">曼谷</div>
-          <div class="cf-amount">THB 573,000</div>
-          <div class="cf-sub" style="color:#f59e0b">可用約 60 天</div>
-          <div class="cf-row">
-            <span>↑ 收入 95,000</span>
-            <span>↓ 支出 142,000</span>
-          </div>
-          <div class="cf-date">更新：2026-04-25</div>
-        </div></div></div>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">📅 項目排期總覽</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">管理項目 →</a>
+  <div class="section-hdr">
+    <span class="section-title">📊 損益分解</span>
+    <span style="font-size:11px;color:#475569">預算表數據 + 費用實報</span>
   </div>
   <div class="section-body">
-    <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span style="color:#94a3b8;font-size:13px">進行中 <b style="color:#10b981">23</b> 個</span>
-      <span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">其他 <b style="color:#6366f1">21</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">商品批發 <b style="color:#6366f1">1</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">IP商品授權 <b style="color:#6366f1">1</b></span>
-    </div>
-    <div style="overflow-x:auto">
-    <table class="dt">
-      <thead><tr>
-        <th>項目名稱</th><th>類別</th><th>負責人</th>
-        <th>所在地</th><th>截止日期</th><th>狀態</th><th>進度</th>
-      </tr></thead>
-      <tbody>
-        <tr>
-          <td>Maniani 盲盒第一弹</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>张三（产品经理）</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>2026-08-31</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:20.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">20%</small></td>
-        </tr>
-        <tr>
-          <td>Maniani 盲盒第一弹</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>张三（产品经理）</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>2026-08-31</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:20.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">20%</small></td>
-        </tr>
-        <tr>
-          <td>Maniani 盲盒第一弹</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>张三（产品经理）</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>2026-08-31</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:20.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">20%</small></td>
-        </tr>
-        <tr>
-          <td>Maniani 盲盒第一弹</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>张三（产品经理）</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>2026-08-31</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:20.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">20%</small></td>
-        </tr>
-        <tr>
-          <td>【測試2】Mofusand 曼谷授權</td>
-          <td><span style="color:#94a3b8">IP商品授權</span></td>
-          <td>Shawn</td>
-          <td><span style="color:#94a3b8">曼谷</span></td>
-          <td>2026-12-31</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:5.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">5%</small></td>
-        </tr>
-        <tr>
-          <td>【测试】小老虎毛絨掛件（明）- 第一批</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>Shawn</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>2027-02-28</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>【测试】小老虎毛絨掛件（明）- 第一批</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>Shawn</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>2027-02-28</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>吉依卡哇商品批發</td>
-          <td><span style="color:#94a3b8">商品批發</span></td>
-          <td>Shawn</td>
-          <td><span style="color:#94a3b8">跨地區</span></td>
-          <td>—</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#f59e0b;width:33.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">33%</small></td>
-        </tr>
-        <tr>
-          <td>Snoopy公仔</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">跨地區</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>測試</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">台北</span></td>
-          <td>—</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">計劃中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#ef4444;width:0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">0%</small></td>
-        </tr>
-        <tr>
-          <td>【測試】Chiikawa 2026 台灣授權 Q3 商品開發</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">台北</span></td>
-          <td>—</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#f59e0b;width:35.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">35%</small></td>
-        </tr>
-        <tr>
-          <td>【測試】Snoopy 曼谷快閃店 2026 夏</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">曼谷</span></td>
-          <td>—</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#f59e0b;width:60.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">60%</small></td>
-        </tr>
-        <tr>
-          <td>【測試】Miffy 北京授權春季補貨</td>
-          <td><span style="color:#94a3b8">—</span></td>
-          <td>—</td>
-          <td><span style="color:#94a3b8">北京</span></td>
-          <td>—</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">進行中</span></td>
-          <td style="min-width:120px"><div style="background:#1e293b;border-radius:4px;height:8px;width:100%">
-      <div style="background:#10b981;width:75.0%;height:8px;border-radius:4px;transition:width .3s"></div>
-    </div><small style="color:#94a3b8">75%</small></td>
-        </tr></tbody>
-    </table></div></div>
+    <div class="pl-grid" id="pl-grid"><div class="loading-msg">載入中...</div></div>
+  </div>
 </div>
 
+<!-- 各項目盈虧 -->
 <div class="section">
-  <div class="section-header">
-    <span class="section-title">🎯 銷售進度</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">更新銷售 →</a>
+  <div class="section-hdr">
+    <span class="section-title">📋 各項目收支一覽</span>
+    <a href="forms/view_budget_summary.html" class="section-link">查看預算詳情 ›</a>
   </div>
-  <div class="section-body">
-    <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">已下單 <b style="color:#6366f1">1</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">洽談中 <b style="color:#f59e0b">2</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">備貨中 <b style="color:#8b5cf6">1</b></span><span style="background:#1e293b;padding:4px 10px;border-radius:8px;margin:2px;font-size:12px">訂單確認 <b style="color:#6366f1">1</b></span>
-    </div>
-    <div style="overflow-x:auto"><table class="dt">
-      <thead><tr>
-        <th>客戶</th><th>產品/項目</th><th>IP</th><th>地區</th>
-        <th style="text-align:right">金額</th>
-        <th>帳期</th><th>交貨日</th><th>狀態</th><th>業務</th>
-      </tr></thead>
-      <tbody>
-        <tr>
-          <td>誠品生活股份有限公司</td>
-          <td>Chiikawa 公仔 5 款</td>
-          <td><span style="color:#a78bfa">Chiikawa</span></td>
-          <td>台灣</td>
-          <td style="text-align:right">TWD 700,000</td>
-          <td>60天</td>
-          <td>2026-06-30</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已下單</span></td>
-          <td style="color:#94a3b8;font-size:12px">董亮</td>
-        </tr>
-        <tr>
-          <td>泰國 King Power 免稅店</td>
-          <td>Snoopy 快閃店周邊商品</td>
-          <td><span style="color:#a78bfa">Snoopy</span></td>
-          <td>泰國</td>
-          <td style="text-align:right">THB 445,000</td>
-          <td>即期</td>
-          <td>2026-06-01</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">洽談中</span></td>
-          <td style="color:#94a3b8;font-size:12px">Shawn</td>
-        </tr>
-        <tr>
-          <td>北京王府井百貨</td>
-          <td>Miffy 春季系列</td>
-          <td><span style="color:#a78bfa">Miffy</span></td>
-          <td>中國大陸</td>
-          <td style="text-align:right">CNY 384,000</td>
-          <td>30天</td>
-          <td>2026-05-20</td>
-          <td><span style="background:#8b5cf6;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">備貨中</span></td>
-          <td style="color:#94a3b8;font-size:12px">安然</td>
-        </tr>
-        <tr>
-          <td>【測試2】Central Festival 芭提雅</td>
-          <td>Mofusand 文具套組</td>
-          <td><span style="color:#a78bfa">Mofusand</span></td>
-          <td>曼谷</td>
-          <td style="text-align:right">THB 145,000</td>
-          <td>Net30</td>
-          <td>2026-06-15</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">洽談中</span></td>
-          <td style="color:#94a3b8;font-size:12px">Shawn</td>
-        </tr>
-        <tr>
-          <td>Bangkok Central World</td>
-          <td>Snoopy 夏日海灘公仔</td>
-          <td><span style="color:#a78bfa">Snoopy</span></td>
-          <td>曼谷</td>
-          <td style="text-align:right">THB 85,000</td>
-          <td>月結30天</td>
-          <td>—</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">訂單確認</span></td>
-          <td style="color:#94a3b8;font-size:12px">Shawn</td>
-        </tr></tbody>
-    </table></div></div>
+  <div class="section-body" style="padding:0">
+    <div style="overflow-x:auto" id="proj-table-wrap"><div class="loading-msg">載入中...</div></div>
+  </div>
 </div>
 
+<!-- 快閃店流水 -->
 <div class="section">
-  <div class="section-header">
-    <span class="section-title">📊 預算執行狀況</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">管理預算 →</a>
+  <div class="section-hdr">
+    <span class="section-title">🏪 快閃店本月日流水</span>
+    <a href="forms/view_daily_sales.html" class="section-link">查看全部 ›</a>
   </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr>
-        <th>預算名稱</th><th>類別</th><th>所在地</th><th>季度</th>
-        <th style="text-align:right">預算</th>
-        <th style="text-align:right">已用</th>
-        <th style="text-align:right">剩餘</th>
-        <th>執行率</th>
-      </tr></thead>
-      <tbody>
-        <tr>
-          <td>模具</td>
-          <td>採購</td>
-          <td>台北</td>
-          <td>Q1</td>
-          <td style="text-align:right">TWD 300,000</td>
-          <td style="text-align:right;color:#10b981">TWD 0</td>
-          <td style="text-align:right;color:#10b981">TWD 300,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>【測試】Chiikawa Q3 採購成本預算</td>
-          <td>採購</td>
-          <td>台北</td>
-          <td>Q3</td>
-          <td style="text-align:right">TWD 1,200,000</td>
-          <td style="text-align:right;color:#10b981">TWD 0</td>
-          <td style="text-align:right;color:#10b981">TWD 1,200,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>【測試】曼谷快閃店場地與佈展費用</td>
-          <td>展場</td>
-          <td>曼谷</td>
-          <td>Q2</td>
-          <td style="text-align:right">THB 450,000</td>
-          <td style="text-align:right;color:#10b981">THB 120,000</td>
-          <td style="text-align:right;color:#10b981">THB 330,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:27%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">27%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>【測試2】Mofusand 曼谷快閃店人事費</td>
-          <td>人事</td>
-          <td>曼谷</td>
-          <td>Q2</td>
-          <td style="text-align:right">THB 180,000</td>
-          <td style="text-align:right;color:#10b981">THB 45,000</td>
-          <td style="text-align:right;color:#10b981">THB 135,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:25%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">25%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>模具</td>
-          <td>開發費用</td>
-          <td>台北</td>
-          <td>Q1</td>
-          <td style="text-align:right">CNY 300,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 300,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>基礎款粒粒生產費</td>
-          <td>生產製造</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 1,838,850</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 1,838,850</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>隱藏款粒粒生產費</td>
-          <td>生產製造</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 6,150</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 6,150</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>包裝設計費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 6,500</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 6,500</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>2D畫圖設計費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 4,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 4,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>3D建模設計費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 24,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 24,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>3D渲染上色費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 8,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 8,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>包裝銅板費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 5,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 5,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>素模費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 20,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 20,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>模具費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 264,420</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 264,420</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>包裝打樣費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 2,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 2,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>質檢費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 1,100</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 1,100</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>色樣打樣費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 96,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 96,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>單箱發貨運費</td>
-          <td>物流</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 45,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 45,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>雲倉費用</td>
-          <td>物流</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 6,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 6,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>渠道包裝加工成本</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 15,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 15,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>渠道收單樣品費</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 10,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 10,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>樣品粒粒費</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 36,900</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 36,900</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>樣品展示盒費</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 45,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 45,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>宣傳+雜項費</td>
-          <td>行銷</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 100,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 100,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>鐳射標版權費</td>
-          <td>版權費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 50,850</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 50,850</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>版權金（零售價8%）</td>
-          <td>版權費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 896,400</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 896,400</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>批發銷售收入</td>
-          <td>預計收入</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 4,706,100</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 4,706,100</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>基礎款粒粒生產費</td>
-          <td>生產製造</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 1,838,850</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 1,838,850</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>隱藏款粒粒生產費</td>
-          <td>生產製造</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 6,150</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 6,150</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>單箱發貨運費</td>
-          <td>物流</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 45,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 45,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>雲倉費用</td>
-          <td>物流</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 6,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 6,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>渠道包裝加工成本</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 15,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 15,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>渠道收單樣品費</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 10,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 10,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>樣品粒粒費</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 36,900</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 36,900</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>樣品展示盒費</td>
-          <td>運營</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 45,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 45,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>鐳射標版權費</td>
-          <td>版權費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 50,850</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 50,850</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>版權金（零售價8%）</td>
-          <td>版權費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 896,400</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 896,400</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>批發銷售收入</td>
-          <td>預計收入</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 5,042,250</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 5,042,250</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>大貨生產費</td>
-          <td>生產製造</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 213,864</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 213,864</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>設計費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 1,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 1,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>樣品製作費</td>
-          <td>開發費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 2,400</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 2,400</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>品檢費</td>
-          <td>生產製造</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 4,400</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 4,400</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>批發銷售收入</td>
-          <td>預計收入</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 379,488</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 379,488</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>運費</td>
-          <td>物流</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 4,020</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 4,020</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>倉儲費</td>
-          <td>物流</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 3,000</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 3,000</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr>
-        <tr>
-          <td>版稅（按出貨計）</td>
-          <td>版權費用</td>
-          <td>北京</td>
-          <td>Q2</td>
-          <td style="text-align:right">CNY 19,778</td>
-          <td style="text-align:right;color:#10b981">CNY 0</td>
-          <td style="text-align:right;color:#10b981">CNY 19,778</td>
-          <td style="min-width:100px">
-            <div style="background:#1e293b;border-radius:4px;height:6px">
-              <div style="background:#10b981;width:0%;height:6px;border-radius:4px"></div>
-            </div>
-            <small style="color:#10b981">0%</small>
-          </td>
-        </tr></tbody>
-    </table></div></div>
+  <div class="section-body" style="padding:0">
+    <div style="overflow-x:auto" id="daily-table-wrap"><div class="loading-msg">載入中...</div></div>
+  </div>
 </div>
 
+<!-- 今日出勤 -->
 <div class="section">
-  <div class="section-header">
-    <span class="section-title">🔔 審批記錄</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">處理審批 →</a>
+  <div class="section-hdr">
+    <span class="section-title">✅ 今日登入紀錄</span>
+    <span id="att-date-lbl" style="font-size:12px;color:#64748b"></span>
   </div>
-  <div class="section-body"><div style="background:#1e1b4b;border:1px solid #6366f1;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#c7d2fe">🔔 待處理審批 2 件</div><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>審批標題</th><th>類型</th><th>申請人</th><th style="text-align:right">金額</th><th>申請日期</th><th>審批人</th><th>狀態</th><th>意見</th></tr></thead>
-      <tbody><tr>
-          <td>【測試2】曼谷追加備貨 THB 80,000</td>
-          <td>採購審批</td>
-          <td>Shawn</td>
-          <td style="text-align:right;color:#f1f5f9">THB 80,000</td>
-          <td>2026-04-25</td>
-          <td>Ray</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">待審批</span></td>
-          <td style="font-size:12px;color:#94a3b8">五月黃金周前需追加 Mofusand 熱銷 SKU 備貨</td>
-        </tr><tr>
-          <td>【測試】曼谷快閃店額外佈展預算申請</td>
-          <td>費用申請</td>
-          <td>Shawn</td>
-          <td style="text-align:right;color:#f1f5f9">THB 18,000</td>
-          <td>2026-04-23</td>
-          <td>Ray</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">待審批</span></td>
-          <td style="font-size:12px;color:#94a3b8">原展架方案因現場丈量後發現柱位問題，需額外訂製 2 支異形展架，預估追加 ฿18,000。已取得供應商報價單，請管理層審批。</td>
-        </tr></tbody></table></div></div>
+  <div class="section-body" id="att-body"><div class="loading-msg">載入中...</div></div>
 </div>
 
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">📦 庫存 / 物流 / 報關</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">更新庫存 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>品項</th><th>IP</th><th>單位</th><th>倉庫</th><th style="text-align:right">現有庫存</th><th>物流狀態</th><th>報關</th><th>備註</th></tr></thead>
-      <tbody><tr>
-          <td>吉依卡哇周邊</td>
-          <td><span style="color:#a78bfa">Chiikawa</span></td>
-          <td>箱</td>
-          <td>在途</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">600</td>
-          <td><span style="background:#8b5cf6;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已出倉</span></td>
-          <td style="font-size:12px;color:#94a3b8">不需報關</td>
-          <td style="font-size:12px;color:#64748b">已銷1200箱，庫存600箱，待生產1800箱</td>
-        </tr><tr>
-          <td>【測試】Miffy 春季公仔（站姿 12cm）</td>
-          <td><span style="color:#a78bfa">Miffy</span></td>
-          <td>個</td>
-          <td>北京倉</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">3,200</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已到貨</span></td>
-          <td style="font-size:12px;color:#94a3b8">已完成</td>
-          <td style="font-size:12px;color:#64748b">五一前需出貨 3000 個，剩 200 留底</td>
-        </tr><tr>
-          <td>【測試】Snoopy 快閃店商品（帆布袋）</td>
-          <td><span style="color:#a78bfa">Snoopy</span></td>
-          <td>個</td>
-          <td>曼谷倉</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">420</td>
-          <td><span style="background:#8b5cf6;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已出倉</span></td>
-          <td style="font-size:12px;color:#94a3b8">清關中</td>
-          <td style="font-size:12px;color:#64748b">空運抵曼谷，預計 5/28 清關完成</td>
-        </tr><tr>
-          <td>【測試】Chiikawa 文具組（含筆記本+原子筆）</td>
-          <td><span style="color:#a78bfa">Chiikawa</span></td>
-          <td>套</td>
-          <td>台北倉</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">180</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">備貨中</span></td>
-          <td style="font-size:12px;color:#94a3b8">待報關</td>
-          <td style="font-size:12px;color:#64748b">⚠️ 低於安全庫存！採購單已送出，預計 6/10 補貨</td>
-        </tr><tr>
-          <td>【測試2】Mofusand 便當盒貓咪 350ml</td>
-          <td><span style="color:#a78bfa">Mofusand</span></td>
-          <td>件</td>
-          <td>曼谷倉</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">320</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已到貨</span></td>
-          <td style="font-size:12px;color:#94a3b8">已放行</td>
-          <td style="font-size:12px;color:#64748b">已過泰國 FDA 認證</td>
-        </tr><tr>
-          <td>Snoopy 夏日海灘公仔</td>
-          <td><span style="color:#a78bfa">Snoopy</span></td>
-          <td>個</td>
-          <td>曼谷倉</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">120</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">在庫</span></td>
-          <td style="font-size:12px;color:#94a3b8">已清關</td>
-          <td style="font-size:12px;color:#64748b">—</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">🛒 採購詢比價</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">更新採購 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>品項</th><th>數量</th><th>報價A</th><th>報價B</th><th>報價C</th><th>議定價</th><th>節省</th><th>到貨日</th><th>狀態</th></tr></thead>
-      <tbody><tr>
-          <td>【測試】Chiikawa 公仔（坐姿款 8cm）</td>
-          <td>5000</td>
-          <td style="text-align:right;color:#94a3b8">38</td>
-          <td style="text-align:right;color:#94a3b8">42</td>
-          <td style="text-align:right;color:#94a3b8">35</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">CNY 36</td>
-          <td>—</td>
-          <td>2026-06-10</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">議價中</span></td>
-        </tr><tr>
-          <td>【測試】快閃店展架（落地展示架）</td>
-          <td>8</td>
-          <td style="text-align:right;color:#94a3b8">4,500</td>
-          <td style="text-align:right;color:#94a3b8">3,800</td>
-          <td style="text-align:right;color:#94a3b8">0</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">THB 4,200</td>
-          <td>—</td>
-          <td>2026-06-05</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已確認</span></td>
-        </tr><tr>
-          <td>【測試2】Mofusand 貓咪面紙盒</td>
-          <td>2000</td>
-          <td style="text-align:right;color:#94a3b8">38</td>
-          <td style="text-align:right;color:#94a3b8">42</td>
-          <td style="text-align:right;color:#94a3b8">0</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">CNY 36</td>
-          <td><span style="color:#10b981">省 2</span></td>
-          <td>2026-06-01</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">議價中</span></td>
-        </tr><tr>
-          <td>Snoopy 環保購物袋 L</td>
-          <td>500</td>
-          <td style="text-align:right;color:#94a3b8">85</td>
-          <td style="text-align:right;color:#94a3b8">42</td>
-          <td style="text-align:right;color:#94a3b8">58</td>
-          <td style="text-align:right;color:#10b981;font-weight:600">TWD 42</td>
-          <td>—</td>
-          <td>—</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">比價完成</span></td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">🎨 設計送審進度</span>
-    <a class="section-link" href="forms/design.html">填報 →</a>
-  </div>
-  <div class="section-body" id="design-body"><div style="color:#64748b;font-size:13px">載入中...</div></div>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">📋 合約管理</span>
-    <a class="section-link" href="https://mjp26g5rmiv7.jp.larksuite.com/base/YlVkb0ACjacJVqsgRT5j4c6gpeh" target="_blank">管理合約 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>合約名稱</th><th>類型</th><th>對方公司</th><th>我方簽署人</th><th>簽約日</th><th>到期日</th><th style="text-align:right">金額</th><th>狀態</th><th>摘要</th></tr></thead>
-      <tbody><tr>
-          <td>【測試】Chiikawa 2026 台灣區域授權合約</td>
-          <td>IP授權合約</td>
-          <td>株式会社マッチング（日本）</td>
-          <td>Ray</td>
-          <td>2026-01-15</td>
-          <td>2026-12-31</td>
-          <td style="text-align:right">TWD 500,000</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">執行中</span></td>
-          <td style="font-size:12px;color:#94a3b8;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">授權地區：台灣、香港、澳門。授權品類：公仔、文具、生活雜貨。保底 NT$500,000，權利金零售 12%、批發 8%。每季提交銷售報告。</td>
-        </tr><tr>
-          <td>【測試2】Mofusand 泰國授權合約 2026</td>
-          <td>IP授權合約</td>
-          <td>株式会社フェリシモ</td>
-          <td>Shawn</td>
-          <td>2026-01-15</td>
-          <td>2026-12-31</td>
-          <td style="text-align:right">THB 500,000</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">執行中</span></td>
-          <td style="font-size:12px;color:#94a3b8;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">泰國曼谷快閃店限定授權，含文具+公仔，每季報告</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div style="margin:20px 24px 0;padding:12px 20px;background:#1e293b;border:1px solid #334155;border-radius:12px">
-  <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">📚 主資料庫</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">📜 IP版權資料庫</span>
-    <a class="section-link" href="forms/view_ip_db.html">查看全部 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>IP名稱</th><th>版權方</th><th>代理商</th><th>授權地區</th><th>品類</th><th>狀態</th><th>我方對接</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">【測試】Chiikawa（ちいかわ）</td>
-          <td style="color:#94a3b8">株式会社マッチング</td>
-          <td style="color:#94a3b8">AMG 亞太代理</td>
-          <td>台灣、香港、澳門</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">公仔、文具、生活雜貨、服飾配件（布料需單獨申請）</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已簽約</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試】Snoopy（史努比）</td>
-          <td style="color:#94a3b8">Peanuts Worldwide LLC</td>
-          <td style="color:#94a3b8">ACME 代理（泰國區）</td>
-          <td>泰國（全球版圖另議）</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">快閃店周邊全品類（含食品除外）</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已簽約</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試2】Mofusand（もふさんど）</td>
-          <td style="color:#94a3b8">株式会社フェリシモ</td>
-          <td style="color:#94a3b8">頂德文化（泰國）</td>
-          <td>泰國、東南亞</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">文具、家品、公仔</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已簽署</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">🏭 採購供應商</span>
-    <a class="section-link" href="forms/view_supplier.html">查看全部 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>供應商</th><th>地區</th><th>評分</th><th>品類</th><th>聯絡人</th><th style="text-align:right">MOQ</th><th style="text-align:right">交期</th><th>我方對接</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">【測試】廣州盛達玩具廠</td>
-          <td style="color:#94a3b8">中國大陸</td>
-          <td>⭐⭐⭐⭐</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">PVC 公仔、搪膠玩具、樹脂擺件</td>
-          <td style="color:#94a3b8">陳志明</td>
-          <td style="text-align:right;color:#64748b">1000</td>
-          <td style="text-align:right;color:#64748b">45 天</td>
-          <td style="color:#a78bfa">賴哥</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試】義烏優品工藝品有限公司</td>
-          <td style="color:#94a3b8">中國大陸</td>
-          <td>⭐⭐⭐</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">文具、生活雜貨、帆布袋、馬克杯</td>
-          <td style="color:#94a3b8">王麗華</td>
-          <td style="text-align:right;color:#64748b">500</td>
-          <td style="text-align:right;color:#64748b">30 天</td>
-          <td style="color:#a78bfa">木子</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試2】泰國 Siam Craft 製造</td>
-          <td style="color:#94a3b8">泰國</td>
-          <td>⭐⭐⭐⭐ 良</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">紡織品、帆布袋、環保包裝</td>
-          <td style="color:#94a3b8">Somchai W.</td>
-          <td style="text-align:right;color:#64748b">500</td>
-          <td style="text-align:right;color:#64748b">30 天</td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">🤝 客戶名單</span>
-    <a class="section-link" href="forms/view_customer.html">查看全部 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>客戶名稱</th><th>類型</th><th>地區</th><th>聯絡人</th><th>帳期</th><th>品類偏好</th><th>狀態</th><th>業務</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">【測試】誠品生活股份有限公司</td>
-          <td style="color:#94a3b8">KA大客戶</td>
-          <td style="color:#94a3b8">台灣</td>
-          <td style="color:#94a3b8">李采恩（採購部）</td>
-          <td style="color:#64748b">60天</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">設計感公仔、文具、生活雜貨，偏好日系 IP</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">合作中</span></td>
-          <td style="color:#a78bfa">董亮</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試】北京王府井百貨集團</td>
-          <td style="color:#94a3b8">KA大客戶</td>
-          <td style="color:#94a3b8">中國大陸</td>
-          <td style="color:#94a3b8">劉曉峰（品牌招商部）</td>
-          <td style="color:#64748b">30天</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">知名 IP 公仔、節慶禮盒、聯名商品</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">合作中</span></td>
-          <td style="color:#a78bfa">安然</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試2】Central Group Thailand</td>
-          <td style="color:#94a3b8">百貨/商場</td>
-          <td style="color:#94a3b8">泰國</td>
-          <td style="color:#94a3b8">Pichaya M.</td>
-          <td style="color:#64748b">Net45</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">IP周邊文具、生活雜貨</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">合作中</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">Central Department Store</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">東南亞</td>
-          <td style="color:#94a3b8">（網站聯繫表單）</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">IP周邊、公仔、潮流商品</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">King Power Duty Free</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">東南亞</td>
-          <td style="color:#94a3b8">（網站聯繫表單）</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">城市/地區限定IP商品、禮盒化設計</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">Miniso Thailand</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">東南亞</td>
-          <td style="color:#94a3b8">（區域採購）</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">標準化IP周邊、文具、小物</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">Kinokuniya Singapore</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">東南亞</td>
-          <td style="color:#94a3b8">（採購部）</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">日系文化IP、文具、書籍周邊</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">Isetan Malaysia</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">東南亞</td>
-          <td style="color:#94a3b8">（採購部）</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">日系IP周邊、Chiikawa、Mofusand</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">Abysse Corp</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">銷售團隊</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒公仔、動漫手辦、文具周邊；200+授權IP</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Figuya</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫手辦、盲盒收藏品</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Forbidden Planet</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫手辦、Funko Pop、漫畫周邊</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Muddleit Ltd</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲袋、盲盒收藏品批發</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Blind Box Empire</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒公仔（動漫/潮流IP）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">OcioStock</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Funko Pop、盲盒迷你公仔批發</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">ET-Group A/S</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Funko POP批發，流行文化IP</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Animefigures.nl</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫手辦、Nendoroids、Funko Pops</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Japan Sama</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">日系動漫手辦、鬼滅/海賊王周邊</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Manganim</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">漫畫周邊、手辦、鑰匙扣</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">NDA Toys</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">歐洲</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲袋玩具、公仔批發（Funko/Loungefly）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">BlindBox Distribution</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒玩具批發（全美零售店/網店/禮品店）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">ACG Go Anime Wholesale</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫周邊批發、北美授權經銷</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Calembou</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒、潮流IP收藏品</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">MESO Collection</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Labubu/Pop Mart類設計師玩具、盲盒</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">AAA Anime</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫周邊、公仔批發（僅向零售商供貨）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Enesco Business Canada</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">禮品、收藏品批發</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Kidults Box</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒訂閱/批發，服務實體店+活動</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Four Seasons General Merchandise</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">通用批發商，北美覆蓋廣</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Playwell Canada</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">玩具批發，面向零售店和教育市場</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">萬榮國際企業（Wang Jung International）</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">台灣</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">IP周邊、公仔、文創商品（Wonderful實體店+Amuzinc電商）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Animation International Limited (AI)</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">香港</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">IP授權代理、進出口</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">安然</td>
-        </tr><tr>
-          <td style="font-weight:600">OzAnimart</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫周邊批發（澳洲/紐西蘭）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Geek X Distribution</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">潮流IP收藏品批發（澳洲/紐西蘭）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Animeworks B2B</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫周邊B2B批發（澳洲）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">JOYIFY Wholesale</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒/收藏品批發（澳洲/紐西蘭）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">BlindBox NZ</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒公仔（紐西蘭/澳洲）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">animate Hong Kong</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">香港</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫手辦、日系IP周邊</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">安然</td>
-        </tr><tr>
-          <td style="font-weight:600">The Little Things</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">（杜拜Mall門店）</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Labubu/Pop Mart授權、動漫周邊、收藏公仔</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">XO Tech Trading</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Labubu、盲盒、設計師玩具批發（GCC全區）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">BlindBox.ae</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒、Chiikawa、Mofusand、Sanrio（服務UAE/SA/KW/OM/QA/BH）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">COMICAVE™</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">流行文化收藏品、動漫手辦（全球發貨）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Hamleys India</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">印度</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">授權角色玩具、Pokemon周邊、毛絨玩偶</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Big Daddy Store (The Gift Wholesalers)</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">印度</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫公仔、玩具、收藏品B2B批發（印度全境）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Trucare FZC</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Disney/Warner/Marvel授權產品分銷（中東全區）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">The SOOG</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動漫/Manga手辦、收藏品（沙烏地阿拉伯+阿聯酋）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Geekay Games</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動作人物、Funko、集換式卡片（阿聯酋購物中心）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Virgin Megastore Middle East</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Good Smile Company、流行文化、遊戲商品</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">The Pop Up</td>
-          <td style="color:#94a3b8">展覽/快閃</td>
-          <td style="color:#94a3b8">中東</td>
-          <td style="color:#94a3b8">Ahmad Weiss (Spacetoon Entertainment GM)</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">文化零售快閃店、潮流IP商品（沙烏地）</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">潛在客戶</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">POP MART / MESO Collection</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">北美</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">設計師玩具文化全球領導者，在多國有門店，代理MOLLY、Labubu、DIMOO等</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">萬榮國際企業股份有限公司</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">台灣</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">台灣最大日系收藏玩具經銷商，代理BANDAI、Good Smile Company等，銷售網絡遍及全台</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Animation International Limited</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">香港</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">1979年成立，亞洲領先授權代理商，代理哆啦A夢、蠟筆小新、熊本熊等，廣泛被授權商網絡</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Toei Animation Enterprises Limited</td>
-          <td style="color:#94a3b8">海外經銷商</td>
-          <td style="color:#94a3b8">香港</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">在香港、中國大陸、台灣、東南亞等亞洲多個市場經營授權和分銷業務</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Jasnor New Zealand</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">紐西蘭領先玩具禮品經銷商，明確代理盲盒公仔，有PEANUTS Bakery Plush Keyring Blind Box經驗</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Scarce & Co</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">澳洲設計師潮流玩具和收藏品線上商店，銷售Kidrobot、Bearbrick（含Peanuts系列）、Medicom Toy等</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Yellowbox Collectables</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">澳洲流行文化與動漫周邊批發商，產品線廣泛，含收藏品、手辦、服飾等</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">JAYZ International</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">澳洲/紐西蘭</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">紐西蘭玩具經銷商35年以上，涵蓋益智遊戲、收藏品、模型、毛絨玩具等</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">Buy Taiwan Online</td>
-          <td style="color:#94a3b8">電商平台</td>
-          <td style="color:#94a3b8">台灣</td>
-          <td style="color:#94a3b8">—</td>
-          <td style="color:#64748b">—</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">線上商店，提供台灣、中國、日本、韓國等亞洲IP商品，已有Peanuts Snoopy銷售經驗</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">北京潮玩集</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">北京</td>
-          <td style="color:#94a3b8">王總</td>
-          <td style="color:#64748b">Net30</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒公仔、IP周邊</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">安然</td>
-        </tr><tr>
-          <td style="font-weight:600">上海萌貨鋪</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">上海</td>
-          <td style="color:#94a3b8">李小姐</td>
-          <td style="color:#64748b">預付</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Chiikawa、Mofusand</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">活躍合作中</span></td>
-          <td style="color:#a78bfa">安然</td>
-        </tr><tr>
-          <td style="font-weight:600">台北玩具星球</td>
-          <td style="color:#94a3b8">零售門店</td>
-          <td style="color:#94a3b8">台灣</td>
-          <td style="color:#94a3b8">陳老闆</td>
-          <td style="color:#64748b">Net30</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Snoopy全系列</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">董亮</td>
-        </tr><tr>
-          <td style="font-weight:600">廣州潮流批發城</td>
-          <td style="color:#94a3b8">流通渠道商</td>
-          <td style="color:#94a3b8">廣州/深圳</td>
-          <td style="color:#94a3b8">張哥</td>
-          <td style="color:#64748b">Net60</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">盲盒批發大量</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">目標開發中</span></td>
-          <td style="color:#a78bfa">董亮</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">🎨 設計外包資料庫</span>
-    <a class="section-link" href="forms/view_design_vendor.html">查看全部 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>設計師/工作室</th><th>地區</th><th>評分</th><th>專長</th><th>報價參考</th><th>我方對接</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">【測試】Bangkok Creative Studio</td>
-          <td style="color:#94a3b8">泰國</td>
-          <td>⭐⭐⭐⭐</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">主視覺 KV 設計、展場空間設計、社群素材製作、泰文本地化設計</td>
-          <td style="color:#94a3b8">KV 設計 ฿15,000-25,000；展場視覺 ฿35,000 起</td>
-          <td style="color:#a78bfa">Bevis</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試2】Sarun Design BKK</td>
-          <td style="color:#94a3b8">泰國</td>
-          <td>⭐⭐⭐⭐ 良</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">包裝刀模設計、展架陳列設計</td>
-          <td style="color:#94a3b8">包裝刀模 5000 THB/款</td>
-          <td style="color:#a78bfa">Bevis</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">🚢 物流/貨代/報關行</span>
-    <a class="section-link" href="forms/view_logistics.html">查看全部 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>廠商名稱</th><th>類型</th><th>服務地區</th><th>聯絡人</th><th>評分</th><th>我方對接</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">【測試】中外運速遞（台灣）</td>
-          <td style="color:#94a3b8">空運</td>
-          <td style="color:#94a3b8">台灣 ↔ 中國大陸 ↔ 東南亞</td>
-          <td style="color:#94a3b8">陳大偉（業務）</td>
-          <td>⭐⭐⭐⭐⭐</td>
-          <td style="color:#a78bfa">高維</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試2】泰達國際物流（曼谷）</td>
-          <td style="color:#94a3b8">綜合（物流+報關）</td>
-          <td style="color:#94a3b8">中國→泰國、台灣→泰國</td>
-          <td style="color:#94a3b8">陳志明</td>
-          <td>⭐⭐⭐⭐⭐ 優</td>
-          <td style="color:#a78bfa">高維</td>
-        </tr></tbody></table></div></div>
-</div>
-
-  </div>
-</div>
-
-<div style="margin:20px 24px 0;padding:12px 20px;background:#1e293b;border:1px solid #334155;border-radius:12px">
-  <div style="font-size:12px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">🏪 快閃店</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">📊 每日銷售快報</span>
-    <a class="section-link" href="forms/daily_sales.html">填報 →</a>
-  </div>
-  <div class="section-body"><div style="margin-bottom:12px;color:#94a3b8;font-size:13px">近7日合計 <b style="color:#10b981">131,800</b></div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px"><div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;min-width:140px">
-          <div style="font-size:11px;color:#64748b">2026-04-25</div>
-          <div style="font-size:20px;font-weight:700;color:#10b981;margin:4px 0">THB 52,300</div>
-          <div style="font-size:11px;color:#94a3b8">【測試】Snoopy 曼谷快閃店 2026 夏</div>
-          <div style='font-size:11px;color:#64748b;margin-top:4px'>👥 445 人</div>
-        </div><div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;min-width:140px">
-          <div style="font-size:11px;color:#64748b">2026-04-25</div>
-          <div style="font-size:20px;font-weight:700;color:#10b981;margin:4px 0">THB 28,500</div>
-          <div style="font-size:11px;color:#94a3b8">【測試】Snoopy 曼谷快閃店</div>
-          <div style='font-size:11px;color:#64748b;margin-top:4px'>👥 312 人</div>
-        </div><div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;min-width:140px">
-          <div style="font-size:11px;color:#64748b">2026-04-25</div>
-          <div style="font-size:20px;font-weight:700;color:#10b981;margin:4px 0">THB 12,500</div>
-          <div style="font-size:11px;color:#94a3b8">Snoopy 曼谷快閃店 2026</div>
-          <div style='font-size:11px;color:#64748b;margin-top:4px'>👥 87 人</div>
-        </div><div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;min-width:140px">
-          <div style="font-size:11px;color:#64748b">2026-04-24</div>
-          <div style="font-size:20px;font-weight:700;color:#10b981;margin:4px 0">THB 38,500</div>
-          <div style="font-size:11px;color:#94a3b8">【測試】Snoopy 曼谷快閃店 2026 夏</div>
-          <div style='font-size:11px;color:#64748b;margin-top:4px'>👥 312 人</div>
-        </div></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">🏪 場地資訊</span>
-    <a class="section-link" href="forms/popup_venue.html">新增 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>場地名稱</th><th>城市</th><th>活動期間</th><th>租金模式</th><th style="text-align:right">租金</th><th>狀態</th><th>負責人</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">【測試】CentralWorld 商場 B1 中庭</td>
-          <td style="color:#94a3b8">曼谷</td>
-          <td>2026-06-15 ~ 2026-08-31</td>
-          <td style="color:#94a3b8">租金加抽成</td>
-          <td style="text-align:right;color:#f1f5f9">THB 180,000</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已簽約</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr><tr>
-          <td style="font-weight:600">【測試2】Central World B1 中島區</td>
-          <td style="color:#94a3b8">曼谷</td>
-          <td>2026-04-01 ~ 2026-05-31</td>
-          <td style="color:#94a3b8">保底抽成取高</td>
-          <td style="text-align:right;color:#f1f5f9">THB 120,000</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">已簽署</span></td>
-          <td style="color:#a78bfa">Shawn</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">📦 寄售管理</span>
-    <a class="section-link" href="forms/consignment.html">填報 →</a>
-  </div>
-  <div class="section-body"><div style="background:#7c2d12;border:1px solid #f97316;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#fed7aa">💰 待結算/通知金額：<b>1,785</b></div><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>商品</th><th>寄售方</th><th>日期</th><th style="text-align:right">銷售額</th><th style="text-align:right">分潤%</th><th style="text-align:right">應付</th><th>狀態</th></tr></thead>
-      <tbody><tr>
-          <td>【測試】泰國插畫師聯名 Tote Bag</td>
-          <td style="color:#94a3b8">Nana Illustration Studio</td>
-          <td style="color:#94a3b8">2026-04-25</td>
-          <td style="text-align:right">5,340</td>
-          <td style="text-align:right;color:#94a3b8">30.0%</td>
-          <td style="text-align:right;color:#f59e0b;font-weight:600">1,602</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">待結算</span></td>
-        </tr><tr>
-          <td>【測試】泰國陶瓷藝術家手工杯</td>
-          <td style="color:#94a3b8">Mook Ceramics BKK</td>
-          <td style="color:#94a3b8">2026-04-25</td>
-          <td style="text-align:right">3,600</td>
-          <td style="text-align:right;color:#94a3b8">40.0%</td>
-          <td style="text-align:right;color:#f59e0b;font-weight:600">1,440</td>
-          <td><span style="background:#64748b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">待結算</span></td>
-        </tr><tr>
-          <td>【測試2】Sarun BKK 手工陶瓷杯</td>
-          <td style="color:#94a3b8">Sarun Design BKK</td>
-          <td style="color:#94a3b8">2026-04-25</td>
-          <td style="text-align:right">5,100</td>
-          <td style="text-align:right;color:#94a3b8">35.0%</td>
-          <td style="text-align:right;color:#f59e0b;font-weight:600">1,785</td>
-          <td><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">未結算</span></td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="section" style="margin:0">
-  <div class="section-header">
-    <span class="section-title">📍 場地資料庫</span>
-    <a class="section-link" href="forms/view_venue_db.html">查看全部 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>商場名稱</th><th>城市</th><th>商圈</th><th>位置</th>
-      <th style="text-align:right">面積㎡</th><th>客流</th><th>租金模式</th><th>合作條件</th><th>聯繫人</th><th>評分</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">三里屯太古里（北區）</td>
-          <td>北京</td>
-          <td style="color:#94a3b8">三里屯</td>
-          <td style="color:#94a3b8;font-size:12px">L1 廣場南側入口</td>
-          <td style="text-align:right">30</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">極高</span></td>
-          <td style="font-size:12px;color:#94a3b8">固定+抽成</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">固定租金 RMB 2萬/天 + 日銷售額 8% 抽成，最短 7 天起租</td>
-          <td style="color:#64748b">王經理</td>
-          <td>★★★★</td>
-        </tr><tr>
-          <td style="font-weight:600">MixC萬象城（朝陽）</td>
-          <td>北京</td>
-          <td style="color:#94a3b8">朝陽</td>
-          <td style="color:#94a3b8;font-size:12px">L1 南門廣場</td>
-          <td style="text-align:right">35</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">高</span></td>
-          <td style="font-size:12px;color:#94a3b8">固定月租</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">月租 RMB 3萬，活動期最短 10 天，電力需自備</td>
-          <td style="color:#64748b">劉主任</td>
-          <td>★★★</td>
-        </tr><tr>
-          <td style="font-weight:600">台北101購物中心</td>
-          <td>台北</td>
-          <td style="color:#94a3b8">信義區</td>
-          <td style="color:#94a3b8;font-size:12px">B1 連通道中庭</td>
-          <td style="text-align:right">25</td>
-          <td><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">極高</span></td>
-          <td style="font-size:12px;color:#94a3b8">固定月租</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">月租 NT$ 18萬，活動期最短 5 天，保證金 2 個月，禁止釘槍，需自備展架</td>
-          <td style="color:#64748b">陳小姐</td>
-          <td>★★★★★</td>
-        </tr><tr>
-          <td style="font-weight:600">誠品生活松菸</td>
-          <td>台北</td>
-          <td style="color:#94a3b8">信義/松山</td>
-          <td style="color:#94a3b8;font-size:12px">3F 展覽廊道</td>
-          <td style="text-align:right">20</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">高</span></td>
-          <td style="font-size:12px;color:#94a3b8">固定月租</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">月租 NT$ 8萬，文化/IP相關主題優先，合作期至少 2 週</td>
-          <td style="color:#64748b">林企劃</td>
-          <td>★★★★</td>
-        </tr><tr>
-          <td style="font-weight:600">暹羅天地（ICONSIAM）</td>
-          <td>曼谷</td>
-          <td style="color:#94a3b8">暹羅</td>
-          <td style="color:#94a3b8;font-size:12px">G 樓 River Park 戶外區</td>
-          <td style="text-align:right">40</td>
-          <td><span style="background:#6366f1;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">高</span></td>
-          <td style="font-size:12px;color:#94a3b8">純抽成</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">日銷售額 12% 抽成，合約期 14 天，需提前 30 天申請</td>
-          <td style="color:#64748b">Khun Natt</td>
-          <td>★★★★</td>
-        </tr></tbody></table></div></div>
-</div>
-
-  </div>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">📋 會議記錄</span>
-    <a class="section-link" href="forms/meeting.html">新增記錄 →</a>
-  </div>
-  <div class="section-body"><div style="overflow-x:auto"><table class="dt">
-      <thead><tr><th>會議標題</th><th>日期</th><th>地點</th><th>出席人員</th><th>決議事項</th><th>行動項目</th><th>跟進負責人</th></tr></thead>
-      <tbody><tr>
-          <td style="font-weight:600">Q2 IP策略規劃會議</td>
-          <td style="color:#94a3b8">2026-04-25</td>
-          <td style="color:#94a3b8">台北辦公室</td>
-          <td style="color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Ray、安然、Shawn</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">1. 確認 Snoopy 泰國銷售目標 150 萬；2. 授權申請延伸至越南市場；3. Bevis 負責新品設計稿 5 月底前交件</td>
-          <td style="font-size:12px;color:#f59e0b;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Ray - 聯絡 Peanuts 代理商確認越南授權費用 - 5/10；Bevis - 完成3款設計初稿 - 5/31；Shawn - 泰國場地可行性報告 - 5/15</td>
-          <td style="color:#a78bfa">Ray</td>
-        </tr><tr>
-          <td style="font-weight:600">採購詢比價評審會</td>
-          <td style="color:#94a3b8">2026-04-25</td>
-          <td style="color:#94a3b8">線上視訊</td>
-          <td style="color:#94a3b8;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">賴哥、木子、高維</td>
-          <td style="font-size:12px;color:#94a3b8;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">1. 選定深圳廠商 B 為主供應商（報價最優且交期符合）；2. 議定單價下調 8%；3. 首批 5000 件，6 月 20 日前出貨</td>
-          <td style="font-size:12px;color:#f59e0b;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">賴哥 - 正式下單合約 - 5/5；木子 - 確認包材設計稿給廠商 - 5/3；高維 - 聯繫物流報關時間表 - 5/8</td>
-          <td style="color:#a78bfa">賴哥</td>
-        </tr></tbody></table></div></div>
-</div>
-
-<div class="footer">蕪解創意 · 管理儀表板 · 資料來源：飛書多維表格</div>
 <script>
-(function(){
-  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
-})();
+const _P="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _BT="tblteo2QEO0jP8j9";
+const _ET="tblu2NkqBWyBSskG";
+const _DT="tblz7zvgbzOqknzm";
+const _VL="tblUzRSQgKLhlttk";
+const _PROJ="tblYBjAlemYPuNGy";
+const VAM_TARGET=8000000;
+const OVERHEAD_PROJ="全公司固定成本";
 
-(async function(){
-  const PROXY="https://feishu-proxy.raychou6913.workers.dev";
-  const AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-  const VL="tblUzRSQgKLhlttk";
-  const _dn=new Date();
-  const today=_dn.getFullYear()+"-"+String(_dn.getMonth()+1).padStart(2,"0")+"-"+String(_dn.getDate()).padStart(2,"0");
-  document.getElementById("att-date").textContent=today;
-  const el=document.getElementById("att-body");
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(typeof v==="number") return String(v);
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.name||x.link||""):String(x)).join("");
+  if(typeof v==="object") return v.text||v.link||v.name||"";
+  return String(v);
+}
+function _num(s){const n=parseFloat(s);return isNaN(n)?0:n;}
+function _fmt(n,dec=0){
+  if(Math.abs(n)>=1000000) return (n/1000000).toFixed(1)+"M";
+  if(Math.abs(n)>=1000) return (n/1000).toFixed(0)+"K";
+  return n.toFixed(dec);
+}
+function _fmtFull(n){return n.toLocaleString("zh-TW",{maximumFractionDigits:0});}
+
+async function _token(){
+  const r=await fetch(_P+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  if(d.code!==0) throw new Error("token fail");
+  return d.tenant_access_token;
+}
+async function _all(tk,tbl){
+  let items=[],cursor="";
+  do{
+    const url=_P+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tbl+"/records?page_size=100"+(cursor?"&page_token="+cursor:"");
+    const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+    const d=await res.json();
+    items=items.concat(d.data?.items||[]);
+    cursor=d.data?.has_more?d.data.page_token:"";
+  }while(cursor);
+  return items;
+}
+
+async function loadAll(){
   try{
-    const tr=await fetch(PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const td=await tr.json();
-    if(td.code!==0){el.innerHTML='<div style="color:#ef4444;font-size:13px">Token 取得失敗</div>';return;}
-    const tk=td.tenant_access_token;
-    const res=await fetch(PROXY+"/open-apis/bitable/v1/apps/"+AT+"/tables/"+VL+"/records?page_size=200",{
-      headers:{"Authorization":"Bearer "+tk}
+    document.getElementById("refresh-time").textContent="資料載入中...";
+    const tk=await _token();
+    const [budgets,expenses,dailys,projects]=await Promise.all([
+      _all(tk,_BT),_all(tk,_ET),_all(tk,_DT),_all(tk,_PROJ)
+    ]);
+
+    // ── 預算彙整 ─────────────────────────────────────────────────
+    let totalIncome=0, totalDirectCost=0;
+    const projMap={};  // projName → {income, cost, type, loc}
+    budgets.forEach(i=>{
+      const f=i.fields||{};
+      const proj=_fv(f,"項目關聯");
+      const nature=_fv(f,"性質");   // 收入 or 支出
+      const amt=_num(_fv(f,"金額合計")||_fv(f,"金額")||"0");
+      if(!proj) return;
+      if(!projMap[proj]) projMap[proj]={income:0,cost:0,type:"",loc:""};
+      if(nature==="收入"){ totalIncome+=amt; projMap[proj].income+=amt; }
+      else { totalDirectCost+=amt; projMap[proj].cost+=amt; }
     });
-    const data=await res.json();
-    if(data.code!==0){el.innerHTML='<div style="color:#ef4444;font-size:13px">資料載入失敗</div>';return;}
-    const items=data.data?.items||[];
-    const visitors={};
-    items.forEach(item=>{
-      const f=item.fields||{};
-      const rawD=f["日期"];
-      const d=typeof rawD==="number"?new Date(rawD).toISOString().slice(0,10):
-               Array.isArray(rawD)?rawD.map(x=>x.text||String(x)).join(""):String(rawD||"");
-      if(d===today){
-        const name=Array.isArray(f["姓名"])?f["姓名"].map(x=>x.text||x).join(""):String(f["姓名"]||"");
-        const dept=Array.isArray(f["部門"])?f["部門"].map(x=>x.text||x).join(""):String(f["部門"]||"");
-        const time=Array.isArray(f["時間"])?f["時間"].map(x=>x.text||x).join(""):String(f["時間"]||"");
-        if(name&&(!visitors[name]||time<visitors[name].time))
-          visitors[name]={name,dept,time};
+    // 補項目類型
+    projects.forEach(i=>{
+      const f=i.fields||{};
+      const name=_fv(f,"項目名稱")||_fv(f,"案件／產品名稱")||_fv(f,"名稱");
+      if(projMap[name]){
+        projMap[name].type=_fv(f,"業務類型")||"";
+        projMap[name].loc=_fv(f,"所在地")||"";
       }
     });
-    const list=Object.values(visitors).sort((a,b)=>a.time.localeCompare(b.time));
-    if(list.length===0){
-      el.innerHTML='<div style="color:#64748b;font-size:13px">今日尚無使用紀錄</div>';
-      return;
-    }
-    el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:10px">'+
-      list.map(v=>`<div style="background:#0f172a;border:1px solid #10b981;border-radius:10px;padding:10px 16px;min-width:130px">
-        <div style="font-size:14px;font-weight:700;color:#f1f5f9">${v.name}</div>
-        <div style="font-size:11px;color:#64748b;margin-top:2px">${v.dept}</div>
-        <div style="font-size:12px;color:#10b981;margin-top:6px">⏰ ${v.time}</div>
-      </div>`).join("")+
-      '</div><div style="margin-top:12px;font-size:12px;color:#64748b">今日 <b style="color:#10b981">'+list.length+'</b> 人已上線</div>';
-  }catch(e){el.innerHTML='<div style="color:#64748b;font-size:13px">無法載入出勤資料</div>';}
-})();
 
-// ── 設計送審 live（含圖片縮圖）────────────────────────────────
-(async function(){
-  const PROXY="https://feishu-proxy.raychou6913.workers.dev";
-  const AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-  const DT="tblTEoNLDvtYi4pX";
-  const STATUS_C={"待提交":"#64748b","已提交":"#6366f1","修改中":"#f59e0b","已通過":"#10b981","已拒絕":"#ef4444"};
-  const el=document.getElementById("design-body");
-  try{
-    const tr=await fetch(PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const td=await tr.json();
-    if(td.code!==0){el.innerHTML='<div style="color:#ef4444;font-size:13px">Token 失敗</div>';return;}
-    const tk=td.tenant_access_token;
-    const res=await fetch(PROXY+"/open-apis/bitable/v1/apps/"+AT+"/tables/"+DT+"/records?page_size=50",{
-      headers:{"Authorization":"Bearer "+tk}
-    });
-    const data=await res.json();
-    const items=(data.data?.items||[]);
-    if(!items.length){el.innerHTML='<div style="color:#64748b;font-size:13px;padding:20px;text-align:center">📭 尚無設計送審資料</div>';return;}
+    const grossProfit=totalIncome-totalDirectCost;
 
-    function fv(f,k){const v=f[k];if(!v&&v!==0)return"";if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.text||x.name||""):String(x)).join("");return String(v);}
-
-    const rows=items.map(item=>{
-      const f=item.fields||{};
-      const status=fv(f,"審核狀態")||"待提交";
-      const sc=STATUS_C[status]||"#64748b";
-      // 附件縮圖
-      const atts=f["設計圖附件"];
-      let imgHtml="";
-      if(Array.isArray(atts)&&atts.length){
-        imgHtml='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">';
-        atts.forEach(a=>{
-          const url=a.tmp_url||a.url||"";
-          const name=a.name||"圖片";
-          if(url&&(a.type||"").startsWith("image")){
-            imgHtml+=`<a href="${url}" target="_blank" title="${name}">
-              <img src="${url}" alt="${name}" style="width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid #334155;cursor:pointer">
-            </a>`;
-          }else if(url){
-            imgHtml+=`<a href="${url}" target="_blank" style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:11px;color:#94a3b8;text-decoration:none">📎 ${name.slice(0,12)}</a>`;
-          }
-        });
-        imgHtml+='</div>';
+    // ── 費用彙整（固定成本 vs 項目費用）──────────────────────────
+    let overhead=0, projectExpense=0;
+    const overheadByType={};
+    expenses.forEach(i=>{
+      const f=i.fields||{};
+      const proj=_fv(f,"關聯項目")||_fv(f,"項目關聯");
+      const amt=_num(_fv(f,"實際金額")||_fv(f,"金額")||"0");
+      const cat=_fv(f,"費用類別");
+      if(proj===OVERHEAD_PROJ||!proj){
+        overhead+=amt;
+        overheadByType[cat]=(overheadByType[cat]||0)+amt;
+      } else {
+        projectExpense+=amt;
       }
+    });
+
+    const netProfit=grossProfit-overhead;
+    const vamPct=Math.min(150,Math.round(netProfit/VAM_TARGET*100));
+
+    // ── KPI ──────────────────────────────────────────────────────
+    document.getElementById("kpi-net").textContent="¥"+_fmt(netProfit);
+    document.getElementById("kpi-net").style.color=netProfit>=VAM_TARGET?"#10b981":netProfit>=0?"#f59e0b":"#ef4444";
+    document.getElementById("kpi-net-sub").textContent=netProfit>=VAM_TARGET?"✅ 超過對賭目標！":netProfit>=0?"離目標差 ¥"+_fmt(VAM_TARGET-netProfit):"⚠️ 目前虧損";
+    document.getElementById("kpi-gross").textContent="¥"+_fmt(grossProfit);
+    document.getElementById("kpi-gross-sub").textContent="收入 ¥"+_fmt(totalIncome)+" - 成本 ¥"+_fmt(totalDirectCost);
+    document.getElementById("kpi-overhead").textContent="¥"+_fmt(overhead);
+    document.getElementById("kpi-vam-pct").textContent=vamPct+"%";
+    document.getElementById("kpi-vam-pct").style.color=vamPct>=100?"#10b981":vamPct>=60?"#f59e0b":"#ef4444";
+
+    // VAM bar
+    document.getElementById("vam-bar").style.width=Math.min(100,vamPct)+"%";
+    document.getElementById("vam-current").textContent="¥"+_fmtFull(Math.round(netProfit));
+    const breakdown=Object.entries(overheadByType).map(([k,v])=>`<span style="margin-right:12px">${k} ¥${_fmt(v)}</span>`).join("");
+    document.getElementById("vam-breakdown").innerHTML="固定成本明細："+breakdown;
+
+    // ── 損益分解卡 ────────────────────────────────────────────────
+    document.getElementById("pl-grid").innerHTML=`
+      <div class="pl-card"><div class="pl-label">全年預計收入</div><div class="pl-num" style="color:#10b981">¥${_fmtFull(Math.round(totalIncome))}</div></div>
+      <div class="pl-card"><div class="pl-label">直接成本（採購+版權+物流等）</div><div class="pl-num" style="color:#f97316">¥${_fmtFull(Math.round(totalDirectCost))}</div></div>
+      <div class="pl-card"><div class="pl-label">毛利</div><div class="pl-num" style="color:#6366f1">¥${_fmtFull(Math.round(grossProfit))}<span style="font-size:13px;color:#64748b"> (${totalIncome?Math.round(grossProfit/totalIncome*100):0}%)</span></div></div>
+      <div class="pl-card"><div class="pl-label">固定成本（薪資/租金/運營）</div><div class="pl-num" style="color:#f97316">¥${_fmtFull(Math.round(overhead))}</div></div>
+      <div class="pl-card"><div class="pl-label">預計淨利</div><div class="pl-num" style="color:${netProfit>=0?'#10b981':'#ef4444'}">¥${_fmtFull(Math.round(netProfit))}</div></div>
+      <div class="pl-card"><div class="pl-label">對賭缺口</div><div class="pl-num" style="color:${netProfit>=VAM_TARGET?'#10b981':'#f59e0b'}">${netProfit>=VAM_TARGET?"已達標":"差 ¥"+_fmtFull(Math.round(VAM_TARGET-netProfit))}</div></div>
+    `;
+
+    // ── 項目明細表 ────────────────────────────────────────────────
+    const projEntries=Object.entries(projMap).filter(([k])=>k!==OVERHEAD_PROJ);
+    projEntries.sort((a,b)=>(b[1].income-b[1].cost)-(a[1].income-a[1].cost));
+    const TYPE_C={"批發":"#6366f1","快閃店":"#10b981","代工":"#f59e0b","設計服務":"#ec4899","授權":"#8b5cf6","其他":"#64748b"};
+    const projRows=projEntries.map(([name,p])=>{
+      const gp=p.income-p.cost;
+      const gm=p.income>0?Math.round(gp/p.income*100):0;
+      const tc=TYPE_C[p.type]||"#64748b";
+      const barPct=p.income>0?Math.min(100,Math.max(0,gm))+"%" :"0%";
       return `<tr>
         <td>
-          <div style="font-weight:600;color:#f1f5f9">${fv(f,"設計名稱")||"—"}</div>
-          ${imgHtml}
+          <div style="font-weight:600;color:#f1f5f9;white-space:nowrap">${name}</div>
+          <div style="display:flex;gap:5px;margin-top:3px">
+            ${p.type?`<span class="badge" style="background:${tc}33;color:${tc}">${p.type}</span>`:""}
+            ${p.loc?`<span class="loc-pill">${p.loc}</span>`:""}
+          </div>
         </td>
-        <td style="color:#a78bfa">${fv(f,"IP品牌")||"—"}</td>
-        <td style="color:#94a3b8">${fv(f,"送審階段")||"—"}</td>
-        <td style="color:#94a3b8">${fv(f,"設計師/供應商")||"—"}</td>
-        <td style="color:#64748b">${fv(f,"提交日期")||"—"}</td>
-        <td><span style="background:${sc};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">${status}</span></td>
-        <td style="color:#94a3b8;font-size:12px">${fv(f,"版本號")||"—"}</td>
+        <td style="text-align:right;color:#10b981;font-weight:600;white-space:nowrap">¥${_fmt(p.income)}</td>
+        <td style="text-align:right;color:#f97316;white-space:nowrap">¥${_fmt(p.cost)}</td>
+        <td style="text-align:right">
+          <span style="color:${gp>=0?'#10b981':'#ef4444'};font-weight:700">¥${_fmt(gp)}</span>
+          <div class="proj-row-bar" style="background:${gp>=0?'#10b98130':'#ef444430'}"><div style="height:100%;border-radius:3px;background:${gp>=0?'#10b981':'#ef4444'};width:${barPct}"></div></div>
+          <div style="font-size:11px;color:#64748b">${gm}%</div>
+        </td>
       </tr>`;
     }).join("");
 
-    el.innerHTML=`<div style="overflow-x:auto"><table class="dt">
-      <thead><tr>
-        <th>設計名稱 / 圖片</th><th>IP</th><th>送審階段</th><th>設計師</th><th>提交日</th><th>狀態</th><th>版本</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table></div>`;
-  }catch(e){el.innerHTML='<div style="color:#64748b;font-size:13px">無法載入設計資料</div>';}
+    document.getElementById("proj-table-wrap").innerHTML=
+      projEntries.length?`<table class="dt">
+        <thead><tr><th>項目</th><th style="text-align:right">預計收入</th><th style="text-align:right">直接成本</th><th style="text-align:right">毛利 / 毛利率</th></tr></thead>
+        <tbody>${projRows}</tbody>
+      </table>`:'<div class="loading-msg">尚無項目預算資料</div>';
+
+    // ── 快閃店本月流水 ────────────────────────────────────────────
+    const now=new Date();
+    const thisYear=now.getFullYear(), thisMon=now.getMonth()+1;
+    const thisMonStr=thisYear+"-"+String(thisMon).padStart(2,"0");
+    let popupTotal=0, popupDays=0;
+    const dailyRows=dailys.filter(i=>{
+      const d=_fv(i.fields,"日期")||"";
+      return d.startsWith(thisMonStr);
+    }).sort((a,b)=>_fv(b.fields,"日期").localeCompare(_fv(a.fields,"日期"))).map(i=>{
+      const f=i.fields||{};
+      const amt=_num(_fv(f,"日流水總額")||"0");
+      popupTotal+=amt; popupDays++;
+      return `<tr>
+        <td style="font-weight:600;white-space:nowrap">${_fv(f,"日期")||"—"}</td>
+        <td style="color:#94a3b8">${_fv(f,"項目關聯")||"—"}</td>
+        <td style="text-align:right;color:#10b981;font-weight:700">${amt.toLocaleString()} ${_fv(f,"幣別")||""}</td>
+        <td style="text-align:right">${_fv(f,"客流人數")||"—"}</td>
+        <td style="color:#64748b">${_fv(f,"填報人")||"—"}</td>
+      </tr>`;
+    });
+    document.getElementById("kpi-daily").textContent="¥"+_fmt(popupTotal);
+    document.getElementById("kpi-daily-sub").textContent=thisMon+"月 · "+popupDays+"天記錄";
+
+    document.getElementById("daily-table-wrap").innerHTML=
+      dailyRows.length?`<table class="dt">
+        <thead><tr><th>日期</th><th>項目</th><th style="text-align:right">流水</th><th style="text-align:right">客流</th><th>填報人</th></tr></thead>
+        <tbody>${dailyRows.join("")}</tbody>
+      </table>`:'<div class="loading-msg">本月尚無每日流水記錄</div>';
+
+    // ── 項目數量 KPI ──────────────────────────────────────────────
+    const activeProj=Object.values(projMap).filter(p=>p.type);
+    document.getElementById("kpi-proj").textContent=activeProj.length;
+    const popup=activeProj.filter(p=>p.type==="快閃店").length;
+    const batch=activeProj.filter(p=>p.type==="批發").length;
+    document.getElementById("kpi-proj-sub").textContent=`批發 ${batch} 個 / 快閃店 ${popup} 場`;
+
+    // ── 今日登入 ──────────────────────────────────────────────────
+    const today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    document.getElementById("att-date-lbl").textContent=today;
+    const [vtk]=await Promise.all([_token()]);
+    const vItems=await _all(vtk,_VL);
+    const visitors={};
+    vItems.forEach(i=>{
+      const f=i.fields||{};
+      const rawD=_fv(f,"日期");
+      const d=typeof f["日期"]==="number"?new Date(f["日期"]).toISOString().slice(0,10):rawD.slice(0,10);
+      if(d!==today) return;
+      const name=_fv(f,"姓名"); const time=_fv(f,"時間");
+      if(name&&(!visitors[name]||time<visitors[name].time)) visitors[name]={name,dept:_fv(f,"部門"),time};
+    });
+    const vList=Object.values(visitors).sort((a,b)=>a.time.localeCompare(b.time));
+    document.getElementById("att-body").innerHTML=vList.length
+      ?'<div style="display:flex;flex-wrap:wrap;gap:10px">'+vList.map(v=>`
+        <div style="background:#0f172a;border:1px solid #10b981;border-radius:10px;padding:10px 16px;min-width:130px">
+          <div style="font-size:14px;font-weight:700;color:#f1f5f9">${v.name}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${v.dept}</div>
+          <div style="font-size:12px;color:#10b981;margin-top:6px">⏰ ${v.time}</div>
+        </div>`).join("")+'</div>'
+      :'<div style="color:#64748b;font-size:13px">今日尚無登入紀錄</div>';
+
+    const ts=new Date().toLocaleTimeString("zh-TW");
+    document.getElementById("refresh-time").textContent="最後更新："+today+" "+ts;
+  }catch(e){
+    document.getElementById("refresh-time").textContent="資料載入失敗："+e.message;
+  }
+}
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");return;}
+  if(s.role!=="超級管理員"&&s.role!=="總部管理中心"){
+    location.replace("home.html"); return;
+  }
+  loadAll();
 })();
 </script>
-</body>
-</html>
+</body></html>

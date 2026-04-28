@@ -72,10 +72,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <form id="frm">
 
     <div class="card" style="border-color:#f97316">
-      <div class="ctitle" style="color:#f97316">📋 關聯項目（必填）</div>
+      <div class="ctitle" style="color:#f97316">📋 關聯項目（選填）</div>
       <div class="f">
-        <label>選擇項目 <span class="req" style="color:#f97316">*</span></label>
-        <select id="proj-sel" required><option value="">載入中...</option></select>
+        <label>選擇項目</label>
+        <select id="proj-sel"><option value="">載入中...</option></select>
+        <div class="hint">薪資、租金、水電等固定成本可選「全公司固定成本」；若不選則預設歸入固定成本</div>
       </div>
       <div id="budget-ref" style="display:none;margin-top:12px">
         <div style="font-size:12px;font-weight:700;color:#f97316;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">本項目預算對照（含稅）</div>
@@ -89,8 +90,9 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
           <select id="f-cat" required>
             <option>生產製造</option><option>開發費用</option><option>版權費用</option>
             <option>採購</option><option>行銷</option><option>物流</option><option>倉儲</option>
-            <option>運營</option><option>人事</option><option>差旅</option>
-            <option>展場</option><option>其他支出</option>
+            <option>運營</option><option>薪資發放</option><option>辦公室租金</option>
+            <option>人事</option><option>差旅</option>
+            <option>展場</option><option>水電雜費</option><option>其他支出</option>
           </select></div>
         <div class="f"><label>批次</label>
           <select id="f-batch">
@@ -505,7 +507,12 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
-_loadProjectSelect("proj-sel", window._ctxTypeFilter||null);
+_loadProjectSelect("proj-sel", window._ctxTypeFilter||null).then(()=>{
+  const sel=document.getElementById("proj-sel");
+  const opt=document.createElement("option");
+  opt.value="全公司固定成本"; opt.textContent="📌 全公司固定成本（薪資/租金/水電）";
+  sel.insertBefore(opt, sel.options[1]);
+});
 (function(){
   const t=new Date();
   const d=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
@@ -656,8 +663,7 @@ loadSuppliers();
 
 document.getElementById("frm").onsubmit=async(e)=>{
   e.preventDefault();
-  const proj=_projVal("proj-sel");
-  if(!proj){alert("請先選擇關聯項目");return;}
+  const proj=_projVal("proj-sel")||"全公司固定成本";
   const amount=parseFloat(document.getElementById("f-amount").value)||0;
   if(!amount){alert("請填寫申請金額");return;}
   const btn=document.getElementById("sbtn");
