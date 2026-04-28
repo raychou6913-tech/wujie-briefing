@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🏦 MG消耗總覽 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#fff;border-bottom:3px solid #8b5cf6;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.btn-back{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;text-decoration:none}
+.btn-back:hover{border-color:#8b5cf6;color:#8b5cf6}
+.filter-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-bar select{border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 12px;font-size:13px;color:#0f172a;background:#f8fafc;cursor:pointer}
+.filter-bar select:focus{border-color:#8b5cf6;outline:none}
+.wrap{max-width:1100px;margin:20px auto;padding:0 16px}
+.mg-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:0 1px 4px #0000000a}
+.mg-hdr{padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid #f1f5f9;flex-wrap:wrap}
+.contract-name{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:3px}
+.contract-meta{font-size:12px;color:#64748b}
+.health-badge{padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.mg-body{padding:16px 20px}
+.mg-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.mg-row:last-child{border-bottom:none}
+.mg-label{color:#64748b;font-size:12px}
+.mg-val{font-weight:600;color:#0f172a}
+.bar-wrap{margin:12px 0 4px}
+.bar-bg{background:#f1f5f9;border-radius:6px;height:10px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width .5s ease}
+.bar-pct{font-size:11px;color:#64748b;margin-top:4px}
+.no-mg{color:#94a3b8;font-size:13px;font-style:italic}
+.empty{text-align:center;color:#94a3b8;padding:40px;font-size:14px}
+.loading{text-align:center;color:#94a3b8;padding:40px;font-size:14px}
+.summary-bar{background:#1e293b;color:#f1f5f9;padding:14px 24px;display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
+.sum-item{text-align:center}
+.sum-num{font-size:22px;font-weight:700}
+.sum-lbl{font-size:11px;color:#94a3b8;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="font-size:26px">🏦</div>
+    <div>
+      <div style="font-size:19px;font-weight:700;color:#0f172a">MG 消耗總覽</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px">各合約保底金使用狀況 · 即時剩餘追蹤</div>
+    </div>
+  </div>
+  <a href="../progress_browser.html" class="btn-back">← 進度查閱</a>
+</div>
+<div id="summary-bar" class="summary-bar" style="display:none">
+  <div class="sum-item"><div class="sum-num" id="s-total">—</div><div class="sum-lbl">合約總 MG</div></div>
+  <div class="sum-item"><div class="sum-num" id="s-used">—</div><div class="sum-lbl">已消耗</div></div>
+  <div class="sum-item"><div class="sum-num" id="s-remain">—</div><div class="sum-lbl">剩餘 MG</div></div>
+  <div class="sum-item"><div class="sum-num" id="s-over">—</div><div class="sum-lbl">超出 MG</div></div>
+</div>
+<div class="filter-bar">
+  <select id="f-ip" onchange="applyFilter()">
+    <option value="">全部 IP</option>
+  </select>
+  <select id="f-health" onchange="applyFilter()">
+    <option value="">全部狀態</option>
+    <option value="green">安全</option>
+    <option value="yellow">注意</option>
+    <option value="red">超出 MG</option>
+    <option value="none">無 MG</option>
+  </select>
+  <span id="count-label" style="font-size:12px;color:#94a3b8;margin-left:4px"></span>
+</div>
+<div class="wrap" id="main-wrap"><div class="loading">載入中…</div></div>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _CT="tbltnJNDhRNwVkZC";
+const _ET="tblu2NkqBWyBSskG";
+
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.link||x.text||""):String(x)).join(", ");
+  if(typeof v==="object") return v.link||v.text||"";
+  return String(v);
+}
+function _n(f,k){const v=parseFloat(_fv(f,k));return isNaN(v)?0:v;}
+function _tsDate(ts){
+  if(!ts) return null;
+  const d=new Date(parseInt(ts));
+  return d.getFullYear()+"/"+(d.getMonth()+1).toString().padStart(2,"0")+"/"+(d.getDate()).toString().padStart(2,"0");
+}
+function _numFmt(n,cur){
+  if(!n&&n!==0) return "—";
+  return n.toLocaleString("zh-TW",{maximumFractionDigits:0})+(cur?" "+cur:"");
+}
+
+async function _allRecords(tk,tblId){
+  let items=[],cursor="";
+  do{
+    const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tblId+"/records?page_size=100"+(cursor?"&page_token="+cursor:"");
+    const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+    const data=await res.json();
+    items=items.concat(data.data?.items||[]);
+    cursor=data.data?.has_more?data.data.page_token:"";
+  }while(cursor);
+  return items;
+}
+
+let _contracts=[], _expenseMap={};
+
+async function loadData(){
+  const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  if(d.code!==0){document.getElementById("main-wrap").innerHTML='<div class="empty">Token 取得失敗</div>';return;}
+  const tk=d.tenant_access_token;
+
+  const [cItems,eItems]=await Promise.all([_allRecords(tk,_CT),_allRecords(tk,_ET)]);
+
+  // Build expense map: contract/project name → total 版權費用
+  _expenseMap={};
+  eItems.forEach(i=>{
+    const f=i.fields||{};
+    const cat=_fv(f,"費用類別");
+    if(cat!=="版權費用") return;
+    const proj=_fv(f,"項目關聯")||"";
+    const amt=_n(f,"金額");
+    if(!proj) return;
+    _expenseMap[proj]=(_expenseMap[proj]||0)+amt;
+  });
+
+  _contracts=cItems.map(i=>{
+    const f=i.fields||{};
+    return {
+      name:_fv(f,"合約名稱"),
+      ip:_fv(f,"IP品牌"),
+      party:_fv(f,"對方公司")||_fv(f,"版權方"),
+      status:_fv(f,"合約狀態"),
+      mg:_n(f,"保底金額"),
+      cur:_fv(f,"幣別")||"",
+      endTs:_fv(f,"到期日期"),
+    };
+  }).filter(c=>c.name);
+
+  // Populate IP filter
+  const ips=[...new Set(_contracts.map(c=>c.ip).filter(Boolean))].sort();
+  const sel=document.getElementById("f-ip");
+  ips.forEach(ip=>{const o=document.createElement("option");o.value=ip;o.textContent=ip;sel.appendChild(o);});
+
+  applyFilter();
+}
+
+function applyFilter(){
+  const ipF=document.getElementById("f-ip").value;
+  const healthF=document.getElementById("f-health").value;
+
+  const processed=_contracts.map(c=>{
+    const used=_expenseMap[c.name]||0;
+    const remain=c.mg>0?(c.mg-used):null;
+    const pct=c.mg>0?Math.min(100,Math.round(used/c.mg*100)):null;
+    let health=c.mg>0?(pct>=100?"red":pct>=70?"yellow":"green"):"none";
+    return {...c,used,remain,pct,health};
+  });
+
+  const filtered=processed.filter(c=>{
+    if(ipF&&c.ip!==ipF) return false;
+    if(healthF&&c.health!==healthF) return false;
+    return true;
+  });
+
+  document.getElementById("count-label").textContent=filtered.length+"份合約";
+
+  // Summary stats (only mg>0)
+  const mgContracts=processed.filter(c=>c.mg>0);
+  if(mgContracts.length){
+    const totalMG=mgContracts.reduce((s,c)=>s+c.mg,0);
+    const totalUsed=mgContracts.reduce((s,c)=>s+c.used,0);
+    const totalRemain=mgContracts.reduce((s,c)=>s+(c.remain>0?c.remain:0),0);
+    const totalOver=mgContracts.reduce((s,c)=>s+(c.remain<0?Math.abs(c.remain):0),0);
+    document.getElementById("s-total").textContent=totalMG.toLocaleString();
+    document.getElementById("s-used").textContent=totalUsed.toLocaleString();
+    document.getElementById("s-remain").textContent=totalRemain.toLocaleString();
+    document.getElementById("s-over").textContent=totalOver>0?totalOver.toLocaleString():"0";
+    document.getElementById("summary-bar").style.display="flex";
+  }
+
+  renderCards(filtered);
+}
+
+function renderCards(contracts){
+  const wrap=document.getElementById("main-wrap");
+  if(!contracts.length){wrap.innerHTML='<div class="empty">沒有符合條件的合約</div>';return;}
+
+  const HEALTH={
+    green: {label:"✅ MG 安全",bg:"#d1fae5",color:"#065f46"},
+    yellow:{label:"⚠️ 請注意",bg:"#fef3c7",color:"#92400e"},
+    red:   {label:"🔴 超出 MG",bg:"#fee2e2",color:"#991b1b"},
+    none:  {label:"— 無 MG",bg:"#f1f5f9",color:"#64748b"},
+  };
+  const BAR_COLOR={green:"#10b981",yellow:"#f59e0b",red:"#ef4444"};
+
+  wrap.innerHTML=contracts.map(c=>{
+    const hs=HEALTH[c.health];
+    const expiry=_tsDate(c.endTs);
+    const today=new Date();
+    const daysLeft=expiry?Math.round((new Date(c.endTs)-today)/86400000):null;
+    const expiryStr=expiry
+      ?(daysLeft<0?`<span style="color:#ef4444;font-weight:700">${expiry} ⚠️ 已到期</span>`
+        :daysLeft<90?`<span style="color:#f59e0b;font-weight:700">${expiry}（剩 ${daysLeft} 天）</span>`
+        :`<span>${expiry}（剩 ${daysLeft} 天）</span>`)
+      :"—";
+    const mgSection=c.mg>0?`
+      <div class="bar-wrap">
+        <div class="bar-bg"><div class="bar-fill" style="width:${c.pct}%;background:${BAR_COLOR[c.health]||'#94a3b8'}"></div></div>
+        <div class="bar-pct">已消耗 ${c.pct}%　${_numFmt(c.used,c.cur)} / ${_numFmt(c.mg,c.cur)}</div>
+      </div>
+      <div class="mg-row"><span class="mg-label">MG 保底金</span><span class="mg-val">${_numFmt(c.mg,c.cur)}</span></div>
+      <div class="mg-row"><span class="mg-label">已消耗版權費用</span><span class="mg-val" style="color:${c.used>0?"#ef4444":"#0f172a"}">${_numFmt(c.used,c.cur)}</span></div>
+      <div class="mg-row"><span class="mg-label">MG 剩餘</span><span class="mg-val" style="color:${c.remain<0?"#ef4444":c.remain<c.mg*0.3?"#f59e0b":"#10b981"}">${c.remain>=0?_numFmt(c.remain,c.cur):"超出 "+_numFmt(Math.abs(c.remain),c.cur)}</span></div>
+    `:
+    `<div class="mg-row"><span class="no-mg">此合約未設定 MG 保底金</span></div>`;
+
+    return `<div class="mg-card">
+      <div class="mg-hdr">
+        <div>
+          <div class="contract-name">${c.name}</div>
+          <div class="contract-meta">
+            <span style="background:#e0f2fe;color:#0284c7;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;margin-right:6px">${c.ip||"—"}</span>
+            ${c.party?`<span style="margin-right:6px">${c.party}</span>`:""}<span style="color:#475569">${c.status||""}</span>
+          </div>
+          <div class="contract-meta" style="margin-top:4px">到期：${expiryStr}</div>
+        </div>
+        <span class="health-badge" style="background:${hs.bg};color:${hs.color}">${hs.label}</span>
+      </div>
+      <div class="mg-body">${mgSection}</div>
+    </div>`;
+  }).join("");
+}
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");return;}
+  loadData();
+})();
+</script>
+</body></html>

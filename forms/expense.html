@@ -683,7 +683,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     if(payterm) fields["帳期（天）"]=parseInt(payterm);
     if(document.getElementById("f-cat").value==="版權費用"){
       const mgBody=document.getElementById("mg-pool-body")?.textContent||"";
-      fields["MG狀態"]=mgBody.includes("超出MG")?"超出MG補繳":"抵扣MG";
+      if(mgBody) fields["備註"]=(fields["備註"]?fields["備註"]+" | ":"")+(mgBody.includes("超出MG")?"超出MG補繳":"抵扣MG");
     }
     await _post("expense", fields);
     res.className="result ok";res.style.display="block";

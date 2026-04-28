@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📦 產品開發進度 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#fff;border-bottom:3px solid #06b6d4;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.btn-back{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;text-decoration:none}
+.btn-back:hover{border-color:#06b6d4;color:#06b6d4}
+.filter-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 12px;font-size:13px;color:#0f172a;background:#f8fafc;cursor:pointer}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#06b6d4;outline:none}
+.wrap{max-width:1200px;margin:20px auto;padding:0 16px}
+.proj-group{background:#fff;border:1px solid #e2e8f0;border-radius:14px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 4px #0000000a}
+.proj-hdr{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.proj-hdr:hover{background:#f0f9ff}
+.proj-name{font-size:15px;font-weight:700;color:#0f172a}
+.proj-meta{font-size:12px;color:#64748b}
+.prod-table{width:100%;border-collapse:collapse;font-size:13px}
+.prod-table th{background:#fafbfd;padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #f1f5f9}
+.prod-table td{padding:10px 16px;border-bottom:1px solid #f8fafc;vertical-align:middle}
+.prod-table tr:last-child td{border-bottom:none}
+.prod-table tr:hover td{background:#f8fafc}
+.stage-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.sale-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.stat-pills{display:flex;gap:8px;flex-wrap:wrap;padding:12px 20px 10px;border-bottom:1px solid #f1f5f9}
+.stat-pill{font-size:11px;background:#f1f5f9;color:#475569;border-radius:20px;padding:3px 10px;font-weight:600}
+.empty{text-align:center;color:#94a3b8;padding:30px;font-size:13px}
+.loading{text-align:center;color:#94a3b8;padding:40px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="font-size:26px">📦</div>
+    <div>
+      <div style="font-size:19px;font-weight:700;color:#0f172a">產品開發進度</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px">各項目產品清單 · 開發 / 銷售狀態即時追蹤</div>
+    </div>
+  </div>
+  <a href="../progress_browser.html" class="btn-back">← 進度查閱</a>
+</div>
+<div class="filter-bar">
+  <select id="f-devst" onchange="applyFilter()">
+    <option value="">全部開發狀態</option>
+    <option>概念討論</option><option>設計中</option><option>送審中</option>
+    <option>打樣中</option><option>修改中</option><option>已確認</option>
+    <option>生產中</option><option>已完成</option><option>已取消</option>
+  </select>
+  <select id="f-salest" onchange="applyFilter()">
+    <option value="">全部銷售狀態</option>
+    <option>未開售</option><option>預售中</option><option>銷售中</option>
+    <option>已售罄</option><option>已停售</option>
+  </select>
+  <input id="f-search" type="text" placeholder="搜尋產品名稱 / IP品牌…" oninput="applyFilter()" style="min-width:200px">
+  <span id="count-label" style="font-size:12px;color:#94a3b8;margin-left:4px"></span>
+</div>
+<div class="wrap" id="main-wrap"><div class="loading">載入中…</div></div>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _PROD_TBL="tblH1pYYlHBGSBHc";
+
+const STAGE_STYLE={
+  "概念討論":{bg:"#f1f5f9",color:"#475569"},
+  "設計中":  {bg:"#dbeafe",color:"#1d4ed8"},
+  "送審中":  {bg:"#fef3c7",color:"#92400e"},
+  "打樣中":  {bg:"#ede9fe",color:"#6d28d9"},
+  "修改中":  {bg:"#fee2e2",color:"#b91c1c"},
+  "已確認":  {bg:"#d1fae5",color:"#065f46"},
+  "生產中":  {bg:"#cffafe",color:"#0e7490"},
+  "已完成":  {bg:"#f0fdf4",color:"#166534"},
+  "已取消":  {bg:"#f8fafc",color:"#94a3b8"},
+};
+const SALE_STYLE={
+  "未開售":{bg:"#f1f5f9",color:"#64748b"},
+  "預售中":{bg:"#fef3c7",color:"#92400e"},
+  "銷售中":{bg:"#d1fae5",color:"#065f46"},
+  "已售罄":{bg:"#fee2e2",color:"#991b1b"},
+  "已停售":{bg:"#f8fafc",color:"#94a3b8"},
+};
+
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.link||x.text||""):String(x)).join(", ");
+  if(typeof v==="object") return v.link||v.text||"";
+  return String(v);
+}
+function _ts(ts){
+  if(!ts) return "—";
+  const d=new Date(ts);
+  return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+(d.getDate());
+}
+function _stageBadge(s){
+  const st=STAGE_STYLE[s]||{bg:"#f1f5f9",color:"#64748b"};
+  return `<span class="stage-badge" style="background:${st.bg};color:${st.color}">${s||"—"}</span>`;
+}
+function _saleBadge(s){
+  const st=SALE_STYLE[s]||{bg:"#f1f5f9",color:"#64748b"};
+  return `<span class="sale-badge" style="background:${st.bg};color:${st.color}">${s||"—"}</span>`;
+}
+
+let _allProducts=[];
+
+async function loadData(){
+  const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  if(d.code!==0){document.getElementById("main-wrap").innerHTML='<div class="empty">Token 取得失敗</div>';return;}
+  const tk=d.tenant_access_token;
+  let items=[],cursor="";
+  do{
+    const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_PROD_TBL+"/records?page_size=100"+(cursor?"&page_token="+cursor:"");
+    const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+    const data=await res.json();
+    items=items.concat(data.data?.items||[]);
+    cursor=data.data?.has_more?data.data.page_token:"";
+  }while(cursor);
+  _allProducts=items.map(i=>{
+    const f=i.fields||{};
+    return {
+      id:i.record_id,
+      name:_fv(f,"產品名稱"),
+      ip:_fv(f,"IP品牌"),
+      proj:_fv(f,"項目關聯"),
+      cat:_fv(f,"產品類別"),
+      devst:_fv(f,"開發狀態")||"概念討論",
+      salest:_fv(f,"銷售狀態")||"未開售",
+      launch:_fv(f,"預計上市日"),
+      launched:_fv(f,"實際上市日"),
+      note:_fv(f,"備註"),
+      sku:_fv(f,"SKU編號"),
+      retail:_fv(f,"目標零售價"),
+      cur:_fv(f,"幣別")||"",
+    };
+  }).filter(p=>p.name);
+  applyFilter();
+}
+
+function applyFilter(){
+  const devF=document.getElementById("f-devst").value;
+  const saleF=document.getElementById("f-salest").value;
+  const q=document.getElementById("f-search").value.trim().toLowerCase();
+  const filtered=_allProducts.filter(p=>{
+    if(devF&&p.devst!==devF) return false;
+    if(saleF&&p.salest!==saleF) return false;
+    if(q&&!(p.name.toLowerCase().includes(q)||p.ip.toLowerCase().includes(q)||p.proj.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  document.getElementById("count-label").textContent=filtered.length+"件產品";
+  renderGroups(filtered);
+}
+
+function renderGroups(products){
+  const wrap=document.getElementById("main-wrap");
+  if(!products.length){wrap.innerHTML='<div class="empty">沒有符合條件的產品</div>';return;}
+  const groups={};
+  products.forEach(p=>{
+    const key=p.proj||"（未關聯項目）";
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(p);
+  });
+  const STAGE_ORDER=["概念討論","設計中","送審中","打樣中","修改中","已確認","生產中","已完成","已取消"];
+  const countStages=(arr)=>{
+    const c={};
+    arr.forEach(p=>c[p.devst]=(c[p.devst]||0)+1);
+    return STAGE_ORDER.filter(s=>c[s]).map(s=>`<span class="stat-pill">${s} ×${c[s]}</span>`).join("");
+  };
+  wrap.innerHTML=Object.entries(groups).map(([proj,prods])=>{
+    const rows=prods.map(p=>{
+      const price=p.retail?(parseFloat(p.retail).toLocaleString()+" "+p.cur):"—";
+      return `<tr>
+        <td style="font-weight:600;color:#0f172a">${p.name}</td>
+        <td><span style="background:#f0f9ff;color:#0284c7;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">${p.ip||"—"}</span></td>
+        <td>${p.cat||"—"}</td>
+        <td>${_stageBadge(p.devst)}</td>
+        <td>${_saleBadge(p.salest)}</td>
+        <td style="color:#475569">${p.launch?_ts(parseInt(p.launch)):"—"}</td>
+        <td style="color:#475569">${price}</td>
+        <td style="color:#64748b;max-width:180px;word-break:break-all">${p.note||"—"}</td>
+      </tr>`;
+    }).join("");
+    return `<div class="proj-group">
+      <div class="proj-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+        <div>
+          <span class="proj-name">📋 ${proj}</span>
+          <span class="proj-meta" style="margin-left:10px">${prods.length} 件產品</span>
+        </div>
+        <span style="font-size:18px;color:#94a3b8">▾</span>
+      </div>
+      <div>
+        <div class="stat-pills">${countStages(prods)}</div>
+        <div style="overflow-x:auto">
+        <table class="prod-table">
+          <thead><tr>
+            <th>產品名稱</th><th>IP</th><th>類別</th>
+            <th>開發狀態</th><th>銷售狀態</th>
+            <th>預計上市</th><th>目標零售價</th><th>備註</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");return;}
+  loadData();
+})();
+</script>
+</body></html>
