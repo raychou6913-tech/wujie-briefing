@@ -72,6 +72,7 @@ const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _CT="tbltnJNDhRNwVkZC";
 const _ET="tblu2NkqBWyBSskG";
+const _PROJ="tblYBjAlemYPuNGy";
 
 function _fv(f,k){
   const v=f[k];
@@ -111,18 +112,28 @@ async function loadData(){
   if(d.code!==0){document.getElementById("main-wrap").innerHTML='<div class="empty">Token 取得失敗</div>';return;}
   const tk=d.tenant_access_token;
 
-  const [cItems,eItems]=await Promise.all([_allRecords(tk,_CT),_allRecords(tk,_ET)]);
+  const [cItems,eItems,pItems]=await Promise.all([_allRecords(tk,_CT),_allRecords(tk,_ET),_allRecords(tk,_PROJ)]);
 
-  // Build expense map: contract/project name → total 版權費用
+  // Build project→contract mapping
+  const proj2contract={};
+  pItems.forEach(i=>{
+    const f=i.fields||{};
+    const pname=_fv(f,"項目名稱");
+    const cname=_fv(f,"合約名稱");
+    if(pname&&cname) proj2contract[pname]=cname;
+  });
+
+  // Build expense map keyed by CONTRACT name (via project→contract mapping)
   _expenseMap={};
   eItems.forEach(i=>{
     const f=i.fields||{};
     const cat=_fv(f,"費用類別");
     if(cat!=="版權費用") return;
-    const proj=_fv(f,"項目關聯")||"";
-    const amt=_n(f,"金額");
+    const proj=_fv(f,"關聯項目")||"";
+    const amt=_n(f,"實際金額");
     if(!proj) return;
-    _expenseMap[proj]=(_expenseMap[proj]||0)+amt;
+    const contract=proj2contract[proj]||proj;
+    _expenseMap[contract]=(_expenseMap[contract]||0)+amt;
   });
 
   _contracts=cItems.map(i=>{
@@ -205,7 +216,24 @@ function renderCards(contracts){
         :daysLeft<90?`<span style="color:#f59e0b;font-weight:700">${expiry}（剩 ${daysLeft} 天）</span>`
         :`<span>${expiry}（剩 ${daysLeft} 天）</span>`)
       :"—";
+    // Action suggestion banner based on health
+    let actionBanner="";
+    if(c.health==="red"){
+      const overAmt=_numFmt(Math.abs(c.remain),c.cur);
+      actionBanner=`<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#991b1b">
+        ⚠️ <strong>超出 MG 保底金</strong>，已超出 ${overAmt}。需與版權方協商補繳授權費，或確認本期銷售是否達追繳門檻。
+        <div style="margin-top:6px;color:#7f1d1d">建議行動：① 確認版權方是否有超出計算條款 ② 評估追繳金額是否影響項目利潤 ③ 通知財務預留資金</div>
+      </div>`;
+    }else if(c.health==="yellow"){
+      const remainAmt=_numFmt(c.remain,c.cur);
+      actionBanner=`<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#92400e">
+        ⚡ <strong>MG 剩餘不足 30%</strong>，剩餘 ${remainAmt}。後續版權費用需謹慎控制。
+        <div style="margin-top:6px;color:#78350f">建議行動：① 確認本合約後續期間出貨量 ② 預估剩餘版權費用是否超出 ③ 必要時與版權方討論追加 MG 或調整授權計劃</div>
+      </div>`;
+    }
+
     const mgSection=c.mg>0?`
+      ${actionBanner}
       <div class="bar-wrap">
         <div class="bar-bg"><div class="bar-fill" style="width:${c.pct}%;background:${BAR_COLOR[c.health]||'#94a3b8'}"></div></div>
         <div class="bar-pct">已消耗 ${c.pct}%　${_numFmt(c.used,c.cur)} / ${_numFmt(c.mg,c.cur)}</div>
@@ -215,6 +243,8 @@ function renderCards(contracts){
       <div class="mg-row"><span class="mg-label">MG 剩餘</span><span class="mg-val" style="color:${c.remain<0?"#ef4444":c.remain<c.mg*0.3?"#f59e0b":"#10b981"}">${c.remain>=0?_numFmt(c.remain,c.cur):"超出 "+_numFmt(Math.abs(c.remain),c.cur)}</span></div>
     `:
     `<div class="mg-row"><span class="no-mg">此合約未設定 MG 保底金</span></div>`;
+
+    const contractLink=`view_contract_progress.html?q=${encodeURIComponent(c.name)}`;
 
     return `<div class="mg-card">
       <div class="mg-hdr">
@@ -226,7 +256,10 @@ function renderCards(contracts){
           </div>
           <div class="contract-meta" style="margin-top:4px">到期：${expiryStr}</div>
         </div>
-        <span class="health-badge" style="background:${hs.bg};color:${hs.color}">${hs.label}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <span class="health-badge" style="background:${hs.bg};color:${hs.color}">${hs.label}</span>
+          <a href="${contractLink}" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600;background:#eef2ff;padding:4px 10px;border-radius:6px">📄 查看合約 →</a>
+        </div>
       </div>
       <div class="mg-body">${mgSection}</div>
     </div>`;

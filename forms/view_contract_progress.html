@@ -145,6 +145,8 @@ async function loadData(){
     applyFilter();
     const _urlRid=new URLSearchParams(location.search).get("rid");
     if(_urlRid) setTimeout(()=>openDetail(_urlRid),300);
+    const _urlQ=new URLSearchParams(location.search).get("q");
+    if(_urlQ){const sb=document.getElementById("search-box");if(sb){sb.value=_urlQ;applyFilter();}}
   }catch(e){
     document.getElementById("card-view").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
     document.getElementById("hdr-count").textContent="載入失敗";

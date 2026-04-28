@@ -54,6 +54,7 @@ body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFo
     <div style="font-size:12px;color:#64748b;margin-top:2px" id="refresh-time">資料載入中...</div>
   </div>
   <div class="topbar-actions">
+    <span id="topbar-user" style="font-size:12px;color:#94a3b8"></span>
     <button class="btn-sm" style="background:#334155;color:#94a3b8" onclick="loadAll()">↻ 重新整理</button>
     <a href="home.html" class="btn-sm" style="background:#6366f1;color:#fff">← 首頁</a>
   </div>
@@ -310,15 +311,20 @@ async function loadAll(){
     const thisYear=now.getFullYear(), thisMon=now.getMonth()+1;
     const thisMonStr=thisYear+"-"+String(thisMon).padStart(2,"0");
     let popupTotal=0, popupDays=0;
+    function _dateStr(raw){
+      if(typeof raw==="number") return new Date(raw).toISOString().slice(0,10);
+      return String(raw||"").slice(0,10);
+    }
     const dailyRows=dailys.filter(i=>{
-      const d=_fv(i.fields,"日期")||"";
-      return d.startsWith(thisMonStr);
-    }).sort((a,b)=>_fv(b.fields,"日期").localeCompare(_fv(a.fields,"日期"))).map(i=>{
+      const raw=i.fields["日期"];
+      return _dateStr(raw).startsWith(thisMonStr);
+    }).sort((a,b)=>_dateStr(b.fields["日期"]).localeCompare(_dateStr(a.fields["日期"]))).map(i=>{
       const f=i.fields||{};
       const amt=_num(_fv(f,"日流水總額")||"0");
+      const dateLabel=_dateStr(f["日期"]);
       popupTotal+=amt; popupDays++;
       return `<tr>
-        <td style="font-weight:600;white-space:nowrap">${_fv(f,"日期")||"—"}</td>
+        <td style="font-weight:600;white-space:nowrap">${dateLabel||"—"}</td>
         <td style="color:#94a3b8">${_fv(f,"項目關聯")||"—"}</td>
         <td style="text-align:right;color:#10b981;font-weight:700">${amt.toLocaleString()} ${_fv(f,"幣別")||""}</td>
         <td style="text-align:right">${_fv(f,"客流人數")||"—"}</td>
@@ -375,9 +381,13 @@ async function loadAll(){
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");return;}
-  if(s.role!=="超級管理員"&&s.role!=="總部管理中心"){
+  const MGMT_ROLES=["超級管理員","總部管理中心","管理層"];
+  const MGMT_NAMES=["Ray","Shawn","安然"];
+  if(!MGMT_ROLES.includes(s.role)&&!MGMT_NAMES.includes(s.name)){
     location.replace("home.html"); return;
   }
+  const el=document.getElementById("topbar-user");
+  if(el) el.textContent=s.name+" · "+s.role;
   loadAll();
 })();
 </script>
