@@ -275,6 +275,7 @@ async function _loadIpSelect(selectId){
       const o=document.createElement("option");
       o.value=ip.name; o.textContent=ip.name;
       if(ip.licensor) o.dataset.licensor=ip.licensor;
+      if(ip.agent) o.dataset.agent=ip.agent;
       sel.appendChild(o);
     });
     const other=document.createElement("option");
@@ -298,6 +299,8 @@ async function _loadIpSelect(selectId){
         const el=document.getElementById(id);
         if(el) el.value=chosen?.dataset?.licensor||"";
       });
+      const agEl=document.getElementById("f-agent");
+      if(agEl) agEl.value=chosen?.dataset?.agent||"";
     };
     sel.addEventListener("change",_syncLicensor);
     _syncLicensor();

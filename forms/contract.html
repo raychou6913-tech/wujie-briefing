@@ -76,9 +76,14 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       <div class="f"><label>IP 品牌 <span class="req">*</span></label>
         <select id="f-ip" required><option value="">載入中…</option></select>
         <div class="hint">從版權方資料庫選擇，選後自動帶入版權方名稱</div></div>
-      <div class="f"><label>版權方</label>
-        <input id="f-licensor" placeholder="選 IP 後自動帶入" readonly
-          style="background:#f1f5f9;color:#64748b;cursor:default"></div>
+      <div class="row2">
+        <div class="f"><label>版權方（原廠）</label>
+          <input id="f-licensor" placeholder="選 IP 後自動帶入" readonly
+            style="background:#f1f5f9;color:#64748b;cursor:default"></div>
+        <div class="f"><label>版權代理商</label>
+          <input id="f-agent" placeholder="若有代理商則自動帶入" readonly
+            style="background:#f1f5f9;color:#64748b;cursor:default"></div>
+      </div>
     </div>
     <div class="card">
       <div class="ctitle">合約基本資訊</div>
@@ -347,6 +352,7 @@ async function _loadIpSelect(selectId){
       const o=document.createElement("option");
       o.value=ip.name; o.textContent=ip.name;
       if(ip.licensor) o.dataset.licensor=ip.licensor;
+      if(ip.agent) o.dataset.agent=ip.agent;
       sel.appendChild(o);
     });
     const other=document.createElement("option");
@@ -370,6 +376,8 @@ async function _loadIpSelect(selectId){
         const el=document.getElementById(id);
         if(el) el.value=chosen?.dataset?.licensor||"";
       });
+      const agEl=document.getElementById("f-agent");
+      if(agEl) agEl.value=chosen?.dataset?.agent||"";
     };
     sel.addEventListener("change",_syncLicensor);
     _syncLicensor();
@@ -661,6 +669,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
       const fields={...({
       "IP品牌":       document.getElementById("f-ip").value,
       "版權方":       document.getElementById("f-licensor").value,
+      "版權代理商":   document.getElementById("f-agent").value,
       "合約名稱":     document.getElementById("f-name").value,
       "合約類型":     document.getElementById("f-type").value,
       "合約狀態":     document.getElementById("f-status").value,

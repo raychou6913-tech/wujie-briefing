@@ -79,7 +79,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 
     <!-- Step 1: 版權方 -->
     <div class="card">
-      <div class="ctitle">① 選擇版權方 <span class="req">*</span></div>
+      <div class="ctitle">① 選擇版權方 / 版權代理 <span class="req">*</span></div>
       <div class="f">
         <select id="m-licensor-sel" required>
           <option value="">載入中…</option>
@@ -390,6 +390,7 @@ async function _loadIpSelect(selectId){
       const o=document.createElement("option");
       o.value=ip.name; o.textContent=ip.name;
       if(ip.licensor) o.dataset.licensor=ip.licensor;
+      if(ip.agent) o.dataset.agent=ip.agent;
       sel.appendChild(o);
     });
     const other=document.createElement("option");
@@ -413,6 +414,8 @@ async function _loadIpSelect(selectId){
         const el=document.getElementById(id);
         if(el) el.value=chosen?.dataset?.licensor||"";
       });
+      const agEl=document.getElementById("f-agent");
+      if(agEl) agEl.value=chosen?.dataset?.agent||"";
     };
     sel.addEventListener("change",_syncLicensor);
     _syncLicensor();
