@@ -94,12 +94,6 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <option>人事</option><option>差旅</option>
             <option>展場</option><option>水電雜費</option><option>其他支出</option>
           </select></div>
-        <div class="f"><label>批次</label>
-          <select id="f-batch">
-            <option value="">— 不分批次 —</option>
-            <option>第一批</option><option>追加批-1</option><option>追加批-2</option>
-            <option>追加批-3</option><option>開發期（一次性）</option>
-          </select></div>
       </div>
       <div class="row2">
         <div class="f"><label>申請金額（含稅）<span class="req">*</span></label>
@@ -673,7 +667,6 @@ document.getElementById("frm").onsubmit=async(e)=>{
   const res=document.getElementById("res");
   btn.disabled=true;btn.textContent="提交中...";res.style.display="none";
   try{
-    const batch=document.getElementById("f-batch").value;
     const supplier=document.getElementById("f-supplier").value;
     const paymethod=document.getElementById("f-paymethod").value;
     const payterm=document.getElementById("f-payterm").value;
@@ -686,7 +679,6 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "填報人":   document.getElementById("f-who").value,
       "備註":     document.getElementById("f-note").value,
     };
-    if(batch) fields["批次"]=batch;
     if(supplier&&supplier!=="__new__") fields["供應商"]=supplier;
     if(paymethod) fields["付款方式"]=paymethod;
     if(payterm) fields["帳期（天）"]=parseInt(payterm);
