@@ -131,13 +131,20 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
       <div id="rg-preview" class="img-preview"></div>
     </div>
     <div class="mrow">
-      <div class="mf"><label>審核狀態</label>
+      <div class="mf"><label>整體審核狀態</label>
         <select id="rg-status">
           <option>待審核</option><option>修改中</option><option>已通過</option><option>已拒絕</option>
         </select></div>
       <div class="mf"><label>送審輪次</label><input id="rg-round" type="number" min="1" value="1"></div>
     </div>
     <div class="mf"><label>版權方回饋說明</label><textarea id="rg-note" placeholder="版權方的修改意見、需調整的細節..."></textarea></div>
+    <div class="mf" style="border-top:1px solid #fce7f3;padding-top:14px;margin-top:4px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <label style="margin:0;font-weight:700">設計送審歷程（各稿件）</label>
+        <a id="rg-add-design" href="design.html" target="_blank" style="font-size:12px;color:#ec4899;font-weight:700;text-decoration:none;background:#fce7f3;padding:3px 10px;border-radius:6px">＋ 新增送審記錄</a>
+      </div>
+      <div id="rg-design-history" style="max-height:180px;overflow-y:auto"><span style="color:#94a3b8;font-size:12px">載入中...</span></div>
+    </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('modal-rights')">取消</button>
       <button class="btn-submit" onclick="doRights()">儲存送審狀態</button>
@@ -231,6 +238,7 @@ const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _PP="tblfX6fsMshb7KL0";
 const _PROJ_TBL="tblYBjAlemYPuNGy";
 const _IP_TBL="tblHPNUTdcFa7tqs";
+const _DESIGN_TBL="tblTEoNLDvtYi4pX";
 const PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const STAGES=["\u5275\u610f\u63d0\u6848", "\u5167\u90e8\u7acb\u9805\u78ba\u8a8d", "\u7248\u6b0a\u9001\u5be9", "\u63a1\u8cfc\u8a62\u50f9", "\u6253\u6a23\u9a57\u6536", "\u5927\u8ca8\u78ba\u8a8d"];
 const COLORS={"\u5275\u610f\u63d0\u6848": "#8b5cf6", "\u5167\u90e8\u7acb\u9805\u78ba\u8a8d": "#f59e0b", "\u7248\u6b0a\u9001\u5be9": "#ec4899", "\u63a1\u8cfc\u8a62\u50f9": "#f97316", "\u6253\u6a23\u9a57\u6536": "#06b6d4", "\u5927\u8ca8\u78ba\u8a8d": "#10b981"};
@@ -402,6 +410,10 @@ function openStageAction(rid,stage){
     document.getElementById("rg-sub").textContent=name;
     document.getElementById("rg-round").value=parseInt(_fv(f,"送審輪次")||"0")+1;
     document.getElementById("rg-status").value=_fv(f,"版權送審狀態")||"待審核";
+    const proj=_fv(f,"關聯項目");
+    const addLink=document.getElementById("rg-add-design");
+    if(addLink&&proj) addLink.href=`design.html?proj=${encodeURIComponent(proj)}`;
+    _loadDesignHistory(proj);
     openModal("modal-rights");
   }else if(stage==="採購詢價"){
     document.getElementById("pc-sub").textContent=name;
@@ -615,7 +627,40 @@ function _calcProfit(){
 // ── Init ──────────────────────────────────────────
 async function _reload(){
   _records=await _get(_PP);
+  try{
+    const ds=await _get(_DESIGN_TBL);
+    window._dsMap={};
+    ds.forEach(r=>{
+      const f=r.fields||{};
+      const proj=Array.isArray(f["項目關聯"])?f["項目關聯"][0]?.text||"":String(f["項目關聯"]||"");
+      if(!proj) return;
+      if(!window._dsMap[proj]) window._dsMap[proj]=[];
+      window._dsMap[proj].push(r);
+    });
+  }catch(e){window._dsMap={};}
   _renderBoard();
+}
+const _DS_STAGES=["2D設計","四視圖","3D建模","打樣送審","包裝設計","包裝送審","展架設計","展架送審","大貨樣送審"];
+async function _loadDesignHistory(proj){
+  const el=document.getElementById("rg-design-history");
+  if(!el) return;
+  const SC={"已通過":"#10b981","已拒絕":"#ef4444","修改中":"#f59e0b","已提交":"#6366f1","待提交":"#94a3b8"};
+  const recs=(window._dsMap&&window._dsMap[proj])||[];
+  if(!recs.length){el.innerHTML='<div style="color:#94a3b8;font-size:12px;padding:6px 0">尚無送審記錄，請點右上角「＋ 新增」建立第一筆</div>';return;}
+  el.innerHTML=recs.slice().sort((a,b)=>{
+    const ia=_DS_STAGES.indexOf(_fv(a.fields,"送審階段")||"");
+    const ib=_DS_STAGES.indexOf(_fv(b.fields,"送審階段")||"");
+    return ia-ib;
+  }).map(r=>{
+    const f=r.fields;
+    const stage=_fv(f,"送審階段"); const status=_fv(f,"審核狀態"); const note=_fv(f,"修改備註");
+    const sc=SC[status]||"#94a3b8";
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #fce7f3;flex-wrap:wrap">
+      <span style="font-size:11px;color:#64748b;min-width:68px;flex-shrink:0">${stage||"—"}</span>
+      <span style="font-size:11px;background:${sc}18;color:${sc};border-radius:4px;padding:2px 7px;font-weight:600;flex-shrink:0">${status||"—"}</span>
+      ${note?`<span style="font-size:11px;color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${note}</span>`:""}
+    </div>`;
+  }).join("");
 }
 
 async function _loadSelects(){
