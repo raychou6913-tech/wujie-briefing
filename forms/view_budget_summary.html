@@ -76,6 +76,17 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <span id="stat-summary" style="color:#8b5cf6;font-weight:600"></span>
 </div>
 <div class="grid" id="grid"><div class="empty">載入中...</div></div>
+<div id="budget-edit-modal" onclick="if(event.target===this)closeBudgetEdit()" style="display:none;position:fixed;inset:0;background:#0009;z-index:10000;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:#fff;border-radius:18px;max-width:460px;width:100%;padding:24px;position:relative">
+    <button onclick="closeBudgetEdit()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8">✕</button>
+    <div style="font-size:17px;font-weight:700;margin-bottom:16px">✏️ 編輯預算項目</div>
+    <div id="budget-edit-body"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onclick="closeBudgetEdit()" style="flex:1;background:#f1f5f9;border:none;border-radius:8px;padding:10px;font-size:14px;color:#64748b;cursor:pointer">取消</button>
+      <button id="budget-save-btn" onclick="saveBudgetEdit()" style="flex:1;background:#8b5cf6;border:none;border-radius:8px;padding:10px;font-size:14px;color:#fff;cursor:pointer;font-weight:700">💾 儲存</button>
+    </div>
+  </div>
+</div>
 <div id="detail-modal" onclick="if(event.target===this)closeDetail()">
   <div class="detail-box">
     <button onclick="closeDetail()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8">✕</button>
@@ -180,7 +191,7 @@ function applyFilter(){
     const f=i.fields||{};
     const pn=projName(f);
     if(!grouped[pn])grouped[pn]=[];
-    grouped[pn].push(f);
+    grouped[pn].push({...f,__rid:i.record_id});
     const amt=parseFloat(fv(f,"預算金額"))||0;
     if(fv(f,"預算性質")==="收入")totalIncome+=amt;else totalExpense+=amt;
   }
@@ -276,12 +287,22 @@ function openDetail(pn){
       expBreakdown.map(([cat,amt])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:#475569">${esc(cat)}</span><span style="font-weight:600">${amt.toLocaleString()}</span></div>`).join("");
     document.getElementById("d-summary").insertAdjacentHTML("afterend",breakHtml);
   }
+  const _bse=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  const _bSuper=_bse&&(_bse.role==="超級管理員"||_bse.role==="總部管理中心"||["Ray","Shawn","安然"].includes(_bse.name));
+  const _bCanEdit=_bSuper||["財務","管理層"].includes(_bse?.role||"");
   const tbody=document.getElementById("d-table");
+  const thead=document.querySelector("#detail-modal table thead tr");
+  if(thead){
+    const hasEditCol=thead.querySelector("th.edit-col");
+    if(_bCanEdit&&!hasEditCol){const th=document.createElement("th");th.className="edit-col";th.textContent="";thead.appendChild(th);}
+    if(!_bCanEdit&&hasEditCol)hasEditCol.remove();
+  }
   const INC_C="#10b981";const EXP_C="#f97316";
   tbody.innerHTML=items.map(f=>{
     const isInc=fv(f,"預算性質")==="收入";
     const r2=parseFloat(fv(f,"執行率%"))||0;
     const unit=fv(f,"單價");const qty=fv(f,"數量");
+    const editBtn=_bCanEdit?`<td><button onclick="openBudgetEdit('${f.__rid}',event)" style="background:#8b5cf6;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">✏️</button></td>`:"";
     return `<tr>
       <td style="font-weight:600">${esc(fv(f,"預算名稱"))||"—"}</td>
       <td style="color:#64748b">${esc(fv(f,"類別"))||"—"}</td>
@@ -292,11 +313,69 @@ function openDetail(pn){
       <td style="color:#64748b">${esc(fv(f,"幣別"))}</td>
       <td style="color:#8b5cf6;font-size:11px">${esc(fv(f,"批次"))||"—"}</td>
       <td><div style="display:flex;align-items:center;gap:4px"><div style="background:#f1f5f9;border-radius:4px;height:6px;width:50px;overflow:hidden"><div style="width:${r2}%;background:${r2>90?"#ef4444":r2>70?"#f59e0b":"#8b5cf6"};height:100%"></div></div><span style="font-size:11px;color:#94a3b8">${r2}%</span></div></td>
+      ${editBtn}
     </tr>`;
-  }).join("")||'<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:16px">無明細</td></tr>';
+  }).join("")||'<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:16px">無明細</td></tr>';
   document.getElementById("detail-modal").style.display="flex";
 }
 function closeDetail(){document.getElementById("detail-modal").style.display="none";}
+let _budgetEditRid="";
+function openBudgetEdit(rid,e){
+  e&&e.stopPropagation();
+  _budgetEditRid=rid;
+  const rec=allRecords.find(r=>r.record_id===rid);
+  if(!rec)return;
+  const f=rec.fields||{};
+  const schema=[
+    ["預算名稱","text",null],["類別","text",null],
+    ["預算性質","select",["收入","支出"]],
+    ["單價","number",null],["數量","number",null],["預算金額","number",null],
+    ["幣別","select",["CNY","TWD","THB","USD"]],
+    ["批次","text",null],["執行率%","number",null],["備註","textarea",null]
+  ];
+  let html="";
+  for(const[k,t,opts]of schema){
+    const cur=fv(f,k)||"";
+    const lbl=`<div style="font-size:12px;color:#94a3b8;min-width:80px;padding-top:6px">${k}</div>`;
+    let inp;
+    if(t==="select")inp=`<select data-field="${k}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;background:#fff;outline:none">${opts.map(o=>`<option${o===cur?" selected":""}>${o}</option>`).join("")}</select>`;
+    else if(t==="textarea")inp=`<textarea data-field="${k}" rows="2" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;resize:vertical;outline:none">${cur}</textarea>`;
+    else inp=`<input type="${t==="number"?"number":"text"}" data-field="${k}" value="${cur}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none">`;
+    html+=`<div style="display:flex;gap:12px;padding:7px 0;border-bottom:1px solid #f1f5f9">${lbl}<div style="flex:1">${inp}</div></div>`;
+  }
+  document.getElementById("budget-edit-body").innerHTML=html;
+  document.getElementById("budget-edit-modal").style.display="flex";
+}
+function closeBudgetEdit(){document.getElementById("budget-edit-modal").style.display="none";_budgetEditRid="";}
+async function saveBudgetEdit(){
+  if(!_budgetEditRid)return;
+  const btn=document.getElementById("budget-save-btn");
+  btn.disabled=true;btn.textContent="儲存中...";
+  try{
+    const fields={};
+    document.querySelectorAll("#budget-edit-body [data-field]").forEach(el=>{
+      const k=el.dataset.field;const v=el.value.trim();
+      if(el.tagName==="INPUT"&&el.type==="number")fields[k]=v?Number(v):null;
+      else if(v)fields[k]=v;else fields[k]="";
+    });
+    const tr=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0)throw new Error("Token fail");
+    const res=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBL+"/records/"+_budgetEditRid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+td.tenant_access_token,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d=await res.json();
+    if(d.code!==0)throw new Error(d.msg||"API 錯誤");
+    const idx=allRecords.findIndex(r=>r.record_id===_budgetEditRid);
+    if(idx>=0)allRecords[idx].fields=Object.assign(allRecords[idx].fields||{},d.data?.record?.fields||{});
+    closeBudgetEdit();
+    applyFilter();
+    openDetail(_curProj);
+    alert("✅ 已儲存");
+  }catch(e){alert("❌ 儲存失敗："+e.message);}
+  finally{btn.disabled=false;btn.textContent="💾 儲存";}
+}
 function _buildCSV(rows){
   const headers=["項目","預算名稱","類別","性質","單價","數量","預算金額","幣別","批次","已使用","剩餘","執行率%","年度","季度","所在地","備註"];
   const lines=[headers.join(",")];
