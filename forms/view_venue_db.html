@@ -105,8 +105,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <button onclick="closeDetail()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#94a3b8;line-height:1">✕</button>
     <div style="font-size:17px;font-weight:700;margin-bottom:16px;padding-right:32px" id="detail-title">詳細資訊</div>
     <div id="detail-body"></div>
-    <div style="position:sticky;bottom:0;background:#fff;padding:12px 0 4px;margin-top:8px;border-top:1px solid #f1f5f9">
-      <button onclick="closeDetail()" style="width:100%;background:#f1f5f9;border:none;border-radius:8px;padding:10px;font-size:14px;color:#64748b;cursor:pointer;font-weight:500">關閉</button>
+    <div id="detail-footer" style="position:sticky;bottom:0;background:#fff;padding:12px 0 4px;margin-top:8px;border-top:1px solid #f1f5f9">
+      <div id="detail-view-btns" style="display:flex;gap:8px">
+        <button onclick="closeDetail()" style="flex:1;background:#f1f5f9;border:none;border-radius:8px;padding:10px;font-size:14px;color:#64748b;cursor:pointer;font-weight:500">關閉</button>
+        <button id="btn-edit-record" onclick="openEdit(_curRid)" style="display:none;flex:1;background:#f59e0b;border:none;border-radius:8px;padding:10px;font-size:14px;color:#fff;cursor:pointer;font-weight:600">✏️ 編輯</button>
+      </div>
+      <div id="detail-edit-btns" style="display:none;gap:8px">
+        <button onclick="cancelEdit()" style="flex:1;background:#f1f5f9;border:none;border-radius:8px;padding:10px;font-size:14px;color:#64748b;cursor:pointer;font-weight:500">取消</button>
+        <button onclick="saveEdit(_curRid)" id="btn-save-edit" style="flex:1;background:#f59e0b;border:none;border-radius:8px;padding:10px;font-size:14px;color:#fff;cursor:pointer;font-weight:700">💾 儲存</button>
+      </div>
     </div>
   </div>
 </div>
@@ -114,8 +121,10 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG", "follow_up": "tblyO9Cz2nUx6q46", "roles": "tblEj5GSDYUrKGY9", "product_pipeline": "tblfX6fsMshb7KL0"};
+const _EDIT_SCHEMA={{}};
 let allRecords=[];
 let _filteredRecs=[];
+let _curRid="";
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
@@ -198,6 +207,9 @@ function setView(v){
 }
 (function(){const sv=localStorage.getItem("wj_view_venue_db");if(sv&&document.getElementById("btn-"+sv))setView(sv);})();
 async function openDetail(rid){
+  _curRid=rid;
+  const hasEdit=Object.keys(_EDIT_SCHEMA).length>0;
+  document.getElementById("btn-edit-record").style.display=hasEdit?"flex":"none";
   const rec=allRecords.find(r=>r.record_id===rid);
   if(!rec)return;
   const f=rec.fields||{};
@@ -253,6 +265,70 @@ async function openDetail(rid){
 }
 function closeDetail(){
   document.getElementById("detail-modal").style.display="none";
+  cancelEdit();
+}
+function openEdit(rid){
+  const rec=allRecords.find(r=>r.record_id===rid);
+  if(!rec)return;
+  const f=rec.fields||{};
+  const schema=_EDIT_SCHEMA;
+  let html="";
+  for(const[k,cfg]of Object.entries(schema)){
+    const cur=fv(f,k)||"";
+    const lbl=`<div class="df-key" style="padding-top:6px">${_esc(k)}</div>`;
+    let inp="";
+    if(cfg.type==="select"){
+      const opts=cfg.options.map(o=>`<option${o===cur?' selected':''}>${_esc(o)}</option>`).join("");
+      inp=`<select data-field="${k}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;background:#fff;outline:none">${opts}</select>`;
+    }else if(cfg.type==="textarea"){
+      inp=`<textarea data-field="${k}" rows="3" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;resize:vertical;outline:none">${_esc(cur)}</textarea>`;
+    }else{
+      const t=cfg.type==="number"?"number":"text";
+      inp=`<input type="${t}" data-field="${k}" value="${_esc(cur)}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none">`;
+    }
+    html+=`<div class="df-row">${lbl}<div style="flex:1">${inp}</div></div>`;
+  }
+  document.getElementById("detail-body").innerHTML=html||'<div style="color:#94a3b8;padding:20px 0;text-align:center">無可編輯欄位</div>';
+  document.getElementById("detail-title").textContent="✏️ 編輯資料";
+  document.getElementById("detail-view-btns").style.display="none";
+  document.getElementById("detail-edit-btns").style.display="flex";
+}
+function cancelEdit(){
+  document.getElementById("detail-view-btns").style.display="flex";
+  document.getElementById("detail-edit-btns").style.display="none";
+  document.getElementById("detail-title").textContent="詳細資訊";
+  if(_curRid)openDetail(_curRid);
+}
+async function saveEdit(rid){
+  const btn=document.getElementById("btn-save-edit");
+  btn.disabled=true;btn.textContent="儲存中...";
+  try{
+    const fields={};
+    document.querySelectorAll("#detail-body [data-field]").forEach(el=>{
+      const k=el.dataset.field;
+      const schema=_EDIT_SCHEMA[k]||{};
+      let v=el.value.trim();
+      if(schema.type==="number"){fields[k]=v?Number(v):null;}
+      else if(v){fields[k]=v;}
+      else{fields[k]="";}
+    });
+    const tr=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    if(td.code!==0)throw new Error("Token fail");
+    const res=await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["venue_db"]+"/records/"+rid,{
+      method:"PUT",
+      headers:{"Authorization":"Bearer "+td.tenant_access_token,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d=await res.json();
+    if(d.code!==0)throw new Error(d.msg||"API 錯誤 "+d.code);
+    const idx=allRecords.findIndex(r=>r.record_id===rid);
+    if(idx>=0)allRecords[idx].fields=Object.assign(allRecords[idx].fields||{},d.data?.record?.fields||{});
+    cancelEdit();
+    applyFilter();
+    alert("✅ 已儲存");
+  }catch(e){alert("❌ 儲存失敗："+e.message);}
+  finally{btn.disabled=false;btn.textContent="💾 儲存";}
 }
 
 const TC={"極高":"#10b981","高":"#6366f1","中":"#f59e0b","低":"#64748b"};
