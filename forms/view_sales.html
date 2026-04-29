@@ -152,6 +152,73 @@ async function loadData(){
     allRecords=items;
     document.getElementById("hdr-count").textContent="共 "+items.length+" 筆資料";
     
+// Pre-load procurement & stock for fulfillment chain
+(async()=>{
+  try{
+    const tr2=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td2=await tr2.json();
+    const tk2=td2.tenant_access_token;
+    const [pd,sd]=await Promise.all([
+      fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["procure"]+"/records?page_size=200",{headers:{"Authorization":"Bearer "+tk2}}).then(r=>r.json()),
+      fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TABLES["stock"]+"/records?page_size=200",{headers:{"Authorization":"Bearer "+tk2}}).then(r=>r.json()),
+    ]);
+    window._procAll=pd.data?.items||[];
+    window._stockAll=sd.data?.items||[];
+  }catch(e){window._procAll=[];window._stockAll=[];}
+})();
+// Override openDetail to append fulfillment chain
+const _origOD=openDetail;
+openDetail=async function(rid){
+  await _origOD(rid);
+  const rec=allRecords.find(r=>r.record_id===rid);
+  if(!rec)return;
+  const prodRaw=fv(rec.fields,"產品/項目")||"";
+  if(!prodRaw)return;
+  const prod=prodRaw.toLowerCase();
+  const procMatches=(window._procAll||[]).filter(r=>{
+    const it=(r.fields["採購品項"]||"").toLowerCase();
+    return it&&(it.includes(prod)||prod.includes(it));
+  });
+  const stockMatches=(window._stockAll||[]).filter(r=>{
+    const it=(r.fields["品項名稱"]||"").toLowerCase();
+    return it&&(it.includes(prod)||prod.includes(it));
+  });
+  if(!procMatches.length&&!stockMatches.length)return;
+  const SC_P={"詢價中":"#f59e0b","比價完成":"#6366f1","已下單":"#10b981","到貨中":"#06b6d4","已到貨":"#84cc16","取消":"#ef4444"};
+  const SC_S={"在庫":"#10b981","出貨中":"#f59e0b","已出貨":"#6366f1","待補貨":"#ef4444","滯銷":"#94a3b8"};
+  let html=`<div style="border-top:2px solid #e2e8f0;margin-top:14px;padding-top:12px">
+    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📦 履約鏈</div>`;
+  if(procMatches.length){
+    html+=`<div style="font-size:12px;font-weight:700;color:#f97316;margin-bottom:6px">🛒 相關採購</div>`;
+    procMatches.forEach(r=>{
+      const f=r.fields,st=f["採購狀態"]||"—",sc=SC_P[st]||"#64748b";
+      html+=`<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+          <span style="font-weight:600">${_esc(f["採購品項"]||"—")}</span>
+          <span style="background:${sc};color:#fff;border-radius:4px;padding:1px 7px;font-size:11px">${st}</span>
+        </div>
+        <div style="color:#64748b;font-size:12px">數量：${f["採購數量"]||"—"} · 議定：${f["議定價格"]||"—"} ${f["幣別"]||""}${f["預計到貨日"]?" · 到貨："+f["預計到貨日"]:""}</div>
+      </div>`;
+    });
+  }
+  if(stockMatches.length){
+    html+=`<div style="font-size:12px;font-weight:700;color:#10b981;margin:8px 0 6px">📦 庫存狀態</div>`;
+    stockMatches.forEach(r=>{
+      const f=r.fields,ls=f["物流狀態"]||"—",lc=SC_S[ls]||"#64748b";
+      const qty=parseFloat(f["現有庫存"]||0);
+      html+=`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+          <span style="font-weight:600">${_esc(f["品項名稱"]||"—")}</span>
+          <span style="background:${lc};color:#fff;border-radius:4px;padding:1px 7px;font-size:11px">${ls}</span>
+        </div>
+        <div style="color:${qty<=0?"#ef4444":"#10b981"};font-weight:700;font-size:12px">庫存：${f["現有庫存"]||"0"} ${f["單位"]||""} · ${_esc(f["所在倉庫"]||"—")}</div>
+      </div>`;
+    });
+  }
+  html+='</div>';
+  document.getElementById("detail-body").innerHTML+=html;
+};
+
     applyFilter();
     const _urlRid=new URLSearchParams(location.search).get("rid");
     if(_urlRid) setTimeout(()=>openDetail(_urlRid),300);

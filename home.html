@@ -51,18 +51,30 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="hero-date" id="hero-date"></div>
   <div class="iter-badge" onclick="toggleIterReveal()" title="點擊看看">
     <span class="iter-dot"></span>
-    <span class="iter-num">2604.V.228.228.76.11</span>
+    <span class="iter-num">2604.V.229.229.77.11</span>
   </div>
   <div class="iter-reveal" id="iter-reveal">
     🤫 版本號不是手動維護的<br>
     <span style="color:#94a3b8">2604</span> = 系統建立於 2026年04月 &nbsp;·&nbsp; <span style="color:#94a3b8">V</span> = Version<br>
-    <b style="color:#f1f5f9">228</b> 年累計更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">228</b> 月更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">76</b> 週更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">229</b> 年累計更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">229</b> 月更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">77</b> 週更新 &nbsp;·&nbsp;
     <b style="color:#f1f5f9">11</b> 今日更新<br>
     <span style="color:#475569;font-size:11px;margin-top:4px;display:block">每次 deploy，Git 紀錄自動更新這組數字 🤖×👤</span>
   </div>
 </div>
+<a id="cmd-center-card" href="forms/view_management_overview.html" style="display:none;max-width:700px;margin:16px auto 0;padding:0 24px">
+  <div style="background:linear-gradient(135deg,#1e293b,#312e81);border-radius:16px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-decoration:none;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 20px #6366f120" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 32px #6366f130'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px #6366f120'">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="font-size:32px">🎯</span>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#f1f5f9">項目指揮中心</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px">各項目狀態 · 預算執行 · 活躍訂單 · 預警一覽</div>
+      </div>
+    </div>
+    <div style="background:#6366f1;color:#fff;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;white-space:nowrap">進入 →</div>
+  </div>
+</a>
 <div class="nav-grid">
   <a href="forms/index.html" class="nav-card" style="--c:#6366f1">
     <div class="nav-icon">📝</div>
@@ -113,6 +125,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="notice-hdr" style="display:flex;justify-content:space-between;align-items:center">
     <span>⚡ 我的待辦</span>
     <a href="forms/view_product_pipeline.html" style="font-size:11px;color:#8b5cf6;text-decoration:none;font-weight:600">查看產品流程看板 ›</a>
+    <a id="cmd-link" href="forms/view_management_overview.html" style="display:none;font-size:11px;color:#6366f1;text-decoration:none;font-weight:600;margin-left:12px">項目指揮中心 ›</a>
   </div>
   <div id="todo-pipeline"><div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px">待辦載入中...</div></div>
 </div>
@@ -449,6 +462,10 @@ async function _loadTodoCenterPipeline(s){
   if(s.role==="超級管理員"||s.role==="總部管理中心"){
     const ac=document.getElementById("admin-card");
     if(ac) ac.style.display="block";
+    const cc=document.getElementById("cmd-center-card");
+    if(cc) cc.style.display="block";
+    const cl=document.getElementById("cmd-link");
+    if(cl) cl.style.display="inline";
   }
   if(["Den","Meaw"].includes(s.name)){
     const fc=document.getElementById("followup-card");

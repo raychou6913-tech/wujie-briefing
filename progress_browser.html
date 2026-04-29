@@ -77,11 +77,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/view_product_pipeline.html" style="flex:1;text-align:center;background:#8b5cf6;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div class="dept-card" data-roles="採購,業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #06b6d4">
+        <div class="dept-card" data-roles="採購,業務,設計,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #06b6d4">
           <div style="font-size:26px;margin-bottom:8px">🛍️</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">已上市商品目錄</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">已進入銷售的 SKU 清單/定價/庫存狀態管理</div>
-          <div style="font-size:11px;background:#06b6d418;color:#06b6d4;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">採購 / Shawn / 業務</div>
+          <div style="font-size:11px;background:#06b6d418;color:#06b6d4;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">採購 / 業務 / 設計</div>
           <div style="display:flex;gap:8px">
             <a href="forms/view_product_progress.html" style="flex:1;text-align:center;background:#06b6d418;color:#06b6d4;border:1px solid #06b6d440;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
             <a href="forms/product.html" style="flex:1;text-align:center;background:#06b6d4;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
@@ -117,11 +117,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/procure.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div class="dept-card" data-roles="採購,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
+        <div class="dept-card" data-roles="採購,業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
           <div style="font-size:26px;margin-bottom:8px">📦</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">庫存 / 物流</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">現有庫存/物流狀態/報關</div>
-          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">倉庫 / 物流</div>
+          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">採購 / 業務 / 倉庫</div>
           <div style="display:flex;gap:8px">
             <a href="forms/view_stock.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
             <a href="forms/stock.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
@@ -179,6 +179,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         </div></div>
 <script>
 const _DEPT_NAMES={"管理層":"管理層視角（Ray / Shawn / 安然）","設計":"設計部視角（Bevis / 詩彤）","採購":"採購部視角（賴哥 / 木子）","業務":"業務部視角（Den / Meaw）","財務":"財務視角（躍明）"};
+const _DEPT_INTRO={"管理層":"🎯 管理層可查看全局狀態、指揮中心、預算/合約/MG 等高層模組","設計":"🎨 設計部主入口：產品開發流程（含送審歷程）、商品目錄","採購":"🛒 採購部：採購比價、庫存/物流、已上市商品目錄","業務":"💼 業務部：銷售進度（可直接更新狀態）、庫存查詢、每日快報","財務":"💵 財務：項目預算 vs 實際支出、固定成本填報、MG 消耗","all":"📋 超級管理員視角 — 顯示全部功能模組"};
 function switchView(role){
   const cards=document.querySelectorAll(".dept-card");
   let shown=0;
@@ -189,7 +190,10 @@ function switchView(role){
     if(visible)shown++;
   });
   document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
-  document.getElementById("view-note").textContent=role==="all"?`顯示全部 ${shown} 項`:`${_DEPT_NAMES[role]||role}・顯示 ${shown} 項`;
+  const noteEl=document.getElementById("view-note");
+  noteEl.textContent=role==="all"?`顯示全部 ${shown} 項`:`${_DEPT_NAMES[role]||role}・顯示 ${shown} 項`;
+  const introEl=document.getElementById("intro-bar");
+  if(introEl)introEl.textContent=_DEPT_INTRO[role]||_DEPT_INTRO["all"];
   localStorage.setItem("wj_preview_role",role);
 }
 (function(){
