@@ -55,6 +55,8 @@ const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _VL="tblUzRSQgKLhlttk";
 const _PP="tblfX6fsMshb7KL0";
+const _EXP="tblu2NkqBWyBSskG";
+const _FUP="tblyO9Cz2nUx6q46";
 const STAFF_INFO={
   "Ray":   {dept:"管理層",color:"#6366f1",emoji:"👑"},
   "安然":  {dept:"管理層",color:"#6366f1",emoji:"👑"},
@@ -127,7 +129,7 @@ function _pendingForDept(dept,pipeRecs){
   return todos;
 }
 
-function renderCards(visitMap, pipeRecs){
+function renderCards(visitMap, pipeRecs, expMap, fupMap){
   const today=new Date().toISOString().slice(0,10);
   const weekAgo=new Date(Date.now()-7*86400000).toISOString().slice(0,10);
   const el=document.getElementById("member-grid");
@@ -149,7 +151,12 @@ function renderCards(visitMap, pipeRecs){
       <div class="mcard-body">
         <div class="mcard-row"><span>最後登入</span><span style="font-weight:600;color:#0f172a">${lastLog?lastLog.date+" "+lastLog.time:"尚無記錄"}</span></div>
         <div class="mcard-row"><span>本週活躍天數</span><span style="font-weight:700;color:${weekDays>=5?"#10b981":weekDays>=3?"#f59e0b":"#ef4444"}">${weekDays} / 7 天</span></div>
-        ${todos.length?`<div style="margin-top:8px;font-size:11px;font-weight:700;color:#64748b;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px">待確認 (${todos.length})</div>`+todos.slice(0,3).map(t=>`<div class="todo-item${t.urgent?" urgent":""}">${t.label} — ${t.action}</div>`).join("")+(todos.length>3?`<div style="font-size:11px;color:#94a3b8;margin-top:3px;padding-left:8px">+${todos.length-3} 項...</div>`:""`):`<div style="color:#94a3b8;font-size:12px;margin-top:8px">✓ 無待確認事項</div>`}
+        ${todos.length?`<div style="margin-top:8px;font-size:11px;font-weight:700;color:#64748b;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px">待確認 (${todos.length})</div>`+todos.slice(0,3).map(t=>`<div class="todo-item${t.urgent?" urgent":""}">${t.label} — ${t.action}</div>`).join("")+(todos.length>3?`<div style="font-size:11px;color:#94a3b8;margin-top:3px;padding-left:8px">+${todos.length-3} 項...</div>`:""):`<div style="color:#94a3b8;font-size:12px;margin-top:8px">✓ 無待確認事項</div>`}
+        ${(()=>{
+          const recent=[...(expMap[name]||[]).map(r=>({"t":"費用","d":r.date,"s":r.cat})),...(fupMap[name]||[]).map(r=>({"t":"跟進","d":r.date,"s":r.client}))].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,3);
+          if(!recent.length)return"";
+          return`<div style="margin-top:8px;font-size:11px;font-weight:700;color:#64748b;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px">近期填報</div>`+recent.map(r=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;border-bottom:1px solid #f1f5f9"><span style="color:#475569">[${r.t}] ${r.s||"—"}</span><span style="color:#94a3b8;white-space:nowrap;margin-left:8px">${r.d}</span></div>`).join("");
+        })()}
       </div>
     </div>`;
     _allCards[name]={html:cardHtml,dept:info.dept};
@@ -186,7 +193,7 @@ function filterDept(dept,save=true){
     const tr=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
     const td=await tr.json();
     const tk=td.tenant_access_token;
-    const [vlRecs,ppRecs]=await Promise.all([_getAll(tk,_VL),_getAll(tk,_PP)]);
+    const [vlRecs,ppRecs,expRecs,fupRecs]=await Promise.all([_getAll(tk,_VL),_getAll(tk,_PP),_getAll(tk,_EXP),_getAll(tk,_FUP)]);
     const visitMap={};
     vlRecs.forEach(r=>{
       const f=r.fields||{};
@@ -194,8 +201,22 @@ function filterDept(dept,save=true){
       if(!visitMap[nm])visitMap[nm]=[];
       visitMap[nm].push({date:_fv(f,"日期"),time:_fv(f,"時間")});
     });
+    const expMap={};
+    expRecs.forEach(r=>{
+      const f=r.fields||{};
+      const nm=_fv(f,"填報人");if(!nm)return;
+      if(!expMap[nm])expMap[nm]=[];
+      expMap[nm].push({date:_fv(f,"日期")||_fv(f,"填報日期"),cat:_fv(f,"費用類別")});
+    });
+    const fupMap={};
+    fupRecs.forEach(r=>{
+      const f=r.fields||{};
+      const nm=_fv(f,"負責業務")||_fv(f,"填報人");if(!nm)return;
+      if(!fupMap[nm])fupMap[nm]=[];
+      fupMap[nm].push({date:_fv(f,"日期"),client:_fv(f,"客戶名稱")});
+    });
     document.getElementById("last-updated").textContent="更新於 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"});
-    renderCards(visitMap,ppRecs);
+    renderCards(visitMap,ppRecs,expMap,fupMap);
   }catch(e){
     document.getElementById("member-grid").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
   }
