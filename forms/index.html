@@ -161,6 +161,14 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
           </div>
         </a></div>
 
+<div id="preview-banner" style="display:none;background:#312e81;padding:7px 20px;font-size:12px;color:#a5b4fc;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+  <span>👁 超管預覽模式：<strong id="preview-role-label" style="color:#e0e7ff"></strong> 視角</span>
+  <div style="display:flex;gap:12px;align-items:center">
+    <a href="../home.html" style="color:#c7d2fe;font-size:11px;text-decoration:none">← 切換視角</a>
+    <button onclick="exitPreview()" style="background:none;border:1px solid #6366f1;color:#a5b4fc;font-size:11px;cursor:pointer;border-radius:5px;padding:2px 8px">退出預覽</button>
+  </div>
+</div>
+
 <!-- 管理員操作 -->
 <div id="admin-zone" class="admin-zone">
   <div class="sec orange" style="margin-top:16px">管理員操作（Shawn / 超管）</div>
@@ -279,10 +287,36 @@ let _budgetCache={};  // projName -> count
   document.getElementById("user-name").textContent=_sess.name+"（"+_sess.dept+"）";
   // 管理員顯示
   const isAdmin=_sess.role==="超級管理員"||_sess.name==="Shawn"||_sess.name==="安然"||_sess.name==="Ray";
-  if(isAdmin) document.getElementById("admin-zone").style.display="block";
+  const _previewRole=localStorage.getItem("wj_preview_role")||"all";
+  const _isPreviewingNonAdmin=isAdmin&&_previewRole!=="all"&&_previewRole!=="管理層";
+  if(isAdmin&&!_isPreviewingNonAdmin) document.getElementById("admin-zone").style.display="block";
   _loadProjects();
   _logVisit(_sess);
 })();
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s) return;
+  const isSuper=s.role==="超級管理員"||s.role==="總部管理中心"||["Ray","Shawn","安然"].includes(s.name);
+  if(!isSuper) return;
+  const role=localStorage.getItem("wj_preview_role")||"all";
+  if(role==="all") return;
+  const names={"管理層":"管理層","設計":"設計部","採購":"採購部","業務":"業務部","財務":"財務"};
+  const el=document.getElementById("preview-banner");
+  if(el){ el.style.display="flex"; document.getElementById("preview-role-label").textContent=names[role]||role; }
+  // 管理員功能區：非管理層視角時隱藏
+  const isAdminRole=(role==="管理層");
+  if(!isAdminRole){
+    ["admin-zone","admin-card","member-activity-card","cmd-center-card"].forEach(id=>{
+      const e=document.getElementById(id); if(e) e.style.display="none";
+    });
+  }
+})();
+function exitPreview(){
+  localStorage.setItem("wj_preview_role","all");
+  location.reload();
+}
+
 
 async function _getToken(){
   const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
