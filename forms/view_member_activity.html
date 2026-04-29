@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>👥 成員動態 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding-bottom:48px}
+.hdr{background:#0f172a;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-title{font-size:19px;font-weight:700;color:#f1f5f9}
+.hdr-sub{font-size:13px;color:#64748b;margin-top:2px}
+.btn-back{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:8px;padding:7px 14px;font-size:13px;text-decoration:none}
+.dept-bar{background:#1e293b;padding:10px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:4px 13px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.dbtn:hover{background:#ffffff20;color:#f1f5f9}
+.dbtn.active{background:#06b6d4;color:#fff;border-color:#06b6d4}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:20px 24px}
+.mcard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px #0000000a;border-top:3px solid var(--dc)}
+.mcard-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.mcard-avatar{width:40px;height:40px;border-radius:50%;background:var(--dc);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
+.mcard-name{font-size:15px;font-weight:700;color:#0f172a}
+.mcard-dept{font-size:11px;color:#64748b;margin-top:1px}
+.mcard-body{font-size:12px;color:#475569;line-height:1.7}
+.mcard-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #f8fafc}
+.mcard-row:last-child{border-bottom:none}
+.badge-on{background:#dcfce7;color:#166534;border-radius:5px;padding:1px 7px;font-size:11px;font-weight:700}
+.badge-off{background:#f1f5f9;color:#94a3b8;border-radius:5px;padding:1px 7px;font-size:11px}
+.todo-item{background:#fef3c7;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:4px 8px;margin-top:4px;font-size:12px;color:#92400e}
+.todo-item.urgent{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.empty{text-align:center;color:#94a3b8;padding:40px;font-size:14px}
+@media(max-width:480px){.grid{grid-template-columns:1fr;padding:12px}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="hdr-title">👥 成員動態</div>
+    <div class="hdr-sub" id="hdr-sub">登入紀錄 · 今日活躍 · 待確認事項</div>
+  </div>
+  <a href="../home.html" class="btn-back">← 首頁</a>
+</div>
+<div class="dept-bar" id="dept-bar">
+  <span style="font-size:11px;color:#64748b;font-weight:700;letter-spacing:.4px">部門</span>
+  <button class="dbtn active" data-dept="all" onclick="filterDept('all')">全部</button>
+  <button class="dbtn" data-dept="管理層" onclick="filterDept('管理層')">管理層</button>
+  <button class="dbtn" data-dept="業務" onclick="filterDept('業務')">業務</button>
+  <button class="dbtn" data-dept="設計" onclick="filterDept('設計')">設計</button>
+  <button class="dbtn" data-dept="採購" onclick="filterDept('採購')">採購</button>
+  <button class="dbtn" data-dept="財務" onclick="filterDept('財務')">財務</button>
+  <span id="last-updated" style="margin-left:auto;font-size:11px;color:#475569"></span>
+</div>
+<div id="member-grid" class="grid"><div class="empty">資料載入中...</div></div>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _VL="tblUzRSQgKLhlttk";
+const _PP="tblfX6fsMshb7KL0";
+const STAFF_INFO={
+  "Ray":   {dept:"管理層",color:"#6366f1",emoji:"👑"},
+  "安然":  {dept:"管理層",color:"#6366f1",emoji:"👑"},
+  "Shawn": {dept:"管理層",color:"#6366f1",emoji:"👑"},
+  "Den":   {dept:"業務",color:"#10b981",emoji:"🎯"},
+  "Meaw":  {dept:"業務",color:"#10b981",emoji:"🎯"},
+  "董亮":  {dept:"業務",color:"#10b981",emoji:"🎯"},
+  "德寶":  {dept:"業務",color:"#10b981",emoji:"🎯"},
+  "Bevis": {dept:"設計",color:"#ec4899",emoji:"🎨"},
+  "賴哥":  {dept:"採購",color:"#f97316",emoji:"📦"},
+  "木子":  {dept:"採購",color:"#f97316",emoji:"📦"},
+  "高維":  {dept:"採購",color:"#f97316",emoji:"📦"},
+  "躍明":  {dept:"財務",color:"#8b5cf6",emoji:"💰"},
+};
+const STAFF_ORDER=["Ray","安然","Shawn","Den","Meaw","董亮","德寶","Bevis","賴哥","木子","高維","躍明"];
+let _allCards={};
+let _myDept="all";
+
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0)return"";
+  if(typeof v==="number")return String(v);
+  if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.text||x.name||""):String(x)).join("");
+  if(typeof v==="object")return v.text||v.name||"";
+  return String(v);
+}
+
+async function _getAll(tk,tbl){
+  let items=[],pt=null;
+  do{
+    const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tbl+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+    const r=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+    const d=await r.json();
+    items=items.concat(d.data?.items||[]);
+    pt=d.data?.has_more?d.data.page_token:null;
+  }while(pt);
+  return items;
+}
+
+function _pendingForDept(dept,pipeRecs){
+  const todos=[];
+  const isMgmt=dept==="管理層";
+  const isDesign=dept==="設計";
+  const isProcure=dept==="採購";
+  const isSales=dept==="業務";
+  pipeRecs.forEach(r=>{
+    const f=r.fields||{};
+    const stage=_fv(f,"當前階段");
+    const pn=_fv(f,"產品名稱");
+    const ip=_fv(f,"IP品牌");
+    const label=ip?`[${ip}] ${pn}`:pn;
+    if(!pn)return;
+    if(stage==="內部立項確認"&&_fv(f,"立項狀態")==="待確認"&&isMgmt)
+      todos.push({label,action:"待立項確認",urgent:true});
+    if(stage==="版權送審"&&isDesign)
+      todos.push({label,action:"版權送審更新",urgent:false});
+    if(stage==="採購詢價"&&(isProcure||isMgmt))
+      todos.push({label,action:"採購詢價進行中",urgent:false});
+    if(stage==="打樣驗收"){
+      if(isMgmt&&_fv(f,"打樣確認_管理")==="待確認")todos.push({label,action:"待管理層驗收",urgent:true});
+      if(isDesign&&_fv(f,"打樣確認_設計")==="待確認")todos.push({label,action:"待設計驗收",urgent:true});
+    }
+    if(stage==="大貨確認"){
+      if(isMgmt&&_fv(f,"大貨確認_管理")==="待確認")todos.push({label,action:"待大貨確認",urgent:true});
+      if(isProcure&&_fv(f,"大貨確認_採購")==="待確認")todos.push({label,action:"待大貨確認",urgent:true});
+      if(isDesign&&_fv(f,"大貨確認_設計")==="待確認")todos.push({label,action:"待大貨確認",urgent:true});
+      if(isSales&&_fv(f,"大貨確認_銷售")==="待確認")todos.push({label,action:"待大貨確認",urgent:true});
+    }
+  });
+  return todos;
+}
+
+function renderCards(visitMap, pipeRecs){
+  const today=new Date().toISOString().slice(0,10);
+  const weekAgo=new Date(Date.now()-7*86400000).toISOString().slice(0,10);
+  const el=document.getElementById("member-grid");
+  _allCards={};
+  let html="";
+  for(const name of STAFF_ORDER){
+    const info=STAFF_INFO[name]||{dept:"—",color:"#64748b",emoji:"👤"};
+    const logs=(visitMap[name]||[]).sort((a,b)=>b.date.localeCompare(a.date));
+    const lastLog=logs[0];
+    const todayActive=logs.some(l=>l.date===today);
+    const weekDays=new Set(logs.filter(l=>l.date>=weekAgo).map(l=>l.date)).size;
+    const todos=_pendingForDept(info.dept,pipeRecs);
+    const cardHtml=`<div class="mcard" data-dept="${info.dept}" style="--dc:${info.color}">
+      <div class="mcard-head">
+        <div class="mcard-avatar">${info.emoji}</div>
+        <div><div class="mcard-name">${name}</div><div class="mcard-dept">${info.dept}</div></div>
+        <span style="margin-left:auto" class="${todayActive?"badge-on":"badge-off"}">${todayActive?"今日已登入":"今日未登入"}</span>
+      </div>
+      <div class="mcard-body">
+        <div class="mcard-row"><span>最後登入</span><span style="font-weight:600;color:#0f172a">${lastLog?lastLog.date+" "+lastLog.time:"尚無記錄"}</span></div>
+        <div class="mcard-row"><span>本週活躍天數</span><span style="font-weight:700;color:${weekDays>=5?"#10b981":weekDays>=3?"#f59e0b":"#ef4444"}">${weekDays} / 7 天</span></div>
+        ${todos.length?`<div style="margin-top:8px;font-size:11px;font-weight:700;color:#64748b;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px">待確認 (${todos.length})</div>`+todos.slice(0,3).map(t=>`<div class="todo-item${t.urgent?" urgent":""}">${t.label} — ${t.action}</div>`).join("")+(todos.length>3?`<div style="font-size:11px;color:#94a3b8;margin-top:3px;padding-left:8px">+${todos.length-3} 項...</div>`:""`):`<div style="color:#94a3b8;font-size:12px;margin-top:8px">✓ 無待確認事項</div>`}
+      </div>
+    </div>`;
+    _allCards[name]={html:cardHtml,dept:info.dept};
+    html+=cardHtml;
+  }
+  el.innerHTML=html||'<div class="empty">無成員資料</div>';
+  if(_myDept!=="all") filterDept(_myDept,false);
+}
+
+function filterDept(dept,save=true){
+  _myDept=dept;
+  document.querySelectorAll(".mcard").forEach(c=>c.style.display=(dept==="all"||c.dataset.dept===dept)?"block":"none");
+  document.querySelectorAll(".dbtn").forEach(b=>b.classList.toggle("active",b.dataset.dept===dept));
+  if(save)localStorage.setItem("wj_member_dept",dept);
+}
+
+(async()=>{
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){location.replace("../login.html");return;}
+  const isSuper=s.role==="超級管理員"||s.role==="總部管理中心";
+  if(!isSuper){
+    document.getElementById("dept-bar").querySelectorAll(".dbtn[data-dept='all'],.dbtn[data-dept='管理層'],.dbtn[data-dept='設計'],.dbtn[data-dept='採購'],.dbtn[data-dept='業務'],.dbtn[data-dept='財務']").forEach(b=>{
+      if(b.dataset.dept!=="all"&&b.dataset.dept!==s.role)b.style.display="none";
+    });
+    const roleMap={"管理層":"管理層","設計":"設計","採購":"採購","業務":"業務","財務":"財務"};
+    _myDept=roleMap[s.role]||"all";
+    filterDept(_myDept,false);
+    document.getElementById("hdr-sub").textContent=`${s.dept} 部門動態`;
+  }else{
+    const saved=localStorage.getItem("wj_member_dept")||"all";
+    filterDept(saved,false);
+  }
+  try{
+    const tr=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await tr.json();
+    const tk=td.tenant_access_token;
+    const [vlRecs,ppRecs]=await Promise.all([_getAll(tk,_VL),_getAll(tk,_PP)]);
+    const visitMap={};
+    vlRecs.forEach(r=>{
+      const f=r.fields||{};
+      const nm=_fv(f,"姓名");if(!nm)return;
+      if(!visitMap[nm])visitMap[nm]=[];
+      visitMap[nm].push({date:_fv(f,"日期"),time:_fv(f,"時間")});
+    });
+    document.getElementById("last-updated").textContent="更新於 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"});
+    renderCards(visitMap,ppRecs);
+  }catch(e){
+    document.getElementById("member-grid").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
+  }
+})();
+</script>
+</body></html>

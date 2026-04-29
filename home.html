@@ -35,6 +35,12 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 @keyframes iter-pulse{0%,100%{box-shadow:0 0 0 0 #10b98155}60%{box-shadow:0 0 0 6px #10b98100}}
 @keyframes fade-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:540px){.nav-grid{grid-template-columns:1fr}.nav-card{padding:20px 16px}}
+.home-role-bar{display:none;background:#1e293b;padding:8px 20px;gap:8px;align-items:center;flex-wrap:wrap}
+.home-role-bar.visible{display:flex}
+.hrbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.hrbtn:hover{background:#ffffff20;color:#f1f5f9}
+.hrbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.nav-card.hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -51,15 +57,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="hero-date" id="hero-date"></div>
   <div class="iter-badge" onclick="toggleIterReveal()" title="點擊看看">
     <span class="iter-dot"></span>
-    <span class="iter-num">2604.V.232.232.80.14</span>
+    <span class="iter-num">2604.V.233.233.81.15</span>
   </div>
   <div class="iter-reveal" id="iter-reveal">
     🤫 版本號不是手動維護的<br>
     <span style="color:#94a3b8">2604</span> = 系統建立於 2026年04月 &nbsp;·&nbsp; <span style="color:#94a3b8">V</span> = Version<br>
-    <b style="color:#f1f5f9">232</b> 年累計更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">232</b> 月更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">80</b> 週更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">14</b> 今日更新<br>
+    <b style="color:#f1f5f9">233</b> 年累計更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">233</b> 月更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">81</b> 週更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">15</b> 今日更新<br>
     <span style="color:#475569;font-size:11px;margin-top:4px;display:block">每次 deploy，Git 紀錄自動更新這組數字 🤖×👤</span>
   </div>
 </div>
@@ -75,41 +81,56 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div style="background:#6366f1;color:#fff;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;white-space:nowrap">進入 →</div>
   </div>
 </a>
+<div class="home-role-bar" id="home-role-bar">
+  <span style="font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap">👁 模擬視角</span>
+  <button class="hrbtn active" data-role="all" onclick="switchHomeView('all')">全部</button>
+  <button class="hrbtn" data-role="管理層" onclick="switchHomeView('管理層')">管理層</button>
+  <button class="hrbtn" data-role="設計" onclick="switchHomeView('設計')">設計</button>
+  <button class="hrbtn" data-role="採購" onclick="switchHomeView('採購')">採購</button>
+  <button class="hrbtn" data-role="業務" onclick="switchHomeView('業務')">業務</button>
+  <button class="hrbtn" data-role="財務" onclick="switchHomeView('財務')">財務</button>
+  <span id="home-view-note" style="font-size:11px;color:#64748b;margin-left:auto;font-style:italic"></span>
+</div>
 <div class="nav-grid">
-  <a href="forms/index.html" class="nav-card" style="--c:#6366f1">
+  <a href="forms/index.html" class="nav-card" data-roles="管理層,設計,採購,業務,財務" style="--c:#6366f1">
     <div class="nav-icon">📝</div>
     <div class="nav-title">填報中心</div>
     <div class="nav-desc">日常填報、快閃店、審批申請、報價單</div>
   </a>
-  <a href="crm_hub.html" class="nav-card" style="--c:#f97316">
+  <a href="crm_hub.html" class="nav-card" data-roles="業務,管理層" style="--c:#f97316">
     <div class="nav-icon">🎯</div>
     <div class="nav-title">CRM 客戶管理</div>
     <div class="nav-desc">銷售看板、跟進記錄、客戶名單</div>
   </a>
-  <a href="db_browser.html" class="nav-card" style="--c:#f59e0b">
+  <a href="db_browser.html" class="nav-card" data-roles="管理層,採購,設計,財務" style="--c:#f59e0b">
     <div class="nav-icon">📚</div>
     <div class="nav-title">資料庫</div>
     <div class="nav-desc">IP授權、供應商、合約、場地、外包、物流</div>
   </a>
-  <a href="progress_browser.html" class="nav-card" style="--c:#8b5cf6">
+  <a href="progress_browser.html" class="nav-card" data-roles="管理層,設計,採購,業務,財務" style="--c:#8b5cf6">
     <div class="nav-icon">📈</div>
     <div class="nav-title">進度查閱</div>
     <div class="nav-desc">庫存、銷售、採購、設計送審、每日快報</div>
   </a>
-  <a href="dashboard.html" class="nav-card" style="--c:#10b981">
+  <a href="dashboard.html" class="nav-card" data-roles="管理層,財務" style="--c:#10b981">
     <div class="nav-icon">📊</div>
     <div class="nav-title">管理儀表板</div>
     <div class="nav-desc">財務、項目、銷售、庫存總覽（管理層）</div>
   </a>
-  <a href="guide.html" class="nav-card" style="--c:#0ea5e9">
+  <a href="guide.html" class="nav-card" data-roles="管理層,設計,採購,業務,財務" style="--c:#0ea5e9">
     <div class="nav-icon">📖</div>
     <div class="nav-title">使用說明</div>
     <div class="nav-desc">按崗位查看操作流程，點步驟直接跳轉填報</div>
   </a>
-  <a href="admin.html" class="nav-card" id="admin-card" style="--c:#64748b;display:none">
+  <a href="admin.html" class="nav-card" id="admin-card" data-roles="管理層" style="--c:#64748b;display:none">
     <div class="nav-icon">⚙️</div>
     <div class="nav-title">系統管理</div>
     <div class="nav-desc">權限設定、角色管理</div>
+  </a>
+  <a href="forms/view_member_activity.html" class="nav-card" id="member-activity-card" data-roles="管理層" style="--c:#06b6d4;display:none">
+    <div class="nav-icon">👥</div>
+    <div class="nav-title">成員動態</div>
+    <div class="nav-desc">各成員登入紀錄・今日活躍狀態・待確認事項</div>
   </a>
 </div>
 <div class="notice-wrap">
@@ -388,6 +409,20 @@ function toggleIterReveal(){
   const el=document.getElementById("iter-reveal");
   el.classList.toggle("show");
 }
+const _HOME_ROLE_DESC={"管理層":"管理層視角（Ray / Shawn / 安然）","設計":"設計部視角（Bevis）","採購":"採購部視角（賴哥 / 木子）","業務":"業務部視角（Den / Meaw / 董亮 / 德寶）","財務":"財務視角（躍明）"};
+function switchHomeView(role){
+  const cards=document.querySelectorAll(".nav-card");
+  let shown=0;
+  cards.forEach(card=>{
+    const roles=(card.dataset.roles||"").split(",").map(r=>r.trim());
+    const visible=(role==="all"||roles.includes(role));
+    card.classList.toggle("hidden",!visible);
+    if(visible)shown++;
+  });
+  document.querySelectorAll(".hrbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
+  document.getElementById("home-view-note").textContent=role==="all"?`全部 ${shown} 項`:`${_HOME_ROLE_DESC[role]||role} · ${shown} 項`;
+  localStorage.setItem("wj_home_preview_role",role);
+}
 
 const _PP_TBL="tblfX6fsMshb7KL0";
 async function _loadTodoCenterPipeline(s){
@@ -454,13 +489,19 @@ async function _loadTodoCenterPipeline(s){
   const days=["日","一","二","三","四","五","六"];
   document.getElementById("hero-date").textContent=
     now.getFullYear()+"年"+(now.getMonth()+1)+"月"+now.getDate()+"日（週"+days[now.getDay()]+"）";
-  if(s.role==="超級管理員"||s.role==="總部管理中心"){
-    const ac=document.getElementById("admin-card");
-    if(ac) ac.style.display="block";
-    const cc=document.getElementById("cmd-center-card");
-    if(cc) cc.style.display="block";
-    const cl=document.getElementById("cmd-link");
-    if(cl) cl.style.display="inline";
+  const isSuper=s.role==="超級管理員"||s.role==="總部管理中心";
+  if(isSuper){
+    document.getElementById("admin-card").style.display="block";
+    document.getElementById("member-activity-card").style.display="block";
+    document.getElementById("cmd-center-card").style.display="block";
+    document.getElementById("cmd-link").style.display="inline";
+    document.getElementById("home-role-bar").classList.add("visible");
+    const saved=localStorage.getItem("wj_home_preview_role")||"all";
+    switchHomeView(saved);
+  }else{
+    const roleMap={"管理層":"管理層","設計":"設計","採購":"採購","業務":"業務","財務":"財務","總部管理中心":"管理層"};
+    const myRole=roleMap[s.role];
+    if(myRole) switchHomeView(myRole);
   }
   _autoLogVisit(s);
   _loadNotices(s);
