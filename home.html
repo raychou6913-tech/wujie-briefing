@@ -51,15 +51,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="hero-date" id="hero-date"></div>
   <div class="iter-badge" onclick="toggleIterReveal()" title="點擊看看">
     <span class="iter-dot"></span>
-    <span class="iter-num">2604.V.220.220.64.8</span>
+    <span class="iter-num">2604.V.224.224.75.10</span>
   </div>
   <div class="iter-reveal" id="iter-reveal">
     🤫 版本號不是手動維護的<br>
     <span style="color:#94a3b8">2604</span> = 系統建立於 2026年04月 &nbsp;·&nbsp; <span style="color:#94a3b8">V</span> = Version<br>
-    <b style="color:#f1f5f9">220</b> 年累計更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">220</b> 月更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">64</b> 週更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">8</b> 今日更新<br>
+    <b style="color:#f1f5f9">224</b> 年累計更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">224</b> 月更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">75</b> 週更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">10</b> 今日更新<br>
     <span style="color:#475569;font-size:11px;margin-top:4px;display:block">每次 deploy，Git 紀錄自動更新這組數字 🤖×👤</span>
   </div>
 </div>
@@ -108,6 +108,13 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <div class="notice-wrap">
   <div class="notice-hdr">📢 公告與分享</div>
   <div id="notice-board"><div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px">公告載入中...</div></div>
+</div>
+<div class="notice-wrap" style="margin-top:0;padding-top:0">
+  <div class="notice-hdr" style="display:flex;justify-content:space-between;align-items:center">
+    <span>⚡ 我的待辦</span>
+    <a href="forms/view_product_pipeline.html" style="font-size:11px;color:#8b5cf6;text-decoration:none;font-weight:600">查看產品流程看板 ›</a>
+  </div>
+  <div id="todo-pipeline"><div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px">待辦載入中...</div></div>
 </div>
 <div class="notice-wrap" style="margin-top:0;padding-top:0">
   <div class="notice-hdr" style="display:flex;justify-content:space-between;align-items:center">
@@ -373,6 +380,62 @@ function toggleIterReveal(){
   const el=document.getElementById("iter-reveal");
   el.classList.toggle("show");
 }
+
+const _PP_TBL="tblfX6fsMshb7KL0";
+async function _loadTodoCenterPipeline(s){
+  const el=document.getElementById("todo-pipeline");
+  if(!el) return;
+  try{
+    const tk=await _getToken_hub();
+    const items=[]; let cur="";
+    while(true){
+      const url=_PROXY_HUB+"/open-apis/bitable/v1/apps/"+_AT_HUB+"/tables/"+_PP_TBL+"/records?page_size=100"+(cur?"&page_token="+cur:"");
+      const d=await fetch(url,{headers:{"Authorization":"Bearer "+tk}}).then(r=>r.json());
+      if(d.code!==0) break;
+      items.push(...(d.data?.items||[]));
+      if(!d.data?.has_more) break;
+      cur=d.data.page_token;
+    }
+    const name=s.name||""; const role=s.role||"";
+    const isMgmt=["Ray","Shawn"].includes(name)||["超級管理員","管理層","總部管理中心"].includes(role);
+    const isProcure=["賴哥","木子"].includes(name);
+    const isDesign=["Bevis","詩彤"].includes(name);
+    const isSales=["Den","Meaw"].includes(name);
+    const fv=(f,k)=>{const v=f[k];return Array.isArray(v)?v[0]?.text||"":String(v||"");};
+    const todos=[];
+    items.forEach(r=>{
+      const f=r.fields||{};
+      const stage=fv(f,"當前階段");
+      const pname=fv(f,"產品名稱");
+      const ip=fv(f,"IP品牌");
+      const label=ip?`[${ip}] ${pname}`:`${pname}`;
+      if(stage==="內部立項確認"&&fv(f,"立項狀態")==="待確認"&&isMgmt)
+        todos.push({label,action:"待立項確認",color:"#f59e0b",href:"forms/view_product_pipeline.html"});
+      if(stage==="版權送審"&&isDesign)
+        todos.push({label,action:"版權送審更新",color:"#ec4899",href:"forms/view_product_pipeline.html"});
+      if(stage==="採購詢價"&&(isProcure||isMgmt))
+        todos.push({label,action:"採購詢價進行中",color:"#f97316",href:"forms/view_product_pipeline.html"});
+      if(stage==="打樣驗收"){
+        if(isMgmt&&fv(f,"打樣確認_管理")==="待確認")
+          todos.push({label,action:"待管理層驗收確認",color:"#06b6d4",href:"forms/view_product_pipeline.html"});
+        if(isDesign&&fv(f,"打樣確認_設計")==="待確認")
+          todos.push({label,action:"待設計驗收確認",color:"#06b6d4",href:"forms/view_product_pipeline.html"});
+      }
+      if(stage==="大貨確認"){
+        const key=isMgmt?"大貨確認_管理":isProcure?"大貨確認_採購":isDesign?"大貨確認_設計":isSales?"大貨確認_銷售":"";
+        if(key&&fv(f,key)==="待確認")
+          todos.push({label,action:"待大貨確認",color:"#10b981",href:"forms/view_product_pipeline.html"});
+      }
+    });
+    if(!todos.length){el.innerHTML='<div style="color:#94a3b8;font-size:12px;padding:4px 0">目前無待辦項目 ✓</div>';return;}
+    el.innerHTML=todos.map(t=>`
+      <a href="${t.href}" style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f5f9;text-decoration:none">
+        <span style="width:6px;height:6px;border-radius:50%;background:${t.color};flex-shrink:0"></span>
+        <span style="flex:1;font-size:13px;color:#0f172a;font-weight:500">${t.label}</span>
+        <span style="font-size:11px;color:${t.color};font-weight:600;white-space:nowrap">${t.action}</span>
+      </a>`).join("");
+  }catch(e){el.innerHTML='<div style="color:#94a3b8;font-size:12px">載入失敗</div>';}
+}
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");return;}
@@ -394,6 +457,7 @@ function toggleIterReveal(){
   _autoLogVisit(s);
   _loadNotices(s);
   _loadBriefingPreview();
+  _loadTodoCenterPipeline(s);
 })();
 </script>
 </body></html>
