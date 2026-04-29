@@ -154,6 +154,10 @@ function switchView(role){
     const roles=(card.dataset.roles||"all").split(",").map(r=>r.trim());
     card.style.display=(role==="all"||roles.includes("all")||roles.includes(role))?"":"none";
   });
+  document.querySelectorAll(".add-btn").forEach(btn=>{
+    const ar=(btn.dataset.addRoles||"all").split(",").map(r=>r.trim());
+    btn.style.display=(role==="all"||ar.includes("all")||ar.includes(role))?"":"none";
+  });
   document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
   const shown=[...document.querySelectorAll(".role-card")].filter(c=>c.style.display!=="none").length;
   const noteEl=document.getElementById("view-note");

@@ -111,7 +111,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <div style="font-size:12px;color:#64748b;margin-top:2px">填寫庫存數量與出入貨物流狀態</div></div>
           </div>
         </a><a id="pc-view_product_pipeline" href="#" onclick="goForm('view_product_pipeline.html');return false;"
-          class="pcard role-card" data-roles="設計,管理層" style="border-left:4px solid #ec4899;opacity:.45;pointer-events:none">
+          class="pcard role-card" data-roles="設計,業務,管理層" style="border-left:4px solid #ec4899;opacity:.45;pointer-events:none">
           <div style="display:flex;align-items:center;gap:10px">
             <span style="font-size:24px">🎨</span>
             <div><div style="font-size:14px;font-weight:700;color:#0f172a">產品開發進度</div>
@@ -304,6 +304,10 @@ function switchView(role){
   document.querySelectorAll(".role-card").forEach(card=>{
     const roles=(card.dataset.roles||"all").split(",").map(r=>r.trim());
     card.style.display=(role==="all"||roles.includes("all")||roles.includes(role))?"":"none";
+  });
+  document.querySelectorAll(".add-btn").forEach(btn=>{
+    const ar=(btn.dataset.addRoles||"all").split(",").map(r=>r.trim());
+    btn.style.display=(role==="all"||ar.includes("all")||ar.includes(role))?"":"none";
   });
   document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
   const shown=[...document.querySelectorAll(".role-card")].filter(c=>c.style.display!=="none").length;
