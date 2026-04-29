@@ -63,6 +63,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   </div>
   <button class="btn-new" onclick="openNewConcept()">＋ 新提案</button>
 </div>
+<div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:8px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+  <input id="q-proj" placeholder="篩選項目名稱..." oninput="_renderBoard()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;background:#f8fafc;outline:none;width:200px">
+  <input id="q-name" placeholder="搜尋產品名稱..." oninput="_renderBoard()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;background:#f8fafc;outline:none;width:200px">
+  <span id="q-count" style="font-size:12px;color:#94a3b8;margin-left:auto"></span>
+</div>
 
 <div class="board" id="board"><div style="color:#94a3b8;font-size:14px;padding:40px">載入中...</div></div>
 
@@ -337,9 +342,21 @@ function _daysSince(ts){
 }
 function _renderBoard(){
   const board=document.getElementById("board");
+  const qProj=(document.getElementById("q-proj")?.value||"").trim().toLowerCase();
+  const qName=(document.getElementById("q-name")?.value||"").trim().toLowerCase();
+  const filtered=_records.filter(r=>{
+    const f=r.fields||{};
+    const proj=_fv(f,"關聯項目").toLowerCase();
+    const name=_fv(f,"產品名稱").toLowerCase();
+    if(qProj&&!proj.includes(qProj)) return false;
+    if(qName&&!name.includes(qName)) return false;
+    return true;
+  });
+  const countEl=document.getElementById("q-count");
+  if(countEl) countEl.textContent=(qProj||qName)?`找到 ${filtered.length} 件`:(_records.length?`共 ${_records.length} 件`:"");
   const byStage={};
   STAGES.forEach(s=>byStage[s]=[]);
-  _records.forEach(r=>{
+  filtered.forEach(r=>{
     const st=_fv(r.fields,"當前階段")||"創意提案";
     if(byStage[st]) byStage[st].push(r);
   });
@@ -680,6 +697,13 @@ document.addEventListener("DOMContentLoaded",async()=>{
   ["ap-price","ap-qty","ap-cost"].forEach(id=>{
     document.getElementById(id)?.addEventListener("input",_calcProfit);
   });
+  const urlProj=new URLSearchParams(location.search).get("proj");
+  if(urlProj){
+    const el=document.getElementById("q-proj");
+    if(el){ el.value=urlProj; el.style.borderColor="#6366f1"; }
+    const np=document.getElementById("n-proj");
+    if(np){ [...np.options].forEach(o=>{if(o.value===urlProj)o.selected=true;}); }
+  }
   await Promise.all([_reload(),_loadSelects()]);
 });
 </script>
