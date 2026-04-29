@@ -176,7 +176,7 @@ function filterDept(dept,save=true){
 (async()=>{
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){location.replace("../login.html");return;}
-  const isSuper=s.role==="超級管理員"||s.role==="總部管理中心";
+  const isSuper=s.role==="超級管理員"||s.role==="總部管理中心"||["Ray","Shawn","安然"].includes(s.name);
   if(!isSuper){
     document.getElementById("dept-bar").querySelectorAll(".dbtn[data-dept='all'],.dbtn[data-dept='管理層'],.dbtn[data-dept='設計'],.dbtn[data-dept='採購'],.dbtn[data-dept='業務'],.dbtn[data-dept='財務']").forEach(b=>{
       if(b.dataset.dept!=="all"&&b.dataset.dept!==s.role)b.style.display="none";
