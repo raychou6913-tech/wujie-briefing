@@ -88,7 +88,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   </div>
 </div>
 <div id="proj-actions" style="display:none">
-  <div class="sec blue">Step 2 — 本項目填報</div>
+  <div class="sec blue" id="step2-title">Step 2 — 本項目填報</div>
   <div class="card-grid"><a id="pc-expense" href="#" onclick="goForm('expense.html');return false;"
           class="pcard role-card" data-roles="all" style="border-left:4px solid #f97316;opacity:.45;pointer-events:none">
           <div style="display:flex;align-items:center;gap:10px">
@@ -314,6 +314,12 @@ function switchView(role){
     const e=document.getElementById(id); if(e) e.style.display=isAdminRole?"":"none";
   });
   localStorage.setItem("wj_preview_role",role);
+  if(typeof _onRoleSwitch==="function") _onRoleSwitch(role);
+}
+const _STEP2_LABELS={"管理層":"Step 2 — 本項目填報","設計":"Step 2 — 設計/創意填報","採購":"Step 2 — 採購/庫存填報","業務":"Step 2 — 銷售/庫存填報","財務":"Step 2 — 費用填報","all":"Step 2 — 本項目填報"};
+function _onRoleSwitch(role){
+  const el=document.getElementById("step2-title");
+  if(el) el.textContent=_STEP2_LABELS[role]||_STEP2_LABELS["all"];
 }
 
 (function(){

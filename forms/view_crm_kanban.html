@@ -50,6 +50,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .btn-add-log:hover{background:#4f46e5}
 .empty-col{text-align:center;padding:20px;color:#cbd5e1;font-size:12px}
 @media(max-width:600px){.col{min-width:160px;width:160px}}
+
+.role-bar{display:none;background:#1e293b;padding:10px 24px;gap:8px;align-items:center;flex-wrap:wrap}
+.role-bar.visible{display:flex}
+.role-bar-label{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.rbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.rbtn:hover{background:#ffffff20;color:#f1f5f9}
+.rbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.view-note{font-size:11px;color:#64748b;margin-left:auto;font-style:italic}
+
 </style>
 </head>
 <body>
@@ -63,6 +72,16 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <a href="customer.html" style="background:#10b981;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;text-decoration:none;font-weight:600">＋ 新客戶</a>
     <a href="../home.html" class="btn-back">← 首頁</a>
   </div>
+</div>
+<div class="role-bar" id="role-bar">
+  <span class="role-bar-label">👁 視角預覽</span>
+  <button class="rbtn active" data-role="all" onclick="switchView('all')">全部</button>
+  <button class="rbtn" data-role="管理層" onclick="switchView('管理層')">管理層</button>
+  <button class="rbtn" data-role="設計" onclick="switchView('設計')">設計</button>
+  <button class="rbtn" data-role="採購" onclick="switchView('採購')">採購</button>
+  <button class="rbtn" data-role="業務" onclick="switchView('業務')">業務</button>
+  <button class="rbtn" data-role="財務" onclick="switchView('財務')">財務</button>
+  <span class="view-note" id="view-note"></span>
 </div>
 <div class="toolbar">
   <select class="filter-sel" id="f-region" onchange="render()">
@@ -129,6 +148,33 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
 })();
+
+function switchView(role){
+  document.querySelectorAll(".role-card").forEach(card=>{
+    const roles=(card.dataset.roles||"all").split(",").map(r=>r.trim());
+    card.style.display=(role==="all"||roles.includes("all")||roles.includes(role))?"":"none";
+  });
+  document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
+  const shown=[...document.querySelectorAll(".role-card")].filter(c=>c.style.display!=="none").length;
+  const noteEl=document.getElementById("view-note");
+  if(noteEl) noteEl.textContent=role==="all"?`顯示全部 ${shown} 項`:`${role}視角・顯示 ${shown} 項`;
+  const isAdminRole=(role==="all"||role==="管理層");
+  ["admin-zone","admin-card","member-activity-card","cmd-center-card"].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.style.display=isAdminRole?"":"none";
+  });
+  localStorage.setItem("wj_preview_role",role);
+  if(typeof _onRoleSwitch==="function") _onRoleSwitch(role);
+}
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s) return;
+  const isSuper=s.role==="超級管理員"||s.role==="總部管理中心"||["Ray","Shawn","安然"].includes(s.name);
+  const rb=document.getElementById("role-bar");
+  if(isSuper&&rb){ rb.classList.add("visible"); switchView(localStorage.getItem("wj_preview_role")||"all"); }
+  else{ const m={"管理層":"管理層","設計":"設計","採購":"採購","業務":"業務","財務":"財務","總部管理中心":"管理層"}; const r=m[s.role]; if(r) switchView(r); }
+})();
+
 
 function fv(f,k){
   const v=f[k];
