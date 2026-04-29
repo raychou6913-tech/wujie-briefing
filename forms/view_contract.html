@@ -271,6 +271,12 @@ function closeDetail(){
   document.getElementById("detail-edit-btns").style.display="none";
   document.getElementById("detail-title").textContent="詳細資訊";
 }
+function _tsToDate(v){
+  if(!v&&v!==0)return"";
+  const n=typeof v==="number"?v:parseFloat(v);
+  if(isNaN(n))return"";
+  return new Date(n).toISOString().slice(0,10);
+}
 function openEdit(rid){
   const rec=allRecords.find(r=>r.record_id===rid);
   if(!rec)return;
@@ -278,6 +284,7 @@ function openEdit(rid){
   const schema=_EDIT_SCHEMA;
   let html="";
   for(const[k,cfg]of Object.entries(schema)){
+    const raw=f[k];
     const cur=fv(f,k)||"";
     const lbl=`<div class="df-key" style="padding-top:6px">${_esc(k)}</div>`;
     let inp="";
@@ -286,6 +293,9 @@ function openEdit(rid){
       inp=`<select data-field="${k}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;background:#fff;outline:none">${opts}</select>`;
     }else if(cfg.type==="textarea"){
       inp=`<textarea data-field="${k}" rows="3" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;resize:vertical;outline:none">${_esc(cur)}</textarea>`;
+    }else if(cfg.type==="date"){
+      const dateVal=_tsToDate(typeof raw==="number"?raw:(cur?new Date(cur).getTime():null));
+      inp=`<input type="date" data-field="${k}" data-type="date" value="${dateVal}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none">`;
     }else{
       const t=cfg.type==="number"?"number":"text";
       inp=`<input type="${t}" data-field="${k}" value="${_esc(cur)}" style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none">`;
@@ -313,6 +323,7 @@ async function saveEdit(rid){
       const schema=_EDIT_SCHEMA[k]||{};
       let v=el.value.trim();
       if(schema.type==="number"){fields[k]=v?Number(v):null;}
+      else if(schema.type==="date"||el.dataset.type==="date"){fields[k]=v?new Date(v).getTime():null;}
       else if(v){fields[k]=v;}
       else{fields[k]="";}
     });
