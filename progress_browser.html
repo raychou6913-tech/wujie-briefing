@@ -10,8 +10,17 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .hdr-left{display:flex;align-items:center;gap:10px}
 .btn-back{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;text-decoration:none;display:inline-block}
 .btn-back:hover{border-color:#8b5cf6;color:#8b5cf6}
+.role-bar{display:none;background:#1e293b;padding:10px 24px;gap:8px;align-items:center;flex-wrap:wrap}
+.role-bar.visible{display:flex}
+.role-bar-label{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.rbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.rbtn:hover{background:#ffffff20;color:#f1f5f9}
+.rbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.view-note{font-size:11px;color:#64748b;margin-left:auto;font-style:italic}
 .intro{padding:14px 24px;background:#f5f3ff;border-bottom:1px solid #ddd6fe;font-size:13px;color:#5b21b6}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:24px}
+.dept-card{transition:opacity .2s}
+.dept-card.hidden{display:none}
 @media(max-width:480px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -21,54 +30,34 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div style="font-size:26px">📈</div>
     <div>
       <div style="font-size:19px;font-weight:700;color:#0f172a">進度查閱</div>
-      <div style="font-size:13px;color:#64748b;margin-top:2px">查看動態營運記錄，掌握最新進度</div>
+      <div style="font-size:13px;color:#64748b;margin-top:2px" id="hdr-sub">查看動態營運記錄，掌握最新進度</div>
     </div>
   </div>
   <a href="home.html" class="btn-back">← 首頁</a>
 </div>
-<div class="intro">💡 點擊「查看」瀏覽記錄（含搜尋/篩選/點擊展開詳情）；點擊「新增」至填報中心提交</div>
-<div class="grid">
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
-          <div style="font-size:26px;margin-bottom:8px">📦</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">庫存 / 物流</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">現有庫存/物流狀態/報關</div>
-          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">倉庫 / 物流</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_stock.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/stock.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
+<div class="role-bar" id="role-bar">
+  <span class="role-bar-label">👁 視角預覽</span>
+  <button class="rbtn active" data-role="all" onclick="switchView('all')">全部</button>
+  <button class="rbtn" data-role="管理層" onclick="switchView('管理層')">管理層</button>
+  <button class="rbtn" data-role="設計" onclick="switchView('設計')">設計</button>
+  <button class="rbtn" data-role="採購" onclick="switchView('採購')">採購</button>
+  <button class="rbtn" data-role="業務" onclick="switchView('業務')">業務</button>
+  <button class="rbtn" data-role="財務" onclick="switchView('財務')">財務</button>
+  <span class="view-note" id="view-note"></span>
+</div>
+<div class="intro" id="intro-bar">💡 點擊「查看」瀏覽記錄（含搜尋/篩選）；點擊「新增」至填報中心提交</div>
+<div class="grid" id="card-grid">
+        <div class="dept-card" data-roles="管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
           <div style="font-size:26px;margin-bottom:8px">🎯</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">銷售進度</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">訂單狀態/金額/帳期/交貨日</div>
-          <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">業務 / BD</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">項目指揮中心</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">【管理層】各項目狀態・預算執行率・活躍訂單・預警一覽</div>
+          <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Ray / Shawn / 安然</div>
           <div style="display:flex;gap:8px">
-            <a href="forms/view_sales.html" style="flex:1;text-align:center;background:#6366f118;color:#6366f1;border:1px solid #6366f140;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/sales.html" style="flex:1;text-align:center;background:#6366f1;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+            <a href="forms/view_management_overview.html" style="flex:1;text-align:center;background:#6366f118;color:#6366f1;border:1px solid #6366f140;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/project.html" style="flex:1;text-align:center;background:#6366f1;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #10b981">
-          <div style="font-size:26px;margin-bottom:8px">📊</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">每日銷售快報</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">日流水/支付方式/客流</div>
-          <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Shawn / 店長</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_daily_sales.html" style="flex:1;text-align:center;background:#10b98118;color:#10b981;border:1px solid #10b98140;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/daily_sales.html?ctx=popup" style="flex:1;text-align:center;background:#10b981;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
-          <div style="font-size:26px;margin-bottom:8px">🛒</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購比價</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">報價比較/議定價/到貨狀態</div>
-          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">採購負責人</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_procure.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/procure.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
+        <div class="dept-card" data-roles="管理層,設計,採購,業務,財務" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
           <div style="font-size:26px;margin-bottom:8px">📋</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">項目排期</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">進度/關卡/截止日/狀態 · 時間線視圖</div>
@@ -78,57 +67,17 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/project.html" style="flex:1;text-align:center;background:#6366f1;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #8b5cf6">
-          <div style="font-size:26px;margin-bottom:8px">💵</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">項目預算</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">各項目收支總覽/執行率/可匯出CSV</div>
-          <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">財務 / 項目負責人</div>
+        <div class="dept-card" data-roles="設計,採購,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #8b5cf6">
+          <div style="font-size:26px;margin-bottom:8px">🏭</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">產品開發流程</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">【主入口】創意提案→立項→版權送審（含設計歷程）→採購→打樣→大貨</div>
+          <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">設計 / 採購 / 管理層</div>
           <div style="display:flex;gap:8px">
-            <a href="forms/view_budget_summary.html" style="flex:1;text-align:center;background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/budget.html" style="flex:1;text-align:center;background:#8b5cf6;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+            <a href="forms/view_product_pipeline.html" style="flex:1;text-align:center;background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/view_product_pipeline.html" style="flex:1;text-align:center;background:#8b5cf6;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
-          <div style="font-size:26px;margin-bottom:8px">🧾</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">費用實報</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">填報項目實際發生費用/批次追蹤</div>
-          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">所有人</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/expense.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/expense.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #475569">
-          <div style="font-size:26px;margin-bottom:8px">🏢</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">固定成本填報</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">薪資/租金/水電等全公司固定費用入口（預設歸入固定成本）</div>
-          <div style="font-size:11px;background:#47556918;color:#475569;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Ray / Shawn / 財務</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/expense.html?proj=%E5%85%A8%E5%85%AC%E5%8F%B8%E5%9B%BA%E5%AE%9A%E6%88%90%E6%9C%AC" style="flex:1;text-align:center;background:#47556918;color:#475569;border:1px solid #47556940;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/expense.html?proj=%E5%85%A8%E5%85%AC%E5%8F%B8%E5%9B%BA%E5%AE%9A%E6%88%90%E6%9C%AC" style="flex:1;text-align:center;background:#475569;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #ec4899">
-          <div style="font-size:26px;margin-bottom:8px">🎨</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">設計送審記錄</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">從產品開發流程看板進入版權送審；此連結可直接新增單筆送審記錄</div>
-          <div style="font-size:11px;background:#ec489918;color:#ec4899;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Bevis / 詩彤</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_product_pipeline.html" style="flex:1;text-align:center;background:#ec489918;color:#ec4899;border:1px solid #ec489940;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/design.html" style="flex:1;text-align:center;background:#ec4899;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #64748b">
-          <div style="font-size:26px;margin-bottom:8px">📄</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">合約進度</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">到期日警示/執行狀態/類型篩選</div>
-          <div style="font-size:11px;background:#64748b18;color:#64748b;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Ray / 安然 / Shawn</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_contract_progress.html" style="flex:1;text-align:center;background:#64748b18;color:#64748b;border:1px solid #64748b40;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/contract.html" style="flex:1;text-align:center;background:#64748b;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #06b6d4">
+        <div class="dept-card" data-roles="採購,業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #06b6d4">
           <div style="font-size:26px;margin-bottom:8px">🛍️</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">已上市商品目錄</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">已進入銷售的 SKU 清單/定價/庫存狀態管理</div>
@@ -138,7 +87,87 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/product.html" style="flex:1;text-align:center;background:#06b6d4;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #8b5cf6">
+        <div class="dept-card" data-roles="業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
+          <div style="font-size:26px;margin-bottom:8px">🎯</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">銷售進度</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">訂單狀態/金額/帳期/交貨日・可直接更新訂單狀態</div>
+          <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">業務 / BD</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/view_sales.html" style="flex:1;text-align:center;background:#6366f118;color:#6366f1;border:1px solid #6366f140;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/sales.html" style="flex:1;text-align:center;background:#6366f1;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #10b981">
+          <div style="font-size:26px;margin-bottom:8px">📊</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">每日銷售快報</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">日流水/支付方式/客流</div>
+          <div style="font-size:11px;background:#10b98118;color:#10b981;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Shawn / 店長</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/view_daily_sales.html" style="flex:1;text-align:center;background:#10b98118;color:#10b981;border:1px solid #10b98140;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/daily_sales.html?ctx=popup" style="flex:1;text-align:center;background:#10b981;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="採購,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
+          <div style="font-size:26px;margin-bottom:8px">🛒</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購比價</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">報價比較/議定價/到貨狀態</div>
+          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">採購負責人</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/view_procure.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/procure.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="採購,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
+          <div style="font-size:26px;margin-bottom:8px">📦</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">庫存 / 物流</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">現有庫存/物流狀態/報關</div>
+          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">倉庫 / 物流</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/view_stock.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/stock.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="財務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #8b5cf6">
+          <div style="font-size:26px;margin-bottom:8px">💵</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">項目預算</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">各項目收支總覽・預算 vs 實際支出・執行率・可匯出 CSV</div>
+          <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">財務 / 項目負責人</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/view_budget_summary.html" style="flex:1;text-align:center;background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/budget.html" style="flex:1;text-align:center;background:#8b5cf6;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="管理層,設計,採購,業務,財務" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
+          <div style="font-size:26px;margin-bottom:8px">🧾</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">費用實報</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">填報項目實際發生費用/批次追蹤</div>
+          <div style="font-size:11px;background:#f9731618;color:#f97316;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">所有人</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/expense.html" style="flex:1;text-align:center;background:#f9731618;color:#f97316;border:1px solid #f9731640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/expense.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="財務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #475569">
+          <div style="font-size:26px;margin-bottom:8px">🏢</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">固定成本填報</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">薪資/租金/水電等全公司固定費用入口</div>
+          <div style="font-size:11px;background:#47556918;color:#475569;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Ray / Shawn / 財務</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/expense.html?proj=%E5%85%A8%E5%85%AC%E5%8F%B8%E5%9B%BA%E5%AE%9A%E6%88%90%E6%9C%AC" style="flex:1;text-align:center;background:#47556918;color:#475569;border:1px solid #47556940;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/expense.html?proj=%E5%85%A8%E5%85%AC%E5%8F%B8%E5%9B%BA%E5%AE%9A%E6%88%90%E6%9C%AC" style="flex:1;text-align:center;background:#475569;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #64748b">
+          <div style="font-size:26px;margin-bottom:8px">📄</div>
+          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">合約進度</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px">到期日警示/執行狀態/類型篩選・可直接編輯合約資訊</div>
+          <div style="font-size:11px;background:#64748b18;color:#64748b;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Ray / 安然 / Shawn</div>
+          <div style="display:flex;gap:8px">
+            <a href="forms/view_contract_progress.html" style="flex:1;text-align:center;background:#64748b18;color:#64748b;border:1px solid #64748b40;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
+            <a href="forms/contract.html" style="flex:1;text-align:center;background:#64748b;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
+          </div>
+        </div>
+        <div class="dept-card" data-roles="管理層,財務" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #8b5cf6">
           <div style="font-size:26px;margin-bottom:8px">🏦</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">MG 消耗總覽</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">各合約保底金剩餘/消耗率/到期預警</div>
@@ -147,31 +176,39 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/view_mg_overview.html" style="flex:1;text-align:center;background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
             <a href="forms/contract.html" style="flex:1;text-align:center;background:#8b5cf6;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
-          <div style="font-size:26px;margin-bottom:8px">🎯</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">項目指揮中心</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">【管理層總覽】各項目狀態 · 產品流程進度 · 預算執行率 · 活躍訂單 · 預警</div>
-          <div style="font-size:11px;background:#6366f118;color:#6366f1;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">Ray / Shawn / 安然</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_management_overview.html" style="flex:1;text-align:center;background:#6366f118;color:#6366f1;border:1px solid #6366f140;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/project.html" style="flex:1;text-align:center;background:#6366f1;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #8b5cf6">
-          <div style="font-size:26px;margin-bottom:8px">🏭</div>
-          <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">產品開發流程</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:10px">【主入口】創意提案 → 立項確認 → 版權送審（含設計歷程）→ 採購詢價 → 打樣驗收 → 大貨確認</div>
-          <div style="font-size:11px;background:#8b5cf618;color:#8b5cf6;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px">設計 / 採購 / 管理層</div>
-          <div style="display:flex;gap:8px">
-            <a href="forms/view_product_pipeline.html" style="flex:1;text-align:center;background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf640;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">👁 查看</a>
-            <a href="forms/view_product_pipeline.html" style="flex:1;text-align:center;background:#8b5cf6;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
-          </div>
         </div></div>
 <script>
+const _DEPT_NAMES={"管理層":"管理層視角（Ray / Shawn / 安然）","設計":"設計部視角（Bevis / 詩彤）","採購":"採購部視角（賴哥 / 木子）","業務":"業務部視角（Den / Meaw）","財務":"財務視角（躍明）"};
+function switchView(role){
+  const cards=document.querySelectorAll(".dept-card");
+  let shown=0;
+  cards.forEach(card=>{
+    const roles=card.dataset.roles||"";
+    const visible=(role==="all"||roles.split(",").map(r=>r.trim()).includes(role));
+    card.classList.toggle("hidden",!visible);
+    if(visible)shown++;
+  });
+  document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
+  document.getElementById("view-note").textContent=role==="all"?`顯示全部 ${shown} 項`:`${_DEPT_NAMES[role]||role}・顯示 ${shown} 項`;
+  localStorage.setItem("wj_preview_role",role);
+}
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");return;}
+  const isSuperAdmin=s.role==="超級管理員";
+  if(isSuperAdmin){
+    document.getElementById("role-bar").classList.add("visible");
+    const saved=localStorage.getItem("wj_preview_role")||"all";
+    switchView(saved);
+  }else{
+    const roleMap={"管理層":"管理層","設計":"設計","採購":"採購","業務":"業務","財務":"財務","總部管理中心":"管理層"};
+    const myRole=roleMap[s.role];
+    if(myRole){
+      switchView(myRole);
+      document.getElementById("hdr-sub").textContent=_DEPT_NAMES[myRole]||"我的功能模組";
+      document.getElementById("intro-bar").style.display="none";
+    }
+  }
 })();
 </script>
 </body></html>
