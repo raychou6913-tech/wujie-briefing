@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎯 項目指揮中心 — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:48px}
+.hdr{background:#1e293b;border-bottom:2px solid #6366f1;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-title{font-size:19px;font-weight:700;color:#f1f5f9}
+.hdr-sub{font-size:12px;color:#94a3b8;margin-top:2px}
+.btn-back{background:#ffffff15;color:#94a3b8;border:1px solid #334155;border-radius:8px;padding:7px 14px;font-size:12px;text-decoration:none}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px;background:#1e293b;border-bottom:1px solid #334155}
+.stat-box{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 16px;text-align:center}
+.stat-num{font-size:22px;font-weight:700;color:#6366f1}
+.stat-lbl{font-size:11px;color:#64748b;margin-top:2px}
+.wrap{padding:20px 24px}
+.section-title{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.cmd-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:18px;transition:border-color .2s,box-shadow .2s;cursor:pointer}
+.cmd-card:hover{border-color:#6366f1;box-shadow:0 0 0 1px #6366f130}
+.cmd-card.warn{border-left:3px solid #ef4444}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.card-name{font-size:15px;font-weight:700;color:#f1f5f9;flex:1}
+.card-loc{font-size:11px;color:#64748b;margin-top:3px}
+.status-badge{font-size:11px;padding:3px 9px;border-radius:7px;font-weight:600;white-space:nowrap}
+.divider{border:none;border-top:1px solid #334155;margin:10px 0}
+.row-label{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.mini-stages{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:2px}
+.stage-dot{font-size:11px;background:#0f172a;border:1px solid #334155;border-radius:5px;padding:2px 7px;color:#94a3b8}
+.stage-dot.has{background:#6366f115;border-color:#6366f140;color:#a5b4fc}
+.budget-track{margin:6px 0}
+.budget-bar-bg{background:#0f172a;border-radius:5px;height:6px;overflow:hidden;margin:4px 0}
+.sales-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#94a3b8}
+.alert-tag{font-size:11px;background:#ef444415;color:#fca5a5;border-radius:5px;padding:2px 7px;margin-top:6px;display:inline-block}
+.empty{text-align:center;padding:60px;color:#64748b;font-size:14px}
+@media(max-width:600px){.stats-bar{grid-template-columns:repeat(2,1fr)}.wrap{padding:12px 16px}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="hdr-title">🎯 項目指揮中心</div>
+    <div class="hdr-sub" id="hdr-sub">載入中…</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button onclick="loadAll()" style="background:#6366f115;color:#a5b4fc;border:1px solid #6366f130;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer">↻ 重新整理</button>
+    <a href="../progress_browser.html" class="btn-back">← 進度查閱</a>
+  </div>
+</div>
+<div class="stats-bar">
+  <div class="stat-box"><div class="stat-num" id="st-projects">—</div><div class="stat-lbl">進行中項目</div></div>
+  <div class="stat-box"><div class="stat-num" id="st-pipeline" style="color:#ec4899">—</div><div class="stat-lbl">在研產品</div></div>
+  <div class="stat-box"><div class="stat-num" id="st-orders" style="color:#10b981">—</div><div class="stat-lbl">活躍訂單</div></div>
+  <div class="stat-box"><div class="stat-num" id="st-alerts" style="color:#ef4444">—</div><div class="stat-lbl">待處理預警</div></div>
+</div>
+<div class="wrap">
+  <div class="section-title">📋 項目一覽</div>
+  <div class="grid" id="cmd-grid"><div class="empty">載入中…</div></div>
+</div>
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TBLS={
+  proj:"tblYBjAlemYPuNGy",
+  pipe:"tblfX6fsMshb7KL0",
+  bud:"tblteo2QEO0jP8j9",
+  exp:"tblu2NkqBWyBSskG",
+  sales:"tblRtqmbO9TO3sYZ"
+};
+const _PIPE_STAGES=["創意提案","內部立項確認","版權送審","採購詢價","打樣驗收","大貨確認"];
+const _PIPE_IC={"創意提案":"💡","內部立項確認":"✅","版權送審":"📜","採購詢價":"🛒","打樣驗收":"🔬","大貨確認":"🚀"};
+const _PROJ_SC={"進行中":"#10b981","計劃中":"#6366f1","已延遲":"#ef4444","已完成":"#94a3b8","已取消":"#475569"};
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
+})();
+function fv(f,k){
+  const v=f[k];
+  if(v===null||v===undefined||v==="")return"";
+  if(typeof v==="number")return String(v);
+  if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.text||x.name||""):String(x)).join("");
+  if(typeof v==="object")return v.text||v.name||"";
+  return String(v);
+}
+function fmt(n){const x=Number(n)||0;if(x>=1000000)return(x/1000000).toFixed(1)+"M";if(x>=1000)return(x/1000).toFixed(0)+"K";return Math.round(x).toLocaleString();}
+function projNameFromBudget(f){const note=fv(f,"備註")||"";const m=note.match(/^\[([^\]]+)\]/);return m?m[1]:"";}
+async function loadAll(){
+  document.getElementById("cmd-grid").innerHTML='<div class="empty">資料載入中…</div>';
+  try{
+    const r=await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+    const td=await r.json();if(td.code!==0)throw new Error("token");
+    const tk=td.tenant_access_token;
+    async function getAll(tbl){
+      let items=[],pt=null;
+      do{
+        const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tbl+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+        const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+        const d=await res.json();if(d.code!==0)throw new Error(d.msg);
+        items=items.concat(d.data?.items||[]);pt=d.data?.has_more?d.data.page_token:null;
+      }while(pt);return items;
+    }
+    const [projs,pipes,buds,exps,salesRecs]=await Promise.all([
+      getAll(_TBLS.proj),getAll(_TBLS.pipe),getAll(_TBLS.bud),getAll(_TBLS.exp),getAll(_TBLS.sales)
+    ]);
+    // Build maps
+    const pipeMap={};
+    pipes.forEach(r=>{
+      const proj=fv(r.fields,"關聯項目");if(!proj)return;
+      if(!pipeMap[proj])pipeMap[proj]=[];
+      pipeMap[proj].push(r.fields);
+    });
+    const budMap={};
+    buds.forEach(r=>{
+      const pn=projNameFromBudget(r.fields);if(!pn)return;
+      if(!budMap[pn])budMap[pn]={inc:0,exp:0};
+      const amt=parseFloat(fv(r.fields,"預算金額"))||0;
+      if(fv(r.fields,"預算性質")==="收入")budMap[pn].inc+=amt;else budMap[pn].exp+=amt;
+    });
+    const expMap={};
+    exps.forEach(r=>{
+      const proj=fv(r.fields,"項目關聯");if(!proj)return;
+      expMap[proj]=(expMap[proj]||0)+(parseFloat(fv(r.fields,"實際金額"))||0);
+    });
+    const salesMap={};
+    salesRecs.forEach(r=>{
+      const proj=fv(r.fields,"項目關聯");if(!proj)return;
+      const st=fv(r.fields,"訂單狀態");
+      if(["已取消","已收款"].includes(st))return;
+      if(!salesMap[proj])salesMap[proj]={count:0,total:0};
+      salesMap[proj].count++;salesMap[proj].total+=(parseFloat(fv(r.fields,"總金額"))||0);
+    });
+    // Render
+    const activeProjs=projs.filter(r=>!["已完成","已取消"].includes(fv(r.fields,"狀態")));
+    document.getElementById("st-projects").textContent=activeProjs.length;
+    const totalPipe=Object.values(pipeMap).flat().length;
+    document.getElementById("st-pipeline").textContent=totalPipe;
+    const totalOrders=Object.values(salesMap).reduce((a,v)=>a+v.count,0);
+    document.getElementById("st-orders").textContent=totalOrders;
+    let alertCount=0;
+    const today=new Date().toISOString().slice(0,10);
+    let html="";
+    activeProjs.sort((a,b)=>{
+      const sa=fv(a.fields,"狀態"),sb=fv(b.fields,"狀態");
+      if(sa==="已延遲"&&sb!=="已延遲")return -1;if(sb==="已延遲"&&sa!=="已延遲")return 1;return 0;
+    });
+    for(const p of activeProjs){
+      const f=p.fields;
+      const pname=fv(f,"項目名稱")||"(未命名)";
+      const st=fv(f,"狀態")||"計劃中";
+      const sc=_PROJ_SC[st]||"#64748b";
+      const ip=fv(f,"IP品牌");const loc=fv(f,"所在地");const owner=fv(f,"版權對接人")||fv(f,"負責人");
+      const deadline=fv(f,"截止日期")||"";
+      const isOverdue=deadline&&deadline<today;
+      // Pipeline summary
+      const products=pipeMap[pname]||[];
+      const stageCount={};
+      products.forEach(pf=>{const s=fv(pf,"當前階段")||"創意提案";stageCount[s]=(stageCount[s]||0)+1;});
+      const stageBadges=_PIPE_STAGES.map(s=>stageCount[s]?
+        `<span class="stage-dot has">${_PIPE_IC[s]}${stageCount[s]}</span>`:
+        `<span class="stage-dot">${_PIPE_IC[s]}</span>`).join("");
+      // Budget
+      const bud=budMap[pname];
+      const actualExp=expMap[pname]||0;
+      const expRate=bud?.exp>0?Math.min(150,Math.round(actualExp/bud.exp*100)):null;
+      const overBudget=bud&&actualExp>bud.exp;
+      if(overBudget)alertCount++;if(isOverdue)alertCount++;
+      const budBar=expRate!==null?`
+        <div class="row-label" style="margin-top:8px">預算執行（實際 vs 預算）</div>
+        <div class="budget-bar-bg"><div style="width:${Math.min(100,expRate)}%;height:100%;background:${expRate>100?'#ef4444':expRate>80?'#f59e0b':'#10b981'};border-radius:5px"></div></div>
+        <div style="font-size:11px;color:${expRate>100?'#fca5a5':expRate>80?'#fcd34d':'#6ee7b7'};font-weight:600">
+          實際 ${fmt(actualExp)} / 預算 ${fmt(bud.exp)}　${expRate}%${overBudget?' ⚠️超支':''}
+        </div>`:'<div style="font-size:11px;color:#475569;margin-top:6px">尚未建立預算</div>';
+      // Sales
+      const sl=salesMap[pname];
+      const salesInfo=sl?`${sl.count} 筆在途訂單 · ${fmt(sl.total)}`:'暫無在途訂單';
+      const alerts=[];
+      if(isOverdue)alerts.push("截止日已過期");
+      if(overBudget)alerts.push("支出已超預算");
+      const stStuck=products.filter(pf=>{
+        const stage=fv(pf,"當前階段");
+        if(stage==="版權送審"&&fv(pf,"版權送審狀態")==="已拒絕")return true;
+        if(stage==="內部立項確認"&&fv(pf,"立項狀態")==="待確認")return true;
+        return false;
+      });
+      stStuck.forEach(pf=>alerts.push(`「${fv(pf,"產品名稱")}」需要確認`));
+      html+=`<div class="cmd-card${alerts.length?' warn':''}" onclick="location.href='view_product_pipeline.html?proj=${encodeURIComponent(pname)}'">
+        <div class="card-top">
+          <div>
+            ${ip?`<div style="font-size:10px;background:#6366f115;color:#a5b4fc;border-radius:4px;padding:1px 6px;display:inline-block;margin-bottom:4px">${ip}</div>`:""}
+            <div class="card-name">${pname}</div>
+            <div class="card-loc">${[loc,owner].filter(Boolean).join(' · ')}</div>
+          </div>
+          <span class="status-badge" style="background:${sc}18;color:${sc}">${st}</span>
+        </div>
+        <hr class="divider">
+        <div class="row-label">產品開發流程</div>
+        <div class="mini-stages">${stageBadges}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">${products.length} 件在研${deadline?'　截止 '+deadline:''}</div>
+        ${budBar}
+        <hr class="divider" style="margin-top:8px">
+        <div class="sales-row">
+          <span>🎯 ${salesInfo}</span>
+          <a href="view_sales.html" style="font-size:11px;color:#6366f1;text-decoration:none">查看訂單 ›</a>
+        </div>
+        ${alerts.map(a=>`<div class="alert-tag">⚠️ ${a}</div>`).join(" ")}
+      </div>`;
+    }
+    document.getElementById("st-alerts").textContent=alertCount;
+    document.getElementById("hdr-sub").textContent="共 "+activeProjs.length+" 個進行中項目 · 最後更新 "+new Date().toLocaleTimeString("zh-TW");
+    document.getElementById("cmd-grid").innerHTML=html||'<div class="empty">目前無進行中項目</div>';
+  }catch(e){
+    document.getElementById("cmd-grid").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
+    console.error(e);
+  }
+}
+document.addEventListener("DOMContentLoaded",loadAll);
+</script>
+</body></html>

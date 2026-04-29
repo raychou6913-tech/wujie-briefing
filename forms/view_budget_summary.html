@@ -99,9 +99,11 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _TBL="tblteo2QEO0jP8j9";
+const _EXP_TBL="tblu2NkqBWyBSskG";
 let allRecords=[];
 let grouped={};
 let _curProj="";
+let _expMap={};
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}
@@ -127,20 +129,34 @@ async function loadData(){
     const td=await r.json();
     if(td.code!==0)throw new Error("Token err");
     const tk=td.tenant_access_token;
-    let items=[],pt=null;
-    do{
-      const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBL+"/records?page_size=100"+(pt?"&page_token="+pt:"");
-      const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
-      const d=await res.json();
-      if(d.code!==0)throw new Error(d.msg);
-      items=items.concat(d.data?.items||[]);
-      pt=d.data?.has_more?d.data.page_token:null;
-    }while(pt);
-    allRecords=items;
-    const years=[...new Set(items.map(i=>fv(i.fields,"年度")).filter(Boolean))].sort().reverse();
+    async function getAll(tbl){
+      let items=[],pt=null;
+      do{
+        const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tbl+"/records?page_size=100"+(pt?"&page_token="+pt:"");
+        const res=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+        const d=await res.json();
+        if(d.code!==0)throw new Error(d.msg);
+        items=items.concat(d.data?.items||[]);
+        pt=d.data?.has_more?d.data.page_token:null;
+      }while(pt);
+      return items;
+    }
+    const [budgetItems,expItems]=await Promise.all([getAll(_TBL),getAll(_EXP_TBL)]);
+    allRecords=budgetItems;
+    _expMap={};
+    expItems.forEach(item=>{
+      const f=item.fields||{};
+      const proj=Array.isArray(f["項目關聯"])?f["項目關聯"][0]?.text||"":String(f["項目關聯"]||"");
+      if(!proj)return;
+      if(!_expMap[proj])_expMap[proj]={total:0,items:[]};
+      const amt=parseFloat(fv(f,"實際金額"))||0;
+      _expMap[proj].total+=amt;
+      _expMap[proj].items.push({cat:fv(f,"費用類別"),amt,cur:fv(f,"幣別")});
+    });
+    const years=[...new Set(budgetItems.map(i=>fv(i.fields,"年度")).filter(Boolean))].sort().reverse();
     const sel=document.getElementById("year-filter");
     years.forEach(y=>{const o=document.createElement("option");o.value=y;o.textContent=y+"年";sel.appendChild(o);});
-    document.getElementById("hdr-sub").textContent="共 "+items.length+" 筆預算記錄";
+    document.getElementById("hdr-sub").textContent="共 "+budgetItems.length+" 筆預算記錄";
     applyFilter();
   }catch(e){
     document.getElementById("grid").innerHTML='<div class="empty">⚠️ 載入失敗：'+e.message+'</div>';
@@ -190,29 +206,36 @@ function renderCards(){
   let html="";
   for(const pn of projs){
     const items=grouped[pn];
-    let income=0,expense=0,used=0;
+    let income=0,expense=0;
     for(const f of items){
       const amt=parseFloat(fv(f,"預算金額"))||0;
-      const u=parseFloat(fv(f,"已使用金額"))||0;
       if(fv(f,"預算性質")==="收入")income+=amt;else expense+=amt;
-      used+=u;
     }
-    const rate=expense>0?Math.min(100,Math.round(used/expense*100)):0;
-    const remaining=expense-used;
+    const actualExp=(_expMap[pn]?.total)||0;
+    const expRate=expense>0?Math.min(150,Math.round(actualExp/expense*100)):0;
+    const overBudget=actualExp>expense&&expense>0;
     const mpct=_margin(income,expense);
     const mc=mpct!==null?_marginColor(mpct):'#94a3b8';
     const batches=[...new Set(items.map(f=>fv(f,"批次")).filter(Boolean))].join(" / ")||"";
-    html+=`<div class="proj-card" onclick="openDetail('${esc(pn)}')">
+    const barColor=expRate>100?"#ef4444":expRate>80?"#f59e0b":"#10b981";
+    html+=`<div class="proj-card" onclick="openDetail('${esc(pn)}')" style="${overBudget?'border-top-color:#ef4444':''}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div class="proj-name" style="margin:0">${esc(pn)}</div>
-        ${mpct!==null?`<div style="background:${mc}18;color:${mc};border-radius:8px;padding:4px 10px;font-size:13px;font-weight:700">${mpct}%<div style="font-size:9px;text-align:center;opacity:.8">毛利率</div></div>`:''}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${overBudget?'<span style="font-size:11px;background:#fee2e2;color:#ef4444;border-radius:5px;padding:2px 6px;font-weight:700">超支</span>':''}
+          ${mpct!==null?`<div style="background:${mc}18;color:${mc};border-radius:8px;padding:4px 10px;font-size:13px;font-weight:700;text-align:center">${mpct}%<div style="font-size:9px;opacity:.8">毛利</div></div>`:''}</div></div>
       ${batches?`<div style="font-size:11px;color:#8b5cf6;margin-bottom:8px">批次：${esc(batches)}</div>`:''}
       <div class="budget-row"><span class="budget-label">收入預算</span><span class="budget-val budget-income">${fmt(income)}</span></div>
       <div class="budget-row"><span class="budget-label">支出預算</span><span class="budget-val budget-expense">${fmt(expense)}</span></div>
-      <div class="budget-row"><span class="budget-label">淨利潤</span><span class="budget-val" style="color:${income-expense>=0?'#10b981':'#ef4444'}">${fmt(income-expense)}</span></div>
-      <div class="budget-bar"><div class="budget-fill" style="width:${rate}%;background:${rate>90?"#ef4444":rate>70?"#f59e0b":"#8b5cf6"}"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8">
-        <span>執行率 ${rate}%</span><span>${items.length} 筆記錄</span>
+      <div class="budget-row"><span class="budget-label">實際支出</span><span class="budget-val" style="color:${overBudget?'#ef4444':'#0f172a'};font-weight:700">${fmt(actualExp)} ${overBudget?'⚠️':''}</span></div>
+      <div style="margin:8px 0 2px">
+        <div style="background:#f1f5f9;border-radius:6px;height:8px;overflow:hidden">
+          <div style="width:${Math.min(100,expRate)}%;height:100%;border-radius:6px;background:${barColor};transition:width .4s"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px">
+        <span style="color:${barColor};font-weight:600">已執行 ${expRate}%</span>
+        <span style="color:#94a3b8">${items.length} 筆預算</span>
       </div>
     </div>`;
   }
@@ -226,23 +249,33 @@ function openDetail(pn){
   const locs=[...new Set(items.map(f=>fv(f,"所在地")).filter(Boolean))].join("、");
   const batches=[...new Set(items.map(f=>fv(f,"批次")).filter(Boolean))].join(" / ");
   document.getElementById("d-sub").textContent=(yrs?yrs+"年　":"")+locs+(batches?" ｜ 批次："+batches:"");
-  let income=0,expense=0,used=0,remaining=0;
+  let income=0,expense=0;
   for(const f of items){
     const amt=parseFloat(fv(f,"預算金額"))||0;
-    const u=parseFloat(fv(f,"已使用金額"))||0;
     if(fv(f,"預算性質")==="收入")income+=amt;else expense+=amt;
-    used+=u;remaining+=(parseFloat(fv(f,"剩餘預算"))||0);
   }
-  const rate=expense>0?Math.min(100,Math.round(used/expense*100)):0;
+  const actualExp=(_expMap[pn]?.total)||0;
+  const expRate=expense>0?Math.min(150,Math.round(actualExp/expense*100)):0;
+  const overBudget=actualExp>expense&&expense>0;
   const mpct=_margin(income,expense);
   const mc=mpct!==null?_marginColor(mpct):'#94a3b8';
+  const barColor=expRate>100?"#ef4444":expRate>80?"#f59e0b":"#10b981";
   document.getElementById("d-summary").innerHTML=`
     <div class="sum-item"><div class="sum-num" style="color:#10b981">${income.toLocaleString()}</div><div class="sum-lbl">收入預算</div></div>
     <div class="sum-item"><div class="sum-num" style="color:#f97316">${expense.toLocaleString()}</div><div class="sum-lbl">支出預算</div></div>
+    <div class="sum-item"><div class="sum-num" style="color:${overBudget?'#ef4444':'#0f172a'}">${actualExp.toLocaleString()}${overBudget?' ⚠️':''}</div><div class="sum-lbl">實際支出</div></div>
     <div class="sum-item"><div class="sum-num" style="color:${mpct!==null?mc:'#94a3b8'}">${mpct!==null?mpct+'%':'—'}</div><div class="sum-lbl">毛利率</div></div>
     <div class="sum-item"><div class="sum-num" style="color:${income-expense>=0?'#10b981':'#ef4444'}">${(income-expense).toLocaleString()}</div><div class="sum-lbl">淨利潤</div></div>
-    <div class="sum-item"><div class="sum-num">${rate}%</div><div class="sum-lbl">執行率</div></div>
-    <div class="sum-item"><div class="sum-num" style="color:#6366f1">${items.length}</div><div class="sum-lbl">預算項目數</div></div>`;
+    <div class="sum-item"><div class="sum-num" style="color:${barColor};font-weight:700">${expRate}%</div><div class="sum-lbl">執行率（實際）</div></div>`;
+  const expItems=_expMap[pn]?.items||[];
+  const expByCategory={};
+  expItems.forEach(e=>{expByCategory[e.cat||"其他"]=(expByCategory[e.cat||"其他"]||0)+e.amt;});
+  const expBreakdown=Object.entries(expByCategory).sort((a,b)=>b[1]-a[1]);
+  if(expBreakdown.length){
+    const breakHtml='<div style="margin:14px 0 8px;font-size:12px;font-weight:600;color:#64748b">實際費用明細（按類別）</div>'+
+      expBreakdown.map(([cat,amt])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:#475569">${esc(cat)}</span><span style="font-weight:600">${amt.toLocaleString()}</span></div>`).join("");
+    document.getElementById("d-summary").insertAdjacentHTML("afterend",breakHtml);
+  }
   const tbody=document.getElementById("d-table");
   const INC_C="#10b981";const EXP_C="#f97316";
   tbody.innerHTML=items.map(f=>{
