@@ -124,6 +124,7 @@ const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG", "follow_up": "tblyO9Cz2nUx6q46", "roles": "tblEj5GSDYUrKGY9", "product_pipeline": "tblfX6fsMshb7KL0"};
 const _EDIT_SCHEMA={{}};
+const _EDIT_ROLES_CFG=[];
 let allRecords=[];
 let _filteredRecs=[];
 let _curRid="";
@@ -211,7 +212,13 @@ function setView(v){
 async function openDetail(rid){
   _curRid=rid;
   const hasEdit=Object.keys(_EDIT_SCHEMA).length>0;
-  document.getElementById("btn-edit-record").style.display=hasEdit?"flex":"none";
+  let _canEdit=hasEdit;
+  if(hasEdit&&_EDIT_ROLES_CFG.length>0){
+    const _se=JSON.parse(localStorage.getItem("wujie_session")||"null");
+    const _isSuper=_se&&(_se.role==="超級管理員"||_se.role==="總部管理中心"||["Ray","Shawn","安然"].includes(_se.name));
+    _canEdit=_isSuper||_EDIT_ROLES_CFG.includes("all")||_EDIT_ROLES_CFG.includes(_se?.role||"");
+  }
+  document.getElementById("btn-edit-record").style.display=_canEdit?"flex":"none";
   const rec=allRecords.find(r=>r.record_id===rid);
   if(!rec)return;
   const f=rec.fields||{};

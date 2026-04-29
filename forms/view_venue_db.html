@@ -121,7 +121,8 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG", "follow_up": "tblyO9Cz2nUx6q46", "roles": "tblEj5GSDYUrKGY9", "product_pipeline": "tblfX6fsMshb7KL0"};
-const _EDIT_SCHEMA={{}};
+const _EDIT_SCHEMA={"\u5546\u5834\u540d\u7a31": {"type": "text"}, "\u57ce\u5e02": {"type": "select", "options": ["\u53f0\u5317", "\u5317\u4eac", "\u66fc\u8c37", "\u4e0a\u6d77", "\u5ee3\u5dde", "\u9999\u6e2f", "\u5409\u9686\u5761", "\u5176\u4ed6"]}, "\u5546\u5708": {"type": "text"}, "\u5177\u9ad4\u6a13\u5c64/\u4f4d\u7f6e": {"type": "text"}, "\u9762\u7a4d\u33a1": {"type": "number"}, "\u5ba2\u6d41\u7b49\u7d1a": {"type": "select", "options": ["\u6975\u9ad8", "\u9ad8", "\u4e2d", "\u4f4e"]}, "\u79df\u91d1\u6a21\u5f0f": {"type": "text"}, "\u5408\u4f5c\u689d\u4ef6": {"type": "text"}, "\u806f\u7e6b\u4eba": {"type": "text"}, "\u806f\u7e6b\u65b9\u5f0f": {"type": "text"}, "\u5408\u4f5c\u8a55\u5206": {"type": "select", "options": ["\u2b50", "\u2b50\u2b50", "\u2b50\u2b50\u2b50", "\u2b50\u2b50\u2b50\u2b50", "\u2b50\u2b50\u2b50\u2b50\u2b50"]}, "\u5099\u8a3b": {"type": "textarea"}};
+const _EDIT_ROLES_CFG=["\u7ba1\u7406\u5c64"];
 let allRecords=[];
 let _filteredRecs=[];
 let _curRid="";
@@ -209,7 +210,13 @@ function setView(v){
 async function openDetail(rid){
   _curRid=rid;
   const hasEdit=Object.keys(_EDIT_SCHEMA).length>0;
-  document.getElementById("btn-edit-record").style.display=hasEdit?"flex":"none";
+  let _canEdit=hasEdit;
+  if(hasEdit&&_EDIT_ROLES_CFG.length>0){
+    const _se=JSON.parse(localStorage.getItem("wujie_session")||"null");
+    const _isSuper=_se&&(_se.role==="超級管理員"||_se.role==="總部管理中心"||["Ray","Shawn","安然"].includes(_se.name));
+    _canEdit=_isSuper||_EDIT_ROLES_CFG.includes("all")||_EDIT_ROLES_CFG.includes(_se?.role||"");
+  }
+  document.getElementById("btn-edit-record").style.display=_canEdit?"flex":"none";
   const rec=allRecords.find(r=>r.record_id===rid);
   if(!rec)return;
   const f=rec.fields||{};
