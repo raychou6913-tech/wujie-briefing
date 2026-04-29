@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年04月29日 IP 趨勢情報日報 - 社群媒體病毒式 IP 傳播</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-neon: #00e6e6; /* Cyan neon */
+            --accent-neon-hover: #00ffff; /* Brighter cyan */
+            --danger-red: #ff4444;
+            --warning-yellow: #ffbb33;
+            --observe-white: #cccccc;
+            --border-radius: 8px;
+            --spacing-medium: 1.5rem;
+            --spacing-large: 2.5rem;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-medium);
+            flex-grow: 1;
+        }
+
+        header {
+            width: 100%;
+            background-color: var(--card-bg-color);
+            padding: var(--spacing-large) 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid var(--accent-neon);
+        }
+
+        header .hero-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        header .hero-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.15; /* Subtle background */
+            filter: grayscale(80%) brightness(50%);
+            transform: scale(1.05); /* Slight zoom for subtle movement */
+        }
+
+        header h1 {
+            font-family: 'Aldrich', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: var(--accent-neon);
+            text-shadow: 0 0 15px var(--accent-neon), 0 0 30px rgba(0, 230, 230, 0.5);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            padding: 0 1rem;
+        }
+
+        header h2 {
+            font-family: 'Aldrich', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--text-color);
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+            opacity: 0.8;
+            padding: 0 1rem;
+        }
+
+        h3 {
+            font-family: 'Aldrich', sans-serif;
+            color: var(--accent-neon);
+            font-size: 1.8rem;
+            margin-top: var(--spacing-large);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 230, 230, 0.3);
+            text-shadow: 0 0 5px rgba(0, 230, 230, 0.3);
+        }
+
+        h4 {
+            font-family: 'Aldrich', sans-serif;
+            color: var(--text-color);
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        section {
+            margin-bottom: var(--spacing-large);
+        }
+
+        .ip-card, .top3-item {
+            background-color: var(--card-bg-color);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-medium);
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .ip-card:hover, .top3-item:hover {
+            border-color: var(--accent-neon-hover);
+            box-shadow: 0 0 20px rgba(0, 230, 230, 0.5), 0 0 40px rgba(0, 230, 230, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .card-header, .top3-header {
+            padding: var(--spacing-medium);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 230, 230, 0.05);
+            border-bottom: 1px solid rgba(0, 230, 230, 0.1);
+        }
+
+        .card-header h4, .top3-header h4 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.25rem;
+            flex-grow: 1;
+        }
+
+        .card-header .summary {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-left: 1rem;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .expand-toggle {
+            font-size: 1.5rem;
+            color: var(--accent-neon);
+            margin-left: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .ip-card.expanded .expand-toggle, .top3-item.expanded .expand-toggle {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.3s ease-out;
+            padding: 0 var(--spacing-medium); /* Padding for expanded content */
+        }
+
+        .ip-card.expanded .card-content, .top3-item.expanded .card-content {
+            max-height: 1500px; /* A sufficiently large value */
+            padding: var(--spacing-medium);
+            padding-top: 0;
+        }
+        
+        .card-content p {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        .card-content ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-content ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        .card-content ul li::before {
+            content: '•';
+            color: var(--accent-neon);
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+        .heat-level {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .heat-level.red { background-color: var(--danger-red); }
+        .heat-level.yellow { background-color: var(--warning-yellow); }
+        .heat-level.white { background-color: var(--observe-white); }
+
+        .heat-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .action-tags {
+            background-color: rgba(0, 230, 230, 0.08);
+            padding: 0.8rem var(--spacing-medium);
+            border-top: 1px solid rgba(0, 230, 230, 0.15);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .action-tags span {
+            background-color: rgba(0, 230, 230, 0.15);
+            color: var(--accent-neon);
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .top3-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .top3-item {
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .top3-header {
+            background-color: rgba(0, 230, 230, 0.08);
+            padding: 1rem var(--spacing-medium);
+        }
+
+        .top3-header h4 {
+            font-size: 1.15rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        .top3-score {
+            font-family: 'Aldrich', sans-serif;
+            color: var(--accent-neon);
+            font-size: 1.3rem;
+            margin-left: 0.8rem;
+        }
+
+        .top3-item .card-content {
+            padding: 0 var(--spacing-medium);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.3s ease-out;
+        }
+        
+        .top3-item.expanded .card-content {
+            max-height: 500px; /* Adjust as needed */
+            padding: var(--spacing-medium);
+            padding-top: 0;
+        }
+
+        .top3-item .card-content p {
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        footer {
+            margin-top: var(--spacing-large);
+            padding: var(--spacing-medium);
+            text-align: center;
+            color: rgba(224, 224, 224, 0.6);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(0, 230, 230, 0.1);
+            background-color: var(--card-bg-color);
+        }
+
+        /* Image styling */
+        .ip-card img, .top3-item img, .card-content img {
+            width: 100%;
+            border-radius: var(--border-radius);
+            margin: 8px 0;
+            height: auto;
+            display: block; /* Ensure no extra space below images */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .card-header, .top3-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .card-header h4, .top3-header h4 {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+                width: 100%;
+            }
+            .card-header .summary {
+                margin-left: 0;
+                font-size: 0.9rem;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            .heat-indicator {
+                margin-bottom: 0.5rem;
+            }
+            .expand-toggle {
+                align-self: flex-end;
+                margin-top: -1.5rem; /* Adjust to float up */
+                margin-right: 0;
+            }
+            .top3-score {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+            .action-tags {
+                padding: 0.8rem 1rem;
+                justify-content: center;
+            }
+            .action-tags span {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="hero-image-container">
+            <img src="https://image.pollinations.ai/prompt/Asia%20toy%20retail%20store%20blind%20box%20display%20colorful%20shopping%20mall?width=600&height=350&nologo=true&seed=501" alt="Asia Retail">
+        </div>
+        <h1>2026年04月29日 IP 趨勢情報日報</h1>
+        <h2>本日重點主題：社群媒體病毒式 IP 傳播：新興爆款信號</h2>
+    </header>
+
+    <div class="container">
+        <section>
+            <h3>🔴 一級信號（立即需要關注）</h3>
+
+            <div class="ip-card">
+                <div class="card-header">
+                    <span class="heat-level red"></span>
+                    <h4>Chiikawa 社群聲量持續爆發，線下活動引導轉換效率高</h4>
+                    <span class="summary">來自日本的療癒系IP「吉伊卡哇」（Chiikawa）在中國大陸及香港的社群媒體熱度持續高漲，其線下展覽和快閃店引發排隊熱潮，商品仍供不應求。</span>
+                    <span class="expand-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Chiikawa_volume_1_cover.jpg/400px-Chiikawa_volume_1_cover.jpg" alt="Chiikawa">
+                    <img src="https://image.pollinations.ai/prompt/TikTok%20Instagram%20social%20media%20viral%20toy%20unboxing%20Gen%20Z%20smartphone%20trending?width=600&height=350&nologo=true&seed=701" alt="Social Media">
+                    <p><strong>信號描述：</strong> 來自日本的療癒系IP「吉伊卡哇」（Chiikawa）在中國大陸及香港的社群媒體熱度持續高漲，其線下展覽和快閃店引發排隊熱潮，即便熱門產品限購且需高消費額才能獲得限量贈品，商品仍供不應求。例如，2026年1月在深圳舉辦的「吉伊卡哇展」吸引了絡繹不絕的人潮，店員需頻繁補貨，全場消費滿288元人民幣可獲得2026年限量掛曆。香港上環街頭出現的Chiikawa「發光揮春」也在社群平台Threads上瘋傳，引發大批市民駐足觀賞及拍照。微博超話#Chiikawa#閱讀量已達5.8億，小紅書相關話題瀏覽量更高達14億次（截至2024年6月，顯示其持續性熱度）。這些現象共同證明Chiikawa憑藉其「可愛」形象與「情緒慰藉」價值，能夠在年輕世代中激發強勁的消費動能。最新的2026年4月角色人氣投票顯示，雖然Chiikawa本身跌出前三，但其他角色如海獺和風獅爺仍高居前列，反映粉絲對其角色群的黏著度極高。</p>
+                    <p><strong>對蕪解的影響：</strong> Chiikawa是蕪解創意在中國大陸的重要授權IP。其社群傳播力與線下消費轉化效率為蕪解的盲盒公仔、掛件等主力商品在中國大陸市場帶來巨大的銷售潛力。這也驗證了IP的「情緒價值」是驅動年輕世代消費的核心力量。</p>
+                    <div class="action-tags">
+                        <span>立即與Chiikawa品牌方溝通，爭取更多中國大陸市場的獨家/限定商品授權，尤其針對熱門角色如海獺、風獅爺，並開發更多具備「情緒價值」和「收藏性」的盲盒產品線。(截止日：2026年05月15日)</span>
+                        <span>規劃在小紅書、抖音等社群平台，針對Chiikawa進行「開箱挑戰」、「情境故事」等UGC活動，並鼓勵粉絲分享與Chiikawa周邊商品的情緒共鳴時刻，利用熱門話題標籤引導流量及銷售。(截止日：2026年05月31日)</span>
+                        <span>考慮與中國大陸主要城市的知名商場合作，舉辦期間限定的Chiikawa快閃店或主題展覽，結合蕪解的周邊商品進行銷售，重現深圳展覽的成功模式。(截止日：2026年06月30日，首個城市合作方案確立)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ip-card">
+                <div class="card-header">
+                    <span class="heat-level red"></span>
+                    <h4>Labubu 「新疆棉」風波與過度商業化警訊，IP 長期價值面臨挑戰</h4>
+                    <span class="summary">Pop Mart旗下熱門IP Labubu近期面臨潛在的供應鏈風險，可能因「新疆棉」問題面臨美國銷售禁令。同時，市場觀察指出其存在過度商業化跡象。</span>
+                    <span class="expand-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Pop_Mart_Labubu_The_Monsters_Exciting_Macaron.jpg/400px-Pop_Mart_Labubu_The_Monsters_Exciting_Macaron.jpg" alt="Labubu">
+                    <img src="https://image.pollinations.ai/prompt/TikTok%20Instagram%20social%20media%20viral%20toy%20unboxing%20Gen%20Z%20smartphone%20trending?width=600&height=350&nologo=true&seed=701" alt="Social Media">
+                    <p><strong>信號描述：</strong> Pop Mart旗下熱門IP Labubu近期面臨潛在的供應鏈風險。2026年4月27日，Labubu因被查出產品含有「新疆棉」，可能面臨美國的銷售禁令，若無法證明無「奴工」生產將被禁止銷售。同時，市場觀察指出Labubu存在過度商業化跡象，其「潮流溢價」因地毯式的產能釋放而降低。例如，知名潮流指標如BLACKPINK成員Lisa在2025年下半年已徹底完成「去Labubu化」，轉而關注Jellycat或定制化的Sonny Angel等更強調「情緒價值」與「獨特性」的IP。儘管Pop Mart在2025年Q1的海外銷售額同比增長高達475%-480%（其中歐洲市場增長600%-605%），顯示其商業化能力，但這種增長主要來自既有策略，且IP集中度高也是其風險之一。Pop Mart也正積極拓展「IP體驗」的空間業務，例如擴建北京「POP LAND」主題樂園預計於2026年夏季推出新主題區。</p>
+                    <p><strong>對蕪解的影響：</strong> Labubu作為盲盒市場的標竿IP，其面臨的供應鏈風險和過度商業化挑戰，對整個潮玩盲盒產業鏈具有警示作用。蕪解創意需警惕IP過度開發、潛在的供應鏈政治風險以及消費者品味快速轉變的趨勢。這也同時預示著市場可能出現新的機會，即消費者對追求獨特性和情緒價值的IP產品需求將增加。</p>
+                    <div class="action-tags">
+                        <span>立即對現有IP周邊商品的供應鏈進行風險評估，確保所有原材料來源符合國際貿易規範，並建立供應商審核機制，以規避類似「新疆棉」的政治/貿易風險。(截止日：2026年05月10日)</span>
+                        <span>內部研討IP產品開發策略，避免單一IP過度商業化導致的價值稀釋。研究如何提升蕪解盲盒公仔及掛件的「獨特性」與「情緒價值」，例如推出聯名設計師款、稀有材質版本或提供更多客製化元素。(截止日：2026年05月31日，完成策略初稿)</span>
+                        <span>加強社群媒體的輿情監測，特別關注潮玩意見領袖(KOL)和核心收藏家社群對新興IP、產品獨特性和品牌故事的討論，及時調整市場策略。(截止日：長期監測機制常態化)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h3>🟡 二級信號（本週需追蹤）</h3>
+
+            <div class="ip-card">
+                <div class="card-header">
+                    <span class="heat-level yellow"></span>
+                    <h4>小紅書「情緒價值」營銷IP化，引導品牌與用戶深度共鳴</h4>
+                    <span class="summary">小紅書在2026年將重點聚焦於「情緒價值」與「興趣圈層營銷」，透過深入洞察用戶「日常小情緒」，搭建品牌與用戶自然溝通的「相對中心場」。</span>
+                    <span class="expand-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <img src="https://image.pollinations.ai/prompt/TikTok%20Instagram%20social%20media%20viral%20toy%20unboxing%20Gen%20Z%20smartphone%20trending?width=600&height=350&nologo=true&seed=701" alt="Social Media">
+                    <p><strong>信號描述：</strong> 小紅書已從「生活指南」升級為「生活興趣社區」，並在2026年將重點聚焦於「情緒價值」與「興趣圈層營銷」。其《2026小紅書營銷IP通案》強調透過深入洞察用戶「日常小情緒」，搭建品牌與用戶自然溝通的「相對中心場」，實現從「被動曝光」到「主動共鳴」，最終達成「聲量+生意」雙增長。平台已打通「種草-轉化」鏈路，用戶可直接通過筆記預約到店或領取優惠券。此外，AI工具將在內容創作和策略制定中扮演更重要的角色，預計可輔助60%的選題和文案工作。</p>
+                    <div class="action-tags">
+                        <span>深入研究小紅書2026年最新營銷IP通案，識別其中與蕪解創意IP產品契合的「情緒價值」點，並制定專屬的內容營銷策略。(截止日：2026年05月20日)</span>
+                        <span>安排社群團隊與小紅書官方對接，了解其AI工具在內容創作和策略制定上的應用，探討如何利用平台資源提升內容生產效率和精準度。(截止日：2026年05月25日)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ip-card">
+                <div class="card-header">
+                    <span class="heat-level yellow"></span>
+                    <h4>亞洲區大型玩具與IP展會熱度不減，跨界合作機會湧現</h4>
+                    <span class="summary">2026年初的多個亞洲區大型展會，證明實體展覽仍是IP推廣和商業洽談的重要平台，潮玩館及高端IP盛事吸引大量買家和公眾。</span>
+                    <span class="expand-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <img src="https://image.pollinations.ai/prompt/toy%20fair%20exhibition%20collectible%20figures%20display%20art%20fair%20booth%20professional?width=600&height=350&nologo=true&seed=503" alt="Toy Fair">
+                    <p><strong>信號描述：</strong> 2026年初的多個亞洲區大型展會，證明實體展覽仍是IP推廣和商業洽談的重要平台。例如，2026年1月香港玩具展首次設立的「潮玩館」吸引了來自121個國家和地區的82,000名買家及10,000名公眾，成功促成約50個跨行業合作聯繫。Medialink於2026年4月4-5日在香港舉辦了「CON-CON HONG KONG 2026」大型IP盛事，匯集了Gundam、Godzilla、Jujutsu Kaisen等知名IP，並結合音樂、時尚藝術等領域，門票價格高達HK$2,288，顯示高端IP活動的市場潛力。此外，4月9-11日在深圳舉辦的國際玩具及潮玩展，中國玩具公司52TOYS也攜100多個IP亮相，並強調IP孵化、產品創意和情緒價值的重要性。</p>
+                    <div class="action-tags">
+                        <span>委派市場部團隊，立即收集2026年下半年及2027年亞洲區（尤其中國大陸、香港、台灣、新加坡）所有重要的玩具、潮玩及IP授權展會資訊，識別潛在的參展或參觀機會。(截止日：2026年05月20日)</span>
+                        <span>針對蕪解創意現有和潛在合作IP，分析在上述展會中進行跨界合作的可能性，例如與時尚品牌、音樂節或藝術展覽等進行聯名推廣。(截止日：2026年06月15日，提交合作潛力報告)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ip-card">
+                <div class="card-header">
+                    <span class="heat-level yellow"></span>
+                    <h4>Mofusand 貓福珊迪跨界聯名發力，日系療癒IP市場潛力大</h4>
+                    <span class="summary">Mofusand貓福珊迪近期在台灣市場與餐飲品牌「爭鮮」等壽司店合作，推出獨家聯名扭蛋和新品，成功吸引了大量消費者並帶動人潮上揚。</span>
+                    <span class="expand-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <img src="https://spiralcute.com/characters/mofusand/en/img/main.jpg" alt="Mofusand">
+                    <p><strong>信號描述：</strong> Mofusand貓福珊迪近期在台灣市場展現了強勁的跨界聯名能力。其與餐飲品牌「爭鮮」等壽司店合作，推出獨家聯名扭蛋和新品，成功吸引了大量消費者，並帶動人潮上揚10%以上。這表明療癒系IP透過精準的異業合作，能有效利用稀缺性周邊商品刺激消費者的購買慾望，進而在不同市場激發強勁的消費動力。這種策略不僅提升了Mofusand的品牌曝光度，也為其周邊商品開闢了新的銷售渠道，驗證了情緒價值IP在餐飲零售等領域的巨大潛力。</p>
+                    <div class="action-tags">
+                        <span>調研台灣市場前5名連鎖餐飲品牌（如速食、咖啡、日料等），評估與蕪解創意旗下療癒系IP進行跨界聯名推出限定周邊或餐點的合作潛力。(截止日：2026年05月25日)</span>
+                        <span>針對Mofusand與爭鮮的成功案例，分析其商品設計、行銷手法及社群互動策略，歸納出可複製到蕪解創意IP聯名合作中的成功要素。(截止日：2026年05月31日)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h3>⚪ 待觀察信號</h3>
+
+            <div class="ip-card">
+                <div class="card-header">
+                    <span class="heat-level white"></span>
+                    <h4>Snoopy/Peanuts 在歐洲及澳紐市場的社群互動潛力</h4>
+                    <span class="summary">Snoopy/Peanuts作為全球經典IP，在蕪解創意授權的歐洲及澳紐市場仍有巨大的潛力，需持續關注其社群媒體互動趨勢。</span>
+                    <span class="expand-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png" alt="Snoopy">
+                    <img src="https://image.pollinations.ai/prompt/viral%20collectible%20toy%20trending%20social%20media%20blind%20box%20young%20consumer?width=600&height=350&nologo=true&seed=702" alt="Trending Ip">
+                    <p><strong>信號描述：</strong> Snoopy/Peanuts作為全球經典IP，在蕪解創意授權的歐洲及澳紐市場仍有巨大的潛力。雖然目前尚未觀察到2026年具體的病毒式社群傳播案例，但鑑於其深厚的品牌歷史、跨世代的情感連結以及藝術性和文化代表性，應持續關注這些地區的社群媒體互動趨勢。例如，是否會出現新的「懷舊主題」活動、與當地藝術家或時尚品牌的「聯名合作」，或是透過新媒體形式（如短影音挑戰）再次引爆社群話題，進而帶動周邊商品的消費熱潮。</p>
+                    <div class="action-tags">
+                        <span>指定專人持續監測歐洲及澳紐市場Snoopy/Peanuts相關的社群媒體話題、KOL動態及潛在的病毒式傳播案例，每月提交一份觀察報告。(截止日：長期監測機制常態化，每月最後一個工作日提交報告)</span>
+                        <span>研究歐洲及澳紐地區具有影響力的藝術家、設計師或時尚品牌，探討與Snoopy/Peanuts進行聯名合作的可能性，以創造新的話題和產品。(截止日：2026年07月31日，提交初步合作夥伴清單)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h3>本週 TOP 3 IP 熱度排行</h3>
+            <ol class="top3-list">
+                <li class="top3-item">
+                    <div class="top3-header">
+                        <h4>1. Chiikawa / 吉伊卡哇</h4>
+                        <span class="top3-score">(熱度分數：9)</span>
+                        <span class="expand-toggle">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>評分依據：</strong> 在中國大陸及香港地區線下活動持續火爆，社群話題討論度極高，尤其在年輕族群中「情緒價值」消費趨勢明顯。儘管角色個體人氣略有波動，但IP整體聲量與吸金力強勁，帶動周邊產品的高效銷售。</p>
+                    </div>
+                </li>
+                <li class="top3-item">
+                    <div class="top3-header">
+                        <h4>2. Labubu / PopMart (The Monsters系列)</h4>
+                        <span class="top3-score">(熱度分數：7.5)</span>
+                        <span class="expand-toggle">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>評分依據：</strong> Pop Mart Q1海外銷售表現亮眼，並積極推出高端跨界產品（如限量版冰箱），顯示其強大的商業化能力和市場擴張野心。然而，近期面臨「新疆棉」供應鏈風險和市場對過度商業化的反思，部分潮流意見領袖已開始轉向其他IP，為其長期發展帶來不確定性。</p>
+                    </div>
+                </li>
+                <li class="top3-item">
+                    <div class="top3-header">
+                        <h4>3. Mofusand / 貓福珊迪</h4>
+                        <span class="top3-score">(熱度分數：6)</span>
+                        <span class="expand-toggle">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>評分依據：</strong> 透過與台灣餐飲業的成功跨界聯名，推出限定扭蛋與新品，證明其在亞洲市場的商業吸引力與粉絲基礎。療癒系IP的策略性合作能有效提升品牌曝光和產品銷量，顯示其穩定的市場潛力。</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h3>幕僚長研判</h3>
+            <div class="ip-card" style="padding: var(--spacing-medium); border: none; box-shadow: none;">
+                <p>2026年IP市場核心競爭力已從單純流量轉向「情緒價值」與「社群共鳴」，尤其在年輕消費群體中，盲盒作為「精神慰藉」與「社交貨幣」的屬性將更加凸顯。蕪解創意應重點加強自有及授權IP的內容故事性與互動體驗，並警惕過度商業化和供應鏈風險，以確保IP的長期生命力。</p>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 蕪解創意 IP 趨勢情報部. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleCards = document.querySelectorAll('.ip-card .card-header');
+            const toggleTop3Items = document.querySelectorAll('.top3-item .top3-header');
+
+            function setupToggle(elements) {
+                elements.forEach(header => {
+                    header.addEventListener('click', () => {
+                        const parent = header.closest('.ip-card') || header.closest('.top3-item');
+                        if (parent) {
+                            parent.classList.toggle('expanded');
+                            const toggleIcon = header.querySelector('.expand-toggle');
+                            if (toggleIcon) {
+                                toggleIcon.textContent = parent.classList.contains('expanded') ? '▲' : '▼';
+                            }
+                        }
+                    });
+                });
+            }
+
+            setupToggle(toggleCards);
+            setupToggle(toggleTop3Items);
+        });
+    </script>
+</body>
+</html>
