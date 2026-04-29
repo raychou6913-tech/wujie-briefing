@@ -126,7 +126,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
 const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG", "follow_up": "tblyO9Cz2nUx6q46", "roles": "tblEj5GSDYUrKGY9", "product_pipeline": "tblfX6fsMshb7KL0"};
-const _EDIT_SCHEMA={"\u72c0\u614b": {"type": "select", "options": ["\u8a08\u5283\u4e2d", "\u9032\u884c\u4e2d", "\u5df2\u5ef6\u9072", "\u5df2\u5b8c\u6210", "\u5df2\u53d6\u6d88"]}, "\u622a\u6b62\u65e5\u671f": {"type": "text"}, "\u7248\u6b0a\u5c0d\u63a5\u4eba": {"type": "select", "options": ["Ray", "\u5b89\u7136", "Shawn", "Den", "Meaw", "\u8463\u4eae", "\u5fb7\u5bf6"]}, "IP\u54c1\u724c": {"type": "select", "options": ["Snoopy", "Mofusand", "Chiikawa", "Kuromi", "Labubu", "Fuggler", "LINE FRIENDS", "EVE\u9ede\u9ede", "\u5176\u4ed6"]}, "\u696d\u52d9\u985e\u578b": {"type": "select", "options": ["\u6279\u767c", "\u5feb\u9583\u5e97", "\u4ee3\u5de5", "\u8a2d\u8a08\u670d\u52d9", "\u6388\u6b0a", "\u5176\u4ed6"]}, "\u6240\u5728\u5730": {"type": "select", "options": ["\u53f0\u5317", "\u5317\u4eac", "\u66fc\u8c37", "\u8de8\u5730\u5340"]}, "\u5099\u8a3b": {"type": "textarea"}};
+const _EDIT_SCHEMA={"\u72c0\u614b": {"type": "select", "options": ["\u8a08\u5283\u4e2d", "\u9032\u884c\u4e2d", "\u5df2\u5ef6\u9072", "\u5df2\u5b8c\u6210", "\u5df2\u53d6\u6d88"]}, "\u622a\u6b62\u65e5\u671f": {"type": "text"}, "IP\u54c1\u724c": {"type": "select", "options": ["Snoopy", "Mofusand", "Chiikawa", "Kuromi", "Labubu", "Fuggler", "LINE FRIENDS", "EVE\u9ede\u9ede", "\u5176\u4ed6"]}, "\u696d\u52d9\u985e\u578b": {"type": "select", "options": ["\u6279\u767c", "\u5feb\u9583\u5e97", "\u4ee3\u5de5", "\u8a2d\u8a08\u670d\u52d9", "\u6388\u6b0a", "\u5176\u4ed6"]}, "\u6240\u5728\u5730": {"type": "select", "options": ["\u53f0\u5317", "\u5317\u4eac", "\u66fc\u8c37", "\u8de8\u5730\u5340"]}, "\u7248\u6b0a\u5c0d\u63a5\u4eba": {"type": "select", "options": ["Ray", "\u5b89\u7136", "Shawn", "Den", "Meaw", "\u8463\u4eae", "\u5fb7\u5bf6"]}, "\u5408\u7d04\u540d\u7a31": {"type": "text"}, "\u7248\u6b0a\u65b9": {"type": "text"}, "\u6388\u6b0a\u5730\u5340\u7bc4\u570d": {"type": "text"}, "\u4fdd\u5e95\u91d1\u984d": {"type": "number"}, "\u5e63\u5225": {"type": "select", "options": ["CNY", "TWD", "THB", "USD"]}, "\u7248\u6b0a\u91d1_\u6279\u767c%": {"type": "number"}, "\u7248\u6b0a\u91d1_\u96f6\u552e%": {"type": "number"}, "\u5099\u8a3b": {"type": "textarea"}};
 let allRecords=[];
 let _filteredRecs=[];
 let _curRid="";
@@ -288,8 +288,11 @@ async function openDetail(rid){
   }
 }
 function closeDetail(){
+  _curRid="";
   document.getElementById("detail-modal").style.display="none";
-  cancelEdit();
+  document.getElementById("detail-view-btns").style.display="flex";
+  document.getElementById("detail-edit-btns").style.display="none";
+  document.getElementById("detail-title").textContent="詳細資訊";
 }
 function openEdit(rid){
   const rec=allRecords.find(r=>r.record_id===rid);
