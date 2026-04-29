@@ -33,6 +33,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .no-proj-hint{margin:12px 20px;padding:12px 16px;background:#f8f7ff;border-radius:10px;border:1px dashed #c7d2fe;font-size:13px;color:#6366f1;display:flex;align-items:center;gap:8px}
 /* 管理員區隱藏 */
 .admin-zone{display:none}
+
+.role-bar{display:none;background:#1e293b;padding:10px 24px;gap:8px;align-items:center;flex-wrap:wrap}
+.role-bar.visible{display:flex}
+.role-bar-label{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.rbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.rbtn:hover{background:#ffffff20;color:#f1f5f9}
+.rbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.view-note{font-size:11px;color:#64748b;margin-left:auto;font-style:italic}
+
 </style>
 </head>
 <body>
@@ -45,6 +54,16 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <span style="font-size:13px;color:#64748b">你好，<span id="user-name" style="color:#6366f1;font-weight:700"></span></span>
     <button style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer;text-decoration:underline" onclick="doLogout()">登出</button>
   </div>
+</div>
+<div class="role-bar" id="role-bar">
+  <span class="role-bar-label">👁 視角預覽</span>
+  <button class="rbtn active" data-role="all" onclick="switchView('all')">全部</button>
+  <button class="rbtn" data-role="管理層" onclick="switchView('管理層')">管理層</button>
+  <button class="rbtn" data-role="設計" onclick="switchView('設計')">設計</button>
+  <button class="rbtn" data-role="採購" onclick="switchView('採購')">採購</button>
+  <button class="rbtn" data-role="業務" onclick="switchView('業務')">業務</button>
+  <button class="rbtn" data-role="財務" onclick="switchView('財務')">財務</button>
+  <span class="view-note" id="view-note"></span>
 </div>
 
 <!-- Step 1: 選擇項目 -->
@@ -160,14 +179,6 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <div style="font-size:12px;color:#64748b;margin-top:1px">遇到問題或建議？填這裡</div></div>
           </div>
         </a></div>
-
-<div id="preview-banner" style="display:none;background:#312e81;padding:7px 20px;font-size:12px;color:#a5b4fc;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-  <span>👁 超管預覽模式：<strong id="preview-role-label" style="color:#e0e7ff"></strong> 視角</span>
-  <div style="display:flex;gap:12px;align-items:center">
-    <a href="../home.html" style="color:#c7d2fe;font-size:11px;text-decoration:none">← 切換視角</a>
-    <button onclick="exitPreview()" style="background:none;border:1px solid #6366f1;color:#a5b4fc;font-size:11px;cursor:pointer;border-radius:5px;padding:2px 8px">退出預覽</button>
-  </div>
-</div>
 
 <!-- 管理員操作 -->
 <div id="admin-zone" class="admin-zone">
@@ -285,45 +296,34 @@ let _budgetCache={};  // projName -> count
     return;
   }
   document.getElementById("user-name").textContent=_sess.name+"（"+_sess.dept+"）";
-  // 管理員顯示
-  const isAdmin=_sess.role==="超級管理員"||_sess.name==="Shawn"||_sess.name==="安然"||_sess.name==="Ray";
-  const _previewRole=localStorage.getItem("wj_preview_role")||"all";
-  const _effectiveRole=isAdmin?_previewRole:(_sess.role||"all");
-  const _isPreviewingNonAdmin=isAdmin&&_previewRole!=="all"&&_previewRole!=="管理層";
-  if(isAdmin&&!_isPreviewingNonAdmin) document.getElementById("admin-zone").style.display="block";
-  // 按角色過濾填報卡片
-  if(_effectiveRole!=="all"){
-    document.querySelectorAll(".role-card").forEach(card=>{
-      const roles=(card.dataset.roles||"all").split(",").map(r=>r.trim());
-      if(!roles.includes("all")&&!roles.includes(_effectiveRole)) card.style.display="none";
-    });
-  }
   _loadProjects();
   _logVisit(_sess);
 })();
+
+function switchView(role){
+  document.querySelectorAll(".role-card").forEach(card=>{
+    const roles=(card.dataset.roles||"all").split(",").map(r=>r.trim());
+    card.style.display=(role==="all"||roles.includes("all")||roles.includes(role))?"":"none";
+  });
+  document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
+  const shown=[...document.querySelectorAll(".role-card")].filter(c=>c.style.display!=="none").length;
+  const noteEl=document.getElementById("view-note");
+  if(noteEl) noteEl.textContent=role==="all"?`顯示全部 ${shown} 項`:`${role}視角・顯示 ${shown} 項`;
+  const isAdminRole=(role==="all"||role==="管理層");
+  ["admin-zone","admin-card","member-activity-card","cmd-center-card"].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.style.display=isAdminRole?"":"none";
+  });
+  localStorage.setItem("wj_preview_role",role);
+}
 
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s) return;
   const isSuper=s.role==="超級管理員"||s.role==="總部管理中心"||["Ray","Shawn","安然"].includes(s.name);
-  if(!isSuper) return;
-  const role=localStorage.getItem("wj_preview_role")||"all";
-  if(role==="all") return;
-  const names={"管理層":"管理層","設計":"設計部","採購":"採購部","業務":"業務部","財務":"財務"};
-  const el=document.getElementById("preview-banner");
-  if(el){ el.style.display="flex"; document.getElementById("preview-role-label").textContent=names[role]||role; }
-  // 管理員功能區：非管理層視角時隱藏
-  const isAdminRole=(role==="管理層");
-  if(!isAdminRole){
-    ["admin-zone","admin-card","member-activity-card","cmd-center-card"].forEach(id=>{
-      const e=document.getElementById(id); if(e) e.style.display="none";
-    });
-  }
+  const rb=document.getElementById("role-bar");
+  if(isSuper&&rb){ rb.classList.add("visible"); switchView(localStorage.getItem("wj_preview_role")||"all"); }
+  else{ const m={"管理層":"管理層","設計":"設計","採購":"採購","業務":"業務","財務":"財務","總部管理中心":"管理層"}; const r=m[s.role]; if(r) switchView(r); }
 })();
-function exitPreview(){
-  localStorage.setItem("wj_preview_role","all");
-  location.reload();
-}
 
 
 async function _getToken(){

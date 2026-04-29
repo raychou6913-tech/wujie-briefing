@@ -35,11 +35,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 @keyframes iter-pulse{0%,100%{box-shadow:0 0 0 0 #10b98155}60%{box-shadow:0 0 0 6px #10b98100}}
 @keyframes fade-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:540px){.nav-grid{grid-template-columns:1fr}.nav-card{padding:20px 16px}}
-.home-role-bar{display:none;background:#1e293b;padding:8px 20px;gap:8px;align-items:center;flex-wrap:wrap}
-.home-role-bar.visible{display:flex}
-.hrbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
-.hrbtn:hover{background:#ffffff20;color:#f1f5f9}
-.hrbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+
+.role-bar{display:none;background:#1e293b;padding:10px 24px;gap:8px;align-items:center;flex-wrap:wrap}
+.role-bar.visible{display:flex}
+.role-bar-label{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.rbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.rbtn:hover{background:#ffffff20;color:#f1f5f9}
+.rbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.view-note{font-size:11px;color:#64748b;margin-left:auto;font-style:italic}
+
 .nav-card.hidden{display:none!important}
 </style>
 </head>
@@ -57,15 +61,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="hero-date" id="hero-date"></div>
   <div class="iter-badge" onclick="toggleIterReveal()" title="點擊看看">
     <span class="iter-dot"></span>
-    <span class="iter-num">2604.V.239.239.87.21</span>
+    <span class="iter-num">2604.V.240.240.87.22</span>
   </div>
   <div class="iter-reveal" id="iter-reveal">
     🤫 版本號不是手動維護的<br>
     <span style="color:#94a3b8">2604</span> = 系統建立於 2026年04月 &nbsp;·&nbsp; <span style="color:#94a3b8">V</span> = Version<br>
-    <b style="color:#f1f5f9">239</b> 年累計更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">239</b> 月更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">240</b> 年累計更新 &nbsp;·&nbsp;
+    <b style="color:#f1f5f9">240</b> 月更新 &nbsp;·&nbsp;
     <b style="color:#f1f5f9">87</b> 週更新 &nbsp;·&nbsp;
-    <b style="color:#f1f5f9">21</b> 今日更新<br>
+    <b style="color:#f1f5f9">22</b> 今日更新<br>
     <span style="color:#475569;font-size:11px;margin-top:4px;display:block">每次 deploy，Git 紀錄自動更新這組數字 🤖×👤</span>
   </div>
 </div>
@@ -81,15 +85,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div style="background:#6366f1;color:#fff;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;white-space:nowrap">進入 →</div>
   </div>
 </a>
-<div class="home-role-bar" id="home-role-bar">
-  <span style="font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap">👁 模擬視角</span>
-  <button class="hrbtn active" data-role="all" onclick="switchHomeView('all')">全部</button>
-  <button class="hrbtn" data-role="管理層" onclick="switchHomeView('管理層')">管理層</button>
-  <button class="hrbtn" data-role="設計" onclick="switchHomeView('設計')">設計</button>
-  <button class="hrbtn" data-role="採購" onclick="switchHomeView('採購')">採購</button>
-  <button class="hrbtn" data-role="業務" onclick="switchHomeView('業務')">業務</button>
-  <button class="hrbtn" data-role="財務" onclick="switchHomeView('財務')">財務</button>
-  <span id="home-view-note" style="font-size:11px;color:#64748b;margin-left:auto;font-style:italic"></span>
+<div class="role-bar" id="home-role-bar">
+  <span class="role-bar-label">👁 模擬視角</span>
+  <button class="rbtn active" data-role="all" onclick="switchHomeView('all')">全部</button>
+  <button class="rbtn" data-role="管理層" onclick="switchHomeView('管理層')">管理層</button>
+  <button class="rbtn" data-role="設計" onclick="switchHomeView('設計')">設計</button>
+  <button class="rbtn" data-role="採購" onclick="switchHomeView('採購')">採購</button>
+  <button class="rbtn" data-role="業務" onclick="switchHomeView('業務')">業務</button>
+  <button class="rbtn" data-role="財務" onclick="switchHomeView('財務')">財務</button>
+  <span class="view-note" id="home-view-note"></span>
 </div>
 <div class="nav-grid">
   <a href="forms/index.html" class="nav-card" data-roles="管理層,設計,採購,業務,財務" style="--c:#6366f1">
@@ -419,7 +423,7 @@ function switchHomeView(role){
     card.classList.toggle("hidden",!visible);
     if(visible)shown++;
   });
-  document.querySelectorAll(".hrbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
+  document.querySelectorAll("#home-role-bar .rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
   document.getElementById("home-view-note").textContent=role==="all"?`全部 ${shown} 項`:`${_HOME_ROLE_DESC[role]||role} · ${shown} 項`;
   localStorage.setItem("wj_preview_role",role);
 }

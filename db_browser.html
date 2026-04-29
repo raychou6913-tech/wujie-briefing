@@ -16,6 +16,15 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 .intro{padding:14px 24px;background:#fffbeb;border-bottom:1px solid #fde68a;font-size:13px;color:#92400e}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:24px}
 @media(max-width:480px){.grid{grid-template-columns:1fr}}
+
+.role-bar{display:none;background:#1e293b;padding:10px 24px;gap:8px;align-items:center;flex-wrap:wrap}
+.role-bar.visible{display:flex}
+.role-bar-label{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.rbtn{background:#ffffff10;color:#94a3b8;border:1px solid #334155;border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s}
+.rbtn:hover{background:#ffffff20;color:#f1f5f9}
+.rbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.view-note{font-size:11px;color:#64748b;margin-left:auto;font-style:italic}
+
 </style>
 </head>
 <body>
@@ -23,20 +32,23 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div class="hdr-left">
     <div class="hdr-icon">📚</div>
     <div><div class="hdr-title">資料庫瀏覽</div>
-    <div class="hdr-sub">查看與維護公司各類核心資料</div></div>
+    <div class="hdr-sub" id="hdr-sub">查看與維護公司各類核心資料</div></div>
   </div>
   <a href="home.html" class="btn-back">← 首頁</a>
 </div>
-<div id="preview-banner" style="display:none;background:#312e81;padding:7px 20px;font-size:12px;color:#a5b4fc;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-  <span>👁 超管預覽模式：<strong id="preview-role-label" style="color:#e0e7ff"></strong> 視角</span>
-  <div style="display:flex;gap:12px;align-items:center">
-    <a href="../home.html" style="color:#c7d2fe;font-size:11px;text-decoration:none">← 切換視角</a>
-    <button onclick="exitPreview()" style="background:none;border:1px solid #6366f1;color:#a5b4fc;font-size:11px;cursor:pointer;border-radius:5px;padding:2px 8px">退出預覽</button>
-  </div>
+<div class="role-bar" id="role-bar">
+  <span class="role-bar-label">👁 視角預覽</span>
+  <button class="rbtn active" data-role="all" onclick="switchView('all')">全部</button>
+  <button class="rbtn" data-role="管理層" onclick="switchView('管理層')">管理層</button>
+  <button class="rbtn" data-role="設計" onclick="switchView('設計')">設計</button>
+  <button class="rbtn" data-role="採購" onclick="switchView('採購')">採購</button>
+  <button class="rbtn" data-role="業務" onclick="switchView('業務')">業務</button>
+  <button class="rbtn" data-role="財務" onclick="switchView('財務')">財務</button>
+  <span class="view-note" id="view-note"></span>
 </div>
-<div class="intro">💡 點擊「查看」瀏覽現有資料（含搜尋/篩選）；點擊「新增」填報新資料</div>
+<div class="intro" id="intro-bar">💡 點擊「查看」瀏覽現有資料（含搜尋/篩選）；點擊「新增」填報新資料</div>
 <div class="grid">
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #a855f7">
+        <div class="role-card" data-roles="管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #a855f7">
           <div style="font-size:26px;margin-bottom:8px">📜</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">IP版權資料庫</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">授權地區/版權方/合約狀態</div>
@@ -46,7 +58,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/ip_db.html" style="flex:1;text-align:center;background:#a855f7;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #64748b">
+        <div class="role-card" data-roles="管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #64748b">
           <div style="font-size:26px;margin-bottom:8px">📄</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">合約管理</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">類型/狀態/到期日/金額</div>
@@ -56,7 +68,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/contract.html" style="flex:1;text-align:center;background:#64748b;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
+        <div class="role-card" data-roles="採購,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f97316">
           <div style="font-size:26px;margin-bottom:8px">🏭</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">採購供應商</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">品類/評分/MOQ/報價</div>
@@ -66,7 +78,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/supplier.html" style="flex:1;text-align:center;background:#f97316;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #10b981">
+        <div class="role-card" data-roles="業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #10b981">
           <div style="font-size:26px;margin-bottom:8px">🤝</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">客戶名單</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">類型/地區/品類偏好/狀態</div>
@@ -76,7 +88,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/customer.html" style="flex:1;text-align:center;background:#10b981;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
+        <div class="role-card" data-roles="業務,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #6366f1">
           <div style="font-size:26px;margin-bottom:8px">🌏</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">海外潛在客戶</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">預設篩選潛在客戶／地區分類</div>
@@ -86,7 +98,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/customer.html" style="flex:1;text-align:center;background:#6366f1;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #ec4899">
+        <div class="role-card" data-roles="設計,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #ec4899">
           <div style="font-size:26px;margin-bottom:8px">🎨</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">設計外包</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">專長/報價/作品集</div>
@@ -96,7 +108,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/design_vendor.html" style="flex:1;text-align:center;background:#ec4899;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #0ea5e9">
+        <div class="role-card" data-roles="採購,管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #0ea5e9">
           <div style="font-size:26px;margin-bottom:8px">🚢</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">物流/貨代/報關行</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">路線/類型/報價/評分</div>
@@ -106,7 +118,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/logistics.html" style="flex:1;text-align:center;background:#0ea5e9;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f59e0b">
+        <div class="role-card" data-roles="管理層" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #f59e0b">
           <div style="font-size:26px;margin-bottom:8px">📍</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">快閃店場地</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">城市/商圈/客流/合作條件</div>
@@ -116,7 +128,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <a href="forms/venue_db.html" style="flex:1;text-align:center;background:#f59e0b;color:#fff;border-radius:7px;padding:8px 0;font-size:12px;font-weight:600;text-decoration:none">＋ 新增</a>
           </div>
         </div>
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #0ea5e9">
+        <div class="role-card" data-roles="all" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 1px 4px #0000000a;border-top:3px solid #0ea5e9">
           <div style="font-size:26px;margin-bottom:8px">📋</div>
           <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px">會議記錄</div>
           <div style="font-size:12px;color:#64748b;margin-bottom:10px">決議事項/行動項目</div>
@@ -132,28 +144,30 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
 })();
 
+function switchView(role){
+  document.querySelectorAll(".role-card").forEach(card=>{
+    const roles=(card.dataset.roles||"all").split(",").map(r=>r.trim());
+    card.style.display=(role==="all"||roles.includes("all")||roles.includes(role))?"":"none";
+  });
+  document.querySelectorAll(".rbtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.role===role));
+  const shown=[...document.querySelectorAll(".role-card")].filter(c=>c.style.display!=="none").length;
+  const noteEl=document.getElementById("view-note");
+  if(noteEl) noteEl.textContent=role==="all"?`顯示全部 ${shown} 項`:`${role}視角・顯示 ${shown} 項`;
+  const isAdminRole=(role==="all"||role==="管理層");
+  ["admin-zone","admin-card","member-activity-card","cmd-center-card"].forEach(id=>{
+    const e=document.getElementById(id); if(e) e.style.display=isAdminRole?"":"none";
+  });
+  localStorage.setItem("wj_preview_role",role);
+}
+
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s) return;
   const isSuper=s.role==="超級管理員"||s.role==="總部管理中心"||["Ray","Shawn","安然"].includes(s.name);
-  if(!isSuper) return;
-  const role=localStorage.getItem("wj_preview_role")||"all";
-  if(role==="all") return;
-  const names={"管理層":"管理層","設計":"設計部","採購":"採購部","業務":"業務部","財務":"財務"};
-  const el=document.getElementById("preview-banner");
-  if(el){ el.style.display="flex"; document.getElementById("preview-role-label").textContent=names[role]||role; }
-  // 管理員功能區：非管理層視角時隱藏
-  const isAdminRole=(role==="管理層");
-  if(!isAdminRole){
-    ["admin-zone","admin-card","member-activity-card","cmd-center-card"].forEach(id=>{
-      const e=document.getElementById(id); if(e) e.style.display="none";
-    });
-  }
+  const rb=document.getElementById("role-bar");
+  if(isSuper&&rb){ rb.classList.add("visible"); switchView(localStorage.getItem("wj_preview_role")||"all"); }
+  else{ const m={"管理層":"管理層","設計":"設計","採購":"採購","業務":"業務","財務":"財務","總部管理中心":"管理層"}; const r=m[s.role]; if(r) switchView(r); }
 })();
-function exitPreview(){
-  localStorage.setItem("wj_preview_role","all");
-  location.reload();
-}
 
 </script>
 </body></html>
