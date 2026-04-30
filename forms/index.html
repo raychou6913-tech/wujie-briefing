@@ -338,7 +338,9 @@ function _onRoleSwitch(role){
 
 async function _getToken(){
   const r=await fetch(_PROXY_IDX+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  if(!r.ok) throw new Error("Token HTTP "+r.status);
   const d=await r.json();
+  if(d.code!==0) throw new Error("Token err: "+d.msg);
   return d.tenant_access_token;
 }
 
@@ -374,7 +376,16 @@ async function _loadProjects(){
       sel.appendChild(o);
     });
     document.getElementById("proj-new-hint").style.display="block";
-    sel.onchange=()=>onProjChange(sel.value);
+    sel.onchange=()=>{
+      localStorage.setItem("wj_last_proj",sel.value);
+      onProjChange(sel.value);
+    };
+    // 自動恢復上次選擇的項目
+    const lastProj=localStorage.getItem("wj_last_proj");
+    if(lastProj){
+      const found=[...sel.options].find(o=>o.value===lastProj);
+      if(found){sel.value=lastProj;onProjChange(lastProj);}
+    }
   }catch(e){
     sel.innerHTML='<option value="">（無法載入，請重整）</option>';
   }
