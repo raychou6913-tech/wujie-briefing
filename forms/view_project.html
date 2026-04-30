@@ -436,7 +436,12 @@ function renderTimeline(recs){
     if(!groups[m])groups[m]=[];
     groups[m].push({f,rid:i.record_id});
   }
-  const sorted=Object.keys(groups).sort();
+  function _monthVal(k){
+    if(k==="__未設截止日")return Infinity;
+    const p=k.replace(/\//g,"-").split("-");
+    return (parseInt(p[0]||0)*100)+(parseInt(p[1]||0));
+  }
+  const sorted=Object.keys(groups).sort((a,b)=>_monthVal(a)-_monthVal(b));
   const noDate=sorted.indexOf("__未設截止日");
   if(noDate>-1){sorted.splice(noDate,1);sorted.push("__未設截止日");}
   if(!sorted.length){el.innerHTML='<div class="empty">😕 無資料</div>';return;}
