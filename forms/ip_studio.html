@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎨 IP Studio — 蕪解</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f0f1a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+.hdr{background:linear-gradient(135deg,#1e1b4b,#312e81);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid #4338ca40}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.hdr-sub{font-size:12px;color:#a5b4fc;margin-top:2px}
+.btn-back{background:#ffffff15;color:#a5b4fc;border:1px solid #4338ca60;border-radius:8px;padding:7px 14px;font-size:13px;text-decoration:none}
+.ip-bar{background:#1e1b4b;border-bottom:1px solid #312e8160;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ip-bar label{font-size:13px;color:#a5b4fc;font-weight:600}
+.ip-sel{background:#0f0f2a;color:#e2e8f0;border:1.5px solid #4338ca80;border-radius:8px;padding:8px 12px;font-size:14px;min-width:220px}
+.ip-badge{background:#4338ca30;color:#a5b4fc;border:1px solid #4338ca60;border-radius:6px;padding:4px 10px;font-size:12px}
+.tabs{display:flex;gap:0;padding:0 24px;background:#1a1a2e;border-bottom:1px solid #312e8140}
+.tab{padding:14px 20px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:#a5b4fc;border-bottom-color:#6366f1}
+.tab:hover:not(.active){color:#94a3b8}
+.panel{display:none;padding:24px;max-width:1100px;margin:0 auto}
+.panel.active{display:block}
+.card{background:#1e1b4b;border:1px solid #312e8140;border-radius:14px;padding:20px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.f{margin-bottom:14px}
+.f label{display:block;font-size:12px;color:#64748b;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.f input,.f select,.f textarea{width:100%;background:#0f0f2a;color:#e2e8f0;border:1.5px solid #312e8160;border-radius:8px;padding:10px 12px;font-size:14px;outline:none;transition:border-color .15s}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#6366f1}
+.f textarea{min-height:90px;resize:vertical;font-family:inherit}
+.btn{border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:#ffffff10;color:#a5b4fc;border:1px solid #4338ca40}
+.btn-ghost:hover{background:#ffffff18}
+.btn-green{background:#065f46;color:#6ee7b7;border:1px solid #059669}
+.btn-red{background:#7f1d1d;color:#fca5a5;border:1px solid #dc2626}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #312e8160;background:#0f0f2a;color:#94a3b8;transition:all .15s}
+.chip.on{background:#4338ca;color:#fff;border-color:#4338ca}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.prompt-box{background:#0a0a1a;border:1.5px solid #4338ca60;border-radius:10px;padding:16px;font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#a5b4fc;white-space:pre-wrap;word-break:break-all;min-height:80px;position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;background:#4338ca;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer}
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.asset-card{background:#1a1a2e;border:1.5px solid #312e8160;border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.asset-card:hover{border-color:#6366f1}
+.asset-img{width:100%;aspect-ratio:1;object-fit:cover;background:#0f0f2a;display:flex;align-items:center;justify-content:center;font-size:36px;color:#312e81}
+.asset-info{padding:10px}
+.asset-type{font-size:11px;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.asset-status{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;margin-top:4px}
+.s-approved{background:#065f4630;color:#6ee7b7;border:1px solid #059669}
+.s-review{background:#78350f30;color:#fcd34d;border:1px solid #d97706}
+.s-pending{background:#1e293b;color:#94a3b8;border:1px solid #334155}
+.s-fix{background:#7f1d1d30;color:#fca5a5;border:1px solid #dc2626}
+.theme-card{background:#1a1a2e;border:1.5px solid #312e8160;border-radius:12px;padding:16px;margin-bottom:12px}
+.theme-name{font-size:16px;font-weight:800;color:#e2e8f0;margin-bottom:4px}
+.theme-sub{font-size:13px;color:#a5b4fc;margin-bottom:8px}
+.theme-desc{font-size:13px;color:#94a3b8;line-height:1.6}
+.theme-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.theme-tag{background:#4338ca20;color:#a5b4fc;border:1px solid #4338ca40;border-radius:12px;padding:3px 10px;font-size:11px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #4338ca40;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-img-wrap{display:flex;align-items:center;justify-content:center;min-height:200px;background:#0a0a1a;border:2px dashed #312e8160;border-radius:12px;margin-top:12px;flex-direction:column;gap:12px;color:#475569;font-size:13px}
+.gen-img-wrap img{max-width:100%;border-radius:10px;display:block}
+.upload-zone{border:2px dashed #4338ca60;border-radius:10px;padding:30px;text-align:center;cursor:pointer;color:#64748b;font-size:13px;transition:border-color .15s}
+.upload-zone:hover{border-color:#6366f1;color:#a5b4fc}
+.modal{display:none;position:fixed;inset:0;background:#000000c0;z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:#1e1b4b;border:1px solid #4338ca60;border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:800;color:#e2e8f0;margin-bottom:16px}
+@media(max-width:600px){.row2,.row3{grid-template-columns:1fr}.asset-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <div style="font-size:32px">🎨</div>
+    <div>
+      <div class="hdr-title">IP Studio</div>
+      <div class="hdr-sub">主題策劃 · 咒語生成 · 資產管理 · 產品開發</div>
+    </div>
+  </div>
+  <a href="../home.html" class="btn-back">← 首頁</a>
+</div>
+
+<div class="ip-bar">
+  <label>選擇 IP：</label>
+  <select class="ip-sel" id="ip-selector" onchange="onIPChange()">
+    <option value="">— 載入中 —</option>
+  </select>
+  <span class="ip-badge" id="ip-licensor" style="display:none"></span>
+  <span class="ip-badge" id="ip-region" style="display:none"></span>
+  <button class="btn btn-ghost" style="margin-left:auto;font-size:12px" onclick="showNewIPModal()">＋ 新增 IP 設定</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('theme')">🧠 主題策劃</div>
+  <div class="tab" onclick="switchTab('prompt')">✨ 咒語生成器</div>
+  <div class="tab" onclick="switchTab('assets')">🗂 資產庫</div>
+  <div class="tab" onclick="switchTab('social')">📱 社媒內容</div>
+</div>
+
+<!-- ══ TAB 1: 主題策劃 ══ -->
+<div class="panel active" id="tab-theme">
+  <div class="card">
+    <div class="card-title">🧠 主題策劃室</div>
+    <div class="row3">
+      <div class="f"><label>目標品類</label>
+        <select id="t-category">
+          <option value="公仔">公仔 / 玩偶</option>
+          <option value="文具">文具 / 周邊</option>
+          <option value="生活用品">生活用品</option>
+          <option value="服飾">服飾 / 配件</option>
+          <option value="包裝禮盒">包裝禮盒</option>
+          <option value="快閃店陳列">快閃店陳列</option>
+          <option value="綜合系列">綜合系列</option>
+        </select></div>
+      <div class="f"><label>目標市場</label>
+        <select id="t-market">
+          <option>台灣</option><option>香港</option><option>泰國</option>
+          <option>東南亞</option><option>中國大陸</option><option>日本</option><option>全球</option>
+        </select></div>
+      <div class="f"><label>季節 / 節慶</label>
+        <input id="t-season" placeholder="例：2026 夏季 / 聖誕節 / 農曆新年"></div>
+    </div>
+    <div class="f"><label>補充方向（選填）</label>
+      <input id="t-direction" placeholder="例：療癒系、黑暗可愛、限定款、聯名系列…"></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-primary" id="btn-gen-theme" onclick="generateThemes()">🧠 AI 生成主題方案</button>
+      <span id="theme-status" style="font-size:12px;color:#64748b"></span>
+    </div>
+  </div>
+  <div id="theme-results"></div>
+</div>
+
+<!-- ══ TAB 2: 咒語生成器 ══ -->
+<div class="panel" id="tab-prompt">
+  <div class="card">
+    <div class="card-title">✨ 咒語生成器</div>
+    <div class="row2">
+      <div class="f"><label>需要什麼</label>
+        <select id="p-type" onchange="onPromptTypeChange()">
+          <optgroup label="角色設計">
+            <option value="character_front">角色正視圖</option>
+            <option value="character_side">角色側視圖</option>
+            <option value="character_back">角色背視圖</option>
+            <option value="character_4view">角色四視圖（一張圖）</option>
+            <option value="character_34">角色 3/4 視圖</option>
+            <option value="expressions">表情包（6-9 種表情）</option>
+            <option value="poses">動作姿態包</option>
+          </optgroup>
+          <optgroup label="產品開發">
+            <option value="plush_design">公仔 / 毛絨設計圖</option>
+            <option value="product_mockup">產品效果圖</option>
+            <option value="packaging">包裝設計草稿</option>
+            <option value="display_stand">展架 / 陳列設計</option>
+          </optgroup>
+          <optgroup label="行銷素材">
+            <option value="social_post">社媒貼文素材</option>
+            <option value="banner">橫幅 Banner</option>
+            <option value="scene">生活場景圖</option>
+          </optgroup>
+        </select></div>
+      <div class="f"><label>生成工具</label>
+        <select id="p-tool">
+          <option value="midjourney">Midjourney（最高品質）</option>
+          <option value="flux">FLUX Pro（推薦）</option>
+          <option value="gemini">Gemini Imagen（快速）</option>
+          <option value="sd3">Stable Diffusion 3</option>
+        </select></div>
+    </div>
+    <div class="f"><label>已有的核准資產（讓 AI 保持風格一致）</label>
+      <div class="chips" id="existing-assets-chips">
+        <span style="font-size:12px;color:#475569">選擇 IP 後自動載入已核准資產…</span>
+      </div></div>
+    <div class="f"><label>補充需求（選填）</label>
+      <input id="p-extra" placeholder="例：穿著聖誕節服裝、背景是東京街道、特寫臉部表情…"></div>
+    <div class="row2">
+      <div class="f"><label>畫面比例</label>
+        <select id="p-ratio">
+          <option value="1:1">1:1 正方形</option>
+          <option value="4:3">4:3 橫向</option>
+          <option value="3:4">3:4 直向</option>
+          <option value="16:9">16:9 寬屏</option>
+          <option value="2:3">2:3 海報</option>
+        </select></div>
+      <div class="f"><label>咒語語言</label>
+        <select id="p-lang">
+          <option value="en">英文（推薦）</option>
+          <option value="zh">中文</option>
+        </select></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="btn-gen-prompt" onclick="generatePrompt()">✨ 生成咒語</button>
+      <button class="btn btn-ghost" id="btn-gen-image" onclick="generateImage()" style="display:none">🖼 直接生成圖片（Gemini）</button>
+    </div>
+  </div>
+  <div id="prompt-result" style="display:none">
+    <div class="card">
+      <div class="card-title">生成的咒語</div>
+      <div class="prompt-box" id="prompt-text">
+        <button class="copy-btn" onclick="copyPrompt()">複製</button>
+        <span id="prompt-content"></span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="generatePrompt()">🔄 重新生成</button>
+        <button class="btn btn-green" onclick="savePromptToAsset()">💾 存入資產庫（待生成）</button>
+      </div>
+    </div>
+    <div id="imagen-result" style="display:none">
+      <div class="card">
+        <div class="card-title">AI 生成圖片</div>
+        <div id="imagen-wrap" class="gen-img-wrap">
+          <div>圖片生成中…</div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap" id="imagen-actions" style="display:none">
+          <button class="btn btn-green" onclick="approveGenImage()">✅ 核准加入資產庫</button>
+          <button class="btn btn-ghost" onclick="generateImage()">🔄 重新生成</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB 3: 資產庫 ══ -->
+<div class="panel" id="tab-assets">
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+    <select id="filter-type" onchange="renderAssets()" style="background:#1e1b4b;color:#e2e8f0;border:1px solid #312e8160;border-radius:8px;padding:7px 12px;font-size:13px">
+      <option value="">全部類型</option>
+      <option>角色設定</option><option>正視圖</option><option>側視圖</option><option>背視圖</option>
+      <option>四視圖</option><option>3/4視圖</option><option>表情包</option><option>場景圖</option>
+      <option>產品效果圖</option><option>包裝設計</option><option>展架設計</option><option>社媒素材</option>
+    </select>
+    <select id="filter-status" onchange="renderAssets()" style="background:#1e1b4b;color:#e2e8f0;border:1px solid #312e8160;border-radius:8px;padding:7px 12px;font-size:13px">
+      <option value="">全部狀態</option>
+      <option>已核准</option><option>審核中</option><option>待生成</option><option>需修改</option>
+    </select>
+    <button class="btn btn-primary" style="margin-left:auto" onclick="showUploadModal()">＋ 上傳圖片</button>
+  </div>
+  <div id="asset-grid-wrap">
+    <div style="color:#475569;text-align:center;padding:40px">選擇 IP 後載入資產</div>
+  </div>
+</div>
+
+<!-- ══ TAB 4: 社媒內容 ══ -->
+<div class="panel" id="tab-social">
+  <div class="card">
+    <div class="card-title">📱 社媒內容生成</div>
+    <div class="row3">
+      <div class="f"><label>平台</label>
+        <select id="s-platform">
+          <option>Instagram</option><option>Facebook</option><option>LINE</option>
+          <option>TikTok</option><option>Xiaohongshu</option>
+        </select></div>
+      <div class="f"><label>主題 / 節慶</label>
+        <input id="s-topic" placeholder="例：新品上市、母親節、IP 故事"></div>
+      <div class="f"><label>語言</label>
+        <select id="s-lang">
+          <option value="zh-TW">繁體中文</option>
+          <option value="zh-CN">簡體中文</option>
+          <option value="th">泰文</option>
+          <option value="en">英文</option>
+        </select></div>
+    </div>
+    <button class="btn btn-primary" onclick="generateSocialContent()">📱 生成社媒文案 + 素材咒語</button>
+  </div>
+  <div id="social-results"></div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal" id="upload-modal">
+  <div class="modal-box">
+    <div class="modal-title">上傳資產圖片</div>
+    <div class="f"><label>資產類型</label>
+      <select id="u-type">
+        <option>角色設定</option><option>正視圖</option><option>側視圖</option><option>背視圖</option>
+        <option>四視圖</option><option>3/4視圖</option><option>表情包</option><option>場景圖</option>
+        <option>產品效果圖</option><option>包裝設計</option><option>展架設計</option><option>社媒素材</option>
+      </select></div>
+    <div class="f"><label>圖片 URL（或貼上 base64）</label>
+      <textarea id="u-url" placeholder="貼上圖片網址，或從 Imgur / GitHub Issues 上傳後貼連結" style="min-height:60px"></textarea></div>
+    <div class="f"><label>使用的咒語（選填）</label>
+      <textarea id="u-prompt" placeholder="記錄生成這張圖用的咒語" style="min-height:60px"></textarea></div>
+    <div class="f"><label>初始狀態</label>
+      <select id="u-status">
+        <option>審核中</option><option>已核准</option><option>需修改</option>
+      </select></div>
+    <div class="f"><label>備註</label>
+      <input id="u-note" placeholder="版本說明、修改意見…"></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-primary" onclick="uploadAsset()">上傳</button>
+      <button class="btn btn-ghost" onclick="closeUploadModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Asset Detail Modal -->
+<div class="modal" id="asset-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="amod-title">資產詳情</div>
+    <img id="amod-img" src="" style="width:100%;border-radius:10px;margin-bottom:14px;display:none">
+    <div id="amod-prompt" style="margin-bottom:12px;display:none">
+      <div class="card-title" style="font-size:11px;margin-bottom:6px">咒語</div>
+      <div class="prompt-box" style="font-size:11px"><span id="amod-prompt-text"></span><button class="copy-btn" onclick="copyText('amod-prompt-text')">複製</button></div>
+    </div>
+    <div class="f"><label>狀態</label>
+      <select id="amod-status">
+        <option>審核中</option><option>已核准</option><option>需修改</option><option>待生成</option>
+      </select></div>
+    <div class="f"><label>備註</label><input id="amod-note"></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-green" onclick="saveAssetDetail()">儲存</button>
+      <button class="btn btn-ghost" onclick="closeAssetModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TABLES={
+  ip_db:"tblHPNUTdcFa7tqs",
+  ip_studio_assets:"tblq1Zl3oo0lYby5",
+  ip_studio_themes:"tblEBClCNZyCSxNb"
+};
+
+// ── State ──────────────────────────────────────────────────────
+let _sess=null, _curIP=null, _curIPRecord=null, _assets=[], _editAssetRid=null;
+let _lastPrompt="", _lastImageB64="", _lastImageType="";
+
+// ── Auth ───────────────────────────────────────────────────────
+(function(){
+  _sess=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!_sess||Date.now()>_sess.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");return;}
+  loadIPList();
+})();
+
+// ── Token ──────────────────────────────────────────────────────
+async function getToken(){
+  const r=await fetch(_PROXY+"/auth/token");
+  return (await r.json()).tenant_access_token;
+}
+
+// ── IP Selector ────────────────────────────────────────────────
+async function loadIPList(){
+  const tk=await getToken();
+  let items=[],pt=null;
+  do{
+    const url=`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_db}/records?page_size=100`+(pt?`&page_token=${pt}`:"");
+    const d=(await (await fetch(url,{headers:{"Authorization":"Bearer "+tk}})).json()).data||{};
+    (d.items||[]).forEach(i=>items.push(i));
+    pt=d.has_more?d.page_token:null;
+  }while(pt);
+  const sel=document.getElementById("ip-selector");
+  sel.innerHTML='<option value="">— 選擇 IP —</option>';
+  items.forEach(i=>{
+    const f=i.fields||{};
+    const name=f["IP品牌"]||f["IP名稱"]||f["名稱"]||"";
+    if(!name)return;
+    const o=document.createElement("option");
+    o.value=i.record_id;
+    o.dataset.name=name;
+    o.dataset.fields=JSON.stringify(f);
+    o.textContent=name;
+    sel.appendChild(o);
+  });
+  // pre-select if saved
+  const saved=localStorage.getItem("studio_ip");
+  if(saved){sel.value=saved;onIPChange();}
+}
+
+function onIPChange(){
+  const sel=document.getElementById("ip-selector");
+  const opt=sel.options[sel.selectedIndex];
+  if(!opt||!opt.value){_curIP=null;_curIPRecord=null;return;}
+  _curIP=opt.dataset.name||opt.textContent;
+  _curIPRecord=JSON.parse(opt.dataset.fields||"{}");
+  localStorage.setItem("studio_ip",opt.value);
+  document.getElementById("ip-licensor").textContent="版權方："+(getField("版權方")||"—");
+  document.getElementById("ip-licensor").style.display="inline-block";
+  document.getElementById("ip-region").textContent="地區："+(getField("授權地區")||getField("地區")||"—");
+  document.getElementById("ip-region").style.display="inline-block";
+  loadAssets();
+}
+
+function getField(k){
+  if(!_curIPRecord)return "";
+  const v=_curIPRecord[k];
+  if(Array.isArray(v))return v.map(x=>x.text||x).join("");
+  return v||"";
+}
+
+// ── Tabs ───────────────────────────────────────────────────────
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach((el,i)=>{
+    const ids=["theme","prompt","assets","social"];
+    el.classList.toggle("active",ids[i]===t);
+  });
+  document.querySelectorAll(".panel").forEach(el=>el.classList.remove("active"));
+  document.getElementById("tab-"+t).classList.add("active");
+}
+
+// ── Gemini Text ────────────────────────────────────────────────
+async function geminiText(prompt,temp=0.8){
+  const r=await fetch(_PROXY+"/ai/text",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:temp,maxOutputTokens:2048}})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error.message||"Gemini error");
+  return d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+}
+
+// ── Tab 1: Theme Planner ───────────────────────────────────────
+async function generateThemes(){
+  if(!_curIP){alert("請先選擇 IP");return;}
+  const btn=document.getElementById("btn-gen-theme");
+  const cat=document.getElementById("t-category").value;
+  const market=document.getElementById("t-market").value;
+  const season=document.getElementById("t-season").value||"無特定季節";
+  const dir=document.getElementById("t-direction").value;
+  btn.disabled=true;
+  document.getElementById("theme-status").innerHTML='<span class="spin"></span>AI 策劃中…';
+  document.getElementById("theme-results").innerHTML="";
+  const ipStyle=getField("風格描述")||getField("設計風格")||getField("角色特色")||"";
+  const prompt=`你是一位資深 IP 商品策劃，請為以下 IP 生成 5 個完整的主題策劃方案，用繁體中文輸出。
+
+IP 名稱：${_curIP}
+IP 風格特徵：${ipStyle||"可愛療癒系"}
+目標品類：${cat}
+目標市場：${market}
+季節/節慶：${season}
+${dir?"補充方向："+dir:""}
+
+每個方案請包含：
+1. 主題名稱（中英文各一，有記憶點、有故事感）
+2. 副標題（一句話）
+3. 主題描述（3-4句，說明視覺概念和故事背景）
+4. 情緒板關鍵詞（6-8個英文詞，用於 AI 生圖）
+5. 建議應用品項（3-5個）
+6. 適合的販售時機
+
+請以 JSON 陣列輸出，每個方案為一個物件：
+[{"name_zh":"...","name_en":"...","tagline":"...","desc":"...","keywords":"...","products":"...","timing":"..."}]
+只輸出純 JSON，不要 markdown。`;
+  try{
+    let raw=await geminiText(prompt,0.9);
+    raw=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    const themes=JSON.parse(raw);
+    renderThemes(themes);
+    document.getElementById("theme-status").textContent=`生成 ${themes.length} 個方案`;
+  }catch(e){
+    document.getElementById("theme-status").textContent="生成失敗："+e.message;
+  }finally{btn.disabled=false;}
+}
+
+function renderThemes(themes){
+  const tk_promise=getToken();
+  document.getElementById("theme-results").innerHTML=themes.map((t,i)=>`
+    <div class="theme-card" id="tc-${i}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div>
+          <div class="theme-name">${t.name_zh} <span style="color:#6366f1;font-size:14px">/ ${t.name_en}</span></div>
+          <div class="theme-sub">${t.tagline}</div>
+        </div>
+        <button class="btn btn-green" style="white-space:nowrap;font-size:11px" onclick="saveTheme(${i},this)">💾 存入</button>
+      </div>
+      <div class="theme-desc">${t.desc}</div>
+      <div class="theme-tags">${(t.keywords||"").split(/[,，]+/).map(k=>`<span class="theme-tag">${k.trim()}</span>`).join("")}</div>
+      <div style="margin-top:10px;font-size:12px;color:#64748b">📦 ${t.products} &nbsp;|&nbsp; ⏰ ${t.timing}</div>
+    </div>`).join("");
+  window._themes=themes;
+}
+
+async function saveTheme(i,btn){
+  const t=window._themes[i];
+  if(!t)return;
+  btn.disabled=true;btn.textContent="存入中…";
+  try{
+    const tk=await getToken();
+    await fetch(`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_studio_themes}/records`,{
+      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{
+        "IP名稱":_curIP,"主題名稱":t.name_zh+" / "+t.name_en,"副標題":t.tagline,
+        "主題描述":t.desc,"情緒板關鍵詞":t.keywords,"目標品類":document.getElementById("t-category").value,
+        "目標市場":document.getElementById("t-market").value,"季節":document.getElementById("t-season").value,"狀態":"AI草稿"
+      }})
+    });
+    btn.textContent="✅ 已存";btn.className="btn btn-ghost";
+  }catch(e){btn.disabled=false;btn.textContent="重試";}
+}
+
+// ── Tab 2: Prompt Generator ────────────────────────────────────
+function onPromptTypeChange(){
+  const t=document.getElementById("p-type").value;
+  const showImagen=["character_front","expressions","scene","social_post"].includes(t);
+  document.getElementById("btn-gen-image").style.display=showImagen?"inline-block":"none";
+}
+
+async function loadApprovedAssets(){
+  if(!_curIP)return;
+  const approved=_assets.filter(a=>a.狀態==="已核准");
+  const wrap=document.getElementById("existing-assets-chips");
+  if(!approved.length){wrap.innerHTML='<span style="font-size:12px;color:#475569">尚無已核准資產</span>';return;}
+  wrap.innerHTML=approved.map(a=>`<span class="chip" data-rid="${a.__rid}" data-type="${a.資產類型}" onclick="this.classList.toggle('on')">${a.資產類型}</span>`).join("");
+}
+
+async function generatePrompt(){
+  if(!_curIP){alert("請先選擇 IP");return;}
+  const btn=document.getElementById("btn-gen-prompt");
+  const ptype=document.getElementById("p-type");
+  const tool=document.getElementById("p-tool").value;
+  const extra=document.getElementById("p-extra").value;
+  const ratio=document.getElementById("p-ratio").value;
+  const lang=document.getElementById("p-lang").value;
+  const typeName=ptype.options[ptype.selectedIndex].text;
+  const selectedChips=[...document.querySelectorAll("#existing-assets-chips .chip.on")].map(c=>c.dataset.type);
+  btn.disabled=true;btn.textContent="生成中…";
+  const ipStyle=getField("風格描述")||getField("設計風格")||"";
+  const ipColor=getField("主色調")||getField("色彩")||"";
+  const toolGuide={
+    midjourney:"針對 Midjourney v6 最佳化，使用 --ar 參數",
+    flux:"針對 FLUX Pro 最佳化，使用 Prompt Weighting",
+    gemini:"針對 Gemini Imagen 3 最佳化",
+    sd3:"針對 Stable Diffusion 3 最佳化"
+  };
+  const prompt=`你是一位精通 AI 生圖的 IP 設計師，請為以下需求生成專業的 AI 生圖咒語。
+
+IP：${_curIP}
+${ipStyle?"IP 風格描述："+ipStyle:""}
+${ipColor?"IP 主色調："+ipColor:""}
+${selectedChips.length?"已有核准資產（需保持一致）："+selectedChips.join("、"):""}
+需要生成：${typeName}
+生成工具：${tool}
+畫面比例：${ratio}
+${extra?"補充需求："+extra:""}
+
+請生成${lang==="zh"?"中文":"英文"} prompt，要求：
+1. 風格關鍵詞完整（角色特徵、藝術風格、色彩、光線、細節描述）
+2. 包含負向咒語（negative prompt）
+3. 加入對應工具的最佳化參數（${toolGuide[tool]}）
+4. 如需多視圖，說明畫面排版方式
+
+請直接輸出咒語內容，格式：
+【正向 Prompt】
+...
+
+【負向 Prompt】
+...
+
+【工具參數】
+...`;
+  try{
+    const result=await geminiText(prompt,0.7);
+    _lastPrompt=result;
+    document.getElementById("prompt-content").textContent=result;
+    document.getElementById("prompt-result").style.display="block";
+    _lastImageType=typeName;
+  }catch(e){alert("生成失敗："+e.message);}
+  finally{btn.disabled=false;btn.textContent="✨ 生成咒語";}
+}
+
+function copyPrompt(){
+  navigator.clipboard.writeText(document.getElementById("prompt-content").textContent);
+  document.querySelector(".copy-btn").textContent="✅";
+  setTimeout(()=>document.querySelector(".copy-btn").textContent="複製",1500);
+}
+function copyText(id){
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+}
+
+async function generateImage(){
+  if(!_lastPrompt){alert("請先生成咒語");return;}
+  const promptLines=_lastPrompt.split("\n");
+  const posLine=promptLines.findIndex(l=>l.includes("正向"));
+  let imgPrompt=_lastPrompt;
+  if(posLine>=0){
+    const negLine=promptLines.findIndex((l,i)=>i>posLine&&l.includes("負向"));
+    imgPrompt=promptLines.slice(posLine+1,negLine>posLine?negLine:undefined).join(" ").trim();
+  }
+  const imgWrap=document.getElementById("imagen-wrap");
+  const imgDiv=document.getElementById("imagen-result");
+  imgDiv.style.display="block";
+  imgWrap.innerHTML='<div><span class="spin"></span>圖片生成中（約 10-20 秒）…</div>';
+  const ratio=document.getElementById("p-ratio").value;
+  try{
+    const r=await fetch(_PROXY+"/ai/imagen",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt:imgPrompt,count:1,aspectRatio:ratio})
+    });
+    const d=await r.json();
+    const b64=d.predictions?.[0]?.bytesBase64Encoded;
+    if(!b64)throw new Error(d.error?.message||"生成失敗，Imagen API 可能需要付費帳戶");
+    _lastImageB64=b64;
+    imgWrap.innerHTML=`<img src="data:image/png;base64,${b64}" style="max-width:100%;border-radius:10px">`;
+    document.getElementById("imagen-actions").style.display="flex";
+  }catch(e){
+    imgWrap.innerHTML=`<div style="color:#f87171">⚠️ ${e.message}<br><span style="font-size:11px;color:#64748b">請複製咒語到 Midjourney / FLUX 手動生圖</span></div>`;
+  }
+}
+
+async function savePromptToAsset(){
+  if(!_curIP)return;
+  const ptype=document.getElementById("p-type");
+  const typeName=ptype.options[ptype.selectedIndex].text.replace(/角色|圖|包|設計|素材/g,"").trim();
+  const tk=await getToken();
+  const r=await fetch(`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_studio_assets}/records`,{
+    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields:{"IP名稱":_curIP,"資產類型":ptype.options[ptype.selectedIndex].text,"狀態":"待生成","咒語":_lastPrompt}})
+  });
+  const d=await r.json();
+  if(d.code===0){alert("✅ 已存入資產庫（狀態：待生成）");loadAssets();}
+  else alert("儲存失敗："+d.msg);
+}
+
+async function approveGenImage(){
+  if(!_lastImageB64||!_curIP)return;
+  const ptype=document.getElementById("p-type");
+  alert("請將圖片上傳至公開圖床（如 Imgur），取得連結後使用「上傳資產」功能加入資產庫。");
+}
+
+// ── Tab 3: Asset Gallery ───────────────────────────────────────
+async function loadAssets(){
+  if(!_curIP)return;
+  const tk=await getToken();
+  let items=[],pt=null;
+  do{
+    const url=`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_studio_assets}/records?page_size=100`+(pt?`&page_token=${pt}`:"");
+    const d=(await (await fetch(url,{headers:{"Authorization":"Bearer "+tk}})).json()).data||{};
+    (d.items||[]).forEach(i=>{
+      const f=i.fields||{};
+      if((f["IP名稱"]||"").trim()===_curIP.trim())
+        items.push({...f,__rid:i.record_id});
+    });
+    pt=d.has_more?d.page_token:null;
+  }while(pt);
+  _assets=items;
+  renderAssets();
+  loadApprovedAssets();
+}
+
+function renderAssets(){
+  const filterType=document.getElementById("filter-type").value;
+  const filterStatus=document.getElementById("filter-status").value;
+  const filtered=_assets.filter(a=>
+    (!filterType||a["資產類型"]===filterType)&&
+    (!filterStatus||a["狀態"]===filterStatus)
+  );
+  const statusMap={"已核准":"s-approved","審核中":"s-review","待生成":"s-pending","需修改":"s-fix"};
+  const wrap=document.getElementById("asset-grid-wrap");
+  if(!filtered.length){wrap.innerHTML='<div style="color:#475569;text-align:center;padding:40px">無符合條件的資產</div>';return;}
+  wrap.innerHTML=`<div class="asset-grid">${filtered.map(a=>{
+    const sc=statusMap[a["狀態"]]||"s-pending";
+    const url=a["圖片URL"]||"";
+    const imgHtml=url
+      ?`<img src="${url}" style="width:100%;aspect-ratio:1;object-fit:cover;background:#0f0f2a">`
+      :`<div class="asset-img">🖼</div>`;
+    return `<div class="asset-card" onclick="openAssetModal('${a.__rid}')">
+      ${imgHtml}
+      <div class="asset-info">
+        <div class="asset-type">${a["資產類型"]||"未分類"}</div>
+        <div><span class="asset-status ${sc}">${a["狀態"]||"待生成"}</span></div>
+        ${a["備註"]?`<div style="font-size:11px;color:#64748b;margin-top:4px">${a["備註"].slice(0,30)}</div>`:""}
+      </div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function showUploadModal(){
+  if(!_curIP){alert("請先選擇 IP");return;}
+  document.getElementById("upload-modal").classList.add("show");
+}
+function closeUploadModal(){document.getElementById("upload-modal").classList.remove("show");}
+
+async function uploadAsset(){
+  const type=document.getElementById("u-type").value;
+  const url=document.getElementById("u-url").value.trim();
+  const prompt=document.getElementById("u-prompt").value.trim();
+  const status=document.getElementById("u-status").value;
+  const note=document.getElementById("u-note").value.trim();
+  if(!url){alert("請填入圖片 URL");return;}
+  const tk=await getToken();
+  const fields={"IP名稱":_curIP,"資產類型":type,"狀態":status,"圖片URL":url};
+  if(prompt)fields["咒語"]=prompt;
+  if(note)fields["備註"]=note;
+  fields["審核人"]=_sess?.name||"";
+  const r=await fetch(`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_studio_assets}/records`,{
+    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields})
+  });
+  const d=await r.json();
+  if(d.code===0){
+    closeUploadModal();
+    ["u-url","u-prompt","u-note"].forEach(id=>document.getElementById(id).value="");
+    loadAssets();
+  }else alert("上傳失敗："+d.msg);
+}
+
+function openAssetModal(rid){
+  const a=_assets.find(x=>x.__rid===rid);
+  if(!a)return;
+  _editAssetRid=rid;
+  document.getElementById("amod-title").textContent=(a["資產類型"]||"資產")+" 詳情";
+  const img=document.getElementById("amod-img");
+  if(a["圖片URL"]){img.src=a["圖片URL"];img.style.display="block";}
+  else img.style.display="none";
+  const pEl=document.getElementById("amod-prompt");
+  if(a["咒語"]){document.getElementById("amod-prompt-text").textContent=a["咒語"];pEl.style.display="block";}
+  else pEl.style.display="none";
+  document.getElementById("amod-status").value=a["狀態"]||"審核中";
+  document.getElementById("amod-note").value=a["備註"]||"";
+  document.getElementById("asset-modal").classList.add("show");
+}
+function closeAssetModal(){document.getElementById("asset-modal").classList.remove("show");_editAssetRid=null;}
+async function saveAssetDetail(){
+  if(!_editAssetRid)return;
+  const tk=await getToken();
+  const r=await fetch(`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_studio_assets}/records/${_editAssetRid}`,{
+    method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields:{"狀態":document.getElementById("amod-status").value,"備註":document.getElementById("amod-note").value,"審核人":_sess?.name||""}})
+  });
+  const d=await r.json();
+  if(d.code===0){closeAssetModal();loadAssets();}
+  else alert("儲存失敗："+d.msg);
+}
+
+// ── Tab 4: Social ──────────────────────────────────────────────
+async function generateSocialContent(){
+  if(!_curIP){alert("請先選擇 IP");return;}
+  const platform=document.getElementById("s-platform").value;
+  const topic=document.getElementById("s-topic").value||"日常貼文";
+  const lang=document.getElementById("s-lang").value;
+  const langName={"zh-TW":"繁體中文","zh-CN":"簡體中文","th":"泰文","en":"英文"}[lang];
+  const approved=_assets.filter(a=>a.狀態==="已核准").map(a=>a["資產類型"]).join("、")||"無";
+  const wrap=document.getElementById("social-results");
+  wrap.innerHTML='<div class="card"><span class="spin"></span> AI 生成中…</div>';
+  const prompt=`你是 IP 行銷專家，請為以下 IP 生成 3 組社媒內容方案，用${langName}輸出。
+
+IP：${_curIP}
+平台：${platform}
+主題：${topic}
+已有素材：${approved}
+
+每組方案包含：
+1. 貼文標題（有吸引力）
+2. 貼文內文（符合平台風格，加上 emoji）
+3. Hashtag（8-12 個）
+4. 素材咒語（描述需要設計師生成的圖片，英文）
+
+輸出純 JSON 陣列：
+[{"title":"...","caption":"...","hashtags":"...","image_prompt":"..."}]
+只輸出純 JSON。`;
+  try{
+    let raw=await geminiText(prompt,0.9);
+    raw=raw.replace(/^```json\s*/,"").replace(/^```\s*/,"").replace(/\s*```$/,"").trim();
+    const posts=JSON.parse(raw);
+    wrap.innerHTML=posts.map((p,i)=>`
+      <div class="card" style="margin-bottom:12px">
+        <div style="font-size:15px;font-weight:800;color:#e2e8f0;margin-bottom:6px">${p.title}</div>
+        <div style="font-size:13px;color:#94a3b8;white-space:pre-line;margin-bottom:10px;line-height:1.7">${p.caption}</div>
+        <div style="font-size:12px;color:#6366f1;margin-bottom:10px">${p.hashtags}</div>
+        <div class="card-title" style="font-size:11px;margin-bottom:6px">素材咒語</div>
+        <div class="prompt-box" style="font-size:11px;position:relative">${p.image_prompt}<button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousSibling.textContent||this.parentElement.textContent)">複製</button></div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button class="btn btn-green" style="font-size:11px" onclick="savePromptForSocial(${i},this)">💾 存入資產庫</button>
+        </div>
+      </div>`).join("");
+    window._socialPosts=posts;
+  }catch(e){wrap.innerHTML=`<div class="card" style="color:#f87171">生成失敗：${e.message}</div>`;}
+}
+
+async function savePromptForSocial(i,btn){
+  const p=window._socialPosts[i];
+  if(!p||!_curIP)return;
+  btn.disabled=true;btn.textContent="存入中…";
+  const tk=await getToken();
+  const r=await fetch(`${_PROXY}/open-apis/bitable/v1/apps/${_AT}/tables/${_TABLES.ip_studio_assets}/records`,{
+    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields:{"IP名稱":_curIP,"資產類型":"社媒素材","狀態":"待生成","咒語":p.image_prompt,"備註":p.title}})
+  });
+  if((await r.json()).code===0){btn.textContent="✅ 已存";}
+  else{btn.disabled=false;btn.textContent="重試";}
+}
+</script>
+</body></html>
