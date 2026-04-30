@@ -1,0 +1,57 @@
+name: LINE Task Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task from LINE Bot'
+        required: true
+      line_user_id:
+        description: 'LINE user ID to notify'
+        required: true
+      callback_secret:
+        description: 'Callback auth secret'
+        required: true
+
+jobs:
+  run-task:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run render script
+        run: python scripts/render_forms.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "蕪解助理"
+          git config user.email "bot@wujie.ai"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "no_changes=true" >> $GITHUB_ENV
+          else
+            git commit -m "LINE task: ${{ github.event.inputs.task }}"
+            git push
+          fi
+
+      - name: Notify Worker on success
+        if: success()
+        run: |
+          curl -s -X POST https://feishu-proxy.raychou6913.workers.dev/github/callback \
+            -H "Content-Type: application/json" \
+            -d "{\"secret\":\"${{ github.event.inputs.callback_secret }}\",\"status\":\"success\",\"task\":\"${{ github.event.inputs.task }}\",\"userId\":\"${{ github.event.inputs.line_user_id }}\"}"
+
+      - name: Notify Worker on failure
+        if: failure()
+        run: |
+          curl -s -X POST https://feishu-proxy.raychou6913.workers.dev/github/callback \
+            -H "Content-Type: application/json" \
+            -d "{\"secret\":\"${{ github.event.inputs.callback_secret }}\",\"status\":\"failure\",\"task\":\"${{ github.event.inputs.task }}\",\"userId\":\"${{ github.event.inputs.line_user_id }}\"}"
