@@ -266,30 +266,30 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="vam-title">對賭目標 · 兩年累計淨利 ≥ 1,600 萬 <span class="ccy ccy-rmb">RMB</span></div>
         <div style="font-size:11px;color:var(--txt-mid);margin-top:4px;">考核期：JV 成立後第 1–2 年　每年目標：¥800 萬 <span class="ccy ccy-rmb">RMB</span></div>
       </div>
-      <div class="vam-badge">⚠ 稍落後進度</div>
+      <div class="vam-badge" id="vam-badge">⚠ 稍落後進度</div>
     </div>
 
     <!-- Big Numbers -->
     <div class="vam-numbers">
       <div class="vam-num">
         <div class="vam-num-label">今年累計實際淨利（截至4月）<span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val warn">¥ 287 萬</div>
-        <div class="vam-num-sub">目標進度應達 ¥333 萬（5/12）</div>
+        <div class="vam-num-val warn" id="vam-ytd-val">¥ 287 萬</div>
+        <div class="vam-num-sub" id="vam-ytd-sub">目標進度應達 ¥333 萬（5/12）</div>
       </div>
       <div class="vam-num">
         <div class="vam-num-label">今年目標缺口 <span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val warn">- ¥46 萬</div>
-        <div class="vam-num-sub">需在剩餘 7 個月追回</div>
+        <div class="vam-num-val warn" id="vam-gap-val">- ¥46 萬</div>
+        <div class="vam-num-sub" id="vam-gap-sub">需在剩餘 7 個月追回</div>
       </div>
       <div class="vam-num">
         <div class="vam-num-label">今年剩餘需達成 <span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val neutral">¥ 513 萬</div>
-        <div class="vam-num-sub">月均需達 ¥73.3 萬</div>
+        <div class="vam-num-val neutral" id="vam-remain-val">¥ 513 萬</div>
+        <div class="vam-num-sub" id="vam-remain-sub">月均需達 ¥73.3 萬</div>
       </div>
       <div class="vam-num">
         <div class="vam-num-label">兩年累計進度 <span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val warn">¥287 萬 / ¥1,600 萬</div>
-        <div class="vam-num-sub">整體完成度 17.9%</div>
+        <div class="vam-num-val warn" id="vam-2yr-val">¥287 萬 / ¥1,600 萬</div>
+        <div class="vam-num-sub" id="vam-2yr-sub">整體完成度 17.9%</div>
       </div>
     </div>
 
@@ -297,12 +297,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="prog-row">
       <div class="prog-label">
         <span class="prog-label-left">今年淨利進度（年度目標 ¥800 萬）</span>
-        <span class="prog-label-right">287 萬 / 800 萬 = 35.9%</span>
+        <span class="prog-label-right" id="vam-yr-label">287 萬 / 800 萬 = 35.9%</span>
       </div>
       <div class="prog-track">
-        <div class="prog-fill warn" style="width:35.9%"></div>
-        <div class="prog-marker" style="left:41.7%">
-          <div class="prog-marker-label">預期進度 41.7%</div>
+        <div class="prog-fill warn" id="vam-yr-fill" style="width:35.9%"></div>
+        <div class="prog-marker" id="vam-yr-marker" style="left:41.7%">
+          <div class="prog-marker-label" id="vam-yr-marker-label">預期進度 41.7%</div>
         </div>
       </div>
     </div>
@@ -310,17 +310,17 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="prog-row">
       <div class="prog-label">
         <span class="prog-label-left">兩年累計進度（總目標 ¥1,600 萬）</span>
-        <span class="prog-label-right">287 萬 / 1,600 萬 = 17.9%</span>
+        <span class="prog-label-right" id="vam-2yr-label">287 萬 / 1,600 萬 = 17.9%</span>
       </div>
       <div class="prog-track">
-        <div class="prog-fill warn" style="width:17.9%"></div>
-        <div class="prog-marker" style="left:20.8%">
-          <div class="prog-marker-label">預期進度 20.8%</div>
+        <div class="prog-fill warn" id="vam-2yr-fill" style="width:17.9%"></div>
+        <div class="prog-marker" id="vam-2yr-marker" style="left:20.8%">
+          <div class="prog-marker-label" id="vam-2yr-marker-label">預期進度 20.8%</div>
         </div>
       </div>
     </div>
 
-    <div class="vam-note">📌 若本月（5月）達成 80 萬淨利，整體進度可追回至預期值。</div>
+    <div class="vam-note" id="vam-note">📌 若本月（5月）達成 80 萬淨利，整體進度可追回至預期值。</div>
   </div>
 
   <!-- ② 業績 & 利潤 -->
@@ -1042,6 +1042,124 @@ async function loadContractAlerts(){
   }catch(e){ console.error("contract",e); }
 }
 
+/* ── LOAD VAM PROGRESS ── */
+async function loadVamProgress(){
+  const VAM_YR  = 7500000;   // 750萬 / year
+  const VAM_2YR = 16000000;  // 1600萬 / 2 years
+  try{
+    const items = await _fetchAll(_TBLS.budget);
+    if(!items.length) return;
+
+    // Sum 實際金額 where 預算科目 contains 淨利
+    const netRows = items.filter(r=>(_fv(r.fields,"預算科目")||"").includes("淨利"));
+    const actual  = netRows.reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0), 0);
+    if(!actual && actual!==0) return; // skip if no data at all
+
+    // ── Derived numbers ──
+    const now        = new Date();
+    const monthPassed= now.getMonth()+1;         // 1-12, months elapsed (current month counts)
+    const monthsLeft = 12 - monthPassed;
+    const expectedYr = VAM_YR * (monthPassed/12); // linear expected pacing
+    const gap        = actual - expectedYr;        // positive = ahead
+    const remain     = VAM_YR - actual;
+    const monthlyNeeded = monthsLeft>0 ? remain/monthsLeft : remain;
+    const yrPct      = Math.min(Math.round(actual/VAM_YR*100*10)/10, 999);
+    const twoPct     = Math.min(Math.round(actual/VAM_2YR*100*10)/10, 999);
+    const expYrPct   = Math.min(Math.round(expectedYr/VAM_YR*100*10)/10, 100);
+    const exp2Pct    = Math.min(Math.round(expectedYr/VAM_2YR*100*10)/10, 100);
+    const isAhead    = gap >= 0;
+
+    function fmt(v){ return (v/10000).toFixed(1); }
+
+    // ── Update badge ──
+    const badge = document.getElementById("vam-badge");
+    if(badge){
+      if(isAhead){
+        badge.textContent = "✅ 超前進度";
+        badge.className   = "vam-badge ok";
+      } else {
+        badge.textContent = "⚠ 稍落後進度";
+        badge.className   = "vam-badge";
+      }
+    }
+
+    // ── Big numbers ──
+    const ytdVal = document.getElementById("vam-ytd-val");
+    if(ytdVal){
+      ytdVal.textContent = `¥ ${fmt(actual)} 萬`;
+      ytdVal.className   = "vam-num-val "+(isAhead?"ok":"warn");
+    }
+    const ytdSub = document.getElementById("vam-ytd-sub");
+    if(ytdSub) ytdSub.textContent = `目標進度應達 ¥${fmt(expectedYr)} 萬（${monthPassed}/12）`;
+
+    const gapVal = document.getElementById("vam-gap-val");
+    if(gapVal){
+      const gapFmt = isAhead ? `+¥${fmt(Math.abs(gap))} 萬` : `- ¥${fmt(Math.abs(gap))} 萬`;
+      gapVal.textContent = gapFmt;
+      gapVal.className   = "vam-num-val "+(isAhead?"ok":"warn");
+    }
+    const gapSub = document.getElementById("vam-gap-sub");
+    if(gapSub) gapSub.textContent = isAhead ? `領先進度，繼續保持` : `需在剩餘 ${monthsLeft} 個月追回`;
+
+    const remVal = document.getElementById("vam-remain-val");
+    if(remVal) remVal.textContent = `¥ ${fmt(remain)} 萬`;
+    const remSub = document.getElementById("vam-remain-sub");
+    if(remSub) remSub.textContent = `月均需達 ¥${fmt(monthlyNeeded)} 萬`;
+
+    const twyrVal = document.getElementById("vam-2yr-val");
+    if(twyrVal){
+      twyrVal.textContent = `¥${fmt(actual)} 萬 / ¥${fmt(VAM_2YR)} 萬`;
+      twyrVal.className   = "vam-num-val "+(twoPct>=exp2Pct?"ok":"warn");
+    }
+    const twyrSub = document.getElementById("vam-2yr-sub");
+    if(twyrSub) twyrSub.textContent = `整體完成度 ${twoPct}%`;
+
+    // ── Year progress bar ──
+    const yrFill  = document.getElementById("vam-yr-fill");
+    const yrLabel = document.getElementById("vam-yr-label");
+    const yrMarker= document.getElementById("vam-yr-marker");
+    const yrMkLbl = document.getElementById("vam-yr-marker-label");
+    if(yrFill){
+      const cls = isAhead?"ok":"warn";
+      yrFill.style.width = yrPct+"%";
+      yrFill.className   = "prog-fill "+cls;
+    }
+    if(yrLabel) yrLabel.textContent = `${fmt(actual)} 萬 / ${fmt(VAM_YR)} 萬 = ${yrPct}%`;
+    if(yrMarker) yrMarker.style.left = expYrPct+"%";
+    if(yrMkLbl)  yrMkLbl.textContent = `預期進度 ${expYrPct}%`;
+
+    // ── 2-year progress bar ──
+    const twFill  = document.getElementById("vam-2yr-fill");
+    const twLabel = document.getElementById("vam-2yr-label");
+    const twMark  = document.getElementById("vam-2yr-marker");
+    const twMkLbl = document.getElementById("vam-2yr-marker-label");
+    if(twFill){
+      const cls = twoPct>=exp2Pct?"ok":"warn";
+      twFill.style.width = twoPct+"%";
+      twFill.className   = "prog-fill "+cls;
+    }
+    if(twLabel) twLabel.textContent = `${fmt(actual)} 萬 / ${fmt(VAM_2YR)} 萬 = ${twoPct}%`;
+    if(twMark)  twMark.style.left   = exp2Pct+"%";
+    if(twMkLbl) twMkLbl.textContent = `預期進度 ${exp2Pct}%`;
+
+    // ── Note ──
+    const note = document.getElementById("vam-note");
+    if(note){
+      const nextMonth = now.toLocaleDateString("zh-TW",{month:"long"});
+      if(isAhead){
+        note.textContent = `📌 目前超前進度 ¥${fmt(Math.abs(gap))} 萬，請繼續保持節奏。`;
+      } else {
+        const catchUp = Math.abs(gap);
+        note.textContent = `📌 若本月達成 ¥${fmt(catchUp)} 萬以上額外淨利，整體進度可追回至預期值。`;
+      }
+    }
+
+  }catch(e){
+    console.error("loadVamProgress", e);
+    // Fallback: leave hardcoded values untouched
+  }
+}
+
 /* ── INIT ── */
 loadApprovals();
 loadPipeline();
@@ -1049,6 +1167,7 @@ loadCashflow();
 loadBudgetKPI();
 loadOrderStats();
 loadContractAlerts();
+loadVamProgress();
 </script>
 </body>
 </html>
