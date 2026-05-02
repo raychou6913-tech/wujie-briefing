@@ -10,510 +10,762 @@
   --border:#222535;--border-hi:#363b58;
   --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
   --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
-  --warn:#f59e0b;--warn-dim:#f59e0b18;--danger:#ef4444;--danger-dim:#ef444418;
-  --amber:#f59e0b;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.brand{display:flex;align-items:center;gap:8px;}
-.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 7px var(--amber);}
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);box-shadow:0 0 6px var(--warn);}
 .brand-name{font-size:14px;font-weight:700;}
-.brand-sub{font-size:11px;color:var(--txt-mid);}
-.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:6px;min-height:34px;display:flex;align-items:center;}
+.brand-sub{font-size:10px;color:var(--txt-mid);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.sess-info{font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:6px;}
+.sess-name{font-weight:700;color:var(--txt-hi);}
+.sess-role{font-size:9px;color:var(--txt-lo);}
+.btn-topbar{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);white-space:nowrap;}
+.btn-topbar:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.btn-topbar.danger{border-color:var(--danger);color:var(--danger);}
+.nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
 
-/* ── KPI BAR ── */
-.kpi-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;}
-.kpi-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;min-width:calc(50% - 5px);}
-.kpi-label{font-size:9px;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
-.kpi-val{font-size:20px;font-weight:800;line-height:1;}
-.kpi-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+/* LAYOUT */
+.main{max-width:1200px;margin:0 auto;padding:20px 28px;}
 
-/* ── TABS ── */
-.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.tab{padding:12px 14px;font-size:12px;font-weight:600;color:var(--txt-mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-height:44px;}
-.tab.active{color:var(--txt-hi);border-bottom-color:var(--amber);}
+/* SECTION HEADER */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;}
+.sec-head:first-child{margin-top:0;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:10px;color:var(--accent);text-decoration:none;}
 
-.main{max-width:720px;margin:0 auto;padding:16px;}
-.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:10px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.kpi-label{font-size:9px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.kpi-val{font-size:30px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--txt-lo);}
 
-/* ── AI UPLOAD HERO ── */
-.upload-hero{background:var(--card);border:2px dashed var(--border-hi);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:.15s;margin-bottom:14px;}
-.upload-hero:hover,.upload-hero.drag-over{border-color:var(--accent);background:var(--card2);}
-.upload-icon{font-size:40px;margin-bottom:10px;}
-.upload-title{font-size:16px;font-weight:800;margin-bottom:6px;}
-.upload-sub{font-size:12px;color:var(--txt-mid);line-height:1.6;}
-.paste-hint{font-size:11px;color:var(--txt-lo);margin-top:10px;padding:6px 12px;background:var(--card2);border-radius:8px;display:inline-block;}
+/* CHIP */
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-info{background:#818cf820;color:var(--accent);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+.chip-done{background:var(--ok-dim);color:var(--ok);}
 
-/* ── PARSE RESULT ── */
-.parse-card{background:var(--card2);border:1px solid var(--border-hi);border-radius:12px;padding:16px;margin-bottom:14px;}
-.parse-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-.ai-badge{background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
-.parse-title{font-size:13px;font-weight:700;flex:1;}
-.parse-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
-.pf{background:var(--card);border-radius:8px;padding:10px;}
-.pf-label{font-size:9px;color:var(--txt-lo);margin-bottom:3px;}
-.pf-val{font-size:14px;font-weight:700;}
-.pf-val.warn{color:var(--warn);}
-.pf-val[contenteditable]{border-bottom:1px dashed var(--border-hi);outline:none;min-width:40px;}
+/* PROCUREMENT LIST */
+.po-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
+.po-card:hover{border-color:var(--border-hi);}
+.po-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;}
+.po-star{font-size:14px;flex-shrink:0;}
+.po-body{flex:1;min-width:0;}
+.po-name{font-size:13px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:7px;}
+.po-meta{font-size:10px;color:var(--txt-mid);}
+.po-right{text-align:right;flex-shrink:0;}
+.po-amt{font-size:15px;font-weight:800;margin-bottom:3px;}
+.po-person{font-size:9px;color:var(--txt-lo);}
+.po-toggle{font-size:11px;color:var(--txt-lo);padding:2px 6px;border-radius:5px;background:var(--card2);margin-left:8px;flex-shrink:0;transition:transform .2s;}
+.po-toggle.open{transform:rotate(180deg);}
 
-/* ── PROCURE LIST ── */
-.proc-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
-.pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.pc-name{font-size:13px;font-weight:700;}
-.pc-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;}
-.pcb-active{background:#3b82f620;color:#60a5fa;}
-.pcb-done{background:var(--ok-dim);color:var(--ok);}
-.pcb-pending{background:var(--warn-dim);color:var(--warn);}
-.pc-meta{font-size:11px;color:var(--txt-mid);margin-bottom:8px;}
-.pc-price{font-size:16px;font-weight:800;margin-bottom:8px;}
-.pc-detail{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
-.pc-tag{font-size:10px;color:var(--txt-mid);background:var(--card);padding:3px 8px;border-radius:6px;}
+/* COMPARE PANEL */
+.compare-panel{display:none;border-top:1px solid var(--border);background:var(--card2);padding:14px 16px;}
+.compare-panel.open{display:block;}
+.compare-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+.compare-table{width:100%;border-collapse:collapse;font-size:11px;}
+.compare-table th{text-align:left;padding:6px 10px;color:var(--txt-lo);font-weight:600;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.06em;}
+.compare-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--txt-mid);vertical-align:middle;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table td.highlight{color:var(--txt-hi);font-weight:700;}
+.compare-table td.recommended{color:var(--ok);font-weight:700;}
+.recommend-badge{background:var(--ok-dim);color:var(--ok);font-size:8px;font-weight:700;padding:1px 5px;border-radius:5px;margin-left:4px;}
+.warn-badge{background:var(--danger-dim);color:var(--danger);font-size:8px;font-weight:700;padding:1px 5px;border-radius:5px;margin-left:4px;}
+.compare-footer{margin-top:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.compare-note{font-size:10px;color:var(--txt-mid);}
+.btn-send-shawn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.btn-send-shawn:hover{opacity:.85;}
+.btn-send-shawn:disabled{opacity:.4;cursor:not-allowed;}
 
-/* ── SAMPLE TRACKING ── */
-.sample-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
-.sc-urgent{border-left:3px solid var(--danger);}
-.sc-pending{border-left:3px solid var(--warn);}
-.sc-done{border-left:3px solid var(--ok);}
+/* SUPPLIER TABLE SECTION */
+.supplier-section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.supplier-section-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.supplier-section-title{font-size:12px;font-weight:700;}
+.supplier-section-sub{font-size:10px;color:var(--txt-mid);}
+.supplier-table-wrap{overflow-x:auto;}
+.supplier-table{width:100%;border-collapse:collapse;min-width:600px;}
+.supplier-table th{padding:10px 14px;text-align:left;color:var(--txt-lo);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);}
+.supplier-table td{padding:10px 14px;font-size:11px;color:var(--txt-mid);border-bottom:1px solid var(--border);}
+.supplier-table tbody tr:last-child td{border-bottom:none;}
+.supplier-table td.col-supplier{color:var(--txt-hi);font-weight:700;font-size:12px;}
+.supplier-table td.col-price-best{color:var(--ok);font-weight:800;font-size:13px;}
+.supplier-table td.col-price{font-size:12px;color:var(--txt-mid);}
+.supplier-table tr.best-row td{background:#22c55e06;}
+.star-rating{color:var(--warn);letter-spacing:1px;}
+.send-shawn-wrap{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.send-shawn-note{font-size:10px;color:var(--txt-mid);}
+.btn-send{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.btn-send:hover{opacity:.85;}
+.btn-send:disabled{background:var(--card2);color:var(--txt-lo);cursor:not-allowed;}
 
-/* ── BUTTONS ── */
-.btn{font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;border:1px solid;min-height:38px;}
-.btn-primary{background:var(--amber);border-color:var(--amber);color:#000;}
-.btn-ok{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
-.btn-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
+/* LOGISTICS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.two-col-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.panel-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
 
-/* ── SUPPLIER ── */
-.supplier-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
-.supplier-row:last-child{border:none;}
-.sup-icon{width:36px;height:36px;border-radius:8px;background:var(--warn-dim);border:1px solid var(--warn);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.sup-body{flex:1;}
-.sup-name{font-size:13px;font-weight:600;}
-.sup-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.logi-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.logi-item:last-child{border-bottom:none;padding-bottom:0;}
+.logi-icon{width:28px;height:28px;border-radius:7px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.logi-body{flex:1;min-width:0;}
+.logi-name{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.logi-sub{font-size:9px;color:var(--txt-lo);margin-top:1px;}
+.status-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0;}
+.sc-sea{background:#0284c720;color:#38bdf8;}
+.sc-air{background:#8b5cf620;color:#a78bfa;}
+.sc-prod{background:var(--warn-dim);color:var(--warn);}
+.sc-stock{background:var(--card2);color:var(--txt-mid);}
+.sc-done{background:var(--ok-dim);color:var(--ok);}
 
-/* ── INPUT ── */
-.inp{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px 12px;border-radius:8px;font-size:14px;margin-bottom:8px;}
-.inp::placeholder{color:var(--txt-lo);}
-select.inp option{background:var(--card2);}
+/* AI UPLOAD PANEL */
+.ai-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.ai-panel-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+.ai-panel-title{font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.ai-badge{background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.ai-panel-body{padding:16px;}
+.upload-zone{border:2px dashed var(--border-hi);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:.15s;}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--card2);}
+.upload-icon{font-size:36px;margin-bottom:8px;}
+.upload-title{font-size:14px;font-weight:700;margin-bottom:5px;}
+.upload-sub{font-size:11px;color:var(--txt-mid);line-height:1.6;}
+.paste-hint{font-size:10px;color:var(--txt-lo);margin-top:8px;padding:5px 10px;background:var(--card2);border-radius:7px;display:inline-block;}
 
-/* ── EMPTY ── */
-.empty{text-align:center;padding:28px 16px;color:var(--txt-lo);}
-.empty-icon{font-size:26px;margin-bottom:6px;}
-
-@media(min-width:600px){
-  .kpi-chip{min-width:calc(33% - 7px);}
-  .parse-grid{grid-template-columns:repeat(3,1fr);}
-  .main{padding:20px 24px;}
-  .topbar,.kpi-bar,.tab-bar{padding-left:24px;padding-right:24px;}
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .two-col{grid-template-columns:1fr;}
+}
+@media(max-width:640px){
+  .main{padding:14px;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">
     <div class="brand-dot"></div>
-    <div>
-      <span class="brand-name">蕪解 ERP</span>
-      <span class="brand-sub"> 採購台</span>
+    <div><div class="brand-name">蕪解 ERP</div><div class="brand-sub">採購台</div></div>
+  </div>
+  <div class="topbar-right">
+    <div class="sess-info">
+      <span class="sess-name" id="sess-name">—</span>
+      <span class="sess-role" id="sess-role"></span>
     </div>
+    <button class="btn-topbar" onclick="switchAccount()">切換帳號</button>
+    <button class="btn-topbar danger" onclick="doLogout()">登出</button>
+    <a class="btn-topbar" href="erp-war-room.html">← 戰情室</a>
   </div>
-  <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
-</div>
-
-<!-- ── KPI BAR ── -->
-<div class="kpi-bar">
-  <div class="kpi-chip">
-    <div class="kpi-label">本月採購金額</div>
-    <div class="kpi-val" id="kpi-total" style="color:var(--warn)">載入中</div>
-    <div class="kpi-sub" id="kpi-total-sub">—</div>
-  </div>
-  <div class="kpi-chip">
-    <div class="kpi-label">待 Ray 批核</div>
-    <div class="kpi-val" id="kpi-pending" style="color:var(--accent)">—</div>
-    <div class="kpi-sub">採購審批佇列</div>
-  </div>
-  <div class="kpi-chip">
-    <div class="kpi-label">打樣待寄出</div>
-    <div class="kpi-val" id="kpi-samples" style="color:var(--ok)">—</div>
-    <div class="kpi-sub">需寄版權方確認</div>
-  </div>
-</div>
-
-<!-- ── TABS ── -->
-<div class="tab-bar">
-  <button class="tab active" onclick="switchTab(this,'tab-ai')">🤖 AI 解析</button>
-  <button class="tab" onclick="switchTab(this,'tab-queue')">📋 採購佇列</button>
-  <button class="tab" onclick="switchTab(this,'tab-samples')">📦 打樣寄出</button>
-  <button class="tab" onclick="switchTab(this,'tab-suppliers')">🏭 供應商</button>
 </div>
 
 <div class="main">
 
-  <!-- ══ TAB 1: AI 解析 ══ -->
-  <div id="tab-ai">
-    <input type="file" id="quote-file" accept="image/*,.pdf" style="display:none" onchange="handleFile(this.files[0])">
-
-    <div class="upload-hero" id="upload-zone"
-      onclick="document.getElementById('quote-file').click()"
-      ondragover="event.preventDefault();this.classList.add('drag-over')"
-      ondragleave="this.classList.remove('drag-over')"
-      ondrop="event.preventDefault();this.classList.remove('drag-over');handleFile(event.dataTransfer.files[0])">
-      <div class="upload-icon">📸</div>
-      <div class="upload-title">拍照 / 截圖 / PDF 丟進來</div>
-      <div class="upload-sub">AI 自動讀取供應商、品項、單價、MOQ、交期、付款條件</div>
-      <div class="paste-hint">💡 微信截圖直接 Ctrl+V 貼上</div>
+  <!-- KPI -->
+  <div class="sec-head" style="margin-top:0;"><span class="sec-title">採購台 · 賴哥 / 木子 核心指標</span></div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">待採購 PO</div>
+      <div class="kpi-val" id="kpi-po" style="color:var(--warn)">3</div>
+      <div class="kpi-sub">張等待處理</div>
     </div>
-
-    <div id="parse-result" style="display:none;"></div>
-
-    <div id="submit-area" style="display:none;">
-      <button class="btn btn-primary" style="width:100%;font-size:14px;min-height:48px;" onclick="submitToRay()">🚀 確認後送 Ray 批核</button>
-      <div id="submit-result" style="display:none;margin-top:8px;font-size:12px;text-align:center;padding:8px;border-radius:8px;"></div>
-      <div style="font-size:10px;color:var(--txt-lo);text-align:center;margin-top:6px;">⚠ 數字必須親自確認，採購出錯代價大</div>
+    <div class="kpi-card">
+      <div class="kpi-label">比價進行中</div>
+      <div class="kpi-val" id="kpi-compare" style="color:var(--accent)">2</div>
+      <div class="kpi-sub">項詢價中</div>
     </div>
-  </div>
-
-  <!-- ══ TAB 2: 採購佇列 ══ -->
-  <div id="tab-queue" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <span class="section-title" style="margin:0;">採購記錄</span>
-      <button onclick="loadQueue()" style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">重新整理</button>
+    <div class="kpi-card">
+      <div class="kpi-label">本月採購金額</div>
+      <div class="kpi-val" id="kpi-total" style="color:var(--ok)">¥ 42.8</div>
+      <div class="kpi-sub" id="kpi-total-sub">萬 RMB</div>
     </div>
-    <div id="queue-list"><div class="empty"><div class="empty-icon">📋</div>載入中...</div></div>
-  </div>
-
-  <!-- ══ TAB 3: 打樣寄出 ══ -->
-  <div id="tab-samples" style="display:none;">
-    <div class="section-title">待寄出打樣追蹤</div>
-    <div id="sample-list"><div class="empty"><div class="empty-icon">📦</div>載入中...</div></div>
-
-    <div class="card" style="margin-top:8px;">
-      <div class="section-title">填報寄出紀錄</div>
-      <input class="inp" id="smp-product" placeholder="產品名稱 / IP品牌">
-      <input class="inp" id="smp-type" placeholder="打樣類型（素模/上色/大貨樣）">
-      <input class="inp" id="smp-tracking" placeholder="快遞單號">
-      <input class="inp" id="smp-date" type="date">
-      <button class="btn btn-ok" style="width:100%;" onclick="submitSample()">✓ 記錄寄出</button>
-      <div id="smp-result" style="display:none;margin-top:8px;font-size:12px;text-align:center;"></div>
+    <div class="kpi-card">
+      <div class="kpi-label">逾期跟進</div>
+      <div class="kpi-val" id="kpi-overdue" style="color:var(--danger)">1</div>
+      <div class="kpi-sub">項需即時處理</div>
     </div>
   </div>
 
-  <!-- ══ TAB 4: 供應商 ══ -->
-  <div id="tab-suppliers" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <span class="section-title" style="margin:0;">供應商名單</span>
-      <button onclick="loadSuppliers()" style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">重新整理</button>
+  <!-- PROCUREMENT LIST -->
+  <div class="sec-head"><span class="sec-title">採購單列表</span><span style="font-size:10px;color:var(--txt-lo)">點擊展開三家比價</span></div>
+
+  <!-- PO 1: Snoopy 夏季大貨 ⭐ 最重要 -->
+  <div class="po-card">
+    <div class="po-header" onclick="togglePO('po1')">
+      <div class="po-star">⭐</div>
+      <div class="po-body">
+        <div class="po-name">
+          Snoopy 夏季大貨 PO
+          <span class="chip chip-warn">待 Shawn 批核 → 送 Ray</span>
+        </div>
+        <div class="po-meta">IP：Snoopy · 供應商：東莞永盛玩具 · 30/40/30 付款</div>
+      </div>
+      <div class="po-right">
+        <div class="po-amt" style="color:var(--warn)">¥ 148,000</div>
+        <div class="po-person">負責：賴哥</div>
+      </div>
+      <div class="po-toggle" id="po1-toggle">▼</div>
     </div>
-    <div class="card">
-      <div id="supplier-list"><div class="empty"><div class="empty-icon">🏭</div>載入中...</div></div>
+    <div class="compare-panel" id="po1">
+      <div class="compare-title">三家比價 · 賴哥推薦永盛</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>供應商</th>
+            <th>報價</th>
+            <th>交期</th>
+            <th>付款條件</th>
+            <th>備注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="recommended">東莞永盛玩具 <span class="recommend-badge">✓ 推薦</span></td>
+            <td class="recommended">¥ 148,000</td>
+            <td class="highlight">45 天</td>
+            <td class="highlight">30/40/30</td>
+            <td style="color:var(--ok)">熟悉 Snoopy 授權標準</td>
+          </tr>
+          <tr>
+            <td>廣州德盛工藝</td>
+            <td>¥ 162,000</td>
+            <td>60 天</td>
+            <td>50/50</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>深圳宏達玩具</td>
+            <td>¥ 155,000</td>
+            <td>50 天</td>
+            <td>40/60</td>
+            <td><span class="warn-badge">⚠ 曾遲交</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="compare-footer">
+        <div class="compare-note">比價完成 · 賴哥確認品質無問題 · 建議即時送審</div>
+        <button class="btn-send-shawn" id="btn-shawn-po1" onclick="sendToShawn('btn-shawn-po1','Snoopy 夏季大貨 PO')">✓ 送 Shawn 審核</button>
+      </div>
     </div>
   </div>
 
-</div>
+  <!-- PO 2: Muziktiger 公仔打樣費 -->
+  <div class="po-card">
+    <div class="po-header" onclick="togglePO('po2')">
+      <div class="po-star" style="visibility:hidden">⭐</div>
+      <div class="po-body">
+        <div class="po-name">
+          Muziktiger 公仔打樣費
+          <span class="chip chip-ok">已批核，準備出貨</span>
+        </div>
+        <div class="po-meta">IP：Muziktiger · 供應商：廣州明盛模型 · 打樣送版權方</div>
+      </div>
+      <div class="po-right">
+        <div class="po-amt" style="color:var(--ok)">¥ 8,500</div>
+        <div class="po-person">負責：木子</div>
+      </div>
+      <div class="po-toggle" id="po2-toggle">▼</div>
+    </div>
+    <div class="compare-panel" id="po2">
+      <div class="compare-title">供應商詳情</div>
+      <table class="compare-table">
+        <thead>
+          <tr><th>供應商</th><th>報價</th><th>類型</th><th>狀態</th><th>備注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="recommended">廣州明盛模型 <span class="recommend-badge">✓ 已選定</span></td>
+            <td class="recommended">¥ 8,500</td>
+            <td class="highlight">公仔打樣</td>
+            <td style="color:var(--ok)">已批核</td>
+            <td>打樣送版權方 Muziktiger Japan</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="compare-footer">
+        <div class="compare-note">已批核 · 等待安排出貨 DHL → 日本版權方</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PO 3: Opanchu 抱枕布料 -->
+  <div class="po-card">
+    <div class="po-header" onclick="togglePO('po3')">
+      <div class="po-star" style="visibility:hidden">⭐</div>
+      <div class="po-body">
+        <div class="po-name">
+          Opanchu 抱枕布料
+          <span class="chip chip-info">木子詢價中</span>
+        </div>
+        <div class="po-meta">IP：Opanchu · 比價中（3 家中的 2 家已回覆）</div>
+      </div>
+      <div class="po-right">
+        <div class="po-amt" style="color:var(--accent)">¥ 22,000</div>
+        <div class="po-person">負責：木子</div>
+      </div>
+      <div class="po-toggle" id="po3-toggle">▼</div>
+    </div>
+    <div class="compare-panel" id="po3">
+      <div class="compare-title">比價進行中 · 1 家待回覆</div>
+      <table class="compare-table">
+        <thead>
+          <tr><th>供應商</th><th>報價</th><th>交期</th><th>狀態</th><th>備注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="highlight">廣州順豐布料</td>
+            <td class="highlight">¥ 22,000</td>
+            <td>30 天</td>
+            <td style="color:var(--ok)">已回覆</td>
+            <td>符合 Opanchu IP 規格</td>
+          </tr>
+          <tr>
+            <td>佛山鴻發紡織</td>
+            <td>¥ 24,500</td>
+            <td>35 天</td>
+            <td style="color:var(--ok)">已回覆</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>東莞三合布業</td>
+            <td style="color:var(--txt-lo)">—</td>
+            <td style="color:var(--txt-lo)">—</td>
+            <td style="color:var(--warn)">待回覆</td>
+            <td style="color:var(--warn)">木子追蹤中</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="compare-footer">
+        <div class="compare-note">等第三家回覆後賴哥決定，預計 2-3 天</div>
+        <button class="btn-send-shawn" id="btn-shawn-po3" onclick="sendToShawn('btn-shawn-po3','Opanchu 抱枕布料')" disabled style="opacity:.4;cursor:not-allowed;">⏳ 等比價完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PO 4: 快閃店道具（泰國）-->
+  <div class="po-card">
+    <div class="po-header" onclick="togglePO('po4')">
+      <div class="po-star" style="visibility:hidden">⭐</div>
+      <div class="po-body">
+        <div class="po-name">
+          快閃店道具採購（泰國）
+          <span class="chip chip-info">Shawn 審核中</span>
+        </div>
+        <div class="po-meta">IP：通用 · 供應商：曼谷本地 · 等 Shawn 現場確認</div>
+      </div>
+      <div class="po-right">
+        <div class="po-amt" style="color:var(--accent)">฿ 35,000</div>
+        <div class="po-person">負責：Shawn</div>
+      </div>
+      <div class="po-toggle" id="po4-toggle">▼</div>
+    </div>
+    <div class="compare-panel" id="po4">
+      <div class="compare-title">採購詳情</div>
+      <table class="compare-table">
+        <thead>
+          <tr><th>項目</th><th>金額</th><th>狀態</th><th>備注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="highlight">快閃展位道具 · 背板 · 展架</td>
+            <td class="highlight">฿ 35,000</td>
+            <td style="color:var(--accent)">Shawn 確認中</td>
+            <td>曼谷本地採購，需 Shawn 現場確認規格</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="compare-footer">
+        <div class="compare-note">Shawn 在曼谷現場確認後直接下單</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PO 5: 包裝材料補貨 -->
+  <div class="po-card">
+    <div class="po-header" onclick="togglePO('po5')">
+      <div class="po-star" style="visibility:hidden">⭐</div>
+      <div class="po-body">
+        <div class="po-name">
+          包裝材料補貨（北京庫）
+          <span class="chip chip-done">✓ 已完成</span>
+        </div>
+        <div class="po-meta">IP：通用 · 供應商：北京德榮包裝 · 北京庫補貨</div>
+      </div>
+      <div class="po-right">
+        <div class="po-amt" style="color:var(--ok)">¥ 12,000</div>
+        <div class="po-person">負責：賴哥</div>
+      </div>
+      <div class="po-toggle" id="po5-toggle">▼</div>
+    </div>
+    <div class="compare-panel" id="po5">
+      <div class="compare-title">採購詳情</div>
+      <table class="compare-table">
+        <thead>
+          <tr><th>供應商</th><th>金額</th><th>品項</th><th>狀態</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="recommended">北京德榮包裝 <span class="recommend-badge">✓ 長期合作</span></td>
+            <td class="recommended">¥ 12,000</td>
+            <td>禮盒 × 1000 / 提袋 × 2000</td>
+            <td style="color:var(--ok)">✓ 已入庫</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="compare-footer">
+        <div class="compare-note">5/01 已確認入庫 · 張作興簽收</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPLIER COMPARISON TABLE -->
+  <div class="sec-head"><span class="sec-title">供應商比價詳細表 · Snoopy 夏季大貨</span></div>
+  <div class="supplier-section">
+    <div class="supplier-section-header">
+      <div>
+        <div class="supplier-section-title">Snoopy 夏季大貨 · 三家比價明細</div>
+        <div class="supplier-section-sub">賴哥確認：永盛報價最低、品質最穩、熟悉 Snoopy 授權標準</div>
+      </div>
+      <span class="chip chip-warn">待送 Shawn</span>
+    </div>
+    <div class="supplier-table-wrap">
+      <table class="supplier-table">
+        <thead>
+          <tr>
+            <th>評比項目</th>
+            <th>東莞永盛玩具</th>
+            <th>廣州德盛工藝</th>
+            <th>深圳宏達玩具</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best-row">
+            <td style="color:var(--txt-mid);font-size:10px;">報價</td>
+            <td class="col-price-best">¥ 148,000 <span class="recommend-badge">✓ 推薦</span></td>
+            <td class="col-price">¥ 162,000</td>
+            <td class="col-price">¥ 155,000</td>
+          </tr>
+          <tr class="best-row">
+            <td style="color:var(--txt-mid);font-size:10px;">交期</td>
+            <td class="col-supplier">45 天</td>
+            <td>60 天</td>
+            <td>50 天</td>
+          </tr>
+          <tr class="best-row">
+            <td style="color:var(--txt-mid);font-size:10px;">付款條件</td>
+            <td class="col-supplier">30/40/30</td>
+            <td>50/50</td>
+            <td>40/60</td>
+          </tr>
+          <tr class="best-row">
+            <td style="color:var(--txt-mid);font-size:10px;">品質評分</td>
+            <td><span class="star-rating">★★★★★</span></td>
+            <td><span class="star-rating">★★★★</span><span style="color:var(--txt-lo)">☆</span></td>
+            <td><span class="star-rating">★★★★</span><span style="color:var(--txt-lo)">☆</span></td>
+          </tr>
+          <tr class="best-row">
+            <td style="color:var(--txt-mid);font-size:10px;">備注</td>
+            <td style="color:var(--ok);font-size:11px;">熟悉 Snoopy 授權標準</td>
+            <td>—</td>
+            <td><span class="warn-badge">⚠ 曾遲交</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="send-shawn-wrap">
+      <div class="send-shawn-note">賴哥推薦東莞永盛玩具 · 30/40/30 條件 · 最低報價 ¥148,000</div>
+      <button class="btn-send" id="btn-send-main" onclick="sendToShawnMain()">✓ 送 Shawn 審核</button>
+    </div>
+  </div>
+
+  <!-- LOGISTICS + AI -->
+  <div class="two-col">
+    <!-- 在途貨物追蹤 -->
+    <div class="two-col-card">
+      <div class="panel-title">在途貨物追蹤</div>
+      <div class="logi-item">
+        <div class="logi-icon">🚢</div>
+        <div class="logi-body">
+          <div class="logi-name">Snoopy 春節尾箱</div>
+          <div class="logi-sub">曼谷 → 北京 · 高維安排 · 預計 5/15 到</div>
+        </div>
+        <div class="status-chip sc-sea">海運中</div>
+      </div>
+      <div class="logi-item">
+        <div class="logi-icon">✈️</div>
+        <div class="logi-body">
+          <div class="logi-name">Muziktiger 打樣</div>
+          <div class="logi-sub">北京 → 日本 · DHL</div>
+        </div>
+        <div class="status-chip sc-done">已獲收</div>
+      </div>
+      <div class="logi-item">
+        <div class="logi-icon">🏭</div>
+        <div class="logi-body">
+          <div class="logi-name">Snoopy 夏季大貨</div>
+          <div class="logi-sub">東莞廠生產中 · 07-15 出廠</div>
+        </div>
+        <div class="status-chip sc-prod">生產中 D2</div>
+      </div>
+    </div>
+
+    <!-- AI 解析入口 -->
+    <div class="two-col-card">
+      <div class="panel-title">
+        <span>📸 AI 解析報價單</span>
+        <span class="chip chip-info">採購台特色</span>
+      </div>
+      <input type="file" id="ai-file" accept="image/*,.pdf" style="display:none" onchange="handleAiFile(this.files[0])">
+      <div class="upload-zone" id="upload-zone"
+        onclick="document.getElementById('ai-file').click()"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="event.preventDefault();this.classList.remove('drag-over');handleAiFile(event.dataTransfer.files[0])">
+        <div class="upload-icon">📸</div>
+        <div class="upload-title">貼上截圖 / 上傳報價單</div>
+        <div class="upload-sub">AI 自動解析 → 存入比價庫<br>品項、單價、MOQ、交期、付款條件</div>
+        <div class="paste-hint">💡 Ctrl+V 直接貼上微信截圖</div>
+      </div>
+      <div id="ai-parse-result" style="display:none;margin-top:10px;"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
 
 <script>
-const _P   = "https://feishu-proxy.raychou6913.workers.dev";
-const _AT  = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _TBLS = {
-  approval:  "tblD6acV3m2ZXJHe",
-  procure:   "tblae5v8pGMXleJZ",
-  pipeline:  "tblfX6fsMshb7KL0",
-  supplier:  "tblgpiqW1yOa2DR4",
-};
-const GEMINI_KEY = "AIzaSyBC51Yef5FtCESl2AF7A3X1WKIfoc0Bojo";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+GEMINI_KEY;
-let _tk=null, _quoteData=null;
+/* ── AUTH ── */
+const ERP_SESS_KEY = 'erp_sess';
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem(ERP_SESS_KEY)||'null');
+  if(!s||Date.now()-s.ts>7*86400000){ location.href='login.html'; return null; }
+  return s;
+}
+const SESS = requireAuth();
+if(!SESS) throw new Error('redirect');
 
-/* ── SESSION ── */
-(function(){
-  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
-})();
+document.getElementById('sess-name').textContent = SESS.name || '—';
+document.getElementById('sess-role').textContent = SESS.role || '';
 
-/* ── PASTE ── */
-document.addEventListener('paste',e=>{
-  const items=e.clipboardData?.items||[];
+function doLogout(){
+  localStorage.removeItem(ERP_SESS_KEY);
+  location.href='login.html';
+}
+function switchAccount(){
+  location.href='login.html';
+}
+
+/* ── FEISHU ── */
+const _P  = 'https://feishu-proxy.raychou6913.workers.dev';
+const _AT = 'YlVkb0ACjacJVqsgRT5j4c6gpeh';
+const _T  = { approval: 'tblD6acV3m2ZXJHe' };
+let _tok=null, _tokExp=0;
+
+async function tok(){
+  if(_tok&&Date.now()<_tokExp) return _tok;
+  const r=await fetch(`${_P}/auth/token`,{method:'POST',headers:{'Content-Type':'application/json','Origin':'https://raychou6913-tech.github.io'},body:'{}'});
+  const d=await r.json();
+  _tok=d.tenant_access_token; _tokExp=Date.now()+6300000;
+  return _tok;
+}
+async function query(tbl,extra=''){
+  const t=await tok();
+  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,
+    {headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
+  const d=await r.json();
+  return (d.data&&d.data.items)||[];
+}
+async function createRec(tbl,fields){
+  const t=await tok();
+  return fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records`,{
+    method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json','Origin':'https://raychou6913-tech.github.io'},
+    body:JSON.stringify({fields})}).then(r=>r.json());
+}
+function fv(f,k){
+  const v=f[k];
+  if(v===null||v===undefined) return '';
+  if(typeof v==='number') return v;
+  if(typeof v==='string') return v;
+  if(Array.isArray(v)) return v.map(x=>typeof x==='object'?(x.text||x.name||''):String(x)).join('');
+  if(typeof v==='object') return v.text||v.name||v.value||'';
+  return String(v);
+}
+
+/* ── KPI LOAD FROM FEISHU (override only if success) ── */
+async function loadKPIsFromFeishu(){
+  try{
+    const rows = await query(_T.approval);
+    const pending = rows.filter(r=>fv(r.fields,'審批類型')==='採購審批'&&fv(r.fields,'審批狀態')==='待審批');
+    if(pending.length>0){
+      document.getElementById('kpi-po').textContent = pending.length;
+    }
+    // compute total from approved procurement
+    const approved = rows.filter(r=>fv(r.fields,'審批類型')==='採購審批'&&fv(r.fields,'審批狀態')==='已批核');
+    const total = approved.reduce((s,r)=>s+(parseFloat(fv(r.fields,'金額'))||0),0);
+    if(total>0){
+      document.getElementById('kpi-total').textContent = '¥ '+(total/10000).toFixed(1);
+      document.getElementById('kpi-total-sub').textContent = '萬 RMB';
+    }
+  }catch(e){ /* keep prefill */ }
+}
+
+/* ── PO TOGGLE ── */
+function togglePO(id){
+  const panel = document.getElementById(id);
+  const toggle = document.getElementById(id+'-toggle');
+  if(!panel||!toggle) return;
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  toggle.classList.toggle('open',!isOpen);
+}
+
+/* ── SEND TO SHAWN ── */
+function sendToShawn(btnId, title){
+  const btn = document.getElementById(btnId);
+  if(!btn||btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '已送出 ✓';
+  btn.style.opacity = '0.5';
+  btn.style.background = 'var(--card2)';
+  btn.style.color = 'var(--txt-mid)';
+  btn.style.border = '1px solid var(--border)';
+  // attempt Feishu write (non-blocking)
+  const fields = {
+    '審批標題': '採購審批 · '+title,
+    '審批類型': '採購審批',
+    '申請人': SESS.name||'賴哥',
+    '申請日期': Date.now(),
+    '審批狀態': '待審批',
+    '申請說明': '由賴哥/木子完成比價後送 Shawn 複核 → 再送 Ray 最終批核',
+  };
+  createRec(_T.approval, fields).catch(()=>{});
+}
+
+function sendToShawnMain(){
+  const btn = document.getElementById('btn-send-main');
+  if(!btn||btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '已送出 ✓';
+  btn.style.background = 'var(--card2)';
+  btn.style.color = 'var(--txt-mid)';
+  btn.style.cursor = 'not-allowed';
+  // mirror: also update the PO1 button
+  const b1 = document.getElementById('btn-shawn-po1');
+  if(b1){ b1.disabled=true; b1.textContent='已送出 ✓'; b1.style.opacity='0.5'; }
+  const fields = {
+    '審批標題': '採購審批 · Snoopy 夏季大貨 PO · 東莞永盛玩具 ¥148,000',
+    '審批類型': '採購審批',
+    '申請人': SESS.name||'賴哥',
+    '申請日期': Date.now(),
+    '審批狀態': '待審批',
+    '申請說明': '三家比價完成，賴哥推薦東莞永盛玩具 ¥148,000，30/40/30 付款，交期 45 天，熟悉 Snoopy 授權標準。請 Shawn 複核後送 Ray 最終批核。',
+    '金額': 148000,
+    '幣別': 'RMB',
+  };
+  createRec(_T.approval, fields).catch(()=>{});
+}
+
+/* ── AI PARSE (Ctrl+V paste) ── */
+const GEMINI_KEY = 'AIzaSyBC51Yef5FtCESl2AF7A3X1WKIfoc0Bojo';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+
+document.addEventListener('paste', e=>{
+  const items = e.clipboardData?.items||[];
   for(const item of items){
     if(item.type.startsWith('image/')){
       e.preventDefault();
-      handleFile(item.getAsFile());
+      handleAiFile(item.getAsFile());
       break;
     }
   }
 });
 
-/* ── TOKEN + HELPERS ── */
-async function _getToken(){
-  if(_tk) return _tk;
-  const r=await fetch(_P+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-  const d=await r.json();
-  _tk=d.tenant_access_token;
-  setTimeout(()=>_tk=null,110*60*1000);
-  return _tk;
-}
-function _fv(f,k){
-  const v=f[k];
-  if(!v&&v!==0) return "";
-  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
-  if(typeof v==="object") return v.text||v.link||"";
-  return String(v);
-}
-async function _getRecords(tbl,filter=""){
-  const tk=await _getToken();
-  const url=`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${filter?"&filter="+encodeURIComponent(filter):""}`;
-  const r=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
-  const d=await r.json();
-  return d.data?.items||[];
-}
-async function _createRecord(tbl,fields){
-  const tk=await _getToken();
-  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records`,{
-    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-    body:JSON.stringify({fields})
-  });
-  return r.json();
-}
-
-/* ── TABS ── */
-const ALL_TABS=['tab-ai','tab-queue','tab-samples','tab-suppliers'];
-function switchTab(btn,tabId){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  ALL_TABS.forEach(id=>document.getElementById(id).style.display=id===tabId?'':'none');
-  if(tabId==='tab-queue') loadQueue();
-  if(tabId==='tab-samples') loadSamples();
-  if(tabId==='tab-suppliers') loadSuppliers();
-}
-
-/* ── KPI ── */
-async function loadKPIs(){
-  try{
-    const [approvals,procs]=await Promise.all([
-      _getRecords(_TBLS.approval,'CurrentValue.[審批類型]="採購審批"'),
-      _getRecords(_TBLS.procure)
-    ]);
-    const pendingCount=approvals.filter(a=>_fv(a.fields,"審批狀態")==="待審批").length;
-    document.getElementById('kpi-pending').textContent=pendingCount;
-
-    const total=procs.reduce((s,p)=>{
-      const st=_fv(p.fields,"採購狀態");
-      if(st==="進行中"||st==="已完成") return s+Number(_fv(p.fields,"議定價格")||0);
-      return s;
-    },0);
-    document.getElementById('kpi-total').textContent=total>0?'¥'+_fmt(total):'¥0';
-    document.getElementById('kpi-total-sub').textContent=procs.length+'筆採購記錄';
-
-    // 打樣待寄出：採購中 且 打樣寄出日期空
-    const samplePending=procs.filter(p=>{
-      const f=p.fields;
-      return _fv(f,"採購類型")==="打樣"&&!_fv(f,"打樣寄出日期");
-    }).length;
-    document.getElementById('kpi-samples').textContent=samplePending||0;
-  }catch(e){}
-}
-function _fmt(n){return n>=10000?(n/10000).toFixed(1)+'萬':n.toLocaleString();}
-
-/* ── FILE HANDLING ── */
-function handleFile(file){
+function handleAiFile(file){
   if(!file) return;
-  const res=document.getElementById('parse-result');
-  const sub=document.getElementById('submit-area');
-  res.style.display='block'; sub.style.display='none';
-  res.innerHTML=`<div class="parse-card"><div style="text-align:center;padding:20px;color:var(--txt-mid);"><div style="font-size:32px;margin-bottom:8px">🤖</div>AI 讀取中 · ${file.name||'截圖'}<br><small style="font-size:11px;color:var(--txt-lo)">自動識別品項、單價、交期...</small></div></div>`;
-  const reader=new FileReader();
-  reader.onload=async e=>{
-    const base64=e.target.result.split(',')[1];
-    const mime=file.type||'image/jpeg';
+  const res = document.getElementById('ai-parse-result');
+  res.style.display='block';
+  res.innerHTML=`<div style="text-align:center;padding:14px;color:var(--txt-mid);font-size:11px;"><div style="font-size:26px;margin-bottom:6px">🤖</div>AI 解析中 · ${file.name||'截圖'}</div>`;
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    const base64 = e.target.result.split(',')[1];
+    const mime = file.type||'image/jpeg';
     try{
-      const p=await callGemini(base64,mime,file.name||'截圖');
-      _quoteData=p;
-      renderResult(p,file.name||'截圖');
-      sub.style.display='block';
+      const p = await callGemini(base64, mime);
+      renderAiResult(p, res);
     }catch(err){
-      res.innerHTML=`<div class="parse-card"><div style="color:var(--danger);padding:16px;">解析失敗：${err.message}</div></div>`;
+      res.innerHTML=`<div style="color:var(--danger);font-size:11px;padding:10px;">解析失敗：${err.message}</div>`;
     }
   };
   reader.readAsDataURL(file);
 }
 
-async function callGemini(base64,mime,name){
-  const prompt=`你是採購AI助理。從報價單圖片/PDF精確提取以下欄位，返回JSON（找不到填null）：
+async function callGemini(base64, mime){
+  const prompt=`你是採購AI助理。從報價單圖片精確提取以下欄位，返回JSON（找不到填null）：
 {"supplier":"供應商名稱","item":"品項名稱","unit_price":"單價（僅數字）","qty":"建議數量（僅數字）","total":"總金額（僅數字）","currency":"幣別(RMB/TWD/USD等)","moq":"最小起訂量（僅數字）","lead_time_days":"交期工作天（僅數字）","payment_terms":"付款條件說明","delivery_date":"預計交貨日期","notes":"其他備注"}
 只返回JSON。`;
   const body={contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:base64}}]}],generationConfig:{temperature:0.1,maxOutputTokens:512}};
-  const r=await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const d=await r.json();
-  const text=d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+  const text=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
   const m=text.match(/\{[\s\S]*\}/);
-  if(!m) throw new Error("AI 無法識別此報價單格式");
+  if(!m) throw new Error('AI 無法識別此報價單格式');
   return JSON.parse(m[0]);
 }
 
-function renderResult(p,name){
-  const safe=v=>(v!=null&&v!=="")?""+v:"—";
-  document.getElementById('parse-result').innerHTML=`
-  <div class="parse-card">
-    <div class="parse-header">
-      <span class="ai-badge">✨ AI 解析完成</span>
-      <span class="parse-title">${name}</span>
+function renderAiResult(p, container){
+  const safe=v=>(v!=null&&v!=='')?""+v:"—";
+  container.innerHTML=`
+  <div style="background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:12px;">
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
+      <span style="background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;">✨ AI 解析完成</span>
       <span style="font-size:10px;color:var(--warn)">請賴哥確認數字</span>
     </div>
-    <div class="parse-grid">
-      <div class="pf"><div class="pf-label">供應商</div><div class="pf-val">${safe(p.supplier)}</div></div>
-      <div class="pf"><div class="pf-label">品項</div><div class="pf-val">${safe(p.item)}</div></div>
-      <div class="pf"><div class="pf-label">單價（${p.currency||'RMB'}）</div><div class="pf-val warn">¥ ${safe(p.unit_price)}</div></div>
-      <div class="pf"><div class="pf-label">數量</div><div class="pf-val pf-val" id="q-qty" contenteditable="true">${safe(p.qty)}</div></div>
-      <div class="pf"><div class="pf-label">MOQ</div><div class="pf-val">${safe(p.moq)}</div></div>
-      <div class="pf"><div class="pf-label">總金額</div><div class="pf-val warn" style="font-size:16px;">¥ ${safe(p.total)}</div></div>
-      <div class="pf"><div class="pf-label">交期（工作天）</div><div class="pf-val">${safe(p.lead_time_days)} 天</div></div>
-      <div class="pf"><div class="pf-label">付款條件</div><div class="pf-val" style="font-size:11px;">${safe(p.payment_terms)}</div></div>
-      <div class="pf"><div class="pf-label">預計交貨日</div><div class="pf-val" style="font-size:11px;">${safe(p.delivery_date)}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;">
+      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">供應商</div><div style="font-size:12px;font-weight:700;">${safe(p.supplier)}</div></div>
+      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">品項</div><div style="font-size:12px;font-weight:700;">${safe(p.item)}</div></div>
+      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">總金額</div><div style="font-size:14px;font-weight:800;color:var(--warn);">${p.currency||'¥'} ${safe(p.total)}</div></div>
+      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">交期</div><div style="font-size:12px;font-weight:700;">${safe(p.lead_time_days)} 天</div></div>
+      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">付款條件</div><div style="font-size:11px;font-weight:600;">${safe(p.payment_terms)}</div></div>
+      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">MOQ</div><div style="font-size:12px;font-weight:700;">${safe(p.moq)}</div></div>
     </div>
-    ${p.notes?`<div style="font-size:11px;color:var(--txt-mid);margin-bottom:4px;">📝 ${p.notes}</div>`:''}
-    <div style="font-size:10px;color:var(--txt-lo);">數字可直接點擊修改</div>
+    ${p.notes?`<div style="font-size:10px;color:var(--txt-mid);margin-bottom:8px;">📝 ${p.notes}</div>`:''}
+    <button onclick="saveAiToCompare(${JSON.stringify(p).replace(/"/g,'&quot;')})" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;">💾 存入比價庫 → 送 Ray</button>
   </div>`;
 }
 
-/* ── SUBMIT TO RAY ── */
-async function submitToRay(){
-  if(!_quoteData){alert("請先上傳報價單");return;}
-  const btn=document.querySelector('.btn-primary');
-  const res=document.getElementById('submit-result');
-  btn.disabled=true;btn.textContent='送出中...';
-  const p=_quoteData;
-  const s=JSON.parse(localStorage.getItem("wujie_session")||"{}");
-  const now=new Date();
+function saveAiToCompare(p){
   const fields={
-    "審批標題":`採購審批 · ${p.item||'?'} · ${p.supplier||'?'}`,
-    "審批類型":"採購審批",
-    "申請人":s.name||"賴哥",
-    "申請日期":now.getTime(),
-    "申請說明":`供應商：${p.supplier||'?'}\n品項：${p.item||'?'}\n數量：${p.qty||'?'}\n單價：¥${p.unit_price||'?'}\n總金額：¥${p.total||'?'} ${p.currency||'RMB'}\nMOQ：${p.moq||'?'}\n交期：${p.lead_time_days||'?'}天\n付款條件：${p.payment_terms||'?'}\n預計交貨：${p.delivery_date||'?'}${p.notes?'\n備注：'+p.notes:''}`,
-    "金額":p.total?Number(String(p.total).replace(/[^0-9.]/g,'')):null,
-    "幣別":p.currency||"RMB",
-    "審批狀態":"待審批",
+    '審批標題': `採購審批 · ${p.item||'?'} · ${p.supplier||'?'}`,
+    '審批類型': '採購審批',
+    '申請人': SESS.name||'賴哥',
+    '申請日期': Date.now(),
+    '申請說明': `AI解析報價單\n供應商：${p.supplier||'?'}\n品項：${p.item||'?'}\n總金額：${p.total||'?'} ${p.currency||'RMB'}\n交期：${p.lead_time_days||'?'}天\n付款條件：${p.payment_terms||'?'}`,
+    '金額': p.total?Number(String(p.total).replace(/[^0-9.]/g,'')):null,
+    '幣別': p.currency||'RMB',
+    '審批狀態': '待審批',
   };
-  Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]==="")delete fields[k];});
-  const d=await _createRecord(_TBLS.approval,fields);
-  res.style.display='block';
-  if(d.code===0){
-    res.style.cssText="background:var(--ok-dim);color:var(--ok);padding:8px;border-radius:8px;font-size:12px;text-align:center;";
-    res.textContent='✅ 已送 Ray 批核！戰情室佇列已更新。';
-    btn.textContent='✓ 已送出';
-    loadKPIs();
-  }else{
-    res.style.cssText="color:var(--danger);font-size:12px;text-align:center;";
-    res.textContent='送出失敗：'+(d.msg||JSON.stringify(d));
-    btn.disabled=false;btn.textContent='重試';
-  }
-}
-
-/* ── QUEUE ── */
-async function loadQueue(){
-  const el=document.getElementById('queue-list');
-  try{
-    const items=await _getRecords(_TBLS.procure);
-    if(!items.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>尚無採購記錄</div>';return;}
-    el.innerHTML=items.map(i=>{
-      const f=i.fields;
-      const st=_fv(f,"採購狀態")||"進行中";
-      const badgeCls=st==="已完成"?"pcb-done":st==="待審批"?"pcb-pending":"pcb-active";
-      const type=_fv(f,"採購類型");
-      const price=Number(_fv(f,"議定價格")||0);
-      return `<div class="proc-card">
-        <div class="pc-top">
-          <span class="pc-name">${_fv(f,"採購品項")||'—'}</span>
-          <span class="pc-badge ${badgeCls}">${st}</span>
-        </div>
-        <div class="pc-meta">${_fv(f,"項目關聯")||''} ${type?'· '+type:''}</div>
-        ${price?`<div class="pc-price">¥ ${price.toLocaleString()} <span style="font-size:11px;color:var(--txt-mid)">${_fv(f,"幣別")||''}</span></div>`:''}
-        <div class="pc-detail">
-          ${_fv(f,"MOQ")?`<span class="pc-tag">MOQ ${_fv(f,"MOQ")}</span>`:''}
-          ${_fv(f,"交期_工作天")?`<span class="pc-tag">交期 ${_fv(f,"交期_工作天")}天</span>`:''}
-          ${_fv(f,"付款條件")?`<span class="pc-tag">${_fv(f,"付款條件")}</span>`:''}
-          ${_fv(f,"預計到貨日")?`<span class="pc-tag">到貨 ${new Date(Number(_fv(f,"預計到貨日"))).toLocaleDateString('zh-TW')}</span>`:''}
-        </div>
-        <div style="font-size:10px;color:var(--txt-mid)">負責：${_fv(f,"負責人")||'—'} ${_fv(f,"選定供應商")?'· 供應商：'+_fv(f,"選定供應商"):''}</div>
-      </div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>載入失敗</div>';}
-}
-
-/* ── SAMPLES ── */
-async function loadSamples(){
-  const el=document.getElementById('sample-list');
-  try{
-    const items=await _getRecords(_TBLS.procure,'CurrentValue.[採購類型]="打樣"');
-    if(!items.length){el.innerHTML='<div class="empty"><div class="empty-icon">✅</div>無待寄出打樣</div>';return;}
-    el.innerHTML=items.map(i=>{
-      const f=i.fields;
-      const sent=_fv(f,"打樣寄出日期");
-      const tracking=_fv(f,"寄樣快遞單號");
-      const cls=sent?'sc-done':!tracking?'sc-pending':'sc-urgent';
-      const statusTxt=sent?'已寄出':tracking?'有單號未確認寄出':'待安排寄出';
-      const statusColor=sent?'var(--ok)':tracking?'var(--warn)':'var(--danger)';
-      return `<div class="sample-card ${cls}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-          <span style="font-size:13px;font-weight:700;">${_fv(f,"採購品項")||'—'}</span>
-          <span style="font-size:10px;font-weight:700;color:${statusColor}">${statusTxt}</span>
-        </div>
-        <div style="font-size:11px;color:var(--txt-mid);margin-bottom:6px;">${_fv(f,"項目關聯")||''} · 數量：${_fv(f,"採購數量")||'—'}</div>
-        ${tracking?`<div style="font-size:11px;color:var(--txt-hi);">快遞單號：${tracking}</div>`:''}
-        ${sent?`<div style="font-size:10px;color:var(--ok);">寄出日期：${new Date(Number(sent)).toLocaleDateString('zh-TW')}</div>`:''}
-        ${!sent?`<div style="font-size:10px;color:var(--warn);margin-top:4px;">⚠ 版權方須收到打樣才能進下一輪送審</div>`:''}
-      </div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>載入失敗</div>';}
-}
-
-async function submitSample(){
-  const product=document.getElementById('smp-product').value.trim();
-  const type=document.getElementById('smp-type').value.trim();
-  const tracking=document.getElementById('smp-tracking').value.trim();
-  const date=document.getElementById('smp-date').value;
-  if(!product||!tracking){alert("請填寫產品名稱和快遞單號");return;}
-  const res=document.getElementById('smp-result');
-  res.style.display='block';res.style.color='var(--txt-mid)';res.textContent='記錄中...';
-  const fields={
-    "採購品項":product,"採購類型":"打樣",
-    "寄樣快遞單號":tracking,
-    "採購狀態":"進行中","備註":type||"",
-  };
-  if(date) fields["打樣寄出日期"]=new Date(date).getTime();
-  const d=await _createRecord(_TBLS.procure,fields);
-  if(d.code===0){
-    res.style.color='var(--ok)';res.textContent='✅ 已記錄！';
-    document.getElementById('smp-product').value='';
-    document.getElementById('smp-tracking').value='';
-    loadSamples();loadKPIs();
-  }else{res.style.color='var(--danger)';res.textContent='失敗：'+JSON.stringify(d);}
-}
-
-/* ── SUPPLIERS ── */
-async function loadSuppliers(){
-  const el=document.getElementById('supplier-list');
-  try{
-    const items=await _getRecords(_TBLS.supplier);
-    if(!items.length){el.innerHTML='<div class="empty"><div class="empty-icon">🏭</div>尚無供應商記錄</div>';return;}
-    el.innerHTML=items.map(i=>{
-      const f=i.fields;
-      const name=_fv(f,"供應商名稱")||_fv(f,"標題")||'—';
-      return `<div class="supplier-row">
-        <div class="sup-icon">🏭</div>
-        <div class="sup-body">
-          <div class="sup-name">${name}</div>
-          <div class="sup-meta">${[_fv(f,"品類"),_fv(f,"所在地"),_fv(f,"聯絡人")].filter(Boolean).join(' · ')}</div>
-        </div>
-        ${_fv(f,"合作評分")?`<div style="font-size:12px;color:var(--warn);">★${_fv(f,"合作評分")}</div>`:''}
-      </div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div>載入失敗</div>';}
+  Object.keys(fields).forEach(k=>{if(fields[k]===null)delete fields[k];});
+  createRec(_T.approval, fields).then(d=>{
+    const btn = document.querySelector('#ai-parse-result button');
+    if(btn){
+      btn.textContent = d.code===0 ? '✓ 已存入，Ray 佇列已更新' : '存入失敗，請重試';
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+    }
+  }).catch(()=>{});
 }
 
 /* ── INIT ── */
-loadKPIs();
+loadKPIsFromFeishu();
 </script>
 </body>
 </html>
