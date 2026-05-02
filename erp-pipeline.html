@@ -210,6 +210,17 @@ select.inp option{background:var(--card2);}
 @media(max-width:420px){
   .kpi-big-row{grid-template-columns:1fr;}
 }
+
+/* EXPAND HINT */
+.expand-hint{font-size:10px;color:var(--accent);cursor:pointer;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);text-align:center;transition:color .15s;}
+.expand-hint:hover{color:var(--txt-hi);}
+.expand-hint.open{color:var(--txt-mid);}
+.card-detail{display:none;}
+.card-detail.open{display:block;}
+
+/* NAV BACK */
+.nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
+.nav-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
 </style>
 </head>
 <body>
@@ -237,6 +248,7 @@ if(!SESS) throw new Error('redirect');
       <div class="sess-name" id="sess-name">—</div>
       <div class="sess-role" id="sess-role">—</div>
     </div>
+    <a class="nav-back" href="login.html">⌂ 首頁</a>
     <a class="btn-switch" href="login.html">切換帳號</a>
     <button class="btn-logout" onclick="doLogout()">登出</button>
   </div>
@@ -325,6 +337,7 @@ if(!SESS) throw new Error('redirect');
             <div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">3,000 件</span></div>
             <div class="ip-stat"><span class="ip-stat-label">毛利率</span><span class="ip-stat-val" style="color:var(--ok)">42%</span></div>
           </div>
+          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'snoopy')">展開詳情 ▾</div>
         </div>
 
         <!-- ===== DEMO CARD 2: Muziktiger ===== -->
@@ -364,6 +377,7 @@ if(!SESS) throw new Error('redirect');
             <div class="ip-stat"><span class="ip-stat-label">卡關</span><span class="ip-stat-val" style="color:var(--danger)">14 天</span></div>
             <div class="ip-stat"><span class="ip-stat-label">Q4 上市</span><span class="ip-stat-val">2026-10</span></div>
           </div>
+          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'muziktiger')">展開詳情 ▾</div>
         </div>
 
         <!-- ===== DEMO CARD 3: Opanchu ===== -->
@@ -395,6 +409,7 @@ if(!SESS) throw new Error('redirect');
             <div class="ip-stat"><span class="ip-stat-label">階段</span><span class="ip-stat-val">2D 設計</span></div>
             <div class="ip-stat"><span class="ip-stat-label">Q3 上市</span><span class="ip-stat-val">2026-09</span></div>
           </div>
+          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'opanchu')">展開詳情 ▾</div>
         </div>
 
         <!-- ===== DEMO CARD 4: Chiikawa ===== -->
@@ -426,6 +441,7 @@ if(!SESS) throw new Error('redirect');
             <div class="ip-stat"><span class="ip-stat-label">階段</span><span class="ip-stat-val">立項確認</span></div>
             <div class="ip-stat"><span class="ip-stat-label">Q4 上市</span><span class="ip-stat-val">2026-11</span></div>
           </div>
+          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'chiikawa')">展開詳情 ▾</div>
         </div>
       </div><!-- /ip-cards -->
 
