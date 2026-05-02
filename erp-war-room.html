@@ -763,8 +763,8 @@ let _tk = null;
 
 /* ── SESSION CHECK ── */
 (function(){
-  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); return; }
+  const s = JSON.parse(localStorage.getItem("erp_sess")||localStorage.getItem("wujie_session")||"null");
+  if(!s||(s.expires&&Date.now()>s.expires)||(s.ts&&Date.now()-s.ts>7*86400000)){ localStorage.removeItem("erp_sess"); localStorage.removeItem("wujie_session"); location.replace("login.html"); return; }
   const now = new Date();
   const days = ["日","一","二","三","四","五","六"];
   document.querySelector(".date-badge").textContent =
