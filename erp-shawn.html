@@ -5,624 +5,571 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>蕪解 ERP · Shawn 營運總看板</title>
 <style>
-:root {
-  --bg:        #0b0c10;
-  --surface:   #111318;
-  --card:      #181a22;
-  --card2:     #1e2130;
-  --border:    #222535;
-  --border-hi: #363b58;
-  --txt-hi:    #e8eaf8;
-  --txt-mid:   #7880a8;
-  --txt-lo:    #3d4268;
-  --accent:    #818cf8;
-  --accent2:   #4f56b0;
-  --ok:        #22c55e;
-  --ok-dim:    #22c55e18;
-  --warn:      #f59e0b;
-  --warn-dim:  #f59e0b18;
-  --danger:    #ef4444;
-  --danger-dim:#ef444418;
-  --beijing:   #f59e0b;
-  --bangkok:   #22c55e;
-  --taipei:    #818cf8;
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--accent2:#4f56b0;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --beijing:#f59e0b;--bangkok:#22c55e;--taipei:#818cf8;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.topbar-brand{display:flex;align-items:center;gap:10px;}
-.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);}
 .brand-name{font-size:14px;font-weight:700;}
-.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:2px;}
-.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
-.nav-back:hover{color:var(--txt-hi);}
+.brand-sub{font-size:10px;color:var(--txt-mid);}
+.nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
 
-.main{max-width:1080px;margin:0 auto;padding:24px 20px;}
-.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:12px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:0;}
+.kpi-bar{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--border);}
+.kpi-bar::-webkit-scrollbar{display:none;}
+.kpi-chip{flex:1 1 calc(50% - 4px);min-width:calc(50% - 4px);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;white-space:nowrap;}
+.kpi-chip-label{font-size:9px;color:var(--txt-mid);font-weight:600;letter-spacing:.05em;margin-bottom:3px;}
+.kpi-chip-val{font-size:17px;font-weight:800;}
+.kpi-chip-sub{font-size:9px;color:var(--txt-mid);margin-top:2px;}
 
-/* ── 城市 TABS ── */
-.city-bar{display:flex;gap:8px;margin-bottom:20px;}
-.city-btn{padding:6px 16px;font-size:12px;font-weight:700;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;transition:.15s;}
-.city-btn.active-bj{background:var(--warn-dim);border-color:var(--beijing);color:var(--beijing);}
-.city-btn.active-bk{background:var(--ok-dim);border-color:var(--bangkok);color:var(--bangkok);}
-.city-btn.active-tp{background:#818cf820;border-color:var(--taipei);color:var(--taipei);}
-.city-btn.all{background:var(--card2);border-color:var(--border-hi);color:var(--txt-hi);}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;position:sticky;top:52px;z-index:90;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:none;padding:11px 14px;font-size:12px;font-weight:600;color:var(--txt-mid);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-/* ── PEOPLE GRID ── */
-.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px;}
-.person-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;}
-.pc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.pc-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-.pc-name{font-size:13px;font-weight:700;}
-.pc-role{font-size:10px;color:var(--txt-mid);margin-top:1px;}
-.pc-status{font-size:10px;padding:2px 7px;border-radius:8px;margin-bottom:6px;display:inline-block;}
-.ps-in{background:var(--ok-dim);color:var(--ok);}
-.ps-leave{background:var(--warn-dim);color:var(--warn);}
-.ps-travel{background:#818cf820;color:var(--accent);}
-.pc-task{font-size:11px;color:var(--txt-mid);line-height:1.4;}
-.pc-city{font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;margin-top:6px;display:inline-block;}
-.city-bj{background:var(--warn-dim);color:var(--beijing);}
-.city-bk{background:var(--ok-dim);color:var(--bangkok);}
-.city-tp{background:#818cf820;color:var(--taipei);}
+.pane{display:none;padding:16px;}
+.pane.active{display:block;}
 
-/* ── THREE-CITY PERF ── */
-.city-perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
-.city-perf-card{border-radius:10px;padding:16px;}
-.cpc-bj{background:var(--card);border:1px solid var(--border);}
-.cpc-bk{background:var(--card);border:1px solid var(--border);}
-.cpc-tp{background:var(--card);border:1px solid var(--border);}
-.city-header{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
-.city-dot{width:8px;height:8px;border-radius:50%;}
-.city-name{font-size:13px;font-weight:700;}
-.city-kpi{display:flex;flex-direction:column;gap:6px;}
-.kpi-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
-.kpi-label{color:var(--txt-mid);}
-.kpi-val{font-weight:700;}
-.kpi-bar{height:3px;border-radius:2px;margin-top:2px;}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;margin:16px 0 8px;}
+.section-label:first-child{margin-top:0;}
 
-/* ── FLASH STORE ── */
-.flash-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;}
-.flash-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
-.flash-row:last-child{border:none;}
-.flash-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.fi-active{background:var(--ok-dim);border:1px solid var(--ok);}
-.fi-plan{background:var(--warn-dim);border:1px solid var(--warn);}
-.fi-done{background:var(--card2);border:1px solid var(--border);}
-.flash-body{flex:1;min-width:0;}
-.flash-title{font-size:13px;font-weight:700;}
-.flash-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
-.flash-right{text-align:right;flex-shrink:0;}
-.flash-revenue{font-size:14px;font-weight:700;}
-.flash-dates{font-size:10px;color:var(--txt-mid);margin-top:2px;}
-.flash-progress{height:4px;border-radius:2px;margin-top:6px;background:var(--card2);}
-.flash-prog-fill{height:100%;border-radius:2px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:700;color:var(--txt-mid);margin-bottom:10px;}
 
-/* ── SUPPLY CHAIN / LOGISTICS ── */
-.logistics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
-.logistics-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px;}
-.logistics-row:last-child{border:none;}
-.logis-icon{font-size:16px;width:24px;flex-shrink:0;text-align:center;}
-.logis-body{flex:1;min-width:0;}
-.logis-name{font-weight:600;}
-.logis-meta{font-size:10px;color:var(--txt-mid);}
-.logis-status{flex-shrink:0;}
-.ls-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
-.ls-ok{background:var(--ok-dim);color:var(--ok);}
-.ls-warn{background:var(--warn-dim);color:var(--warn);}
-.ls-transit{background:#818cf820;color:var(--accent);}
-.ls-danger{background:var(--danger-dim);color:var(--danger);}
+/* KPI row chips (2-col mobile, 3-col desktop) */
+.kpi-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.kpi-cell{flex:1 1 calc(50% - 4px);min-width:calc(50% - 4px);background:var(--card2);border-radius:8px;padding:10px 12px;text-align:center;}
+.kc-val{font-size:22px;font-weight:800;}
+.kc-label{font-size:10px;color:var(--txt-mid);margin-top:3px;}
 
-/* ── BUDGET REVIEW (Shawn 預算第一道關) ── */
-.budget-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
-.budget-item:last-child{border:none;}
-.bi-body{flex:1;min-width:0;}
-.bi-title{font-size:13px;font-weight:600;}
-.bi-meta{font-size:10px;color:var(--txt-mid);margin-top:1px;}
-.bi-right{text-align:right;flex-shrink:0;}
-.bi-amt{font-size:13px;font-weight:700;}
-.bi-actions{display:flex;gap:6px;margin-top:6px;justify-content:flex-end;}
-.bi-btn{font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;border:1px solid;}
-.bi-approve{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
-.bi-reject{background:var(--danger-dim);border-color:var(--danger);color:var(--danger);}
-.bi-hold{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
+/* Progress bar */
+.prog-wrap{background:var(--card2);border-radius:4px;height:7px;overflow:hidden;margin:4px 0;}
+.prog-fill{height:100%;border-radius:4px;transition:width .3s;}
+
+/* Row list */
+.row-list{display:flex;flex-direction:column;gap:0;}
+.row-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.row-item:last-child{border:none;}
+.ri-body{flex:1;min-width:0;}
+.ri-title{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ri-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.ri-right{text-align:right;flex-shrink:0;}
+
+/* Status chips */
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-info{background:#818cf820;color:var(--accent);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+
+/* Action buttons */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;min-height:36px;}
+.btn-ok{background:var(--ok);color:#000;}
+.btn-danger{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
+.btn-ghost{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);}
+.btn:active{opacity:.8;}
+
+/* People grid */
+.people-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.person-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px;}
+.pc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.pc-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.pc-name{font-size:12px;font-weight:700;}
+.pc-role{font-size:9px;color:var(--txt-mid);}
+.pc-task{font-size:10px;color:var(--txt-mid);line-height:1.4;margin-top:4px;}
+.city-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;margin-top:5px;display:inline-block;}
+.cb-bj{background:var(--warn-dim);color:var(--beijing);}
+.cb-bk{background:var(--ok-dim);color:var(--bangkok);}
+.cb-tp{background:#818cf820;color:var(--taipei);}
+
+/* City filter */
+.city-filter{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+.city-filter::-webkit-scrollbar{display:none;}
+.cf-btn{flex:none;padding:5px 13px;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);transition:.15s;}
+.cf-btn.act-all{background:var(--card2);border-color:var(--border-hi);color:var(--txt-hi);}
+.cf-btn.act-bj{background:var(--warn-dim);border-color:var(--beijing);color:var(--beijing);}
+.cf-btn.act-bk{background:var(--ok-dim);border-color:var(--bangkok);color:var(--bangkok);}
+.cf-btn.act-tp{background:#818cf820;border-color:var(--taipei);color:var(--taipei);}
+
+/* Alert banner */
+.alert-banner{border-radius:8px;padding:11px 13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.ab-danger{background:var(--danger-dim);border:1px solid var(--danger);}
+.ab-warn{background:var(--warn-dim);border:1px solid var(--warn);}
+.ab-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.ab-title{font-size:12px;font-weight:700;}
+.ab-body{font-size:11px;color:var(--txt-mid);margin-top:3px;}
+
+/* Approval item */
+.appr-item{background:var(--card2);border-radius:9px;padding:13px;margin-bottom:9px;}
+.appr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.appr-title{font-size:13px;font-weight:700;}
+.appr-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.appr-actions{display:flex;gap:7px;margin-top:10px;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:40px 20px;color:var(--txt-lo);}
+.es-icon{font-size:32px;margin-bottom:8px;}
+.es-text{font-size:12px;}
+
+/* Loading */
+.loading{color:var(--txt-lo);font-size:11px;padding:20px;text-align:center;}
+
+@media(min-width:600px){
+  .pane{padding:20px;}
+  .kpi-cell{flex:1 1 calc(33% - 8px);}
+  .people-grid{grid-template-columns:repeat(3,1fr);}
+  .kpi-chip{flex:1 1 auto;min-width:auto;}
+}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="topbar-brand">
+  <div class="brand">
     <div class="brand-dot"></div>
     <div>
-      <span class="brand-name">蕪解 ERP</span>
-      <span class="brand-sub">Shawn 營運總看板</span>
+      <div class="brand-name">蕪解 ERP</div>
+      <div class="brand-sub">Shawn 營運總看板</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+  <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+</div>
+
+<!-- KPI chips -->
+<div class="kpi-bar" id="kpi-bar">
+  <div class="kpi-chip"><div class="kpi-chip-label">全集團業績達成</div><div class="kpi-chip-val" id="kpi-revenue" style="color:var(--ok)">—</div><div class="kpi-chip-sub" id="kpi-revenue-sub">載入中</div></div>
+  <div class="kpi-chip"><div class="kpi-chip-label">待我複核</div><div class="kpi-chip-val" id="kpi-appr" style="color:var(--warn)">—</div><div class="kpi-chip-sub">件審批待處理</div></div>
+  <div class="kpi-chip"><div class="kpi-chip-label">訂單未出貨</div><div class="kpi-chip-val" id="kpi-orders" style="color:var(--accent)">—</div><div class="kpi-chip-sub">筆訂單待執行</div></div>
+  <div class="kpi-chip"><div class="kpi-chip-label">產品管道</div><div class="kpi-chip-val" id="kpi-pipeline" style="color:var(--txt-hi)">—</div><div class="kpi-chip-sub">個項目進行中</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('budget',this)">業績看板</div>
+  <div class="tab" onclick="switchTab('approvals',this)">待我複核</div>
+  <div class="tab" onclick="switchTab('orders',this)">訂單執行</div>
+  <div class="tab" onclick="switchTab('pipeline',this)">產品管道</div>
+  <div class="tab" onclick="switchTab('people',this)">人員狀態</div>
+</div>
+
+<!-- ① 業績看板 -->
+<div class="pane active" id="pane-budget">
+  <div class="section-label">全集團業績達成率（來自 Shawn 預算管理表）</div>
+  <div id="budget-kpi" class="kpi-grid">
+    <div class="loading">載入中…</div>
+  </div>
+  <div class="section-label">各公司預算 vs 實際</div>
+  <div id="budget-detail" class="card">
+    <div class="loading">載入中…</div>
+  </div>
+  <div class="section-label">各科目達成細項</div>
+  <div id="budget-items" class="card">
+    <div class="loading">載入中…</div>
   </div>
 </div>
 
-<div class="main">
-
-  <!-- ① 業績達成率（Shawn 最核心的焦慮） -->
-  <div class="section-title">全集團業績達成率 · Shawn 核心指標</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-    <!-- 年度業績 -->
-    <div class="card">
-      <div style="font-size:10px;color:var(--txt-mid);margin-bottom:10px;">年度收入達成率（全集團）</div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;">
-        <span style="font-size:26px;font-weight:800;color:var(--ok)">982 萬</span>
-        <span style="font-size:13px;color:var(--txt-mid)">/ 2,400 萬</span>
-        <span style="font-size:12px;font-weight:700;background:var(--ok-dim);color:var(--ok);padding:2px 7px;border-radius:6px;">+5.2% 超前</span>
-      </div>
-      <div style="background:var(--card2);border-radius:4px;height:8px;overflow:hidden;margin-bottom:4px;position:relative;">
-        <div style="width:40.9%;height:100%;background:linear-gradient(90deg,#16a34a,var(--ok));border-radius:4px;"></div>
-        <div style="position:absolute;top:-2px;left:33.3%;height:12px;width:2px;background:rgba(255,255,255,.3);border-radius:1px;"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--txt-lo);">
-        <span>YTD 40.9%</span><span>預期進度 33.3%（4/12）</span>
-      </div>
-    </div>
-    <!-- 年度淨利 -->
-    <div class="card">
-      <div style="font-size:10px;color:var(--txt-mid);margin-bottom:10px;">年度淨利達成率（VAM 考核基礎）</div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;">
-        <span style="font-size:26px;font-weight:800;color:var(--warn)">287 萬</span>
-        <span style="font-size:13px;color:var(--txt-mid)">/ 800 萬</span>
-        <span style="font-size:12px;font-weight:700;background:var(--warn-dim);color:var(--warn);padding:2px 7px;border-radius:6px;">↓ 落後 46 萬</span>
-      </div>
-      <div style="background:var(--card2);border-radius:4px;height:8px;overflow:hidden;margin-bottom:4px;position:relative;">
-        <div style="width:35.9%;height:100%;background:linear-gradient(90deg,#b45309,var(--warn));border-radius:4px;"></div>
-        <div style="position:absolute;top:-2px;left:41.7%;height:12px;width:2px;background:rgba(255,255,255,.3);border-radius:1px;"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--txt-lo);">
-        <span>YTD 35.9%</span><span>預期進度 41.7%（5/12）</span>
-      </div>
-    </div>
+<!-- ② 待我複核 -->
+<div class="pane" id="pane-approvals">
+  <div class="section-label">等待 Shawn 複核的申請</div>
+  <div id="appr-list">
+    <div class="loading">載入中…</div>
   </div>
+</div>
 
-  <!-- 三城業績分拆（聚焦達成率，不看現金） -->
-  <div class="city-perf-grid" style="margin-bottom:24px;">
-    <div class="city-perf-card cpc-bj">
-      <div class="city-header">
-        <div class="city-dot" style="background:var(--beijing)"></div>
-        <span class="city-name">北京蕪解</span>
-        <span style="font-size:10px;color:var(--txt-mid);margin-left:auto;">批發主力</span>
-      </div>
-      <div class="city-kpi">
-        <div class="kpi-row"><span class="kpi-label">本月收入</span><span class="kpi-val" style="color:var(--ok)">¥ 62 萬</span></div>
-        <div style="background:var(--card2);border-radius:3px;height:5px;margin:4px 0 6px;overflow:hidden;"><div style="width:78%;height:100%;background:var(--ok);border-radius:3px;"></div></div>
-        <div class="kpi-row"><span class="kpi-label">月目標達成</span><span class="kpi-val" style="color:var(--ok)">78%（目標 80 萬）</span></div>
-        <div class="kpi-row"><span class="kpi-label">未出貨訂單</span><span class="kpi-val" style="color:var(--warn)">6 張</span></div>
-        <div class="kpi-row"><span class="kpi-label">在職人數</span><span class="kpi-val">9 人</span></div>
-      </div>
-    </div>
-    <div class="city-perf-card cpc-bk">
-      <div class="city-header">
-        <div class="city-dot" style="background:var(--bangkok)"></div>
-        <span class="city-name">UJ BKK 泰國</span>
-        <span style="font-size:10px;color:var(--txt-mid);margin-left:auto;">Shawn 駐點</span>
-      </div>
-      <div class="city-kpi">
-        <div class="kpi-row"><span class="kpi-label">本月銷售</span><span class="kpi-val" style="color:var(--warn)">฿ 28 萬</span></div>
-        <div style="background:var(--card2);border-radius:3px;height:5px;margin:4px 0 6px;overflow:hidden;"><div style="width:46%;height:100%;background:var(--warn);border-radius:3px;"></div></div>
-        <div class="kpi-row"><span class="kpi-label">月目標達成</span><span class="kpi-val" style="color:var(--warn)">46%（無快閃月）</span></div>
-        <div class="kpi-row"><span class="kpi-label">快閃店狀態</span><span class="kpi-val" style="color:var(--txt-mid)">Q3 規劃中</span></div>
-        <div class="kpi-row"><span class="kpi-label">在職人數</span><span class="kpi-val">2 人</span></div>
-      </div>
-    </div>
-    <div class="city-perf-card cpc-tp">
-      <div class="city-header">
-        <div class="city-dot" style="background:var(--taipei)"></div>
-        <span class="city-name">台灣悍草</span>
-        <span style="font-size:10px;color:var(--txt-mid);margin-left:auto;">創意輸出</span>
-      </div>
-      <div class="city-kpi">
-        <div class="kpi-row"><span class="kpi-label">版權送審進行中</span><span class="kpi-val" style="color:var(--accent)">4 個 IP</span></div>
-        <div style="background:var(--card2);border-radius:3px;height:5px;margin:4px 0 6px;overflow:hidden;"><div style="width:100%;height:100%;background:var(--ok);border-radius:3px;"></div></div>
-        <div class="kpi-row"><span class="kpi-label">概念圖核准率</span><span class="kpi-val" style="color:var(--ok)">本月 3 系列推進中</span></div>
-        <div class="kpi-row"><span class="kpi-label">卡關項目</span><span class="kpi-val" style="color:var(--warn)">Muziktiger 等 14 天</span></div>
-        <div class="kpi-row"><span class="kpi-label">在職人數</span><span class="kpi-val">4 人（+2 外包）</span></div>
-      </div>
-    </div>
+<!-- ③ 訂單執行 -->
+<div class="pane" id="pane-orders">
+  <div class="section-label">批發訂單執行狀態</div>
+  <div id="orders-list">
+    <div class="loading">載入中…</div>
   </div>
+</div>
 
-  <!-- ① B 項目管道健康度（Shawn 必須逼出新項目） -->
-  <div class="section-title">項目管道健康度 · Shawn 要主動逼新題材</div>
-  <div class="card" style="margin-bottom:24px;">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
-      <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
-        <div style="font-size:24px;font-weight:800;color:var(--ok)">4</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">進行中項目</div>
-      </div>
-      <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
-        <div style="font-size:24px;font-weight:800;color:var(--warn)">1</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">卡關中（等版權方）</div>
-      </div>
-      <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
-        <div style="font-size:24px;font-weight:800;color:var(--txt-hi)">3</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">Q3 預計上市</div>
-      </div>
-      <div style="text-align:center;padding:12px;background:var(--danger-dim);border:1px solid var(--danger);border-radius:8px;">
-        <div style="font-size:24px;font-weight:800;color:var(--danger)">0</div>
-        <div style="font-size:10px;color:var(--danger);margin-top:3px;">Q4 管道為空 ⚠</div>
-      </div>
-    </div>
-    <div style="background:var(--danger-dim);border:1px solid var(--danger);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:3px;">⚠ Q4 項目管道空窗 — Shawn 需要立刻逼出新提案</div>
-        <div style="font-size:11px;color:var(--txt-mid);">目前無任何 Q4 項目進入流水線。若現在不啟動新 IP 主題，Q4 將無新品上市，VAM 達標壓力倍增。</div>
-      </div>
-      <button style="flex-shrink:0;background:var(--danger);border:none;color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:7px;cursor:pointer;white-space:nowrap;">+ 召集提案會議</button>
-    </div>
-    <!-- 各 IP 負責業務的銷售介入狀態 -->
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;font-weight:700;letter-spacing:.05em;">定價共識狀態（提議→銷售確認→Shawn預算把關，三步到位才能進送審）</div>
-      <div style="display:flex;flex-direction:column;gap:0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <span>Snoopy 夏季</span><span style="color:var(--ok);">✓ 共識完成（老董 NT$480 · 德寶 3,000 件 · Shawn ✓）</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <span>Muziktiger 新系列</span><span style="color:var(--ok);">✓ 共識完成</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <span>Opanchu 秋冬</span><span style="color:var(--danger);font-weight:700;">⚠ 尚未提議 — Bevis/Shawn 可先填，再請老董/德寶確認</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12px;">
-          <span>Gudetama 泰國</span><span style="color:var(--txt-lo);">等版權拍板後啟動</span>
-        </div>
-      </div>
-    </div>
+<!-- ④ 產品管道 -->
+<div class="pane" id="pane-pipeline">
+  <div class="section-label">產品開發管道健康度</div>
+  <div id="pipeline-kpi" class="kpi-grid">
+    <div class="loading">載入中…</div>
   </div>
+  <div class="section-label">各項目當前進度</div>
+  <div id="pipeline-list">
+    <div class="loading">載入中…</div>
+  </div>
+</div>
 
-  <!-- ② 全公司人員狀態 (15 人) -->
-  <div class="section-title">全公司人員狀態 · 15 人</div>
-  <div class="city-bar">
-    <button class="city-btn all" onclick="filterCity('all',this)">全部 15 人</button>
-    <button class="city-btn" style="border-color:var(--beijing);color:var(--txt-mid);" onclick="filterCity('bj',this)">● 北京 9 人</button>
-    <button class="city-btn" style="border-color:var(--taipei);color:var(--txt-mid);" onclick="filterCity('tp',this)">● 台北 4 人</button>
-    <button class="city-btn" style="border-color:var(--bangkok);color:var(--txt-mid);" onclick="filterCity('bk',this)">● 曼谷 2 人</button>
+<!-- ⑤ 人員狀態 -->
+<div class="pane" id="pane-people">
+  <div class="city-filter">
+    <button class="cf-btn act-all" onclick="filterPeople('all',this)">全部 15 人</button>
+    <button class="cf-btn" onclick="filterPeople('bj',this)">北京 9 人</button>
+    <button class="cf-btn" onclick="filterPeople('tp',this)">台北 4 人</button>
+    <button class="cf-btn" onclick="filterPeople('bk',this)">曼谷 2 人</button>
   </div>
   <div class="people-grid" id="people-grid">
-    <!-- 北京 -->
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--accent2)">安</div><div><div class="pc-name">安然</div><div class="pc-role">北京·全球商務</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">Muziktiger 催版權方回覆·Opanchu 續約洽談</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#38bdf8">躍</div><div><div class="pc-name">躍明</div><div class="pc-role">北京·財務</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">本月損益表·採購款項安排</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#7c3aed">楊</div><div><div class="pc-name">楊子</div><div class="pc-role">北京·HR/出納</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">5月薪資核算·2件報銷待複核</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--warn)">賴</div><div><div class="pc-name">賴哥</div><div class="pc-role">北京·供應鏈</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">Snoopy 大貨 PO 等 Ray 批核</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--warn)">木</div><div><div class="pc-name">木子</div><div class="pc-role">北京·採購助理</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">三家比價完成，等賴哥確認</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#0284c7">高</div><div><div class="pc-name">高維</div><div class="pc-role">北京·物流</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">3 票在途貨物追蹤</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#6b7280">張</div><div><div class="pc-name">張作興</div><div class="pc-role">北京·庫管</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">北京庫存盤點中（批發回流貨）</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--danger)">老</div><div><div class="pc-name">老董（董亮）</div><div class="pc-role">北京·批發業務</div></div></div>
-      <span class="pc-status ps-travel">出差中</span>
-      <div class="pc-task">上海客戶拜訪·費用報銷待 Ray</div>
-      <span class="pc-city city-bj">北京→上海</span>
-    </div>
-    <div class="person-card" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--danger)">德</div><div><div class="pc-name">德寶</div><div class="pc-role">北京·批發業務</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">跟進 2 個潛在客戶報價</div>
-      <span class="pc-city city-bj">北京</span>
-    </div>
-    <!-- 台北 -->
-    <div class="person-card" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:var(--accent)">B</div><div><div class="pc-name">Bevis</div><div class="pc-role">台北·設計主管</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">Opanchu 概念圖待核准·Muziktiger 主管盯進度</div>
-      <span class="pc-city city-tp">台北</span>
-    </div>
-    <div class="person-card" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:var(--accent)">珮</div><div><div class="pc-name">珮玲</div><div class="pc-role">台北·企劃（版權送審/產品/快閃）</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">Muziktiger 催版權方·Q3 快閃企劃撰寫中</div>
-      <span class="pc-city city-tp">台北</span>
-    </div>
-    <div class="person-card" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:var(--accent)">詩</div><div><div class="pc-name">詩彤</div><div class="pc-role">台北·設計師</div></div></div>
-      <span class="pc-status ps-leave" style="">請假</span>
-      <div class="pc-task">今日請假（年假）·明日回</div>
-      <span class="pc-city city-tp">台北</span>
-    </div>
-    <div class="person-card" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:#6b7280">L</div><div><div class="pc-name">Leo</div><div class="pc-role">台北·出納</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">本月固定支出已同步躍明</div>
-      <span class="pc-city city-tp">台北</span>
-    </div>
-    <!-- 曼谷 -->
-    <div class="person-card" data-city="bk">
-      <div class="pc-top"><div class="pc-av" style="background:var(--ok)">S</div><div><div class="pc-name">Shawn</div><div class="pc-role">曼谷·COO</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">Q3 快閃店規劃·預算審核佇列 3 項</div>
-      <span class="pc-city city-bk">曼谷</span>
-    </div>
-    <div class="person-card" data-city="bk">
-      <div class="pc-top"><div class="pc-av" style="background:var(--ok)">M</div><div><div class="pc-name">Meaw</div><div class="pc-role">曼谷·財務</div></div></div>
-      <span class="pc-status ps-in">在線</span>
-      <div class="pc-task">UJ BKK 帳務月結中</div>
-      <span class="pc-city city-bk">曼谷</span>
-    </div>
+    <!-- North Beijing 9 -->
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#4f56b0">安</div><div><div class="pc-name">安然</div><div class="pc-role">全球商務 / 北京GM</div></div></div><div class="pc-task">集團批發主窗口·版權商務</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#38bdf8">躍</div><div><div class="pc-name">躍明</div><div class="pc-role">財務</div></div></div><div class="pc-task">月底報表·現金流預測</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#7c3aed">楊</div><div><div class="pc-name">楊子</div><div class="pc-role">會計/出納/人事</div></div></div><div class="pc-task">薪資核算·報銷複核</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:var(--warn)">賴</div><div><div class="pc-name">賴哥</div><div class="pc-role">採購主管</div></div></div><div class="pc-task">供應鏈洽談·PO 跟進</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#d97706">木</div><div><div class="pc-name">木子</div><div class="pc-role">採購助理</div></div></div><div class="pc-task">比價表整理·樣品追蹤</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#0284c7">高</div><div><div class="pc-name">高維</div><div class="pc-role">物流/進出口</div></div></div><div class="pc-task">在途貨物追蹤·報關</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#6b7280">張</div><div><div class="pc-name">張作興</div><div class="pc-role">庫管</div></div></div><div class="pc-task">批發回流貨盤點</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:var(--danger)">董</div><div><div class="pc-name">老董（董亮）</div><div class="pc-role">批發業務</div></div></div><div class="pc-task">主動開發客戶·出差常態</div><span class="city-badge cb-bj">北京</span></div>
+    <div class="person-card" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#b91c1c">德</div><div><div class="pc-name">德寶</div><div class="pc-role">批發業務</div></div></div><div class="pc-task">跟進潛在客戶報價</div><span class="city-badge cb-bj">北京</span></div>
+    <!-- Taipei 4 -->
+    <div class="person-card" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:var(--accent)">B</div><div><div class="pc-name">Bevis</div><div class="pc-role">創意企劃主管</div></div></div><div class="pc-task">主管概念圖·3D外包管理</div><span class="city-badge cb-tp">台北</span></div>
+    <div class="person-card" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:#6d28d9">珮</div><div><div class="pc-name">珮玲</div><div class="pc-role">企劃（版權/產品/快閃）</div></div></div><div class="pc-task">版權送審·快閃企劃·產品提案</div><span class="city-badge cb-tp">台北</span></div>
+    <div class="person-card" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:#9333ea">詩</div><div><div class="pc-name">詩彤</div><div class="pc-role">設計師 + 管實習生</div></div></div><div class="pc-task">手繪主力·帶2位實習生</div><span class="city-badge cb-tp">台北</span></div>
+    <div class="person-card" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:#374151">L</div><div><div class="pc-name">Leo</div><div class="pc-role">出納（台灣）</div></div></div><div class="pc-task">台灣固定支出·同步躍明</div><span class="city-badge cb-tp">台北</span></div>
+    <!-- Bangkok 2 -->
+    <div class="person-card" data-city="bk"><div class="pc-top"><div class="pc-av" style="background:var(--ok)">D</div><div><div class="pc-name">Den</div><div class="pc-role">曼谷合夥人</div></div></div><div class="pc-task">泰國業務開發·快閃店</div><span class="city-badge cb-bk">曼谷</span></div>
+    <div class="person-card" data-city="bk"><div class="pc-top"><div class="pc-av" style="background:#16a34a">M</div><div><div class="pc-name">Meaw</div><div class="pc-role">泰國業開·場地洽談</div></div></div><div class="pc-task">商場資源·曼谷帳務</div><span class="city-badge cb-bk">曼谷</span></div>
   </div>
-
-  <!-- ③ 快閃店計畫 -->
-  <div class="section-title">快閃店計畫</div>
-  <div class="flash-card">
-    <div class="flash-row">
-      <div class="flash-icon fi-done">✓</div>
-      <div class="flash-body">
-        <div class="flash-title">Siam Discovery · 曼谷 · Snoopy 春節</div>
-        <div class="flash-meta">2026-01-18 ~ 02-05 · 19 天 · Den 負責場地 · 高維物流</div>
-        <div class="flash-progress"><div class="flash-prog-fill" style="width:100%;background:var(--ok)"></div></div>
-      </div>
-      <div class="flash-right">
-        <div class="flash-revenue" style="color:var(--ok)">฿ 68.2 萬</div>
-        <div class="flash-dates">已完成結算</div>
-      </div>
-    </div>
-    <div class="flash-row">
-      <div class="flash-icon fi-plan">📋</div>
-      <div class="flash-body">
-        <div class="flash-title">Siam Paragon · 曼谷 · Gudetama Q3</div>
-        <div class="flash-meta">規劃中 · 2026-Q3（7-8月）· 等 Ray 拍板 Gudetama 版權</div>
-        <div class="flash-progress"><div class="flash-prog-fill" style="width:15%;background:var(--warn)"></div></div>
-      </div>
-      <div class="flash-right">
-        <div class="flash-revenue" style="color:var(--warn)">目標 ฿ 85 萬</div>
-        <div class="flash-dates" style="color:var(--warn)">等版權拍板</div>
-      </div>
-    </div>
-    <div class="flash-row">
-      <div class="flash-icon fi-plan">🔍</div>
-      <div class="flash-body">
-        <div class="flash-title">Terminal 21 Asok · 曼谷 · Snoopy 夏季</div>
-        <div class="flash-meta">評估中 · 2026-08 · 貨源待大貨確認（07-15 出廠）</div>
-        <div class="flash-progress"><div class="flash-prog-fill" style="width:8%;background:var(--border-hi)"></div></div>
-      </div>
-      <div class="flash-right">
-        <div class="flash-revenue" style="color:var(--txt-mid)">評估中</div>
-        <div class="flash-dates">場地詢價進行中</div>
-      </div>
-    </div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
-
-    <!-- ④ 物流 & 供應鏈燈號 -->
-    <div class="card">
-      <div class="section-title">物流 & 供應鏈狀態</div>
-      <div class="logistics-row">
-        <div class="logis-icon">🚢</div>
-        <div class="logis-body">
-          <div class="logis-name">Snoopy 春節尾箱（回流）</div>
-          <div class="logis-meta">曼谷→北京 · 高維安排</div>
-        </div>
-        <div class="logis-status"><span class="ls-chip ls-transit">海運中</span></div>
-      </div>
-      <div class="logistics-row">
-        <div class="logis-icon">✈️</div>
-        <div class="logis-body">
-          <div class="logis-name">Muziktiger 素模打樣（寄版權方）</div>
-          <div class="logis-meta">北京→日本 · DHL</div>
-        </div>
-        <div class="logis-status"><span class="ls-chip ls-ok">已簽收</span></div>
-      </div>
-      <div class="logistics-row">
-        <div class="logis-icon">🏭</div>
-        <div class="logis-body">
-          <div class="logis-name">Snoopy 夏季大貨（生產中）</div>
-          <div class="logis-meta">東莞永盛玩具 · 預計 07-15 出廠</div>
-        </div>
-        <div class="logis-status"><span class="ls-chip ls-warn">生產中 D2</span></div>
-      </div>
-      <div class="logistics-row">
-        <div class="logis-icon">📦</div>
-        <div class="logis-body">
-          <div class="logis-name">Opanchu 舊批次（北京庫）</div>
-          <div class="logis-meta">張作興管 · 批發剩餘 320 件</div>
-        </div>
-        <div class="logis-status"><span class="ls-chip ls-ok">在庫</span></div>
-      </div>
-      <div class="logistics-row">
-        <div class="logis-icon">⚠️</div>
-        <div class="logis-body">
-          <div class="logis-name">LOG-ON 出貨（香港）</div>
-          <div class="logis-meta">逾期 2 天 · 高維追工廠</div>
-        </div>
-        <div class="logis-status"><span class="ls-chip ls-danger">逾期</span></div>
-      </div>
-    </div>
-
-    <!-- ⑤ 採購預算第一道審核 -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <span class="section-title" style="margin:0;">預算審核佇列（送 Ray 前 Shawn 先把關）</span>
-        <span id="shawn-review-badge" style="font-size:10px;background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);padding:2px 7px;border-radius:8px;">載入中...</span>
-      </div>
-      <div id="shawn-review-list">
-      <div class="budget-item">
-        <div class="bi-body">
-          <div class="bi-title">採購·Snoopy 夏季大貨 PO</div>
-          <div class="bi-meta">木子詢比價 · 賴哥推薦永盛 · 30/40/30</div>
-        </div>
-        <div class="bi-right">
-          <div class="bi-amt" style="color:var(--warn)">¥ 148,000</div>
-          <div class="bi-actions">
-            <button class="bi-btn bi-approve" onclick="this.closest('.budget-item').style.opacity='.4'">✓ 通過→Ray</button>
-            <button class="bi-btn bi-hold">暫緩</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="budget-item">
-        <div class="bi-body">
-          <div class="bi-title">新項目·Gudetama 泰國快閃備貨</div>
-          <div class="bi-meta">Shawn 自提 · 等 Ray 拍板版權後啟動</div>
-        </div>
-        <div class="bi-right">
-          <div class="bi-amt" style="color:var(--accent)">¥ 180,000</div>
-          <div class="bi-actions">
-            <button class="bi-btn bi-hold">等版權確認</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="budget-item">
-        <div class="bi-body">
-          <div class="bi-title">費用·詩彤出差費</div>
-          <div class="bi-meta">Bevis 已審 · 金額 NT$8,560</div>
-        </div>
-        <div class="bi-right">
-          <div class="bi-amt" style="color:var(--txt-hi)">NT$ 8,560</div>
-          <div class="bi-actions">
-            <button class="bi-btn bi-approve" onclick="this.closest('.budget-item').style.opacity='.4'">✓ 通過→Ray</button>
-            <button class="bi-btn bi-reject">✗</button>
-          </div>
-        </div>
-      </div>
-      </div><!-- /shawn-review-list -->
-    </div>
-  </div>
-
-</div><!-- /main -->
+</div>
 
 <script>
-/* ── SESSION CHECK ── */
-(function(){
-  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); }
-})();
+const PROXY = 'https://feishu-proxy.raychou6913.workers.dev';
+const AT = 'YlVkb0ACjacJVqsgRT5j4c6gpeh';
+const _TBLS = {
+  approval: 'tblD6acV3m2ZXJHe',
+  sales:    'tblRtqmbO9TO3sYZ',
+  budget:   'tblteo2QEO0jP8j9',
+  pipeline: 'tblfX6fsMshb7KL0',
+};
+let _tok = null, _tokExp = 0;
 
-/* ── CONFIG ── */
-const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
-const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _APPROVAL_TBL = "tblD6acV3m2ZXJHe";
-let _tk = null;
-
-async function _getToken(){
-  if(_tk) return _tk;
-  const r = await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+async function getToken() {
+  if (_tok && Date.now() < _tokExp) return _tok;
+  const r = await fetch(`${PROXY}/auth/token`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
   const d = await r.json();
-  if(d.code!==0) throw new Error("token");
-  _tk = d.tenant_access_token;
-  setTimeout(()=>_tk=null, 110*60*1000);
-  return _tk;
-}
-function _fv(f,k){
-  const v=f[k];
-  if(!v&&v!==0) return "";
-  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
-  if(typeof v==="object") return v.text||v.link||"";
-  return String(v);
+  _tok = d.tenant_access_token;
+  _tokExp = Date.now() + 6300000;
+  return _tok;
 }
 
-/* ── LOAD PENDING REVIEWS (Shawn複核) ── */
-async function loadShawnReviews(){
-  const container = document.getElementById('shawn-review-list');
-  if(!container) return;
-  try{
-    const tk = await _getToken();
-    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_APPROVAL_TBL+"/records?page_size=100",{headers:{"Authorization":"Bearer "+tk}});
-    const d = await r.json();
-    const items = (d.data?.items||[]).filter(i=>{
-      const st = _fv(i.fields,"審批狀態");
-      return st==="待審批"||st==="待批核";
-    });
-    if(!items.length){
-      container.innerHTML = '<div style="padding:14px;text-align:center;color:var(--txt-mid);font-size:12px;">目前無待複核項目</div>';
+async function getRecords(tableId, params = {}) {
+  const tok = await getToken();
+  const qs = new URLSearchParams({page_size: 100, ...params}).toString();
+  const r = await fetch(`${PROXY}/bitable/v1/apps/${AT}/tables/${tableId}/records?${qs}`, {
+    headers: {'Authorization': `Bearer ${tok}`}
+  });
+  const d = await r.json();
+  return (d.data && d.data.items) ? d.data.items.map(i => i.fields) : [];
+}
+
+async function updateRecord(tableId, recordId, fields) {
+  const tok = await getToken();
+  const r = await fetch(`${PROXY}/bitable/v1/apps/${AT}/tables/${tableId}/records/${recordId}`, {
+    method: 'PUT',
+    headers: {'Authorization': `Bearer ${tok}`, 'Content-Type': 'application/json'},
+    body: JSON.stringify({fields})
+  });
+  return r.json();
+}
+
+// Tab switching
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pane-' + id).classList.add('active');
+  if (id === 'budget' && !_budgetLoaded) loadBudget();
+  if (id === 'approvals' && !_apprLoaded) loadApprovals();
+  if (id === 'orders' && !_ordersLoaded) loadOrders();
+  if (id === 'pipeline' && !_pipelineLoaded) loadPipelineTab();
+}
+
+// People filter
+function filterPeople(city, el) {
+  document.querySelectorAll('.cf-btn').forEach(b => {
+    b.className = 'cf-btn';
+  });
+  const classMap = {all:'act-all', bj:'act-bj', bk:'act-bk', tp:'act-tp'};
+  el.classList.add(classMap[city]);
+  document.querySelectorAll('#people-grid .person-card').forEach(c => {
+    c.style.display = (city === 'all' || c.dataset.city === city) ? '' : 'none';
+  });
+}
+
+// ── BUDGET TAB ──────────────────────────────────────
+let _budgetLoaded = true; // loads on init
+
+async function loadBudget() {
+  _budgetLoaded = true;
+  try {
+    const rows = await getRecords(_TBLS.budget);
+    if (!rows.length) {
+      document.getElementById('budget-kpi').innerHTML = emptyState('預算管理表暫無資料', '請 Shawn 盡快建立預算');
+      document.getElementById('budget-detail').innerHTML = emptyState('', '');
+      document.getElementById('budget-items').innerHTML = '';
+      document.getElementById('kpi-revenue').textContent = '—';
+      document.getElementById('kpi-revenue-sub').textContent = '預算待建立';
       return;
     }
-    const badge = document.getElementById('shawn-review-badge');
-    if(badge) badge.textContent = items.length+" 項";
-    container.innerHTML = items.slice(0,5).map(r=>{
-      const f=r.fields;
-      const title=_fv(f,"審批標題")||"（無標題）";
-      const who=_fv(f,"申請人");
-      const amt=_fv(f,"涉及金額");
-      const cur=_fv(f,"幣別")||"RMB";
-      return `<div class="budget-item">
-        <div class="bi-body">
-          <div class="bi-title">${title}</div>
-          <div class="bi-meta">${who?who+" 申請 · ":""}待Shawn複核</div>
+
+    const year = new Date().getFullYear().toString();
+    const yearRows = rows.filter(r => {
+      const m = r['月份'] || '';
+      return typeof m === 'string' ? m.startsWith(year) : true;
+    });
+
+    // Find revenue target and actual
+    const incomeRows = yearRows.filter(r => r['預算科目'] === '收入目標' || (r['預算科目'] || '').includes('收入'));
+    const totalTarget = incomeRows.reduce((s, r) => s + (parseFloat(r['預算金額']) || 0), 0);
+    const totalActual = incomeRows.reduce((s, r) => s + (parseFloat(r['實際金額']) || 0), 0);
+    const pct = totalTarget > 0 ? Math.round(totalActual / totalTarget * 100) : 0;
+    const pctColor = pct >= 80 ? 'var(--ok)' : pct >= 50 ? 'var(--warn)' : 'var(--danger)';
+
+    // Update KPI chip
+    document.getElementById('kpi-revenue').textContent = pct + '%';
+    document.getElementById('kpi-revenue-sub').textContent = totalTarget > 0 ?
+      `實際 ${fmtNum(totalActual)} / 目標 ${fmtNum(totalTarget)}` : '建立預算後顯示';
+
+    // KPI grid
+    document.getElementById('budget-kpi').innerHTML = `
+      <div class="kpi-cell"><div class="kc-val" style="color:${pctColor}">${pct}%</div><div class="kc-label">年度收入達成率</div></div>
+      <div class="kpi-cell"><div class="kc-val" style="color:var(--txt-hi)">${fmtNum(totalActual)}</div><div class="kc-label">YTD 實際收入</div></div>
+      <div class="kpi-cell"><div class="kc-val" style="color:var(--txt-mid)">${fmtNum(totalTarget)}</div><div class="kc-label">全年目標</div></div>
+    `;
+
+    // Company breakdown
+    const companies = [...new Set(yearRows.map(r => r['所屬公司']).filter(Boolean))];
+    let detailHtml = '';
+    if (companies.length) {
+      for (const co of companies) {
+        const coRows = yearRows.filter(r => r['所屬公司'] === co && (r['預算科目'] || '').includes('收入'));
+        const coTarget = coRows.reduce((s, r) => s + (parseFloat(r['預算金額']) || 0), 0);
+        const coActual = coRows.reduce((s, r) => s + (parseFloat(r['實際金額']) || 0), 0);
+        const coPct = coTarget > 0 ? Math.round(coActual / coTarget * 100) : 0;
+        const c = coPct >= 80 ? 'var(--ok)' : coPct >= 50 ? 'var(--warn)' : 'var(--danger)';
+        if (coTarget > 0) detailHtml += `
+          <div class="row-item">
+            <div class="ri-body">
+              <div class="ri-title">${co}</div>
+              <div class="ri-meta">實際 ${fmtNum(coActual)} / 目標 ${fmtNum(coTarget)}</div>
+              <div class="prog-wrap" style="margin-top:5px;"><div class="prog-fill" style="width:${Math.min(coPct,100)}%;background:${c};"></div></div>
+            </div>
+            <div class="ri-right"><span class="chip" style="background:${c}18;color:${c}">${coPct}%</span></div>
+          </div>`;
+      }
+    }
+    document.getElementById('budget-detail').innerHTML = detailHtml ||
+      '<div class="empty-state"><div class="es-text" style="color:var(--txt-mid)">各公司收入行尚未建立</div></div>';
+
+    // All budget items
+    let itemHtml = '<div class="row-list">';
+    for (const r of yearRows.slice(0, 20)) {
+      const target = parseFloat(r['預算金額']) || 0;
+      const actual = parseFloat(r['實際金額']) || 0;
+      const rate = parseFloat(r['達成率%']) || (target > 0 ? Math.round(actual / target * 100) : 0);
+      const c = rate >= 80 ? 'chip-ok' : rate >= 50 ? 'chip-warn' : 'chip-danger';
+      itemHtml += `<div class="row-item">
+        <div class="ri-body">
+          <div class="ri-title">${r['預算科目'] || '(未命名)'} <span style="font-size:9px;color:var(--txt-lo)">${r['所屬公司'] || ''}</span></div>
+          <div class="ri-meta">${r['負責人'] || '—'} · 月份 ${r['月份'] || '—'}</div>
         </div>
-        <div class="bi-right">
-          <div class="bi-amt" style="color:var(--warn)">${amt?"¥ "+Number(amt).toLocaleString()+" "+cur:""}</div>
-          <div class="bi-actions">
-            <button class="bi-btn bi-approve" onclick="reviewItem('${r.record_id}',this)">✓ 複核→Ray</button>
-          </div>
+        <div class="ri-right">
+          <div style="font-size:12px;font-weight:700;">${fmtNum(actual)}</div>
+          <div style="font-size:9px;color:var(--txt-lo)">${fmtNum(target)}</div>
+          ${target > 0 ? `<span class="chip ${c}">${rate}%</span>` : ''}
         </div>
       </div>`;
-    }).join("");
-  }catch(e){ console.error("loadShawnReviews",e); }
+    }
+    itemHtml += '</div>';
+    document.getElementById('budget-items').innerHTML = itemHtml;
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('budget-kpi').innerHTML = errHtml(e);
+    document.getElementById('budget-detail').innerHTML = '';
+    document.getElementById('budget-items').innerHTML = '';
+  }
 }
 
-async function reviewItem(rid, btn){
-  btn.disabled=true; btn.textContent="處理中...";
-  try{
-    const tk = await _getToken();
-    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_APPROVAL_TBL+"/records/"+rid,{
-      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields:{"審批狀態":"待審批","Shawn複核":"已複核"}})
+// ── APPROVALS TAB ────────────────────────────────────
+let _apprLoaded = false;
+let _apprData = [];
+
+async function loadApprovals() {
+  _apprLoaded = true;
+  const el = document.getElementById('appr-list');
+  el.innerHTML = '<div class="loading">載入中…</div>';
+  try {
+    const rows = await getRecords(_TBLS.approval, {filter: 'AND(CurrentValue.[Shawn複核]="待複核")'});
+    _apprData = rows;
+    document.getElementById('kpi-appr').textContent = rows.length;
+    if (!rows.length) {
+      el.innerHTML = emptyState('✅ 無待複核項目', '');
+      return;
+    }
+    el.innerHTML = rows.map((r, i) => `
+      <div class="appr-item" id="appr-${i}">
+        <div class="appr-top">
+          <div>
+            <div class="appr-title">${r['申請項目'] || r['類型'] || '(未命名)'}</div>
+            <div class="appr-meta">${r['申請人'] || '—'} · ${r['申請日期'] || '—'} · ${r['金額'] ? fmtNum(r['金額']) : ''}</div>
+          </div>
+          <span class="chip chip-warn">待複核</span>
+        </div>
+        ${r['說明'] ? `<div style="font-size:11px;color:var(--txt-mid);margin-bottom:8px;">${r['說明']}</div>` : ''}
+        <div class="appr-actions">
+          <button class="btn btn-ok" onclick="shawnApprove(${i},'通過')">✓ 通過</button>
+          <button class="btn btn-danger" onclick="shawnApprove(${i},'退回')">✕ 退回</button>
+          <button class="btn btn-ghost" onclick="shawnApprove(${i},'暫緩')">暫緩</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = errHtml(e);
+  }
+}
+
+async function shawnApprove(idx, action) {
+  const row = _apprData[idx];
+  if (!row || !row.__recordId) return;
+  const el = document.getElementById(`appr-${idx}`);
+  el.style.opacity = '.5';
+  try {
+    await updateRecord(_TBLS.approval, row.__recordId, {'Shawn複核': action});
+    el.innerHTML = `<div style="padding:8px;font-size:12px;color:var(--txt-mid)">✓ 已標記：${action}</div>`;
+    const remaining = _apprData.filter((r, i) => i !== idx);
+    document.getElementById('kpi-appr').textContent = remaining.length;
+  } catch(e) {
+    el.style.opacity = '1';
+    alert('操作失敗：' + e.message);
+  }
+}
+
+// ── ORDERS TAB ───────────────────────────────────────
+let _ordersLoaded = false;
+
+async function loadOrders() {
+  _ordersLoaded = true;
+  const el = document.getElementById('orders-list');
+  el.innerHTML = '<div class="loading">載入中…</div>';
+  try {
+    const rows = await getRecords(_TBLS.sales);
+    const pending = rows.filter(r => {
+      const s = r['收款狀態'] || '';
+      return s !== '全款已收' && s !== '已完結';
     });
-    btn.textContent="✓ 已複核";
-    btn.closest(".budget-item").style.opacity="0.5";
-  }catch(e){ btn.disabled=false; btn.textContent="✓ 複核→Ray"; }
+    document.getElementById('kpi-orders').textContent = pending.length;
+    if (!rows.length) {
+      el.innerHTML = emptyState('無銷售訂單資料', '');
+      return;
+    }
+    const html = rows.slice(0, 30).map(r => {
+      const status = r['收款狀態'] || '未知';
+      const ship = r['物流單號'] ? `<span class="chip chip-info">已出貨</span>` : `<span class="chip chip-warn">待出貨</span>`;
+      const chipClass = status === '全款已收' ? 'chip-ok' : status === '訂金已收' ? 'chip-warn' : 'chip-grey';
+      return `<div class="row-item">
+        <div class="ri-body">
+          <div class="ri-title">${r['客戶名稱'] || r['客戶'] || '—'} · ${r['IP品牌'] || '—'}</div>
+          <div class="ri-meta">數量 ${r['訂購數量'] || '—'} · 折扣 ${r['批發折扣'] || '—'} · ${r['業務'] || '—'}</div>
+          <div style="margin-top:4px;display:flex;gap:5px;">${ship}<span class="chip ${chipClass}">${status}</span></div>
+        </div>
+        <div class="ri-right" style="font-size:13px;font-weight:700;">${r['訂單金額'] ? fmtNum(r['訂單金額']) : '—'}</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div class="card"><div class="row-list">${html}</div></div>`;
+  } catch(e) {
+    el.innerHTML = errHtml(e);
+  }
 }
 
-/* ── CITY FILTER ── */
-function filterCity(city, btn) {
-  document.querySelectorAll('.city-btn').forEach(b => {
-    b.className = 'city-btn';
-    b.style.borderColor = '';
-    b.style.color = '';
-  });
-  if (city === 'bj') { btn.classList.add('active-bj'); }
-  else if (city === 'bk') { btn.classList.add('active-bk'); }
-  else if (city === 'tp') { btn.classList.add('active-tp'); }
-  else { btn.classList.add('all'); }
-  document.querySelectorAll('#people-grid .person-card').forEach(c => {
-    const cv = c.dataset.city;
-    c.style.display = (city === 'all' || cv === city) ? '' : 'none';
-  });
+// ── PIPELINE TAB ─────────────────────────────────────
+let _pipelineLoaded = false;
+
+async function loadPipelineTab() {
+  _pipelineLoaded = true;
+  const kpiEl = document.getElementById('pipeline-kpi');
+  const listEl = document.getElementById('pipeline-list');
+  try {
+    const rows = await getRecords(_TBLS.pipeline);
+    const active = rows.filter(r => r['開發狀態'] !== '已完成' && r['開發狀態'] !== '已終止');
+    const blocked = rows.filter(r => (r['當前階段'] || '').includes('等版權'));
+    const readyBulk = rows.filter(r => r['當前階段'] === '大貨生產');
+    document.getElementById('kpi-pipeline').textContent = active.length;
+
+    kpiEl.innerHTML = `
+      <div class="kpi-cell"><div class="kc-val" style="color:var(--ok)">${active.length}</div><div class="kc-label">進行中項目</div></div>
+      <div class="kpi-cell"><div class="kc-val" style="color:var(--warn)">${blocked.length}</div><div class="kc-label">等版權方回覆</div></div>
+      <div class="kpi-cell"><div class="kc-val" style="color:var(--accent)">${readyBulk.length}</div><div class="kc-label">本月可進大貨</div></div>
+    `;
+
+    if (!rows.length) {
+      listEl.innerHTML = emptyState('產品管道暫無資料', '');
+      return;
+    }
+
+    const stageColor = s => {
+      if (!s) return 'chip-grey';
+      if (s.includes('大貨')) return 'chip-ok';
+      if (s.includes('等版權') || s.includes('等待')) return 'chip-warn';
+      if (s.includes('送審') || s.includes('審核')) return 'chip-info';
+      return 'chip-grey';
+    };
+
+    listEl.innerHTML = '<div class="card"><div class="row-list">' + rows.map(r => `
+      <div class="row-item">
+        <div class="ri-body">
+          <div class="ri-title">${r['項目名稱'] || '—'}</div>
+          <div class="ri-meta">${r['IP品牌'] || '—'} · ${r['產品類型'] || '—'} · ${r['負責人'] || '—'}</div>
+        </div>
+        <div class="ri-right"><span class="chip ${stageColor(r['當前階段'])}">${r['當前階段'] || '—'}</span></div>
+      </div>`).join('') + '</div></div>';
+
+  } catch(e) {
+    kpiEl.innerHTML = errHtml(e);
+    listEl.innerHTML = '';
+  }
 }
 
-loadShawnReviews();
+// ── INIT ─────────────────────────────────────────────
+function fmtNum(n) {
+  const v = parseFloat(n) || 0;
+  if (Math.abs(v) >= 10000) return (v / 10000).toFixed(1) + '萬';
+  return v.toLocaleString('zh-TW');
+}
+function emptyState(icon, msg) {
+  return `<div class="empty-state"><div class="es-icon">${icon}</div><div class="es-text">${msg}</div></div>`;
+}
+function errHtml(e) {
+  return `<div class="empty-state" style="color:var(--danger);font-size:11px;">載入失敗：${e.message}</div>`;
+}
+
+async function init() {
+  try { await loadBudget(); } catch(e) { console.error(e); }
+  // load approval/order counts for KPI chips
+  try {
+    const apprRows = await getRecords(_TBLS.approval, {filter: 'AND(CurrentValue.[Shawn複核]="待複核")'});
+    document.getElementById('kpi-appr').textContent = apprRows.length;
+  } catch(e) {}
+  try {
+    const saleRows = await getRecords(_TBLS.sales);
+    const pending = saleRows.filter(r => {
+      const s = r['收款狀態'] || '';
+      return s !== '全款已收' && s !== '已完結';
+    });
+    document.getElementById('kpi-orders').textContent = pending.length;
+  } catch(e) {}
+  try {
+    const pRows = await getRecords(_TBLS.pipeline);
+    const active = pRows.filter(r => r['開發狀態'] !== '已完成' && r['開發狀態'] !== '已終止');
+    document.getElementById('kpi-pipeline').textContent = active.length;
+  } catch(e) {}
+}
+
+init();
 </script>
 </body>
 </html>
