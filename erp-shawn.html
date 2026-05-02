@@ -579,13 +579,13 @@ async function loadBudget(){
     totalRevT+=t; totalRevA+=a;
     const pct = t>0?Math.round(a/t*100):0;
     const cc = pctColor(pct);
-    if(document.getElementById(pre+'-val')){
-      document.getElementById(pre+'-val').textContent = t>0?wan(a):'—';
+    if(t>0&&document.getElementById(pre+'-val')){
+      document.getElementById(pre+'-val').textContent = wan(a);
       document.getElementById(pre+'-val').style.color = cc;
       document.getElementById(pre+'-bar').style.width = Math.min(pct,100)+'%';
       document.getElementById(pre+'-bar').style.background = cc;
       if(document.getElementById(pre+'-pct')){
-        document.getElementById(pre+'-pct').textContent = t>0?`${pct}%（目標 ${wan(t)}）`:'—';
+        document.getElementById(pre+'-pct').textContent = `${pct}%（目標 ${wan(t)}）`;
         document.getElementById(pre+'-pct').style.color = cc;
       }
     }
@@ -617,16 +617,18 @@ async function loadBudget(){
   const gRevPct = totalRevT>0?Math.round(totalRevA/totalRevT*100):0;
   const expPct  = Math.round(MONTHS_ELAPSED/12*100);
   const ahead   = gRevPct - expPct;
-  document.getElementById('g-rev').textContent = totalRevT>0?wan(totalRevA):'—';
-  document.getElementById('g-rev').style.color = pctColor(gRevPct);
-  document.getElementById('g-rev-sub').textContent = totalRevT>0?`${wan(totalRevA)} / ${wan(totalRevT)}`:'預算待設定';
-  document.getElementById('g-rev-bar').style.width = Math.min(gRevPct,100)+'%';
-  document.getElementById('g-rev-bar').style.background = pctColor(gRevPct);
-  document.getElementById('g-rev-ytd').textContent = `YTD ${gRevPct}%`;
-  document.getElementById('g-rev-exp').textContent = `預期進度 ${expPct}% (${MONTHS_ELAPSED}/12)`;
-  const trendEl = document.getElementById('g-rev-trend');
-  if(ahead>0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-up'; trendEl.textContent=`+${ahead}% 超前`; }
-  else if(ahead<0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-dn'; trendEl.textContent=`落後 ${Math.abs(ahead)}%`; }
+  if(totalRevT>0){
+    document.getElementById('g-rev').textContent = wan(totalRevA);
+    document.getElementById('g-rev').style.color = pctColor(gRevPct);
+    document.getElementById('g-rev-sub').textContent = `${wan(totalRevA)} / ${wan(totalRevT)}`;
+    document.getElementById('g-rev-bar').style.width = Math.min(gRevPct,100)+'%';
+    document.getElementById('g-rev-bar').style.background = pctColor(gRevPct);
+    document.getElementById('g-rev-ytd').textContent = `YTD ${gRevPct}%`;
+    document.getElementById('g-rev-exp').textContent = `預期進度 ${expPct}% (${MONTHS_ELAPSED}/12)`;
+    const trendEl = document.getElementById('g-rev-trend');
+    if(ahead>0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-up'; trendEl.textContent=`+${ahead}% 超前`; }
+    else if(ahead<0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-dn'; trendEl.textContent=`落後 ${Math.abs(ahead)}%`; }
+  }
 
   // Profit KPI — VAM target 750萬
   const VAM_TARGET = 7500000;
