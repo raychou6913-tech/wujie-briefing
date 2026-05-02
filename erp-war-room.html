@@ -501,8 +501,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <div class="queue-card">
     <div class="queue-header">
       <span class="section-title" style="margin:0">待我批核 · Pending Approvals</span>
-      <span class="queue-count">5 項待批</span>
+      <span class="queue-count" id="queue-badge">載入中...</span>
     </div>
+    <div id="approval-queue-inner">
     <!-- Row 1: expense -->
     <div class="approval-row-wrap">
       <div class="approval-row" onclick="toggleAppr('a1')">
@@ -671,6 +672,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">首期 MG 付款（簽署後30天）</span><span style="color:var(--danger)">¥ 14 萬 RMB</span></div>
       </div>
     </div>
+    </div><!-- /approval-queue-inner -->
   </div>
 
   <!-- ⑤ 產品開發流水線快照 -->
@@ -693,6 +695,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
       <div style="width:90px;font-size:9px;color:var(--txt-lo);text-align:right;">狀態</div>
     </div>
+    <div id="pipeline-inner">
     <a class="pipe-link" href="index.html?ip=snoopy">
     <div class="pipeline-row">
       <div class="pipe-ip">Snoopy 夏季</div>
@@ -753,6 +756,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="pipe-status" style="color:var(--txt-mid)">版權條件洽談 →</div>
     </div>
     </a>
+    </div><!-- /pipeline-inner -->
   </div>
 
   <!-- 各廳快速導航 -->
@@ -785,18 +789,208 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 </div><!-- /main -->
 
 <script>
+/* ── CONFIG ── */
+const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TBLS  = {
+  approval:        "tblD6acV3m2ZXJHe",
+  product_pipeline:"tblfX6fsMshb7KL0",
+};
+let _tk = null;
+
+/* ── SESSION CHECK ── */
+(function(){
+  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); return; }
+  const now = new Date();
+  const days = ["日","一","二","三","四","五","六"];
+  document.querySelector(".date-badge").textContent =
+    now.getFullYear()+"年"+(now.getMonth()+1)+"月"+now.getDate()+"日（週"+days[now.getDay()]+"）";
+  document.querySelector(".user-chip").innerHTML =
+    `<div class="user-av">${s.name.charAt(0)}</div>${s.name}`;
+})();
+
+/* ── FEISHU TOKEN ── */
+async function _getToken(){
+  if(_tk) return _tk;
+  const r = await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d = await r.json();
+  if(d.code!==0) throw new Error("token");
+  _tk = d.tenant_access_token;
+  setTimeout(()=>_tk=null, 110*60*1000);
+  return _tk;
+}
+async function _fetchAll(tbl){
+  const tk = await _getToken();
+  const items=[]; let cur="";
+  while(true){
+    const url=_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+tbl+"/records?page_size=100"+(cur?"&page_token="+cur:"");
+    const d = await fetch(url,{headers:{"Authorization":"Bearer "+tk}}).then(r=>r.json());
+    if(d.code!==0) break;
+    items.push(...(d.data?.items||[]));
+    if(!d.data?.has_more) break;
+    cur = d.data.page_token;
+  }
+  return items;
+}
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
+  if(typeof v==="object") return v.text||v.link||"";
+  return String(v);
+}
+
+/* ── LOAD APPROVAL QUEUE ── */
+async function loadApprovals(){
+  const container = document.getElementById("approval-queue-inner");
+  if(!container) return;
+  try{
+    const items = await _fetchAll(_TBLS.approval);
+    const pending = items.filter(r=>{
+      const st = _fv(r.fields,"審批狀態");
+      return st==="待審批"||st==="待批核"||st==="待核准";
+    }).sort((a,b)=>{
+      const ta=typeof a.fields["申請日期"]==="number"?a.fields["申請日期"]:0;
+      const tb=typeof b.fields["申請日期"]==="number"?b.fields["申請日期"]:0;
+      return tb-ta;
+    });
+
+    const badge = document.getElementById("queue-badge");
+    if(badge) badge.textContent = pending.length+" 項待批";
+
+    if(!pending.length){
+      container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--txt-mid);font-size:13px">🎉 目前無待批項目</div>`;
+      return;
+    }
+
+    const TYPE_ICON={"採購審批":"📋","支出審批":"💸","合約審批":"🔗","折扣審批":"🏷","其他":"🔔"};
+    const TYPE_CLASS={"採購審批":"purchase","支出審批":"expense","合約審批":"project","折扣審批":"project","其他":"expense"};
+    const CCY_CLS={"RMB":"ccy-rmb","TWD":"ccy-twd","HKD":"ccy-hkd","THB":"ccy-thb"};
+    const now = Date.now();
+
+    container.innerHTML = pending.map((r,i)=>{
+      const f=r.fields; const id="la"+i;
+      const title=_fv(f,"審批標題")||"（無標題）";
+      const type=_fv(f,"審批類型")||"其他";
+      const who=_fv(f,"申請人");
+      const desc=_fv(f,"申請說明");
+      const amt=_fv(f,"涉及金額");
+      const cur=_fv(f,"幣別")||"RMB";
+      const ts=typeof f["申請日期"]==="number"?f["申請日期"]:0;
+      const ageDays=ts?Math.floor((now-ts)/86400000):0;
+      const ageStr=ageDays>=2?`等待 ${ageDays} 天`:ageDays===1?"等待 1 天":"今天";
+      const ageColor=ageDays>=3?"var(--warn)":"var(--txt-mid)";
+      const ccyCls=CCY_CLS[cur]||"";
+      return `<div class="approval-row-wrap">
+        <div class="approval-row" onclick="toggleAppr('${id}')">
+          <div class="appr-icon ${TYPE_CLASS[type]||'expense'}">${TYPE_ICON[type]||"🔔"}</div>
+          <div class="appr-body">
+            <div class="appr-title">${type} · ${title}</div>
+            <div class="appr-meta">${who?who+" 申請 · ":""}等 Ray 批核</div>
+          </div>
+          <div>
+            <div class="appr-amount" style="color:var(--txt-hi)">${amt?'¥ '+Number(amt).toLocaleString()+" ":""}<span class="ccy ${ccyCls}">${cur}</span></div>
+            <div class="appr-age" style="color:${ageColor}">${ageStr}</div>
+          </div>
+          <span class="appr-expand-hint" id="hint-${id}">▼ 展開</span>
+          <div class="appr-action" onclick="event.stopPropagation()">
+            <button class="btn-approve" onclick="approveItem('${r.record_id}',this)">✓ 批准</button>
+            <button class="btn-reject" onclick="rejectItem('${r.record_id}',this)">✗</button>
+          </div>
+        </div>
+        <div class="appr-detail" id="${id}">
+          <div class="appr-detail-title">申請說明</div>
+          <div style="font-size:12px;color:var(--txt-mid);line-height:1.7">${desc||"（無說明）"}</div>
+        </div>
+      </div>`;
+    }).join("");
+  }catch(e){
+    console.error("loadApprovals",e);
+  }
+}
+
+/* ── LOAD PIPELINE ── */
+const STAGE_ORDER=["內部立項確認","版權送審","採購詢價","打樣驗收","大貨確認","出貨","完成"];
+const STAGE_SHORT=["立項","送審","採購","打樣","大貨","出貨","完成"];
+
+async function loadPipeline(){
+  const container = document.getElementById("pipeline-inner");
+  if(!container) return;
+  try{
+    const items = await _fetchAll(_TBLS.product_pipeline);
+    const active = items.filter(r=>{
+      const st=_fv(r.fields,"當前階段");
+      return st&&st!=="完成"&&st!=="取消";
+    }).slice(0,6);
+    if(!active.length) return;
+    container.innerHTML = active.map(r=>{
+      const f=r.fields;
+      const name=_fv(f,"產品名稱");
+      const ip=_fv(f,"IP品牌");
+      const stage=_fv(f,"當前階段");
+      const idx=STAGE_ORDER.indexOf(stage);
+      const stages=STAGE_ORDER.map((s,i)=>{
+        if(i<idx) return `<div class="pipe-stage ps-done">✓</div>`;
+        if(i===idx) return `<div class="pipe-stage ps-active">${STAGE_SHORT[i]}</div>`;
+        return `<div class="pipe-stage ps-wait">—</div>`;
+      }).join("");
+      const label=(ip||name).substring(0,8);
+      return `<div class="pipeline-row">
+        <div class="pipe-ip" title="${name}">${label}</div>
+        <div class="pipe-stages">${stages}</div>
+        <div class="pipe-status" style="color:var(--txt-mid)">${stage}</div>
+      </div>`;
+    }).join("");
+  }catch(e){
+    console.error("loadPipeline",e);
+  }
+}
+
+/* ── APPROVE / REJECT ── */
+async function approveItem(rid, btn){
+  btn.disabled=true; btn.textContent="處理中...";
+  try{
+    const tk=await _getToken();
+    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"審批狀態":"已批准"}})
+    });
+    btn.textContent="✓ 已批准"; btn.style.background="var(--ok)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 1500);
+  }catch(e){ btn.disabled=false; btn.textContent="✓ 批准"; }
+}
+async function rejectItem(rid, btn){
+  btn.disabled=true; btn.textContent="處理中...";
+  try{
+    const tk=await _getToken();
+    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"審批狀態":"已拒絕"}})
+    });
+    btn.textContent="✗ 已拒絕"; btn.style.background="var(--danger)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 1500);
+  }catch(e){ btn.disabled=false; btn.textContent="✗"; }
+}
+
+/* ── UI HELPERS ── */
 function switchEntity(tab) {
   document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
   tab.classList.add('active');
 }
-
 function toggleAppr(id) {
   const panel = document.getElementById(id);
   const hint = document.getElementById('hint-' + id);
   const isOpen = panel.classList.contains('open');
   panel.classList.toggle('open', !isOpen);
-  hint.textContent = isOpen ? '▼ 展開' : '▲ 收起';
+  if(hint) hint.textContent = isOpen ? '▼ 展開' : '▲ 收起';
 }
+
+/* ── INIT ── */
+loadApprovals();
+loadPipeline();
 </script>
 </body>
 </html>
