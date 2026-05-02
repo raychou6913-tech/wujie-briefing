@@ -1,130 +1,99 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>蕪解創意 — 登入</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 登入</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(135deg,#f0f4ff 0%,#faf5ff 100%);display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:20px}
-.card{background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 8px 40px #6366f120;border:1px solid #e0e7ff}
-.logo{text-align:center;margin-bottom:32px}
-.logo-icon{font-size:44px;margin-bottom:10px}
-.logo-name{font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-.3px}
-.logo-sub{font-size:12px;color:#94a3b8;margin-top:4px;letter-spacing:.3px}
-.f{margin-bottom:16px}
-.f label{display:block;font-size:13px;color:#64748b;font-weight:600;margin-bottom:6px}
-.f input{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;font-size:15px;color:#0f172a;outline:none;transition:all .15s}
-.f input:focus{border-color:#6366f1;background:#fff;box-shadow:0 0 0 3px #6366f115}
-.pw-wrap{position:relative}
-.pw-wrap input{padding-right:44px}
-.pw-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#94a3b8;font-size:18px;user-select:none;transition:color .15s}
-.pw-eye:hover{color:#6366f1}
-.remember{display:flex;align-items:center;gap:8px;font-size:13px;color:#64748b;margin-bottom:22px;cursor:pointer}
-.remember input{width:16px;height:16px;accent-color:#6366f1}
-.btn-login{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px}
-.btn-login:hover{background:#4f46e5;box-shadow:0 4px 20px #6366f140;transform:translateY(-1px)}
-.btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.err{background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#991b1b;margin-top:14px;display:none;text-align:center}
-.ver{text-align:center;font-size:11px;color:#cbd5e1;margin-top:28px}
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--danger:#ef4444;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.wrap{width:100%;max-width:440px;}
+.logo{text-align:center;margin-bottom:32px;}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);display:inline-block;margin-right:8px;vertical-align:middle;}
+.logo-name{font-size:22px;font-weight:800;}
+.logo-sub{font-size:10px;color:var(--txt-lo);margin-top:6px;letter-spacing:.12em;text-transform:uppercase;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:6px;letter-spacing:.04em;}
+.field input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--txt-hi);outline:none;transition:border-color .2s;}
+.field input::placeholder{color:var(--txt-lo);}
+.field input:focus{border-color:var(--accent);}
+.btn-login{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:opacity .2s;}
+.btn-login:hover{opacity:.88;}
+.err{background:#ef444412;border:1px solid #ef444435;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger);margin-bottom:14px;display:none;}
+.err.show{display:block;}
+.hint-title{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:24px 0 10px;}
+.acc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.acc{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:8px;}
+.acc:hover{border-color:var(--border-hi);}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.acc-name{font-size:11px;font-weight:700;}
+.acc-role{font-size:9px;color:var(--txt-lo);}
+.foot{text-align:center;font-size:10px;color:var(--txt-lo);margin-top:18px;}
 </style>
 </head>
 <body>
-<div class="card">
+<div class="wrap">
   <div class="logo">
-    <div class="logo-icon">🏢</div>
-    <div class="logo-name">蕪解創意</div>
-    <div class="logo-sub">WUJIE CREATIVE · 管理系統</div>
+    <div><span class="logo-dot"></span><span class="logo-name">蕪解 ERP</span></div>
+    <div class="logo-sub">WUJIE CREATIVE · 管理系統 v2.0</div>
   </div>
-  <div class="f">
-    <label>帳號</label>
-    <input id="username" type="text" placeholder="輸入你的帳號" autocomplete="username" autocapitalize="none">
+
+  <div class="card">
+    <div class="err" id="err">帳號或密碼不正確，請再試一次</div>
+    <div class="field"><label>帳號</label><input id="usr" type="text" placeholder="輸入你的帳號" autocapitalize="none"></div>
+    <div class="field"><label>密碼</label><input id="pwd" type="password" placeholder="wujie2026"></div>
+    <button class="btn-login" onclick="doLogin()">登入</button>
   </div>
-  <div class="f">
-    <label>密碼</label>
-    <div class="pw-wrap">
-      <input id="password" type="password" placeholder="輸入你的密碼" autocomplete="current-password">
-      <span class="pw-eye" id="eye" onclick="togglePw()">👁</span>
-    </div>
-  </div>
-  <label class="remember">
-    <input type="checkbox" id="remember" checked> 記住登入（30 天）
-  </label>
-  <button class="btn-login" id="loginBtn" onclick="doLogin()">登入</button>
-  <div class="err" id="err"></div>
-  <div class="ver">v1.6 · 蕪解創意管理系統</div>
+
+  <div class="hint-title">快速切換帳號（測試用）</div>
+  <div class="acc-grid" id="acc-grid"></div>
+  <div class="foot">所有帳號密碼：wujie2026</div>
 </div>
+
 <script>
-const PROXY="https://feishu-proxy.raychou6913.workers.dev";
-const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _ROLES_TBL="tblEj5GSDYUrKGY9";
+const ACCS = {
+  ray:     {pass:'wujie2026',name:'Ray',    role:'CEO・創辦人',      hall:'erp-war-room.html',    color:'#818cf8'},
+  shawn:   {pass:'wujie2026',name:'Shawn',  role:'COO・曼谷',        hall:'erp-shawn.html',       color:'#22c55e'},
+  anran:   {pass:'wujie2026',name:'安然',   role:'全球商務・北京GM',  hall:'erp-anran.html',       color:'#4f46e5'},
+  bevis:   {pass:'wujie2026',name:'Bevis',  role:'設計主管',          hall:'erp-pipeline.html',    color:'#818cf8'},
+  peilin:  {pass:'wujie2026',name:'珮玲',   role:'企劃・版權',        hall:'erp-pipeline.html',    color:'#6d28d9'},
+  shetong: {pass:'wujie2026',name:'詩彤',   role:'設計師',            hall:'erp-pipeline.html',    color:'#9333ea'},
+  laige:   {pass:'wujie2026',name:'賴哥',   role:'採購主管',          hall:'erp-procurement.html', color:'#f59e0b'},
+  muzi:    {pass:'wujie2026',name:'木子',   role:'採購助理',          hall:'erp-procurement.html', color:'#d97706'},
+  yuming:  {pass:'wujie2026',name:'躍明',   role:'財務',              hall:'erp-anran.html',       color:'#0284c7'},
+};
 
-// 已登入直接跳轉
-const _s=JSON.parse(localStorage.getItem("wujie_session")||"null");
-if(_s&&Date.now()<_s.expires){
-  location.replace("home.html");
+const grid = document.getElementById('acc-grid');
+Object.entries(ACCS).forEach(([id,a])=>{
+  const d=document.createElement('div');
+  d.className='acc';
+  d.innerHTML=`<div class="av" style="background:${a.color}">${[...a.name][0]}</div><div><div class="acc-name">${a.name}</div><div class="acc-role">${a.role}</div></div>`;
+  d.onclick=()=>{ document.getElementById('usr').value=id; document.getElementById('pwd').value=a.pass; doLogin(); };
+  grid.appendChild(d);
+});
+
+function doLogin(){
+  const usr=document.getElementById('usr').value.trim().toLowerCase();
+  const pwd=document.getElementById('pwd').value;
+  const a=ACCS[usr];
+  if(!a||a.pass!==pwd){ document.getElementById('err').classList.add('show'); document.getElementById('pwd').value=''; return; }
+  document.getElementById('err').classList.remove('show');
+  localStorage.setItem('erp_sess',JSON.stringify({user:usr,name:a.name,role:a.role,hall:a.hall,color:a.color,ts:Date.now()}));
+  location.href=a.hall;
 }
+document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('usr').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pwd').focus();});
 
-document.getElementById("username").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("password").focus();});
-document.getElementById("password").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
-
-function togglePw(){
-  const inp=document.getElementById("password");
-  inp.type=inp.type==="password"?"text":"password";
-}
-
-async function fetchRole(name){
-  try{
-    const tr=await fetch(PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-    const td=await tr.json();
-    if(td.code!==0) return "一般員工";
-    const tk=td.tenant_access_token;
-    const url=PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_ROLES_TBL+"/records?page_size=100";
-    const rr=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
-    const rd=await rr.json();
-    if(rd.code!==0) return "一般員工";
-    const items=rd.data?.items||[];
-    for(const item of items){
-      const f=item.fields||{};
-      const n=Array.isArray(f["姓名"])?f["姓名"][0]?.text||"":String(f["姓名"]||"");
-      if(n===name){
-        const rv=f["角色"];
-        return Array.isArray(rv)?rv[0]?.text||"一般員工":String(rv||"一般員工");
-      }
-    }
-  }catch(e){}
-  return "一般員工";
-}
-
-async function doLogin(){
-  const username=document.getElementById("username").value.trim().toLowerCase();
-  const password=document.getElementById("password").value;
-  const remember=document.getElementById("remember").checked;
-  const errEl=document.getElementById("err");
-  errEl.style.display="none";
-  if(!username||!password){errEl.textContent="請填寫帳號和密碼";errEl.style.display="block";return;}
-  const btn=document.getElementById("loginBtn");
-  btn.disabled=true; btn.textContent="登入中...";
-  try{
-    const r=await fetch(PROXY+"/login",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({username,password})
-    });
-    const d=await r.json();
-    if(!d.ok){errEl.textContent=d.msg||"帳號或密碼錯誤";errEl.style.display="block";return;}
-    btn.textContent="讀取權限...";
-    const role=await fetchRole(d.name);
-    localStorage.setItem("wujie_session",JSON.stringify({
-      name:d.name,dept:d.dept,username,role,
-      expires:Date.now()+(remember?30:1)*86400000,
-      loginTime:Date.now()
-    }));
-    location.replace("home.html");
-  }catch(e){
-    errEl.textContent="網路錯誤，請稍後重試";
-    errEl.style.display="block";
-  }finally{
-    btn.disabled=false; btn.textContent="登入";
-  }
-}
+// Auto-redirect if valid session
+const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
+if(s&&Date.now()-s.ts<7*86400000) location.href=s.hall;
 </script>
-</body></html>
+</body>
+</html>
