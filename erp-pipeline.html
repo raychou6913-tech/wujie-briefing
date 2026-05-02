@@ -5,795 +5,543 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>蕪解 ERP · 產品開發流水線</title>
 <style>
-:root {
-  --bg:        #0b0c10;
-  --surface:   #111318;
-  --card:      #181a22;
-  --card2:     #1e2130;
-  --border:    #222535;
-  --border-hi: #363b58;
-  --txt-hi:    #e8eaf8;
-  --txt-mid:   #7880a8;
-  --txt-lo:    #3d4268;
-  --accent:    #818cf8;
-  --accent2:   #4f56b0;
-  --ok:        #22c55e;
-  --ok-dim:    #22c55e18;
-  --warn:      #f59e0b;
-  --warn-dim:  #f59e0b18;
-  --danger:    #ef4444;
-  --danger-dim:#ef444418;
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;--danger:#ef4444;--danger-dim:#ef444418;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
 
-/* ── TOPBAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.topbar-brand{display:flex;align-items:center;gap:10px;}
-.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
-.brand-name{font-size:14px;font-weight:700;letter-spacing:.05em;}
-.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:2px;}
-.topbar-right{display:flex;align-items:center;gap:12px;}
-.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
-.nav-back:hover{color:var(--txt-hi);border-color:var(--border-hi);}
-.date-badge{font-size:11px;color:var(--txt-mid);}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent);}
+.brand-name{font-size:14px;font-weight:700;}
+.brand-sub{font-size:11px;color:var(--txt-mid);}
+.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:6px;min-height:34px;display:flex;align-items:center;}
 
-/* ── LAYOUT ── */
-.layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 56px);}
+/* ── KPI BAR ── */
+.kpi-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;}
+.kpi-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;min-width:calc(50% - 5px);}
+.kpi-label{font-size:9px;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.kpi-val{font-size:20px;font-weight:800;line-height:1;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
 
-/* ── LEFT SIDEBAR: PROJECT LIST ── */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;}
-.sidebar-section{padding:0 16px;margin-bottom:4px;}
-.sidebar-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-lo);text-transform:uppercase;padding:8px 0 6px;}
-.proj-card{padding:10px 12px;border-radius:8px;cursor:pointer;margin:0 8px 4px;border:1px solid transparent;transition:.15s;}
-.proj-card:hover{background:var(--card);}
-.proj-card.active{background:var(--card2);border-color:var(--border-hi);}
-.proj-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-.proj-ip{font-size:13px;font-weight:700;}
-.proj-stage-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;}
-.pb-ok{background:var(--ok-dim);color:var(--ok);}
-.pb-warn{background:var(--warn-dim);color:var(--warn);}
-.pb-danger{background:var(--danger-dim);color:var(--danger);}
-.pb-accent{background:#818cf820;border:1px solid #818cf840;color:var(--accent);}
-.pb-mid{background:var(--card2);color:var(--txt-mid);}
-.proj-meta{font-size:10px;color:var(--txt-mid);}
-.proj-mini-bar{display:flex;gap:2px;margin-top:6px;}
-.pmb-seg{flex:1;height:3px;border-radius:2px;}
-.pmb-done{background:var(--ok);}
-.pmb-active{background:var(--accent);}
-.pmb-blocked{background:var(--warn);}
-.pmb-wait{background:var(--border-hi);}
+/* ── PROJECT PICKER ── */
+.proj-strip{padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.proj-pill{flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:36px;}
+.proj-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.proj-pill .pp-status{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+.pp-active{background:var(--ok);}
+.pp-warn{background:var(--warn);}
+.pp-wait{background:var(--txt-lo);}
 
-.new-proj-btn{margin:8px 16px 0;padding:8px;background:var(--card2);border:1px dashed var(--border-hi);border-radius:8px;font-size:12px;color:var(--txt-mid);text-align:center;cursor:pointer;}
-.new-proj-btn:hover{color:var(--accent);border-color:var(--accent2);}
-
-/* ── MAIN CONTENT ── */
-.main{overflow-y:auto;padding:24px;}
+.main{max-width:720px;margin:0 auto;padding:16px;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:10px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
 
 /* ── PROJECT HEADER ── */
-.proj-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
-.proj-title-block{}
-.proj-title{font-size:22px;font-weight:800;margin-bottom:4px;}
-.proj-subtitle{font-size:12px;color:var(--txt-mid);}
-.proj-actions{display:flex;gap:8px;flex-shrink:0;}
-.btn{font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer;border:1px solid;}
-.btn-primary{background:var(--accent2);border-color:var(--accent);color:#fff;}
-.btn-secondary{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
-.btn-secondary:hover{color:var(--txt-hi);}
+.proj-header{margin-bottom:16px;}
+.proj-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+.proj-meta{font-size:11px;color:var(--txt-mid);margin-bottom:10px;line-height:1.6;}
+.type-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--accent);color:#fff;vertical-align:middle;margin-left:6px;}
+.type-nonfig{background:#10b981;}
 
-/* ── STAGE TYPE TAG ── */
-.type-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;margin-left:8px;vertical-align:middle;}
-.type-figurine{background:#7c3aed20;border:1px solid #7c3aed40;color:#c084fc;}
-.type-flat{background:#0284c720;border:1px solid #0284c740;color:#38bdf8;}
+/* ── PROGRESS BAR ── */
+.stage-bar{display:flex;gap:3px;margin-bottom:6px;}
+.sb-seg{flex:1;height:6px;border-radius:3px;background:var(--border);}
+.sb-done{background:var(--ok);}
+.sb-active{background:var(--accent);}
+.sb-blocked{background:var(--danger);}
+.stage-bar-labels{display:flex;gap:3px;margin-bottom:14px;}
+.sbl{flex:1;font-size:8px;color:var(--txt-lo);text-align:center;overflow:hidden;white-space:nowrap;}
+.sbl.done{color:var(--ok);}
+.sbl.active{color:var(--accent);}
 
-/* ── STAGE TIMELINE ── */
-.timeline{position:relative;padding-left:0;}
-.stage-block{display:grid;grid-template-columns:200px 30px 1fr;gap:0;margin-bottom:0;position:relative;}
-.stage-block::before{content:'';position:absolute;left:214px;top:40px;width:2px;bottom:-1px;background:var(--border);}
-.stage-block:last-child::before{display:none;}
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;gap:0;position:relative;}
+.tl-left{width:80px;flex-shrink:0;padding:4px 12px 4px 0;text-align:right;}
+.tl-num{font-size:9px;color:var(--txt-lo);font-weight:700;}
+.tl-name{font-size:11px;color:var(--txt-mid);font-weight:600;margin-top:2px;}
+.tl-owner{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+.tl-connector{width:24px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:6px;}
+.tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.dot-done{background:var(--ok);}
+.dot-active{background:var(--accent);box-shadow:0 0 8px var(--accent);}
+.dot-blocked{background:var(--danger);}
+.dot-wait{background:var(--border-hi);}
+.tl-line{flex:1;width:2px;background:var(--border);min-height:20px;}
+.tl-right{flex:1;padding:0 0 20px 4px;}
+.tl-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:2px;}
+.tl-card.tc-done{border-color:#22c55e30;}
+.tl-card.tc-active{border-color:var(--accent);}
+.tl-card.tc-blocked{border-color:var(--danger);}
+.tl-card.tc-wait{opacity:.45;}
+.tc-status{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.tc-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.tcb-done{background:var(--ok-dim);color:var(--ok);}
+.tcb-active{background:#818cf820;color:var(--accent);}
+.tcb-blocked{background:var(--danger-dim);color:var(--danger);}
+.tcb-wait{background:var(--border);color:var(--txt-lo);}
+.tc-date{font-size:10px;color:var(--txt-mid);margin-left:auto;}
+.tc-desc{font-size:12px;color:var(--txt-hi);line-height:1.6;margin-bottom:8px;}
+.tc-parallel{background:var(--card);border-radius:8px;padding:10px;margin-bottom:8px;}
+.tcp-title{font-size:9px;color:var(--txt-lo);font-weight:700;margin-bottom:6px;text-transform:uppercase;}
+.tcp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.tcp-label{font-size:11px;color:var(--txt-mid);}
+.tcp-status{font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;}
+.tcs-ok{background:var(--ok-dim);color:var(--ok);}
+.tcs-active{background:#818cf820;color:var(--accent);}
+.tcs-wait{background:var(--border);color:var(--txt-lo);}
+.tc-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.tc-btn{font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;border:1px solid;min-height:34px;}
+.tcb-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tcb-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.tcb-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
 
-.stage-left{padding:16px 20px 16px 0;text-align:right;padding-top:20px;}
-.stage-num{font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.1em;text-transform:uppercase;}
-.stage-name{font-size:13px;font-weight:700;color:var(--txt-hi);margin:2px 0;}
-.stage-owner{font-size:10px;color:var(--txt-mid);}
+/* ── NEW PROJECT FORM ── */
+.inp{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px 12px;border-radius:8px;font-size:14px;margin-bottom:8px;}
+.inp::placeholder{color:var(--txt-lo);}
+select.inp option{background:var(--card2);}
+.btn-ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;min-height:44px;}
 
-.stage-connector{display:flex;flex-direction:column;align-items:center;padding-top:20px;position:relative;}
-.stage-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid;z-index:1;}
-.sd-done{background:var(--ok);border-color:var(--ok);}
-.sd-active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--accent);}
-.sd-blocked{background:var(--warn-dim);border-color:var(--warn);}
-.sd-wait{background:var(--bg);border-color:var(--border-hi);}
-.sd-skip{background:var(--bg);border-color:var(--border);opacity:.4;}
+/* ── EMPTY ── */
+.empty{text-align:center;padding:32px 16px;color:var(--txt-lo);}
+.empty-icon{font-size:28px;margin-bottom:8px;}
 
-.stage-right{padding:16px 0 16px 20px;}
-.stage-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
-.stage-card.s-active{border-color:var(--accent2);background:var(--card2);}
-.stage-card.s-blocked{border-color:#b45309;}
-.stage-card.s-done{opacity:.7;}
-.stage-card.s-skip{opacity:.35;border-style:dashed;}
-.stage-status-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.stage-status-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
-.sc-done{background:var(--ok-dim);color:var(--ok);}
-.sc-active{background:#818cf820;color:var(--accent);}
-.sc-blocked{background:var(--warn-dim);color:var(--warn);}
-.sc-wait{background:var(--card2);color:var(--txt-lo);}
-.sc-skip{background:var(--card2);color:var(--txt-lo);}
-.stage-elapsed{font-size:10px;color:var(--txt-mid);}
-.stage-desc{font-size:12px;color:var(--txt-mid);line-height:1.5;margin-bottom:10px;}
-.stage-people{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.person-chip{display:flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:3px 8px;}
-.person-av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;}
-.person-name{font-size:10px;color:var(--txt-mid);}
-.person-role{font-size:9px;color:var(--txt-lo);}
-
-.stage-actions{display:flex;gap:6px;flex-wrap:wrap;}
-.sa-btn{font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;border:1px solid;}
-.sa-primary{background:var(--accent2);border-color:var(--accent);color:#fff;}
-.sa-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
-.sa-ok{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
-.sa-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
-.sa-ghost:hover{color:var(--txt-hi);}
-.sa-forge{background:#4f56b020;border-color:var(--accent);color:var(--accent);}
-
-/* Activity log inside stage */
-.activity-log{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.activity-label{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--txt-lo);text-transform:uppercase;margin-bottom:6px;}
-.activity-item{display:flex;gap:8px;padding:4px 0;font-size:11px;}
-.activity-time{color:var(--txt-lo);white-space:nowrap;flex-shrink:0;}
-.activity-text{color:var(--txt-mid);}
-.activity-text strong{color:var(--txt-hi);}
-
-/* Sales input box */
-.sales-input-box{background:var(--warn-dim);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;margin-top:8px;}
-.sib-label{font-size:10px;font-weight:700;color:var(--warn);margin-bottom:6px;}
-.sib-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.sib-field{background:var(--card);border:1px solid var(--border-hi);border-radius:6px;padding:6px 8px;}
-.sib-field-label{font-size:9px;color:var(--txt-lo);margin-bottom:2px;}
-.sib-field-input{font-size:12px;color:var(--txt-hi);}
-
-/* Notify chain */
-.notify-chain{display:flex;align-items:center;gap:4px;margin-top:8px;flex-wrap:wrap;}
-.nc-label{font-size:9px;color:var(--txt-lo);margin-right:2px;}
-.nc-chip{font-size:9px;font-weight:700;padding:2px 6px;background:var(--card2);border-radius:10px;color:var(--txt-mid);}
-
-/* Section header */
-.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-
-/* Stage grid overview (top) */
-.overview-bar{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:24px;}
-.ov-title{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
-.ov-grid{display:flex;gap:4px;}
-.ov-seg{flex:1;text-align:center;}
-.ov-seg-bar{height:6px;border-radius:3px;margin-bottom:4px;}
-.ov-seg-label{font-size:8px;color:var(--txt-lo);}
-.ov-seg.ov-done .ov-seg-bar{background:var(--ok);}
-.ov-seg.ov-active .ov-seg-bar{background:var(--accent);}
-.ov-seg.ov-blocked .ov-seg-bar{background:var(--warn);}
-.ov-seg.ov-wait .ov-seg-bar{background:var(--border-hi);}
-.ov-seg.ov-skip .ov-seg-bar{background:var(--border);opacity:.4;}
-
-/* Approved images shelf (for done stages) */
-.image-shelf{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
-.img-thumb{width:56px;height:56px;border-radius:6px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;position:relative;overflow:hidden;}
-.img-thumb:hover{border-color:var(--accent2);}
-.img-approved{position:absolute;bottom:2px;right:2px;background:var(--ok);border-radius:3px;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;}
-
-@media(max-width:768px){
-  .layout{grid-template-columns:1fr;}
-  .sidebar{display:none;}
-  .stage-block{grid-template-columns:120px 1fr;}
+@media(min-width:600px){
+  .kpi-chip{min-width:calc(33% - 7px);}
+  .main{padding:20px 24px;}
+  .topbar,.kpi-bar,.proj-strip{padding-left:24px;padding-right:24px;}
+  .tl-left{width:100px;}
 }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="topbar-brand">
+  <div class="brand">
     <div class="brand-dot"></div>
     <div>
       <span class="brand-name">蕪解 ERP</span>
-      <span class="brand-sub">產品開發流水線</span>
+      <span class="brand-sub"> 產品開發流水線</span>
     </div>
   </div>
-  <div class="topbar-right">
-    <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
-    <span class="date-badge">2026年 5月 1日（週四）</span>
+  <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+</div>
+
+<!-- ── KPI BAR ── -->
+<div class="kpi-bar">
+  <div class="kpi-chip">
+    <div class="kpi-label">進行中項目</div>
+    <div class="kpi-val" id="kpi-active" style="color:var(--accent)">—</div>
+    <div class="kpi-sub" id="kpi-active-sub">—</div>
+  </div>
+  <div class="kpi-chip">
+    <div class="kpi-label">等版權方回覆</div>
+    <div class="kpi-val" id="kpi-waiting" style="color:var(--warn)">—</div>
+    <div class="kpi-sub">送審中</div>
+  </div>
+  <div class="kpi-chip">
+    <div class="kpi-label">本月可進大貨</div>
+    <div class="kpi-val" id="kpi-ready" style="color:var(--ok)">—</div>
+    <div class="kpi-sub">打樣已通過</div>
   </div>
 </div>
 
-<div class="layout">
+<!-- ── PROJECT STRIP ── -->
+<div class="proj-strip" id="proj-strip">
+  <div style="color:var(--txt-lo);font-size:12px;padding:8px;">載入中...</div>
+</div>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">進行中 · 4 項</div>
-
-      <!-- Project 1: Snoopy -->
-      <div class="proj-card active" onclick="switchProject('snoopy')">
-        <div class="proj-card-top">
-          <span class="proj-ip">Snoopy 夏季系列</span>
-          <span class="proj-stage-badge pb-ok">大貨生產中</span>
-        </div>
-        <div class="proj-meta">公仔 · 5 輪送審 · 7/7 完成</div>
-        <div class="proj-mini-bar">
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-active"></div>
-        </div>
-      </div>
-
-      <!-- Project 2: Muziktiger -->
-      <div class="proj-card" onclick="switchProject('muziktiger')">
-        <div class="proj-card-top">
-          <span class="proj-ip">Muziktiger 新系列</span>
-          <span class="proj-stage-badge pb-warn">等版權方 14天</span>
-        </div>
-        <div class="proj-meta">公仔 · 第1輪送審中</div>
-        <div class="proj-mini-bar">
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-blocked"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-        </div>
-      </div>
-
-      <!-- Project 3: Opanchu -->
-      <div class="proj-card" onclick="switchProject('opanchu')">
-        <div class="proj-card-top">
-          <span class="proj-ip">Opanchu 秋冬系列</span>
-          <span class="proj-stage-badge pb-accent">概念圖生成中</span>
-        </div>
-        <div class="proj-meta">公仔 · Forge 生圖進行中</div>
-        <div class="proj-mini-bar">
-          <div class="pmb-seg pmb-done"></div>
-          <div class="pmb-seg pmb-active"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-        </div>
-      </div>
-
-      <!-- Project 4: Gudetama -->
-      <div class="proj-card" onclick="switchProject('gudetama')">
-        <div class="proj-card-top">
-          <span class="proj-ip">Gudetama 泰國授權</span>
-          <span class="proj-stage-badge pb-mid">版權條件洽談</span>
-        </div>
-        <div class="proj-meta">公仔 · 等 Ray 拍板授權條件</div>
-        <div class="proj-mini-bar">
-          <div class="pmb-seg pmb-active"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-          <div class="pmb-seg pmb-wait"></div>
-        </div>
-      </div>
-
-      <div class="sidebar-label" style="margin-top:16px;">已完成 · 本季</div>
-      <div class="proj-card" style="opacity:.5;">
-        <div class="proj-card-top">
-          <span class="proj-ip">Snoopy 春節系列</span>
-          <span class="proj-stage-badge pb-ok">已出貨</span>
-        </div>
-        <div class="proj-meta">公仔 · 2026-02 完成出貨</div>
-      </div>
-
-    </div>
-    <div class="new-proj-btn">＋ 新增 IP 項目</div>
+<div class="main">
+  <div id="proj-detail">
+    <div class="empty"><div class="empty-icon">👆</div>選擇上方項目查看流水線</div>
   </div>
 
-  <!-- MAIN CONTENT -->
-  <div class="main" id="main-content">
-
-    <!-- ── SNOOPY VIEW (DEFAULT) ── -->
-    <div id="view-snoopy">
-      <div class="proj-header">
-        <div class="proj-title-block">
-          <div class="proj-title">Snoopy 夏季系列 <span class="type-tag type-figurine">公仔 · 5輪送審</span></div>
-          <div class="proj-subtitle">授權方：Peanuts Worldwide LLC｜執行：珮玲｜版權主管：Bevis｜商務：安然</div>
-        </div>
-        <div class="proj-actions">
-          <button class="btn btn-secondary" onclick="window.open('index.html?ip=snoopy')">→ 開啟 Forge</button>
-          <button class="btn btn-primary">📤 分享進度報告</button>
-        </div>
-      </div>
-
-      <!-- Overview bar -->
-      <div class="overview-bar">
-        <div class="ov-title">整體進度 — 7 個階段 · 全部完成 · 大貨生產中</div>
-        <div class="ov-grid">
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">主題確認</div></div>
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">概念圖</div></div>
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">2D送審</div></div>
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">3D建模</div></div>
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">素模打樣</div></div>
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">上色打樣</div></div>
-          <div class="ov-seg ov-active"><div class="ov-seg-bar"></div><div class="ov-seg-label">大貨生產</div></div>
-        </div>
-      </div>
-
-      <div class="section-title">開發時間軸</div>
-      <div class="timeline">
-
-        <!-- Stage 1: Theme -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 01</div>
-            <div class="stage-name">主題確認</div>
-            <div class="stage-owner">Shawn 提案 → Ray 批核</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 完成</span>
-                <span class="stage-elapsed">2026-03-05</span>
-              </div>
-              <div class="stage-desc">Shawn 提案「夏日海灘」主題，含預估首批 5,000 件、建議售價 NT$480。Ray 批核通過，同步啟動 Forge 概念圖生成。</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 2: Concept -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 02</div>
-            <div class="stage-name">概念圖 & 定價共識</div>
-            <div class="stage-owner">Forge生圖 → 任何人提議定價 → 銷售確認 → Shawn預算把關</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 完成</span>
-                <span class="stage-elapsed">2026-03-12</span>
-              </div>
-              <div class="stage-desc">Forge 生成 12 張概念圖，Bevis 核准 3 張。老董確認定價 NT$480、德寶預估首批 3,000 件（台灣）。</div>
-              <div class="image-shelf">
-                <div class="img-thumb">🌊<div class="img-approved">✓</div></div>
-                <div class="img-thumb">☀️<div class="img-approved">✓</div></div>
-                <div class="img-thumb">🏖️<div class="img-approved">✓</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 3: 2D Submission -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 03</div>
-            <div class="stage-name">2D 四視圖送審</div>
-            <div class="stage-owner">珮玲送審 → 版權方回覆</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 通過</span>
-                <span class="stage-elapsed">2026-03-28（等待 16 天）</span>
-              </div>
-              <div class="stage-desc">珮玲送出四視圖，版權方要求修改耳朵比例。詩彤修改後再送，第二次通過。</div>
-              <div class="image-shelf">
-                <div class="img-thumb" title="正面視圖（最終核准版）">🐾<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="側面視圖">🐾<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="背面視圖">🐾<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="3/4 角度視圖">🐾<div class="img-approved">✓</div></div>
-                <div class="img-thumb" style="opacity:.35;cursor:default;" title="第一版（被退回）">🐾</div>
-              </div>
-              <div style="font-size:9px;color:var(--txt-lo);margin-top:4px;">4 張核准（最終版）· 1 張退回（版權方要求修改耳朵）</div>
-              <div class="activity-log">
-                <div class="activity-label">送審紀錄</div>
-                <div class="activity-item"><span class="activity-time">03-14</span><span class="activity-text">珮玲送出第一版四視圖</span></div>
-                <div class="activity-item"><span class="activity-time">03-21</span><span class="activity-text">版權方回覆：<strong>耳朵比例需調整，嘴巴修細</strong></span></div>
-                <div class="activity-item"><span class="activity-time">03-25</span><span class="activity-text">詩彤修改完成，珮玲再送</span></div>
-                <div class="activity-item"><span class="activity-time">03-28</span><span class="activity-text"><strong>版權方批准</strong>，進入3D階段</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 4: 3D -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 04</div>
-            <div class="stage-name">3D 建模</div>
-            <div class="stage-owner">外包雕刻師 → Bevis 驗收</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 完成</span>
-                <span class="stage-elapsed">2026-04-06（8 天）</span>
-              </div>
-              <div class="stage-desc">外包 3D 雕刻師（合作廠商深圳鵬鵠）完成建模。Bevis 線上驗收通過，匯出 STL 檔給工廠。</div>
-              <div class="image-shelf">
-                <div class="img-thumb" title="3D 渲染圖 — 正面">🗿<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="3D 渲染圖 — 側面">🗿<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="3D 渲染圖 — 俯視">🗿<div class="img-approved">✓</div></div>
-              </div>
-              <div style="font-size:9px;color:var(--txt-lo);margin-top:4px;">3 張渲染圖 · Bevis 驗收核准 · STL 檔已交工廠</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 5: Plain sample -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 05</div>
-            <div class="stage-name">素模打樣送審</div>
-            <div class="stage-owner">賴哥送廠 → 版權方審</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 通過</span>
-                <span class="stage-elapsed">2026-04-18（12 天）</span>
-              </div>
-              <div class="stage-desc">工廠製作 5 個素模樣品，高維安排快遞寄版權方。版權方一次通過（無修改意見）。</div>
-              <div class="image-shelf">
-                <div class="img-thumb" title="素模樣品照 — 正面">🪆<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="素模樣品照 — 側面">🪆<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="素模樣品照 — 細節">🪆<div class="img-approved">✓</div></div>
-              </div>
-              <div style="font-size:9px;color:var(--txt-lo);margin-top:4px;">樣品照片 3 張 · 版權方一次通過（無修改意見）</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 6: Color sample -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 06</div>
-            <div class="stage-name">上色打樣送審</div>
-            <div class="stage-owner">珮玲送審 → 版權方</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 通過</span>
-                <span class="stage-elapsed">2026-04-28（10 天）</span>
-              </div>
-              <div class="stage-desc">上色版本版權方批准。採購啟動點：賴哥此時取得下大貨授權。</div>
-              <div class="image-shelf">
-                <div class="img-thumb" title="上色打樣 — 海灘版（核准色）">🎨<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="上色打樣 — 衝浪版（核准色）">🎨<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="上色細節 — 臉部特寫">🎨<div class="img-approved">✓</div></div>
-                <div class="img-thumb" title="上色細節 — 配件特寫">🎨<div class="img-approved">✓</div></div>
-              </div>
-              <div style="font-size:9px;color:var(--txt-lo);margin-top:4px;">4 張核准色照 · 此為大貨生產的最終色彩標準</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 7: Production -->
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 07</div>
-            <div class="stage-name">大貨生產</div>
-            <div class="stage-owner">賴哥下 PO → 高維追蹤物流</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-active"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-active">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-active">⚡ 進行中</span>
-                <span class="stage-elapsed">開始 2026-04-29 · 第 2 天</span>
-              </div>
-              <div class="stage-desc">東莞永盛玩具接單，預計 45 天出貨（2026-07-15）。首付款 ¥44,400 已觸發（PO 批核後）。</div>
-              <div class="stage-actions">
-                <button class="sa-btn sa-ghost">📦 查物流狀態</button>
-                <button class="sa-btn sa-ghost">💰 確認付款進度</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /timeline -->
-    </div><!-- /view-snoopy -->
-
-
-    <!-- ── MUZIKTIGER VIEW ── -->
-    <div id="view-muziktiger" style="display:none;">
-      <div class="proj-header">
-        <div class="proj-title-block">
-          <div class="proj-title">Muziktiger 新系列 <span class="type-tag type-figurine">公仔 · 5輪送審</span></div>
-          <div class="proj-subtitle">授權方：Muziktiger Studio｜執行：珮玲｜版權主管：Bevis｜商務：安然</div>
-        </div>
-        <div class="proj-actions">
-          <button class="btn btn-secondary" onclick="window.open('index.html?ip=muziktiger')">→ 開啟 Forge</button>
-          <button class="btn btn-primary">📤 催版權方回覆</button>
-        </div>
-      </div>
-
-      <div class="overview-bar" style="border-color:#b45309;">
-        <div class="ov-title" style="color:var(--warn);">⚠ 等待版權方回覆 · 已 14 天 · 進度落後</div>
-        <div class="ov-grid">
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">主題確認</div></div>
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">概念圖</div></div>
-          <div class="ov-seg ov-blocked"><div class="ov-seg-bar"></div><div class="ov-seg-label">2D送審</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">3D建模</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">素模打樣</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">上色打樣</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">大貨生產</div></div>
-        </div>
-      </div>
-
-      <div class="section-title">開發時間軸</div>
-      <div class="timeline">
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 01</div>
-            <div class="stage-name">主題確認</div>
-            <div class="stage-owner">Shawn → Ray</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 完成</span>
-                <span class="stage-elapsed">2026-04-01</span>
-              </div>
-              <div class="stage-desc">主題：「夜光派對」系列，首批 3,000 件，目標 Q4 上市。</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 02</div>
-            <div class="stage-name">概念圖 & 定價共識</div>
-            <div class="stage-owner">Forge生圖 → 任何人提議定價 → 銷售確認 → Shawn預算把關</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-done">✓ 完成</span>
-                <span class="stage-elapsed">2026-04-10</span>
-              </div>
-              <div class="stage-desc">Forge 生成 8 張概念圖，核准 2 張。德寶預估 2,000 件（香港）。</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 03</div>
-            <div class="stage-name">2D 四視圖送審</div>
-            <div class="stage-owner">珮玲送審 → ⏳ 版權方</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-blocked"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-blocked">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-blocked">⏳ 等待回覆 · 第 14 天</span>
-                <span class="stage-elapsed" style="color:var(--danger)">超出正常等待期（10天）</span>
-              </div>
-              <div class="stage-desc">珮玲於 4/17 送出四視圖。版權方至今未回覆。安然已發第二封催促信（4/25）。</div>
-              <div class="activity-log">
-                <div class="activity-label">送審紀錄</div>
-                <div class="activity-item"><span class="activity-time">04-17</span><span class="activity-text">珮玲送出四視圖（Email）</span></div>
-                <div class="activity-item"><span class="activity-time">04-25</span><span class="activity-text">安然發催促信，請求版權方優先回覆</span></div>
-                <div class="activity-item"><span class="activity-time">05-01</span><span class="activity-text" style="color:var(--danger)"><strong>今天：仍無回覆</strong>，建議安然升級聯繫方式</span></div>
-              </div>
-              <div class="stage-actions" style="margin-top:10px;">
-                <button class="sa-btn sa-warn">🔔 請安然電話催促</button>
-                <button class="sa-btn sa-ghost">📋 查看送審文件</button>
-              </div>
-              <div class="notify-chain">
-                <span class="nc-label">即時通知：</span>
-                <span class="nc-chip">Ray</span>
-                <span class="nc-chip">安然</span>
-                <span class="nc-chip">Shawn</span>
-                <span class="nc-chip">Bevis</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 04</div>
-            <div class="stage-name">3D 建模</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-wait"></div></div>
-          <div class="stage-right">
-            <div class="stage-card" style="opacity:.4;"><div class="stage-status-chip sc-wait" style="font-size:10px;">等待前階段</div></div>
-          </div>
-        </div>
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 05–07</div>
-            <div class="stage-name">後續三階段</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-wait"></div></div>
-          <div class="stage-right">
-            <div class="stage-card" style="opacity:.3;"><div class="stage-status-chip sc-wait" style="font-size:10px;">鎖定中</div></div>
-          </div>
-        </div>
-
-      </div>
-    </div><!-- /muziktiger -->
-
-
-    <!-- ── OPANCHU VIEW ── -->
-    <div id="view-opanchu" style="display:none;">
-      <div class="proj-header">
-        <div class="proj-title-block">
-          <div class="proj-title">Opanchu 秋冬系列 <span class="type-tag type-figurine">公仔 · 5輪送審</span></div>
-          <div class="proj-subtitle">授權方：Opanchu Usagi Japan｜執行：珮玲｜版權主管：Bevis｜商務：安然</div>
-        </div>
-        <div class="proj-actions">
-          <button class="btn btn-secondary" onclick="window.open('index.html?ip=opanchu')">→ 開啟 Forge</button>
-        </div>
-      </div>
-
-      <div class="overview-bar">
-        <div class="ov-title">Stage 2 進行中 — Forge 概念圖生成中，等 Bevis 核准後進入送審</div>
-        <div class="ov-grid">
-          <div class="ov-seg ov-done"><div class="ov-seg-bar"></div><div class="ov-seg-label">主題確認</div></div>
-          <div class="ov-seg ov-active"><div class="ov-seg-bar"></div><div class="ov-seg-label">概念圖</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">2D送審</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">3D建模</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">素模打樣</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">上色打樣</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">大貨生產</div></div>
-        </div>
-      </div>
-
-      <div class="section-title">開發時間軸</div>
-      <div class="timeline">
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 01</div>
-            <div class="stage-name">主題確認</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-done"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-done">
-              <div class="stage-status-row"><span class="stage-status-chip sc-done">✓ 完成</span><span class="stage-elapsed">2026-04-20</span></div>
-              <div class="stage-desc">主題：「楓葉秋日」，首批 2,500 件，預計 9 月上市。</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage-block">
-          <div class="stage-left">
-            <div class="stage-num">Stage 02</div>
-            <div class="stage-name">概念圖 & 銷售確認</div>
-            <div class="stage-owner">Bevis/詩彤 Forge生圖</div>
-          </div>
-          <div class="stage-connector"><div class="stage-dot sd-active"></div></div>
-          <div class="stage-right">
-            <div class="stage-card s-active">
-              <div class="stage-status-row">
-                <span class="stage-status-chip sc-active">⚡ 進行中</span>
-                <span class="stage-elapsed">今日第 11 天</span>
-              </div>
-              <div class="stage-desc">詩彤在 Forge 已生成 6 張。Bevis 尚未完成核准。<strong>老董/德寶尚未填入定價與預估數量</strong>（⚠ 此步驟必須在進入送審前完成）。</div>
-              <!-- 定價共識流程：三步驟 -->
-              <div style="background:var(--card2);border:1px solid var(--border-hi);border-radius:8px;padding:12px;margin-top:8px;">
-                <div style="font-size:10px;font-weight:700;color:var(--txt-mid);margin-bottom:10px;letter-spacing:.04em;">定價共識流程（需三方到位才能進入送審）</div>
-
-                <!-- Step 1: 提議（任何人） -->
-                <div style="margin-bottom:8px;padding:8px 10px;background:var(--card);border-radius:6px;border-left:3px solid var(--accent);">
-                  <div style="font-size:9px;color:var(--accent);font-weight:700;margin-bottom:5px;">① 提議定價（Bevis / Shawn / 詩彤 均可先填）</div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                    <div style="background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;">
-                      <div style="font-size:9px;color:var(--txt-lo);">建議售價</div>
-                      <div style="font-size:12px;font-weight:700;color:var(--txt-lo);">尚未填入</div>
-                    </div>
-                    <div style="background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;">
-                      <div style="font-size:9px;color:var(--txt-lo);">預估首批數量</div>
-                      <div style="font-size:12px;font-weight:700;color:var(--txt-lo);">尚未填入</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Step 2: 銷售確認 -->
-                <div style="margin-bottom:8px;padding:8px 10px;background:var(--card);border-radius:6px;border-left:3px solid var(--warn);opacity:.6;">
-                  <div style="font-size:9px;color:var(--warn);font-weight:700;margin-bottom:4px;">② 銷售確認（老董 / 德寶 必須同意）</div>
-                  <div style="font-size:11px;color:var(--txt-lo);">等待提議數字 → 老董/德寶確認市場可行後點「同意」</div>
-                </div>
-
-                <!-- Step 3: Shawn 預算把關 -->
-                <div style="padding:8px 10px;background:var(--card);border-radius:6px;border-left:3px solid var(--ok);opacity:.4;">
-                  <div style="font-size:9px;color:var(--ok);font-weight:700;margin-bottom:4px;">③ Shawn 預算把關（確認毛利率合理後送 Ray 啟動）</div>
-                  <div style="font-size:11px;color:var(--txt-lo);">等待銷售確認 → Shawn 審核毛利預估 → 通過才解鎖送審</div>
-                </div>
-              </div>
-              <div class="stage-actions" style="margin-top:10px;">
-                <button class="sa-btn sa-forge" onclick="window.open('index.html?ip=opanchu')">⚡ 前往 Forge 生圖</button>
-                <button class="sa-btn sa-warn">🔔 催老董/德寶確認定價</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stage-block">
-          <div class="stage-left"><div class="stage-num">Stage 03–07</div><div class="stage-name">後續五階段</div></div>
-          <div class="stage-connector"><div class="stage-dot sd-wait"></div></div>
-          <div class="stage-right">
-            <div class="stage-card" style="opacity:.3;"><div class="stage-status-chip sc-wait" style="font-size:10px;">概念圖核准後解鎖</div></div>
-          </div>
-        </div>
-
-      </div>
-    </div><!-- /opanchu -->
-
-
-    <!-- ── GUDETAMA VIEW ── -->
-    <div id="view-gudetama" style="display:none;">
-      <div class="proj-header">
-        <div class="proj-title-block">
-          <div class="proj-title">Gudetama 泰國授權 <span class="type-tag type-figurine">公仔 · 5輪送審</span></div>
-          <div class="proj-subtitle">授權方：Sanrio｜商務洽談：安然｜等 Ray 最終拍板</div>
-        </div>
-        <div class="proj-actions">
-          <button class="btn btn-primary">✓ Ray 拍板啟動</button>
-        </div>
-      </div>
-
-      <div class="overview-bar" style="border-color:var(--border-hi);">
-        <div class="ov-title" style="color:var(--txt-mid);">授權條件洽談中 — Ray 批核後全線解鎖</div>
-        <div class="ov-grid">
-          <div class="ov-seg ov-active"><div class="ov-seg-bar"></div><div class="ov-seg-label">授權洽談</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">主題確認</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">概念圖</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">2D送審</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">3D建模</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">打樣</div></div>
-          <div class="ov-seg ov-wait"><div class="ov-seg-bar"></div><div class="ov-seg-label">大貨</div></div>
-        </div>
-      </div>
-
-      <div class="section-title">授權條件摘要（安然第三輪溝通）</div>
-      <div class="stage-card" style="margin-bottom:16px;">
-        <div class="stage-status-row">
-          <span class="stage-status-chip sc-blocked">⏳ 等 Ray 拍板</span>
-          <span class="stage-elapsed">安然已洽談 3 輪</span>
-        </div>
-        <div class="stage-desc">當前條件：MG 尚未談攏（代理商要求 ¥35 萬，我方出價 ¥28 萬）。Royalty 9% 雙方同意。授權區域：泰國（UJ BKK 用）。</div>
-        <div class="stage-actions">
-          <button class="sa-btn sa-primary">✓ Ray：接受 ¥35 萬，啟動</button>
-          <button class="sa-btn sa-warn">討價：最終出價 ¥31 萬</button>
-          <button class="sa-btn sa-ghost">暫緩本項目</button>
-        </div>
-      </div>
-    </div><!-- /gudetama -->
-
-  </div><!-- /main-content -->
-</div><!-- /layout -->
+  <!-- 新增項目 -->
+  <div style="margin-top:8px;">
+    <button class="tcb-ghost tc-btn" style="width:100%;min-height:44px;" onclick="toggleNewForm()">+ 新增產品開發項目</button>
+    <div id="new-form" style="display:none;" class="card" style="margin-top:8px;">
+      <div class="section-title">新增項目</div>
+      <input class="inp" id="nf-name" placeholder="產品名稱">
+      <select class="inp" id="nf-ip">
+        <option value="">選擇 IP 品牌</option>
+        <option>Snoopy</option><option>Mofusand</option><option>Muziktiger</option>
+        <option>Opanchu</option><option>Chiikawa</option><option>SHRUG</option><option>其他</option>
+      </select>
+      <select class="inp" id="nf-type">
+        <option value="">產品類型</option>
+        <option>公仔</option><option>非公仔</option>
+      </select>
+      <input class="inp" id="nf-price" type="number" placeholder="建議零售價（RMB）">
+      <input class="inp" id="nf-qty" type="number" placeholder="預計銷量">
+      <button class="btn-ok" onclick="createProject()">✓ 建立項目</button>
+      <div id="nf-result" style="display:none;margin-top:8px;font-size:12px;text-align:center;"></div>
+    </div>
+  </div>
+</div>
 
 <script>
-const views = ['snoopy','muziktiger','opanchu','gudetama'];
-function switchProject(id) {
-  views.forEach(v => {
-    document.getElementById('view-' + v).style.display = v === id ? '' : 'none';
-  });
-  document.querySelectorAll('.proj-card').forEach((c, i) => {
-    c.classList.toggle('active', views[i] === id);
-  });
-  document.getElementById('main-content').scrollTop = 0;
+const _P  = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TBL = "tblfX6fsMshb7KL0";
+let _tk=null, _projects=[], _activeId=null;
+
+(function(){
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
+})();
+
+async function _getToken(){
+  if(_tk) return _tk;
+  const r=await fetch(_P+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  _tk=d.tenant_access_token;
+  setTimeout(()=>_tk=null,110*60*1000);
+  return _tk;
 }
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
+  if(typeof v==="object") return v.text||v.link||"";
+  return String(v);
+}
+async function _getRecords(filter=""){
+  const tk=await _getToken();
+  const url=`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records?page_size=100${filter?"&filter="+encodeURIComponent(filter):""}`;
+  const r=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+  const d=await r.json();
+  return d.data?.items||[];
+}
+async function _updateRecord(rid,fields){
+  const tk=await _getToken();
+  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records/${rid}`,{
+    method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields})
+  });
+  return r.json();
+}
+async function _createRecord(fields){
+  const tk=await _getToken();
+  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records`,{
+    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields})
+  });
+  return r.json();
+}
+
+/* ── STAGE DEFINITIONS ── */
+const STAGES_FIGURINE=[
+  {key:"主題確認",label:"主題",owner:"Ray/安然/Shawn"},
+  {key:"概念視覺",label:"概念圖",owner:"詩彤/Forge"},
+  {key:"2D送審",label:"2D送審",owner:"珮玲"},
+  {key:"3D建模",label:"3D建模",owner:"Bevis/外包"},
+  {key:"打樣送審",label:"打樣",owner:"採購寄出"},
+  {key:"上色打樣",label:"上色",owner:"採購寄出"},
+  {key:"大貨生產",label:"大貨",owner:"採購/設計"},
+];
+const STAGES_NONFIG=[
+  {key:"主題確認",label:"主題",owner:"Ray/安然/Shawn"},
+  {key:"概念視覺",label:"概念圖",owner:"詩彤/Forge"},
+  {key:"產品設計送審",label:"設計送審",owner:"珮玲"},
+  {key:"打樣送審",label:"打樣",owner:"採購"},
+  {key:"大貨生產",label:"大貨",owner:"採購/設計"},
+];
+
+function getStages(f){
+  return _fv(f,"產品類型")==="非公仔"?STAGES_NONFIG:STAGES_FIGURINE;
+}
+
+function stageIndex(f){
+  const stages=getStages(f);
+  const cur=_fv(f,"當前階段");
+  const idx=stages.findIndex(s=>s.key===cur);
+  return idx>=0?idx:0;
+}
+
+/* ── LOAD ── */
+async function loadProjects(){
+  try{
+    _projects=await _getRecords();
+    renderStrip();
+    updateKPIs();
+    if(_projects.length>0) selectProject(_projects[0].record_id);
+  }catch(e){
+    document.getElementById('proj-strip').innerHTML='<div style="color:var(--danger);font-size:12px;padding:8px;">載入失敗：'+e.message+'</div>';
+  }
+}
+
+function updateKPIs(){
+  const active=_projects.filter(p=>{
+    const st=_fv(p.fields,"立項狀態");
+    return st!=="已完成"&&st!=="暫緩";
+  }).length;
+  document.getElementById('kpi-active').textContent=active;
+  document.getElementById('kpi-active-sub').textContent='共 '+_projects.length+' 個項目';
+
+  const waiting=_projects.filter(p=>_fv(p.fields,"版權送審狀態")==="等待回覆").length;
+  document.getElementById('kpi-waiting').textContent=waiting;
+
+  const ready=_projects.filter(p=>{
+    const f=p.fields;
+    return _fv(f,"打樣狀態")==="通過"&&_fv(f,"立項狀態")!=="大貨生產中"&&_fv(f,"立項狀態")!=="已完成";
+  }).length;
+  document.getElementById('kpi-ready').textContent=ready;
+}
+
+function renderStrip(){
+  const strip=document.getElementById('proj-strip');
+  if(!_projects.length){strip.innerHTML='<div style="color:var(--txt-lo);font-size:12px;padding:8px;">尚無項目</div>';return;}
+  strip.innerHTML=_projects.map(p=>{
+    const f=p.fields;
+    const st=_fv(f,"版權送審狀態");
+    const dotCls=st==="等待回覆"?"pp-warn":_fv(f,"立項狀態")==="已完成"?"pp-wait":"pp-active";
+    return `<button class="proj-pill" id="pill-${p.record_id}" onclick="selectProject('${p.record_id}')">
+      <span class="pp-status ${dotCls}"></span>${_fv(f,"產品名稱")||'未命名'}
+    </button>`;
+  }).join('');
+}
+
+function selectProject(rid){
+  _activeId=rid;
+  document.querySelectorAll('.proj-pill').forEach(p=>{
+    p.classList.toggle('active',p.id==='pill-'+rid);
+  });
+  const proj=_projects.find(p=>p.record_id===rid);
+  if(proj) renderDetail(proj);
+}
+
+/* ── RENDER DETAIL ── */
+function renderDetail(proj){
+  const f=proj.fields; const rid=proj.record_id;
+  const stages=getStages(f);
+  const isFig=_fv(f,"產品類型")!=="非公仔";
+  const curIdx=stageIndex(f);
+
+  // Progress bar
+  const barSegs=stages.map((s,i)=>{
+    const cls=i<curIdx?"sb-done":i===curIdx?"sb-active":"";
+    return `<div class="sb-seg ${cls}"></div>`;
+  }).join('');
+  const barLabels=stages.map((s,i)=>{
+    const cls=i<curIdx?"done":i===curIdx?"active":"";
+    return `<div class="sbl ${cls}">${s.label}</div>`;
+  }).join('');
+
+  // Timeline items
+  const timelineHtml=stages.map((s,i)=>{
+    const isDone=i<curIdx;
+    const isActive=i===curIdx;
+    const dotCls=isDone?"dot-done":isActive?"dot-active":"dot-wait";
+    const cardCls=isDone?"tc-done":isActive?"tc-active":"tc-wait";
+    const badgeCls=isDone?"tcb-done":isActive?"tcb-active":"tcb-wait";
+    const badgeTxt=isDone?"✓ 完成":isActive?"⚡ 進行中":"待解鎖";
+
+    let content='';
+    if(isActive){
+      // Show current stage details
+      content=buildActiveStageContent(f,rid,s,i,isFig);
+    } else if(isDone){
+      content=`<div class="tc-desc" style="color:var(--txt-mid);">已完成</div>`;
+    }
+
+    return `<div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-num">Stage ${String(i+1).padStart(2,'0')}</div>
+        <div class="tl-name">${s.key}</div>
+        <div class="tl-owner">${s.owner}</div>
+      </div>
+      <div class="tl-connector">
+        <div class="tl-dot ${dotCls}"></div>
+        ${i<stages.length-1?'<div class="tl-line"></div>':''}
+      </div>
+      <div class="tl-right">
+        ${isActive||isDone?`<div class="tl-card ${cardCls}">
+          <div class="tc-status"><span class="tc-badge ${badgeCls}">${badgeTxt}</span></div>
+          ${content}
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Price/volume info
+  const price=_fv(f,"建議零售價");
+  const qty=_fv(f,"預計銷量");
+  const cost=_fv(f,"預估成本_件");
+
+  document.getElementById('proj-detail').innerHTML=`
+    <div class="proj-header">
+      <div class="proj-title">${_fv(f,"產品名稱")||'未命名'}
+        <span class="type-tag ${isFig?'':'type-nonfig'}">${isFig?'公仔':'非公仔'}</span>
+      </div>
+      <div class="proj-meta">
+        IP：${_fv(f,"IP品牌")||'—'} ·
+        立項狀態：${_fv(f,"立項狀態")||'進行中'} ·
+        版權送審：${_fv(f,"版權送審狀態")||'—'}
+        ${price?'<br>建議售價：¥'+price+' · 預計銷量：'+qty+'件 · 成本/件：¥'+cost:''}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-anran.html'">📋 版權送審記錄</button>
+        <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購詢價</button>
+      </div>
+    </div>
+
+    <div class="stage-bar">${barSegs}</div>
+    <div class="stage-bar-labels">${barLabels}</div>
+
+    <div class="timeline">${timelineHtml}</div>
+  `;
+}
+
+function buildActiveStageContent(f,rid,stage,idx,isFig){
+  const key=stage.key;
+  let html='';
+
+  if(key==="主題確認"){
+    html=`<div class="tc-desc">確認 IP 品牌、目標品類、主題方向。管理層三方共識後解鎖下一步。</div>
+    <div class="tc-actions">
+      <button class="tc-btn tcb-primary" onclick="advanceStage('${rid}','概念視覺')">✓ 主題已確認 → 進概念圖</button>
+    </div>`;
+  } else if(key==="概念視覺"){
+    html=`<div class="tc-desc">詩彤/珮玲 在 Forge 生成概念圖，Bevis 核准後進入版權送審。</div>
+    <div class="tc-actions">
+      <button class="tc-btn tcb-primary" onclick="advanceStage('${rid}',isFig?'2D送審':'產品設計送審')">✓ Bevis 已核准 → 進送審</button>
+      <button class="tc-btn tcb-ghost" onclick="window.open('index.html')">⚡ 前往 Forge 生圖</button>
+    </div>`;
+  } else if(key==="2D送審"||key==="產品設計送審"){
+    const reviewSt=_fv(f,"版權送審狀態")||"未提交";
+    const round=_fv(f,"送審輪次")||"1";
+    html=`<div class="tc-desc">珮玲提交 ${isFig?"2D四視圖":"產品設計稿"} 給版權方，目前第 ${round} 輪送審。</div>
+    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:8px;">版權送審狀態：<strong style="color:${reviewSt==="通過"?"var(--ok)":reviewSt==="等待回覆"?"var(--warn)":"var(--txt-hi)"}">${reviewSt||"未提交"}</strong></div>
+    ${_fv(f,"版權回饋說明")?`<div class="tc-desc" style="color:var(--warn);">版權方意見：${_fv(f,"版權回饋說明")}</div>`:''}
+    <div class="tc-actions">
+      <button class="tc-btn tcb-primary" onclick="updateReview('${rid}','通過')" ${reviewSt==="通過"?"style='opacity:.5;cursor:default;'":""}>✓ 版權方通過</button>
+      <button class="tc-btn tcb-warn" onclick="updateReview('${rid}','修改中')">⚠ 需修改</button>
+    </div>`;
+  } else if(key==="3D建模"){
+    const st3d=_fv(f,"3D建模狀態")||"未啟動";
+    html=`<div class="tc-parallel">
+      <div class="tcp-title">平行進度</div>
+      <div class="tcp-row"><span class="tcp-label">3D建模（外包）</span><span class="tcp-status ${st3d==="已完成"?"tcs-ok":st3d==="進行中"?"tcs-active":"tcs-wait"}">${st3d}</span></div>
+      <div class="tcp-row"><span class="tcp-label">包裝設計</span><span class="tcp-status ${_fv(f,"包裝設計狀態")==="已完成"?"tcs-ok":_fv(f,"包裝設計狀態")==="進行中"?"tcs-active":"tcs-wait"}">${_fv(f,"包裝設計狀態")||"未啟動"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">採購第一次詢價</span><span class="tcp-status ${_fv(f,"採購詢價狀態")==="完成"?"tcs-ok":_fv(f,"採購詢價狀態")==="進行中"?"tcs-active":"tcs-wait"}">${_fv(f,"採購詢價狀態")||"待啟動"}</span></div>
+    </div>
+    <div class="tc-actions">
+      <button class="tc-btn tcb-primary" onclick="update3D('${rid}')">✓ 3D模型完成，送審</button>
+    </div>`;
+  } else if(key==="打樣送審"||key==="上色打樣"){
+    const pSt=_fv(f,"打樣狀態")||"未啟動";
+    html=`<div class="tc-desc">採購寄出實體打樣給版權方，等待確認。</div>
+    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:8px;">打樣狀態：<strong style="color:${pSt==="通過"?"var(--ok)":"var(--warn)"}">${pSt}</strong></div>
+    <div class="tc-actions">
+      <button class="tc-btn tcb-primary" onclick="updatePrintSample('${rid}','通過')">✓ 版權方打樣通過</button>
+      <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購台填寄樣單號</button>
+    </div>`;
+  } else if(key==="大貨生產"){
+    const confirmMgmt=_fv(f,"大貨確認_管理");
+    const confirmProc=_fv(f,"大貨確認_採購");
+    const confirmDes=_fv(f,"大貨確認_設計");
+    const confirmSales=_fv(f,"大貨確認_銷售");
+    html=`<div class="tc-parallel">
+      <div class="tcp-title">大貨四方確認</div>
+      <div class="tcp-row"><span class="tcp-label">管理層</span><span class="tcp-status ${confirmMgmt?"tcs-ok":"tcs-wait"}">${confirmMgmt||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">採購</span><span class="tcp-status ${confirmProc?"tcs-ok":"tcs-wait"}">${confirmProc||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">設計</span><span class="tcp-status ${confirmDes?"tcs-ok":"tcs-wait"}">${confirmDes||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">銷售</span><span class="tcp-status ${confirmSales?"tcs-ok":"tcs-wait"}">${confirmSales||"待確認"}</span></div>
+    </div>
+    <div class="tc-actions">
+      <button class="tc-btn tcb-primary" onclick="confirmBulk('${rid}')">✓ 本廳確認大貨</button>
+    </div>`;
+  }
+  return html;
+}
+
+/* ── ACTIONS ── */
+const s=JSON.parse(localStorage.getItem("wujie_session")||"{}");
+
+async function advanceStage(rid,nextStage){
+  await _updateRecord(rid,{"當前階段":nextStage});
+  await reload();
+}
+async function updateReview(rid,status){
+  const fields={"版權送審狀態":status};
+  if(status==="通過"){
+    // Advance to next stage
+    const proj=_projects.find(p=>p.record_id===rid);
+    if(proj){
+      const stages=getStages(proj.fields);
+      const cur=stageIndex(proj.fields);
+      if(cur+1<stages.length) fields["當前階段"]=stages[cur+1].key;
+    }
+  }
+  await _updateRecord(rid,fields);
+  await reload();
+}
+async function update3D(rid){
+  await _updateRecord(rid,{"3D建模狀態":"已完成","當前階段":"打樣送審","版權送審狀態":"等待回覆"});
+  await reload();
+}
+async function updatePrintSample(rid,status){
+  const fields={"打樣狀態":status};
+  if(status==="通過"){
+    const proj=_projects.find(p=>p.record_id===rid);
+    if(proj){
+      const stages=getStages(proj.fields);
+      const cur=stageIndex(proj.fields);
+      if(cur+1<stages.length) fields["當前階段"]=stages[cur+1].key;
+    }
+  }
+  await _updateRecord(rid,fields);
+  await reload();
+}
+async function confirmBulk(rid){
+  const dept=s.dept||"";
+  const field=dept.includes("採購")?"大貨確認_採購":dept.includes("設計")?"大貨確認_設計":dept.includes("業務")?"大貨確認_銷售":"大貨確認_管理";
+  await _updateRecord(rid,{[field]:"已確認"});
+  await reload();
+}
+async function reload(){
+  _projects=await _getRecords();
+  renderStrip();
+  updateKPIs();
+  if(_activeId) selectProject(_activeId);
+}
+
+/* ── NEW PROJECT ── */
+function toggleNewForm(){
+  const f=document.getElementById('new-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+async function createProject(){
+  const name=document.getElementById('nf-name').value.trim();
+  const ip=document.getElementById('nf-ip').value;
+  const type=document.getElementById('nf-type').value;
+  if(!name||!ip||!type){alert("請填寫名稱、IP品牌和產品類型");return;}
+  const res=document.getElementById('nf-result');
+  res.style.display='block';res.style.color='var(--txt-mid)';res.textContent='建立中...';
+  const fields={
+    "產品名稱":name,"IP品牌":ip,"產品類型":type,
+    "當前階段":"主題確認","立項狀態":"進行中",
+    "建議零售價":Number(document.getElementById('nf-price').value)||null,
+    "預計銷量":Number(document.getElementById('nf-qty').value)||null,
+  };
+  Object.keys(fields).forEach(k=>{if(fields[k]===null)delete fields[k];});
+  const d=await _createRecord(fields);
+  if(d.code===0){
+    res.style.color='var(--ok)';res.textContent='✅ 已建立！';
+    document.getElementById('nf-name').value='';
+    toggleNewForm();
+    await reload();
+  }else{res.style.color='var(--danger)';res.textContent='失敗：'+JSON.stringify(d);}
+}
+
+/* ── INIT ── */
+loadProjects();
 </script>
 </body>
 </html>
