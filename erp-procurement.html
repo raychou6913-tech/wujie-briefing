@@ -162,7 +162,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ① UPLOAD HERO — 整頁就這一個大框 -->
   <div class="section-title">新採購詢報價</div>
-  <div class="upload-hero" id="upload-hero" onclick="simulateParse()">
+  <input type="file" id="quote-file-input" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" style="display:none" onchange="handleQuoteFile(this.files[0])">
+  <div class="upload-hero" id="upload-hero"
+    onclick="document.getElementById('quote-file-input').click()"
+    ondragover="event.preventDefault();this.classList.add('drag-over')"
+    ondragleave="this.classList.remove('drag-over')"
+    ondrop="event.preventDefault();this.classList.remove('drag-over');handleQuoteFile(event.dataTransfer.files[0])">
     <div class="upload-icon">📎</div>
     <div class="upload-title">把報價單丟進來</div>
     <div class="upload-sub">
@@ -172,7 +177,6 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="upload-formats">
       <span class="fmt-tag">JPG / PNG</span>
       <span class="fmt-tag">PDF</span>
-      <span class="fmt-tag">Excel</span>
       <span class="fmt-tag">微信截圖</span>
     </div>
     <div class="upload-or">— 或 —</div>
@@ -361,7 +365,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         </div>
       </div>
     </div>
-    <button class="submit-big-btn" onclick="alert('已送出！Ray 將收到通知。')">✓ 確認數字正確，送出給 Ray 批核</button>
+    <button class="submit-big-btn" id="submit-btn" onclick="submitToRay()">✓ 確認數字正確，送出給 Ray 批核</button>
+    <div id="submit-result" style="display:none;margin-top:10px;font-size:12px;text-align:center;"></div>
     <div class="submit-confirm">送出後仍可在「採購歷史」中查看與修改（在 Ray 批核前）</div>
   </div>
 
@@ -409,18 +414,215 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 </div>
 
 <script>
-let parsed = false;
-function simulateParse() {
-  if (parsed) return;
-  parsed = true;
+/* ── CONFIG ── */
+const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _APPROVAL_TBL = "tblD6acV3m2ZXJHe";
+const _PROCURE_TBL  = "tblae5v8pGMXleJZ";
+const GEMINI_KEY = "AIzaSyBC51Yef5FtCESl2AF7A3X1WKIfoc0Bojo";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+GEMINI_KEY;
+let _tk = null;
+let _quoteData = null;
+
+/* ── SESSION CHECK ── */
+(function(){
+  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); }
+})();
+
+/* ── CLIPBOARD PASTE ── */
+document.addEventListener('paste', e => {
+  const items = e.clipboardData?.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      handleQuoteFile(item.getAsFile());
+      break;
+    }
+  }
+});
+
+/* ── FILE HANDLING ── */
+async function handleQuoteFile(file){
+  if(!file) return;
   const hero = document.getElementById('upload-hero');
-  hero.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">⚡</div><div style="font-size:14px;font-weight:700;color:var(--ok)">AI 解析中…</div>';
-  setTimeout(() => {
+  hero.innerHTML = `<div style="font-size:32px;margin-bottom:8px">⚡</div><div style="font-size:14px;font-weight:700;color:var(--ok)">AI 解析中…</div><div style="font-size:12px;color:var(--txt-mid);margin-top:4px">${file.name}</div>`;
+  try{
+    const base64 = await fileToBase64(file);
+    const mimeType = file.type || 'image/jpeg';
+    _quoteData = await callGeminiQuote(base64, mimeType, file.name);
     hero.style.display = 'none';
-    ['parse-card','compare-section','payment-plan','submit-panel'].forEach(id => {
-      document.getElementById(id).style.display = 'block';
+    renderQuoteResult(_quoteData, file.name);
+    ['parse-card','submit-panel'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.style.display='block';
     });
-  }, 1200);
+  }catch(e){
+    hero.innerHTML = `<div style="font-size:32px;margin-bottom:8px">❌</div><div style="font-size:14px;color:var(--danger)">解析失敗：${e.message}</div><div style="margin-top:12px;font-size:12px;color:var(--txt-mid);cursor:pointer" onclick="document.getElementById('upload-hero').innerHTML='<div class=upload-icon>📎</div><div class=upload-title>把報價單丟進來</div><div class=upload-sub>AI 看內容，格式不限</div>'">重試</div>`;
+  }
+}
+
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function callGeminiQuote(base64, mimeType, fileName){
+  const prompt = `你是蕪解創意的採購 AI 助理。請從這份報價單中精確抽取採購資訊，以 JSON 格式返回。
+
+必須抽取（找不到填 null）：
+{
+  "supplier": "供應商名稱",
+  "item": "品項名稱（含IP和款式）",
+  "unit_price": 數字（單價，人民幣），
+  "qty": 數字（建議採購數量或MOQ），
+  "total": 數字（總金額），
+  "currency": "幣別（默認RMB）",
+  "lead_time_days": 數字（交期天數），
+  "payment_terms": "付款條件（如30/40/30）",
+  "moq": 數字（最低起訂量），
+  "delivery_date": "預計交貨日期 YYYY-MM-DD（推算）",
+  "notes": "其他重要備注"
+}
+
+只返回 JSON，不要其他文字。`;
+
+  const body = {
+    contents:[{parts:[
+      {text: prompt},
+      {inline_data:{mime_type:mimeType,data:base64}}
+    ]}],
+    generationConfig:{temperature:0.1,maxOutputTokens:512}
+  };
+  const r = await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const d = await r.json();
+  const text = d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+  const m = text.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error("AI 無法識別報價單格式");
+  return JSON.parse(m[0]);
+}
+
+function renderQuoteResult(p, fileName){
+  const card = document.getElementById('parse-card');
+  if(!card) return;
+  const safe = (v,suf='') => (v!=null&&v!=='') ? v+suf : '—';
+  card.innerHTML = `
+    <div class="parse-header">
+      <span class="ai-badge">✨ AI 解析完成</span>
+      <span class="parse-title">${fileName}</span>
+      <span class="parse-conf">請賴哥確認數字</span>
+    </div>
+    <div class="parse-grid">
+      <div class="parse-field">
+        <div class="pf-label">供應商</div>
+        <div class="pf-val">${safe(p.supplier)}</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">品項</div>
+        <div class="pf-val">${safe(p.item)}</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">單價（${p.currency||'RMB'}）</div>
+        <div class="pf-val">¥ ${safe(p.unit_price)}</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">建議數量</div>
+        <div class="pf-val editable-val" id="q-qty" contenteditable="true" style="border-bottom:1px dashed var(--border-hi);outline:none;">${safe(p.qty)}</div>
+        <div class="pf-conf-dot conf-mid"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">總金額</div>
+        <div class="pf-val" style="color:var(--warn);font-weight:800;">¥ ${safe(p.total)}</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">交期</div>
+        <div class="pf-val">${safe(p.lead_time_days,' 天')}</div>
+        <div class="pf-conf-dot conf-mid"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">付款條件</div>
+        <div class="pf-val" style="font-size:12px;">${safe(p.payment_terms)}</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">預計交貨日</div>
+        <div class="pf-val" style="font-size:12px;">${safe(p.delivery_date)}</div>
+        <div class="pf-conf-dot conf-mid"></div>
+      </div>
+    </div>
+    ${p.notes?`<div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px;">📝 備注：${p.notes}</div>`:''}
+    <div style="font-size:10px;color:var(--txt-lo)">🟡 AI 不確定，請人工確認　🟢 解析可靠</div>
+  `;
+}
+
+/* ── SUBMIT TO RAY ── */
+async function _getToken(){
+  if(_tk) return _tk;
+  const r = await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d = await r.json();
+  if(d.code!==0) throw new Error("token");
+  _tk = d.tenant_access_token;
+  setTimeout(()=>_tk=null, 110*60*1000);
+  return _tk;
+}
+
+async function submitToRay(){
+  if(!_quoteData){ alert("請先上傳報價單"); return; }
+  const btn = document.getElementById('submit-btn');
+  const res = document.getElementById('submit-result');
+  btn.disabled=true; btn.textContent='送出中...';
+  const p = _quoteData;
+  const s = JSON.parse(localStorage.getItem("wujie_session")||"{}");
+  const now = new Date();
+  const dateStr = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  try{
+    const tk = await _getToken();
+    const fields = {
+      "審批標題": `採購審批 · ${p.item||'?'} · ${p.supplier||'?'}`,
+      "審批類型": "採購審批",
+      "申請人": s.name||"賴哥",
+      "申請日期": now.getTime(),
+      "申請說明": `供應商：${p.supplier||'?'}
+品項：${p.item||'?'}
+數量：${p.qty||'?'} 個
+單價：¥${p.unit_price||'?'}
+總金額：¥${p.total||'?'} ${p.currency||'RMB'}
+交期：${p.lead_time_days||'?'} 天
+付款條件：${p.payment_terms||'?'}
+預計交貨：${p.delivery_date||'?'}
+${p.notes?'備注：'+p.notes:''}`,
+      "涉及金額": p.total?Number(p.total):null,
+      "幣別": p.currency||"RMB",
+      "審批狀態": "待審批",
+    };
+    Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]==="")delete fields[k];});
+    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_APPROVAL_TBL+"/records",{
+      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d = await r.json();
+    res.style.display='block';
+    if(d.code===0){
+      res.style.color='var(--ok)';
+      res.textContent='✅ 已送出！Ray 的戰情室批核佇列已更新，等待批核。';
+      btn.textContent='✓ 已送出';
+    }else{
+      res.style.color='var(--danger)';
+      res.textContent='送出失敗：'+JSON.stringify(d);
+      btn.disabled=false; btn.textContent='重試';
+    }
+  }catch(e){
+    res.style.display='block'; res.style.color='var(--danger)'; res.textContent='送出失敗：'+e.message;
+    btn.disabled=false; btn.textContent='重試';
+  }
 }
 </script>
 </body>
