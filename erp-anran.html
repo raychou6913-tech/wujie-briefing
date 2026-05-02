@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 安然中控台</title>
+<style>
+:root {
+  --bg:        #0b0c10;
+  --surface:   #111318;
+  --card:      #181a22;
+  --card2:     #1e2130;
+  --border:    #222535;
+  --border-hi: #363b58;
+  --txt-hi:    #e8eaf8;
+  --txt-mid:   #7880a8;
+  --txt-lo:    #3d4268;
+  --accent:    #818cf8;
+  --accent2:   #4f56b0;
+  --ok:        #22c55e;
+  --ok-dim:    #22c55e18;
+  --warn:      #f59e0b;
+  --warn-dim:  #f59e0b18;
+  --danger:    #ef4444;
+  --danger-dim:#ef444418;
+  --hk:        #e879f9;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--hk);box-shadow:0 0 8px var(--hk);}
+.brand-name{font-size:14px;font-weight:700;}
+.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:2px;}
+.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
+.nav-back:hover{color:var(--txt-hi);}
+
+/* TAB NAV */
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
+.tab{padding:12px 18px;font-size:12px;font-weight:600;color:var(--txt-mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab.active{color:var(--txt-hi);border-bottom-color:var(--hk);}
+
+.main{max-width:1040px;margin:0 auto;padding:24px 20px;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:12px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+
+/* ── TAB 1: 合約知識庫 ── */
+.contract-upload{border:2px dashed var(--border-hi);border-radius:10px;padding:28px;text-align:center;cursor:pointer;margin-bottom:16px;transition:.15s;}
+.contract-upload:hover{border-color:var(--hk);background:var(--card2);}
+.cu-icon{font-size:32px;margin-bottom:8px;}
+.cu-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.cu-sub{font-size:12px;color:var(--txt-mid);}
+
+.contract-list{display:flex;flex-direction:column;gap:0;}
+.contract-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.contract-row:last-child{border:none;}
+.contract-row:hover{opacity:.8;}
+.ct-icon{width:36px;height:36px;border-radius:8px;background:#e879f920;border:1px solid #e879f940;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ct-body{flex:1;min-width:0;}
+.ct-name{font-size:13px;font-weight:600;}
+.ct-meta{font-size:10px;color:var(--txt-mid);margin-top:1px;}
+.ct-status{flex-shrink:0;text-align:right;}
+.ct-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.ctb-ok{background:var(--ok-dim);color:var(--ok);}
+.ctb-warn{background:var(--warn-dim);color:var(--warn);}
+.ctb-danger{background:var(--danger-dim);color:var(--danger);}
+.ctb-ai{background:#e879f920;border:1px solid #e879f940;color:var(--hk);}
+.ct-expiry{font-size:10px;color:var(--txt-mid);margin-top:1px;}
+
+/* AI parse panel */
+.ai-parse-result{background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:16px;margin-top:14px;}
+.apr-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.apr-ai{background:#e879f920;border:1px solid var(--hk);color:var(--hk);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.apr-title{font-size:13px;font-weight:700;}
+.apr-conf{font-size:11px;color:var(--ok);margin-left:auto;}
+.key-terms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.kt-cell{background:var(--card);border-radius:6px;padding:8px 10px;}
+.kt-label{font-size:9px;color:var(--txt-lo);margin-bottom:2px;}
+.kt-val{font-size:13px;font-weight:700;}
+.kt-val.warn{color:var(--warn);}
+.kt-val.ok{color:var(--ok);}
+.kt-val.danger{color:var(--danger);}
+.apr-actions{display:flex;gap:8px;}
+.btn{font-size:11px;font-weight:600;padding:6px 12px;border-radius:7px;cursor:pointer;border:1px solid;}
+.btn-confirm{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
+.btn-edit{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
+
+/* Query box */
+.query-box{background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:14px;margin-top:14px;}
+.qb-label{font-size:10px;color:var(--txt-lo);margin-bottom:8px;}
+.qb-input-row{display:flex;gap:8px;}
+.qb-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.qb-input::placeholder{color:var(--txt-lo);}
+.qb-btn{background:var(--hk);border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;color:#000;cursor:pointer;}
+.qb-result{margin-top:10px;padding:10px;background:var(--card);border-radius:7px;font-size:12px;color:var(--txt-hi);line-height:1.6;}
+.qb-result strong{color:var(--hk);}
+
+/* ── TAB 2: 版權送審 ── */
+.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
+.review-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;}
+.review-card:hover{border-color:var(--border-hi);}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.rc-ip{font-size:14px;font-weight:700;}
+.rc-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;}
+.rcs-wait{background:var(--warn-dim);color:var(--warn);}
+.rcs-ok{background:var(--ok-dim);color:var(--ok);}
+.rcs-block{background:var(--danger-dim);color:var(--danger);}
+.rc-round{font-size:11px;color:var(--txt-mid);margin-bottom:6px;}
+.rc-progress{display:flex;gap:3px;margin-bottom:8px;}
+.rcp-dot{width:20px;height:6px;border-radius:3px;}
+.rcp-done{background:var(--ok);}
+.rcp-active{background:var(--accent);}
+.rcp-wait{background:var(--border-hi);}
+.rcp-blocked{background:var(--warn);}
+.rc-owner{display:flex;gap:6px;flex-wrap:wrap;}
+.owner-tag{font-size:9px;padding:2px 6px;background:var(--card2);border-radius:8px;color:var(--txt-mid);}
+.rc-action{margin-top:10px;}
+.rc-action-btn{font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;border:1px solid;}
+
+/* ── TAB 3: B2B 應收款 ── */
+.ar-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.ar-row:last-child{border:none;}
+.ar-client{flex:1;}
+.ar-name{font-size:13px;font-weight:600;}
+.ar-detail{font-size:10px;color:var(--txt-mid);margin-top:1px;}
+.ar-amt{text-align:right;flex-shrink:0;}
+.ar-val{font-size:14px;font-weight:700;}
+.ar-due{font-size:10px;margin-top:1px;}
+.ar-action-btn{font-size:10px;padding:4px 9px;border-radius:5px;cursor:pointer;border:1px solid var(--border-hi);background:transparent;color:var(--txt-mid);}
+.ar-action-btn:hover{color:var(--txt-hi);}
+
+/* stat chips top */
+.stat-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.stat-chip{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:140px;}
+.sc-label{font-size:9px;color:var(--txt-lo);margin-bottom:3px;text-transform:uppercase;}
+.sc-val{font-size:18px;font-weight:800;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    <div>
+      <span class="brand-name">蕪解 ERP</span>
+      <span class="brand-sub">安然中控台</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab(this,'tab-contracts')">🔒 合約知識庫</button>
+  <button class="tab" onclick="switchTab(this,'tab-review')">📋 版權送審追蹤</button>
+  <button class="tab" onclick="switchTab(this,'tab-ar')">💰 B2B 應收款催收</button>
+</div>
+
+<div class="main">
+
+  <!-- ══ TAB 1: 合約知識庫 ══ -->
+  <div id="tab-contracts">
+
+    <div class="grid-2" style="margin-bottom:20px;">
+
+      <!-- 上傳新合約 -->
+      <div class="card">
+        <div class="section-title">上傳合約 · AI 解析</div>
+        <div class="contract-upload" onclick="showParseDemo()">
+          <div class="cu-icon">📄</div>
+          <div class="cu-title">拖入 PDF 合約</div>
+          <div class="cu-sub">AI 自動抽取保底金、抽成比例、授權期限、區域、違約條款</div>
+        </div>
+        <!-- AI 解析結果 (Demo) -->
+        <div class="ai-parse-result" id="parse-demo" style="display:none;">
+          <div class="apr-header">
+            <span class="apr-ai">AI 解析完成</span>
+            <span class="apr-title">Opanchu_License_2026.pdf</span>
+            <span class="apr-conf">信心度 96%</span>
+          </div>
+          <div class="key-terms">
+            <div class="kt-cell"><div class="kt-label">保底金（MG）</div><div class="kt-val warn">¥ 28 萬/年</div></div>
+            <div class="kt-cell"><div class="kt-label">版稅率</div><div class="kt-val">9%</div></div>
+            <div class="kt-cell"><div class="kt-label">授權期限</div><div class="kt-val">2026-08 ~ 2028-07</div></div>
+            <div class="kt-cell"><div class="kt-label">授權區域</div><div class="kt-val">台灣 / 香港</div></div>
+            <div class="kt-cell"><div class="kt-label">首期付款</div><div class="kt-val danger">¥14萬（簽後30天）</div></div>
+            <div class="kt-cell"><div class="kt-label">違約賠償</div><div class="kt-val" style="font-size:11px;">MG 未達則補差額</div></div>
+          </div>
+          <div class="apr-actions">
+            <button class="btn btn-confirm">✓ 確認後存入知識庫</button>
+            <button class="btn btn-edit">✏ 人工修改</button>
+          </div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:8px;">⚠ 安然必須人工確認每一筆——合約數字入庫後，全系統查詢都以此為準</div>
+        </div>
+      </div>
+
+      <!-- 快速查詢 -->
+      <div class="card">
+        <div class="section-title">智慧查詢（AI 直接回答）</div>
+        <div style="font-size:12px;color:var(--txt-mid);margin-bottom:12px;">把問題直接問出來，不用自己翻合約。</div>
+        <div class="query-box">
+          <div class="qb-label">問一個關於合約的問題</div>
+          <div class="qb-input-row">
+            <input class="qb-input" id="qb-in" placeholder="例：Snoopy 台灣授權的保底是多少？" value="Snoopy 台灣授權的保底是多少？">
+            <button class="qb-btn" onclick="showQueryResult()">問</button>
+          </div>
+          <div class="qb-result" id="qb-result" style="display:none;">
+            根據 <strong>Peanuts_License_TW_2025.pdf</strong>（安然 2025-11-03 確認）：<br>
+            Snoopy 台灣授權 MG 為 <strong>¥ 32 萬人民幣/年</strong>，版稅率 <strong>9%</strong>，授權期限至 <strong>2027-03-31</strong>。<br>
+            首期 MG ¥16 萬已於 2025-11-15 支付。
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">常見問題快捷：</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;" onclick="document.getElementById('qb-in').value='Muziktiger 的授權到期日？'">Muziktiger 到期？</button>
+            <button style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">誰還沒付 MG？</button>
+            <button style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">90 天內到期合約</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 合約列表 -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span class="section-title" style="margin:0;">已結構化合約 · 7 份</span>
+        <span style="font-size:11px;color:var(--txt-mid);">全部已安然人工確認</span>
+      </div>
+      <div class="contract-list">
+        <div class="contract-row">
+          <div class="ct-icon">🐾</div>
+          <div class="ct-body">
+            <div class="ct-name">Snoopy · 台灣授權</div>
+            <div class="ct-meta">Peanuts Worldwide · MG ¥32萬 · 9% · 台灣</div>
+          </div>
+          <div class="ct-status">
+            <div class="ct-badge ctb-ok">有效</div>
+            <div class="ct-expiry">到期：2027-03-31</div>
+          </div>
+        </div>
+        <div class="contract-row">
+          <div class="ct-icon">🐰</div>
+          <div class="ct-body">
+            <div class="ct-name">Opanchu Usagi · 台灣+香港</div>
+            <div class="ct-meta">Opanchu Japan · MG ¥28萬 · 9% · 台灣/香港</div>
+          </div>
+          <div class="ct-status">
+            <div class="ct-badge ctb-warn">87天後到期</div>
+            <div class="ct-expiry">到期：2026-07-28</div>
+          </div>
+        </div>
+        <div class="contract-row">
+          <div class="ct-icon">🎵</div>
+          <div class="ct-body">
+            <div class="ct-name">Muziktiger · 大陸+台灣</div>
+            <div class="ct-meta">Muziktiger Studio · MG ¥18萬 · 8% · 中國大陸/台灣</div>
+          </div>
+          <div class="ct-status">
+            <div class="ct-badge ctb-ok">有效</div>
+            <div class="ct-expiry">到期：2027-06-30</div>
+          </div>
+        </div>
+        <div class="contract-row">
+          <div class="ct-icon">🥚</div>
+          <div class="ct-body">
+            <div class="ct-name">Gudetama · 大陸 （洽談中）</div>
+            <div class="ct-meta">Sanrio · MG 未定 · 9% · 大陸（草案）</div>
+          </div>
+          <div class="ct-status">
+            <div class="ct-badge ctb-ai">AI 草案待確認</div>
+            <div class="ct-expiry">等 Ray 拍板</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-contracts -->
+
+  <!-- ══ TAB 2: 版權送審追蹤 ══ -->
+  <div id="tab-review" style="display:none;">
+
+    <div class="stat-row">
+      <div class="stat-chip"><div class="sc-label">進行中項目</div><div class="sc-val" style="color:var(--accent)">4</div></div>
+      <div class="stat-chip"><div class="sc-label">等版權方回覆</div><div class="sc-val" style="color:var(--warn)">2</div></div>
+      <div class="stat-chip"><div class="sc-label">超過 10 天未回</div><div class="sc-val" style="color:var(--danger)">1</div></div>
+      <div class="stat-chip"><div class="sc-label">本月通過送審</div><div class="sc-val" style="color:var(--ok)">3</div></div>
+    </div>
+
+    <div class="review-grid">
+      <div class="review-card">
+        <div class="rc-top">
+          <span class="rc-ip">Snoopy 夏季</span>
+          <span class="rc-status rcs-ok">全部通過</span>
+        </div>
+        <div class="rc-round">公仔 · 5/5 輪送審完成</div>
+        <div class="rc-progress">
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-done"></div>
+        </div>
+        <div class="rc-owner">
+          <span class="owner-tag">珮玲 送審/企劃</span>
+          <span class="owner-tag">Bevis 主管</span>
+          <span class="owner-tag">安然 商務</span>
+        </div>
+        <div style="font-size:10px;color:var(--ok);margin-top:8px;">✓ 已進入大貨生產</div>
+      </div>
+
+      <div class="review-card" style="border-color:#b45309;">
+        <div class="rc-top">
+          <span class="rc-ip">Muziktiger 新系列</span>
+          <span class="rc-status rcs-block">⚠ 超時未回覆</span>
+        </div>
+        <div class="rc-round">公仔 · 第 1 輪（2D四視圖） · 已等 14 天</div>
+        <div class="rc-progress">
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-blocked"></div>
+          <div class="rcp-dot rcp-wait"></div>
+          <div class="rcp-dot rcp-wait"></div>
+        </div>
+        <div class="rc-owner">
+          <span class="owner-tag">珮玲 送審/企劃</span>
+          <span class="owner-tag" style="color:var(--warn)">安然 催促中</span>
+        </div>
+        <div class="rc-action" style="margin-top:10px;">
+          <button class="rc-action-btn" style="background:var(--warn-dim);border-color:var(--warn);color:var(--warn);">📞 升級：安排電話溝通</button>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="rc-top">
+          <span class="rc-ip">Opanchu 秋冬</span>
+          <span class="rc-status rcs-wait">等概念圖核准</span>
+        </div>
+        <div class="rc-round">公仔 · 第 1 輪送審尚未開始</div>
+        <div class="rc-progress">
+          <div class="rcp-dot rcp-done"></div>
+          <div class="rcp-dot rcp-active"></div>
+          <div class="rcp-dot rcp-wait"></div>
+          <div class="rcp-dot rcp-wait"></div>
+          <div class="rcp-dot rcp-wait"></div>
+        </div>
+        <div class="rc-owner">
+          <span class="owner-tag">等 Bevis 核准概念圖</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="rc-top">
+          <span class="rc-ip">Gudetama 泰國</span>
+          <span class="rc-status" style="background:var(--card2);color:var(--txt-mid);">尚未啟動</span>
+        </div>
+        <div class="rc-round">等 Ray 拍板版權條件</div>
+        <div class="rc-progress">
+          <div class="rcp-dot" style="background:var(--border-hi)"></div>
+          <div class="rcp-dot" style="background:var(--border-hi)"></div>
+          <div class="rcp-dot" style="background:var(--border-hi)"></div>
+          <div class="rcp-dot" style="background:var(--border-hi)"></div>
+          <div class="rcp-dot" style="background:var(--border-hi)"></div>
+        </div>
+        <div style="font-size:10px;color:var(--txt-lo);margin-top:6px;">版權合約確認後自動解鎖</div>
+      </div>
+    </div>
+
+    <!-- 送審紀錄時間軸 -->
+    <div class="card">
+      <div class="section-title">近期送審活動紀錄</div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">05-01 今天</span>
+          <span style="color:var(--warn);">⚠ Muziktiger 第1輪 仍無回覆（14天），安然升級聯繫</span>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">04-28</span>
+          <span><strong style="color:var(--ok);">✓</strong> Snoopy 夏季 第4輪（上色打樣）版權方批准</span>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">04-25</span>
+          <span>安然發催促信給 Muziktiger Studio（第二封）</span>
+        </div>
+        <div style="display:flex;gap:12px;padding:8px 0;font-size:12px;">
+          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">04-20</span>
+          <span><strong style="color:var(--ok);">✓</strong> Opanchu 秋冬 主題確認（Shawn→Ray 批核）</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-review -->
+
+  <!-- ══ TAB 3: B2B 應收款 ══ -->
+  <div id="tab-ar" style="display:none;">
+
+    <div class="stat-row">
+      <div class="stat-chip"><div class="sc-label">未收款總額</div><div class="sc-val" style="color:var(--warn)">¥ 286 萬</div></div>
+      <div class="stat-chip"><div class="sc-label">逾期超帳期</div><div class="sc-val" style="color:var(--danger)">¥ 18.2 萬</div></div>
+      <div class="stat-chip"><div class="sc-label">本月預計到帳</div><div class="sc-val" style="color:var(--ok)">¥ 94 萬</div></div>
+      <div class="stat-chip"><div class="sc-label">待收訂金筆數</div><div class="sc-val" style="color:var(--txt-hi)">8 筆</div></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span class="section-title" style="margin:0;">B2B 客戶應收款明細</span>
+        <select style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--txt-mid);padding:4px 8px;border-radius:6px;">
+          <option>全部客戶</option>
+          <option>逾期優先</option>
+          <option>金額大到小</option>
+        </select>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-client">
+          <div class="ar-name">誠品生活（台灣）</div>
+          <div class="ar-detail">Snoopy 春季 5,000 件 · 2026-03-15 出貨</div>
+        </div>
+        <div class="ar-amt">
+          <div class="ar-val" style="color:var(--ok)">¥ 98,400</div>
+          <div class="ar-due" style="color:var(--ok)">帳期內（到 05-15）</div>
+        </div>
+        <button class="ar-action-btn">查看</button>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-client">
+          <div class="ar-name">LOG-ON（香港）</div>
+          <div class="ar-detail">Muziktiger 冬季 2,000 件 · 2026-02-28 出貨</div>
+        </div>
+        <div class="ar-amt">
+          <div class="ar-val" style="color:var(--danger)">¥ 56,800</div>
+          <div class="ar-due" style="color:var(--danger)">⚠ 逾期 18 天</div>
+        </div>
+        <button class="ar-action-btn" style="border-color:var(--danger);color:var(--danger);">催款</button>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-client">
+          <div class="ar-name">UJ BKK（泰國）← 集團內</div>
+          <div class="ar-detail">北京發貨貨款 · 貨品買賣結算</div>
+        </div>
+        <div class="ar-amt">
+          <div class="ar-val" style="color:var(--warn)">¥ 420,000</div>
+          <div class="ar-due" style="color:var(--txt-mid)">快閃店結束後結算</div>
+        </div>
+        <button class="ar-action-btn">查看</button>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-client">
+          <div class="ar-name">ESLITE（台灣）</div>
+          <div class="ar-detail">Opanchu 春節系列 3,000 件 · 2026-01-20 出貨</div>
+        </div>
+        <div class="ar-amt">
+          <div class="ar-val" style="color:var(--txt-hi)">¥ 72,000</div>
+          <div class="ar-due" style="color:var(--ok)">已收訂金 50%</div>
+        </div>
+        <button class="ar-action-btn">催尾款</button>
+      </div>
+
+      <div class="ar-row">
+        <div class="ar-client">
+          <div class="ar-name">TOKYU HANDS（台灣）</div>
+          <div class="ar-detail">Snoopy 夏季 2,000 件 · 預售</div>
+        </div>
+        <div class="ar-amt">
+          <div class="ar-val" style="color:var(--txt-mid)">¥ 58,800</div>
+          <div class="ar-due" style="color:var(--txt-lo)">待出貨後收款</div>
+        </div>
+        <button class="ar-action-btn">查看</button>
+      </div>
+    </div>
+  </div><!-- /tab-ar -->
+
+</div><!-- /main -->
+
+<script>
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['tab-contracts','tab-review','tab-ar'].forEach(id => {
+    document.getElementById(id).style.display = id === tabId ? '' : 'none';
+  });
+}
+function showParseDemo() {
+  document.getElementById('parse-demo').style.display = 'block';
+}
+function showQueryResult() {
+  document.getElementById('qb-result').style.display = 'block';
+}
+</script>
+</body>
+</html>

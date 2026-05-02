@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 採購台</title>
+<style>
+:root {
+  --bg:        #0b0c10;
+  --surface:   #111318;
+  --card:      #181a22;
+  --card2:     #1e2130;
+  --border:    #222535;
+  --border-hi: #363b58;
+  --txt-hi:    #e8eaf8;
+  --txt-mid:   #7880a8;
+  --txt-lo:    #3d4268;
+  --accent:    #818cf8;
+  --accent2:   #4f56b0;
+  --ok:        #22c55e;
+  --ok-dim:    #22c55e18;
+  --warn:      #f59e0b;
+  --warn-dim:  #f59e0b18;
+  --danger:    #ef4444;
+  --danger-dim:#ef444418;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px #f59e0b;}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:.05em;}
+.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:2px;}
+.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
+.nav-back:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+
+.main{max-width:760px;margin:0 auto;padding:32px 20px;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:14px;}
+
+/* ── UPLOAD ZONE (Hero — the only thing on screen) ── */
+.upload-hero{background:var(--card);border:2px dashed var(--border-hi);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:32px;}
+.upload-hero:hover{border-color:var(--accent);background:var(--card2);}
+.upload-hero.drag-over{border-color:var(--accent);background:#818cf810;}
+.upload-icon{font-size:48px;margin-bottom:12px;}
+.upload-title{font-size:18px;font-weight:800;margin-bottom:6px;}
+.upload-sub{font-size:13px;color:var(--txt-mid);line-height:1.6;}
+.upload-formats{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+.fmt-tag{font-size:11px;padding:3px 10px;border-radius:10px;background:var(--card2);border:1px solid var(--border);color:var(--txt-mid);}
+.upload-or{font-size:12px;color:var(--txt-lo);margin:16px 0 8px;}
+.paste-hint{font-size:11px;color:var(--txt-lo);margin-top:8px;}
+
+/* ── AI PARSING RESULT ── */
+.parse-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+.parse-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.ai-badge{background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;}
+.parse-title{font-size:14px;font-weight:700;}
+.parse-conf{font-size:11px;color:var(--ok);margin-left:auto;}
+
+.parse-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.parse-field{background:var(--card2);border-radius:8px;padding:10px 12px;position:relative;}
+.parse-field.edited{border:1px solid var(--accent2);}
+.pf-label{font-size:9px;color:var(--txt-lo);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;}
+.pf-val{font-size:14px;font-weight:700;color:var(--txt-hi);}
+.pf-edit{position:absolute;top:8px;right:8px;font-size:10px;color:var(--txt-lo);cursor:pointer;}
+.pf-edit:hover{color:var(--accent);}
+.pf-conf-dot{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;}
+.conf-hi{background:var(--ok);}
+.conf-mid{background:var(--warn);}
+.conf-lo{background:var(--danger);}
+
+.parse-items{border-top:1px solid var(--border);padding-top:14px;}
+.pi-header{display:grid;grid-template-columns:3fr 1fr 1fr 1fr;gap:8px;padding:4px 0 8px;font-size:9px;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.05em;}
+.pi-row{display:grid;grid-template-columns:3fr 1fr 1fr 1fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.pi-row:last-child{border:none;}
+.pi-name{font-size:13px;font-weight:600;}
+.pi-val{font-size:13px;text-align:right;}
+.pi-total{font-size:14px;font-weight:700;color:var(--warn);}
+.pi-editable{background:var(--card2);border:1px solid var(--border-hi);border-radius:4px;padding:4px 6px;font-size:12px;color:var(--txt-hi);text-align:right;width:100%;}
+
+/* ── COMPARISON TABLE ── */
+.compare-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+.compare-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.compare-title{font-size:13px;font-weight:700;}
+.add-supplier-btn{font-size:11px;color:var(--accent);cursor:pointer;border:1px dashed var(--accent2);padding:3px 10px;border-radius:6px;background:transparent;}
+
+.compare-table{width:100%;border-collapse:collapse;}
+.compare-table th{font-size:10px;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);}
+.compare-table td{font-size:12px;padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.compare-table tr:last-child td{border:none;}
+.compare-table tr.winner td{background:var(--ok-dim);}
+.winner-tag{font-size:9px;font-weight:700;background:var(--ok);color:#000;padding:2px 6px;border-radius:4px;}
+.select-btn{font-size:10px;padding:3px 8px;border-radius:5px;cursor:pointer;border:1px solid var(--border-hi);background:transparent;color:var(--txt-mid);}
+.select-btn.selected{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
+
+/* ── PAYMENT PLAN ── */
+.payment-plan{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+.pp-title{font-size:13px;font-weight:700;margin-bottom:14px;}
+.pp-options{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.pp-opt{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);}
+.pp-opt.active{background:var(--card2);border-color:var(--accent);color:var(--accent);}
+.pp-timeline{display:flex;gap:0;margin-top:10px;}
+.pp-step{flex:1;text-align:center;position:relative;}
+.pp-step::after{content:'';position:absolute;top:12px;left:50%;width:100%;height:2px;background:var(--border);}
+.pp-step:last-child::after{display:none;}
+.pp-dot{width:24px;height:24px;border-radius:50%;background:var(--accent2);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin:0 auto 6px;position:relative;z-index:1;}
+.pp-pct{font-size:14px;font-weight:800;color:var(--accent);}
+.pp-label{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+.pp-amt{font-size:11px;color:var(--warn);font-weight:600;}
+
+/* ── SUBMIT PANEL ── */
+.submit-panel{background:var(--card2);border:1px solid var(--border-hi);border-radius:12px;padding:20px;}
+.submit-title{font-size:13px;font-weight:700;margin-bottom:10px;}
+.submit-note{font-size:12px;color:var(--txt-mid);line-height:1.6;margin-bottom:16px;}
+.submit-approver{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.approver-chain{display:flex;align-items:center;gap:8px;}
+.appr-chip{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px 10px;}
+.appr-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;}
+.appr-n{font-size:11px;}
+.chain-arrow{font-size:12px;color:var(--txt-lo);}
+.submit-big-btn{width:100%;padding:14px;background:var(--accent2);border:1px solid var(--accent);color:#fff;font-size:16px;font-weight:800;border-radius:10px;cursor:pointer;letter-spacing:.05em;}
+.submit-big-btn:hover{background:#5b65c5;}
+.submit-confirm{font-size:10px;color:var(--txt-lo);text-align:center;margin-top:8px;}
+
+/* ── HISTORY ── */
+.history-list{margin-top:32px;}
+.history-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.history-row:hover{opacity:.8;}
+.hist-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hist-title{font-size:13px;flex:1;}
+.hist-meta{font-size:10px;color:var(--txt-mid);}
+.hist-amt{font-size:13px;font-weight:700;}
+
+/* ── STATE MACHINE ── */
+.state-new{}
+.state-parsed .upload-hero{display:none;}
+.state-parsed .parse-card{display:block;}
+.state-parsed .compare-section{display:block;}
+.state-parsed .payment-plan{display:block;}
+.state-parsed .submit-panel{display:block;}
+
+/* hide by default, shown after parse */
+.parse-card,.compare-section,.payment-plan,.submit-panel{display:none;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    <div>
+      <span class="brand-name">蕪解 ERP</span>
+      <span class="brand-sub">採購台 · 賴哥 / 木子</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+  </div>
+</div>
+
+<div class="main" id="main">
+
+  <!-- ① UPLOAD HERO — 整頁就這一個大框 -->
+  <div class="section-title">新採購詢報價</div>
+  <div class="upload-hero" id="upload-hero" onclick="simulateParse()">
+    <div class="upload-icon">📎</div>
+    <div class="upload-title">把報價單丟進來</div>
+    <div class="upload-sub">
+      微信截圖、LINE 截圖、供應商 PDF、Excel 報價表<br>
+      <strong style="color:var(--txt-hi);">檔名隨便，格式不限，AI 看內容</strong>
+    </div>
+    <div class="upload-formats">
+      <span class="fmt-tag">JPG / PNG</span>
+      <span class="fmt-tag">PDF</span>
+      <span class="fmt-tag">Excel</span>
+      <span class="fmt-tag">微信截圖</span>
+    </div>
+    <div class="upload-or">— 或 —</div>
+    <div style="display:inline-block;background:var(--card2);border:1px solid var(--border-hi);border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;color:var(--txt-hi);">選擇檔案</div>
+    <div class="paste-hint">Ctrl+V 直接貼上截圖也可以</div>
+  </div>
+
+  <!-- ② AI PARSE RESULT （上傳後顯示） -->
+  <div class="parse-card" id="parse-card">
+    <div class="parse-header">
+      <span class="ai-badge">AI 解析完成</span>
+      <span class="parse-title">永盛玩具_Snoopy報價_0430.jpg</span>
+      <span class="parse-conf">整體信心度 94%</span>
+    </div>
+
+    <div class="parse-grid">
+      <div class="parse-field">
+        <div class="pf-label">供應商</div>
+        <div class="pf-val">東莞永盛玩具</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">品項</div>
+        <div class="pf-val">Snoopy 夏季公仔</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">MOQ</div>
+        <div class="pf-val">3,000 個</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">單價</div>
+        <div class="pf-val">¥ 29.60</div>
+        <div class="pf-conf-dot conf-hi"></div>
+      </div>
+      <div class="parse-field edited">
+        <div class="pf-label">交貨天數</div>
+        <div class="pf-val">45 天</div>
+        <div class="pf-edit" onclick="alert('編輯模式')">✏</div>
+      </div>
+      <div class="parse-field">
+        <div class="pf-label">付款條件</div>
+        <div class="pf-val" style="font-size:12px;">訂金30% / 出貨40%</div>
+        <div class="pf-conf-dot conf-mid"></div>
+      </div>
+    </div>
+
+    <div class="parse-items">
+      <div class="pi-header">
+        <div>品項明細</div><div style="text-align:right">數量</div><div style="text-align:right">單價</div><div style="text-align:right">小計</div>
+      </div>
+      <div class="pi-row">
+        <div class="pi-name">Snoopy 夏季公仔 · 海灘版</div>
+        <div class="pi-val"><input class="pi-editable" value="3,000" style="width:72px"></div>
+        <div class="pi-val">¥ 29.60</div>
+        <div class="pi-val">¥ 88,800</div>
+      </div>
+      <div class="pi-row">
+        <div class="pi-name">Snoopy 夏季公仔 · 衝浪版</div>
+        <div class="pi-val"><input class="pi-editable" value="2,000" style="width:72px"></div>
+        <div class="pi-val">¥ 29.60</div>
+        <div class="pi-val">¥ 59,200</div>
+      </div>
+      <div class="pi-row" style="background:var(--card2);">
+        <div class="pi-name" style="font-weight:700;">合計</div>
+        <div class="pi-val" style="font-weight:700;">5,000 個</div>
+        <div class="pi-val"></div>
+        <div class="pi-total">¥ 148,000</div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+      <span style="font-size:11px;color:var(--txt-lo);">🔴 信心低　🟡 AI不確定，請人工確認　🟢 解析可靠</span>
+      <button style="font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid var(--border-hi);background:transparent;color:var(--txt-mid);cursor:pointer;">✏ 手動修改所有欄位</button>
+    </div>
+  </div>
+
+  <!-- ③ COMPARISON TABLE -->
+  <div class="compare-section" id="compare-section">
+    <div class="compare-header">
+      <span class="compare-title">比價比較表</span>
+      <button class="add-supplier-btn">＋ 再加一家供應商報價</button>
+    </div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>供應商</th>
+          <th>單價</th>
+          <th>5,000個總價</th>
+          <th>交期</th>
+          <th>付款條件</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="winner">
+          <td><strong>東莞永盛玩具</strong><br><span style="font-size:10px;color:var(--txt-mid)">合作 3 年，0 次違約</span></td>
+          <td><strong>¥ 29.60</strong></td>
+          <td><strong style="color:var(--ok)">¥ 148,000</strong></td>
+          <td>45 天</td>
+          <td>30/40/30</td>
+          <td><span class="winner-tag">✓ 選定</span></td>
+        </tr>
+        <tr>
+          <td>廣州博騰玩具<br><span style="font-size:10px;color:var(--txt-mid)">合作 1 年</span></td>
+          <td>¥ 31.00</td>
+          <td style="color:var(--txt-mid)">¥ 155,000</td>
+          <td>40 天</td>
+          <td>50/50</td>
+          <td><button class="select-btn" onclick="this.classList.toggle('selected');this.textContent=this.classList.contains('selected')?'✓ 選定':'選定此廠'">選定此廠</button></td>
+        </tr>
+        <tr>
+          <td>深圳鴻達實業<br><span style="font-size:10px;color:var(--txt-mid)">新廠商</span></td>
+          <td>¥ 33.50</td>
+          <td style="color:var(--txt-mid)">¥ 167,500</td>
+          <td>50 天</td>
+          <td>30/70</td>
+          <td><button class="select-btn">選定此廠</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:10px;color:var(--txt-mid);margin-top:10px;">賴哥建議：選永盛，長期合作關係，品質穩定。</div>
+  </div>
+
+  <!-- ④ PAYMENT PLAN -->
+  <div class="payment-plan" id="payment-plan">
+    <div class="pp-title">付款計畫（合約條款：30 / 40 / 30）</div>
+    <div class="pp-options">
+      <button class="pp-opt active">公仔大貨標準（30/40/30）</button>
+      <button class="pp-opt">模具費（50/50）</button>
+      <button class="pp-opt">自訂</button>
+    </div>
+    <div class="pp-timeline">
+      <div class="pp-step">
+        <div class="pp-dot">1</div>
+        <div class="pp-pct">30%</div>
+        <div class="pp-label">下訂單時</div>
+        <div class="pp-amt">¥ 44,400</div>
+        <div style="font-size:9px;color:var(--danger);margin-top:2px;">批核後即觸發</div>
+      </div>
+      <div class="pp-step">
+        <div class="pp-dot">2</div>
+        <div class="pp-pct">40%</div>
+        <div class="pp-label">出貨時</div>
+        <div class="pp-amt">¥ 59,200</div>
+        <div style="font-size:9px;color:var(--txt-lo);margin-top:2px;">預計 07-15</div>
+      </div>
+      <div class="pp-step">
+        <div class="pp-dot">3</div>
+        <div class="pp-pct">30%</div>
+        <div class="pp-label">出貨後 1-2 月</div>
+        <div class="pp-amt">¥ 44,400</div>
+        <div style="font-size:9px;color:var(--txt-lo);margin-top:2px;">預計 09-15</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ SUBMIT -->
+  <div class="submit-panel" id="submit-panel">
+    <div class="submit-title">確認後送出批核</div>
+    <div class="submit-note">
+      按下送出後，系統會自動通知以下人員。Ray 批核後，躍明將安排首付款 ¥44,400。
+    </div>
+    <div class="submit-approver">
+      <span style="font-size:11px;color:var(--txt-mid);margin-right:4px;">審核鏈：</span>
+      <div class="approver-chain">
+        <div class="appr-chip">
+          <div class="appr-av" style="background:#f59e0b;">賴</div>
+          <span class="appr-n">賴哥 確認</span>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="appr-chip">
+          <div class="appr-av" style="background:#22c55e;">安</div>
+          <span class="appr-n">安然 複核</span>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="appr-chip">
+          <div class="appr-av" style="background:#818cf8;">R</div>
+          <span class="appr-n">Ray 批核</span>
+        </div>
+        <span class="chain-arrow">→</span>
+        <div class="appr-chip">
+          <div class="appr-av" style="background:#38bdf8;">躍</div>
+          <span class="appr-n">躍明 付款</span>
+        </div>
+      </div>
+    </div>
+    <button class="submit-big-btn" onclick="alert('已送出！Ray 將收到通知。')">✓ 確認數字正確，送出給 Ray 批核</button>
+    <div class="submit-confirm">送出後仍可在「採購歷史」中查看與修改（在 Ray 批核前）</div>
+  </div>
+
+  <!-- ⑥ HISTORY -->
+  <div class="history-list">
+    <div class="section-title" style="margin-top:8px;">採購歷史</div>
+
+    <div class="history-row">
+      <div class="hist-status" style="background:var(--ok)"></div>
+      <div style="flex:1;">
+        <div class="hist-title">Snoopy 春節公仔 · 東莞永盛</div>
+        <div class="hist-meta">2026-01-15 · Ray 已批核 · 躍明已付款</div>
+      </div>
+      <div>
+        <div class="hist-amt" style="color:var(--txt-hi)">¥ 132,000</div>
+        <div style="font-size:10px;color:var(--ok);text-align:right;">已完成</div>
+      </div>
+    </div>
+
+    <div class="history-row">
+      <div class="hist-status" style="background:var(--ok)"></div>
+      <div style="flex:1;">
+        <div class="hist-title">Opanchu 模具費 · 廣州博騰</div>
+        <div class="hist-meta">2026-02-20 · 已付 50%</div>
+      </div>
+      <div>
+        <div class="hist-amt" style="color:var(--txt-hi)">¥ 45,000</div>
+        <div style="font-size:10px;color:var(--warn);text-align:right;">尾款待付</div>
+      </div>
+    </div>
+
+    <div class="history-row">
+      <div class="hist-status" style="background:var(--warn)"></div>
+      <div style="flex:1;">
+        <div class="hist-title">Snoopy 夏季公仔 · 東莞永盛 ← 本次</div>
+        <div class="hist-meta">2026-05-01 · 等待 Ray 批核中</div>
+      </div>
+      <div>
+        <div class="hist-amt" style="color:var(--warn)">¥ 148,000</div>
+        <div style="font-size:10px;color:var(--warn);text-align:right;">待批核</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let parsed = false;
+function simulateParse() {
+  if (parsed) return;
+  parsed = true;
+  const hero = document.getElementById('upload-hero');
+  hero.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">⚡</div><div style="font-size:14px;font-weight:700;color:var(--ok)">AI 解析中…</div>';
+  setTimeout(() => {
+    hero.style.display = 'none';
+    ['parse-card','compare-section','payment-plan','submit-panel'].forEach(id => {
+      document.getElementById(id).style.display = 'block';
+    });
+  }, 1200);
+}
+</script>
+</body>
+</html>
