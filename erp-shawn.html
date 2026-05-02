@@ -473,9 +473,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <span class="section-title" style="margin:0;">預算審核佇列（送 Ray 前 Shawn 先把關）</span>
-        <span style="font-size:10px;background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);padding:2px 7px;border-radius:8px;">3 項待審</span>
+        <span id="shawn-review-badge" style="font-size:10px;background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);padding:2px 7px;border-radius:8px;">載入中...</span>
       </div>
-
+      <div id="shawn-review-list">
       <div class="budget-item">
         <div class="bi-body">
           <div class="bi-title">採購·Snoopy 夏季大貨 PO</div>
@@ -516,13 +516,96 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           </div>
         </div>
       </div>
-
+      </div><!-- /shawn-review-list -->
     </div>
   </div>
 
 </div><!-- /main -->
 
 <script>
+/* ── SESSION CHECK ── */
+(function(){
+  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); }
+})();
+
+/* ── CONFIG ── */
+const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _APPROVAL_TBL = "tblD6acV3m2ZXJHe";
+let _tk = null;
+
+async function _getToken(){
+  if(_tk) return _tk;
+  const r = await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d = await r.json();
+  if(d.code!==0) throw new Error("token");
+  _tk = d.tenant_access_token;
+  setTimeout(()=>_tk=null, 110*60*1000);
+  return _tk;
+}
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
+  if(typeof v==="object") return v.text||v.link||"";
+  return String(v);
+}
+
+/* ── LOAD PENDING REVIEWS (Shawn複核) ── */
+async function loadShawnReviews(){
+  const container = document.getElementById('shawn-review-list');
+  if(!container) return;
+  try{
+    const tk = await _getToken();
+    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_APPROVAL_TBL+"/records?page_size=100",{headers:{"Authorization":"Bearer "+tk}});
+    const d = await r.json();
+    const items = (d.data?.items||[]).filter(i=>{
+      const st = _fv(i.fields,"審批狀態");
+      return st==="待審批"||st==="待批核";
+    });
+    if(!items.length){
+      container.innerHTML = '<div style="padding:14px;text-align:center;color:var(--txt-mid);font-size:12px;">目前無待複核項目</div>';
+      return;
+    }
+    const badge = document.getElementById('shawn-review-badge');
+    if(badge) badge.textContent = items.length+" 項";
+    container.innerHTML = items.slice(0,5).map(r=>{
+      const f=r.fields;
+      const title=_fv(f,"審批標題")||"（無標題）";
+      const who=_fv(f,"申請人");
+      const amt=_fv(f,"涉及金額");
+      const cur=_fv(f,"幣別")||"RMB";
+      return `<div class="budget-item">
+        <div class="bi-body">
+          <div class="bi-title">${title}</div>
+          <div class="bi-meta">${who?who+" 申請 · ":""}待Shawn複核</div>
+        </div>
+        <div class="bi-right">
+          <div class="bi-amt" style="color:var(--warn)">${amt?"¥ "+Number(amt).toLocaleString()+" "+cur:""}</div>
+          <div class="bi-actions">
+            <button class="bi-btn bi-approve" onclick="reviewItem('${r.record_id}',this)">✓ 複核→Ray</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }catch(e){ console.error("loadShawnReviews",e); }
+}
+
+async function reviewItem(rid, btn){
+  btn.disabled=true; btn.textContent="處理中...";
+  try{
+    const tk = await _getToken();
+    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_APPROVAL_TBL+"/records/"+rid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"審批狀態":"待審批","Shawn複核":"已複核"}})
+    });
+    btn.textContent="✓ 已複核";
+    btn.closest(".budget-item").style.opacity="0.5";
+  }catch(e){ btn.disabled=false; btn.textContent="✓ 複核→Ray"; }
+}
+
+/* ── CITY FILTER ── */
 function filterCity(city, btn) {
   document.querySelectorAll('.city-btn').forEach(b => {
     b.className = 'city-btn';
@@ -533,12 +616,13 @@ function filterCity(city, btn) {
   else if (city === 'bk') { btn.classList.add('active-bk'); }
   else if (city === 'tp') { btn.classList.add('active-tp'); }
   else { btn.classList.add('all'); }
-
   document.querySelectorAll('#people-grid .person-card').forEach(c => {
     const cv = c.dataset.city;
     c.style.display = (city === 'all' || cv === city) ? '' : 'none';
   });
 }
+
+loadShawnReviews();
 </script>
 </body>
 </html>
