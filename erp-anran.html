@@ -5,514 +5,322 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>蕪解 ERP · 安然中控台</title>
 <style>
-:root {
-  --bg:        #0b0c10;
-  --surface:   #111318;
-  --card:      #181a22;
-  --card2:     #1e2130;
-  --border:    #222535;
-  --border-hi: #363b58;
-  --txt-hi:    #e8eaf8;
-  --txt-mid:   #7880a8;
-  --txt-lo:    #3d4268;
-  --accent:    #818cf8;
-  --accent2:   #4f56b0;
-  --ok:        #22c55e;
-  --ok-dim:    #22c55e18;
-  --warn:      #f59e0b;
-  --warn-dim:  #f59e0b18;
-  --danger:    #ef4444;
-  --danger-dim:#ef444418;
-  --hk:        #e879f9;
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;--danger:#ef4444;--danger-dim:#ef444418;
+  --hk:#e879f9;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.topbar-brand{display:flex;align-items:center;gap:10px;}
-.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--hk);box-shadow:0 0 8px var(--hk);}
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--hk);box-shadow:0 0 7px var(--hk);}
 .brand-name{font-size:14px;font-weight:700;}
-.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:2px;}
-.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
-.nav-back:hover{color:var(--txt-hi);}
+.brand-sub{font-size:11px;color:var(--txt-mid);}
+.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:6px;min-height:34px;display:flex;align-items:center;}
 
-/* TAB NAV */
-.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;}
-.tab{padding:12px 18px;font-size:12px;font-weight:600;color:var(--txt-mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+/* ── KPI BAR (always visible) ── */
+.kpi-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;}
+.kpi-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;min-width:calc(50% - 5px);}
+.kpi-label{font-size:9px;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.kpi-val{font-size:20px;font-weight:800;line-height:1;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+.kpi-bar-inner{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;}
+.kpi-fill{height:100%;border-radius:2px;background:var(--ok);transition:width .6s;}
+
+/* ── TABS ── */
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tab{padding:12px 14px;font-size:12px;font-weight:600;color:var(--txt-mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-height:44px;}
 .tab.active{color:var(--txt-hi);border-bottom-color:var(--hk);}
 
-.main{max-width:1040px;margin:0 auto;padding:24px 20px;}
-.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:12px;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+/* ── MAIN ── */
+.main{max-width:720px;margin:0 auto;padding:16px;}
+.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:10px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
 
-/* ── TAB 1: 合約知識庫 ── */
-.contract-upload{border:2px dashed var(--border-hi);border-radius:10px;padding:28px;text-align:center;cursor:pointer;margin-bottom:16px;transition:.15s;}
-.contract-upload:hover{border-color:var(--hk);background:var(--card2);}
-.cu-icon{font-size:32px;margin-bottom:8px;}
-.cu-title{font-size:14px;font-weight:700;margin-bottom:4px;}
-.cu-sub{font-size:12px;color:var(--txt-mid);}
+/* ── ORDER CARDS ── */
+.order-status-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.ost{font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;min-height:34px;}
+.ost.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.order-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.oc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.oc-client{font-size:14px;font-weight:700;}
+.oc-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;}
+.ocb-pending{background:var(--warn-dim);color:var(--warn);}
+.ocb-shipping{background:#3b82f620;color:#60a5fa;}
+.ocb-collect{background:var(--ok-dim);color:var(--ok);}
+.oc-detail{font-size:11px;color:var(--txt-mid);margin-bottom:8px;}
+.oc-amount{font-size:16px;font-weight:800;margin-bottom:8px;}
+.oc-progress{display:flex;gap:4px;align-items:center;margin-bottom:10px;}
+.ocp-step{font-size:9px;padding:2px 6px;border-radius:4px;}
+.ocp-done{background:var(--ok-dim);color:var(--ok);}
+.ocp-active{background:var(--accent);color:#fff;}
+.ocp-wait{background:var(--border);color:var(--txt-lo);}
+.oc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;border:1px solid;min-height:38px;}
+.btn-ok{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
+.btn-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.btn-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
 
-.contract-list{display:flex;flex-direction:column;gap:0;}
-.contract-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+/* ── APPROVAL QUEUE ── */
+.approval-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+.ai-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.ai-title{font-size:13px;font-weight:700;}
+.ai-type{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;background:#818cf820;color:var(--accent);}
+.ai-meta{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
+.ai-desc{font-size:12px;color:var(--txt-hi);margin-bottom:10px;line-height:1.5;}
+.ai-actions{display:flex;gap:8px;}
+
+/* ── CONTRACT ROWS ── */
+.contract-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
 .contract-row:last-child{border:none;}
-.contract-row:hover{opacity:.8;}
-.ct-icon{width:36px;height:36px;border-radius:8px;background:#e879f920;border:1px solid #e879f940;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ct-icon{width:38px;height:38px;border-radius:9px;background:#e879f920;border:1px solid #e879f940;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .ct-body{flex:1;min-width:0;}
 .ct-name{font-size:13px;font-weight:600;}
-.ct-meta{font-size:10px;color:var(--txt-mid);margin-top:1px;}
-.ct-status{flex-shrink:0;text-align:right;}
+.ct-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
 .ct-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;}
 .ctb-ok{background:var(--ok-dim);color:var(--ok);}
 .ctb-warn{background:var(--warn-dim);color:var(--warn);}
 .ctb-danger{background:var(--danger-dim);color:var(--danger);}
-.ctb-ai{background:#e879f920;border:1px solid #e879f940;color:var(--hk);}
-.ct-expiry{font-size:10px;color:var(--txt-mid);margin-top:1px;}
+.ct-expiry{font-size:10px;color:var(--txt-mid);margin-top:2px;}
 
-/* AI parse panel */
-.ai-parse-result{background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:16px;margin-top:14px;}
-.apr-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+/* ── CONTRACT UPLOAD ── */
+.contract-upload{border:2px dashed var(--border-hi);border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:14px;}
+.contract-upload:hover{border-color:var(--hk);background:var(--card2);}
+.cu-icon{font-size:28px;margin-bottom:6px;}
+.cu-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.cu-sub{font-size:11px;color:var(--txt-mid);}
+
+/* ── PARSE RESULT ── */
+.apr-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
 .apr-ai{background:#e879f920;border:1px solid var(--hk);color:var(--hk);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
-.apr-title{font-size:13px;font-weight:700;}
-.apr-conf{font-size:11px;color:var(--ok);margin-left:auto;}
-.key-terms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.apr-title{font-size:12px;font-weight:600;flex:1;}
+.key-terms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
 .kt-cell{background:var(--card);border-radius:6px;padding:8px 10px;}
 .kt-label{font-size:9px;color:var(--txt-lo);margin-bottom:2px;}
 .kt-val{font-size:13px;font-weight:700;}
 .kt-val.warn{color:var(--warn);}
-.kt-val.ok{color:var(--ok);}
 .kt-val.danger{color:var(--danger);}
-.apr-actions{display:flex;gap:8px;}
-.btn{font-size:11px;font-weight:600;padding:6px 12px;border-radius:7px;cursor:pointer;border:1px solid;}
-.btn-confirm{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
-.btn-edit{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
 
-/* Query box */
+/* ── QUERY ── */
 .query-box{background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:14px;margin-top:14px;}
-.qb-label{font-size:10px;color:var(--txt-lo);margin-bottom:8px;}
-.qb-input-row{display:flex;gap:8px;}
-.qb-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.qb-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--txt-hi);outline:none;margin-bottom:8px;}
 .qb-input::placeholder{color:var(--txt-lo);}
-.qb-btn{background:var(--hk);border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:700;color:#000;cursor:pointer;}
-.qb-result{margin-top:10px;padding:10px;background:var(--card);border-radius:7px;font-size:12px;color:var(--txt-hi);line-height:1.6;}
+.qb-btn{width:100%;background:var(--hk);border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;color:#000;cursor:pointer;min-height:44px;}
+.qb-result{margin-top:10px;padding:12px;background:var(--card);border-radius:8px;font-size:12px;color:var(--txt-hi);line-height:1.7;display:none;}
 .qb-result strong{color:var(--hk);}
 
-/* ── TAB 2: 版權送審 ── */
-.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
-.review-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;}
-.review-card:hover{border-color:var(--border-hi);}
-.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.rc-ip{font-size:14px;font-weight:700;}
-.rc-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;}
-.rcs-wait{background:var(--warn-dim);color:var(--warn);}
-.rcs-ok{background:var(--ok-dim);color:var(--ok);}
-.rcs-block{background:var(--danger-dim);color:var(--danger);}
-.rc-round{font-size:11px;color:var(--txt-mid);margin-bottom:6px;}
-.rc-progress{display:flex;gap:3px;margin-bottom:8px;}
-.rcp-dot{width:20px;height:6px;border-radius:3px;}
-.rcp-done{background:var(--ok);}
-.rcp-active{background:var(--accent);}
-.rcp-wait{background:var(--border-hi);}
-.rcp-blocked{background:var(--warn);}
-.rc-owner{display:flex;gap:6px;flex-wrap:wrap;}
-.owner-tag{font-size:9px;padding:2px 6px;background:var(--card2);border-radius:8px;color:var(--txt-mid);}
-.rc-action{margin-top:10px;}
-.rc-action-btn{font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;border:1px solid;}
+/* ── CASHFLOW ── */
+.cf-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.cf-row:last-child{border:none;}
+.cf-company{font-size:13px;font-weight:600;}
+.cf-date{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.cf-balance{text-align:right;}
+.cf-val{font-size:15px;font-weight:800;}
+.cf-currency{font-size:10px;color:var(--txt-mid);margin-top:1px;}
 
-/* ── TAB 3: B2B 應收款 ── */
-.ar-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
-.ar-row:last-child{border:none;}
-.ar-client{flex:1;}
-.ar-name{font-size:13px;font-weight:600;}
-.ar-detail{font-size:10px;color:var(--txt-mid);margin-top:1px;}
-.ar-amt{text-align:right;flex-shrink:0;}
-.ar-val{font-size:14px;font-weight:700;}
-.ar-due{font-size:10px;margin-top:1px;}
-.ar-action-btn{font-size:10px;padding:4px 9px;border-radius:5px;cursor:pointer;border:1px solid var(--border-hi);background:transparent;color:var(--txt-mid);}
-.ar-action-btn:hover{color:var(--txt-hi);}
+/* ── EXPIRY ALERTS ── */
+.expiry-item{background:var(--card2);border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--warn);}
+.expiry-item.danger{border-left-color:var(--danger);}
+.expiry-item.ok{border-left-color:var(--ok);}
+.ei-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.ei-name{font-size:13px;font-weight:700;}
+.ei-days{font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;}
 
-/* stat chips top */
-.stat-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-.stat-chip{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:140px;}
-.sc-label{font-size:9px;color:var(--txt-lo);margin-bottom:3px;text-transform:uppercase;}
-.sc-val{font-size:18px;font-weight:800;}
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:32px 16px;color:var(--txt-lo);}
+.empty-icon{font-size:28px;margin-bottom:8px;}
+
+/* ── DESKTOP OVERRIDES ── */
+@media(min-width:600px){
+  .kpi-chip{min-width:calc(33% - 7px);}
+  .key-terms{grid-template-columns:repeat(3,1fr);}
+  .main{padding:20px 24px;}
+  .topbar{padding:0 24px;}
+  .kpi-bar{padding:14px 24px;}
+  .tab-bar{padding:0 24px;}
+}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="topbar-brand">
+  <div class="brand">
     <div class="brand-dot"></div>
     <div>
       <span class="brand-name">蕪解 ERP</span>
-      <span class="brand-sub">安然中控台</span>
+      <span class="brand-sub"> 安然中控台</span>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+  <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
+</div>
+
+<!-- ══ KPI BAR ══ -->
+<div class="kpi-bar">
+  <div class="kpi-chip">
+    <div class="kpi-label">本月業績達標</div>
+    <div class="kpi-val" id="kpi-revenue" style="color:var(--ok)">載入中</div>
+    <div class="kpi-sub" id="kpi-revenue-sub">—</div>
+    <div class="kpi-bar-inner"><div class="kpi-fill" id="kpi-revenue-bar" style="width:0%"></div></div>
+  </div>
+  <div class="kpi-chip">
+    <div class="kpi-label">全集團現金餘額</div>
+    <div class="kpi-val" id="kpi-cash" style="color:var(--accent)">載入中</div>
+    <div class="kpi-sub" id="kpi-cash-sub">5 家公司合計</div>
+  </div>
+  <div class="kpi-chip">
+    <div class="kpi-label">未收款應收</div>
+    <div class="kpi-val" id="kpi-ar" style="color:var(--warn)">載入中</div>
+    <div class="kpi-sub" id="kpi-ar-sub">—</div>
   </div>
 </div>
 
-<!-- TAB BAR -->
+<!-- ══ TAB BAR ══ -->
 <div class="tab-bar">
-  <button class="tab active" onclick="switchTab(this,'tab-contracts')">🔒 合約知識庫</button>
-  <button class="tab" onclick="switchTab(this,'tab-review')">📋 版權送審追蹤</button>
-  <button class="tab" onclick="switchTab(this,'tab-ar')">💰 B2B 應收款催收</button>
+  <button class="tab active" onclick="switchTab(this,'tab-todo')">📋 待辦</button>
+  <button class="tab" onclick="switchTab(this,'tab-cashflow')">💰 現金流</button>
+  <button class="tab" onclick="switchTab(this,'tab-contracts')">🔒 合約</button>
+  <button class="tab" onclick="switchTab(this,'tab-expiry')">⏰ 到期提醒</button>
 </div>
 
 <div class="main">
 
-  <!-- ══ TAB 1: 合約知識庫 ══ -->
-  <div id="tab-contracts">
+  <!-- ══ TAB 1: 待辦 ══ -->
+  <div id="tab-todo">
 
-    <div class="grid-2" style="margin-bottom:20px;">
-
-      <!-- 上傳新合約 -->
-      <div class="card">
-        <div class="section-title">上傳合約 · AI 解析</div>
-        <input type="file" id="contract-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileUpload(this)">
-        <div class="contract-upload" onclick="document.getElementById('contract-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--hk)'" ondragleave="this.style.borderColor=''" ondrop="event.preventDefault();handleFileDrop(event)">
-          <div class="cu-icon">📄</div>
-          <div class="cu-title">拖入 PDF 合約 或點擊上傳</div>
-          <div class="cu-sub">AI 自動抽取保底金、抽成比例、授權期限、區域、違約條款</div>
-        </div>
-        <!-- AI 解析結果 (Demo) -->
-        <div class="ai-parse-result" id="parse-demo" style="display:none;">
-          <div class="apr-header">
-            <span class="apr-ai">AI 解析完成</span>
-            <span class="apr-title">Opanchu_License_2026.pdf</span>
-            <span class="apr-conf">信心度 96%</span>
-          </div>
-          <div class="key-terms">
-            <div class="kt-cell"><div class="kt-label">保底金（MG）</div><div class="kt-val warn">¥ 28 萬/年</div></div>
-            <div class="kt-cell"><div class="kt-label">版稅率</div><div class="kt-val">9%</div></div>
-            <div class="kt-cell"><div class="kt-label">授權期限</div><div class="kt-val">2026-08 ~ 2028-07</div></div>
-            <div class="kt-cell"><div class="kt-label">授權區域</div><div class="kt-val">台灣 / 香港</div></div>
-            <div class="kt-cell"><div class="kt-label">首期付款</div><div class="kt-val danger">¥14萬（簽後30天）</div></div>
-            <div class="kt-cell"><div class="kt-label">違約賠償</div><div class="kt-val" style="font-size:11px;">MG 未達則補差額</div></div>
-          </div>
-          <div class="apr-actions">
-            <button class="btn btn-confirm">✓ 確認後存入知識庫</button>
-            <button class="btn btn-edit">✏ 人工修改</button>
-          </div>
-          <div style="font-size:10px;color:var(--txt-lo);margin-top:8px;">⚠ 安然必須人工確認每一筆——合約數字入庫後，全系統查詢都以此為準</div>
-        </div>
-      </div>
-
-      <!-- 快速查詢 -->
-      <div class="card">
-        <div class="section-title">智慧查詢（AI 直接回答）</div>
-        <div style="font-size:12px;color:var(--txt-mid);margin-bottom:12px;">把問題直接問出來，不用自己翻合約。</div>
-        <div class="query-box">
-          <div class="qb-label">問一個關於合約的問題</div>
-          <div class="qb-input-row">
-            <input class="qb-input" id="qb-in" placeholder="例：Snoopy 台灣授權的保底是多少？" value="Snoopy 台灣授權的保底是多少？">
-            <button class="qb-btn" id="qb-btn" onclick="runContractQuery()">問</button>
-          </div>
-          <div class="qb-result" id="qb-result" style="display:none;">
-            根據 <strong>Peanuts_License_TW_2025.pdf</strong>（安然 2025-11-03 確認）：<br>
-            Snoopy 台灣授權 MG 為 <strong>¥ 32 萬人民幣/年</strong>，版稅率 <strong>9%</strong>，授權期限至 <strong>2027-03-31</strong>。<br>
-            首期 MG ¥16 萬已於 2025-11-15 支付。
-          </div>
-        </div>
-        <div style="margin-top:12px;">
-          <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">常見問題快捷：</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;" onclick="document.getElementById('qb-in').value='Muziktiger 的授權到期日？'">Muziktiger 到期？</button>
-            <button style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">誰還沒付 MG？</button>
-            <button style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">90 天內到期合約</button>
-          </div>
-        </div>
-      </div>
+    <!-- 批發訂單佇列 -->
+    <div class="section-title">批發訂單佇列</div>
+    <div class="order-status-tabs">
+      <button class="ost active" onclick="filterOrders(this,'待確認')">待確認 <span id="cnt-pending">—</span></button>
+      <button class="ost" onclick="filterOrders(this,'出貨中')">出貨中 <span id="cnt-shipping">—</span></button>
+      <button class="ost" onclick="filterOrders(this,'待收款')">待收款 <span id="cnt-collect">—</span></button>
+      <button class="ost" onclick="filterOrders(this,'all')">全部</button>
+    </div>
+    <div id="order-list">
+      <div class="empty-state"><div class="empty-icon">📦</div>載入訂單中...</div>
     </div>
 
-    <!-- 合約列表 -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <span class="section-title" style="margin:0;">已結構化合約 · 7 份</span>
-        <span style="font-size:11px;color:var(--txt-mid);">全部已安然人工確認</span>
-      </div>
-      <div class="contract-list">
-        <div class="contract-row">
-          <div class="ct-icon">🐾</div>
-          <div class="ct-body">
-            <div class="ct-name">Snoopy · 台灣授權</div>
-            <div class="ct-meta">Peanuts Worldwide · MG ¥32萬 · 9% · 台灣</div>
-          </div>
-          <div class="ct-status">
-            <div class="ct-badge ctb-ok">有效</div>
-            <div class="ct-expiry">到期：2027-03-31</div>
-          </div>
-        </div>
-        <div class="contract-row">
-          <div class="ct-icon">🐰</div>
-          <div class="ct-body">
-            <div class="ct-name">Opanchu Usagi · 台灣+香港</div>
-            <div class="ct-meta">Opanchu Japan · MG ¥28萬 · 9% · 台灣/香港</div>
-          </div>
-          <div class="ct-status">
-            <div class="ct-badge ctb-warn">87天後到期</div>
-            <div class="ct-expiry">到期：2026-07-28</div>
-          </div>
-        </div>
-        <div class="contract-row">
-          <div class="ct-icon">🎵</div>
-          <div class="ct-body">
-            <div class="ct-name">Muziktiger · 大陸+台灣</div>
-            <div class="ct-meta">Muziktiger Studio · MG ¥18萬 · 8% · 中國大陸/台灣</div>
-          </div>
-          <div class="ct-status">
-            <div class="ct-badge ctb-ok">有效</div>
-            <div class="ct-expiry">到期：2027-06-30</div>
-          </div>
-        </div>
-        <div class="contract-row">
-          <div class="ct-icon">🥚</div>
-          <div class="ct-body">
-            <div class="ct-name">Gudetama · 大陸 （洽談中）</div>
-            <div class="ct-meta">Sanrio · MG 未定 · 9% · 大陸（草案）</div>
-          </div>
-          <div class="ct-status">
-            <div class="ct-badge ctb-ai">AI 草案待確認</div>
-            <div class="ct-expiry">等 Ray 拍板</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div><!-- /tab-contracts -->
-
-  <!-- ══ TAB 2: 版權送審追蹤 ══ -->
-  <div id="tab-review" style="display:none;">
-
-    <div class="stat-row">
-      <div class="stat-chip"><div class="sc-label">進行中項目</div><div class="sc-val" style="color:var(--accent)">4</div></div>
-      <div class="stat-chip"><div class="sc-label">等版權方回覆</div><div class="sc-val" style="color:var(--warn)">2</div></div>
-      <div class="stat-chip"><div class="sc-label">超過 10 天未回</div><div class="sc-val" style="color:var(--danger)">1</div></div>
-      <div class="stat-chip"><div class="sc-label">本月通過送審</div><div class="sc-val" style="color:var(--ok)">3</div></div>
+    <!-- 審批佇列 -->
+    <div class="section-title" style="margin-top:8px;">待安然批核</div>
+    <div id="approval-list">
+      <div class="empty-state"><div class="empty-icon">✍️</div>載入審批中...</div>
     </div>
 
-    <div class="review-grid">
-      <div class="review-card">
-        <div class="rc-top">
-          <span class="rc-ip">Snoopy 夏季</span>
-          <span class="rc-status rcs-ok">全部通過</span>
-        </div>
-        <div class="rc-round">公仔 · 5/5 輪送審完成</div>
-        <div class="rc-progress">
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-done"></div>
-        </div>
-        <div class="rc-owner">
-          <span class="owner-tag">珮玲 送審/企劃</span>
-          <span class="owner-tag">Bevis 主管</span>
-          <span class="owner-tag">安然 商務</span>
-        </div>
-        <div style="font-size:10px;color:var(--ok);margin-top:8px;">✓ 已進入大貨生產</div>
-      </div>
+  </div>
 
-      <div class="review-card" style="border-color:#b45309;">
-        <div class="rc-top">
-          <span class="rc-ip">Muziktiger 新系列</span>
-          <span class="rc-status rcs-block">⚠ 超時未回覆</span>
-        </div>
-        <div class="rc-round">公仔 · 第 1 輪（2D四視圖） · 已等 14 天</div>
-        <div class="rc-progress">
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-blocked"></div>
-          <div class="rcp-dot rcp-wait"></div>
-          <div class="rcp-dot rcp-wait"></div>
-        </div>
-        <div class="rc-owner">
-          <span class="owner-tag">珮玲 送審/企劃</span>
-          <span class="owner-tag" style="color:var(--warn)">安然 催促中</span>
-        </div>
-        <div class="rc-action" style="margin-top:10px;">
-          <button class="rc-action-btn" style="background:var(--warn-dim);border-color:var(--warn);color:var(--warn);">📞 升級：安排電話溝通</button>
-        </div>
-      </div>
-
-      <div class="review-card">
-        <div class="rc-top">
-          <span class="rc-ip">Opanchu 秋冬</span>
-          <span class="rc-status rcs-wait">等概念圖核准</span>
-        </div>
-        <div class="rc-round">公仔 · 第 1 輪送審尚未開始</div>
-        <div class="rc-progress">
-          <div class="rcp-dot rcp-done"></div>
-          <div class="rcp-dot rcp-active"></div>
-          <div class="rcp-dot rcp-wait"></div>
-          <div class="rcp-dot rcp-wait"></div>
-          <div class="rcp-dot rcp-wait"></div>
-        </div>
-        <div class="rc-owner">
-          <span class="owner-tag">等 Bevis 核准概念圖</span>
-        </div>
-      </div>
-
-      <div class="review-card">
-        <div class="rc-top">
-          <span class="rc-ip">Gudetama 泰國</span>
-          <span class="rc-status" style="background:var(--card2);color:var(--txt-mid);">尚未啟動</span>
-        </div>
-        <div class="rc-round">等 Ray 拍板版權條件</div>
-        <div class="rc-progress">
-          <div class="rcp-dot" style="background:var(--border-hi)"></div>
-          <div class="rcp-dot" style="background:var(--border-hi)"></div>
-          <div class="rcp-dot" style="background:var(--border-hi)"></div>
-          <div class="rcp-dot" style="background:var(--border-hi)"></div>
-          <div class="rcp-dot" style="background:var(--border-hi)"></div>
-        </div>
-        <div style="font-size:10px;color:var(--txt-lo);margin-top:6px;">版權合約確認後自動解鎖</div>
-      </div>
-    </div>
-
-    <!-- 送審紀錄時間軸 -->
-    <div class="card">
-      <div class="section-title">近期送審活動紀錄</div>
-      <div style="display:flex;flex-direction:column;gap:0;">
-        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">05-01 今天</span>
-          <span style="color:var(--warn);">⚠ Muziktiger 第1輪 仍無回覆（14天），安然升級聯繫</span>
-        </div>
-        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">04-28</span>
-          <span><strong style="color:var(--ok);">✓</strong> Snoopy 夏季 第4輪（上色打樣）版權方批准</span>
-        </div>
-        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">04-25</span>
-          <span>安然發催促信給 Muziktiger Studio（第二封）</span>
-        </div>
-        <div style="display:flex;gap:12px;padding:8px 0;font-size:12px;">
-          <span style="color:var(--txt-lo);white-space:nowrap;width:80px;">04-20</span>
-          <span><strong style="color:var(--ok);">✓</strong> Opanchu 秋冬 主題確認（Shawn→Ray 批核）</span>
-        </div>
-      </div>
-    </div>
-  </div><!-- /tab-review -->
-
-  <!-- ══ TAB 3: B2B 應收款 ══ -->
-  <div id="tab-ar" style="display:none;">
-
-    <div class="stat-row">
-      <div class="stat-chip"><div class="sc-label">未收款總額</div><div class="sc-val" style="color:var(--warn)">¥ 286 萬</div></div>
-      <div class="stat-chip"><div class="sc-label">逾期超帳期</div><div class="sc-val" style="color:var(--danger)">¥ 18.2 萬</div></div>
-      <div class="stat-chip"><div class="sc-label">本月預計到帳</div><div class="sc-val" style="color:var(--ok)">¥ 94 萬</div></div>
-      <div class="stat-chip"><div class="sc-label">待收訂金筆數</div><div class="sc-val" style="color:var(--txt-hi)">8 筆</div></div>
-    </div>
-
+  <!-- ══ TAB 2: 現金流 ══ -->
+  <div id="tab-cashflow" style="display:none;">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <span class="section-title" style="margin:0;">B2B 客戶應收款明細</span>
-        <select style="font-size:11px;background:var(--card2);border:1px solid var(--border);color:var(--txt-mid);padding:4px 8px;border-radius:6px;">
-          <option>全部客戶</option>
-          <option>逾期優先</option>
-          <option>金額大到小</option>
-        </select>
+        <span class="section-title" style="margin:0;">全集團現金流明細</span>
+        <button onclick="loadCashflow()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">重新整理</button>
       </div>
-
-      <div class="ar-row">
-        <div class="ar-client">
-          <div class="ar-name">誠品生活（台灣）</div>
-          <div class="ar-detail">Snoopy 春季 5,000 件 · 2026-03-15 出貨</div>
-        </div>
-        <div class="ar-amt">
-          <div class="ar-val" style="color:var(--ok)">¥ 98,400</div>
-          <div class="ar-due" style="color:var(--ok)">帳期內（到 05-15）</div>
-        </div>
-        <button class="ar-action-btn">查看</button>
-      </div>
-
-      <div class="ar-row">
-        <div class="ar-client">
-          <div class="ar-name">LOG-ON（香港）</div>
-          <div class="ar-detail">Muziktiger 冬季 2,000 件 · 2026-02-28 出貨</div>
-        </div>
-        <div class="ar-amt">
-          <div class="ar-val" style="color:var(--danger)">¥ 56,800</div>
-          <div class="ar-due" style="color:var(--danger)">⚠ 逾期 18 天</div>
-        </div>
-        <button class="ar-action-btn" style="border-color:var(--danger);color:var(--danger);">催款</button>
-      </div>
-
-      <div class="ar-row">
-        <div class="ar-client">
-          <div class="ar-name">UJ BKK（泰國）← 集團內</div>
-          <div class="ar-detail">北京發貨貨款 · 貨品買賣結算</div>
-        </div>
-        <div class="ar-amt">
-          <div class="ar-val" style="color:var(--warn)">¥ 420,000</div>
-          <div class="ar-due" style="color:var(--txt-mid)">快閃店結束後結算</div>
-        </div>
-        <button class="ar-action-btn">查看</button>
-      </div>
-
-      <div class="ar-row">
-        <div class="ar-client">
-          <div class="ar-name">ESLITE（台灣）</div>
-          <div class="ar-detail">Opanchu 春節系列 3,000 件 · 2026-01-20 出貨</div>
-        </div>
-        <div class="ar-amt">
-          <div class="ar-val" style="color:var(--txt-hi)">¥ 72,000</div>
-          <div class="ar-due" style="color:var(--ok)">已收訂金 50%</div>
-        </div>
-        <button class="ar-action-btn">催尾款</button>
-      </div>
-
-      <div class="ar-row">
-        <div class="ar-client">
-          <div class="ar-name">TOKYU HANDS（台灣）</div>
-          <div class="ar-detail">Snoopy 夏季 2,000 件 · 預售</div>
-        </div>
-        <div class="ar-amt">
-          <div class="ar-val" style="color:var(--txt-mid)">¥ 58,800</div>
-          <div class="ar-due" style="color:var(--txt-lo)">待出貨後收款</div>
-        </div>
-        <button class="ar-action-btn">查看</button>
+      <div id="cashflow-list">
+        <div class="empty-state"><div class="empty-icon">💰</div>載入中...</div>
       </div>
     </div>
-  </div><!-- /tab-ar -->
+
+    <div class="card">
+      <div class="section-title">填報現金流</div>
+      <select id="cf-company" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px;border-radius:8px;font-size:13px;margin-bottom:8px;">
+        <option value="">選擇公司</option>
+        <option>北京蕪解</option><option>台灣悍草</option><option>UJ BKK</option><option>香港JV</option><option>深圳子公司</option>
+      </select>
+      <select id="cf-currency" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px;border-radius:8px;font-size:13px;margin-bottom:8px;">
+        <option>RMB</option><option>TWD</option><option>THB</option><option>HKD</option><option>USD</option>
+      </select>
+      <input id="cf-balance" type="number" placeholder="期末餘額" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px;border-radius:8px;font-size:14px;margin-bottom:8px;">
+      <input id="cf-income" type="number" placeholder="本期收入（選填）" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px;border-radius:8px;font-size:14px;margin-bottom:8px;">
+      <input id="cf-expense" type="number" placeholder="本期支出（選填）" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px;border-radius:8px;font-size:14px;margin-bottom:10px;">
+      <button class="btn btn-ok" style="width:100%;" onclick="submitCashflow()">✓ 提交現金流</button>
+      <div id="cf-result" style="display:none;margin-top:8px;font-size:12px;text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3: 合約知識庫 ══ -->
+  <div id="tab-contracts" style="display:none;">
+
+    <div class="card">
+      <div class="section-title">上傳合約 · AI 解析</div>
+      <input type="file" id="contract-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileUpload(this)">
+      <div class="contract-upload" onclick="document.getElementById('contract-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--hk)'" ondragleave="this.style.borderColor=''" ondrop="event.preventDefault();handleFileDrop(event)">
+        <div class="cu-icon">📄</div>
+        <div class="cu-title">拖入 PDF 合約 或點擊上傳</div>
+        <div class="cu-sub">AI 自動抽取保底金、版稅率、授權期限、區域、違約條款</div>
+      </div>
+      <div id="parse-demo" style="display:none;"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">智慧查詢（AI 直接回答）</div>
+      <div class="query-box">
+        <input class="qb-input" id="qb-in" placeholder="例：Snoopy 台灣授權的保底是多少？">
+        <button class="qb-btn" id="qb-btn" onclick="runContractQuery()">問 AI</button>
+        <div class="qb-result" id="qb-result"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;min-height:32px;" onclick="quickQuery('Muziktiger 的授權到期日？')">Muziktiger 到期？</button>
+        <button style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;min-height:32px;" onclick="quickQuery('哪些合約保底金還沒付清？')">未付保底？</button>
+        <button style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;min-height:32px;" onclick="quickQuery('90天內到期的合約有哪些？')">90天內到期</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span class="section-title" style="margin:0;">合約清單</span>
+        <button onclick="loadContracts()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;">重新整理</button>
+      </div>
+      <div id="contract-list">
+        <div class="empty-state"><div class="empty-icon">📋</div>載入合約中...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ TAB 4: 到期提醒 ══ -->
+  <div id="tab-expiry" style="display:none;">
+    <div class="card">
+      <div class="section-title">合約到期提醒（180天內）</div>
+      <div id="expiry-list">
+        <div class="empty-state"><div class="empty-icon">⏰</div>載入中...</div>
+      </div>
+    </div>
+  </div>
 
 </div><!-- /main -->
 
 <script>
-/* ── CONFIG ── */
-const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
-const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _CONTRACT_TBL = "tbltnJNDhRNwVkZC";
+const _P  = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _TBLS = {
+  approval:  "tblD6acV3m2ZXJHe",
+  contract:  "tbltnJNDhRNwVkZC",
+  sales:     "tblRtqmbO9TO3sYZ",
+  budget:    "tblteo2QEO0jP8j9",
+  cashflow:  "tblxaiogh3tYlZUz",
+};
 const GEMINI_KEY = "AIzaSyBC51Yef5FtCESl2AF7A3X1WKIfoc0Bojo";
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+GEMINI_KEY;
-let _tk = null;
-let _parsedResult = null;
-let _currentFileName = "";
+let _tk=null, _parsedResult=null, _currentFileName="", _allOrders=[], _currentFilter="待確認";
 
-/* ── SESSION CHECK ── */
+/* ── SESSION ── */
 (function(){
-  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
-  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); }
+  const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
 })();
 
-/* ── TAB ── */
-function switchTab(btn, tabId) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  ['tab-contracts','tab-review','tab-ar'].forEach(id => {
-    document.getElementById(id).style.display = id === tabId ? '' : 'none';
-  });
-}
-
-/* ── FEISHU TOKEN ── */
+/* ── TOKEN ── */
 async function _getToken(){
   if(_tk) return _tk;
-  const r = await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
-  const d = await r.json();
-  if(d.code!==0) throw new Error("token");
-  _tk = d.tenant_access_token;
-  setTimeout(()=>_tk=null, 110*60*1000);
+  const r=await fetch(_P+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d=await r.json();
+  _tk=d.tenant_access_token;
+  setTimeout(()=>_tk=null,110*60*1000);
   return _tk;
 }
 function _fv(f,k){
@@ -522,91 +330,418 @@ function _fv(f,k){
   if(typeof v==="object") return v.text||v.link||"";
   return String(v);
 }
-
-/* ── FILE HANDLING ── */
-function handleFileDrop(e){
-  const f = e.dataTransfer.files[0];
-  if(f) processFile(f);
+async function _getRecords(tbl,filter=""){
+  const tk=await _getToken();
+  const url=`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${filter?"&filter="+encodeURIComponent(filter):""}`;
+  const r=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+  const d=await r.json();
+  return d.data?.items||[];
 }
-function handleFileUpload(input){
-  if(input.files[0]) processFile(input.files[0]);
+async function _updateRecord(tbl,rid,fields){
+  const tk=await _getToken();
+  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records/${rid}`,{
+    method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields})
+  });
+  return r.json();
+}
+async function _createRecord(tbl,fields){
+  const tk=await _getToken();
+  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records`,{
+    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    body:JSON.stringify({fields})
+  });
+  return r.json();
 }
 
-async function processFile(file){
-  _currentFileName = file.name;
-  const demo = document.getElementById('parse-demo');
-  demo.style.display = 'block';
-  demo.innerHTML = `<div style="padding:20px;text-align:center;color:var(--txt-mid);font-size:13px">
-    <div style="font-size:24px;margin-bottom:8px">🤖</div>
-    AI 解析中 · ${file.name}<br>
-    <div style="margin-top:6px;font-size:11px;color:var(--txt-lo)">讀取文件並抽取關鍵條款...</div>
-  </div>`;
+/* ── TABS ── */
+const ALL_TABS=['tab-todo','tab-cashflow','tab-contracts','tab-expiry'];
+function switchTab(btn,tabId){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ALL_TABS.forEach(id=>document.getElementById(id).style.display=id===tabId?'':'none');
+  if(tabId==='tab-cashflow') loadCashflow();
+  if(tabId==='tab-contracts') loadContracts();
+  if(tabId==='tab-expiry') loadExpiry();
+}
 
+/* ── KPI LOAD ── */
+async function loadKPIs(){
   try{
-    const base64 = await fileToBase64(file);
-    const mimeType = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
-    const parsed = await callGeminiParse(base64, mimeType, file.name);
-    _parsedResult = parsed;
-    showParseResult(parsed, file.name);
+    // 業績：本月銷售總額 vs 預算目標
+    const now=new Date();
+    const [orders,budgets]=await Promise.all([
+      _getRecords(_TBLS.sales),
+      _getRecords(_TBLS.budget)
+    ]);
+    // 收入目標：找本月或本年的收入目標
+    const revBudget=budgets.find(b=>{
+      const f=b.fields;
+      return _fv(f,"預算科目")==="收入目標"&&(String(_fv(f,"年度"))===String(now.getFullYear()));
+    });
+    const target=revBudget?Number(_fv(revBudget.fields,"預算金額")||0):0;
+    // 實際收入：本月已確認訂單金額
+    const actual=orders.reduce((s,o)=>{
+      const f=o.fields;
+      const status=_fv(f,"訂單狀態");
+      if(status==="已完成"||status==="出貨中"||status==="待收款"){
+        return s+Number(_fv(f,"總金額")||0);
+      }
+      return s;
+    },0);
+    const pct=target>0?Math.min(100,Math.round(actual/target*100)):0;
+    document.getElementById('kpi-revenue').textContent=actual>0?'¥'+_fmt(actual):'¥0';
+    document.getElementById('kpi-revenue-sub').textContent=target>0?`目標 ¥${_fmt(target)}（${pct}%）`:'預算待 Shawn 設定';
+    document.getElementById('kpi-revenue-bar').style.width=pct+'%';
+    document.getElementById('kpi-revenue-bar').style.background=pct>=80?'var(--ok)':pct>=50?'var(--warn)':'var(--danger)';
+
+    // 應收款：未全款收清的訂單
+    const ar=orders.reduce((s,o)=>{
+      const f=o.fields;
+      const cs=_fv(f,"收款狀態");
+      if(cs!=="全款已收"&&cs!=="") return s+Number(_fv(f,"總金額")||0);
+      return s;
+    },0);
+    const arCnt=orders.filter(o=>_fv(o.fields,"收款狀態")!=="全款已收"&&_fv(o.fields,"收款狀態")!=="").length;
+    document.getElementById('kpi-ar').textContent='¥'+_fmt(ar);
+    document.getElementById('kpi-ar-sub').textContent=arCnt>0?`${arCnt} 筆待收款`:'暫無未收款';
+
   }catch(e){
-    demo.innerHTML = `<div style="padding:16px;color:var(--danger);font-size:13px">解析失敗：${e.message}</div>`;
+    document.getElementById('kpi-revenue').textContent='—';
+    document.getElementById('kpi-ar').textContent='—';
+  }
+
+  // 現金流合計
+  try{
+    const cf=await _getRecords(_TBLS.cashflow);
+    // 取每家公司最新一筆，匯總
+    const latest={};
+    cf.forEach(r=>{
+      const f=r.fields;
+      const co=_fv(f,"所屬公司")||_fv(f,"辦公室")||"其他";
+      const ts=Number(_fv(f,"日期")||0);
+      if(!latest[co]||ts>latest[co].ts) latest[co]={ts,balance:Number(_fv(f,"期末餘額")||0),currency:_fv(f,"幣別")||"RMB"};
+    });
+    const total=Object.values(latest).reduce((s,v)=>s+v.balance,0);
+    const cnt=Object.keys(latest).length;
+    document.getElementById('kpi-cash').textContent='¥'+_fmt(total);
+    document.getElementById('kpi-cash-sub').textContent=cnt>0?`${cnt} 家公司已填報`:'尚無現金流記錄';
+  }catch(e){
+    document.getElementById('kpi-cash').textContent='—';
   }
 }
 
+function _fmt(n){
+  if(n>=10000) return (n/10000).toFixed(1)+'萬';
+  return n.toLocaleString();
+}
+
+/* ── ORDERS ── */
+async function loadOrders(){
+  try{
+    _allOrders=await _getRecords(_TBLS.sales);
+    // 計算各狀態數量
+    const pending=_allOrders.filter(o=>_fv(o.fields,"訂單狀態")==="待確認").length;
+    const shipping=_allOrders.filter(o=>_fv(o.fields,"訂單狀態")==="出貨中").length;
+    const collect=_allOrders.filter(o=>_fv(o.fields,"訂單狀態")==="待收款").length;
+    document.getElementById('cnt-pending').textContent=pending||0;
+    document.getElementById('cnt-shipping').textContent=shipping||0;
+    document.getElementById('cnt-collect').textContent=collect||0;
+    renderOrders(_currentFilter);
+  }catch(e){
+    document.getElementById('order-list').innerHTML=`<div class="empty-state"><div class="empty-icon">⚠️</div>載入失敗</div>`;
+  }
+}
+
+function filterOrders(btn,status){
+  document.querySelectorAll('.ost').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _currentFilter=status;
+  renderOrders(status);
+}
+
+function renderOrders(filter){
+  const list=document.getElementById('order-list');
+  const items=filter==='all'?_allOrders:_allOrders.filter(o=>_fv(o.fields,"訂單狀態")===filter);
+  if(!items.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">✅</div>${filter==='all'?'暫無訂單':'此狀態暫無訂單'}</div>`;
+    return;
+  }
+  list.innerHTML=items.map(o=>{
+    const f=o.fields; const rid=o.record_id;
+    const status=_fv(f,"訂單狀態");
+    const badgeCls=status==="待確認"?"ocb-pending":status==="出貨中"?"ocb-shipping":"ocb-collect";
+    const amt=Number(_fv(f,"總金額")||0);
+    const ccy=_fv(f,"幣別")||"¥";
+    const cs=_fv(f,"收款狀態")||"未收款";
+    const steps=[
+      {label:"接單",done:true},
+      {label:"訂金",done:cs!=="未收款"},
+      {label:"出貨",done:status==="出貨中"||status==="待收款"||status==="已完成"},
+      {label:"收款",done:cs==="全款已收"},
+    ];
+    const stepsHtml=steps.map(s=>`<span class="ocp-step ${s.done?'ocp-done':status!=="待確認"&&!s.done?'ocp-active':'ocp-wait'}">${s.label}</span>`).join('');
+    const actions=status==="待確認"
+      ?`<button class="btn btn-ok" onclick="confirmOrder('${rid}')">✓ 確認訂單</button>`
+      :status==="出貨中"
+      ?`<button class="btn btn-ok" onclick="markShipped('${rid}')">📦 填物流單號</button>`
+      :status==="待收款"
+      ?`<button class="btn btn-ok" onclick="markPaid('${rid}','tail')">💰 確認尾款到帳</button>`
+      :'';
+    return `<div class="order-card">
+      <div class="oc-top">
+        <span class="oc-client">${_fv(f,"客戶名稱")||'未知客戶'}</span>
+        <span class="oc-badge ${badgeCls}">${status}</span>
+      </div>
+      <div class="oc-detail">${_fv(f,"產品/項目")||''} · ${_fv(f,"IP品牌")||''} · 數量 ${_fv(f,"數量")||'—'}</div>
+      <div class="oc-amount">${ccy} ${amt.toLocaleString()}</div>
+      <div class="oc-progress">${stepsHtml}</div>
+      <div style="font-size:10px;color:var(--txt-mid);margin-bottom:8px;">收款狀態：${cs} · 負責業務：${_fv(f,"負責業務")||'—'}</div>
+      ${actions?`<div class="oc-actions">${actions}<button class="btn btn-ghost" onclick="viewOrder('${rid}')">查看</button></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function confirmOrder(rid){
+  if(!confirm("確認此訂單？")) return;
+  await _updateRecord(_TBLS.sales,rid,{"訂單狀態":"出貨中","收款狀態":"訂金已收"});
+  loadOrders(); loadKPIs();
+}
+function markShipped(rid){
+  const logistic=prompt("輸入物流單號：");
+  if(!logistic) return;
+  _updateRecord(_TBLS.sales,rid,{"物流單號":logistic,"訂單狀態":"待收款"}).then(()=>{loadOrders();loadKPIs();});
+}
+async function markPaid(rid){
+  if(!confirm("確認尾款已到帳？")) return;
+  await _updateRecord(_TBLS.sales,rid,{"收款狀態":"全款已收","訂單狀態":"已完成"});
+  loadOrders(); loadKPIs();
+}
+function viewOrder(rid){
+  const o=_allOrders.find(o=>o.record_id===rid);
+  if(!o) return;
+  const f=o.fields;
+  alert(`客戶：${_fv(f,"客戶名稱")}\n產品：${_fv(f,"產品/項目")}\n金額：${_fv(f,"幣別")} ${_fv(f,"總金額")}\n批發折扣：${_fv(f,"批發折扣")||"—"}\n帳期：${_fv(f,"帳期")||"—"}\n備注：${_fv(f,"備註")||"—"}`);
+}
+
+/* ── APPROVALS ── */
+async function loadApprovals(){
+  try{
+    const items=await _getRecords(_TBLS.approval,'CurrentValue.[審批狀態]="待審批"');
+    const list=document.getElementById('approval-list');
+    if(!items.length){
+      list.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div>暫無待批核項目</div>';
+      return;
+    }
+    list.innerHTML=items.map(i=>{
+      const f=i.fields; const rid=i.record_id;
+      const amt=_fv(f,"金額");
+      const ccy=_fv(f,"幣別");
+      return `<div class="approval-item">
+        <div class="ai-top">
+          <span class="ai-title">${_fv(f,"審批標題")||_fv(f,"標題")}</span>
+          <span class="ai-type">${_fv(f,"審批類型")}</span>
+        </div>
+        <div class="ai-meta">申請人：${_fv(f,"申請人")} · ${amt?ccy+' '+amt:'—'}</div>
+        ${_fv(f,"申請說明")?`<div class="ai-desc">${_fv(f,"申請說明")}</div>`:''}
+        <div class="ai-actions">
+          <button class="btn btn-ok" onclick="approveItem('${rid}',this)">✓ 批准</button>
+          <button class="btn" style="background:var(--danger-dim);border-color:var(--danger);color:var(--danger);" onclick="rejectItem('${rid}',this)">✗ 拒絕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('approval-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div>載入失敗</div>';
+  }
+}
+
+async function approveItem(rid,btn){
+  btn.disabled=true; btn.textContent='處理中...';
+  await _updateRecord(_TBLS.approval,rid,{"審批狀態":"已批准","審批人":"安然","審批日期":Date.now()});
+  btn.closest('.approval-item').style.opacity='.4';
+  setTimeout(()=>loadApprovals(),800);
+}
+async function rejectItem(rid,btn){
+  const reason=prompt("拒絕原因（選填）：");
+  btn.disabled=true;
+  await _updateRecord(_TBLS.approval,rid,{"審批狀態":"已拒絕","審批意見":reason||"","審批人":"安然","審批日期":Date.now()});
+  btn.closest('.approval-item').style.opacity='.4';
+  setTimeout(()=>loadApprovals(),800);
+}
+
+/* ── CASHFLOW ── */
+async function loadCashflow(){
+  try{
+    const items=await _getRecords(_TBLS.cashflow);
+    // 每家公司取最新
+    const latest={};
+    items.forEach(r=>{
+      const f=r.fields;
+      const co=_fv(f,"所屬公司")||_fv(f,"辦公室")||"未分類";
+      const ts=Number(_fv(f,"日期")||0);
+      if(!latest[co]||ts>latest[co].ts) latest[co]={ts,f,rid:r.record_id};
+    });
+    const el=document.getElementById('cashflow-list');
+    const entries=Object.entries(latest);
+    if(!entries.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📊</div>尚無現金流記錄<br><small style="font-size:11px">請在下方填報</small></div>';return;}
+    const companies=["北京蕪解","台灣悍草","UJ BKK","香港JV","深圳子公司"];
+    let html=companies.map(co=>{
+      const item=latest[co];
+      if(!item) return `<div class="cf-row"><div><div class="cf-company">${co}</div><div class="cf-date" style="color:var(--txt-lo)">尚未填報</div></div><div class="cf-balance"><div class="cf-val" style="color:var(--txt-lo)">—</div></div></div>`;
+      const f=item.f;
+      const bal=Number(_fv(f,"期末餘額")||0);
+      const ccy=_fv(f,"幣別")||"";
+      const dateMs=Number(_fv(f,"日期")||0);
+      const date=dateMs?new Date(dateMs).toLocaleDateString('zh-TW'):'—';
+      const color=bal<0?'var(--danger)':bal<50000?'var(--warn)':'var(--ok)';
+      return `<div class="cf-row">
+        <div><div class="cf-company">${co}</div><div class="cf-date">最後更新 ${date}</div></div>
+        <div class="cf-balance"><div class="cf-val" style="color:${color}">${ccy} ${bal.toLocaleString()}</div></div>
+      </div>`;
+    }).join('');
+    // 其他未在名單的
+    entries.filter(([co])=>!companies.includes(co)).forEach(([co,item])=>{
+      const f=item.f;
+      const bal=Number(_fv(f,"期末餘額")||0);
+      html+=`<div class="cf-row"><div><div class="cf-company">${co}</div></div><div class="cf-balance"><div class="cf-val">${_fv(f,"幣別")} ${bal.toLocaleString()}</div></div></div>`;
+    });
+    el.innerHTML=html;
+  }catch(e){
+    document.getElementById('cashflow-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div>載入失敗</div>';
+  }
+}
+
+async function submitCashflow(){
+  const company=document.getElementById('cf-company').value;
+  const currency=document.getElementById('cf-currency').value;
+  const balance=Number(document.getElementById('cf-balance').value);
+  const income=Number(document.getElementById('cf-income').value||0);
+  const expense=Number(document.getElementById('cf-expense').value||0);
+  if(!company||!balance){alert("請填寫公司和期末餘額");return;}
+  const res=document.getElementById('cf-result');
+  res.style.display='block';res.style.color='var(--txt-mid)';res.textContent='提交中...';
+  const fields={"所屬公司":company,"幣別":currency,"期末餘額":balance,"日期":Date.now(),"填報人":JSON.parse(localStorage.getItem("wujie_session")||"{}").name||"安然"};
+  if(income) fields["本期收入"]=income;
+  if(expense) fields["本期支出"]=expense;
+  const d=await _createRecord(_TBLS.cashflow,fields);
+  if(d.code===0){
+    res.style.color='var(--ok)';res.textContent='✅ 已提交';
+    document.getElementById('cf-balance').value='';
+    document.getElementById('cf-income').value='';
+    document.getElementById('cf-expense').value='';
+    loadCashflow(); loadKPIs();
+  }else{res.style.color='var(--danger)';res.textContent='失敗：'+JSON.stringify(d);}
+}
+
+/* ── CONTRACTS ── */
+async function loadContracts(){
+  try{
+    const items=await _getRecords(_TBLS.contract);
+    const el=document.getElementById('contract-list');
+    if(!items.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>尚無合約記錄</div>';return;}
+    const icons={'Snoopy':'🐾','Opanchu':'🐰','Muziktiger':'🎵','Mofusand':'🐱','Chiikawa':'🌟'};
+    el.innerHTML=items.map(i=>{
+      const f=i.fields;
+      const ip=_fv(f,"IP品牌")||_fv(f,"合約名稱");
+      const endMs=Number(_fv(f,"合約結束日")||_fv(f,"到期日期")||0);
+      const daysLeft=endMs?Math.round((endMs-Date.now())/(864e5)):-1;
+      const status=_fv(f,"合約狀態")||"有效";
+      const badgeCls=daysLeft<0?'ctb-danger':daysLeft<90?'ctb-warn':'ctb-ok';
+      const badgeTxt=daysLeft<0?'已到期':daysLeft<90?`${daysLeft}天後到期`:'有效';
+      const icon=Object.entries(icons).find(([k])=>ip.includes(k))?.[1]||'📄';
+      return `<div class="contract-row">
+        <div class="ct-icon">${icon}</div>
+        <div class="ct-body">
+          <div class="ct-name">${ip}</div>
+          <div class="ct-meta">${_fv(f,"版權方")||''} · MG ${_fv(f,"幣別")||''} ${_fv(f,"保底金額")||'—'}/年 · ${_fv(f,"授權區域")||''}</div>
+        </div>
+        <div style="flex-shrink:0;text-align:right;">
+          <div class="ct-badge ${badgeCls}">${badgeTxt}</div>
+          <div class="ct-expiry">${endMs?new Date(endMs).toLocaleDateString('zh-TW'):'—'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('contract-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div>載入失敗</div>';
+  }
+}
+
+/* ── EXPIRY ── */
+async function loadExpiry(){
+  try{
+    const items=await _getRecords(_TBLS.contract);
+    const el=document.getElementById('expiry-list');
+    const now=Date.now();
+    const soon=items.filter(i=>{
+      const f=i.fields;
+      const endMs=Number(_fv(f,"合約結束日")||_fv(f,"到期日期")||0);
+      return endMs>0&&(endMs-now)<(180*864e5);
+    }).sort((a,b)=>{
+      const ae=Number(_fv(a.fields,"合約結束日")||_fv(a.fields,"到期日期")||0);
+      const be=Number(_fv(b.fields,"合約結束日")||_fv(b.fields,"到期日期")||0);
+      return ae-be;
+    });
+    if(!soon.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div>180天內無到期合約</div>';return;}
+    el.innerHTML=soon.map(i=>{
+      const f=i.fields;
+      const ip=_fv(f,"IP品牌")||_fv(f,"合約名稱");
+      const endMs=Number(_fv(f,"合約結束日")||_fv(f,"到期日期")||0);
+      const days=Math.round((endMs-now)/864e5);
+      const cls=days<0?'danger':days<30?'danger':days<90?'':'ok';
+      const color=days<0?'var(--danger)':days<30?'var(--danger)':days<90?'var(--warn)':'var(--ok)';
+      return `<div class="expiry-item ${cls}">
+        <div class="ei-top">
+          <span class="ei-name">${ip}</span>
+          <span class="ei-days" style="background:${color}20;color:${color}">${days<0?'已到期':days+'天後到期'}</span>
+        </div>
+        <div style="font-size:11px;color:var(--txt-mid);">${_fv(f,"版權方")||''} · ${_fv(f,"授權區域")||''} · 到期：${new Date(endMs).toLocaleDateString('zh-TW')}</div>
+        ${days<90&&days>0?`<div style="font-size:11px;color:var(--warn);margin-top:4px;">⚠ 請安然確認是否續約</div>`:''}
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('expiry-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div>載入失敗</div>';
+  }
+}
+
+/* ── CONTRACT AI PARSE ── */
+function handleFileDrop(e){const f=e.dataTransfer.files[0];if(f)processFile(f);}
+function handleFileUpload(input){if(input.files[0])processFile(input.files[0]);}
+async function processFile(file){
+  _currentFileName=file.name;
+  const demo=document.getElementById('parse-demo');
+  demo.style.display='block';
+  demo.innerHTML=`<div style="padding:20px;text-align:center;color:var(--txt-mid);"><div style="font-size:28px;margin-bottom:8px">🤖</div>AI 解析中 · ${file.name}</div>`;
+  try{
+    const base64=await fileToBase64(file);
+    const mimeType=file.type||(file.name.endsWith('.pdf')?'application/pdf':'image/jpeg');
+    const parsed=await callGeminiParse(base64,mimeType,file.name);
+    _parsedResult=parsed;
+    showParseResult(parsed,file.name);
+  }catch(e){
+    demo.innerHTML=`<div style="padding:16px;color:var(--danger);font-size:13px">解析失敗：${e.message}</div>`;
+  }
+}
 function fileToBase64(file){
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = () => res(reader.result.split(',')[1]);
-    reader.onerror = rej;
-    reader.readAsDataURL(file);
-  });
+  return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
 }
-
-async function callGeminiParse(base64, mimeType, fileName){
-  const prompt = `你是蕪解創意的 AI 合約解析助理。請從以下IP授權合約中精確抽取關鍵條款，以 JSON 格式返回。
-
-必須抽取以下欄位（找不到的填 null）：
-{
-  "ip_name": "IP名稱（如 Snoopy / Opanchu / Muziktiger）",
-  "licensor": "版權方/代理商名稱",
-  "territory": "授權地區",
-  "categories": "授權品類",
-  "start_date": "授權開始日期 YYYY-MM-DD",
-  "end_date": "授權結束日期 YYYY-MM-DD",
-  "mg_annual": "年保底金額（僅數字，單位附在 currency 欄）",
-  "royalty_rate": "版稅率（如 9%）",
-  "currency": "幣別（USD/RMB/HKD等）",
-  "first_payment": "首期付款金額（含時限說明）",
-  "penalty": "違約條款摘要",
-  "notes": "其他重要條款（如產品類型限制、樣品審批要求）"
+async function callGeminiParse(base64,mimeType,fileName){
+  const prompt=`你是蕪解創意的AI合約解析助理。從IP授權合約中精確抽取關鍵條款，以JSON格式返回。
+欄位（找不到填null）：{"ip_name":"IP名稱","licensor":"版權方","territory":"授權地區","categories":"授權品類","start_date":"YYYY-MM-DD","end_date":"YYYY-MM-DD","mg_annual":"年保底金額（數字）","royalty_rate":"版稅率","currency":"幣別","first_payment":"首期付款說明","penalty":"違約條款摘要","notes":"其他重要條款"}
+只返回JSON。`;
+  const body={contents:[{parts:[{text:prompt},{inline_data:{mime_type:mimeType,data:base64}}]}],generationConfig:{temperature:0.1,maxOutputTokens:1024}};
+  const r=await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const d=await r.json();
+  const text=d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+  const m=text.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error("AI 無法解析此文件");
+  return JSON.parse(m[0]);
 }
-
-只返回 JSON，不要其他文字。`;
-
-  const body = {
-    contents:[{parts:[
-      {text: prompt},
-      {inline_data:{mime_type: mimeType, data: base64}}
-    ]}],
-    generationConfig:{temperature:0.1, maxOutputTokens:1024}
-  };
-
-  const r = await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  const d = await r.json();
-  const text = d.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if(!jsonMatch) throw new Error("AI 無法解析此文件");
-  return JSON.parse(jsonMatch[0]);
-}
-
-function showParseResult(p, fileName){
-  const demo = document.getElementById('parse-demo');
-  const safe = v => v||'—';
-  demo.innerHTML = `
+function showParseResult(p,fileName){
+  const safe=v=>v||'—';
+  document.getElementById('parse-demo').innerHTML=`
     <div class="apr-header">
       <span class="apr-ai">✨ AI 解析完成</span>
       <span class="apr-title">${fileName}</span>
-      <span class="apr-conf">請安然人工核對</span>
     </div>
     <div class="key-terms">
       <div class="kt-cell"><div class="kt-label">IP 名稱</div><div class="kt-val">${safe(p.ip_name)}</div></div>
@@ -617,96 +752,57 @@ function showParseResult(p, fileName){
       <div class="kt-cell"><div class="kt-label">首期付款</div><div class="kt-val danger" style="font-size:11px">${safe(p.first_payment)}</div></div>
     </div>
     ${p.penalty?`<div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px">⚠ 違約：${p.penalty}</div>`:''}
-    ${p.notes?`<div style="font-size:11px;color:var(--txt-lo);margin-bottom:10px">📝 備注：${p.notes}</div>`:''}
-    <div class="apr-actions">
-      <button class="btn btn-confirm" onclick="saveContractToFeishu()">✓ 確認後存入知識庫</button>
-      <button class="btn btn-edit" onclick="toggleEditMode()">✏ 人工修改</button>
+    <div class="oc-actions">
+      <button class="btn btn-ok" onclick="saveContractToFeishu()">✓ 確認存入合約庫</button>
+      <button class="btn btn-ghost">✏ 人工修改</button>
     </div>
-    <div id="save-result" style="display:none;margin-top:8px;font-size:12px;"></div>
-    <div style="font-size:10px;color:var(--txt-lo);margin-top:8px;">⚠ 安然必須人工確認每一筆——合約數字入庫後，全系統查詢都以此為準</div>
-  `;
+    <div id="save-result" style="display:none;margin-top:8px;font-size:12px;text-align:center;"></div>
+    <div style="font-size:10px;color:var(--txt-lo);margin-top:8px;">⚠ 安然必須人工確認——入庫後全系統查詢以此為準</div>`;
 }
-
 async function saveContractToFeishu(){
   if(!_parsedResult) return;
-  const p = _parsedResult;
-  const resultEl = document.getElementById('save-result');
-  resultEl.style.display='block'; resultEl.style.color='var(--txt-mid)'; resultEl.textContent='存入中...';
+  const p=_parsedResult;
+  const el=document.getElementById('save-result');
+  el.style.display='block';el.style.color='var(--txt-mid)';el.textContent='存入中...';
   try{
-    const tk = await _getToken();
-    const now = new Date();
-    const fields = {
-      "IP品牌": p.ip_name||_currentFileName,
-      "版權方": p.licensor||"",
-      "授權區域": p.territory||"",
-      "授權品類": p.categories||"",
-      "合約起始日": p.start_date?new Date(p.start_date).getTime():null,
-      "合約結束日": p.end_date?new Date(p.end_date).getTime():null,
-      "幣別": p.currency||"RMB",
-      "保底金額": p.mg_annual?Number(String(p.mg_annual).replace(/[^0-9.]/g,'')):null,
-      "版稅率": p.royalty_rate||"",
-      "違約條款": p.penalty||"",
-      "備注": p.notes||"",
-      "合約狀態": "有效",
-      "確認人": JSON.parse(localStorage.getItem("wujie_session")||"{}").name||"安然",
-      "確認日期": now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0"),
-    };
-    Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]==="") delete fields[k]; });
-    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_CONTRACT_TBL+"/records",{
-      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
-      body:JSON.stringify({fields})
-    });
-    const d = await r.json();
-    if(d.code===0){
-      resultEl.style.color='var(--ok)';
-      resultEl.textContent='✅ 已存入合約知識庫！全系統查詢生效。';
-    }else{
-      resultEl.style.color='var(--danger)';
-      resultEl.textContent='存入失敗：'+JSON.stringify(d);
-    }
-  }catch(e){
-    resultEl.style.color='var(--danger)';
-    resultEl.textContent='存入失敗：'+e.message;
-  }
+    const fields={"IP品牌":p.ip_name||_currentFileName,"版權方":p.licensor||"","授權區域":p.territory||"","授權品類":p.categories||"","幣別":p.currency||"RMB","保底金額":p.mg_annual?Number(String(p.mg_annual).replace(/[^0-9.]/g,'')):null,"版稅率":p.royalty_rate||"","主要條款摘要":p.penalty||"","特殊條款":p.notes||"","合約狀態":"有效"};
+    if(p.start_date) fields["簽約日期"]=new Date(p.start_date).getTime();
+    if(p.end_date) fields["到期日期"]=new Date(p.end_date).getTime();
+    Object.keys(fields).forEach(k=>{if(fields[k]===null||fields[k]==="")delete fields[k];});
+    const d=await _createRecord(_TBLS.contract,fields);
+    if(d.code===0){el.style.color='var(--ok)';el.textContent='✅ 已存入合約庫！';}
+    else{el.style.color='var(--danger)';el.textContent='存入失敗：'+JSON.stringify(d);}
+  }catch(e){el.style.color='var(--danger)';el.textContent='存入失敗：'+e.message;}
 }
 
 /* ── CONTRACT QUERY ── */
+function quickQuery(q){document.getElementById('qb-in').value=q;runContractQuery();}
 async function runContractQuery(){
-  const q = document.getElementById('qb-in').value.trim();
-  const resultEl = document.getElementById('qb-result');
-  const btn = document.getElementById('qb-btn');
+  const q=document.getElementById('qb-in').value.trim();
+  const el=document.getElementById('qb-result');
+  const btn=document.getElementById('qb-btn');
   if(!q) return;
-  btn.disabled=true; btn.textContent='查詢中...';
-  resultEl.style.display='block'; resultEl.innerHTML='<span style="color:var(--txt-mid)">AI 查詢中...</span>';
+  btn.disabled=true;btn.textContent='查詢中...';
+  el.style.display='block';el.innerHTML='<span style="color:var(--txt-mid)">AI 查詢中...</span>';
   try{
-    const tk = await _getToken();
-    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_CONTRACT_TBL+"/records?page_size=100",{headers:{"Authorization":"Bearer "+tk}});
-    const d = await r.json();
-    const contracts = (d.data?.items||[]).map(i=>{
+    const items=await _getRecords(_TBLS.contract);
+    const contracts=items.map(i=>{
       const f=i.fields;
-      return `IP: ${_fv(f,"IP品牌")} | 區域: ${_fv(f,"授權區域")} | 保底: ${_fv(f,"幣別")} ${_fv(f,"保底金額")}/年 | 版稅: ${_fv(f,"版稅率")} | 到期: ${_fv(f,"合約結束日")} | 狀態: ${_fv(f,"合約狀態")}`;
-    }).filter(s=>s.length>10).join("\n");
-
-    const prompt = `你是蕪解創意的合約知識庫助理。根據以下合約資料回答問題。
-回答要直接、精確，引用具體數字，不超過 100 字。
-
-合約資料：
-${contracts||"（尚無合約記錄）"}
-
-問題：${q}`;
-
-    const gemR = await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-      contents:[{parts:[{text:prompt}]}],
-      generationConfig:{temperature:0.1,maxOutputTokens:300}
-    })});
-    const gemD = await gemR.json();
-    const ans = gemD.candidates?.[0]?.content?.parts?.[0]?.text || "查詢失敗";
-    resultEl.innerHTML = ans.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  }catch(e){
-    resultEl.innerHTML = `<span style="color:var(--danger)">查詢失敗：${e.message}</span>`;
-  }
-  btn.disabled=false; btn.textContent='問';
+      return `IP:${_fv(f,"IP品牌")} 版權方:${_fv(f,"版權方")} 區域:${_fv(f,"授權區域")} 保底:${_fv(f,"幣別")}${_fv(f,"保底金額")}/年 版稅:${_fv(f,"版稅率")} 到期:${_fv(f,"到期日期")||_fv(f,"合約結束日")} 狀態:${_fv(f,"合約狀態")}`;
+    }).filter(s=>s.length>20).join("\n");
+    const prompt=`你是蕪解創意合約知識庫助理。根據合約資料精確回答問題，引用具體數字，不超過100字。\n合約資料：\n${contracts||"（尚無記錄）"}\n問題：${q}`;
+    const r=await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.1,maxOutputTokens:300}})});
+    const d=await r.json();
+    const ans=d.candidates?.[0]?.content?.parts?.[0]?.text||"查詢失敗";
+    el.innerHTML=ans.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  }catch(e){el.innerHTML=`<span style="color:var(--danger)">查詢失敗：${e.message}</span>`;}
+  btn.disabled=false;btn.textContent='問 AI';
 }
+
+/* ── INIT ── */
+loadKPIs();
+loadOrders();
+loadApprovals();
 </script>
 </body>
 </html>
