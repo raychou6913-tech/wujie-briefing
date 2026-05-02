@@ -10,113 +10,195 @@
   --border:#222535;--border-hi:#363b58;
   --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
   --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
-  --warn:#f59e0b;--warn-dim:#f59e0b18;--danger:#ef4444;--danger-dim:#ef444418;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --fig-color:#818cf8;--nonfig-color:#10b981;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.brand{display:flex;align-items:center;gap:8px;}
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:10px;}
 .brand-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent);}
 .brand-name{font-size:14px;font-weight:700;}
-.brand-sub{font-size:11px;color:var(--txt-mid);}
-.nav-back{font-size:12px;color:var(--txt-mid);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:6px;min-height:34px;display:flex;align-items:center;}
+.brand-sub{font-size:10px;color:var(--txt-mid);}
+.nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
 
-/* ── KPI BAR ── */
-.kpi-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;}
-.kpi-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;min-width:calc(50% - 5px);}
-.kpi-label{font-size:9px;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
-.kpi-val{font-size:20px;font-weight:800;line-height:1;}
-.kpi-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+/* MAIN */
+.main{max-width:900px;margin:0 auto;padding:20px 24px;}
 
-/* ── PROJECT PICKER ── */
-.proj-strip{padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.proj-pill{flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:36px;}
+/* SECTION HEAD */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;}
+.sec-head:first-child{margin-top:0;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:10px;color:var(--accent);text-decoration:none;cursor:pointer;}
+
+/* KPI ROW — big cards */
+.kpi-big-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.kpi-big-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:10px;}
+.kpi-big-val{font-size:36px;font-weight:800;line-height:1;margin-bottom:2px;}
+.kpi-big-sub{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
+.kpi-big-trend{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;}
+.trend-up{background:var(--ok-dim);color:var(--ok);}
+.trend-dn{background:var(--danger-dim);color:var(--danger);}
+.trend-warn{background:var(--warn-dim);color:var(--warn);}
+.prog{background:var(--card2);border-radius:3px;height:5px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.kpi-big-footer{display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo);margin-top:5px;}
+
+/* CHIP */
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-info{background:#818cf820;color:var(--accent);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+.chip-nonfig{background:#10b98120;color:#10b981;}
+
+/* PROJECT PICKER */
+.proj-strip{padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.proj-strip::-webkit-scrollbar{display:none;}
+.proj-pill{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:36px;display:flex;align-items:center;gap:6px;transition:all .15s;}
+.proj-pill:hover{border-color:var(--border-hi);color:var(--txt-hi);}
 .proj-pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.proj-pill .pp-status{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;}
-.pp-active{background:var(--ok);}
-.pp-warn{background:var(--warn);}
-.pp-wait{background:var(--txt-lo);}
+.proj-pill.blocked{border-color:var(--danger);}
+.pp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.pp-active-dot{background:var(--ok);}
+.pp-warn-dot{background:var(--warn);}
+.pp-blocked-dot{background:var(--danger);}
+.pp-wait-dot{background:var(--txt-lo);}
 
-.main{max-width:720px;margin:0 auto;padding:16px;}
-.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:10px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+/* IP CARD LIST (overview) */
+.ip-cards{display:flex;flex-direction:column;gap:12px;}
 
-/* ── PROJECT HEADER ── */
-.proj-header{margin-bottom:16px;}
-.proj-title{font-size:18px;font-weight:800;margin-bottom:4px;}
-.proj-meta{font-size:11px;color:var(--txt-mid);margin-bottom:10px;line-height:1.6;}
-.type-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--accent);color:#fff;vertical-align:middle;margin-left:6px;}
-.type-nonfig{background:#10b981;}
+/* IP CARD */
+.ip-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:border-color .15s;}
+.ip-card:hover{border-color:var(--border-hi);}
+.ip-card.selected{border-color:var(--accent);}
+.ip-card.blocked-card{border-left:3px solid var(--danger);}
 
-/* ── PROGRESS BAR ── */
-.stage-bar{display:flex;gap:3px;margin-bottom:6px;}
-.sb-seg{flex:1;height:6px;border-radius:3px;background:var(--border);}
-.sb-done{background:var(--ok);}
-.sb-active{background:var(--accent);}
-.sb-blocked{background:var(--danger);}
-.stage-bar-labels{display:flex;gap:3px;margin-bottom:14px;}
-.sbl{flex:1;font-size:8px;color:var(--txt-lo);text-align:center;overflow:hidden;white-space:nowrap;}
-.sbl.done{color:var(--ok);}
-.sbl.active{color:var(--accent);}
+.ip-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.ip-card-left{flex:1;min-width:0;}
+.ip-card-title{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ip-type-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.fig-badge{background:#818cf820;color:var(--accent);}
+.nonfig-badge{background:#10b98120;color:#10b981;}
+.ip-card-meta{font-size:11px;color:var(--txt-mid);line-height:1.7;}
 
-/* ── TIMELINE ── */
+.ip-card-right{text-align:right;flex-shrink:0;}
+.ip-launch-label{font-size:9px;color:var(--txt-lo);font-weight:600;letter-spacing:.05em;margin-bottom:2px;}
+.ip-launch-val{font-size:13px;font-weight:700;color:var(--txt-hi);}
+.ip-owner-val{font-size:10px;color:var(--txt-mid);margin-top:4px;}
+
+/* STAGE PROGRESS BAR */
+.stage-prog-wrap{margin-bottom:10px;}
+.stage-prog-bar{display:flex;gap:3px;margin-bottom:5px;}
+.sp-seg{flex:1;height:7px;border-radius:4px;background:var(--border);}
+.sp-done{background:var(--ok);}
+.sp-active{background:var(--accent);box-shadow:0 0 6px #818cf860;}
+.sp-blocked{background:var(--danger);}
+.stage-prog-labels{display:flex;gap:3px;}
+.spl{flex:1;font-size:8px;color:var(--txt-lo);text-align:center;overflow:hidden;white-space:nowrap;line-height:1.3;}
+.spl.done{color:var(--ok);}
+.spl.active{color:var(--accent);}
+.spl.blocked{color:var(--danger);}
+
+/* BLOCKED ALERT */
+.blocked-alert{background:var(--danger-dim);border:1px solid #ef444430;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-top:10px;}
+.blocked-alert-icon{font-size:16px;flex-shrink:0;}
+.blocked-alert-text{flex:1;min-width:0;}
+.blocked-alert-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:2px;}
+.blocked-alert-desc{font-size:10px;color:var(--txt-mid);line-height:1.5;}
+.blocked-days{font-size:11px;font-weight:700;color:var(--danger);white-space:nowrap;flex-shrink:0;}
+
+/* IP CARD STATS ROW */
+.ip-card-stats{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;}
+.ip-stat{display:flex;flex-direction:column;gap:2px;}
+.ip-stat-label{font-size:9px;color:var(--txt-lo);}
+.ip-stat-val{font-size:12px;font-weight:700;}
+
+/* DETAIL PANEL */
+.detail-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:12px;}
+.detail-header{margin-bottom:18px;}
+.detail-title{font-size:20px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.detail-meta{font-size:11px;color:var(--txt-mid);line-height:1.8;margin-bottom:12px;}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* BRANCH INFO */
+.branch-info{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.branch-icon{font-size:18px;flex-shrink:0;}
+.branch-body{flex:1;}
+.branch-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.branch-desc{font-size:10px;color:var(--txt-mid);line-height:1.5;}
+
+/* TIMELINE */
 .timeline{display:flex;flex-direction:column;gap:0;}
 .tl-item{display:flex;gap:0;position:relative;}
-.tl-left{width:80px;flex-shrink:0;padding:4px 12px 4px 0;text-align:right;}
+.tl-left{width:90px;flex-shrink:0;padding:4px 12px 4px 0;text-align:right;}
 .tl-num{font-size:9px;color:var(--txt-lo);font-weight:700;}
-.tl-name{font-size:11px;color:var(--txt-mid);font-weight:600;margin-top:2px;}
-.tl-owner{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+.tl-name{font-size:11px;color:var(--txt-mid);font-weight:600;margin-top:2px;line-height:1.3;}
+.tl-owner{font-size:9px;color:var(--txt-lo);margin-top:2px;line-height:1.3;}
 .tl-connector{width:24px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:6px;}
 .tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
 .dot-done{background:var(--ok);}
 .dot-active{background:var(--accent);box-shadow:0 0 8px var(--accent);}
-.dot-blocked{background:var(--danger);}
+.dot-blocked{background:var(--danger);box-shadow:0 0 8px var(--danger);}
 .dot-wait{background:var(--border-hi);}
 .tl-line{flex:1;width:2px;background:var(--border);min-height:20px;}
 .tl-right{flex:1;padding:0 0 20px 4px;}
-.tl-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:2px;}
+.tl-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:13px;margin-top:2px;}
 .tl-card.tc-done{border-color:#22c55e30;}
 .tl-card.tc-active{border-color:var(--accent);}
-.tl-card.tc-blocked{border-color:var(--danger);}
-.tl-card.tc-wait{opacity:.45;}
-.tc-status{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.tl-card.tc-blocked{border-color:var(--danger);background:#ef444408;}
+.tl-card.tc-wait{opacity:.4;}
+.tc-status{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
 .tc-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
 .tcb-done{background:var(--ok-dim);color:var(--ok);}
 .tcb-active{background:#818cf820;color:var(--accent);}
 .tcb-blocked{background:var(--danger-dim);color:var(--danger);}
 .tcb-wait{background:var(--border);color:var(--txt-lo);}
 .tc-date{font-size:10px;color:var(--txt-mid);margin-left:auto;}
-.tc-desc{font-size:12px;color:var(--txt-hi);line-height:1.6;margin-bottom:8px;}
-.tc-parallel{background:var(--card);border-radius:8px;padding:10px;margin-bottom:8px;}
-.tcp-title{font-size:9px;color:var(--txt-lo);font-weight:700;margin-bottom:6px;text-transform:uppercase;}
-.tcp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.tc-desc{font-size:12px;color:var(--txt-hi);line-height:1.6;margin-bottom:10px;}
+.tc-parallel{background:var(--card);border-radius:8px;padding:10px;margin-bottom:10px;}
+.tcp-title{font-size:9px;color:var(--txt-lo);font-weight:700;margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em;}
+.tcp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.tcp-row:last-child{margin-bottom:0;}
 .tcp-label{font-size:11px;color:var(--txt-mid);}
-.tcp-status{font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;}
+.tcp-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;}
 .tcs-ok{background:var(--ok-dim);color:var(--ok);}
 .tcs-active{background:#818cf820;color:var(--accent);}
 .tcs-wait{background:var(--border);color:var(--txt-lo);}
+.tcs-block{background:var(--danger-dim);color:var(--danger);}
 .tc-actions{display:flex;gap:6px;flex-wrap:wrap;}
-.tc-btn{font-size:11px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;border:1px solid;min-height:34px;}
+.tc-btn{font-size:11px;font-weight:600;padding:7px 13px;border-radius:8px;cursor:pointer;border:1px solid;min-height:34px;}
 .tcb-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-.tcb-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.tcb-warn-btn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
 .tcb-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
 
-/* ── NEW PROJECT FORM ── */
+/* NEW PROJECT FORM */
 .inp{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px 12px;border-radius:8px;font-size:14px;margin-bottom:8px;}
 .inp::placeholder{color:var(--txt-lo);}
 select.inp option{background:var(--card2);}
-.btn-ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;min-height:44px;}
+.btn-ok-full{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%;min-height:44px;}
 
-/* ── EMPTY ── */
-.empty{text-align:center;padding:32px 16px;color:var(--txt-lo);}
-.empty-icon{font-size:28px;margin-bottom:8px;}
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px;color:var(--txt-lo);}
+.empty-icon{font-size:32px;margin-bottom:8px;}
 
-@media(min-width:600px){
-  .kpi-chip{min-width:calc(33% - 7px);}
-  .main{padding:20px 24px;}
-  .topbar,.kpi-bar,.proj-strip{padding-left:24px;padding-right:24px;}
-  .tl-left{width:100px;}
+/* LOADING */
+.loading{color:var(--txt-lo);font-size:11px;padding:16px 0;text-align:center;}
+
+@media(max-width:640px){
+  .main{padding:14px;}
+  .kpi-big-row{grid-template-columns:1fr 1fr;}
+  .topbar,.proj-strip{padding-left:14px;padding-right:14px;}
+  .tl-left{width:72px;}
+  .ip-card-stats{gap:8px;}
+}
+@media(max-width:420px){
+  .kpi-big-row{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -125,103 +207,268 @@ select.inp option{background:var(--card2);}
 <div class="topbar">
   <div class="brand">
     <div class="brand-dot"></div>
-    <div>
-      <span class="brand-name">蕪解 ERP</span>
-      <span class="brand-sub"> 產品開發流水線</span>
-    </div>
+    <div><div class="brand-name">蕪解 ERP</div><div class="brand-sub">產品開發流水線</div></div>
   </div>
   <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
 </div>
 
-<!-- ── KPI BAR ── -->
-<div class="kpi-bar">
-  <div class="kpi-chip">
-    <div class="kpi-label">進行中項目</div>
-    <div class="kpi-val" id="kpi-active" style="color:var(--accent)">—</div>
-    <div class="kpi-sub" id="kpi-active-sub">—</div>
-  </div>
-  <div class="kpi-chip">
-    <div class="kpi-label">等版權方回覆</div>
-    <div class="kpi-val" id="kpi-waiting" style="color:var(--warn)">—</div>
-    <div class="kpi-sub">送審中</div>
-  </div>
-  <div class="kpi-chip">
-    <div class="kpi-label">本月可進大貨</div>
-    <div class="kpi-val" id="kpi-ready" style="color:var(--ok)">—</div>
-    <div class="kpi-sub">打樣已通過</div>
-  </div>
-</div>
-
-<!-- ── PROJECT STRIP ── -->
+<!-- PROJECT STRIP -->
 <div class="proj-strip" id="proj-strip">
-  <div style="color:var(--txt-lo);font-size:12px;padding:8px;">載入中...</div>
+  <div class="loading">載入中…</div>
 </div>
 
 <div class="main">
-  <div id="proj-detail">
-    <div class="empty"><div class="empty-icon">👆</div>選擇上方項目查看流水線</div>
+
+  <!-- KPI BIG ROW -->
+  <div class="sec-head" style="margin-top:0;margin-bottom:10px;">
+    <span class="sec-title">流水線核心指標</span>
+    <span class="sec-link" onclick="loadProjects()">↻ 重新整理</span>
+  </div>
+  <div class="kpi-big-row">
+    <div class="kpi-big">
+      <div class="kpi-big-label">進行中項目</div>
+      <div class="kpi-big-val" id="kpi-active" style="color:var(--accent)">4</div>
+      <div class="kpi-big-sub" id="kpi-active-sub">共 7 個項目</div>
+      <span class="kpi-big-trend trend-up" id="kpi-active-trend">全力推進中</span>
+      <div class="prog"><div id="kpi-active-bar" class="prog-fill" style="width:57%;background:var(--accent)"></div></div>
+      <div class="kpi-big-footer"><span>公仔 3 · 非公仔 1</span><span id="kpi-active-foot">4/7 進行中</span></div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-big-label">待版權方回覆</div>
+      <div class="kpi-big-val" id="kpi-waiting" style="color:var(--warn)">2</div>
+      <div class="kpi-big-sub" id="kpi-waiting-sub">送審等待中</div>
+      <span class="kpi-big-trend trend-warn" id="kpi-waiting-trend">最長等待 14 天</span>
+      <div class="prog"><div id="kpi-waiting-bar" class="prog-fill" style="width:29%;background:var(--warn)"></div></div>
+      <div class="kpi-big-footer"><span>Muziktiger 卡關最久</span><span id="kpi-waiting-foot">2D/打樣階段</span></div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-big-label">本月可進大貨</div>
+      <div class="kpi-big-val" id="kpi-ready" style="color:var(--ok)">1</div>
+      <div class="kpi-big-sub" id="kpi-ready-sub">打樣已通過</div>
+      <span class="kpi-big-trend trend-up" id="kpi-ready-trend">Snoopy 夏季就緒</span>
+      <div class="prog"><div id="kpi-ready-bar" class="prog-fill" style="width:14%;background:var(--ok)"></div></div>
+      <div class="kpi-big-footer"><span>等四方確認大貨</span><span id="kpi-ready-foot">預計 Q3 上市</span></div>
+    </div>
   </div>
 
-  <!-- 新增項目 -->
-  <div style="margin-top:8px;">
-    <button class="tcb-ghost tc-btn" style="width:100%;min-height:44px;" onclick="toggleNewForm()">+ 新增產品開發項目</button>
-    <div id="new-form" style="display:none;" class="card" style="margin-top:8px;">
-      <div class="section-title">新增項目</div>
-      <input class="inp" id="nf-name" placeholder="產品名稱">
+  <!-- IP CARD LIST -->
+  <div class="sec-head">
+    <span class="sec-title">所有項目 · 點擊查看流水線</span>
+    <span class="sec-link" onclick="toggleNewForm()">+ 新增項目</span>
+  </div>
+
+  <div class="ip-cards" id="ip-cards">
+    <!-- Demo cards pre-filled; overwritten by Feishu on load -->
+    <!-- Snoopy -->
+    <div class="ip-card" id="demo-snoopy" onclick="selectDemoCard(this,'snoopy')">
+      <div class="ip-card-top">
+        <div class="ip-card-left">
+          <div class="ip-card-title">
+            Snoopy 夏季系列公仔
+            <span class="ip-type-badge fig-badge">公仔 7 輪</span>
+            <span class="chip chip-ok">大貨確認中</span>
+          </div>
+          <div class="ip-card-meta">
+            IP：Snoopy &nbsp;·&nbsp; 負責人：Bevis &nbsp;·&nbsp; 版權方：Peanuts / 北京代理<br>
+            當前階段：大貨生產 &nbsp;·&nbsp; 打樣狀態：通過 ✓
+          </div>
+        </div>
+        <div class="ip-card-right">
+          <div class="ip-launch-label">預計上市</div>
+          <div class="ip-launch-val" style="color:var(--ok)">2026-Q3</div>
+          <div class="ip-owner-val">詩彤 / 珮玲</div>
+        </div>
+      </div>
+      <div class="stage-prog-wrap">
+        <div class="stage-prog-bar" id="bar-snoopy"></div>
+        <div class="stage-prog-labels" id="labels-snoopy"></div>
+      </div>
+      <div class="ip-card-stats">
+        <div class="ip-stat"><span class="ip-stat-label">送審輪次</span><span class="ip-stat-val" style="color:var(--accent)">第 3 輪</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">建議售價</span><span class="ip-stat-val">¥ 199</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">2,000 件</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">毛利率</span><span class="ip-stat-val" style="color:var(--ok)">52%</span></div>
+      </div>
+    </div>
+
+    <!-- Muziktiger — blocked -->
+    <div class="ip-card blocked-card" id="demo-muziktiger" onclick="selectDemoCard(this,'muziktiger')">
+      <div class="ip-card-top">
+        <div class="ip-card-left">
+          <div class="ip-card-title">
+            Muziktiger 音樂節公仔
+            <span class="ip-type-badge fig-badge">公仔 7 輪</span>
+            <span class="chip chip-danger">版權卡關 14天</span>
+          </div>
+          <div class="ip-card-meta">
+            IP：Muziktiger &nbsp;·&nbsp; 負責人：珮玲 &nbsp;·&nbsp; 版權方：日本 Muziktiger 官方<br>
+            當前階段：打樣送審 &nbsp;·&nbsp; 版權送審狀態：等待回覆（送出 14 天）
+          </div>
+        </div>
+        <div class="ip-card-right">
+          <div class="ip-launch-label">預計上市</div>
+          <div class="ip-launch-val" style="color:var(--warn)">2026-Q3</div>
+          <div class="ip-owner-val">珮玲 / 詩彤</div>
+        </div>
+      </div>
+      <div class="stage-prog-wrap">
+        <div class="stage-prog-bar" id="bar-muziktiger"></div>
+        <div class="stage-prog-labels" id="labels-muziktiger"></div>
+      </div>
+      <div class="blocked-alert">
+        <div class="blocked-alert-icon">⚠️</div>
+        <div class="blocked-alert-text">
+          <div class="blocked-alert-title">版權方未回覆 — 安然持續追催中</div>
+          <div class="blocked-alert-desc">打樣已寄出 DHL，日本已獲收。等版權方書面確認後方可進上色打樣。</div>
+        </div>
+        <div class="blocked-days">+14 天</div>
+      </div>
+      <div class="ip-card-stats" style="margin-top:10px;">
+        <div class="ip-stat"><span class="ip-stat-label">送審輪次</span><span class="ip-stat-val" style="color:var(--warn)">第 5 輪</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">建議售價</span><span class="ip-stat-val">¥ 179</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">1,500 件</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">毛利率</span><span class="ip-stat-val" style="color:var(--ok)">48%</span></div>
+      </div>
+    </div>
+
+    <!-- Opanchu -->
+    <div class="ip-card" id="demo-opanchu" onclick="selectDemoCard(this,'opanchu')">
+      <div class="ip-card-top">
+        <div class="ip-card-left">
+          <div class="ip-card-title">
+            Opanchu 兔年紀念版
+            <span class="ip-type-badge fig-badge">公仔 7 輪</span>
+            <span class="chip chip-info">2D 送審中</span>
+          </div>
+          <div class="ip-card-meta">
+            IP：Opanchu &nbsp;·&nbsp; 負責人：詩彤 &nbsp;·&nbsp; 版權方：韓國 Opanchu 代理<br>
+            當前階段：2D 送審 &nbsp;·&nbsp; 版權送審狀態：等待回覆（第 2 輪）
+          </div>
+        </div>
+        <div class="ip-card-right">
+          <div class="ip-launch-label">預計上市</div>
+          <div class="ip-launch-val" style="color:var(--accent)">2026-Q4</div>
+          <div class="ip-owner-val">詩彤 / Bevis</div>
+        </div>
+      </div>
+      <div class="stage-prog-wrap">
+        <div class="stage-prog-bar" id="bar-opanchu"></div>
+        <div class="stage-prog-labels" id="labels-opanchu"></div>
+      </div>
+      <div class="ip-card-stats">
+        <div class="ip-stat"><span class="ip-stat-label">送審輪次</span><span class="ip-stat-val" style="color:var(--accent)">第 2 輪</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">建議售價</span><span class="ip-stat-val">¥ 159</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">1,200 件</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">毛利率</span><span class="ip-stat-val" style="color:var(--ok)">50%</span></div>
+      </div>
+    </div>
+
+    <!-- Chiikawa -->
+    <div class="ip-card" id="demo-chiikawa" onclick="selectDemoCard(this,'chiikawa')">
+      <div class="ip-card-top">
+        <div class="ip-card-left">
+          <div class="ip-card-title">
+            Chiikawa 環保袋（聯名款）
+            <span class="ip-type-badge nonfig-badge">非公仔 5 輪</span>
+            <span class="chip chip-info">設計送審中</span>
+          </div>
+          <div class="ip-card-meta">
+            IP：Chiikawa &nbsp;·&nbsp; 負責人：珮玲 &nbsp;·&nbsp; 版權方：日本 Chiikawa 官方<br>
+            當前階段：產品設計送審 &nbsp;·&nbsp; 版權送審狀態：等待回覆（第 1 輪）
+          </div>
+        </div>
+        <div class="ip-card-right">
+          <div class="ip-launch-label">預計上市</div>
+          <div class="ip-launch-val" style="color:var(--accent)">2026-Q4</div>
+          <div class="ip-owner-val">珮玲 / 詩彤</div>
+        </div>
+      </div>
+      <div class="stage-prog-wrap">
+        <div class="stage-prog-bar" id="bar-chiikawa"></div>
+        <div class="stage-prog-labels" id="labels-chiikawa"></div>
+      </div>
+      <div class="ip-card-stats">
+        <div class="ip-stat"><span class="ip-stat-label">送審輪次</span><span class="ip-stat-val" style="color:var(--accent)">第 1 輪</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">建議售價</span><span class="ip-stat-val">¥ 99</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">3,000 件</span></div>
+        <div class="ip-stat"><span class="ip-stat-label">毛利率</span><span class="ip-stat-val" style="color:var(--ok)">61%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL PANEL (hidden by default) -->
+  <div id="detail-panel" style="display:none;"></div>
+
+  <!-- NEW PROJECT FORM -->
+  <div style="margin-top:16px;">
+    <div id="new-form" style="display:none;" class="detail-panel">
+      <div class="sec-title" style="margin-bottom:14px;">新增產品開發項目</div>
+      <input class="inp" id="nf-name" placeholder="產品名稱（例：Snoopy 夏季系列公仔）">
       <select class="inp" id="nf-ip">
         <option value="">選擇 IP 品牌</option>
         <option>Snoopy</option><option>Mofusand</option><option>Muziktiger</option>
         <option>Opanchu</option><option>Chiikawa</option><option>SHRUG</option><option>其他</option>
       </select>
       <select class="inp" id="nf-type">
-        <option value="">產品類型</option>
+        <option value="">產品類型（公仔 = 7輪送審 / 非公仔 = 5輪）</option>
         <option>公仔</option><option>非公仔</option>
       </select>
+      <input class="inp" id="nf-owner" placeholder="負責設計師（例：詩彤）">
+      <input class="inp" id="nf-launch" placeholder="預計上市（例：2026-Q3）">
       <input class="inp" id="nf-price" type="number" placeholder="建議零售價（RMB）">
-      <input class="inp" id="nf-qty" type="number" placeholder="預計銷量">
-      <button class="btn-ok" onclick="createProject()">✓ 建立項目</button>
-      <div id="nf-result" style="display:none;margin-top:8px;font-size:12px;text-align:center;"></div>
+      <input class="inp" id="nf-qty" type="number" placeholder="預計銷量（件）">
+      <button class="btn-ok-full" onclick="createProject()">✓ 建立項目</button>
+      <div id="nf-result" style="display:none;margin-top:10px;font-size:12px;text-align:center;"></div>
     </div>
   </div>
-</div>
+
+</div><!-- /main -->
 
 <script>
-const _P  = "https://feishu-proxy.raychou6913.workers.dev";
-const _AT = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _P   = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT  = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
 const _TBL = "tblfX6fsMshb7KL0";
-let _tk=null, _projects=[], _activeId=null;
+const _APR = "tblD6acV3m2ZXJHe";
+let _tk=null, _tkExp=0, _projects=[], _activeId=null, _fromFeishu=false;
 
+/* ── AUTH CHECK ── */
 (function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("login.html");}
 })();
 
+/* ── TOKEN ── */
 async function _getToken(){
-  if(_tk) return _tk;
+  if(_tk&&Date.now()<_tkExp) return _tk;
   const r=await fetch(_P+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
   const d=await r.json();
   _tk=d.tenant_access_token;
-  setTimeout(()=>_tk=null,110*60*1000);
+  _tkExp=Date.now()+6300000;
   return _tk;
 }
-function _fv(f,k){
+
+/* ── fv helper (handles select fields) ── */
+function fv(f,k){
   const v=f[k];
-  if(!v&&v!==0) return "";
-  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
-  if(typeof v==="object") return v.text||v.link||"";
+  if(v===null||v===undefined) return "";
+  if(typeof v==="number") return v;
+  if(typeof v==="string") return v;
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.name||x.value||""):String(x)).join("");
+  if(typeof v==="object") return v.text||v.name||v.value||"";
   return String(v);
 }
+
 async function _getRecords(filter=""){
   const tk=await _getToken();
   const url=`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records?page_size=100${filter?"&filter="+encodeURIComponent(filter):""}`;
-  const r=await fetch(url,{headers:{"Authorization":"Bearer "+tk}});
+  const r=await fetch(url,{headers:{"Authorization":"Bearer "+tk,"Origin":"https://raychou6913-tech.github.io"}});
   const d=await r.json();
   return d.data?.items||[];
 }
 async function _updateRecord(rid,fields){
   const tk=await _getToken();
   const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records/${rid}`,{
-    method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json","Origin":"https://raychou6913-tech.github.io"},
     body:JSON.stringify({fields})
   });
   return r.json();
@@ -229,230 +476,512 @@ async function _updateRecord(rid,fields){
 async function _createRecord(fields){
   const tk=await _getToken();
   const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records`,{
-    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+    method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json","Origin":"https://raychou6913-tech.github.io"},
     body:JSON.stringify({fields})
   });
   return r.json();
 }
 
 /* ── STAGE DEFINITIONS ── */
-const STAGES_FIGURINE=[
-  {key:"主題確認",label:"主題",owner:"Ray/安然/Shawn"},
-  {key:"概念視覺",label:"概念圖",owner:"詩彤/Forge"},
-  {key:"2D送審",label:"2D送審",owner:"珮玲"},
-  {key:"3D建模",label:"3D建模",owner:"Bevis/外包"},
-  {key:"打樣送審",label:"打樣",owner:"採購寄出"},
-  {key:"上色打樣",label:"上色",owner:"採購寄出"},
-  {key:"大貨生產",label:"大貨",owner:"採購/設計"},
+const STAGES_FIG=[
+  {key:"主題確認",  label:"主題",   owner:"Ray/Shawn"},
+  {key:"概念視覺",  label:"概念圖",  owner:"詩彤/Forge"},
+  {key:"2D送審",   label:"2D送審",  owner:"珮玲"},
+  {key:"3D建模",   label:"3D建模",  owner:"Bevis/外包"},
+  {key:"打樣送審",  label:"打樣",   owner:"採購寄出"},
+  {key:"上色打樣",  label:"上色",   owner:"採購寄出"},
+  {key:"大貨生產",  label:"大貨",   owner:"採購/設計"},
 ];
 const STAGES_NONFIG=[
-  {key:"主題確認",label:"主題",owner:"Ray/安然/Shawn"},
-  {key:"概念視覺",label:"概念圖",owner:"詩彤/Forge"},
-  {key:"產品設計送審",label:"設計送審",owner:"珮玲"},
-  {key:"打樣送審",label:"打樣",owner:"採購"},
-  {key:"大貨生產",label:"大貨",owner:"採購/設計"},
+  {key:"主題確認",    label:"主題",   owner:"Ray/Shawn"},
+  {key:"概念視覺",    label:"概念圖",  owner:"詩彤/Forge"},
+  {key:"產品設計送審", label:"設計送審", owner:"珮玲"},
+  {key:"打樣送審",    label:"打樣",   owner:"採購"},
+  {key:"大貨生產",    label:"大貨",   owner:"採購/設計"},
 ];
 
-function getStages(f){
-  return _fv(f,"產品類型")==="非公仔"?STAGES_NONFIG:STAGES_FIGURINE;
+/* Demo project data for progress bars */
+const DEMO_PROJECTS = {
+  snoopy:    {type:"公仔",  stage:"大貨生產",    blocked:false},
+  muziktiger:{type:"公仔",  stage:"打樣送審",    blocked:true},
+  opanchu:   {type:"公仔",  stage:"2D送審",      blocked:false},
+  chiikawa:  {type:"非公仔",stage:"產品設計送審", blocked:false},
+};
+
+/* ── RENDER STAGE PROGRESS BAR ── */
+function renderBar(barEl, labelsEl, type, stage, blocked){
+  const stages = type==="非公仔"?STAGES_NONFIG:STAGES_FIG;
+  const curIdx = stages.findIndex(s=>s.key===stage);
+  barEl.innerHTML = stages.map((s,i)=>{
+    let cls = i<curIdx ? "sp-seg sp-done"
+            : i===curIdx ? (blocked?"sp-seg sp-blocked":"sp-seg sp-active")
+            : "sp-seg";
+    return `<div class="${cls}"></div>`;
+  }).join("");
+  labelsEl.innerHTML = stages.map((s,i)=>{
+    let cls = i<curIdx?"spl done":i===curIdx?(blocked?"spl blocked":"spl active"):"spl";
+    return `<div class="${cls}">${s.label}</div>`;
+  }).join("");
 }
 
-function stageIndex(f){
-  const stages=getStages(f);
-  const cur=_fv(f,"當前階段");
-  const idx=stages.findIndex(s=>s.key===cur);
-  return idx>=0?idx:0;
+/* ── INIT DEMO BARS ── */
+function initDemoBars(){
+  for(const [key,d] of Object.entries(DEMO_PROJECTS)){
+    const barEl = document.getElementById("bar-"+key);
+    const labelsEl = document.getElementById("labels-"+key);
+    if(barEl&&labelsEl) renderBar(barEl,labelsEl,d.type,d.stage,d.blocked);
+  }
 }
+initDemoBars();
 
-/* ── LOAD ── */
+/* ── LOAD FROM FEISHU ── */
 async function loadProjects(){
   try{
-    _projects=await _getRecords();
-    renderStrip();
+    const items = await _getRecords();
+    if(!items||items.length===0) return; // Keep demo data
+    _projects = items;
+    _fromFeishu = true;
+    renderAllFromFeishu();
     updateKPIs();
-    if(_projects.length>0) selectProject(_projects[0].record_id);
+    renderStrip();
   }catch(e){
-    document.getElementById('proj-strip').innerHTML='<div style="color:var(--danger);font-size:12px;padding:8px;">載入失敗：'+e.message+'</div>';
+    console.warn("Feishu load failed, keeping demo data:", e.message);
+    updateKPIsDemoFallback();
   }
 }
 
-function updateKPIs(){
-  const active=_projects.filter(p=>{
-    const st=_fv(p.fields,"立項狀態");
-    return st!=="已完成"&&st!=="暫緩";
-  }).length;
-  document.getElementById('kpi-active').textContent=active;
-  document.getElementById('kpi-active-sub').textContent='共 '+_projects.length+' 個項目';
-
-  const waiting=_projects.filter(p=>_fv(p.fields,"版權送審狀態")==="等待回覆").length;
-  document.getElementById('kpi-waiting').textContent=waiting;
-
-  const ready=_projects.filter(p=>{
-    const f=p.fields;
-    return _fv(f,"打樣狀態")==="通過"&&_fv(f,"立項狀態")!=="大貨生產中"&&_fv(f,"立項狀態")!=="已完成";
-  }).length;
-  document.getElementById('kpi-ready').textContent=ready;
+function updateKPIsDemoFallback(){
+  // Already showing demo values in HTML, nothing to do
 }
 
+function updateKPIs(){
+  if(!_fromFeishu) return;
+  const active=_projects.filter(p=>{
+    const st=fv(p.fields,"立項狀態");
+    return st!=="已完成"&&st!=="暫緩";
+  });
+  const waiting=_projects.filter(p=>fv(p.fields,"版權送審狀態")==="等待回覆");
+  const ready=_projects.filter(p=>fv(p.fields,"打樣狀態")==="通過"&&fv(p.fields,"立項狀態")!=="大貨生產中"&&fv(p.fields,"立項狀態")!=="已完成");
+  const total=_projects.length;
+
+  const figCount = active.filter(p=>fv(p.fields,"產品類型")!=="非公仔").length;
+  const nfCount  = active.filter(p=>fv(p.fields,"產品類型")==="非公仔").length;
+
+  document.getElementById("kpi-active").textContent = active.length;
+  document.getElementById("kpi-active-sub").textContent = "共 "+total+" 個項目";
+  document.getElementById("kpi-active-foot").textContent = active.length+"/"+total+" 進行中";
+  document.getElementById("kpi-active-bar").style.width = Math.min(Math.round(active.length/Math.max(total,1)*100),100)+"%";
+  const activeSubTxt = document.querySelector(".kpi-big:nth-child(1) .kpi-big-sub");
+  if(activeSubTxt) activeSubTxt.textContent = "共 "+total+" 個項目";
+
+  // update fig/nonfig
+  const activeTrendEl = document.getElementById("kpi-active-trend");
+  if(activeTrendEl) activeTrendEl.textContent = "公仔 "+figCount+" · 非公仔 "+nfCount;
+
+  document.getElementById("kpi-waiting").textContent = waiting.length;
+  document.getElementById("kpi-waiting-sub").textContent = "送審等待中";
+  document.getElementById("kpi-waiting-bar").style.width = Math.min(Math.round(waiting.length/Math.max(active.length,1)*100),100)+"%";
+
+  document.getElementById("kpi-ready").textContent = ready.length;
+  document.getElementById("kpi-ready-bar").style.width = Math.min(Math.round(ready.length/Math.max(active.length,1)*100),100)+"%";
+}
+
+/* ── RENDER STRIP ── */
 function renderStrip(){
-  const strip=document.getElementById('proj-strip');
+  if(!_fromFeishu) return;
+  const strip=document.getElementById("proj-strip");
   if(!_projects.length){strip.innerHTML='<div style="color:var(--txt-lo);font-size:12px;padding:8px;">尚無項目</div>';return;}
   strip.innerHTML=_projects.map(p=>{
     const f=p.fields;
-    const st=_fv(f,"版權送審狀態");
-    const dotCls=st==="等待回覆"?"pp-warn":_fv(f,"立項狀態")==="已完成"?"pp-wait":"pp-active";
-    return `<button class="proj-pill" id="pill-${p.record_id}" onclick="selectProject('${p.record_id}')">
-      <span class="pp-status ${dotCls}"></span>${_fv(f,"產品名稱")||'未命名'}
+    const st=fv(f,"版權送審狀態");
+    const isBlocked=st==="等待回覆";
+    const isDone=fv(f,"立項狀態")==="已完成";
+    const dotCls=isBlocked?"pp-dot pp-warn-dot":isDone?"pp-dot pp-wait-dot":"pp-dot pp-active-dot";
+    const pillCls="proj-pill"+(isBlocked?" blocked":"");
+    return `<button class="${pillCls}" id="pill-${p.record_id}" onclick="selectProject('${p.record_id}')">
+      <span class="${dotCls}"></span>${fv(f,"產品名稱")||"未命名"}
     </button>`;
-  }).join('');
+  }).join("");
 }
 
+/* ── RENDER ALL CARDS FROM FEISHU ── */
+function renderAllFromFeishu(){
+  const container = document.getElementById("ip-cards");
+  container.innerHTML = _projects.map(p=>{
+    return buildIPCard(p);
+  }).join("");
+}
+
+function buildIPCard(proj){
+  const f=proj.fields; const rid=proj.record_id;
+  const name=fv(f,"產品名稱")||"未命名";
+  const ip=fv(f,"IP品牌")||"—";
+  const type=fv(f,"產品類型")||"公仔";
+  const isFig=type!=="非公仔";
+  const stage=fv(f,"當前階段")||"主題確認";
+  const reviewSt=fv(f,"版權送審狀態")||"—";
+  const round=fv(f,"送審輪次")||"1";
+  const launch=fv(f,"預計上市")||"—";
+  const price=fv(f,"建議零售價");
+  const qty=fv(f,"預計銷量");
+  const owner=fv(f,"設計負責人")||fv(f,"負責人")||"—";
+  const isBlocked=reviewSt==="等待回覆";
+  const isDone=fv(f,"立項狀態")==="已完成";
+
+  const stages=isFig?STAGES_FIG:STAGES_NONFIG;
+  const curIdx=stages.findIndex(s=>s.key===stage);
+  const safeIdx=curIdx>=0?curIdx:0;
+  const barSegs=stages.map((s,i)=>{
+    let cls=i<safeIdx?"sp-seg sp-done":i===safeIdx?(isBlocked?"sp-seg sp-blocked":"sp-seg sp-active"):"sp-seg";
+    return `<div class="${cls}"></div>`;
+  }).join("");
+  const barLabels=stages.map((s,i)=>{
+    let cls=i<safeIdx?"spl done":i===safeIdx?(isBlocked?"spl blocked":"spl active"):"spl";
+    return `<div class="${cls}">${s.label}</div>`;
+  }).join("");
+
+  let chipHtml="";
+  if(isDone) chipHtml=`<span class="chip chip-grey">已完成</span>`;
+  else if(isBlocked) chipHtml=`<span class="chip chip-danger">版權卡關</span>`;
+  else if(stage==="大貨生產") chipHtml=`<span class="chip chip-ok">大貨確認中</span>`;
+  else chipHtml=`<span class="chip chip-info">${stage}</span>`;
+
+  let blockedAlertHtml="";
+  if(isBlocked){
+    const feedback=fv(f,"版權回饋說明");
+    blockedAlertHtml=`<div class="blocked-alert">
+      <div class="blocked-alert-icon">⚠️</div>
+      <div class="blocked-alert-text">
+        <div class="blocked-alert-title">版權方未回覆 — 安然/珮玲持續追催</div>
+        <div class="blocked-alert-desc">${feedback||"等版權方書面確認，請持續追催。"}</div>
+      </div>
+    </div>`;
+  }
+
+  const statPrice=price?`<div class="ip-stat"><span class="ip-stat-label">建議售價</span><span class="ip-stat-val">¥ ${price}</span></div>`:"";
+  const statQty=qty?`<div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">${Number(qty).toLocaleString()} 件</span></div>`:"";
+
+  const launchColor=isDone?"var(--ok)":isBlocked?"var(--warn)":"var(--accent)";
+
+  return `<div class="ip-card ${isBlocked?"blocked-card":""}" id="fs-card-${rid}" onclick="selectProject('${rid}')">
+    <div class="ip-card-top">
+      <div class="ip-card-left">
+        <div class="ip-card-title">
+          ${name}
+          <span class="ip-type-badge ${isFig?"fig-badge":"nonfig-badge"}">${isFig?"公仔 7 輪":"非公仔 5 輪"}</span>
+          ${chipHtml}
+        </div>
+        <div class="ip-card-meta">
+          IP：${ip} &nbsp;·&nbsp; 負責人：${owner}<br>
+          當前階段：${stage} &nbsp;·&nbsp; 版權送審：${reviewSt}（第 ${round} 輪）
+        </div>
+      </div>
+      <div class="ip-card-right">
+        <div class="ip-launch-label">預計上市</div>
+        <div class="ip-launch-val" style="color:${launchColor}">${launch}</div>
+        <div class="ip-owner-val">${owner}</div>
+      </div>
+    </div>
+    <div class="stage-prog-wrap">
+      <div class="stage-prog-bar">${barSegs}</div>
+      <div class="stage-prog-labels">${barLabels}</div>
+    </div>
+    ${blockedAlertHtml}
+    <div class="ip-card-stats" style="margin-top:10px;">
+      <div class="ip-stat"><span class="ip-stat-label">送審輪次</span><span class="ip-stat-val" style="color:var(--accent)">第 ${round} 輪</span></div>
+      ${statPrice}
+      ${statQty}
+    </div>
+  </div>`;
+}
+
+/* ── SELECT PROJECT (Feishu) ── */
 function selectProject(rid){
   _activeId=rid;
-  document.querySelectorAll('.proj-pill').forEach(p=>{
-    p.classList.toggle('active',p.id==='pill-'+rid);
-  });
+  document.querySelectorAll(".proj-pill").forEach(p=>{p.classList.toggle("active",p.id==="pill-"+rid);});
   const proj=_projects.find(p=>p.record_id===rid);
-  if(proj) renderDetail(proj);
+  if(proj){
+    const panel=document.getElementById("detail-panel");
+    panel.style.display="block";
+    panel.innerHTML=renderDetail(proj);
+    panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
 }
 
-/* ── RENDER DETAIL ── */
-function renderDetail(proj){
-  const f=proj.fields; const rid=proj.record_id;
-  const stages=getStages(f);
-  const isFig=_fv(f,"產品類型")!=="非公仔";
-  const curIdx=stageIndex(f);
+/* ── SELECT DEMO CARD ── */
+function selectDemoCard(el, key){
+  // Deselect all
+  document.querySelectorAll(".ip-card").forEach(c=>c.classList.remove("selected"));
+  el.classList.add("selected");
+  const d=DEMO_PROJECTS[key];
+  if(!d) return;
+  const panel=document.getElementById("detail-panel");
+  panel.style.display="block";
+  panel.innerHTML=renderDemoDetail(key,d);
+  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
 
-  // Progress bar
-  const barSegs=stages.map((s,i)=>{
-    const cls=i<curIdx?"sb-done":i===curIdx?"sb-active":"";
-    return `<div class="sb-seg ${cls}"></div>`;
-  }).join('');
-  const barLabels=stages.map((s,i)=>{
-    const cls=i<curIdx?"done":i===curIdx?"active":"";
-    return `<div class="sbl ${cls}">${s.label}</div>`;
-  }).join('');
+function renderDemoDetail(key, d){
+  const stages=d.type==="非公仔"?STAGES_NONFIG:STAGES_FIG;
+  const curIdx=stages.findIndex(s=>s.key===d.stage);
+  const isFig=d.type!=="非公仔";
+  const totalRounds=isFig?7:5;
 
-  // Timeline items
+  const branchDesc=isFig
+    ?"公仔走 <strong>7 輪送審</strong>：主題確認 → 概念圖 → 2D送審 → 3D建模 → 打樣送審 → 上色打樣 → 大貨生產。每輪版權方可能要求修改。"
+    :"非公仔走 <strong>5 輪送審</strong>：主題確認 → 概念圖 → 產品設計送審 → 打樣送審 → 大貨生產。跳過 3D建模環節。";
+
   const timelineHtml=stages.map((s,i)=>{
     const isDone=i<curIdx;
     const isActive=i===curIdx;
-    const dotCls=isDone?"dot-done":isActive?"dot-active":"dot-wait";
-    const cardCls=isDone?"tc-done":isActive?"tc-active":"tc-wait";
-    const badgeCls=isDone?"tcb-done":isActive?"tcb-active":"tcb-wait";
-    const badgeTxt=isDone?"✓ 完成":isActive?"⚡ 進行中":"待解鎖";
-
-    let content='';
-    if(isActive){
-      // Show current stage details
-      content=buildActiveStageContent(f,rid,s,i,isFig);
-    } else if(isDone){
-      content=`<div class="tc-desc" style="color:var(--txt-mid);">已完成</div>`;
+    const isBlocked=d.blocked&&isActive;
+    const dotCls=isDone?"dot-done":isBlocked?"dot-blocked":isActive?"dot-active":"dot-wait";
+    const cardCls=isDone?"tc-done":isBlocked?"tc-blocked":isActive?"tc-active":"tc-wait";
+    const badgeCls=isDone?"tcb-done":isBlocked?"tcb-blocked":isActive?"tcb-active":"tcb-wait";
+    const badgeTxt=isDone?"✓ 完成":isBlocked?"⚠ 卡關":isActive?"⚡ 進行中":"待解鎖";
+    let content="";
+    if(isDone) content=`<div class="tc-desc" style="color:var(--txt-mid);font-size:11px;">已完成</div>`;
+    else if(isActive){
+      if(isBlocked){
+        content=`<div class="tc-desc" style="color:var(--danger);">版權方未回覆，安然/珮玲持續追催中。打樣已寄出，對方已獲收，等書面確認。</div>
+        <div class="tc-actions">
+          <button class="tc-btn tcb-warn-btn">📞 安然跟進回覆</button>
+          <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-anran.html'">📋 查看送審記錄</button>
+        </div>`;
+      } else {
+        content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong> 階段。負責人：${s.owner}。</div>
+        <div class="tc-actions">
+          <button class="tc-btn tcb-primary">✓ 標記此階段完成</button>
+          <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-anran.html'">📋 版權送審記錄</button>
+        </div>`;
+      }
     }
-
     return `<div class="tl-item">
       <div class="tl-left">
-        <div class="tl-num">Stage ${String(i+1).padStart(2,'0')}</div>
+        <div class="tl-num">Round ${String(i+1).padStart(2,"0")} / ${totalRounds}</div>
         <div class="tl-name">${s.key}</div>
         <div class="tl-owner">${s.owner}</div>
       </div>
       <div class="tl-connector">
         <div class="tl-dot ${dotCls}"></div>
-        ${i<stages.length-1?'<div class="tl-line"></div>':''}
+        ${i<stages.length-1?"<div class=\"tl-line\"></div>":""}
       </div>
       <div class="tl-right">
-        ${isActive||isDone?`<div class="tl-card ${cardCls}">
+        ${isDone||isActive?`<div class="tl-card ${cardCls}">
           <div class="tc-status"><span class="tc-badge ${badgeCls}">${badgeTxt}</span></div>
           ${content}
-        </div>`:''}
+        </div>`:""}
       </div>
     </div>`;
-  }).join('');
+  }).join("");
 
-  // Price/volume info
-  const price=_fv(f,"建議零售價");
-  const qty=_fv(f,"預計銷量");
-  const cost=_fv(f,"預估成本_件");
-
-  document.getElementById('proj-detail').innerHTML=`
-    <div class="proj-header">
-      <div class="proj-title">${_fv(f,"產品名稱")||'未命名'}
-        <span class="type-tag ${isFig?'':'type-nonfig'}">${isFig?'公仔':'非公仔'}</span>
+  return `<div class="detail-panel">
+    <div class="detail-header">
+      <div class="detail-title">
+        ${key==="snoopy"?"Snoopy 夏季系列公仔":key==="muziktiger"?"Muziktiger 音樂節公仔":key==="opanchu"?"Opanchu 兔年紀念版":"Chiikawa 環保袋（聯名款）"}
+        <span class="ip-type-badge ${isFig?"fig-badge":"nonfig-badge"}">${isFig?"公仔":"非公仔"}</span>
+        ${d.blocked?`<span class="chip chip-danger">版權卡關</span>`:""}
       </div>
-      <div class="proj-meta">
-        IP：${_fv(f,"IP品牌")||'—'} ·
-        立項狀態：${_fv(f,"立項狀態")||'進行中'} ·
-        版權送審：${_fv(f,"版權送審狀態")||'—'}
-        ${price?'<br>建議售價：¥'+price+' · 預計銷量：'+qty+'件 · 成本/件：¥'+cost:''}
+      <div class="detail-meta">
+        IP：${key==="snoopy"?"Snoopy":key==="muziktiger"?"Muziktiger":key==="opanchu"?"Opanchu":"Chiikawa"} &nbsp;·&nbsp;
+        當前階段：${d.stage} &nbsp;·&nbsp;
+        總輪次：${totalRounds} 輪&nbsp;·&nbsp;
+        ${d.blocked?"<span style='color:var(--danger)'>版權卡關中</span>":"正常推進中"}
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <div class="detail-actions">
         <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-anran.html'">📋 版權送審記錄</button>
         <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購詢價</button>
+        <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
       </div>
     </div>
 
-    <div class="stage-bar">${barSegs}</div>
-    <div class="stage-bar-labels">${barLabels}</div>
+    <div class="branch-info">
+      <div class="branch-icon">${isFig?"🪆":"🛍️"}</div>
+      <div class="branch-body">
+        <div class="branch-title">${isFig?"公仔流程（7 輪）":"非公仔流程（5 輪）"}</div>
+        <div class="branch-desc">${branchDesc}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div style="font-size:10px;color:var(--txt-lo);font-weight:700;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;">整體進度</div>
+      <div class="stage-prog-bar" style="height:10px;">
+        ${stages.map((s,i)=>{
+          let cls=i<curIdx?"sp-seg sp-done":i===curIdx?(d.blocked?"sp-seg sp-blocked":"sp-seg sp-active"):"sp-seg";
+          return `<div class="${cls}"></div>`;
+        }).join("")}
+      </div>
+      <div class="stage-prog-labels" style="margin-top:4px;">
+        ${stages.map((s,i)=>{
+          let cls=i<curIdx?"spl done":i===curIdx?(d.blocked?"spl blocked":"spl active"):"spl";
+          return `<div class="${cls}">${s.label}</div>`;
+        }).join("")}
+      </div>
+    </div>
 
     <div class="timeline">${timelineHtml}</div>
-  `;
+  </div>`;
 }
 
+/* ── RENDER DETAIL (Feishu record) ── */
+function renderDetail(proj){
+  const f=proj.fields; const rid=proj.record_id;
+  const name=fv(f,"產品名稱")||"未命名";
+  const type=fv(f,"產品類型")||"公仔";
+  const isFig=type!=="非公仔";
+  const stages=isFig?STAGES_FIG:STAGES_NONFIG;
+  const totalRounds=isFig?7:5;
+  const stage=fv(f,"當前階段")||"主題確認";
+  const curIdx=stages.findIndex(s=>s.key===stage);
+  const safeIdx=curIdx>=0?curIdx:0;
+  const reviewSt=fv(f,"版權送審狀態")||"—";
+  const isBlocked=reviewSt==="等待回覆";
+  const launch=fv(f,"預計上市")||"—";
+  const ip=fv(f,"IP品牌")||"—";
+  const price=fv(f,"建議零售價");
+  const qty=fv(f,"預計銷量");
+  const cost=fv(f,"預估成本_件");
+
+  const branchDesc=isFig
+    ?"公仔走 <strong>7 輪送審</strong>：主題確認 → 概念圖 → 2D送審 → 3D建模 → 打樣送審 → 上色打樣 → 大貨生產。"
+    :"非公仔走 <strong>5 輪送審</strong>：主題確認 → 概念圖 → 產品設計送審 → 打樣送審 → 大貨生產。";
+
+  const barSegs=stages.map((s,i)=>{
+    let cls=i<safeIdx?"sp-seg sp-done":i===safeIdx?(isBlocked?"sp-seg sp-blocked":"sp-seg sp-active"):"sp-seg";
+    return `<div class="${cls}"></div>`;
+  }).join("");
+  const barLabels=stages.map((s,i)=>{
+    let cls=i<safeIdx?"spl done":i===safeIdx?(isBlocked?"spl blocked":"spl active"):"spl";
+    return `<div class="${cls}">${s.label}</div>`;
+  }).join("");
+
+  const timelineHtml=stages.map((s,i)=>{
+    const isDone=i<safeIdx;
+    const isActive=i===safeIdx;
+    const isBlk=isBlocked&&isActive;
+    const dotCls=isDone?"dot-done":isBlk?"dot-blocked":isActive?"dot-active":"dot-wait";
+    const cardCls=isDone?"tc-done":isBlk?"tc-blocked":isActive?"tc-active":"tc-wait";
+    const badgeCls=isDone?"tcb-done":isBlk?"tcb-blocked":isActive?"tcb-active":"tcb-wait";
+    const badgeTxt=isDone?"✓ 完成":isBlk?"⚠ 版權卡關":isActive?"⚡ 進行中":"待解鎖";
+    const content=isDone?`<div class="tc-desc" style="color:var(--txt-mid);font-size:11px;">已完成</div>`:
+      isActive?buildActiveStageContent(f,rid,s,safeIdx,isFig):"";
+    return `<div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-num">Round ${String(i+1).padStart(2,"0")} / ${totalRounds}</div>
+        <div class="tl-name">${s.key}</div>
+        <div class="tl-owner">${s.owner}</div>
+      </div>
+      <div class="tl-connector">
+        <div class="tl-dot ${dotCls}"></div>
+        ${i<stages.length-1?"<div class=\"tl-line\"></div>":""}
+      </div>
+      <div class="tl-right">
+        ${isDone||isActive?`<div class="tl-card ${cardCls}">
+          <div class="tc-status"><span class="tc-badge ${badgeCls}">${badgeTxt}</span></div>
+          ${content}
+        </div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+
+  return `<div class="detail-panel">
+    <div class="detail-header">
+      <div class="detail-title">
+        ${name}
+        <span class="ip-type-badge ${isFig?"fig-badge":"nonfig-badge"}">${isFig?"公仔":"非公仔"}</span>
+        ${isBlocked?`<span class="chip chip-danger">版權卡關</span>`:""}
+      </div>
+      <div class="detail-meta">
+        IP：${ip} &nbsp;·&nbsp; 立項狀態：${fv(f,"立項狀態")||"進行中"} &nbsp;·&nbsp; 預計上市：${launch}<br>
+        版權送審：${reviewSt} &nbsp;·&nbsp; 打樣狀態：${fv(f,"打樣狀態")||"—"}
+        ${price?"<br>建議售價：¥"+price+" &nbsp;·&nbsp; 預計銷量："+qty+"件 &nbsp;·&nbsp; 成本/件：¥"+(cost||"—"):""}
+      </div>
+      <div class="detail-actions">
+        <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-anran.html'">📋 版權送審記錄</button>
+        <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購詢價</button>
+        <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+      </div>
+    </div>
+
+    <div class="branch-info">
+      <div class="branch-icon">${isFig?"🪆":"🛍️"}</div>
+      <div class="branch-body">
+        <div class="branch-title">${isFig?"公仔流程（7 輪）":"非公仔流程（5 輪）"}</div>
+        <div class="branch-desc">${branchDesc}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:10px;color:var(--txt-lo);font-weight:700;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;">整體進度</div>
+      <div class="stage-prog-bar" style="height:10px;">${barSegs}</div>
+      <div class="stage-prog-labels" style="margin-top:4px;">${barLabels}</div>
+    </div>
+
+    <div class="timeline">${timelineHtml}</div>
+  </div>`;
+}
+
+/* ── BUILD ACTIVE STAGE CONTENT (Feishu) ── */
 function buildActiveStageContent(f,rid,stage,idx,isFig){
   const key=stage.key;
-  let html='';
+  const stages=isFig?STAGES_FIG:STAGES_NONFIG;
+  let html="";
 
   if(key==="主題確認"){
-    html=`<div class="tc-desc">確認 IP 品牌、目標品類、主題方向。管理層三方共識後解鎖下一步。</div>
+    html=`<div class="tc-desc">確認 IP 品牌、目標品類、主題方向。管理層三方（Ray/安然/Shawn）達成共識後解鎖下一步。</div>
     <div class="tc-actions">
       <button class="tc-btn tcb-primary" onclick="advanceStage('${rid}','概念視覺')">✓ 主題已確認 → 進概念圖</button>
     </div>`;
   } else if(key==="概念視覺"){
     html=`<div class="tc-desc">詩彤/珮玲 在 Forge 生成概念圖，Bevis 核准後進入版權送審。</div>
     <div class="tc-actions">
-      <button class="tc-btn tcb-primary" onclick="advanceStage('${rid}',isFig?'2D送審':'產品設計送審')">✓ Bevis 已核准 → 進送審</button>
+      <button class="tc-btn tcb-primary" onclick="advanceStage('${rid}','${isFig?"2D送審":"產品設計送審"}')">✓ Bevis 已核准 → 進送審</button>
       <button class="tc-btn tcb-ghost" onclick="window.open('index.html')">⚡ 前往 Forge 生圖</button>
     </div>`;
   } else if(key==="2D送審"||key==="產品設計送審"){
-    const reviewSt=_fv(f,"版權送審狀態")||"未提交";
-    const round=_fv(f,"送審輪次")||"1";
+    const reviewSt=fv(f,"版權送審狀態")||"未提交";
+    const round=fv(f,"送審輪次")||"1";
     html=`<div class="tc-desc">珮玲提交 ${isFig?"2D四視圖":"產品設計稿"} 給版權方，目前第 ${round} 輪送審。</div>
-    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:8px;">版權送審狀態：<strong style="color:${reviewSt==="通過"?"var(--ok)":reviewSt==="等待回覆"?"var(--warn)":"var(--txt-hi)"}">${reviewSt||"未提交"}</strong></div>
-    ${_fv(f,"版權回饋說明")?`<div class="tc-desc" style="color:var(--warn);">版權方意見：${_fv(f,"版權回饋說明")}</div>`:''}
+    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px;">
+      版權送審狀態：<strong style="color:${reviewSt==="通過"?"var(--ok)":reviewSt==="等待回覆"?"var(--warn)":"var(--txt-hi)"}">${reviewSt}</strong>
+    </div>
+    ${fv(f,"版權回饋說明")?`<div class="tc-desc" style="color:var(--warn);">版權方意見：${fv(f,"版權回饋說明")}</div>`:""}
     <div class="tc-actions">
-      <button class="tc-btn tcb-primary" onclick="updateReview('${rid}','通過')" ${reviewSt==="通過"?"style='opacity:.5;cursor:default;'":""}>✓ 版權方通過</button>
-      <button class="tc-btn tcb-warn" onclick="updateReview('${rid}','修改中')">⚠ 需修改</button>
+      <button class="tc-btn tcb-primary" onclick="updateReview('${rid}','通過')">✓ 版權方通過</button>
+      <button class="tc-btn tcb-warn-btn" onclick="updateReview('${rid}','修改中')">⚠ 需修改</button>
     </div>`;
   } else if(key==="3D建模"){
-    const st3d=_fv(f,"3D建模狀態")||"未啟動";
+    const st3d=fv(f,"3D建模狀態")||"未啟動";
+    const pkgSt=fv(f,"包裝設計狀態")||"未啟動";
+    const poSt=fv(f,"採購詢價狀態")||"待啟動";
     html=`<div class="tc-parallel">
       <div class="tcp-title">平行進度</div>
       <div class="tcp-row"><span class="tcp-label">3D建模（外包）</span><span class="tcp-status ${st3d==="已完成"?"tcs-ok":st3d==="進行中"?"tcs-active":"tcs-wait"}">${st3d}</span></div>
-      <div class="tcp-row"><span class="tcp-label">包裝設計</span><span class="tcp-status ${_fv(f,"包裝設計狀態")==="已完成"?"tcs-ok":_fv(f,"包裝設計狀態")==="進行中"?"tcs-active":"tcs-wait"}">${_fv(f,"包裝設計狀態")||"未啟動"}</span></div>
-      <div class="tcp-row"><span class="tcp-label">採購第一次詢價</span><span class="tcp-status ${_fv(f,"採購詢價狀態")==="完成"?"tcs-ok":_fv(f,"採購詢價狀態")==="進行中"?"tcs-active":"tcs-wait"}">${_fv(f,"採購詢價狀態")||"待啟動"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">包裝設計</span><span class="tcp-status ${pkgSt==="已完成"?"tcs-ok":pkgSt==="進行中"?"tcs-active":"tcs-wait"}">${pkgSt}</span></div>
+      <div class="tcp-row"><span class="tcp-label">採購第一次詢價</span><span class="tcp-status ${poSt==="完成"?"tcs-ok":poSt==="進行中"?"tcs-active":"tcs-wait"}">${poSt}</span></div>
     </div>
     <div class="tc-actions">
-      <button class="tc-btn tcb-primary" onclick="update3D('${rid}')">✓ 3D模型完成，送審</button>
+      <button class="tc-btn tcb-primary" onclick="update3D('${rid}')">✓ 3D模型完成，送版權方</button>
     </div>`;
   } else if(key==="打樣送審"||key==="上色打樣"){
-    const pSt=_fv(f,"打樣狀態")||"未啟動";
-    html=`<div class="tc-desc">採購寄出實體打樣給版權方，等待確認。</div>
-    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:8px;">打樣狀態：<strong style="color:${pSt==="通過"?"var(--ok)":"var(--warn)"}">${pSt}</strong></div>
+    const pSt=fv(f,"打樣狀態")||"未啟動";
+    html=`<div class="tc-desc">採購寄出實體打樣給版權方，等待書面確認。</div>
+    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px;">打樣狀態：<strong style="color:${pSt==="通過"?"var(--ok)":"var(--warn)"}">${pSt}</strong></div>
     <div class="tc-actions">
       <button class="tc-btn tcb-primary" onclick="updatePrintSample('${rid}','通過')">✓ 版權方打樣通過</button>
-      <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購台填寄樣單號</button>
+      <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購填寄樣單號</button>
     </div>`;
   } else if(key==="大貨生產"){
-    const confirmMgmt=_fv(f,"大貨確認_管理");
-    const confirmProc=_fv(f,"大貨確認_採購");
-    const confirmDes=_fv(f,"大貨確認_設計");
-    const confirmSales=_fv(f,"大貨確認_銷售");
+    const c1=fv(f,"大貨確認_管理");
+    const c2=fv(f,"大貨確認_採購");
+    const c3=fv(f,"大貨確認_設計");
+    const c4=fv(f,"大貨確認_銷售");
     html=`<div class="tc-parallel">
       <div class="tcp-title">大貨四方確認</div>
-      <div class="tcp-row"><span class="tcp-label">管理層</span><span class="tcp-status ${confirmMgmt?"tcs-ok":"tcs-wait"}">${confirmMgmt||"待確認"}</span></div>
-      <div class="tcp-row"><span class="tcp-label">採購</span><span class="tcp-status ${confirmProc?"tcs-ok":"tcs-wait"}">${confirmProc||"待確認"}</span></div>
-      <div class="tcp-row"><span class="tcp-label">設計</span><span class="tcp-status ${confirmDes?"tcs-ok":"tcs-wait"}">${confirmDes||"待確認"}</span></div>
-      <div class="tcp-row"><span class="tcp-label">銷售</span><span class="tcp-status ${confirmSales?"tcs-ok":"tcs-wait"}">${confirmSales||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">管理層（Ray/Shawn）</span><span class="tcp-status ${c1?"tcs-ok":"tcs-wait"}">${c1||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">採購（賴哥）</span><span class="tcp-status ${c2?"tcs-ok":"tcs-wait"}">${c2||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">設計（Bevis）</span><span class="tcp-status ${c3?"tcs-ok":"tcs-wait"}">${c3||"待確認"}</span></div>
+      <div class="tcp-row"><span class="tcp-label">銷售（老董）</span><span class="tcp-status ${c4?"tcs-ok":"tcs-wait"}">${c4||"待確認"}</span></div>
     </div>
     <div class="tc-actions">
       <button class="tc-btn tcb-primary" onclick="confirmBulk('${rid}')">✓ 本廳確認大貨</button>
@@ -462,7 +991,7 @@ function buildActiveStageContent(f,rid,stage,idx,isFig){
 }
 
 /* ── ACTIONS ── */
-const s=JSON.parse(localStorage.getItem("wujie_session")||"{}");
+const _sess=JSON.parse(localStorage.getItem("wujie_session")||"{}");
 
 async function advanceStage(rid,nextStage){
   await _updateRecord(rid,{"當前階段":nextStage});
@@ -471,12 +1000,11 @@ async function advanceStage(rid,nextStage){
 async function updateReview(rid,status){
   const fields={"版權送審狀態":status};
   if(status==="通過"){
-    // Advance to next stage
     const proj=_projects.find(p=>p.record_id===rid);
     if(proj){
-      const stages=getStages(proj.fields);
-      const cur=stageIndex(proj.fields);
-      if(cur+1<stages.length) fields["當前階段"]=stages[cur+1].key;
+      const stages=fv(proj.fields,"產品類型")==="非公仔"?STAGES_NONFIG:STAGES_FIG;
+      const cur=stages.findIndex(s=>s.key===fv(proj.fields,"當前階段"));
+      if(cur>=0&&cur+1<stages.length) fields["當前階段"]=stages[cur+1].key;
     }
   }
   await _updateRecord(rid,fields);
@@ -491,53 +1019,64 @@ async function updatePrintSample(rid,status){
   if(status==="通過"){
     const proj=_projects.find(p=>p.record_id===rid);
     if(proj){
-      const stages=getStages(proj.fields);
-      const cur=stageIndex(proj.fields);
-      if(cur+1<stages.length) fields["當前階段"]=stages[cur+1].key;
+      const stages=fv(proj.fields,"產品類型")==="非公仔"?STAGES_NONFIG:STAGES_FIG;
+      const cur=stages.findIndex(s=>s.key===fv(proj.fields,"當前階段"));
+      if(cur>=0&&cur+1<stages.length) fields["當前階段"]=stages[cur+1].key;
     }
   }
   await _updateRecord(rid,fields);
   await reload();
 }
 async function confirmBulk(rid){
-  const dept=s.dept||"";
+  const dept=_sess.dept||"";
   const field=dept.includes("採購")?"大貨確認_採購":dept.includes("設計")?"大貨確認_設計":dept.includes("業務")?"大貨確認_銷售":"大貨確認_管理";
   await _updateRecord(rid,{[field]:"已確認"});
   await reload();
 }
 async function reload(){
-  _projects=await _getRecords();
-  renderStrip();
-  updateKPIs();
-  if(_activeId) selectProject(_activeId);
+  const items=await _getRecords();
+  if(items&&items.length>0){
+    _projects=items;
+    renderAllFromFeishu();
+    updateKPIs();
+    renderStrip();
+    if(_activeId) selectProject(_activeId);
+  }
 }
 
 /* ── NEW PROJECT ── */
 function toggleNewForm(){
-  const f=document.getElementById('new-form');
-  f.style.display=f.style.display==='none'?'block':'none';
+  const f=document.getElementById("new-form");
+  f.style.display=f.style.display==="none"?"block":"none";
+  if(f.style.display==="block") f.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 async function createProject(){
-  const name=document.getElementById('nf-name').value.trim();
-  const ip=document.getElementById('nf-ip').value;
-  const type=document.getElementById('nf-type').value;
+  const name=document.getElementById("nf-name").value.trim();
+  const ip=document.getElementById("nf-ip").value;
+  const type=document.getElementById("nf-type").value;
+  const owner=document.getElementById("nf-owner").value.trim();
+  const launch=document.getElementById("nf-launch").value.trim();
   if(!name||!ip||!type){alert("請填寫名稱、IP品牌和產品類型");return;}
-  const res=document.getElementById('nf-result');
-  res.style.display='block';res.style.color='var(--txt-mid)';res.textContent='建立中...';
+  const res=document.getElementById("nf-result");
+  res.style.display="block";res.style.color="var(--txt-mid)";res.textContent="建立中…";
   const fields={
     "產品名稱":name,"IP品牌":ip,"產品類型":type,
     "當前階段":"主題確認","立項狀態":"進行中",
-    "建議零售價":Number(document.getElementById('nf-price').value)||null,
-    "預計銷量":Number(document.getElementById('nf-qty').value)||null,
+    "設計負責人":owner||undefined,
+    "預計上市":launch||undefined,
+    "建議零售價":Number(document.getElementById("nf-price").value)||undefined,
+    "預計銷量":Number(document.getElementById("nf-qty").value)||undefined,
   };
-  Object.keys(fields).forEach(k=>{if(fields[k]===null)delete fields[k];});
-  const d=await _createRecord(fields);
-  if(d.code===0){
-    res.style.color='var(--ok)';res.textContent='✅ 已建立！';
-    document.getElementById('nf-name').value='';
-    toggleNewForm();
-    await reload();
-  }else{res.style.color='var(--danger)';res.textContent='失敗：'+JSON.stringify(d);}
+  Object.keys(fields).forEach(k=>{if(fields[k]===undefined)delete fields[k];});
+  try{
+    const d=await _createRecord(fields);
+    if(d.code===0){
+      res.style.color="var(--ok)";res.textContent="✅ 已建立！重新載入中…";
+      document.getElementById("nf-name").value="";
+      toggleNewForm();
+      await reload();
+    }else{res.style.color="var(--danger)";res.textContent="失敗："+JSON.stringify(d);}
+  }catch(e){res.style.color="var(--danger)";res.textContent="網路錯誤："+e.message;}
 }
 
 /* ── INIT ── */
