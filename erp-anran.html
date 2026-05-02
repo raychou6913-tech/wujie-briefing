@@ -171,9 +171,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <!-- 上傳新合約 -->
       <div class="card">
         <div class="section-title">上傳合約 · AI 解析</div>
-        <div class="contract-upload" onclick="showParseDemo()">
+        <input type="file" id="contract-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileUpload(this)">
+        <div class="contract-upload" onclick="document.getElementById('contract-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--hk)'" ondragleave="this.style.borderColor=''" ondrop="event.preventDefault();handleFileDrop(event)">
           <div class="cu-icon">📄</div>
-          <div class="cu-title">拖入 PDF 合約</div>
+          <div class="cu-title">拖入 PDF 合約 或點擊上傳</div>
           <div class="cu-sub">AI 自動抽取保底金、抽成比例、授權期限、區域、違約條款</div>
         </div>
         <!-- AI 解析結果 (Demo) -->
@@ -207,7 +208,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="qb-label">問一個關於合約的問題</div>
           <div class="qb-input-row">
             <input class="qb-input" id="qb-in" placeholder="例：Snoopy 台灣授權的保底是多少？" value="Snoopy 台灣授權的保底是多少？">
-            <button class="qb-btn" onclick="showQueryResult()">問</button>
+            <button class="qb-btn" id="qb-btn" onclick="runContractQuery()">問</button>
           </div>
           <div class="qb-result" id="qb-result" style="display:none;">
             根據 <strong>Peanuts_License_TW_2025.pdf</strong>（安然 2025-11-03 確認）：<br>
@@ -479,6 +480,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 </div><!-- /main -->
 
 <script>
+/* ── CONFIG ── */
+const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
+const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _CONTRACT_TBL = "tbltnJNDhRNwVkZC";
+const GEMINI_KEY = "AIzaSyBC51Yef5FtCESl2AF7A3X1WKIfoc0Bojo";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+GEMINI_KEY;
+let _tk = null;
+let _parsedResult = null;
+let _currentFileName = "";
+
+/* ── SESSION CHECK ── */
+(function(){
+  const s = JSON.parse(localStorage.getItem("wujie_session")||"null");
+  if(!s||Date.now()>s.expires){ localStorage.removeItem("wujie_session"); location.replace("login.html"); }
+})();
+
+/* ── TAB ── */
 function switchTab(btn, tabId) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
@@ -486,11 +504,208 @@ function switchTab(btn, tabId) {
     document.getElementById(id).style.display = id === tabId ? '' : 'none';
   });
 }
-function showParseDemo() {
-  document.getElementById('parse-demo').style.display = 'block';
+
+/* ── FEISHU TOKEN ── */
+async function _getToken(){
+  if(_tk) return _tk;
+  const r = await fetch(_PROXY+"/auth/token",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const d = await r.json();
+  if(d.code!==0) throw new Error("token");
+  _tk = d.tenant_access_token;
+  setTimeout(()=>_tk=null, 110*60*1000);
+  return _tk;
 }
-function showQueryResult() {
-  document.getElementById('qb-result').style.display = 'block';
+function _fv(f,k){
+  const v=f[k];
+  if(!v&&v!==0) return "";
+  if(Array.isArray(v)) return v.map(x=>typeof x==="object"?(x.text||x.link||JSON.stringify(x)):String(x)).join("");
+  if(typeof v==="object") return v.text||v.link||"";
+  return String(v);
+}
+
+/* ── FILE HANDLING ── */
+function handleFileDrop(e){
+  const f = e.dataTransfer.files[0];
+  if(f) processFile(f);
+}
+function handleFileUpload(input){
+  if(input.files[0]) processFile(input.files[0]);
+}
+
+async function processFile(file){
+  _currentFileName = file.name;
+  const demo = document.getElementById('parse-demo');
+  demo.style.display = 'block';
+  demo.innerHTML = `<div style="padding:20px;text-align:center;color:var(--txt-mid);font-size:13px">
+    <div style="font-size:24px;margin-bottom:8px">🤖</div>
+    AI 解析中 · ${file.name}<br>
+    <div style="margin-top:6px;font-size:11px;color:var(--txt-lo)">讀取文件並抽取關鍵條款...</div>
+  </div>`;
+
+  try{
+    const base64 = await fileToBase64(file);
+    const mimeType = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+    const parsed = await callGeminiParse(base64, mimeType, file.name);
+    _parsedResult = parsed;
+    showParseResult(parsed, file.name);
+  }catch(e){
+    demo.innerHTML = `<div style="padding:16px;color:var(--danger);font-size:13px">解析失敗：${e.message}</div>`;
+  }
+}
+
+function fileToBase64(file){
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function callGeminiParse(base64, mimeType, fileName){
+  const prompt = `你是蕪解創意的 AI 合約解析助理。請從以下IP授權合約中精確抽取關鍵條款，以 JSON 格式返回。
+
+必須抽取以下欄位（找不到的填 null）：
+{
+  "ip_name": "IP名稱（如 Snoopy / Opanchu / Muziktiger）",
+  "licensor": "版權方/代理商名稱",
+  "territory": "授權地區",
+  "categories": "授權品類",
+  "start_date": "授權開始日期 YYYY-MM-DD",
+  "end_date": "授權結束日期 YYYY-MM-DD",
+  "mg_annual": "年保底金額（僅數字，單位附在 currency 欄）",
+  "royalty_rate": "版稅率（如 9%）",
+  "currency": "幣別（USD/RMB/HKD等）",
+  "first_payment": "首期付款金額（含時限說明）",
+  "penalty": "違約條款摘要",
+  "notes": "其他重要條款（如產品類型限制、樣品審批要求）"
+}
+
+只返回 JSON，不要其他文字。`;
+
+  const body = {
+    contents:[{parts:[
+      {text: prompt},
+      {inline_data:{mime_type: mimeType, data: base64}}
+    ]}],
+    generationConfig:{temperature:0.1, maxOutputTokens:1024}
+  };
+
+  const r = await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const d = await r.json();
+  const text = d.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if(!jsonMatch) throw new Error("AI 無法解析此文件");
+  return JSON.parse(jsonMatch[0]);
+}
+
+function showParseResult(p, fileName){
+  const demo = document.getElementById('parse-demo');
+  const safe = v => v||'—';
+  demo.innerHTML = `
+    <div class="apr-header">
+      <span class="apr-ai">✨ AI 解析完成</span>
+      <span class="apr-title">${fileName}</span>
+      <span class="apr-conf">請安然人工核對</span>
+    </div>
+    <div class="key-terms">
+      <div class="kt-cell"><div class="kt-label">IP 名稱</div><div class="kt-val">${safe(p.ip_name)}</div></div>
+      <div class="kt-cell"><div class="kt-label">保底金（MG）</div><div class="kt-val warn">${p.mg_annual?p.currency+' '+p.mg_annual+'/年':'—'}</div></div>
+      <div class="kt-cell"><div class="kt-label">版稅率</div><div class="kt-val">${safe(p.royalty_rate)}</div></div>
+      <div class="kt-cell"><div class="kt-label">授權期限</div><div class="kt-val">${safe(p.start_date)} ~ ${safe(p.end_date)}</div></div>
+      <div class="kt-cell"><div class="kt-label">授權區域</div><div class="kt-val">${safe(p.territory)}</div></div>
+      <div class="kt-cell"><div class="kt-label">首期付款</div><div class="kt-val danger" style="font-size:11px">${safe(p.first_payment)}</div></div>
+    </div>
+    ${p.penalty?`<div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px">⚠ 違約：${p.penalty}</div>`:''}
+    ${p.notes?`<div style="font-size:11px;color:var(--txt-lo);margin-bottom:10px">📝 備注：${p.notes}</div>`:''}
+    <div class="apr-actions">
+      <button class="btn btn-confirm" onclick="saveContractToFeishu()">✓ 確認後存入知識庫</button>
+      <button class="btn btn-edit" onclick="toggleEditMode()">✏ 人工修改</button>
+    </div>
+    <div id="save-result" style="display:none;margin-top:8px;font-size:12px;"></div>
+    <div style="font-size:10px;color:var(--txt-lo);margin-top:8px;">⚠ 安然必須人工確認每一筆——合約數字入庫後，全系統查詢都以此為準</div>
+  `;
+}
+
+async function saveContractToFeishu(){
+  if(!_parsedResult) return;
+  const p = _parsedResult;
+  const resultEl = document.getElementById('save-result');
+  resultEl.style.display='block'; resultEl.style.color='var(--txt-mid)'; resultEl.textContent='存入中...';
+  try{
+    const tk = await _getToken();
+    const now = new Date();
+    const fields = {
+      "IP品牌": p.ip_name||_currentFileName,
+      "版權方": p.licensor||"",
+      "授權區域": p.territory||"",
+      "授權品類": p.categories||"",
+      "合約起始日": p.start_date?new Date(p.start_date).getTime():null,
+      "合約結束日": p.end_date?new Date(p.end_date).getTime():null,
+      "幣別": p.currency||"RMB",
+      "保底金額": p.mg_annual?Number(String(p.mg_annual).replace(/[^0-9.]/g,'')):null,
+      "版稅率": p.royalty_rate||"",
+      "違約條款": p.penalty||"",
+      "備注": p.notes||"",
+      "合約狀態": "有效",
+      "確認人": JSON.parse(localStorage.getItem("wujie_session")||"{}").name||"安然",
+      "確認日期": now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0"),
+    };
+    Object.keys(fields).forEach(k=>{ if(fields[k]===null||fields[k]==="") delete fields[k]; });
+    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_CONTRACT_TBL+"/records",{
+      method:"POST",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields})
+    });
+    const d = await r.json();
+    if(d.code===0){
+      resultEl.style.color='var(--ok)';
+      resultEl.textContent='✅ 已存入合約知識庫！全系統查詢生效。';
+    }else{
+      resultEl.style.color='var(--danger)';
+      resultEl.textContent='存入失敗：'+JSON.stringify(d);
+    }
+  }catch(e){
+    resultEl.style.color='var(--danger)';
+    resultEl.textContent='存入失敗：'+e.message;
+  }
+}
+
+/* ── CONTRACT QUERY ── */
+async function runContractQuery(){
+  const q = document.getElementById('qb-in').value.trim();
+  const resultEl = document.getElementById('qb-result');
+  const btn = document.getElementById('qb-btn');
+  if(!q) return;
+  btn.disabled=true; btn.textContent='查詢中...';
+  resultEl.style.display='block'; resultEl.innerHTML='<span style="color:var(--txt-mid)">AI 查詢中...</span>';
+  try{
+    const tk = await _getToken();
+    const r = await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_CONTRACT_TBL+"/records?page_size=100",{headers:{"Authorization":"Bearer "+tk}});
+    const d = await r.json();
+    const contracts = (d.data?.items||[]).map(i=>{
+      const f=i.fields;
+      return `IP: ${_fv(f,"IP品牌")} | 區域: ${_fv(f,"授權區域")} | 保底: ${_fv(f,"幣別")} ${_fv(f,"保底金額")}/年 | 版稅: ${_fv(f,"版稅率")} | 到期: ${_fv(f,"合約結束日")} | 狀態: ${_fv(f,"合約狀態")}`;
+    }).filter(s=>s.length>10).join("\n");
+
+    const prompt = `你是蕪解創意的合約知識庫助理。根據以下合約資料回答問題。
+回答要直接、精確，引用具體數字，不超過 100 字。
+
+合約資料：
+${contracts||"（尚無合約記錄）"}
+
+問題：${q}`;
+
+    const gemR = await fetch(GEMINI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.1,maxOutputTokens:300}
+    })});
+    const gemD = await gemR.json();
+    const ans = gemD.candidates?.[0]?.content?.parts?.[0]?.text || "查詢失敗";
+    resultEl.innerHTML = ans.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  }catch(e){
+    resultEl.innerHTML = `<span style="color:var(--danger)">查詢失敗：${e.message}</span>`;
+  }
+  btn.disabled=false; btn.textContent='問';
 }
 </script>
 </body>
