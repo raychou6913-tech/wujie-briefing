@@ -260,16 +260,16 @@ async function getToken() {
 async function getRecords(tableId, params = {}) {
   const tok = await getToken();
   const qs = new URLSearchParams({page_size: 100, ...params}).toString();
-  const r = await fetch(`${PROXY}/bitable/v1/apps/${AT}/tables/${tableId}/records?${qs}`, {
+  const r = await fetch(`${PROXY}/open-apis/bitable/v1/apps/${AT}/tables/${tableId}/records?${qs}`, {
     headers: {'Authorization': `Bearer ${tok}`}
   });
   const d = await r.json();
-  return (d.data && d.data.items) ? d.data.items.map(i => i.fields) : [];
+  return (d.data && d.data.items) ? d.data.items.map(i => ({...i.fields, __recordId: i.record_id})) : [];
 }
 
 async function updateRecord(tableId, recordId, fields) {
   const tok = await getToken();
-  const r = await fetch(`${PROXY}/bitable/v1/apps/${AT}/tables/${tableId}/records/${recordId}`, {
+  const r = await fetch(`${PROXY}/open-apis/bitable/v1/apps/${AT}/tables/${tableId}/records/${recordId}`, {
     method: 'PUT',
     headers: {'Authorization': `Bearer ${tok}`, 'Content-Type': 'application/json'},
     body: JSON.stringify({fields})
