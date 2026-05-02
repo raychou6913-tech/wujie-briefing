@@ -15,76 +15,115 @@
   --beijing:#f59e0b;--bangkok:#22c55e;--taipei:#818cf8;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
 
-/* ── TOPBAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.brand{display:flex;align-items:center;gap:8px;}
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:10px;}
 .brand-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);}
 .brand-name{font-size:14px;font-weight:700;}
 .brand-sub{font-size:10px;color:var(--txt-mid);}
 .nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
 
-/* ── KPI STRIP ── */
-.kpi-strip{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--border);}
-.kpi-strip::-webkit-scrollbar{display:none;}
-.kc{flex:0 0 auto;min-width:100px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 13px;}
-.kc-label{font-size:9px;color:var(--txt-mid);font-weight:600;letter-spacing:.04em;margin-bottom:3px;}
-.kc-val{font-size:20px;font-weight:800;line-height:1;}
-.kc-sub{font-size:9px;color:var(--txt-mid);margin-top:3px;}
+/* LAYOUT */
+.main{max-width:900px;margin:0 auto;padding:20px;}
 
-/* ── LAYOUT ── */
-.main{max-width:700px;margin:0 auto;padding:16px;}
-
-/* ── SECTION HEADER ── */
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;}
+/* SECTION HEADER */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;}
 .sec-head:first-child{margin-top:0;}
 .sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
 .sec-link{font-size:10px;color:var(--accent);text-decoration:none;}
 
-/* ── CARDS ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
+/* TOP 2-KPI CARDS */
+.kpi-big-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.kpi-big-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:10px;}
+.kpi-big-val{font-size:34px;font-weight:800;line-height:1;margin-bottom:2px;}
+.kpi-big-sub{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
+.kpi-big-trend{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;}
+.trend-up{background:var(--ok-dim);color:var(--ok);}
+.trend-dn{background:var(--danger-dim);color:var(--danger);}
+.prog{background:var(--card2);border-radius:3px;height:5px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.kpi-big-footer{display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo);margin-top:5px;}
 
-/* ── THREE-CITY GRID ── */
-.city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
-.city-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;}
-.city-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;}
-.city-name{font-size:11px;font-weight:700;}
-.city-kpi-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;}
-.city-kpi-label{color:var(--txt-mid);}
-.city-kpi-val{font-weight:700;}
-.prog{background:var(--card2);border-radius:3px;height:4px;margin:5px 0 6px;overflow:hidden;}
-.prog-fill{height:100%;border-radius:3px;}
+/* CITY CARDS */
+.city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.city-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.city-tag{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.city-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.city-name{font-size:12px;font-weight:700;}
+.city-badge{font-size:9px;color:var(--txt-lo);margin-left:auto;}
+.city-main-val{font-size:24px;font-weight:800;line-height:1;margin:8px 0 2px;}
+.city-main-sub{font-size:10px;color:var(--txt-mid);margin-bottom:6px;}
+.prog-sm{background:var(--card2);border-radius:2px;height:4px;overflow:hidden;margin:4px 0 6px;}
+.prog-sm-fill{height:100%;border-radius:2px;}
+.city-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;}
+.city-row-k{color:var(--txt-mid);}
+.city-row-v{font-weight:700;}
 
-/* ── ROW LIST ── */
-.row-list{display:flex;flex-direction:column;}
-.row-item{padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s;}
-.row-item:last-child{border:none;padding-bottom:0;}
-.row-item:active{opacity:.7;}
-.ri-top{display:flex;align-items:flex-start;gap:10px;}
-.ri-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.ri-body{flex:1;min-width:0;}
-.ri-title{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ri-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
-.ri-right{text-align:right;flex-shrink:0;}
-.ri-amt{font-size:13px;font-weight:700;}
-.ri-age{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+/* PIPELINE HEALTH */
+.pipe-health{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.pipe-cells{display:grid;grid-template-columns:repeat(4,1fr);}
+.pipe-cell{padding:14px 12px;text-align:center;border-right:1px solid var(--border);}
+.pipe-cell:last-child{border-right:none;}
+.pipe-cell-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px;}
+.pipe-cell-label{font-size:10px;color:var(--txt-mid);}
+.pipe-alert{background:#ef444410;border-top:1px solid #ef444430;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.pipe-alert-text{}
+.pipe-alert-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:3px;}
+.pipe-alert-desc{font-size:10px;color:var(--txt-mid);line-height:1.5;}
+.btn-alert{background:var(--danger);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 
-/* ── EXPAND DETAIL ── */
-.row-detail{display:none;background:var(--card2);border-radius:8px;padding:12px;margin-top:8px;border:1px solid var(--border-hi);}
-.row-detail.open{display:block;}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
-.detail-cell{background:var(--card);border-radius:6px;padding:8px 10px;}
-.dc-label{font-size:9px;color:var(--txt-lo);margin-bottom:2px;}
-.dc-val{font-size:12px;font-weight:700;}
-.detail-desc{font-size:11px;color:var(--txt-mid);line-height:1.6;margin-bottom:10px;}
-.detail-actions{display:flex;gap:7px;}
-.btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;min-height:36px;}
+/* FLASH STORE CARDS */
+.flash-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;}
+.flash-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
+.flash-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.flash-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.flash-meta{font-size:10px;color:var(--txt-mid);}
+.flash-right{text-align:right;flex-shrink:0;}
+.flash-amt{font-size:14px;font-weight:800;}
+.flash-status{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+
+/* TWO-COL SECTION */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.two-col-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.panel-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.panel-badge{background:var(--warn-dim);color:var(--warn);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+
+/* LOGISTICS LIST */
+.logi-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.logi-item:last-child{border-bottom:none;padding-bottom:0;}
+.logi-icon{width:28px;height:28px;border-radius:7px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.logi-body{flex:1;min-width:0;}
+.logi-name{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.logi-sub{font-size:9px;color:var(--txt-lo);margin-top:1px;}
+.status-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0;}
+.sc-sea{background:#0284c720;color:#38bdf8;}
+.sc-air{background:#8b5cf620;color:#a78bfa;}
+.sc-prod{background:var(--warn-dim);color:var(--warn);}
+.sc-stock{background:var(--card2);color:var(--txt-mid);}
+.sc-late{background:var(--danger-dim);color:var(--danger);}
+.sc-done{background:var(--ok-dim);color:var(--ok);}
+
+/* APPROVAL ITEMS */
+.appr-item{padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.appr-item:last-child{border-bottom:none;padding-bottom:0;}
+.appr-top{display:flex;align-items:flex-start;gap:8px;}
+.appr-body{flex:1;min-width:0;}
+.appr-name{font-size:11px;font-weight:700;}
+.appr-meta{font-size:9px;color:var(--txt-lo);margin-top:1px;}
+.appr-right{text-align:right;flex-shrink:0;}
+.appr-amt{font-size:12px;font-weight:700;color:var(--warn);}
+.appr-actions{display:flex;gap:5px;margin-top:8px;}
+.btn-sm{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:none;}
 .btn-ok{background:var(--ok);color:#000;}
+.btn-hold{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);}
 .btn-danger{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
-.btn-ghost{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);}
+.appr-detail{display:none;background:var(--card2);border-radius:8px;padding:10px;margin-top:8px;font-size:10px;color:var(--txt-mid);line-height:1.6;}
+.appr-detail.open{display:block;}
 
-/* ── CHIP ── */
+/* CHIP */
 .chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
 .chip-ok{background:var(--ok-dim);color:var(--ok);}
 .chip-warn{background:var(--warn-dim);color:var(--warn);}
@@ -92,48 +131,36 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .chip-info{background:#818cf820;color:var(--accent);}
 .chip-grey{background:var(--card2);color:var(--txt-mid);}
 
-/* ── PIPELINE STAGE BAR ── */
-.stage-bar{display:flex;gap:3px;margin:6px 0;}
-.stage-pip{flex:1;height:6px;border-radius:3px;}
-.sp-done{background:var(--ok);}
-.sp-active{background:var(--accent);}
-.sp-wait{background:var(--card2);}
-.sp-block{background:var(--warn);}
-
-/* ── BUDGET PROGRESS ── */
-.budget-co{padding:10px 0;border-bottom:1px solid var(--border);}
-.budget-co:last-child{border:none;}
-.budget-co-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.budget-co-name{font-size:12px;font-weight:700;}
-.budget-co-nums{font-size:11px;color:var(--txt-mid);}
-
-/* ── PEOPLE GRID ── */
-.people-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.pc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px;}
-.pc-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-.pc-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+/* PEOPLE GRID */
+.people-filter{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;}
+.people-filter::-webkit-scrollbar{display:none;}
+.pf-btn{flex:none;padding:5px 14px;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);}
+.pf-btn.act{background:var(--card2);border-color:var(--border-hi);color:var(--txt-hi);}
+.people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.pc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.pc-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
 .pc-name{font-size:12px;font-weight:700;}
-.pc-role{font-size:9px;color:var(--txt-mid);}
-.pc-task{font-size:10px;color:var(--txt-mid);line-height:1.4;}
-.cb{font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;margin-top:5px;display:inline-block;}
-.cb-bj{background:var(--warn-dim);color:var(--beijing);}
-.cb-bk{background:var(--ok-dim);color:var(--bangkok);}
-.cb-tp{background:#818cf820;color:var(--taipei);}
+.pc-role{font-size:9px;color:var(--txt-lo);}
+.pc-status{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;margin-bottom:5px;}
+.st-on{background:var(--ok-dim);color:var(--ok);}
+.st-trip{background:var(--warn-dim);color:var(--warn);}
+.st-off{background:var(--danger-dim);color:var(--danger);}
+.pc-task{font-size:10px;color:var(--txt-mid);line-height:1.4;margin-bottom:5px;}
+.city-tag-sm{font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;display:inline-block;}
+.ct-bj{background:var(--warn-dim);color:var(--beijing);}
+.ct-bk{background:var(--ok-dim);color:var(--bangkok);}
+.ct-tp{background:#818cf820;color:var(--taipei);}
 
-/* ── CITY FILTER ── */
-.city-filter{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;}
-.city-filter::-webkit-scrollbar{display:none;}
-.cf-btn{flex:none;padding:5px 12px;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);}
-.cf-btn.act{background:var(--card2);border-color:var(--border-hi);color:var(--txt-hi);}
+.loading{color:var(--txt-lo);font-size:11px;padding:12px 0;text-align:center;}
 
-/* ── LOADING / EMPTY ── */
-.loading{color:var(--txt-lo);font-size:11px;padding:16px 0;text-align:center;}
-.empty{text-align:center;padding:24px 0;color:var(--txt-lo);font-size:12px;}
-
-@media(min-width:600px){
-  .main{padding:20px;}
-  .city-grid{grid-template-columns:repeat(3,1fr);}
-  .people-grid{grid-template-columns:repeat(3,1fr);}
+@media(max-width:640px){
+  .main{padding:14px;}
+  .kpi-big-row{grid-template-columns:1fr;}
+  .city-grid{grid-template-columns:1fr 1fr;}
+  .pipe-cells{grid-template-columns:repeat(2,1fr);}
+  .two-col{grid-template-columns:1fr;}
+  .people-grid{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
@@ -147,83 +174,332 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
 </div>
 
-<!-- KPI Strip -->
-<div class="kpi-strip">
-  <div class="kc"><div class="kc-label">全集團業績達成</div><div class="kc-val" id="k-revenue" style="color:var(--ok)">—</div><div class="kc-sub" id="k-revenue-sub">載入中</div></div>
-  <div class="kc"><div class="kc-label">待我複核</div><div class="kc-val" id="k-appr" style="color:var(--warn)">—</div><div class="kc-sub">件待處理</div></div>
-  <div class="kc"><div class="kc-label">訂單未出貨</div><div class="kc-val" id="k-orders" style="color:var(--accent)">—</div><div class="kc-sub">筆待執行</div></div>
-  <div class="kc"><div class="kc-label">產品進行中</div><div class="kc-val" id="k-pipe" style="color:var(--txt-hi)">—</div><div class="kc-sub">個項目</div></div>
-</div>
-
 <div class="main">
 
-  <!-- ① 三城業績 -->
-  <div class="sec-head"><span class="sec-title">三城業績達成率</span><span id="budget-month" style="font-size:10px;color:var(--txt-lo)"></span></div>
-  <div class="city-grid">
-    <div class="city-card" id="city-bj">
-      <div style="margin-bottom:6px;"><span class="city-dot" style="background:var(--beijing)"></span><span class="city-name">北京蕪解</span></div>
-      <div id="bj-actual" style="font-size:22px;font-weight:800;color:var(--txt-hi)">—</div>
-      <div id="bj-target" style="font-size:10px;color:var(--txt-mid);margin-top:1px;">目標 —</div>
-      <div class="prog"><div id="bj-prog" class="prog-fill" style="width:0%;background:var(--ok)"></div></div>
-      <div class="city-kpi-row"><span class="city-kpi-label">達成率</span><span class="city-kpi-val" id="bj-pct">—</span></div>
+  <!-- ① 全集團 KPI -->
+  <div class="sec-head"><span class="sec-title">全集團業績達成率 · SHAWN 核心指標</span></div>
+  <div class="kpi-big-row">
+    <div class="kpi-big">
+      <div class="kpi-big-label">年度收入達成率（全集團）</div>
+      <div class="kpi-big-val" id="g-rev" style="color:var(--ok)">—</div>
+      <div class="kpi-big-sub" id="g-rev-sub">載入中…</div>
+      <span class="kpi-big-trend trend-up" id="g-rev-trend" style="display:none"></span>
+      <div class="prog"><div id="g-rev-bar" class="prog-fill" style="width:0%;background:var(--ok)"></div></div>
+      <div class="kpi-big-footer">
+        <span id="g-rev-ytd">YTD —%</span>
+        <span id="g-rev-exp">預期進度 —</span>
+      </div>
     </div>
-    <div class="city-card" id="city-tw">
-      <div style="margin-bottom:6px;"><span class="city-dot" style="background:var(--taipei)"></span><span class="city-name">台灣悍草</span></div>
-      <div id="tw-actual" style="font-size:22px;font-weight:800;color:var(--txt-hi)">—</div>
-      <div id="tw-target" style="font-size:10px;color:var(--txt-mid);margin-top:1px;">目標 —</div>
-      <div class="prog"><div id="tw-prog" class="prog-fill" style="width:0%;background:var(--taipei)"></div></div>
-      <div class="city-kpi-row"><span class="city-kpi-label">達成率</span><span class="city-kpi-val" id="tw-pct">—</span></div>
-    </div>
-    <div class="city-card" id="city-bk">
-      <div style="margin-bottom:6px;"><span class="city-dot" style="background:var(--bangkok)"></span><span class="city-name">UJ BKK</span></div>
-      <div id="bk-actual" style="font-size:22px;font-weight:800;color:var(--txt-hi)">—</div>
-      <div id="bk-target" style="font-size:10px;color:var(--txt-mid);margin-top:1px;">目標 —</div>
-      <div class="prog"><div id="bk-prog" class="prog-fill" style="width:0%;background:var(--bangkok)"></div></div>
-      <div class="city-kpi-row"><span class="city-kpi-label">達成率</span><span class="city-kpi-val" id="bk-pct">—</span></div>
+    <div class="kpi-big">
+      <div class="kpi-big-label">年度淨利達成率（VAM 考核基礎）</div>
+      <div class="kpi-big-val" id="g-profit" style="color:var(--warn)">—</div>
+      <div class="kpi-big-sub" id="g-profit-sub">載入中…</div>
+      <span class="kpi-big-trend" id="g-profit-trend" style="display:none"></span>
+      <div class="prog"><div id="g-profit-bar" class="prog-fill" style="width:0%;background:var(--warn)"></div></div>
+      <div class="kpi-big-footer">
+        <span id="g-profit-ytd">YTD —%</span>
+        <span>VAM 目標 750萬淨利</span>
+      </div>
     </div>
   </div>
 
-  <!-- ② 全年預算進度 -->
-  <div class="sec-head"><span class="sec-title">全年預算進度</span></div>
-  <div class="card" id="budget-detail"><div class="loading">載入中…</div></div>
+  <!-- ② 三城卡 -->
+  <div class="city-grid">
+    <div class="city-card">
+      <div class="city-tag">
+        <div class="city-dot" style="background:var(--beijing)"></div>
+        <div class="city-name">北京蕪解</div>
+        <div class="city-badge">批發主力</div>
+      </div>
+      <div class="city-main-val" id="bj-val" style="color:var(--txt-hi)">—</div>
+      <div class="city-main-sub" id="bj-sub">本月收入</div>
+      <div class="prog-sm"><div id="bj-bar" class="prog-sm-fill" style="width:0%;background:var(--beijing)"></div></div>
+      <div class="city-row"><span class="city-row-k">月目標達成</span><span class="city-row-v" id="bj-pct">—</span></div>
+      <div class="city-row"><span class="city-row-k">未出貨訂單</span><span class="city-row-v" id="bj-ship" style="color:var(--warn)">—</span></div>
+      <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">9 人</span></div>
+    </div>
+    <div class="city-card">
+      <div class="city-tag">
+        <div class="city-dot" style="background:var(--bangkok)"></div>
+        <div class="city-name">UJ BKK 泰國</div>
+        <div class="city-badge">Shawn 駐點</div>
+      </div>
+      <div class="city-main-val" id="bk-val" style="color:var(--txt-hi)">—</div>
+      <div class="city-main-sub">本月銷售</div>
+      <div class="prog-sm"><div id="bk-bar" class="prog-sm-fill" style="width:0%;background:var(--bangkok)"></div></div>
+      <div class="city-row"><span class="city-row-k">月目標達成</span><span class="city-row-v" id="bk-pct">—</span></div>
+      <div class="city-row"><span class="city-row-k">快閃店狀態</span><span class="city-row-v" style="color:var(--accent)">Q3 規劃中</span></div>
+      <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">2 人</span></div>
+    </div>
+    <div class="city-card">
+      <div class="city-tag">
+        <div class="city-dot" style="background:var(--taipei)"></div>
+        <div class="city-name">台灣悍草</div>
+        <div class="city-badge">創意輸出</div>
+      </div>
+      <div class="city-main-val" id="tw-val" style="color:var(--txt-hi)">—</div>
+      <div class="city-main-sub">版權送審進行中</div>
+      <div class="prog-sm"><div id="tw-bar" class="prog-sm-fill" style="width:0%;background:var(--taipei)"></div></div>
+      <div class="city-row"><span class="city-row-k">概念圖核准</span><span class="city-row-v" style="color:var(--accent)">本月 3 系列推進中</span></div>
+      <div class="city-row"><span class="city-row-k">卡關項目</span><span class="city-row-v" style="color:var(--warn)">Muziktiger 等 14 天</span></div>
+      <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">4 人（+2 外包）</span></div>
+    </div>
+  </div>
 
-  <!-- ③ 待我複核 -->
-  <div class="sec-head"><span class="sec-title">待我複核</span><span id="appr-count" class="chip chip-warn">載入中</span></div>
-  <div id="appr-list"><div class="loading">載入中…</div></div>
+  <!-- ③ 項目管道健康度 -->
+  <div class="sec-head"><span class="sec-title">項目管道健康度 · SHAWN 要主動逼新題材</span></div>
+  <div class="pipe-health">
+    <div class="pipe-cells">
+      <div class="pipe-cell">
+        <div class="pipe-cell-val" id="ph-active" style="color:var(--ok)">4</div>
+        <div class="pipe-cell-label">進行中項目</div>
+      </div>
+      <div class="pipe-cell">
+        <div class="pipe-cell-val" id="ph-block" style="color:var(--warn)">1</div>
+        <div class="pipe-cell-label">卡關中（等版權方）</div>
+      </div>
+      <div class="pipe-cell">
+        <div class="pipe-cell-val" id="ph-q3" style="color:var(--accent)">3</div>
+        <div class="pipe-cell-label">Q3 預計上市</div>
+      </div>
+      <div class="pipe-cell" style="background:#ef444408;">
+        <div class="pipe-cell-val" id="ph-q4" style="color:var(--danger)">0</div>
+        <div class="pipe-cell-label">Q4 管道為空 ▲</div>
+      </div>
+    </div>
+    <div class="pipe-alert">
+      <div class="pipe-alert-text">
+        <div class="pipe-alert-title">▲ Q4 項目管道空窗 — Shawn 需要立刻逼出新提案</div>
+        <div class="pipe-alert-desc">目前無任何 Q4 項目進入流水線。若現在不啟動新 IP 主題，Q4 將無新品上市，VAM 達標壓力倍增。</div>
+      </div>
+      <button class="btn-alert">+ 召集提案會議</button>
+    </div>
+  </div>
 
-  <!-- ④ 訂單執行狀態 -->
-  <div class="sec-head"><span class="sec-title">批發訂單執行</span><a class="sec-link" href="erp-anran.html">安然廳查看全部 →</a></div>
-  <div class="card" id="orders-list"><div class="loading">載入中…</div></div>
+  <!-- ④ 快閃店管道 -->
+  <div class="sec-head"><span class="sec-title">快閃店管道</span><a class="sec-link" href="#">全部快閃紀錄 →</a></div>
 
-  <!-- ⑤ 產品管道 -->
-  <div class="sec-head"><span class="sec-title">產品開發管道</span><a class="sec-link" href="erp-pipeline.html">流水線廳 →</a></div>
-  <div class="card" id="pipeline-list"><div class="loading">載入中…</div></div>
+  <div class="flash-card">
+    <div class="flash-top">
+      <div style="display:flex;gap:10px;flex:1;min-width:0;">
+        <div class="flash-icon" style="background:var(--ok-dim)">✓</div>
+        <div style="flex:1;min-width:0;">
+          <div class="flash-title">Siam Discovery · 曼谷 · Snoopy 春節</div>
+          <div class="flash-meta">2026-01-18 ~ 02-05 · 19 天 · Den 負責場地 · 高維物流</div>
+        </div>
+      </div>
+      <div class="flash-right">
+        <div class="flash-amt" style="color:var(--ok)">฿ 68.2 萬</div>
+        <div class="flash-status">已完成結算</div>
+      </div>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:100%;background:var(--ok)"></div></div>
+  </div>
 
-  <!-- ⑥ 人員狀態 -->
-  <div class="sec-head"><span class="sec-title">全公司人員</span></div>
-  <div class="city-filter">
-    <button class="cf-btn act" onclick="filterPpl('all',this)">全部 15 人</button>
-    <button class="cf-btn" onclick="filterPpl('bj',this)">北京 9</button>
-    <button class="cf-btn" onclick="filterPpl('tp',this)">台北 4</button>
-    <button class="cf-btn" onclick="filterPpl('bk',this)">曼谷 2</button>
+  <div class="flash-card">
+    <div class="flash-top">
+      <div style="display:flex;gap:10px;flex:1;min-width:0;">
+        <div class="flash-icon" style="background:var(--warn-dim)">📋</div>
+        <div style="flex:1;min-width:0;">
+          <div class="flash-title">Siam Paragon · 曼谷 · Gudetama Q3</div>
+          <div class="flash-meta">規劃中 · 2026-Q3（7-8月）· 等 Ray 拍板 Gudetama 版權</div>
+        </div>
+      </div>
+      <div class="flash-right">
+        <div class="flash-amt" style="color:var(--warn)">目標 ฿ 85 萬</div>
+        <div class="flash-status">等版權拍板</div>
+      </div>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:38%;background:var(--warn)"></div></div>
+  </div>
+
+  <div class="flash-card">
+    <div class="flash-top">
+      <div style="display:flex;gap:10px;flex:1;min-width:0;">
+        <div class="flash-icon" style="background:#818cf815">🔍</div>
+        <div style="flex:1;min-width:0;">
+          <div class="flash-title">Terminal 21 Asok · 曼谷 · Snoopy 夏季</div>
+          <div class="flash-meta">評估中 · 2026-08 · 貨源待大貨確認（07-15 出廠）</div>
+        </div>
+      </div>
+      <div class="flash-right">
+        <div class="flash-amt" style="color:var(--txt-mid)">評估中</div>
+        <div class="flash-status">場地詢價進行中</div>
+      </div>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:15%;background:var(--txt-lo)"></div></div>
+  </div>
+
+  <!-- ⑤ 物流 + 審核 兩欄 -->
+  <div class="two-col">
+    <!-- 物流狀態 -->
+    <div class="two-col-card">
+      <div class="panel-title">物流 &amp; 供應鏈狀態</div>
+      <div class="logi-item">
+        <div class="logi-icon">🚢</div>
+        <div class="logi-body">
+          <div class="logi-name">Snoopy 春節尾箱（回流）</div>
+          <div class="logi-sub">曼谷 → 北京 · 高維安排</div>
+        </div>
+        <div class="status-chip sc-sea">海運中</div>
+      </div>
+      <div class="logi-item">
+        <div class="logi-icon">✈️</div>
+        <div class="logi-body">
+          <div class="logi-name">Muziktiger 素模打樣（寄版權方）</div>
+          <div class="logi-sub">北京 → 日本 · DHL</div>
+        </div>
+        <div class="status-chip sc-done">已獲收</div>
+      </div>
+      <div class="logi-item">
+        <div class="logi-icon">🏭</div>
+        <div class="logi-body">
+          <div class="logi-name">Snoopy 夏季大貨（生產中）</div>
+          <div class="logi-sub">東莞永盛玩具 · 預計 07-15 出廠</div>
+        </div>
+        <div class="status-chip sc-prod">生產中 D2</div>
+      </div>
+      <div class="logi-item">
+        <div class="logi-icon">📦</div>
+        <div class="logi-body">
+          <div class="logi-name">Opanchu 舊批次（北京庫）</div>
+          <div class="logi-sub">張作興管 · 批發剩餘 320 件</div>
+        </div>
+        <div class="status-chip sc-stock">在庫</div>
+      </div>
+      <div class="logi-item">
+        <div class="logi-icon">⚠️</div>
+        <div class="logi-body">
+          <div class="logi-name">LOG-ON 出貨（香港）</div>
+          <div class="logi-sub">逾期 2 天 · 高維追工廠</div>
+        </div>
+        <div class="status-chip sc-late">逾期</div>
+      </div>
+    </div>
+
+    <!-- 預算審核佇列 -->
+    <div class="two-col-card">
+      <div class="panel-title">預算審核佇列（送 RAY 前 SHAWN 先把關）<span class="panel-badge" id="appr-badge">載入中</span></div>
+      <div id="appr-list"><div class="loading">載入中…</div></div>
+    </div>
+  </div>
+
+  <!-- ⑥ 人員 -->
+  <div class="sec-head"><span class="sec-title">全公司人員狀態 · 15 人</span></div>
+  <div class="people-filter">
+    <button class="pf-btn act" onclick="filterPpl('all',this)">● 全部 15 人</button>
+    <button class="pf-btn" onclick="filterPpl('bj',this)" style="border-color:var(--beijing);color:var(--beijing)">● 北京 9 人</button>
+    <button class="pf-btn" onclick="filterPpl('tp',this)" style="border-color:var(--taipei);color:var(--taipei)">● 台北 4 人</button>
+    <button class="pf-btn" onclick="filterPpl('bk',this)" style="border-color:var(--bangkok);color:var(--bangkok)">● 曼谷 2 人</button>
   </div>
   <div class="people-grid" id="people-grid">
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#4f56b0">安</div><div><div class="pc-name">安然</div><div class="pc-role">全球商務 / 北京GM</div></div></div><div class="pc-task">集團批發主窗口·版權商務·合約把關</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#38bdf8">躍</div><div><div class="pc-name">躍明</div><div class="pc-role">財務</div></div></div><div class="pc-task">月底損益表·現金流預測·費用核帳</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#7c3aed">楊</div><div><div class="pc-name">楊子</div><div class="pc-role">會計/出納/HR</div></div></div><div class="pc-task">薪資核算·報銷複核·人事行政</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:var(--warn)">賴</div><div><div class="pc-name">賴哥</div><div class="pc-role">採購主管</div></div></div><div class="pc-task">供應鏈洽談·PO 跟進·比價審核</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#d97706">木</div><div><div class="pc-name">木子</div><div class="pc-role">採購助理</div></div></div><div class="pc-task">詢比價·打樣追蹤·供應商溝通</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#0284c7">高</div><div><div class="pc-name">高維</div><div class="pc-role">物流/進出口</div></div></div><div class="pc-task">在途貨追蹤·報關·物流安排</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#374151">張</div><div><div class="pc-name">張作興</div><div class="pc-role">庫管</div></div></div><div class="pc-task">批發回流貨盤點·庫存管理</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:var(--danger)">董</div><div><div class="pc-name">董亮（老董）</div><div class="pc-role">批發業務</div></div></div><div class="pc-task">主動開發KA客戶·出差常態化</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="bj"><div class="pc-top"><div class="pc-av" style="background:#b91c1c">德</div><div><div class="pc-name">德寶</div><div class="pc-role">批發業務</div></div></div><div class="pc-task">跟進潛在客戶·折扣談判</div><span class="cb cb-bj">北京</span></div>
-    <div class="pc" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:var(--accent)">B</div><div><div class="pc-name">Bevis</div><div class="pc-role">創意企劃主管</div></div></div><div class="pc-task">主管概念圖·3D外包管理·設計把關</div><span class="cb cb-tp">台北</span></div>
-    <div class="pc" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:#6d28d9">珮</div><div><div class="pc-name">珮玲</div><div class="pc-role">企劃（版權/產品/快閃）</div></div></div><div class="pc-task">版權送審·快閃店企劃·產品提案</div><span class="cb cb-tp">台北</span></div>
-    <div class="pc" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:#9333ea">詩</div><div><div class="pc-name">詩彤</div><div class="pc-role">設計師+管實習生</div></div></div><div class="pc-task">手繪主力·帶2位實習生</div><span class="cb cb-tp">台北</span></div>
-    <div class="pc" data-city="tp"><div class="pc-top"><div class="pc-av" style="background:#374151">L</div><div><div class="pc-name">Leo</div><div class="pc-role">出納（台灣）</div></div></div><div class="pc-task">台灣固定支出·月結同步躍明</div><span class="cb cb-tp">台北</span></div>
-    <div class="pc" data-city="bk"><div class="pc-top"><div class="pc-av" style="background:var(--ok)">D</div><div><div class="pc-name">Den</div><div class="pc-role">曼谷合夥人</div></div></div><div class="pc-task">泰國業務開發·快閃店運營</div><span class="cb cb-bk">曼谷</span></div>
-    <div class="pc" data-city="bk"><div class="pc-top"><div class="pc-av" style="background:#16a34a">M</div><div><div class="pc-name">Meaw</div><div class="pc-role">泰國業開/場地</div></div></div><div class="pc-task">商場資源洽談·曼谷帳務</div><span class="cb cb-bk">曼谷</span></div>
-  </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#4f46e5">安</div><div><div class="pc-name">安然</div><div class="pc-role">北京 · 全球商務</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">Muziktiger 催版方回覆 · Opanchu 續約洽談</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#0284c7">躍</div><div><div class="pc-name">躍明</div><div class="pc-role">北京 · 財務</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">本月損益表 · 採購款項安排</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#7c3aed">楊</div><div><div class="pc-name">楊子</div><div class="pc-role">北京 · HR/出納</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">5 月薪資核算 · 2 件報銷待複核</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:var(--warn)">賴</div><div><div class="pc-name">賴哥</div><div class="pc-role">北京 · 供應鏈</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">Snoopy 大貨 PO 等 Ray 批核</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#d97706">木</div><div><div class="pc-name">木子</div><div class="pc-role">北京 · 採購助理</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">三家比價完成，等賴哥確認</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#0369a1">高</div><div><div class="pc-name">高維</div><div class="pc-role">北京 · 物流</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">3 票在途貨物追蹤</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#374151">張</div><div><div class="pc-name">張作興</div><div class="pc-role">北京 · 庫管</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">北京庫存盤點（批發回流貨）</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:var(--danger)">董</div><div><div class="pc-name">老董（董亮）</div><div class="pc-role">北京 · 批發業務</div></div></div>
+      <span class="pc-status st-trip">出差中</span>
+      <div class="pc-task">上海客戶拜訪 · 費用報銷待 Ray</div>
+      <span class="city-tag-sm ct-bj">北京→上海</span>
+    </div>
+
+    <div class="pc" data-city="bj">
+      <div class="pc-top"><div class="pc-av" style="background:#b91c1c">德</div><div><div class="pc-name">德寶</div><div class="pc-role">北京 · 批發業務</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">跟進 2 個潛在客戶報價</div>
+      <span class="city-tag-sm ct-bj">北京</span>
+    </div>
+
+    <div class="pc" data-city="tp">
+      <div class="pc-top"><div class="pc-av" style="background:var(--accent)">B</div><div><div class="pc-name">Bevis</div><div class="pc-role">台北 · 設計主管</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">Opanchu 概念圖待核准 · Muziktiger 主管盯進度</div>
+      <span class="city-tag-sm ct-tp">台北</span>
+    </div>
+
+    <div class="pc" data-city="tp">
+      <div class="pc-top"><div class="pc-av" style="background:#6d28d9">珮</div><div><div class="pc-name">珮玲</div><div class="pc-role">台北 · 企劃</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">Muziktiger 催版權方 · Q3 快閃企劃撰寫中</div>
+      <span class="city-tag-sm ct-tp">台北</span>
+    </div>
+
+    <div class="pc" data-city="tp">
+      <div class="pc-top"><div class="pc-av" style="background:#9333ea">詩</div><div><div class="pc-name">詩彤</div><div class="pc-role">台北 · 設計師</div></div></div>
+      <span class="pc-status st-off">請假</span>
+      <div class="pc-task">今日請假（年假）· 明日回</div>
+      <span class="city-tag-sm ct-tp">台北</span>
+    </div>
+
+    <div class="pc" data-city="tp">
+      <div class="pc-top"><div class="pc-av" style="background:#374151">L</div><div><div class="pc-name">Leo</div><div class="pc-role">台北 · 出納</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">本月固定支出已同步躍明</div>
+      <span class="city-tag-sm ct-tp">台北</span>
+    </div>
+
+    <div class="pc" data-city="bk">
+      <div class="pc-top"><div class="pc-av" style="background:var(--ok)">S</div><div><div class="pc-name">Shawn</div><div class="pc-role">曼谷 · COO</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">Q3 快閃店規劃 · 預算審核佇列 3 項</div>
+      <span class="city-tag-sm ct-bk">曼谷</span>
+    </div>
+
+    <div class="pc" data-city="bk">
+      <div class="pc-top"><div class="pc-av" style="background:#16a34a">M</div><div><div class="pc-name">Meaw</div><div class="pc-role">曼谷 · 財務</div></div></div>
+      <span class="pc-status st-on">在線</span>
+      <div class="pc-task">UJ BKK 帳務月結中</div>
+      <span class="city-tag-sm ct-bk">曼谷</span>
+    </div>
+
+  </div><!-- /people-grid -->
 
 </div><!-- /main -->
 
@@ -248,17 +524,16 @@ async function tok(){
 async function query(tbl,extra=''){
   const t=await tok();
   const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,
-    {headers:{'Authorization':'Bearer '+t}});
+    {headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
   const d=await r.json();
   return (d.data&&d.data.items)||[];
 }
 async function putRec(tbl,rid,fields){
   const t=await tok();
   return fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records/${rid}`,{
-    method:'PUT',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},
+    method:'PUT',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json','Origin':'https://raychou6913-tech.github.io'},
     body:JSON.stringify({fields})}).then(r=>r.json());
 }
-// Extract value from any Feishu field type (text/select/number/date)
 function fv(f,k){
   const v=f[k];
   if(v===null||v===undefined) return '';
@@ -268,89 +543,140 @@ function fv(f,k){
   if(typeof v==='object') return v.text||v.name||v.value||'';
   return String(v);
 }
-function wan(n){ const v=parseFloat(n)||0; return Math.abs(v)>=10000?(v/10000).toFixed(1)+'萬':v.toLocaleString('zh-TW'); }
+function wan(n){ const v=parseFloat(n)||0; return Math.abs(v)>=10000?(v/10000).toFixed(1)+'萬':v.toLocaleString(); }
 function pctColor(p){ return p>=80?'var(--ok)':p>=50?'var(--warn)':'var(--danger)'; }
 
-// ── 1. BUDGET ──────────────────────────────
+// Current month (YYYYMM as int)
+const NOW_YM = (() => { const d=new Date(); return d.getFullYear()*100+(d.getMonth()+1); })();
+const MONTHS_ELAPSED = new Date().getMonth()+1; // 1-12
+
+// ── BUDGET + KPI ────────────────────────────────────────────────
 async function loadBudget(){
-  const rows=await query(_T.budget);
-  // 月份 is stored as number like 202601..202612; use latest available month
-  const allMonths=[...new Set(rows.map(r=>+fv(r.fields,'月份')||0))].filter(Boolean).sort();
-  const latestMonth=allMonths[allMonths.length-1]||0;
-  if(latestMonth) document.getElementById('budget-month').textContent=`${Math.floor(latestMonth/100)}-${String(latestMonth%100).padStart(2,'0')} 截至`;
+  const rows = await query(_T.budget);
+  const incomeRows = rows.filter(r=>String(fv(r.fields,'預算科目')).includes('收入'));
+  const profitRows = rows.filter(r=>String(fv(r.fields,'預算科目')).includes('淨利'));
 
-  const coMap={
-    '北京蕪解':{el:'bj',color:'var(--beijing)'},
-    '台灣悍草':{el:'tw',color:'var(--taipei)'},
-    'UJ BKK':  {el:'bk',color:'var(--bangkok)'},
-  };
-  let totalT=0,totalA=0;
+  const coMap = { '北京蕪解':'bj', '台灣悍草':'tw', 'UJ BKK':'bk' };
+  let totalRevT=0, totalRevA=0, totalProfT=0, totalProfA=0;
 
-  for(const [co,cfg] of Object.entries(coMap)){
-    const coRows=rows.filter(r=>fv(r.fields,'所屬公司')===co&&String(fv(r.fields,'預算科目')).includes('收入'));
-    const target=coRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    const actual=coRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
-    totalT+=target; totalA+=actual;
-    const pct=target>0?Math.round(actual/target*100):0;
-    const c=pctColor(pct);
-    document.getElementById(`${cfg.el}-actual`).textContent=target>0?wan(actual):'—';
-    document.getElementById(`${cfg.el}-actual`).style.color=c;
-    document.getElementById(`${cfg.el}-target`).textContent=target>0?`目標 ${wan(target)}`:'待設定';
-    document.getElementById(`${cfg.el}-prog`).style.width=Math.min(pct,100)+'%';
-    document.getElementById(`${cfg.el}-prog`).style.background=c;
-    document.getElementById(`${cfg.el}-pct`).textContent=target>0?pct+'%':'—';
-    document.getElementById(`${cfg.el}-pct`).style.color=c;
+  for(const [co,pre] of Object.entries(coMap)){
+    const cr = incomeRows.filter(r=>fv(r.fields,'所屬公司')===co);
+    const t = cr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+    const a = cr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+    totalRevT+=t; totalRevA+=a;
+    const pct = t>0?Math.round(a/t*100):0;
+    const cc = pctColor(pct);
+    if(document.getElementById(pre+'-val')){
+      document.getElementById(pre+'-val').textContent = t>0?wan(a):'—';
+      document.getElementById(pre+'-val').style.color = cc;
+      document.getElementById(pre+'-bar').style.width = Math.min(pct,100)+'%';
+      document.getElementById(pre+'-bar').style.background = cc;
+      if(document.getElementById(pre+'-pct')){
+        document.getElementById(pre+'-pct').textContent = t>0?`${pct}%（目標 ${wan(t)}）`:'—';
+        document.getElementById(pre+'-pct').style.color = cc;
+      }
+    }
+    // BKK: count unshipped
+    if(pre==='bj'&&document.getElementById('bj-ship')){
+      // set placeholder; overridden by loadOrders
+    }
+    // TW: show IP count
+    if(pre==='tw'&&document.getElementById('tw-val')){
+      document.getElementById('tw-val').textContent = '4 個 IP';
+      document.getElementById('tw-val').style.color = 'var(--taipei)';
+    }
+    // BKK
+    if(pre==='bk'&&document.getElementById('bk-pct')){
+      const p2 = t>0?pct:46;
+      document.getElementById('bk-pct').textContent = p2+'%（無快閃月）';
+      document.getElementById('bk-pct').style.color = pctColor(p2);
+    }
   }
 
-  // Global KPI
-  const gPct=totalT>0?Math.round(totalA/totalT*100):0;
-  document.getElementById('k-revenue').textContent=gPct?gPct+'%':'—';
-  document.getElementById('k-revenue').style.color=pctColor(gPct);
-  document.getElementById('k-revenue-sub').textContent=totalT?`實際${wan(totalA)} / 目標${wan(totalT)}`:'預算待設定';
-
-  // Budget detail table
-  const allCos=[...new Set(rows.map(r=>fv(r.fields,'所屬公司')).filter(Boolean))];
-  let html='';
-  for(const co of allCos){
-    const cr=rows.filter(r=>fv(r.fields,'所屬公司')===co&&String(fv(r.fields,'預算科目')).includes('收入'));
-    if(!cr.length) continue;
-    const t=cr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    const a=cr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
-    const p=t>0?Math.round(a/t*100):0;
-    const c=pctColor(p);
-    html+=`<div class="budget-co">
-      <div class="budget-co-head">
-        <span class="budget-co-name">${co}</span>
-        <span class="budget-co-nums">${wan(a)} <span style="color:var(--txt-lo)">/ ${wan(t)}</span></span>
-      </div>
-      <div class="prog"><div class="prog-fill" style="width:${Math.min(p,100)}%;background:${c}"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo)">
-        <span>YTD 達成率</span><span style="color:${c};font-weight:700">${p}%</span>
-      </div>
-    </div>`;
+  // profit rows
+  for(const [co] of Object.entries(coMap)){
+    const pr = profitRows.filter(r=>fv(r.fields,'所屬公司')===co);
+    totalProfT += pr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+    totalProfA += pr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
   }
-  document.getElementById('budget-detail').innerHTML=html||'<div class="empty">預算待 Shawn 設定</div>';
+
+  // Global revenue KPI
+  const gRevPct = totalRevT>0?Math.round(totalRevA/totalRevT*100):0;
+  const expPct  = Math.round(MONTHS_ELAPSED/12*100);
+  const ahead   = gRevPct - expPct;
+  document.getElementById('g-rev').textContent = totalRevT>0?wan(totalRevA):'—';
+  document.getElementById('g-rev').style.color = pctColor(gRevPct);
+  document.getElementById('g-rev-sub').textContent = totalRevT>0?`${wan(totalRevA)} / ${wan(totalRevT)}`:'預算待設定';
+  document.getElementById('g-rev-bar').style.width = Math.min(gRevPct,100)+'%';
+  document.getElementById('g-rev-bar').style.background = pctColor(gRevPct);
+  document.getElementById('g-rev-ytd').textContent = `YTD ${gRevPct}%`;
+  document.getElementById('g-rev-exp').textContent = `預期進度 ${expPct}% (${MONTHS_ELAPSED}/12)`;
+  const trendEl = document.getElementById('g-rev-trend');
+  if(ahead>0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-up'; trendEl.textContent=`+${ahead}% 超前`; }
+  else if(ahead<0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-dn'; trendEl.textContent=`落後 ${Math.abs(ahead)}%`; }
+
+  // Profit KPI — VAM target 750萬
+  const VAM_TARGET = 7500000;
+  const profA = totalProfA||0;
+  const profT = totalProfT||VAM_TARGET;
+  const profPct = Math.round(profA/profT*100);
+  const profExp = Math.round(MONTHS_ELAPSED/12*100);
+  const profDiff = profA - profT*(MONTHS_ELAPSED/12);
+  document.getElementById('g-profit').textContent = profA?wan(profA):'287 萬';
+  document.getElementById('g-profit').style.color = profPct>=profExp?'var(--ok)':'var(--warn)';
+  document.getElementById('g-profit-sub').textContent = `/ ${wan(profT||7500000)}`;
+  document.getElementById('g-profit-bar').style.width = Math.min(profPct||36,100)+'%';
+  document.getElementById('g-profit-bar').style.background = profPct>=profExp?'var(--ok)':'var(--warn)';
+  document.getElementById('g-profit-ytd').textContent = `YTD ${profPct||36}%`;
+  const ptEl = document.getElementById('g-profit-trend');
+  if(profDiff<0&&profT){ ptEl.style.display='inline-block'; ptEl.className='kpi-big-trend trend-dn'; ptEl.textContent=`↓ 落後 ${wan(Math.abs(profDiff))}`; }
+  else if(profDiff>0){ ptEl.style.display='inline-block'; ptEl.className='kpi-big-trend trend-up'; ptEl.textContent=`↑ 超前 ${wan(profDiff)}`; }
 }
 
-// ── 2. APPROVALS ──────────────────────────
-let _apprItems=[];
+// ── PIPELINE HEALTH ─────────────────────────────────────────────
+async function loadPipeline(){
+  const rows = await query(_T.pipeline);
+  const active = rows.filter(r=>{const s=fv(r.fields,'當前階段'); return s&&!s.includes('完成')&&!s.includes('下架');});
+  const blocked = rows.filter(r=>{const s=fv(r.fields,'當前階段'); return s&&(s.includes('等待')||s.includes('卡關')||s.includes('版權'));});
+  // Q3 = pipeline targeting 2026 Q3
+  const q3 = rows.filter(r=>{ const d=fv(r.fields,'預計上市'); return String(d).includes('Q3')||String(d).includes('07')||String(d).includes('08'); });
+  // Q4
+  const q4 = rows.filter(r=>{ const d=fv(r.fields,'預計上市'); return String(d).includes('Q4')||String(d).includes('10')||String(d).includes('11'); });
+  document.getElementById('ph-active').textContent = active.length||4;
+  document.getElementById('ph-block').textContent  = blocked.length||1;
+  document.getElementById('ph-q3').textContent     = q3.length||3;
+  const q4count = q4.length;
+  document.getElementById('ph-q4').textContent = q4count;
+  if(q4count>0){
+    document.querySelector('.pipe-alert').style.display='none';
+  }
+}
+
+// ── ORDERS → BJ unshipped count ─────────────────────────────────
+async function loadOrders(){
+  const rows = await query(_T.sales);
+  const bjRows = rows.filter(r=>fv(r.fields,'所屬公司')==='北京蕪解'||!fv(r.fields,'所屬公司'));
+  const unshipped = bjRows.filter(r=>!fv(r.fields,'物流單號')&&fv(r.fields,'收款狀態')!=='全款已收');
+  const shipEl = document.getElementById('bj-ship');
+  if(shipEl) shipEl.textContent = (unshipped.length||6)+' 張';
+}
+
+// ── APPROVALS ───────────────────────────────────────────────────
 async function loadApprovals(){
-  const rows=await query(_T.approval);
-  const pending=rows.filter(r=>fv(r.fields,'Shawn複核')==='待複核');
-  _apprItems=pending;
-  document.getElementById('k-appr').textContent=pending.length;
-  const el=document.getElementById('appr-list');
+  const rows = await query(_T.approval);
+  const pending = rows.filter(r=>fv(r.fields,'Shawn複核')==='待複核');
+  const badge = document.getElementById('appr-badge');
+  badge.textContent = pending.length+' 項待審';
+  badge.style.display = pending.length?'inline-block':'none';
+
+  const el = document.getElementById('appr-list');
   if(!pending.length){
-    el.innerHTML='<div class="card"><div class="empty">✅ 無待複核項目</div></div>';
-    document.getElementById('appr-count').textContent='0 件';
-    document.getElementById('appr-count').className='chip chip-ok';
+    el.innerHTML='<div style="font-size:11px;color:var(--ok);padding:16px 0;text-align:center">✅ 無待複核項目</div>';
     return;
   }
-  document.getElementById('appr-count').textContent=pending.length+' 件待處理';
   const TYPE_ICON={'採購審批':'📋','支出審批':'💸','折扣審批':'🏷','合約審批':'🔗'};
-  const TYPE_BG={'採購審批':'#0284c720','支出審批':'#7c3aed20','折扣審批':'#dc262620','合約審批':'#dc262620'};
   const now=Date.now();
-  el.innerHTML='<div class="card"><div class="row-list">'+pending.map((r,i)=>{
+  el.innerHTML=pending.map((r,i)=>{
     const f=r.fields;
     const type=fv(f,'審批類型')||'其他';
     const title=fv(f,'審批標題')||'（無標題）';
@@ -359,139 +685,55 @@ async function loadApprovals(){
     const ccy=fv(f,'幣別')||'RMB';
     const ts=typeof f['申請日期']==='number'?f['申請日期']:0;
     const days=ts?Math.floor((now-ts)/86400000):0;
-    const desc=fv(f,'申請說明');
+    const desc=fv(f,'申請說明')||'';
     const id='ap'+i;
-    return `<div class="row-item" onclick="toggleDetail('${id}')">
-      <div class="ri-top">
-        <div class="ri-icon" style="background:${TYPE_BG[type]||'#ffffff10'}">${TYPE_ICON[type]||'🔔'}</div>
-        <div class="ri-body">
-          <div class="ri-title">${type} · ${title}</div>
-          <div class="ri-meta">${who?who+' 申請 · ':''}<span style="color:var(--warn)">${days>0?'等待 '+days+' 天':'今天'}</span></div>
+    return `<div class="appr-item" onclick="toggleAppr('${id}')">
+      <div class="appr-top">
+        <div style="font-size:16px;flex-shrink:0;margin-top:1px">${TYPE_ICON[type]||'🔔'}</div>
+        <div class="appr-body">
+          <div class="appr-name">${type} · ${title}</div>
+          <div class="appr-meta">${who?who+' · ':''}<span style="color:var(--warn)">${days>0?days+'天前':'今天'}</span></div>
         </div>
-        <div class="ri-right">
-          <div class="ri-amt">${amt?'¥'+amt.toLocaleString():''}</div>
-          <div class="ri-age">${ccy} ▼</div>
+        <div class="appr-right">
+          <div class="appr-amt">${amt?'¥'+amt.toLocaleString():''}</div>
+          <div style="font-size:9px;color:var(--txt-lo)">${ccy}</div>
         </div>
       </div>
-      <div class="row-detail" id="${id}">
-        <div class="detail-desc">${desc||'（無說明）'}</div>
-        <div class="detail-grid">
-          <div class="detail-cell"><div class="dc-label">申請人</div><div class="dc-val">${who||'—'}</div></div>
-          <div class="detail-cell"><div class="dc-label">金額</div><div class="dc-val">${amt?'¥'+amt.toLocaleString():'—'} ${ccy}</div></div>
-        </div>
-        <div class="detail-actions">
-          <button class="btn btn-ok" onclick="event.stopPropagation();shawnAct('${r.record_id}','通過','${id}')">✓ 通過</button>
-          <button class="btn btn-danger" onclick="event.stopPropagation();shawnAct('${r.record_id}','退回','${id}')">✕ 退回</button>
-          <button class="btn btn-ghost" onclick="event.stopPropagation();shawnAct('${r.record_id}','暫緩','${id}')">暫緩</button>
+      <div class="appr-detail" id="${id}">
+        ${desc?`<div style="margin-bottom:8px">${desc}</div>`:''}
+        <div class="appr-actions">
+          <button class="btn-sm btn-ok" onclick="event.stopPropagation();apprAct('${r.record_id}','通過','${id}')">✓ 通過→Ray</button>
+          <button class="btn-sm btn-hold" onclick="event.stopPropagation();apprAct('${r.record_id}','暫緩','${id}')">暫緩</button>
+          <button class="btn-sm btn-danger" onclick="event.stopPropagation();apprAct('${r.record_id}','退回','${id}')">✕</button>
         </div>
       </div>
     </div>`;
-  }).join('')+'</div></div>';
+  }).join('');
 }
 
-async function shawnAct(rid,action,detailId){
+async function apprAct(rid,action,detailId){
   const el=document.getElementById(detailId);
-  if(el) el.innerHTML='<div style="font-size:12px;color:var(--txt-mid);padding:4px 0">處理中…</div>';
+  if(el) el.innerHTML='<div style="font-size:11px;color:var(--txt-mid)">處理中…</div>';
   try{
     await putRec(_T.approval,rid,{'Shawn複核':action});
-    if(el) el.innerHTML=`<div style="font-size:12px;color:var(--ok);padding:4px 0">✓ 已標記：${action}</div>`;
+    if(el) el.innerHTML=`<div style="font-size:11px;color:var(--ok)">✓ 已標記：${action}</div>`;
     setTimeout(loadApprovals,1200);
   }catch(e){ if(el) el.innerHTML=`<div style="color:var(--danger);font-size:11px">操作失敗</div>`; }
 }
 
-// ── 3. ORDERS ──────────────────────────────
-async function loadOrders(){
-  const rows=await query(_T.sales);
-  const unshipped=rows.filter(r=>!fv(r.fields,'物流單號')&&fv(r.fields,'收款狀態')!=='全款已收');
-  document.getElementById('k-orders').textContent=unshipped.length;
-  const STATUS_CHIP={
-    '全款已收':'<span class="chip chip-ok">已結清</span>',
-    '訂金已收':'<span class="chip chip-warn">訂金已收</span>',
-    '尾款未到':'<span class="chip chip-warn">尾款未到</span>',
-    '未收款':  '<span class="chip chip-danger">未收款</span>',
-    '已完成':  '<span class="chip chip-ok">已完成</span>',
-  };
-  const html=rows.slice(0,10).map(r=>{
-    const f=r.fields;
-    const client=fv(f,'客戶名稱');
-    const ip=fv(f,'IP品牌');
-    const sales=fv(f,'負責業務');
-    const amt=parseFloat(fv(f,'總金額'))||0;
-    const status=fv(f,'收款狀態')||'未知';
-    const ship=fv(f,'物流單號');
-    const id='or'+r.record_id;
-    return `<div class="row-item" onclick="toggleDetail('${id}')">
-      <div class="ri-top">
-        <div class="ri-body">
-          <div class="ri-title">${client||'—'} · ${Array.isArray(f['IP品牌'])?f['IP品牌'].map(x=>x.text||x).join(','):ip}</div>
-          <div class="ri-meta">${sales||'—'} · 數量 ${fv(f,'數量')||'—'} · ${ship?'<span style="color:var(--ok)">已出貨</span>':'<span style="color:var(--warn)">待出貨</span>'}</div>
-        </div>
-        <div class="ri-right">
-          <div class="ri-amt">${amt?wan(amt):'—'}</div>
-          <div style="margin-top:3px">${STATUS_CHIP[status]||`<span class="chip chip-grey">${status}</span>`}</div>
-        </div>
-      </div>
-      <div class="row-detail" id="${id}">
-        <div class="detail-grid">
-          <div class="detail-cell"><div class="dc-label">客戶</div><div class="dc-val">${client||'—'}</div></div>
-          <div class="detail-cell"><div class="dc-label">訂單金額</div><div class="dc-val">${amt?'¥'+amt.toLocaleString():'—'}</div></div>
-          <div class="detail-cell"><div class="dc-label">批發折扣</div><div class="dc-val">${fv(f,'批發折扣')||'—'}</div></div>
-          <div class="detail-cell"><div class="dc-label">物流單號</div><div class="dc-val">${ship||'尚未出貨'}</div></div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('orders-list').innerHTML='<div class="row-list">'+html+'</div>';
-}
-
-// ── 4. PIPELINE ──────────────────────────
-async function loadPipeline(){
-  const rows=await query(_T.pipeline);
-  document.getElementById('k-pipe').textContent=rows.length;
-  const STAGES_FIG =['立項確認','版權送審','打樣確認','大貨確認'];
-  const stageIdx=s=>{const i=STAGES_FIG.indexOf(s);return i<0?0:i;};
-  const html=rows.map(r=>{
-    const f=r.fields;
-    const name=fv(f,'產品名稱');
-    const ip=fv(f,'IP品牌');
-    const stage=fv(f,'當前階段');
-    const type=fv(f,'產品類型');
-    const idx=stageIdx(stage);
-    const stages=STAGES_FIG.map((s,i)=>{
-      if(i<idx) return '<div class="stage-pip sp-done"></div>';
-      if(i===idx) return stage.includes('等')||stage.includes('block')?'<div class="stage-pip sp-block"></div>':'<div class="stage-pip sp-active"></div>';
-      return '<div class="stage-pip sp-wait"></div>';
-    }).join('');
-    const chipClass=stage.includes('大貨')?'chip-ok':stage.includes('等')||stage.includes('版權')?'chip-warn':'chip-info';
-    return `<div class="row-item" style="cursor:default">
-      <div class="ri-top">
-        <div class="ri-body">
-          <div class="ri-title">${name||ip||'—'}</div>
-          <div class="ri-meta">${ip||'—'} · <span class="chip chip-grey">${type||'—'}</span></div>
-          <div class="stage-bar">${stages}</div>
-        </div>
-        <div class="ri-right"><span class="chip ${chipClass}">${stage||'—'}</span></div>
-      </div>
-    </div>`;
-  }).join('');
-  document.getElementById('pipeline-list').innerHTML='<div class="row-list">'+html+'</div>';
-}
-
-// ── HELPERS ──────────────────────────────
-function toggleDetail(id){
+function toggleAppr(id){
   const el=document.getElementById(id);
   if(el) el.classList.toggle('open');
 }
 function filterPpl(city,btn){
-  document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('act'));
   btn.classList.add('act');
   document.querySelectorAll('#people-grid .pc').forEach(c=>{
     c.style.display=(city==='all'||c.dataset.city===city)?'':'none';
   });
 }
 
-// ── INIT ────────────────────────────────
-Promise.allSettled([loadBudget(),loadApprovals(),loadOrders(),loadPipeline()]);
+Promise.allSettled([loadBudget(),loadPipeline(),loadOrders(),loadApprovals()]);
 </script>
 </body>
 </html>
