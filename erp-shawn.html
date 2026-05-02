@@ -36,7 +36,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* TOP 2-KPI CARDS */
 .kpi-big-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:border-color .15s;}
+.kpi-big:hover{border-color:var(--border-hi);}
 .kpi-big-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:10px;}
 .kpi-big-val{font-size:34px;font-weight:800;line-height:1;margin-bottom:2px;}
 .kpi-big-sub{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
@@ -49,7 +50,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* CITY CARDS */
 .city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
-.city-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.city-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s;}
+.city-card:hover{border-color:var(--border-hi);}
 .city-tag{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
 .city-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .city-name{font-size:12px;font-weight:700;}
@@ -65,7 +67,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 /* PIPELINE HEALTH */
 .pipe-health{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
 .pipe-cells{display:grid;grid-template-columns:repeat(4,1fr);}
-.pipe-cell{padding:14px 12px;text-align:center;border-right:1px solid var(--border);}
+.pipe-cell{padding:14px 12px;text-align:center;border-right:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.pipe-cell:hover{background:var(--card2);}
 .pipe-cell:last-child{border-right:none;}
 .pipe-cell-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px;}
 .pipe-cell-label{font-size:10px;color:var(--txt-mid);}
@@ -197,8 +200,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- ① 全集團 KPI -->
   <div class="sec-head"><span class="sec-title">全集團業績達成率 · SHAWN 核心指標</span></div>
   <div class="kpi-big-row">
-    <div class="kpi-big">
-      <div class="kpi-big-label">年度收入達成率（全集團）</div>
+    <div class="kpi-big" onclick="location.href='erp-war-room.html'" title="查看完整 VAM 數據 →">
+      <div class="kpi-big-label">年度收入達成率（全集團）<span style="font-size:9px;color:var(--txt-lo);margin-left:6px;">→ 戰情室</span></div>
       <div class="kpi-big-val" id="g-rev" style="color:var(--ok)">503 萬</div>
       <div class="kpi-big-sub" id="g-rev-sub">503萬 / 1642.5萬</div>
       <span class="kpi-big-trend trend-up" id="g-rev-trend">+5.2% 超前</span>
@@ -208,8 +211,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <span id="g-rev-exp">預期進度 33.3% (4/12)</span>
       </div>
     </div>
-    <div class="kpi-big">
-      <div class="kpi-big-label">年度淨利達成率（VAM 考核基礎）</div>
+    <div class="kpi-big" onclick="location.href='erp-war-room.html'" title="查看完整 VAM 數據 →">
+      <div class="kpi-big-label">年度淨利達成率（VAM 考核基礎）<span style="font-size:9px;color:var(--txt-lo);margin-left:6px;">→ 戰情室</span></div>
       <div class="kpi-big-val" id="g-profit" style="color:var(--warn)">287 萬</div>
       <div class="kpi-big-sub" id="g-profit-sub">/ 750萬</div>
       <span class="kpi-big-trend trend-dn" id="g-profit-trend">↓ 落後 46萬</span>
@@ -223,7 +226,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ② 三城卡 -->
   <div class="city-grid">
-    <div class="city-card">
+    <div class="city-card" onclick="location.href='erp-anran.html'" title="安然中控台 →">
       <div class="city-tag">
         <div class="city-dot" style="background:var(--beijing)"></div>
         <div class="city-name">北京蕪解</div>
@@ -233,10 +236,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="city-main-sub" id="bj-sub">目標 1124.5萬</div>
       <div class="prog-sm"><div id="bj-bar" class="prog-sm-fill" style="width:29%;background:var(--beijing)"></div></div>
       <div class="city-row"><span class="city-row-k">月目標達成</span><span class="city-row-v" id="bj-pct" style="color:var(--danger)">29%（目標 80萬）</span></div>
-      <div class="city-row"><span class="city-row-k">未出貨訂單</span><span class="city-row-v" id="bj-ship" style="color:var(--warn)">6 張</span></div>
+      <div class="city-row"><span class="city-row-k">未出貨訂單</span><a href="erp-anran.html" style="text-decoration:none;"><span class="city-row-v" id="bj-ship" style="color:var(--warn);text-decoration:underline;text-decoration-color:#f59e0b44;">6 張</span></a></div>
       <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">9 人</span></div>
     </div>
-    <div class="city-card">
+    <div class="city-card" onclick="location.href='erp-war-room.html'" title="戰情室 →">
       <div class="city-tag">
         <div class="city-dot" style="background:var(--bangkok)"></div>
         <div class="city-name">UJ BKK 泰國</div>
@@ -249,7 +252,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="city-row"><span class="city-row-k">快閃店狀態</span><span class="city-row-v" style="color:var(--accent)">Q3 規劃中</span></div>
       <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">2 人</span></div>
     </div>
-    <div class="city-card">
+    <div class="city-card" onclick="location.href='erp-pipeline.html'" title="流水線廳 →">
       <div class="city-tag">
         <div class="city-dot" style="background:var(--taipei)"></div>
         <div class="city-name">台灣悍草</div>
@@ -268,19 +271,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <div class="sec-head"><span class="sec-title">項目管道健康度 · SHAWN 要主動逼新題材</span></div>
   <div class="pipe-health">
     <div class="pipe-cells">
-      <div class="pipe-cell">
+      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
         <div class="pipe-cell-val" id="ph-active" style="color:var(--ok)">4</div>
         <div class="pipe-cell-label">進行中項目</div>
       </div>
-      <div class="pipe-cell">
+      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
         <div class="pipe-cell-val" id="ph-block" style="color:var(--warn)">1</div>
         <div class="pipe-cell-label">卡關中（等版權方）</div>
       </div>
-      <div class="pipe-cell">
+      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
         <div class="pipe-cell-val" id="ph-q3" style="color:var(--accent)">3</div>
         <div class="pipe-cell-label">Q3 預計上市</div>
       </div>
-      <div class="pipe-cell" style="background:#ef444408;">
+      <div class="pipe-cell" style="background:#ef444408;" onclick="location.href='erp-pipeline.html'">
         <div class="pipe-cell-val" id="ph-q4" style="color:var(--danger)">0</div>
         <div class="pipe-cell-label">Q4 管道為空 ▲</div>
       </div>
