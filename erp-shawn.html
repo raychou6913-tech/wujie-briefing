@@ -170,6 +170,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 }
 .open{ display:block !important; }
 </style>
+<script src="mock-data.js"></script>
 </head>
 <body>
 
@@ -191,6 +192,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <a href="login.html" onclick="localStorage.removeItem('erp_sess');return true;" style="display:block;padding:10px 14px;font-size:12px;color:var(--danger);text-decoration:none;">登出</a>
       </div>
     </div>
+    <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 大廳</a>
     <a class="nav-back" href="erp-war-room.html">← 戰情室</a>
   </div>
 </div>
@@ -351,6 +353,43 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="prog"><div class="prog-fill" style="width:15%;background:var(--txt-lo)"></div></div>
   </div>
 
+  <!-- ④.5 AI & 技術投資 -->
+  <div class="sec-head"><span class="sec-title">AI & 技術投資 · 本月費用歸屬</span></div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
+      <div style="background:var(--card2);border-radius:8px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:3px;">本月 AI 費用</div>
+        <div style="font-size:20px;font-weight:800;">$204</div>
+        <div style="font-size:9px;color:var(--txt-mid);margin-top:1px;">USD</div>
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:3px;">Soft Cap</div>
+        <div style="font-size:20px;font-weight:800;color:var(--txt-mid);">$250</div>
+        <div style="font-size:9px;color:var(--txt-mid);margin-top:1px;">MJ 自主上限</div>
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:3px;">使用率</div>
+        <div style="font-size:20px;font-weight:800;color:var(--warn);">81.6%</div>
+        <div style="font-size:9px;color:var(--txt-mid);margin-top:1px;">剩餘 $46</div>
+      </div>
+    </div>
+    <div style="background:var(--card2);border-radius:4px;height:5px;overflow:hidden;margin-bottom:10px;">
+      <div style="width:81.6%;height:100%;border-radius:4px;background:linear-gradient(90deg,#b45309,var(--warn));"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--txt-mid);">Claude Code（MJ 系統維運）</span><span style="font-weight:700;">$89 → 營運費</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border);">
+        <span style="color:var(--txt-mid);">Gemini OCR（採購報價解析）</span><span style="font-weight:700;">$32 → 採購作業</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;">
+        <span style="color:var(--txt-mid);">生圖費（Snoopy + Opanchu 概念圖）</span><span style="font-weight:700;color:var(--warn);">$83 → 開模費（各專案）</span>
+      </div>
+    </div>
+    <a href="erp-war-room.html" style="display:block;margin-top:8px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看完整 AI 費用歸屬 → Ray 戰情室</a>
+  </div>
+
   <!-- ⑤ 物流 + 審核 兩欄 -->
   <div class="two-col">
     <!-- 物流狀態 -->
@@ -473,7 +512,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="pc" data-city="bj">
       <div class="pc-top"><div class="pc-av" style="background:#374151">張</div><div><div class="pc-name">張作興</div><div class="pc-role">北京 · 庫管</div></div></div>
       <span class="pc-status st-on">在線</span>
-      <div class="pc-task">北京庫存盤點（批發回流貨）</div>
+      <div class="pc-task">北京倉盤點（快閃回流貨 + 老批發庫存）</div>
       <span class="city-tag-sm ct-bj">北京</span>
     </div>
 
@@ -570,6 +609,8 @@ async function tok(){
   return _tok;
 }
 async function query(tbl,extra=''){
+  const mock = window._mockCheck && window._mockCheck(tbl);
+  if(mock) return mock;
   const t=await tok();
   const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,
     {headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
@@ -786,5 +827,128 @@ function filterPpl(city,btn){
 
 Promise.allSettled([loadBudget(),loadPipeline(),loadOrders(),loadApprovals()]);
 </script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
 </body>
 </html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>蕪解 ERP · 業務中心</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --crm:#f97316;--crm-dim:#f9731618;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:100px;}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--crm);box-shadow:0 0 6px var(--crm);flex-shrink:0;}
+.brand-name{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.btn-topbar{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;white-space:nowrap;cursor:pointer;}
+.btn-topbar:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.btn-topbar.danger{border-color:var(--danger);color:var(--danger);}
+
+/* LAYOUT */
+.main{max-width:600px;margin:0 auto;padding:16px;}
+
+/* TODAY HEADER */
+.today-hdr{padding:16px 0 12px;}
+.today-date{font-size:11px;color:var(--txt-lo);margin-bottom:4px;}
+.today-greeting{font-size:20px;font-weight:800;}
+.today-sub{font-size:12px;color:var(--txt-mid);margin-top:4px;}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;}
+.sec-hdr:first-of-type{margin-top:0;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:11px;color:var(--crm);cursor:pointer;font-weight:700;}
+
+/* FOLLOW-UP CARDS — 主角 */
+.fu-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;margin-bottom:8px;overflow:hidden;transition:border-color .15s;}
+.fu-card:hover{border-color:var(--border-hi);}
+.fu-card.urgent{border-color:#ef444440;}
+.fu-card.today{border-color:#f59e0b40;}
+.fu-header{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;}
+.fu-urgency{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.fu-av{width:38px;height:38px;border-radius:10px;font-size:15px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fu-body{flex:1;min-width:0;}
+.fu-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.fu-action{font-size:11px;color:var(--txt-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fu-right{text-align:right;flex-shrink:0;}
+.fu-when{font-size:11px;font-weight:700;}
+.fu-when.overdue{color:var(--danger);}
+.fu-when.today{color:var(--warn);}
+.fu-when.soon{color:var(--ok);}
+.fu-handler{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+
+/* EXPAND DETAIL */
+.fu-detail{display:none;padding:0 14px 14px 14px;border-top:1px solid var(--border);}
+.fu-detail.open{display:block;}
+.fu-notes{font-size:12px;color:var(--txt-mid);line-height:1.6;margin-bottom:10px;margin-top:10px;}
+.fu-hist{margin-bottom:10px;}
+.fu-hist-item{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+.fu-hist-item:last-child{border-bottom:none;}
+.fh-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.fh-text{font-size:11px;color:var(--txt-mid);flex:1;line-height:1.5;}
+.fh-date{font-size:10px;color:var(--txt-lo);flex-shrink:0;}
+.fu-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.fa-btn{font-size:11px;font-weight:700;padding:7px 14px;border-radius:8px;cursor:pointer;border:1px solid;transition:opacity .15s;}
+.fa-btn:active{opacity:.75;}
+.fa-ok{background:var(--ok-dim);color:var(--ok);border-color:#22c55e40;}
+.fa-crm{background:var(--crm-dim);color:var(--crm);border-color:#f9731640;}
+.fa-warn{background:var(--warn-dim);color:var(--warn);border-color:#f59e0b40;}
+.fa-grey{background:var(--card2);color:var(--txt-mid);border-color:var(--border-hi);}
+
+/* QUICK LOG CARD */
+.quick-log{background:linear-gradient(135deg,var(--card2),var(--card));border:1.5px solid var(--crm-dim);border-radius:14px;padding:14px;margin-bottom:16px;cursor:pointer;}
+.ql-top{display:flex;align-items:center;gap:10px;}
+.ql-icon{font-size:22px;}
+.ql-text{flex:1;}
+.ql-title{font-size:13px;font-weight:700;color:var(--crm);}
+.ql-sub{font-size:10px;color:var(--txt-lo);margin-top:2px;}
+.ql-btn{font-size:11px;font-weight:700;background:var(--crm);color:#fff;border:none;border-radius:8px;padding:7px 14px;cursor:pointer;white-space:nowrap;}
+
+/* PIPELINE SECTION (管理層看的，放最下面) */
+.pipeline-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;}
+.pipeline-row::-webkit-scrollbar{display:none;}
+.p-col{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center;flex-shrink:0;min-width:80px;}
+.p-stage{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.p-count{font-size:20px;font-weight:800;}
+.p-amt{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+
+/* BOTTOM FAB */
+.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--crm);border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px #f9731660;display:flex;align-items:center;justify-content:center;z-index:50;transition:transform .12s;}
+.fab:active{transform:scale(.92);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#0009;z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px 20px 36px;max-height:85vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border-hi);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:16px;}
+.mf{margin-bottom:12px;}
+.mf label{font-size:10px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase;}
+.mf input,.mf textarea,.mf select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.mf input:focus,.mf textarea:focus,.mf select:focus{border-color:var(--crm);}
+.mf select option{background:var(--card2);}
+.mf textarea{resize:none;}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-actions{display:flex;gap:10px;margin-top:16px;}
+.mbtn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+.mbtn.primary{background:var(--crm);color:#fff;}
+.mbtn.ghost{background:var(--card2);color:var(--txt-mid);}
+
+/* CHIP */
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-info{background:#818cf820;color:var(--accent);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">業務中心</div>
+  </div>
+  <div class="topbar-right">
+    <span id="tb-name" style="font-size:11px;color:var(--txt-mid)">—</span>
+    <a href="erp-lobby.html" class="btn-topbar">← 大廳</a>
+    <a href="login.html" class="btn-topbar danger" onclick="localStorage.removeItem('erp_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- TODAY HEADER -->
+  <div class="today-hdr">
+    <div class="today-date" id="today-date">—</div>
+    <div class="today-greeting" id="today-greeting">今天要見誰？</div>
+    <div class="today-sub" id="today-sub">—</div>
+  </div>
+
+  <!-- QUICK LOG -->
+  <div class="quick-log" onclick="openLogModal()">
+    <div class="ql-top">
+      <div class="ql-icon">✍️</div>
+      <div class="ql-text">
+        <div class="ql-title">快速記錄拜訪 / 通話</div>
+        <div class="ql-sub">剛見完客戶？30 秒記下來，不用事後靠記憶</div>
+      </div>
+      <button class="ql-btn" onclick="event.stopPropagation();openLogModal()">記錄</button>
+    </div>
+  </div>
+
+  <!-- TODAY'S FOLLOW-UPS -->
+  <div class="sec-hdr">
+    <div class="sec-title">今天要跟進（<span id="today-count">0</span> 項）</div>
+    <span class="sec-link" onclick="openAddModal()">+ 新增客戶</span>
+  </div>
+  <div id="today-list"></div>
+
+  <!-- UPCOMING -->
+  <div class="sec-hdr">
+    <div class="sec-title">即將到期（<span id="upcoming-count">0</span> 項）</div>
+  </div>
+  <div id="upcoming-list"></div>
+
+  <!-- PIPELINE — 給管理層看，放最後 -->
+  <div class="sec-hdr" style="margin-top:28px">
+    <div class="sec-title" style="color:var(--txt-lo)">漏斗總覽</div>
+    <span style="font-size:9px;color:var(--txt-lo)">安然 / Shawn / Ray 可見</span>
+  </div>
+  <div class="pipeline-row">
+    <div class="p-col"><div class="p-stage">初接觸</div><div class="p-count" style="color:var(--txt-mid)">8</div><div class="p-amt">評估中</div></div>
+    <div class="p-col"><div class="p-stage">報價出</div><div class="p-count" style="color:var(--accent)">5</div><div class="p-amt">¥46.5萬</div></div>
+    <div class="p-col"><div class="p-stage">議價中</div><div class="p-count" style="color:var(--warn)">4</div><div class="p-amt">¥32萬</div></div>
+    <div class="p-col"><div class="p-stage">確認單</div><div class="p-count" style="color:var(--crm)">3</div><div class="p-amt">¥28.4萬</div></div>
+    <div class="p-col"><div class="p-stage">本月成交</div><div class="p-count" style="color:var(--ok)">6</div><div class="p-amt">¥38.2萬</div></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openLogModal()" title="快速記錄">✍</button>
+
+<!-- LOG MODAL -->
+<div class="modal-overlay" id="log-modal" onclick="if(event.target===this)closeModal('log-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">記錄拜訪 / 通話</div>
+    <div class="mf">
+      <label>客戶名稱</label>
+      <input id="log-client" placeholder="例：名創優品上海、酷動城廣州..." list="client-list-datalist">
+      <datalist id="client-list-datalist">
+        <option value="名創優品（上海）">
+        <option value="酷動城（廣州）">
+        <option value="泡泡瑪特北京">
+        <option value="首爾 SMTOWN COEX">
+        <option value="天猫旗艦店">
+      </datalist>
+    </div>
+    <div class="mrow">
+      <div class="mf">
+        <label>接觸方式</label>
+        <select id="log-type">
+          <option value="拜訪">實地拜訪</option>
+          <option value="電話">電話/視訊</option>
+          <option value="微信">微信溝通</option>
+          <option value="展會">展會/活動</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>目前意向</label>
+        <select id="log-intent">
+          <option value="初接觸">初步接觸</option>
+          <option value="有意向">有採購意向</option>
+          <option value="報價中">報價/議價中</option>
+          <option value="即將成交">即將成交</option>
+          <option value="已成交">已成交</option>
+          <option value="暫不考慮">暫不考慮</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <label>談了什麼 / 客戶說了什麼</label>
+      <textarea id="log-notes" rows="3" placeholder="例：對 Snoopy 夏日系列有興趣，問能不能做獨家，要先看樣品..."></textarea>
+    </div>
+    <div class="mf">
+      <label>下一步行動 + 提醒日期</label>
+      <input id="log-nextaction" placeholder="例：3天後發樣品報價、下週確認首批數量">
+    </div>
+    <div class="mrow">
+      <div class="mf">
+        <label>提醒我跟進</label>
+        <input id="log-remind" type="date">
+      </div>
+      <div class="mf">
+        <label>需要通知誰</label>
+        <select id="log-notify">
+          <option value="">不需要通知</option>
+          <option value="安然">通知安然（合約/授權）</option>
+          <option value="高維">通知高維（備貨/出貨）</option>
+          <option value="Shawn">通知 Shawn（預算/決策）</option>
+          <option value="Ray">通知 Ray（重大客戶）</option>
+        </select>
+      </div>
+    </div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="saveLog()">儲存記錄</button>
+      <button class="mbtn ghost" onclick="closeModal('log-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CLIENT MODAL -->
+<div class="modal-overlay" id="add-modal" onclick="if(event.target===this)closeModal('add-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">新增客戶 / 潛在客戶</div>
+    <div class="mrow">
+      <div class="mf">
+        <label>客戶名稱</label>
+        <input id="add-name" placeholder="公司名稱">
+      </div>
+      <div class="mf">
+        <label>地區</label>
+        <select id="add-region">
+          <option>上海</option><option>北京</option><option>廣州</option>
+          <option>深圳</option><option>杭州</option><option>成都</option>
+          <option>台灣</option><option>香港</option><option>東南亞</option><option>韓國</option><option>其他</option>
+        </select>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mf">
+        <label>客戶類型</label>
+        <select id="add-type">
+          <option>連鎖零售</option><option>潮玩/盲盒</option><option>電商平台</option>
+          <option>百貨/展覽</option><option>品牌聯名</option><option>其他</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>負責業務</label>
+        <select id="add-owner">
+          <option value="laodong">老董</option>
+          <option value="debao">德寶</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <label>初步接觸備注</label>
+      <textarea id="add-notes" rows="2" placeholder="怎麼認識的、對方背景、可能的合作方向..."></textarea>
+    </div>
+    <div class="mf">
+      <label>第一次跟進日期</label>
+      <input id="add-remind" type="date">
+    </div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="saveNewClient()">建立客戶</button>
+      <button class="mbtn ghost" onclick="closeModal('add-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(!s||Date.now()-s.ts>7*86400000){location.replace('login.html');return null;}
+  return s;
+}
+const SESS = requireAuth();
+if(SESS) document.getElementById('tb-name').textContent = SESS.name;
+
+// ── 資料（localStorage 持久化，Demo 預設值）──
+const STORE_KEY = 'crm_clients_v1';
+function loadClients(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'null') || DEFAULT_CLIENTS(); }
+  catch{ return DEFAULT_CLIENTS(); }
+}
+function saveClients(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+
+function DEFAULT_CLIENTS(){
+  const today = new Date();
+  const d = (offset=0) => {
+    const t = new Date(today); t.setDate(t.getDate()+offset);
+    return t.toISOString().slice(0,10);
+  };
+  return [
+    {id:1, name:'名創優品（上海）', region:'上海', type:'連鎖零售', owner:'laodong',
+     intent:'報價中', color:'#6366f1', remind: d(-12),
+     notes:'Q2 訂單 ¥22萬已確認，等出貨。Q1 尾款 ¥4.2萬逾期 12 天未付。',
+     nextAction:'今天電話催款，確認付款時間',
+     history:[
+       {date:d(-14), type:'電話', text:'確認 Q2 Snoopy 夏日系列 3,500 件，報價 ¥62/件，對方接受'},
+       {date:d(-30), type:'拜訪', text:'年度採購會議，確認全年框架合作意向'},
+     ]},
+    {id:2, name:'酷動城（廣州）', region:'廣州', type:'潮玩/盲盒', owner:'debao',
+     intent:'有意向', color:'#0891b2', remind: d(0),
+     notes:'Q3 補貨 3000 件意向，主要看 Snoopy 系列。對方負責人林總今天有空。',
+     nextAction:'今天電話確認報價，問 7月活動配合意向',
+     history:[
+       {date:d(-7), type:'微信', text:'林總說 Q3 有補貨需求，叫我這週報個價'},
+       {date:d(-45), type:'拜訪', text:'首次合作後回訪，關係建立中'},
+     ]},
+    {id:3, name:'泡泡瑪特北京', region:'北京', type:'潮玩/盲盒', owner:'laodong',
+     intent:'初接觸', color:'#16a34a', remind: d(0),
+     notes:'Muziktiger 盲盒合作提案已送出，等採購負責人王總回覆。需確認授權範圍含盲盒品類。',
+     nextAction:'今天下午追問王總是否收到提案，問是否需要補充資料',
+     history:[
+       {date:d(-3), type:'微信', text:'送出 Muziktiger 聯名盲盒提案 PDF，王總說會看'},
+       {date:d(-10), type:'拜訪', text:'初次拜訪，對方對我司 IP 資源有興趣'},
+     ]},
+    {id:4, name:'首爾 SMTOWN COEX', region:'韓國', type:'百貨/展覽', owner:'laodong',
+     intent:'有意向', color:'#7c3aed', remind: d(4),
+     notes:'樣品已寄出（5/1），預計 5/6 到。確認收到後討論首批採購量。',
+     nextAction:'5/6 確認樣品是否收到，詢問反饋意見',
+     history:[
+       {date:d(-1), type:'微信', text:'確認寄送貓福珊迪夏日海邊主題樣品，快遞單號已傳'},
+       {date:d(-14), type:'電話', text:'視訊會議介紹新主題，對方很有興趣，要看實物'},
+     ]},
+    {id:5, name:'天猫旗艦店（春雷）', region:'上海', type:'電商平台', owner:'debao',
+     intent:'報價中', color:'#0284c7', remind: d(2),
+     notes:'5 月活動備貨清單需要確認，要對接春雷了解電商端庫存需求。',
+     nextAction:'確認 5月618 活動備貨 SKU 和數量',
+     history:[
+       {date:d(-5), type:'微信', text:'春雷說 618 需要提前備貨，要我這週給清單'},
+     ]},
+  ];
+}
+
+// ── 日期工具 ──
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(str){
+  if(!str) return '';
+  const d = new Date(str+'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((d-today)/(1000*60*60*24));
+  if(diff < 0) return {label:`逾期 ${-diff} 天`, cls:'overdue'};
+  if(diff === 0) return {label:'今天', cls:'today'};
+  if(diff === 1) return {label:'明天', cls:'soon'};
+  return {label:`${d.getMonth()+1}/${d.getDate()}`, cls:'soon'};
+}
+
+// ── 渲染 ──
+function renderLists(){
+  const clients = loadClients();
+  const today = todayStr();
+  const myUser = SESS ? SESS.user : null;
+
+  // 過濾：業務只看自己的，管理層看全部
+  const MGMT = ['ray','shawn','anran','yuming'];
+  const mine = (myUser && !MGMT.includes(myUser))
+    ? clients.filter(c => c.owner === myUser)
+    : clients;
+
+  const todayItems = mine.filter(c => c.remind <= today);
+  const upcoming = mine.filter(c => c.remind > today).sort((a,b)=>a.remind.localeCompare(b.remind));
+
+  document.getElementById('today-count').textContent = todayItems.length;
+  document.getElementById('upcoming-count').textContent = upcoming.length;
+
+  // TODAY SUB TEXT
+  const name = SESS ? SESS.name : '—';
+  const d = new Date();
+  const weekdays = ['日','一','二','三','四','五','六'];
+  document.getElementById('today-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 星期${weekdays[d.getDay()]}`;
+  document.getElementById('today-greeting').textContent = `${name}，你今天有 ${todayItems.length} 個客戶要跟進`;
+  document.getElementById('today-sub').textContent = todayItems.length
+    ? todayItems.map(c=>c.name.split('（')[0]).join('、')
+    : '今天暫無跟進，可以新增拜訪記錄或安排下一步';
+
+  renderCards(todayItems, 'today-list', true);
+  renderCards(upcoming, 'upcoming-list', false);
+}
+
+function renderCards(list, containerId, isUrgent){
+  const el = document.getElementById(containerId);
+  if(!list.length){
+    el.innerHTML = `<div style="font-size:12px;color:var(--txt-lo);padding:12px 0">${isUrgent?'今天沒有待跟進項目 ✅':'—'}</div>`;
+    return;
+  }
+  el.innerHTML = list.map(c => {
+    const when = fmtDate(c.remind);
+    const histHtml = (c.history||[]).slice(0,3).map(h=>`
+      <div class="fu-hist-item">
+        <div class="fh-dot" style="background:var(--accent)"></div>
+        <div class="fh-text">${h.type}：${h.text}</div>
+        <div class="fh-date">${h.date}</div>
+      </div>`).join('');
+    const urgentClass = when.cls==='overdue'?'urgent':when.cls==='today'?'today':'';
+    return `
+    <div class="fu-card ${urgentClass}">
+      <div class="fu-header" onclick="toggleCard(this)">
+        <div class="fu-urgency" style="background:${when.cls==='overdue'?'var(--danger)':when.cls==='today'?'var(--warn)':'var(--ok)'}"></div>
+        <div class="fu-av" style="background:${c.color}">${[...c.name][0]}</div>
+        <div class="fu-body">
+          <div class="fu-name">${c.name} <span class="chip ${intentChip(c.intent)}">${c.intent}</span></div>
+          <div class="fu-action">${c.nextAction||'—'}</div>
+        </div>
+        <div class="fu-right">
+          <div class="fu-when ${when.cls}">${when.label}</div>
+          <div class="fu-handler">${ownerName(c.owner)}</div>
+        </div>
+      </div>
+      <div class="fu-detail">
+        <div class="fu-notes">${c.notes||'—'}</div>
+        ${histHtml ? `<div style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">過往記錄</div><div class="fu-hist">${histHtml}</div>` : ''}
+        <div class="fu-actions">
+          <button class="fa-btn fa-ok" onclick="markDone(${c.id})">✓ 已跟進，更新記錄</button>
+          <button class="fa-btn fa-crm" onclick="openLogModalFor('${c.name}')">+ 記錄本次拜訪</button>
+          ${c.owner==='laodong'||c.owner==='debao' ? `<button class="fa-btn fa-warn" onclick="notifyAnran('${c.name}')">→ 通知安然</button>` : ''}
+          <button class="fa-btn fa-grey" onclick="openLogModalFor('${c.name}')">改提醒日期</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function intentChip(intent){
+  const map = {'初接觸':'chip-grey','有意向':'chip-info','報價中':'chip-warn','即將成交':'chip-crm','已成交':'chip-ok','暫不考慮':'chip-danger'};
+  return map[intent]||'chip-grey';
+}
+function ownerName(u){ return u==='laodong'?'老董':u==='debao'?'德寶':u||'—'; }
+
+function toggleCard(header){
+  const detail = header.nextElementSibling;
+  detail.classList.toggle('open');
+}
+
+function markDone(id){
+  const clients = loadClients();
+  const c = clients.find(x=>x.id===id);
+  if(!c) return;
+  openLogModalFor(c.name);
+}
+
+// ── MODALS ──
+let _logForClient = '';
+function openLogModal(){ _logForClient=''; _showLogModal(); }
+function openLogModalFor(name){ _logForClient=name; _showLogModal(); }
+function _showLogModal(){
+  document.getElementById('log-client').value = _logForClient;
+  const d = new Date(); d.setDate(d.getDate()+3);
+  document.getElementById('log-remind').value = d.toISOString().slice(0,10);
+  document.getElementById('log-notes').value='';
+  document.getElementById('log-nextaction').value='';
+  document.getElementById('log-modal').classList.add('open');
+}
+
+function openAddModal(){
+  const d = new Date(); d.setDate(d.getDate()+1);
+  document.getElementById('add-remind').value = d.toISOString().slice(0,10);
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function saveLog(){
+  const client = document.getElementById('log-client').value.trim();
+  const notes = document.getElementById('log-notes').value.trim();
+  const nextAction = document.getElementById('log-nextaction').value.trim();
+  const remind = document.getElementById('log-remind').value;
+  const type = document.getElementById('log-type').value;
+  const notify = document.getElementById('log-notify').value;
+  if(!client){ alert('請填寫客戶名稱'); return; }
+
+  const clients = loadClients();
+  const existing = clients.find(c=>c.name===client||c.name.startsWith(client));
+  const histEntry = { date: todayStr(), type, text: notes||nextAction||'已跟進' };
+
+  if(existing){
+    existing.notes = notes || existing.notes;
+    existing.nextAction = nextAction || existing.nextAction;
+    if(remind) existing.remind = remind;
+    if(!existing.history) existing.history=[];
+    existing.history.unshift(histEntry);
+    existing.intent = document.getElementById('log-intent').value;
+  } else {
+    clients.unshift({
+      id: Date.now(), name: client, region:'—', type:'—',
+      owner: SESS?.user||'laodong',
+      intent: document.getElementById('log-intent').value,
+      color: '#f97316', remind, notes, nextAction,
+      history: [histEntry]
+    });
+  }
+  saveClients(clients);
+  closeModal('log-modal');
+  renderLists();
+  showToast(notify ? `✅ 記錄已存 · 已通知${notify}` : '✅ 記錄已存');
+}
+
+function saveNewClient(){
+  const name = document.getElementById('add-name').value.trim();
+  if(!name){ alert('請填寫客戶名稱'); return; }
+  const clients = loadClients();
+  const colors = ['#6366f1','#0891b2','#16a34a','#7c3aed','#f97316','#0284c7','#d97706'];
+  clients.unshift({
+    id: Date.now(),
+    name,
+    region: document.getElementById('add-region').value,
+    type: document.getElementById('add-type').value,
+    owner: document.getElementById('add-owner').value,
+    intent: '初接觸',
+    color: colors[Math.floor(Math.random()*colors.length)],
+    remind: document.getElementById('add-remind').value,
+    notes: document.getElementById('add-notes').value,
+    nextAction: '初次跟進',
+    history: [{date: todayStr(), type:'建立', text:'新增客戶'}]
+  });
+  saveClients(clients);
+  closeModal('add-modal');
+  renderLists();
+  showToast('✅ 客戶已建立');
+}
+
+function notifyAnran(clientName){
+  showToast(`→ 已通知安然：${clientName.split('（')[0]} 需確認授權`);
+}
+
+function showToast(msg){
+  let t = document.getElementById('crm-toast');
+  if(!t){ t=document.createElement('div'); t.id='crm-toast';
+    t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0', 2500);
+}
+
+// Init
+renderLists();
+</script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:84px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
+</body>
+</html>

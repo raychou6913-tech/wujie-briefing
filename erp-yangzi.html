@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 楊子工作台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#7c3aed;--accent-dim:#7c3aed18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.tb-back{background:none;border:1px solid var(--border);border-radius:8px;color:var(--txt-mid);padding:6px 12px;font-size:12px;cursor:pointer;}
+.tb-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.tb-title{font-size:14px;font-weight:700;}
+.tb-user{margin-left:auto;font-size:11px;color:var(--txt-mid);}
+
+.main{padding:16px;max-width:720px;margin:0 auto;}
+
+/* Greeting */
+.greet{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border-hi);border-radius:16px;padding:20px;margin-bottom:16px;}
+.greet-hi{font-size:18px;font-weight:800;margin-bottom:4px;}
+.greet-sub{font-size:12px;color:var(--txt-mid);}
+.greet-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.badge-danger{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
+.badge-warn{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
+.badge-ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
+
+/* Section */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:24px;}
+.sec-hd:first-of-type{margin-top:0;}
+.sec-title{font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;}
+
+/* Inbox — pending approvals */
+.inbox-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
+.inbox-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;}
+.inbox-item:hover{border-color:var(--border-hi);}
+.inbox-item.urgent{border-color:#ef444435;}
+.inbox-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-danger{background:var(--danger);}
+.dot-warn{background:var(--warn);}
+.dot-lo{background:var(--txt-lo);}
+.inbox-info{flex:1;min-width:0;}
+.inbox-name{font-size:13px;font-weight:700;}
+.inbox-meta{font-size:11px;color:var(--txt-mid);margin-top:2px;}
+.inbox-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.type-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;}
+.tag-expense{background:#f59e0b20;color:var(--warn);}
+.tag-leave{background:#22c55e20;color:var(--ok);}
+.tag-recruit{background:#818cf820;color:#818cf8;}
+.tag-payroll{background:#7c3aed20;color:var(--accent);}
+.inbox-chevron{color:var(--txt-lo);font-size:12px;}
+.inbox-amount{font-size:12px;font-weight:700;}
+
+/* Form launcher grid */
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:4px;}
+@media(max-width:420px){.form-grid{grid-template-columns:1fr;}}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s;display:flex;flex-direction:column;gap:6px;}
+.form-card:hover{border-color:var(--border-hi);}
+.form-icon{font-size:22px;}
+.form-name{font-size:13px;font-weight:700;}
+.form-desc{font-size:11px;color:var(--txt-mid);line-height:1.5;}
+.form-route{font-size:10px;color:var(--txt-lo);margin-top:4px;}
+.form-route span{color:var(--accent);}
+
+/* Payroll card */
+.payroll-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:4px;}
+.payroll-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.payroll-month{font-size:14px;font-weight:800;}
+.payroll-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.status-progress{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
+.status-done{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
+.payroll-rows{display:flex;flex-direction:column;gap:8px;}
+.payroll-row{display:flex;align-items:center;gap:10px;}
+.pr-step{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.step-done{background:var(--ok);color:#000;}
+.step-active{background:var(--accent);color:#fff;}
+.step-todo{background:var(--card2);border:1px solid var(--border);color:var(--txt-lo);}
+.pr-label{font-size:12px;flex:1;}
+.pr-label.active{font-weight:700;color:var(--txt-hi);}
+.pr-label.done{color:var(--txt-lo);text-decoration:line-through;}
+.pr-action{font-size:11px;color:var(--accent);cursor:pointer;border:none;background:none;}
+.pr-action:hover{opacity:.8;}
+
+/* Approval modal */
+.modal-bg{position:fixed;inset:0;background:#00000080;z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;padding:22px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;}
+.detail-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.detail-row:last-child{border-bottom:none;}
+.detail-label{font-size:11px;color:var(--txt-lo);}
+.detail-val{font-size:13px;font-weight:700;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:5px;}
+.field textarea,.field select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.field textarea:focus,.field select:focus{border-color:var(--accent);}
+.field select option{background:var(--card2);}
+.field textarea{resize:vertical;min-height:60px;}
+.modal-footer{display:flex;gap:8px;}
+.btn-full{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-approve{background:var(--ok);color:#000;}
+.btn-reject{background:var(--danger);color:#fff;}
+.btn-cancel{background:var(--card2);color:var(--txt-mid);border:1px solid var(--border);}
+
+/* Form modal */
+.field input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.field input:focus{border-color:var(--accent);}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ok);color:#000;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="location.href='erp-lobby.html'">← 大廳</button>
+  <span class="tb-title">🗂 楊子工作台</span>
+  <span class="tb-user" id="tb-user"></span>
+  <button class="tb-back" onclick="logout()" style="margin-left:8px;">登出</button>
+</div>
+
+<div class="main">
+
+  <!-- Greeting -->
+  <div class="greet">
+    <div class="greet-hi" id="greet-hi">楊子，今天有 — 件事要處理</div>
+    <div class="greet-sub" id="greet-sub"></div>
+    <div class="greet-badges" id="greet-badges"></div>
+  </div>
+
+  <!-- Pending inbox -->
+  <div class="sec-hd">
+    <span class="sec-title" id="inbox-title">待審核申請</span>
+  </div>
+  <div class="inbox-list" id="inbox-list"></div>
+
+  <!-- Payroll tracker -->
+  <div class="sec-hd"><span class="sec-title">薪資發放流程</span></div>
+  <div class="payroll-card">
+    <div class="payroll-head">
+      <span class="payroll-month">2026 年 5 月薪資</span>
+      <span class="payroll-status status-progress" id="payroll-status">進行中</span>
+    </div>
+    <div class="payroll-rows" id="payroll-rows"></div>
+  </div>
+
+  <!-- Form launchers -->
+  <div class="sec-hd"><span class="sec-title">標準表單</span></div>
+  <div class="form-grid" id="form-grid"></div>
+
+</div>
+
+<!-- Approval Modal -->
+<div class="modal-bg" id="modal-approval">
+  <div class="modal">
+    <div class="modal-title" id="ap-title">審核申請</div>
+    <div class="modal-sub" id="ap-sub"></div>
+    <div class="detail-rows" id="ap-details"></div>
+    <div class="field"><label>審核意見（選填）</label>
+      <textarea id="ap-note" placeholder="如有退回原因或補件要求，請填寫..."></textarea>
+    </div>
+    <div class="field"><label>核准後路由至</label>
+      <select id="ap-route">
+        <option value="anran">安然（複核簽字）</option>
+        <option value="yuming">躍明（付款執行）</option>
+        <option value="ray">Ray（最終批准）</option>
+        <option value="done">直接完成</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeApproval()">取消</button>
+      <button class="btn-full btn-reject" onclick="doReject()">退回 ✗</button>
+      <button class="btn-full btn-approve" onclick="doApprove()">核准 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Form Modal -->
+<div class="modal-bg" id="modal-form">
+  <div class="modal">
+    <div class="modal-title" id="nf-title">填寫申請</div>
+    <div class="modal-sub" id="nf-sub"></div>
+    <div id="nf-fields"></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeForm()">取消</button>
+      <button class="btn-full btn-full" style="background:var(--accent);color:#fff;" onclick="submitForm()">送出申請</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('erp_sess')||'null');
+if(!SESS||Date.now()-SESS.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
+function logout(){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
+
+document.getElementById('tb-user').textContent = SESS.name + ' · ' + SESS.role;
+
+// ── Inbox Data ─────────────────────────────────────────────
+const INBOX_KEY = 'yangzi_inbox_v1';
+function loadInbox(){
+  const stored = localStorage.getItem(INBOX_KEY);
+  if(stored) return JSON.parse(stored);
+  // Seed demo data
+  const seed = [
+    {
+      id:'i1', type:'expense', urgency:'high',
+      name:'詩彤 出差費用報銷',
+      meta:'台北→高雄出差 · 2026-04-28',
+      amount:'NT$8,560',
+      status:'pending',
+      details:[
+        {label:'申請人',val:'詩彤'},
+        {label:'事由',val:'客戶簡報出差（台北→高雄）'},
+        {label:'日期',val:'2026-04-28'},
+        {label:'金額',val:'NT$8,560'},
+        {label:'明細',val:'高鐵 NT$1,490 + 飯店 NT$4,800 + 餐費 NT$2,270'},
+        {label:'附單據',val:'✓ 已上傳'},
+      ],
+      defaultRoute:'anran',
+    },
+    {
+      id:'i2', type:'leave', urgency:'med',
+      name:'木子 請假申請',
+      meta:'事假 2 天 · 2026-05-05～05-06',
+      amount:'2天',
+      status:'pending',
+      details:[
+        {label:'申請人',val:'木子'},
+        {label:'假別',val:'事假'},
+        {label:'日期',val:'2026-05-05 ～ 2026-05-06（2天）'},
+        {label:'代理人',val:'賴哥'},
+        {label:'原因',val:'家庭事務'},
+      ],
+      defaultRoute:'done',
+    },
+    {
+      id:'i3', type:'expense', urgency:'med',
+      name:'高維 油資/車資報銷',
+      meta:'北京送貨車資 · 2026-04-30',
+      amount:'¥340',
+      status:'pending',
+      details:[
+        {label:'申請人',val:'高維'},
+        {label:'事由',val:'廠端提貨·送貨車資'},
+        {label:'日期',val:'2026-04-30'},
+        {label:'金額',val:'¥340'},
+        {label:'附單據',val:'✓ 已上傳'},
+      ],
+      defaultRoute:'yuming',
+    },
+  ];
+  localStorage.setItem(INBOX_KEY,JSON.stringify(seed));
+  return seed;
+}
+function saveInbox(arr){ localStorage.setItem(INBOX_KEY,JSON.stringify(arr)); }
+
+// ── Payroll Steps ──────────────────────────────────────────
+const PAYROLL_KEY = 'yangzi_payroll_v1';
+const PAYROLL_STEPS = [
+  {id:'p1',label:'收集各部門考勤記錄'},
+  {id:'p2',label:'核算薪資（含加班/請假）'},
+  {id:'p3',label:'送安然複核簽字'},
+  {id:'p4',label:'送躍明付款執行'},
+  {id:'p5',label:'確認入帳，通知各員工'},
+];
+function loadPayroll(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY)||'{"done":["p1"]}'); }
+function savePayroll(s){ localStorage.setItem(PAYROLL_KEY,JSON.stringify(s)); }
+
+// ── Form Definitions ───────────────────────────────────────
+const FORMS = [
+  {
+    id:'f-expense', icon:'💸', name:'費用報銷申請',
+    desc:'員工出差、採購、日常費用',
+    route:'楊子初審 → 安然複核 → 躍明付款',
+    fields:[
+      {type:'text',id:'申請人',label:'申請人'},
+      {type:'text',id:'事由',label:'申請事由'},
+      {type:'date',id:'日期',label:'費用發生日期'},
+      {type:'text',id:'金額',label:'金額'},
+      {type:'select',id:'貨幣',label:'貨幣',options:['TWD','CNY','THB','USD','HKD']},
+      {type:'textarea',id:'明細',label:'費用明細'},
+    ],
+  },
+  {
+    id:'f-leave', icon:'🌿', name:'請假申請',
+    desc:'事假、病假、特休、年假',
+    route:'楊子初審 → 直屬主管 → 安然備案',
+    fields:[
+      {type:'text',id:'申請人',label:'申請人'},
+      {type:'select',id:'假別',label:'假別',options:['事假','病假','特休','年假','其他']},
+      {type:'date',id:'開始',label:'開始日期'},
+      {type:'date',id:'結束',label:'結束日期'},
+      {type:'text',id:'代理人',label:'代理人'},
+      {type:'textarea',id:'原因',label:'請假原因（選填）'},
+    ],
+  },
+  {
+    id:'f-recruit', icon:'👤', name:'招募需求申請',
+    desc:'新增人力、實習生、合約工',
+    route:'部門主管申請 → 安然批准 → 楊子執行招募',
+    fields:[
+      {type:'text',id:'職位',label:'需求職位'},
+      {type:'text',id:'部門',label:'所屬部門'},
+      {type:'select',id:'類型',label:'僱用類型',options:['正職','實習生','兼職','合約工']},
+      {type:'date',id:'到職日',label:'預計到職日'},
+      {type:'textarea',id:'要求',label:'技能要求'},
+      {type:'textarea',id:'原因',label:'增員原因'},
+    ],
+  },
+  {
+    id:'f-procurement', icon:'📦', name:'行政採購申請',
+    desc:'辦公室耗材、設備、雜費',
+    route:'楊子整合 → 安然批准 → 轉採購台',
+    fields:[
+      {type:'text',id:'申請人',label:'申請人'},
+      {type:'textarea',id:'品項',label:'採購品項與數量'},
+      {type:'text',id:'預算',label:'預估預算'},
+      {type:'select',id:'緊急',label:'緊急程度',options:['正常（1週內）','緊急（3天內）','非常緊急（今天）']},
+      {type:'textarea',id:'原因',label:'採購原因'},
+    ],
+  },
+];
+
+// ── Render ─────────────────────────────────────────────────
+let currentApprovalId = null;
+let currentFormId = null;
+
+function render(){
+  const inbox = loadInbox().filter(i=>i.status==='pending');
+
+  // Greeting
+  const pending = inbox.length;
+  const urgent = inbox.filter(i=>i.urgency==='high').length;
+  document.getElementById('greet-hi').textContent = pending===0
+    ? '楊子，今天沒有待審核的申請 ✨'
+    : `楊子，你有 ${pending} 件申請待審核`;
+  document.getElementById('greet-sub').textContent = urgent>0
+    ? `其中 ${urgent} 件需要優先處理`
+    : '目前進度順暢';
+  const badges = document.getElementById('greet-badges');
+  badges.innerHTML='';
+  if(urgent>0) badges.innerHTML+=`<span class="badge badge-danger">⚠ ${urgent} 件緊急</span>`;
+  if(pending>urgent) badges.innerHTML+=`<span class="badge badge-warn">${pending-urgent} 件一般</span>`;
+
+  // Inbox
+  const TYPE_TAG = {expense:'tag-expense',leave:'tag-leave',recruit:'tag-recruit',payroll:'tag-payroll'};
+  const TYPE_LABEL = {expense:'費用報銷',leave:'請假',recruit:'招募',payroll:'薪資'};
+  document.getElementById('inbox-title').textContent = `待審核申請（${pending}）`;
+  const inboxEl = document.getElementById('inbox-list');
+  if(!pending){
+    inboxEl.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:13px;">目前沒有待審核申請</div>';
+  } else {
+    inboxEl.innerHTML = inbox.map(i=>`
+      <div class="inbox-item ${i.urgency==='high'?'urgent':''}" onclick="openApproval('${i.id}')">
+        <div class="inbox-dot dot-${i.urgency==='high'?'danger':i.urgency==='med'?'warn':'lo'}"></div>
+        <div class="inbox-info">
+          <div class="inbox-name">${i.name}</div>
+          <div class="inbox-meta">${i.meta}</div>
+        </div>
+        <div class="inbox-right">
+          <span class="type-tag ${TYPE_TAG[i.type]||''}">${TYPE_LABEL[i.type]||i.type}</span>
+          <span class="inbox-amount">${i.amount}</span>
+          <span class="inbox-chevron">›</span>
+        </div>
+      </div>`).join('');
+  }
+
+  // Payroll
+  const payroll = loadPayroll();
+  const rows = document.getElementById('payroll-rows');
+  rows.innerHTML = PAYROLL_STEPS.map((step,i)=>{
+    const done = payroll.done.includes(step.id);
+    const activeIdx = PAYROLL_STEPS.findIndex(s=>!payroll.done.includes(s.id));
+    const isActive = i===activeIdx;
+    const stepClass = done?'step-done':isActive?'step-active':'step-todo';
+    const labelClass = done?'done':isActive?'active':'';
+    const action = !done&&isActive ? `<button class="pr-action" onclick="markPayrollDone('${step.id}')">完成 →</button>` : '';
+    return `<div class="payroll-row">
+      <div class="pr-step ${stepClass}">${done?'✓':i+1}</div>
+      <div class="pr-label ${labelClass}">${step.label}</div>
+      ${action}
+    </div>`;
+  }).join('');
+  const allDone = PAYROLL_STEPS.every(s=>payroll.done.includes(s.id));
+  document.getElementById('payroll-status').textContent = allDone ? '✓ 已完成' : '進行中';
+  document.getElementById('payroll-status').className = 'payroll-status ' + (allDone?'status-done':'status-progress');
+
+  // Forms
+  const formGrid = document.getElementById('form-grid');
+  formGrid.innerHTML = FORMS.map(f=>`
+    <div class="form-card" onclick="openForm('${f.id}')">
+      <div class="form-icon">${f.icon}</div>
+      <div class="form-name">${f.name}</div>
+      <div class="form-desc">${f.desc}</div>
+      <div class="form-route">送審路徑：<span>${f.route}</span></div>
+    </div>`).join('');
+}
+
+function openApproval(id){
+  const inbox = loadInbox();
+  const item = inbox.find(i=>i.id===id);
+  if(!item) return;
+  currentApprovalId = id;
+  document.getElementById('ap-title').textContent = item.name;
+  document.getElementById('ap-sub').textContent = item.meta;
+  document.getElementById('ap-details').innerHTML = item.details.map(d=>`
+    <div class="detail-row">
+      <span class="detail-label">${d.label}</span>
+      <span class="detail-val">${d.val}</span>
+    </div>`).join('');
+  document.getElementById('ap-route').value = item.defaultRoute||'anran';
+  document.getElementById('ap-note').value='';
+  document.getElementById('modal-approval').classList.add('show');
+}
+
+function doApprove(){
+  const inbox = loadInbox();
+  const i = inbox.findIndex(x=>x.id===currentApprovalId);
+  if(i>-1){ inbox[i].status='approved'; saveInbox(inbox); }
+  closeApproval(); render();
+  showToast('已核准，送下一關 ✓');
+}
+
+function doReject(){
+  const inbox = loadInbox();
+  const i = inbox.findIndex(x=>x.id===currentApprovalId);
+  if(i>-1){ inbox[i].status='rejected'; saveInbox(inbox); }
+  closeApproval(); render();
+  showToast('已退回申請人');
+}
+
+function closeApproval(){ document.getElementById('modal-approval').classList.remove('show'); }
+
+function markPayrollDone(stepId){
+  const payroll = loadPayroll();
+  payroll.done.push(stepId);
+  savePayroll(payroll);
+  render();
+  showToast('已完成此步驟 ✓');
+}
+
+function openForm(id){
+  const f = FORMS.find(x=>x.id===id);
+  if(!f) return;
+  currentFormId = id;
+  document.getElementById('nf-title').textContent = f.icon + ' ' + f.name;
+  document.getElementById('nf-sub').textContent = '送審路徑：' + f.route;
+  document.getElementById('nf-fields').innerHTML = f.fields.map(field=>{
+    let input='';
+    if(field.type==='text') input=`<input id="nf-${field.id}" placeholder="">`;
+    else if(field.type==='date') input=`<input type="date" id="nf-${field.id}">`;
+    else if(field.type==='textarea') input=`<textarea id="nf-${field.id}" style="resize:vertical;min-height:60px;"></textarea>`;
+    else if(field.type==='select') input=`<select id="nf-${field.id}">${(field.options||[]).map(o=>`<option>${o}</option>`).join('')}</select>`;
+    return `<div class="field"><label>${field.label}</label>${input}</div>`;
+  }).join('');
+  document.getElementById('modal-form').classList.add('show');
+}
+
+function submitForm(){
+  closeForm();
+  showToast('申請已送出，審核中...');
+}
+
+function closeForm(){ document.getElementById('modal-form').classList.remove('show'); }
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+render();
+</script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
+</body>
+</html>

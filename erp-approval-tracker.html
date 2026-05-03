@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>蕪解 ERP · 版權送審追蹤</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --pur:#9333ea;--pur-dim:#9333ea18;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--pur);box-shadow:0 0 6px var(--pur);flex-shrink:0;}
+.brand-name{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:640px;margin:0 auto;padding:16px;}
+
+/* DEADLINE BANNER */
+.deadline-banner{background:var(--danger-dim);border:1.5px solid #ef444430;border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.db-icon{font-size:22px;}
+.db-body{flex:1;}
+.db-title{font-size:13px;font-weight:800;color:var(--danger);margin-bottom:3px;}
+.db-desc{font-size:11px;color:var(--txt-mid);}
+.db-btn{font-size:11px;font-weight:700;background:var(--danger);color:#fff;border:none;border-radius:8px;padding:7px 13px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:11px;color:var(--pur);cursor:pointer;font-weight:700;}
+
+/* IP SUBMISSION CARD */
+.ip-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;margin-bottom:8px;overflow:hidden;transition:border-color .15s;}
+.ip-card:hover{border-color:var(--border-hi);}
+.ip-card.deadline-near{border-color:#ef444430;}
+.ip-card.waiting{border-color:#f59e0b30;}
+.ip-card.approved{border-color:#22c55e30;}
+.ip-header{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;}
+.ip-icon{font-size:24px;flex-shrink:0;}
+.ip-body{flex:1;min-width:0;}
+.ip-name{font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ip-meta{font-size:10px;color:var(--txt-mid);}
+.ip-right{text-align:right;flex-shrink:0;}
+.ip-deadline{font-size:11px;font-weight:700;}
+.ip-deadline.red{color:var(--danger);}
+.ip-deadline.yellow{color:var(--warn);}
+.ip-deadline.green{color:var(--ok);}
+.ip-stage{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+
+/* EXPAND */
+.ip-detail{display:none;border-top:1px solid var(--border);padding:14px;background:var(--card2);}
+.ip-detail.open{display:block;}
+
+/* STAGE STEPS */
+.stage-steps{display:flex;gap:0;margin-bottom:14px;overflow-x:auto;}
+.stage-steps::-webkit-scrollbar{display:none;}
+.step{display:flex;align-items:center;gap:0;flex-shrink:0;}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid var(--border);background:var(--card);color:var(--txt-lo);flex-shrink:0;}
+.step-dot.done{background:var(--ok);border-color:var(--ok);color:#fff;}
+.step-dot.active{background:var(--pur);border-color:var(--pur);color:#fff;}
+.step-dot.waiting{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.step-line{width:20px;height:2px;background:var(--border);flex-shrink:0;}
+.step-line.done{background:var(--ok);}
+.step-label{font-size:9px;color:var(--txt-lo);text-align:center;margin-top:4px;white-space:nowrap;}
+.step-wrap{display:flex;flex-direction:column;align-items:center;}
+
+/* FEEDBACK LOG */
+.fb-log{margin-bottom:12px;}
+.fb-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.fb-item:last-child{border-bottom:none;}
+.fb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.fb-body{flex:1;}
+.fb-from{font-size:11px;font-weight:700;margin-bottom:2px;}
+.fb-text{font-size:11px;color:var(--txt-mid);line-height:1.5;}
+.fb-date{font-size:10px;color:var(--txt-lo);}
+
+/* ACTION BUTTONS */
+.ip-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ia-btn{font-size:11px;font-weight:700;padding:7px 14px;border-radius:8px;cursor:pointer;border:1px solid;transition:opacity .15s;}
+.ia-btn:active{opacity:.75;}
+.ia-ok{background:var(--ok-dim);color:var(--ok);border-color:#22c55e40;}
+.ia-pur{background:var(--pur-dim);color:var(--pur);border-color:#9333ea40;}
+.ia-warn{background:var(--warn-dim);color:var(--warn);border-color:#f59e0b40;}
+.ia-grey{background:var(--card);color:var(--txt-mid);border-color:var(--border-hi);}
+
+/* CHIP */
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-pur{background:var(--pur-dim);color:var(--pur);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+
+/* FEEDBACK MODAL */
+.modal-overlay{position:fixed;inset:0;background:#0009;z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px 20px 36px;}
+.modal-handle{width:36px;height:4px;background:var(--border-hi);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;}
+.mf{margin-bottom:12px;}
+.mf label{font-size:10px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.mf input,.mf textarea,.mf select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.mf input:focus,.mf textarea:focus{border-color:var(--pur);}
+.mf select option{background:var(--card2);}
+.mf textarea{resize:none;}
+.m-actions{display:flex;gap:10px;margin-top:16px;}
+.mbtn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+.mbtn.primary{background:var(--pur);color:#fff;}
+.mbtn.ghost{background:var(--card2);color:var(--txt-mid);}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">版權送審追蹤</div>
+  </div>
+  <div class="topbar-right">
+    <span id="tb-name" style="font-size:11px;color:var(--txt-mid)">—</span>
+    <a href="erp-pipeline.html" class="btn-sm">流水線</a>
+    <a href="erp-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="login.html" class="btn-sm danger" onclick="localStorage.removeItem('erp_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- URGENT BANNER -->
+  <div class="deadline-banner">
+    <div class="db-icon">⏰</div>
+    <div class="db-body">
+      <div class="db-title">Snoopy 秋冬運動款 — 版權方回覆截止 5/5（3 天後）</div>
+      <div class="db-desc">需提交修改稿第 3 輪，安然已催促版權方，等回覆中</div>
+    </div>
+    <button class="db-btn" onclick="openFeedbackModal('snoopy-autumn','Snoopy 秋冬運動款')">記錄回覆</button>
+  </div>
+
+  <!-- MY TODO -->
+  <div class="sec-hdr">
+    <div class="sec-title">我的送審待辦（<span id="todo-count">4</span> 項）</div>
+    <span class="sec-link" onclick="openFeedbackModal('','')">+ 新增送審</span>
+  </div>
+  <div id="approval-list"></div>
+
+  <!-- COMPLETED THIS MONTH -->
+  <div class="sec-hdr" style="margin-top:24px">
+    <div class="sec-title" style="color:var(--txt-lo)">本月已完成（<span id="done-count">2</span> 項）</div>
+  </div>
+  <div id="done-list"></div>
+
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-overlay" id="fb-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="fb-modal-title">記錄版權方回覆</div>
+    <div class="modal-sub" id="fb-modal-sub">填入版權方的意見，一秒同步給 Bevis / 安然</div>
+    <div class="mf">
+      <label>IP 主題</label>
+      <input id="fb-ip" placeholder="例：Snoopy 秋冬運動款">
+    </div>
+    <div class="mf">
+      <label>版權方回覆結果</label>
+      <select id="fb-result">
+        <option value="pass">✅ 通過，可進下一階段</option>
+        <option value="revise">🔄 需修改，附意見</option>
+        <option value="reject">❌ 不通過，需重做</option>
+        <option value="waiting">⏳ 尚未回覆，催促中</option>
+        <option value="submitted">📤 剛剛送審</option>
+      </select>
+    </div>
+    <div class="mf">
+      <label>版權方意見 / 修改要求</label>
+      <textarea id="fb-notes" rows="3" placeholder="例：顏色需改深、logo 比例不對、需重新送素模..."></textarea>
+    </div>
+    <div class="mf">
+      <label>下一步 + 預計時間</label>
+      <input id="fb-next" placeholder="例：詩彤 3天內修改完，5/8 前再送">
+    </div>
+    <div class="mf">
+      <label>通知</label>
+      <select id="fb-notify">
+        <option value="bevis+anran">通知 Bevis + 安然（預設）</option>
+        <option value="all">全體相關人（Ray/Shawn/老董/德寶/賴哥）</option>
+        <option value="bevis">只通知 Bevis</option>
+        <option value="none">暫不通知</option>
+      </select>
+    </div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="saveFeedback()">記錄並同步</button>
+      <button class="mbtn ghost" onclick="closeModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(!s||Date.now()-s.ts>7*86400000){location.replace('login.html');return null;}
+  return s;
+}
+const SESS = requireAuth();
+if(SESS) document.getElementById('tb-name').textContent = SESS.name;
+
+const APPROVALS = [
+  {
+    id:'snoopy-autumn', ip:'Snoopy', theme:'秋冬運動款', icon:'🐶',
+    stage:'2D稿修改', stageIdx:2, status:'waiting',
+    deadline:'2026-05-05', urgency:'red',
+    rights_holder:'Peanuts Worldwide', contact:'安然協助',
+    notes:'第 2 輪修改稿已送出（4/28），版權方要求顏色加深、logo 比例調整',
+    feedback:[
+      {from:'Peanuts Worldwide', date:'4/28', dot:'var(--warn)',
+       text:'第1輪：整體方向OK，但主色太淺，logo尺寸需放大15%，運動元素可以更活潑'},
+      {from:'珮玲', date:'4/25', dot:'var(--pur)',
+       text:'初稿送審，5個品項：T恤/帽子/書包/水壺/玩具'},
+    ],
+    stages:['概念稿','初稿','2D修改','色彩樣','素模','成品'],
+  },
+  {
+    id:'cat-summer', ip:'貓福珊迪', theme:'夏日海邊', icon:'🐱',
+    stage:'色彩樣', stageIdx:3, status:'pass',
+    deadline:'2026-05-12', urgency:'green',
+    rights_holder:'San-X / 代理商', contact:'安然協助',
+    notes:'色彩樣已過審（4/30），可進入開模報價階段，需通知賴哥採購啟動',
+    feedback:[
+      {from:'San-X 代理', date:'4/30', dot:'var(--ok)',
+       text:'色彩樣通過！顏色飽和度符合品牌規範，可進入打樣階段'},
+      {from:'珮玲', date:'4/22', dot:'var(--pur)',
+       text:'色彩樣送審，3款配色，主打海洋藍+珊瑚橙'},
+    ],
+    stages:['概念稿','初稿','色彩樣','素模','成品'],
+  },
+  {
+    id:'muziktiger-box', ip:'Muziktiger', theme:'盲盒聯名系列', icon:'🐯',
+    stage:'概念稿', stageIdx:0, status:'active',
+    deadline:'2026-05-20', urgency:'yellow',
+    rights_holder:'Muziktiger 官方', contact:'安然主辦',
+    notes:'老董確認泡泡瑪特有意合作，珮玲本週要完成概念稿，需先確認授權範圍含盲盒',
+    feedback:[
+      {from:'安然', date:'5/1', dot:'var(--accent)',
+       text:'已聯繫 Muziktiger 官方，確認盲盒品類在授權範圍內，可推進'},
+    ],
+    stages:['授權確認','概念稿','初稿','色彩樣','素模','成品'],
+  },
+  {
+    id:'opanchu-autumn', ip:'Opanchu', theme:'秋收系列', icon:'🐢',
+    stage:'等待排期', stageIdx:-1, status:'pending',
+    deadline:'2026-06-01', urgency:'green',
+    rights_holder:'FLYING CHEESE', contact:'安然協助',
+    notes:'Bevis 確認 Q3 開發方向，詩彤排期尚未確定',
+    feedback:[],
+    stages:['概念稿','初稿','色彩樣','素模','成品'],
+  },
+];
+
+const DONE = [
+  {id:'snoopy-spring',ip:'Snoopy',theme:'春日野餐款',icon:'🐶',stage:'全部通過',status:'done',completedDate:'4/18',notes:'6 品項全部核准，已移交採購'},
+  {id:'cat-new-year',ip:'貓福珊迪',theme:'新春款',icon:'🐱',stage:'全部通過',status:'done',completedDate:'3/25',notes:'4 品項核准，已生產'},
+];
+
+function statusChip(status){
+  if(status==='pass') return '<span class="chip chip-ok">已通過</span>';
+  if(status==='waiting') return '<span class="chip chip-warn">等回覆</span>';
+  if(status==='active') return '<span class="chip chip-pur">進行中</span>';
+  if(status==='pending') return '<span class="chip chip-grey">待排期</span>';
+  if(status==='done') return '<span class="chip chip-ok">完成</span>';
+  return '';
+}
+
+function deadlineLabel(d, urgency){
+  if(!d) return {label:'—',cls:''};
+  const days = Math.round((new Date(d)-new Date())/(1000*60*60*24));
+  const cls = urgency==='red'?'red':urgency==='yellow'?'yellow':'green';
+  if(days<0) return {label:`逾期 ${-days} 天`,cls:'red'};
+  if(days===0) return {label:'今天截止',cls:'red'};
+  if(days<=3) return {label:`${days} 天後截止`,cls:'red'};
+  if(days<=7) return {label:`${days} 天後`,cls:'yellow'};
+  return {label:`${new Date(d).getMonth()+1}/${new Date(d).getDate()}`,cls:'green'};
+}
+
+function renderSteps(stages, activeIdx){
+  return stages.map((s,i)=>{
+    const isDone = i < activeIdx;
+    const isActive = i === activeIdx;
+    const isWaiting = i === activeIdx && true;
+    let cls = isDone?'done':isActive?'active':'';
+    const lineCls = isDone?'done':'';
+    return `<div class="step"><div class="step-wrap"><div class="step-dot ${cls}">${isDone?'✓':i+1}</div><div class="step-label" style="max-width:36px;overflow:hidden;text-overflow:ellipsis">${s}</div></div>${i<stages.length-1?`<div class="step-line ${lineCls}"></div>`:''}`;
+  }).join('');
+}
+
+function renderList(){
+  const list = document.getElementById('approval-list');
+  list.innerHTML = APPROVALS.map(a => {
+    const dl = deadlineLabel(a.deadline, a.urgency);
+    const fbHtml = a.feedback.map(f=>`
+      <div class="fb-item">
+        <div class="fb-dot" style="background:${f.dot}"></div>
+        <div class="fb-body">
+          <div class="fb-from">${f.from} <span class="fb-date">${f.date}</span></div>
+          <div class="fb-text">${f.text}</div>
+        </div>
+      </div>`).join('');
+    const cardCls = a.urgency==='red'?'deadline-near':a.status==='waiting'?'waiting':a.status==='pass'?'approved':'';
+    return `
+    <div class="ip-card ${cardCls}">
+      <div class="ip-header" onclick="toggleCard(this)">
+        <div class="ip-icon">${a.icon}</div>
+        <div class="ip-body">
+          <div class="ip-name">${a.ip} · ${a.theme} ${statusChip(a.status)}</div>
+          <div class="ip-meta">目前：${a.stage} · ${a.rights_holder}</div>
+        </div>
+        <div class="ip-right">
+          <div class="ip-deadline ${dl.cls}">${dl.label}</div>
+          <div class="ip-stage">${a.contact}</div>
+        </div>
+      </div>
+      <div class="ip-detail">
+        <div style="overflow-x:auto;margin-bottom:14px">
+          <div class="stage-steps">${renderSteps(a.stages, a.stageIdx)}</div>
+        </div>
+        <div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px;line-height:1.6">${a.notes}</div>
+        ${fbHtml ? `<div style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">版權方意見記錄</div><div class="fb-log">${fbHtml}</div>` : ''}
+        <div class="ip-actions">
+          <button class="ia-btn ia-ok" onclick="openFeedbackModal('${a.id}','${a.ip} · ${a.theme}')">+ 記錄回覆</button>
+          <button class="ia-btn ia-pur" onclick="alert('已通知 Bevis + 安然')">→ 通知 Bevis/安然</button>
+          ${a.status==='pass' ? `<button class="ia-btn ia-warn" onclick="alert('已通知賴哥採購可以啟動')">→ 通知採購啟動</button>` : ''}
+          <button class="ia-btn ia-grey">📎 附件管理</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const doneList = document.getElementById('done-list');
+  doneList.innerHTML = DONE.map(a=>`
+    <div class="ip-card approved" style="opacity:.7">
+      <div class="ip-header">
+        <div class="ip-icon">${a.icon}</div>
+        <div class="ip-body">
+          <div class="ip-name">${a.ip} · ${a.theme} ${statusChip(a.status)}</div>
+          <div class="ip-meta">${a.notes}</div>
+        </div>
+        <div class="ip-right">
+          <div class="ip-deadline green">${a.completedDate} 完成</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleCard(header){
+  header.nextElementSibling.classList.toggle('open');
+}
+
+let _modalIP = '', _modalId = '';
+function openFeedbackModal(id, ipName){
+  _modalId = id; _modalIP = ipName;
+  document.getElementById('fb-modal-title').textContent = id ? `記錄回覆 — ${ipName}` : '新增送審記錄';
+  document.getElementById('fb-modal-sub').textContent = id ? '填入版權方意見，一秒同步給 Bevis / 安然' : '建立新的送審項目';
+  document.getElementById('fb-ip').value = ipName;
+  document.getElementById('fb-notes').value = '';
+  document.getElementById('fb-next').value = '';
+  document.getElementById('fb-modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('fb-modal').classList.remove('open'); }
+
+function saveFeedback(){
+  const notes = document.getElementById('fb-notes').value.trim();
+  const next = document.getElementById('fb-next').value.trim();
+  const result = document.getElementById('fb-result').value;
+  const notify = document.getElementById('fb-notify').value;
+  closeModal();
+  const resultLabel = {pass:'✅ 通過',revise:'🔄 需修改',reject:'❌ 不通過',waiting:'⏳ 尚未回覆',submitted:'📤 已送審'}[result];
+  const notifyLabel = {bevis_anran:'Bevis+安然',all:'全體相關人',bevis:'Bevis',none:''}[notify]||'Bevis+安然';
+  showToast(`${resultLabel} · 已通知${notifyLabel}`);
+}
+
+function showToast(msg){
+  let t=document.getElementById('at-toast');
+  if(!t){t=document.createElement('div');t.id='at-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+renderList();
+</script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
+</body>
+</html>

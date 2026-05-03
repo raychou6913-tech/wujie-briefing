@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 物流作業台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#16a34a;--accent-dim:#16a34a18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --blue:#0284c7;--blue-dim:#0284c718;
+  --indigo:#818cf8;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.tb-back{background:none;border:1px solid var(--border);border-radius:8px;color:var(--txt-mid);padding:6px 12px;font-size:12px;cursor:pointer;}
+.tb-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.tb-title{font-size:14px;font-weight:700;}
+.tb-user{margin-left:auto;font-size:11px;color:var(--txt-mid);}
+
+.main{padding:16px;max-width:900px;margin:0 auto;}
+
+/* Section */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:20px;}
+.sec-hd:first-of-type{margin-top:0;}
+.sec-title{font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;}
+.sec-action{font-size:11px;color:var(--ok);cursor:pointer;border:none;background:none;font-weight:700;}
+.sec-action:hover{opacity:.8;}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px;}
+@media(max-width:500px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+.stat-label{font-size:10px;color:var(--txt-lo);margin-bottom:4px;}
+.stat-num{font-size:22px;font-weight:800;}
+.stat-num.ok{color:var(--ok);}
+.stat-num.warn{color:var(--warn);}
+.stat-num.danger{color:var(--danger);}
+.stat-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+
+/* Shipment cards */
+.ship-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:4px;}
+.ship-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .15s;}
+.ship-card:hover{border-color:var(--border-hi);}
+.ship-card.alert{border-color:#ef444440;}
+.ship-head{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.ship-status-bar{width:4px;border-radius:4px;align-self:stretch;flex-shrink:0;}
+.bar-transit{background:var(--blue);}
+.bar-customs{background:var(--warn);}
+.bar-alert{background:var(--danger);}
+.bar-delivered{background:var(--ok);}
+.bar-prep{background:var(--txt-lo);}
+.ship-info{flex:1;min-width:0;}
+.ship-id{font-size:13px;font-weight:800;margin-bottom:3px;}
+.ship-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;}
+.tag-sea{background:#0284c720;color:var(--blue);}
+.tag-air{background:#818cf820;color:var(--indigo);}
+.tag-express{background:#7c3aed20;color:#a78bfa;}
+.tag-fob{background:#f59e0b15;color:var(--warn);}
+.tag-cif{background:#22c55e15;color:var(--ok);}
+.tag-ddp{background:#ef444415;color:var(--danger);}
+.tag-cn{background:#f9731620;color:#fb923c;}
+.tag-domestic{background:#22c55e20;color:var(--ok);}
+.ship-route{font-size:11px;color:var(--txt-mid);}
+.ship-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.ship-eta{font-size:11px;font-weight:700;}
+.ship-eta.soon{color:var(--warn);}
+.ship-eta.late{color:var(--danger);}
+.ship-eta.ok{color:var(--ok);}
+.ship-chevron{color:var(--txt-lo);font-size:12px;transition:transform .2s;}
+.ship-card.open .ship-chevron{transform:rotate(180deg);}
+
+/* Timeline */
+.timeline{display:flex;align-items:center;gap:0;margin:12px 0;overflow-x:auto;padding-bottom:4px;}
+.tl-step{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.tl-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;cursor:pointer;transition:all .15s;}
+.tl-dot.done{background:var(--ok);color:#000;}
+.tl-dot.active{background:var(--warn);color:#000;box-shadow:0 0 8px var(--warn);}
+.tl-dot.todo{background:var(--card2);border:1.5px solid var(--border);color:var(--txt-lo);}
+.tl-dot.alert{background:var(--danger);color:#fff;box-shadow:0 0 8px var(--danger);}
+.tl-label{font-size:9px;color:var(--txt-lo);margin-top:4px;text-align:center;max-width:44px;line-height:1.3;}
+.tl-label.active{color:var(--warn);font-weight:700;}
+.tl-label.done{color:var(--ok);}
+.tl-line{flex:1;height:2px;background:var(--border);min-width:12px;}
+.tl-line.done{background:var(--ok);}
+.tl-line.active{background:var(--warn);}
+
+/* Detail body */
+.ship-body{display:none;border-top:1px solid var(--border);padding:16px;}
+.ship-card.open .ship-body{display:block;}
+.block-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+@media(max-width:580px){.block-grid{grid-template-columns:1fr;}}
+.detail-block{background:var(--card2);border-radius:10px;padding:12px;}
+.db-label{font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.db-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.db-row:last-child{border-bottom:none;}
+.db-key{font-size:11px;color:var(--txt-mid);}
+.db-val{font-size:12px;font-weight:700;}
+.db-val.warn{color:var(--warn);}
+.db-val.ok{color:var(--ok);}
+.db-val.danger{color:var(--danger);}
+
+/* Doc upload zone */
+.doc-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.doc-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;}
+.doc-icon{font-size:14px;flex-shrink:0;}
+.doc-name{font-size:11px;flex:1;}
+.doc-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;}
+.doc-ok{background:var(--ok-dim);color:var(--ok);}
+.doc-missing{background:var(--danger-dim);color:var(--danger);}
+.doc-warn{background:var(--warn-dim);color:var(--warn);}
+.doc-upload-btn{font-size:10px;color:var(--blue);cursor:pointer;border:none;background:none;font-weight:700;white-space:nowrap;}
+
+/* Transfer pricing warning */
+.tp-warn{background:#f59e0b0a;border:1px solid #f59e0b40;border-radius:8px;padding:10px 12px;font-size:11px;color:var(--warn);margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;}
+.tp-warn .icon{flex-shrink:0;}
+
+/* Action buttons */
+.ship-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{font-size:11px;font-weight:700;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-ok{background:var(--ok);color:#000;}
+.btn-warn{background:var(--warn);color:#000;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-outline{background:none;border:1px solid var(--border-hi);color:var(--txt-mid);}
+.btn-danger{background:var(--danger);color:#fff;}
+
+/* Escalation */
+.escalate-btn{width:100%;padding:12px;background:var(--danger-dim);border:1px solid #ef444450;border-radius:10px;color:var(--danger);font-size:13px;font-weight:800;cursor:pointer;margin-top:12px;text-align:left;display:flex;align-items:center;gap:10px;}
+.escalate-btn:hover{background:#ef444420;}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:#00000088;z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:16px;}
+.field{margin-bottom:13px;}
+.field label{display:block;font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:5px;letter-spacing:.04em;}
+.field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ok);}
+.field select option{background:var(--card2);}
+.field textarea{resize:vertical;min-height:70px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field-note{font-size:10px;color:var(--txt-lo);margin-top:4px;}
+.modal-footer{display:flex;gap:8px;margin-top:16px;}
+.btn-full{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-submit{background:var(--ok);color:#000;}
+.btn-cancel{background:var(--card2);color:var(--txt-mid);border:1px solid var(--border);}
+.btn-esc{background:var(--danger);color:#fff;}
+
+/* Carton info block */
+.carton-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.carton-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px;text-align:center;}
+.carton-val{font-size:16px;font-weight:800;}
+.carton-label{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ok);color:#000;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:22px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #16a34a40;z-index:150;display:flex;align-items:center;justify-content:center;}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="location.href='erp-lobby.html'">← 大廳</button>
+  <span class="tb-title">🚢 物流作業台</span>
+  <span class="tb-user" id="tb-user"></span>
+  <button class="tb-back" onclick="logout()" style="margin-left:8px;">登出</button>
+</div>
+
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">在途批次</div>
+      <div class="stat-num ok" id="stat-transit">—</div>
+      <div class="stat-sub">海運/空運合計</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">本週到港</div>
+      <div class="stat-num warn" id="stat-arriving">—</div>
+      <div class="stat-sub">需安排清關</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">卡關/異常</div>
+      <div class="stat-num danger" id="stat-alert">—</div>
+      <div class="stat-sub">需立即處理</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">本月已完成</div>
+      <div class="stat-num" id="stat-done">—</div>
+      <div class="stat-sub">批次已交付</div>
+    </div>
+  </div>
+
+  <!-- Active shipments -->
+  <div class="sec-hd">
+    <span class="sec-title" id="active-title">進行中批次</span>
+    <button class="sec-action" onclick="openNewShipment()">+ 新增批次</button>
+  </div>
+  <div class="ship-grid" id="ship-grid"></div>
+
+  <!-- Completed -->
+  <div id="done-section" style="display:none;">
+    <div class="sec-hd"><span class="sec-title">本月已完成</span></div>
+    <div class="ship-grid" id="done-grid"></div>
+  </div>
+
+</div>
+
+<button class="fab" onclick="openNewShipment()" title="新增批次">+</button>
+<div class="toast" id="toast"></div>
+
+<!-- New Shipment Modal -->
+<div class="modal-bg" id="modal-new">
+  <div class="modal">
+    <div class="modal-title">新增出貨批次</div>
+
+    <!-- 出貨類型切換 -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button id="type-btn-intl" onclick="setShipType('cross_border')"
+        style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--blue);background:var(--blue-dim);color:#38bdf8;">
+        🌏 境外跨境
+      </button>
+      <button id="type-btn-cn" onclick="setShipType('domestic_cn')"
+        style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--border);background:transparent;color:var(--txt-lo);">
+        🏠 大陸境內
+      </button>
+    </div>
+    <input type="hidden" id="ns-type" value="cross_border">
+
+    <div class="field"><label>批次名稱</label><input id="ns-name" placeholder="例：BKK-240501 Snoopy 夏日系列"></div>
+
+    <!-- 客戶欄位（境內顯示，跨境隱藏） -->
+    <div class="field" id="ns-customer-row" style="display:none;">
+      <label>客戶名稱 ★</label>
+      <input id="ns-customer" placeholder="例：上海潮玩集百貨、北京王府井玩具城">
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>出發地</label>
+        <select id="ns-from">
+          <option value="北京">北京（工廠提貨）</option>
+          <option value="廣州">廣州（工廠提貨）</option>
+          <option value="深圳">深圳（工廠提貨）</option>
+          <option value="上海">上海中轉</option>
+          <option value="台灣">台灣悍草</option>
+        </select>
+      </div>
+      <div class="field"><label id="ns-to-label">目的地（境外）</label>
+        <select id="ns-to-intl">
+          <option value="泰國曼谷">泰國曼谷</option>
+          <option value="台灣">台灣</option>
+          <option value="香港">香港</option>
+          <option value="深圳">深圳</option>
+          <option value="其他">其他</option>
+        </select>
+        <select id="ns-to-cn" style="display:none;">
+          <option value="上海">上海</option>
+          <option value="北京">北京（本地）</option>
+          <option value="廣州">廣州</option>
+          <option value="杭州">杭州</option>
+          <option value="成都">成都</option>
+          <option value="深圳">深圳</option>
+          <option value="武漢">武漢</option>
+          <option value="南京">南京</option>
+          <option value="其他城市">其他城市</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 跨境：運輸方式 + 貿易條件 -->
+    <div id="ns-intl-fields">
+      <div class="field-row">
+        <div class="field"><label>運輸方式</label>
+          <select id="ns-mode-intl">
+            <option value="sea">海運（整櫃）</option>
+            <option value="lcl">海運（拼箱）</option>
+            <option value="express">海快</option>
+            <option value="air">空運</option>
+          </select>
+        </div>
+        <div class="field"><label>貿易條件</label>
+          <select id="ns-terms">
+            <option value="FOB">FOB（工廠責任到上船）</option>
+            <option value="CIF">CIF（含運保費到目的港）</option>
+            <option value="DDP">DDP（完稅交貨）</option>
+            <option value="DAP">DAP（目的地交貨）</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>貨代</label>
+        <select id="ns-agent-intl">
+          <option value="">選擇貨代</option>
+          <option value="中遠海運">中遠海運</option>
+          <option value="嘉里大通">嘉里大通</option>
+          <option value="台灣國際物流">台灣國際物流</option>
+          <option value="FedEx">FedEx</option>
+          <option value="DHL">DHL</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>預計出港日（ETD）</label><input type="date" id="ns-etd"></div>
+        <div class="field"><label>預計到港日（ETA）</label><input type="date" id="ns-eta"></div>
+      </div>
+    </div>
+
+    <!-- 境內：快遞公司 + 追蹤號 -->
+    <div id="ns-cn-fields" style="display:none;">
+      <div class="field-row">
+        <div class="field"><label>快遞/物流公司</label>
+          <select id="ns-mode-cn">
+            <option value="sf">順豐速遞</option>
+            <option value="debang">德邦物流</option>
+            <option value="jd">京東物流</option>
+            <option value="zhongtong">中通快遞</option>
+            <option value="ane">安能物流</option>
+            <option value="truck">整車配送</option>
+            <option value="other_cn">其他</option>
+          </select>
+        </div>
+        <div class="field"><label>快遞單號</label>
+          <input id="ns-tracking" placeholder="攬收後填入">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>出庫日期</label><input type="date" id="ns-etd-cn"></div>
+        <div class="field"><label>預計送達</label><input type="date" id="ns-eta-cn"></div>
+      </div>
+    </div>
+
+    <div class="field"><label>關聯採購單號（PO#）</label>
+      <input id="ns-po" placeholder="例：PO-320, PO-321（多筆用逗號分隔）">
+      <div class="field-note">從採購台取得，用於自動帶入箱規資訊</div>
+    </div>
+    <div class="field"><label>關聯客戶訂單號</label>
+      <input id="ns-order" placeholder="例：ORD-240501">
+    </div>
+
+    <div style="background:var(--card2);border-radius:10px;padding:12px;margin-bottom:13px;">
+      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">箱規資訊</div>
+      <div class="field-row" style="margin-bottom:10px;">
+        <div class="field" style="margin-bottom:0"><label>總箱數</label><input id="ns-boxes" placeholder="例：24" type="number"></div>
+        <div class="field" style="margin-bottom:0"><label>毛重（kg）</label><input id="ns-weight" placeholder="例：180" type="number"></div>
+      </div>
+      <div class="field-row" style="margin-bottom:0;">
+        <div class="field" style="margin-bottom:0"><label>體積（CBM）</label><input id="ns-cbm" placeholder="例：2.4" type="number" step="0.1"></div>
+        <div class="field" style="margin-bottom:0"><label>預估運費</label><input id="ns-freight" placeholder="例：¥3,200"></div>
+      </div>
+    </div>
+
+    <!-- 費用歸屬（跨境才需要） -->
+    <div class="field" id="ns-entity-row">
+      <label>費用由哪個法律實體承擔</label>
+      <select id="ns-entity">
+        <option value="北京蕪解">北京蕪解</option>
+        <option value="UJ BKK">UJ BKK（泰國）</option>
+        <option value="台灣悍草">台灣悍草</option>
+        <option value="香港JV">香港 JV</option>
+        <option value="深圳子公司">深圳子公司</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeModal('modal-new')">取消</button>
+      <button class="btn-full btn-submit" onclick="saveNewShipment()">建立批次</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal-bg" id="modal-status">
+  <div class="modal">
+    <div class="modal-title" id="ms-title">更新狀態</div>
+    <div class="field"><label>更新至</label>
+      <select id="ms-stage"></select>
+    </div>
+    <div class="field"><label>實際日期</label><input type="date" id="ms-date"></div>
+    <div id="ms-tp-warn" style="display:none;" class="tp-warn">
+      <span class="icon">⚠</span>
+      <span>此批次為跨境貨物。請確認商業發票已採用<strong>內部轉讓定價</strong>，而非工廠出廠價，否則會造成跨實體利潤錯誤歸屬。
+        <a href="erp-transfer-pricing.html" style="color:var(--warn);font-weight:700;margin-left:6px;text-decoration:underline;">查看 TP 設定 →</a>
+      </span>
+    </div>
+    <div class="field"><label>備註（選填）</label><textarea id="ms-note" placeholder="如有特殊情況請說明..."></textarea></div>
+    <div class="field"><label>通知誰（同步推送）</label>
+      <select id="ms-notify" multiple style="height:80px;">
+        <option value="anran" selected>安然（資金準備）</option>
+        <option value="shawn" selected>Shawn（運營更新）</option>
+        <option value="laodong">老董（通知客戶到貨）</option>
+        <option value="yuming">躍明（費用確認）</option>
+        <option value="ray">Ray（管理層同步）</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeModal('modal-status')">取消</button>
+      <button class="btn-full btn-submit" onclick="saveStatusUpdate()">確認更新</button>
+    </div>
+  </div>
+</div>
+
+<!-- Escalation Modal -->
+<div class="modal-bg" id="modal-escalate">
+  <div class="modal">
+    <div class="modal-title">🚨 異常升級</div>
+    <div class="field"><label>批次</label><input id="esc-ship" readonly style="opacity:.7;"></div>
+    <div class="field"><label>異常類型</label>
+      <select id="esc-type">
+        <optgroup label="跨境物流">
+          <option value="hs_code">HS Code 錯誤 / 品名不符</option>
+          <option value="missing_doc">缺少報關文件（授權書/原產地證明等）</option>
+          <option value="tariff_dispute">關稅稅率爭議</option>
+          <option value="detained">貨物被扣押</option>
+        </optgroup>
+        <optgroup label="境內配送">
+          <option value="delay_cn">快遞延誤</option>
+          <option value="lost_cn">包裹遺失</option>
+          <option value="refuse_cn">客戶拒收</option>
+          <option value="address_cn">地址問題/找不到客戶</option>
+        </optgroup>
+        <optgroup label="通用">
+          <option value="damage">貨物損壞/短少</option>
+          <option value="other">其他</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field"><label>具體情況</label><textarea id="esc-desc" placeholder="描述卡關原因、海關要求、目前狀態..."></textarea></div>
+    <div class="field"><label>需要哪方介入</label>
+      <select id="esc-escalate">
+        <option value="anran">安然（法務/合約介入）</option>
+        <option value="ray">Ray（最高層決策）</option>
+        <option value="yuming">躍明（稅務/財務處理）</option>
+        <option value="all">全部通知</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeModal('modal-escalate')">取消</button>
+      <button class="btn-full btn-esc" onclick="saveEscalation()">🚨 立即升級通報</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('erp_sess')||'null');
+if(!SESS||Date.now()-SESS.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
+function logout(){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
+document.getElementById('tb-user').textContent = SESS.name + ' · ' + SESS.role;
+
+const IS_MGMT = ['ray','shawn','anran','yuming'].includes(SESS.user);
+
+// ── Data ──────────────────────────────────────────────────
+const STORAGE_KEY = 'logistics_shipments_v1';
+
+// 跨境 8 步
+const STAGES_INTL = [
+  {key:'factory',    label:'工廠提貨'},
+  {key:'warehouse',  label:'入倉/併櫃'},
+  {key:'customs_out',label:'出口報關'},
+  {key:'departed',   label:'已出港'},
+  {key:'transit',    label:'在途'},
+  {key:'arrived',    label:'已到港'},
+  {key:'customs_in', label:'進口清關'},
+  {key:'delivered',  label:'已交付'},
+];
+// 大陸境內 5 步
+const STAGES_CN = [
+  {key:'packing',    label:'備貨出庫'},
+  {key:'collected',  label:'已攬收'},
+  {key:'transit',    label:'在途'},
+  {key:'delivering', label:'派送中'},
+  {key:'delivered',  label:'已簽收'},
+];
+// 向下相容舊資料
+const STAGES = STAGES_INTL;
+function getStages(s){ return s.type==='domestic_cn' ? STAGES_CN : STAGES_INTL; }
+
+const DOCS_REQUIRED = [
+  {key:'invoice',   name:'商業發票 (Commercial Invoice)',      warn:'跨境貨物需確認已採用 Transfer Pricing 內部定價'},
+  {key:'packing',   name:'裝箱單 (Packing List)',              warn:null},
+  {key:'bl',        name:'提單 / 空運提單 (B/L or AWB)',       warn:null},
+  {key:'insurance', name:'保險單（如需）',                     warn:null},
+];
+
+const MODE_LABEL = {
+  sea:'海運整櫃', lcl:'海運拼箱', express:'海快', air:'空運',
+  sf:'順豐速遞', debang:'德邦物流', jd:'京東物流',
+  zhongtong:'中通快遞', ane:'安能物流', truck:'整車配送', other_cn:'其他快遞'
+};
+const MODE_TAG = {
+  sea:'tag-sea', lcl:'tag-sea', express:'tag-express', air:'tag-air',
+  sf:'tag-cn', debang:'tag-cn', jd:'tag-cn',
+  zhongtong:'tag-cn', ane:'tag-cn', truck:'tag-cn', other_cn:'tag-cn'
+};
+const TERMS_TAG  = {FOB:'tag-fob',CIF:'tag-cif',DDP:'tag-ddp',DAP:'tag-fob'};
+
+function loadShipments(){ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+function saveShipments(arr){ localStorage.setItem(STORAGE_KEY,JSON.stringify(arr)); }
+
+function seedIfEmpty(){
+  if(loadShipments().length) return;
+  const today = new Date().toISOString().slice(0,10);
+  const d3 = new Date(Date.now()+3*86400000).toISOString().slice(0,10);
+  const d7 = new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const d14= new Date(Date.now()+14*86400000).toISOString().slice(0,10);
+  saveShipments([
+    {
+      id:'s1', type:'cross_border', name:'BKK-2405 Snoopy 夏日系列', from:'北京', to:'泰國曼谷',
+      mode:'sea', terms:'CIF', agent:'嘉里大通',
+      po:'PO-318, PO-319', order:'ORD-BKK-240501',
+      etd:'2026-04-28', eta:d3,
+      boxes:32, weight:240, cbm:3.2, freight:'¥4,800', freightActual:'',
+      entity:'北京蕪解',
+      stage:'arrived', stageHistory:{factory:'2026-04-22',warehouse:'2026-04-25',customs_out:'2026-04-27',departed:'2026-04-28',transit:'2026-04-29',arrived:today},
+      docs:{invoice:true, packing:true, bl:true, insurance:false},
+      status:'normal', note:'預計'+d3+'曼谷清關，提醒 Den 安排收貨',
+      escalation:null,
+    },
+    {
+      id:'s2', type:'cross_border', name:'TWN-2405 Mofusand 台灣補貨', from:'北京', to:'台灣',
+      mode:'express', terms:'DDP', agent:'DHL',
+      po:'PO-320', order:'ORD-TWN-240502',
+      etd:'2026-04-30', eta:d7,
+      boxes:8, weight:42, cbm:0.6, freight:'¥1,200', freightActual:'',
+      entity:'台灣悍草',
+      stage:'transit', stageHistory:{factory:'2026-04-29',warehouse:'2026-04-30',customs_out:'2026-04-30',departed:'2026-04-30',transit:'2026-05-01'},
+      docs:{invoice:true, packing:true, bl:true, insurance:false},
+      status:'normal', note:'海快，DHL 追蹤號 1234567890',
+      escalation:null,
+    },
+    {
+      id:'s4', type:'domestic_cn',
+      name:'CN-2405 貓福珊迪 春季補貨', from:'北京', to:'上海',
+      customer:'上海潮玩集百貨',
+      mode:'sf', terms:'', agent:'順豐',
+      po:'PO-322', order:'ORD-SH-240503', trackingNo:'SF1234567890123',
+      etd:'2026-05-03', eta:'2026-05-05',
+      boxes:14, weight:72, cbm:1.0, freight:'¥420', freightActual:'',
+      entity:'北京蕪解',
+      stage:'transit',
+      stageHistory:{packing:'2026-05-02',collected:'2026-05-03',transit:'2026-05-03'},
+      docs:{}, status:'normal',
+      note:'順豐在途，預計 5/5 送達上海倉，老董已通知客戶',
+      escalation:null,
+    },
+    {
+      id:'s5', type:'domestic_cn',
+      name:'CN-2405 Chiikawa 北京本地配送', from:'北京', to:'北京',
+      customer:'北京王府井玩具城',
+      mode:'truck', terms:'', agent:'自提/配送',
+      po:'PO-323', order:'ORD-BJ-240503', trackingNo:'',
+      etd:'2026-05-04', eta:'2026-05-04',
+      boxes:6, weight:38, cbm:0.5, freight:'¥80', freightActual:'',
+      entity:'北京蕪解',
+      stage:'packing',
+      stageHistory:{packing:'2026-05-03'},
+      docs:{}, status:'normal',
+      note:'整車配送，明天上午出庫，德寶跟進',
+      escalation:null,
+    },
+    {
+      id:'s3', type:'cross_border',
+      name:'BKK-2406 Chiikawa 快閃店備貨', from:'北京', to:'泰國曼谷',
+      mode:'air', terms:'FOB', agent:'FedEx',
+      po:'PO-321', order:'ORD-BKK-240601',
+      etd:d7, eta:d14,
+      boxes:5, weight:28, cbm:0.4, freight:'¥6,500', freightActual:'',
+      entity:'UJ BKK',
+      stage:'warehouse', stageHistory:{factory:today,warehouse:today},
+      docs:{invoice:false, packing:false, bl:false, insurance:false},
+      status:'alert', note:'⚠ 商業發票未準備，報關資料缺件',
+      escalation:null,
+    },
+  ]);
+}
+seedIfEmpty();
+
+let currentShipId = null;
+
+// ── Render ─────────────────────────────────────────────────
+function render(){
+  const ships = loadShipments();
+  const active = ships.filter(s=>s.stage!=='delivered');
+  const done   = ships.filter(s=>s.stage==='delivered');
+
+  // Stats
+  document.getElementById('stat-transit').textContent = active.filter(s=>['departed','transit'].includes(s.stage)).length;
+  document.getElementById('stat-arriving').textContent = active.filter(s=>['arrived','customs_in'].includes(s.stage)).length;
+  document.getElementById('stat-alert').textContent = active.filter(s=>s.status==='alert'||s.escalation).length;
+  document.getElementById('stat-done').textContent = done.length;
+
+  document.getElementById('active-title').textContent = `進行中批次（${active.length}）`;
+  renderGrid('ship-grid', active);
+  if(done.length){
+    document.getElementById('done-section').style.display='block';
+    renderGrid('done-grid', done);
+  }
+}
+
+function renderGrid(gridId, ships){
+  const grid = document.getElementById(gridId);
+  if(!ships.length){ grid.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:13px;">暫無記錄</div>'; return; }
+  grid.innerHTML = ships.map(s=>{
+    const isCN = s.type === 'domestic_cn';
+    const stages = getStages(s);
+    const stageIdx = stages.findIndex(st=>st.key===s.stage);
+    const stageLabel = stages[stageIdx]?.label || s.stage;
+
+    const barClass = s.status==='alert'?'bar-alert':
+      isCN ? (s.stage==='delivered'?'bar-delivered':s.stage==='packing'?'bar-prep':'bar-transit') :
+      ['arrived','customs_in'].includes(s.stage)?'bar-customs':s.stage==='delivered'?'bar-delivered':['factory','warehouse'].includes(s.stage)?'bar-prep':'bar-transit';
+
+    const etaDiff = s.eta ? Math.round((new Date(s.eta)-new Date())/86400000) : null;
+    const etaClass = etaDiff===null?'':etaDiff<0?'late':etaDiff<=3?'soon':'ok';
+    const etaLabel = isCN ? '預計送達' : 'ETA';
+    const etaText = etaDiff===null?'—':etaDiff<0?`逾期 ${Math.abs(etaDiff)} 天`:etaDiff===0?(isCN?'今日送達':'今日到港'):`${etaDiff} 天後${isCN?'送達':'到港'}`;
+
+    const tlHtml = stages.map((st,i)=>{
+      const isDone = i<=stageIdx && s.stage!=='alert';
+      const isActive = i===stageIdx;
+      const cls = s.status==='alert'&&isActive?'alert':isDone?'done':isActive?'active':'todo';
+      const line = i<stages.length-1 ? `<div class="tl-line ${isDone&&!isActive?'done':isActive?'active':''}"></div>` : '';
+      return `<div class="tl-step"><div class="tl-dot ${cls}" title="${st.label}">${isDone&&!isActive?'✓':i+1}</div><div class="tl-label ${cls}">${st.label}</div></div>${line}`;
+    }).join('');
+
+    const cartonHtml = `<div class="carton-grid">
+      <div class="carton-item"><div class="carton-val">${s.boxes||'—'}</div><div class="carton-label">總箱數</div></div>
+      <div class="carton-item"><div class="carton-val">${s.weight||'—'}</div><div class="carton-label">毛重 kg</div></div>
+      <div class="carton-item"><div class="carton-val">${s.cbm||'—'}</div><div class="carton-label">CBM</div></div>
+    </div>`;
+
+    // 境內：不需要報關文件，只顯示快遞單號
+    const docsSection = isCN ? `
+      <div class="detail-block" style="margin-bottom:12px;">
+        <div class="db-label">快遞追蹤</div>
+        <div class="db-row"><span class="db-key">快遞公司</span><span class="db-val">${MODE_LABEL[s.mode]||s.agent}</span></div>
+        <div class="db-row"><span class="db-key">快遞單號</span><span class="db-val" style="font-family:monospace;font-size:11px;">${s.trackingNo||'—'}</span></div>
+        <div class="db-row"><span class="db-key">預計送達</span><span class="db-val ${etaClass}">${s.eta||'—'}</span></div>
+      </div>` : `
+      <div class="detail-block" style="margin-bottom:12px;">
+        <div class="db-label">報關文件包</div>
+        <div class="doc-list">${DOCS_REQUIRED.map(d=>`
+          <div class="doc-row">
+            <span class="doc-icon">${s.docs&&s.docs[d.key]?'📄':'📋'}</span>
+            <span class="doc-name">${d.name}</span>
+            <span class="doc-status ${s.docs&&s.docs[d.key]?'doc-ok':'doc-missing'}">${s.docs&&s.docs[d.key]?'已上傳':'缺件'}</span>
+            ${!(s.docs&&s.docs[d.key])?`<button class="doc-upload-btn" onclick="event.stopPropagation();uploadDoc('${s.id}','${d.key}')">上傳</button>`:''}
+          </div>
+          ${d.warn&&s.docs&&s.docs[d.key]?`<div class="tp-warn" style="margin:4px 0 6px;"><span class="icon">⚠</span><span>${d.warn}</span></div>`:''}
+        `).join('')}</div>
+      </div>`;
+
+    const missingDocs = isCN ? 0 : DOCS_REQUIRED.filter(d=>!(s.docs&&s.docs[d.key])).length;
+    const docsBadge = isCN
+      ? `<span class="tag tag-domestic">境內配送</span>`
+      : missingDocs>0
+        ? `<span class="tag" style="background:#ef444415;color:var(--danger)">缺 ${missingDocs} 份文件</span>`
+        : `<span class="tag" style="background:var(--ok-dim);color:var(--ok)">文件齊全</span>`;
+
+    const tpWarnHtml = (!isCN) ? `<div class="tp-warn"><span class="icon">⚠</span><span>跨境批次（${s.from}→${s.to}）：請確認商業發票已採用<strong>內部轉讓定價</strong>，費用歸屬：<strong>${s.entity}</strong></span></div>` : '';
+
+    const metaLine = isCN
+      ? `客戶：<strong style="color:var(--txt-hi)">${s.customer||'—'}</strong> · ${s.from} → ${s.to} · ${s.agent||'—'}`
+      : `PO：${s.po||'—'} · 貨代：${s.agent||'—'} · 費用：${s.entity}`;
+
+    const blockB = isCN ? `
+      <div class="detail-block">
+        <div class="db-label">客戶與訂單</div>
+        <div class="db-row"><span class="db-key">客戶名稱</span><span class="db-val" style="color:var(--ok)">${s.customer||'—'}</span></div>
+        <div class="db-row"><span class="db-key">客戶訂單號</span><span class="db-val" style="font-size:10px;">${s.order||'—'}</span></div>
+        <div class="db-row"><span class="db-key">關聯 PO</span><span class="db-val" style="font-size:10px;">${s.po||'—'}</span></div>
+        <div class="db-row"><span class="db-key">出貨日期</span><span class="db-val">${s.etd||'—'}</span></div>
+      </div>` : `
+      <div class="detail-block">
+        <div class="db-label">重要日期</div>
+        <div class="db-row"><span class="db-key">預計出港 ETD</span><span class="db-val">${s.etd||'—'}</span></div>
+        <div class="db-row"><span class="db-key">預計到港 ETA</span><span class="db-val ${etaClass}">${s.eta||'—'}</span></div>
+        <div class="db-row"><span class="db-key">關聯 PO</span><span class="db-val" style="font-size:10px;">${s.po||'—'}</span></div>
+        <div class="db-row"><span class="db-key">客戶訂單</span><span class="db-val" style="font-size:10px;">${s.order||'—'}</span></div>
+      </div>`;
+
+    const escalateBtnLabel = isCN
+      ? '🚨 異常回報：延誤 / 破損 / 簽收問題'
+      : '🚨 異常升級：卡關 / 文件問題 / 貨物損壞';
+
+    return `<div class="ship-card ${s.status==='alert'?'alert':''}" id="card-${s.id}">
+      <div class="ship-head" onclick="toggleCard('${s.id}')">
+        <div class="ship-status-bar ${barClass}"></div>
+        <div class="ship-info">
+          <div class="ship-id">${s.name}</div>
+          <div class="ship-meta">
+            <span class="tag ${MODE_TAG[s.mode]||'tag-sea'}">${MODE_LABEL[s.mode]||s.mode}</span>
+            ${!isCN&&s.terms?`<span class="tag ${TERMS_TAG[s.terms]||'tag-fob'}">${s.terms}</span>`:''}
+            ${docsBadge}
+          </div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:4px;">${metaLine}</div>
+        </div>
+        <div class="ship-right">
+          <div class="ship-eta ${etaClass}">${etaLabel} ${etaText}</div>
+          <div style="font-size:10px;color:var(--txt-lo);">目前：${stageLabel}</div>
+          <span class="ship-chevron">▼</span>
+        </div>
+      </div>
+      <div class="ship-body">
+        <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">狀態時間軸</div>
+        <div class="timeline">${tlHtml}</div>
+        ${s.note?`<div style="font-size:11px;color:var(--txt-mid);margin-bottom:12px;padding:8px 12px;background:var(--card2);border-radius:8px;">${s.note}</div>`:''}
+        ${tpWarnHtml}
+        <div class="block-grid">
+          <div class="detail-block">
+            <div class="db-label">${isCN?'運費與箱規':'貨代與箱規'}</div>
+            <div class="db-row"><span class="db-key">${isCN?'快遞公司':'貨代'}</span><span class="db-val">${s.agent||'—'}</span></div>
+            <div class="db-row"><span class="db-key">預估運費</span><span class="db-val">${s.freight||'—'}</span></div>
+            <div class="db-row"><span class="db-key">實際運費</span><span class="db-val ${s.freightActual?'ok':'warn'}">${s.freightActual||'待確認'}</span></div>
+            <div style="margin-top:10px;">${cartonHtml}</div>
+          </div>
+          ${blockB}
+        </div>
+        ${docsSection}
+        <div class="ship-actions">
+          <button class="btn btn-ok" onclick="event.stopPropagation();openStatusUpdate('${s.id}')">📍 更新狀態</button>
+          <button class="btn btn-blue" onclick="event.stopPropagation();confirmFreight('${s.id}')">💰 確認實際運費</button>
+          <button class="btn btn-outline" onclick="event.stopPropagation();markDelivered('${s.id}')">✓ 標記${isCN?'已簽收':'已交付'}</button>
+        </div>
+        <button class="escalate-btn" onclick="event.stopPropagation();openEscalate('${s.id}')">${escalateBtnLabel}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id){
+  document.getElementById('card-'+id)?.classList.toggle('open');
+}
+
+// ── Actions ────────────────────────────────────────────────
+function setShipType(type){
+  document.getElementById('ns-type').value = type;
+  const isCN = type==='domestic_cn';
+  // Toggle buttons
+  const btnIntl = document.getElementById('type-btn-intl');
+  const btnCN = document.getElementById('type-btn-cn');
+  btnIntl.style.borderColor = isCN ? 'var(--border)' : 'var(--blue)';
+  btnIntl.style.background = isCN ? 'transparent' : 'var(--blue-dim)';
+  btnIntl.style.color = isCN ? 'var(--txt-lo)' : '#38bdf8';
+  btnCN.style.borderColor = isCN ? '#f97316' : 'var(--border)';
+  btnCN.style.background = isCN ? '#f9731618' : 'transparent';
+  btnCN.style.color = isCN ? '#fb923c' : 'var(--txt-lo)';
+  // Toggle fields
+  document.getElementById('ns-customer-row').style.display = isCN ? 'block' : 'none';
+  document.getElementById('ns-to-label').textContent = isCN ? '目的地（城市）' : '目的地（境外）';
+  document.getElementById('ns-to-intl').style.display = isCN ? 'none' : 'block';
+  document.getElementById('ns-to-cn').style.display = isCN ? 'block' : 'none';
+  document.getElementById('ns-intl-fields').style.display = isCN ? 'none' : 'block';
+  document.getElementById('ns-cn-fields').style.display = isCN ? 'block' : 'none';
+  document.getElementById('ns-entity-row').style.display = isCN ? 'none' : 'block';
+  // Update name placeholder
+  document.getElementById('ns-name').placeholder = isCN
+    ? '例：CN-240503 貓福珊迪 補貨-上海潮玩集'
+    : '例：BKK-240501 Snoopy 夏日系列';
+}
+
+function openNewShipment(){
+  ['ns-name','ns-po','ns-order','ns-boxes','ns-weight','ns-cbm','ns-freight','ns-customer','ns-tracking'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  setShipType('cross_border');
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('ns-etd').value = today;
+  document.getElementById('ns-etd-cn').value = today;
+  document.getElementById('modal-new').classList.add('show');
+}
+
+function saveNewShipment(){
+  const name = document.getElementById('ns-name').value.trim();
+  if(!name){ showToast('請填寫批次名稱'); return; }
+  const type = document.getElementById('ns-type').value;
+  const isCN = type==='domestic_cn';
+  if(isCN && !document.getElementById('ns-customer').value.trim()){
+    showToast('大陸境內出貨請填寫客戶名稱'); return;
+  }
+  const ships = loadShipments();
+  const newShip = {
+    id:'s'+Date.now(), type,
+    name,
+    from: document.getElementById('ns-from').value,
+    to: isCN ? document.getElementById('ns-to-cn').value : document.getElementById('ns-to-intl').value,
+    customer: isCN ? document.getElementById('ns-customer').value.trim() : '',
+    mode: isCN ? document.getElementById('ns-mode-cn').value : document.getElementById('ns-mode-intl').value,
+    terms: isCN ? '' : document.getElementById('ns-terms').value,
+    agent: isCN
+      ? (MODE_LABEL[document.getElementById('ns-mode-cn').value]||'快遞')
+      : (document.getElementById('ns-agent-intl').value||'未選擇'),
+    trackingNo: isCN ? document.getElementById('ns-tracking').value.trim() : '',
+    po: document.getElementById('ns-po').value.trim(),
+    order: document.getElementById('ns-order').value.trim(),
+    etd: isCN ? document.getElementById('ns-etd-cn').value : document.getElementById('ns-etd').value,
+    eta: isCN ? document.getElementById('ns-eta-cn').value : document.getElementById('ns-eta').value,
+    boxes: document.getElementById('ns-boxes').value,
+    weight: document.getElementById('ns-weight').value,
+    cbm: document.getElementById('ns-cbm').value,
+    freight: document.getElementById('ns-freight').value,
+    freightActual: '',
+    entity: isCN ? '北京蕪解' : document.getElementById('ns-entity').value,
+    stage: isCN ? 'packing' : 'factory',
+    stageHistory: { [isCN?'packing':'factory']: new Date().toISOString().slice(0,10) },
+    docs: isCN ? {} : {invoice:false,packing:false,bl:false,insurance:false},
+    status: 'normal', note:'', escalation:null,
+  };
+  ships.unshift(newShip);
+  saveShipments(ships);
+  closeModal('modal-new');
+  render();
+  showToast(isCN ? `境內批次已建立，老董已收到通知 ✓` : '跨境批次已建立，安然已收到通知 ✓');
+}
+
+function openStatusUpdate(id){
+  currentShipId = id;
+  const s = loadShipments().find(x=>x.id===id);
+  if(!s) return;
+  const stages = getStages(s);
+  document.getElementById('ms-title').textContent = `更新狀態：${s.name}`;
+  const curIdx = stages.findIndex(st=>st.key===s.stage);
+  const sel = document.getElementById('ms-stage');
+  sel.innerHTML = stages.map((st,i)=>`<option value="${st.key}" ${i===curIdx+1?'selected':''}>${st.label}</option>`).join('');
+  document.getElementById('ms-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('ms-note').value = '';
+  // TP warning only for cross-border
+  const tpWarn = document.getElementById('ms-tp-warn');
+  const isCN = s.type==='domestic_cn';
+  tpWarn.style.display = (!isCN && (s.stage==='customs_out'||sel.value==='customs_out')) ? 'flex' : 'none';
+  document.getElementById('modal-status').classList.add('show');
+}
+
+function saveStatusUpdate(){
+  const ships = loadShipments();
+  const i = ships.findIndex(s=>s.id===currentShipId);
+  if(i<0) return;
+  const newStage = document.getElementById('ms-stage').value;
+  const date = document.getElementById('ms-date').value;
+  ships[i].stage = newStage;
+  ships[i].stageHistory[newStage] = date;
+  ships[i].note = document.getElementById('ms-note').value || ships[i].note;
+  saveShipments(ships);
+  closeModal('modal-status');
+  render();
+  const label = STAGES.find(s=>s.key===newStage)?.label||newStage;
+  showToast(`已更新：${label} ✓（已推送通知）`);
+}
+
+function uploadDoc(id, docKey){
+  const ships = loadShipments();
+  const i = ships.findIndex(s=>s.id===id);
+  if(i<0) return;
+  ships[i].docs[docKey] = true;
+  saveShipments(ships);
+  render();
+  showToast('文件已上傳 ✓（正式版支援 PDF/圖片）');
+}
+
+function confirmFreight(id){
+  const actual = prompt('請輸入實際運費（例：¥5,200）：');
+  if(!actual) return;
+  const ships = loadShipments();
+  const i = ships.findIndex(s=>s.id===id);
+  if(i<0) return;
+  ships[i].freightActual = actual;
+  saveShipments(ships);
+  render();
+  showToast('實際運費已記錄，已通知躍明對帳 ✓');
+}
+
+function markDelivered(id){
+  const ships = loadShipments();
+  const i = ships.findIndex(s=>s.id===id);
+  if(i<0) return;
+  ships[i].stage = 'delivered';
+  ships[i].stageHistory['delivered'] = new Date().toISOString().slice(0,10);
+  saveShipments(ships);
+  render();
+  showToast('已標記交付完成，已通知老董/電商確認到貨 ✓');
+}
+
+function openEscalate(id){
+  currentShipId = id;
+  const s = loadShipments().find(x=>x.id===id);
+  document.getElementById('esc-ship').value = s?.name||'';
+  document.getElementById('esc-desc').value = '';
+  document.getElementById('modal-escalate').classList.add('show');
+}
+
+function saveEscalation(){
+  const ships = loadShipments();
+  const i = ships.findIndex(s=>s.id===currentShipId);
+  if(i<0) return;
+  ships[i].status = 'alert';
+  ships[i].escalation = {
+    type: document.getElementById('esc-type').value,
+    desc: document.getElementById('esc-desc').value,
+    escalateTo: document.getElementById('esc-escalate').value,
+    date: new Date().toISOString().slice(0,10),
+  };
+  ships[i].note = `⚠ 卡關升級：${document.getElementById('esc-desc').value}`;
+  saveShipments(ships);
+  closeModal('modal-escalate');
+  render();
+  showToast('🚨 已緊急通報安然/Ray，戰情室警報已觸發');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+render();
+</script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:84px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
+</body>
+</html>

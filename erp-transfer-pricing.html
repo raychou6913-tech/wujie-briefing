@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>蕪解 ERP · Transfer Pricing 設定</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --fin:#0284c7;--fin-dim:#0284c718;
+  --tp:#7c3aed;--tp-dim:#7c3aed18;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--tp);box-shadow:0 0 6px var(--tp);flex-shrink:0;}
+.brand-name{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:760px;margin:0 auto;padding:16px;}
+
+.page-hdr{padding:12px 0 20px;}
+.page-title{font-size:20px;font-weight:800;margin-bottom:6px;}
+.page-sub{font-size:12px;color:var(--txt-mid);line-height:1.6;}
+
+.info-box{background:var(--tp-dim);border:1px solid #7c3aed30;border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+.info-box p{font-size:11px;color:#c4b5fd;line-height:1.7;}
+.info-box strong{color:var(--txt-hi);}
+
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:11px;color:var(--tp);cursor:pointer;font-weight:700;}
+
+/* ROUTE CARD */
+.route-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .15s;}
+.route-card:hover{border-color:var(--border-hi);}
+.route-card.has-warning{border-color:#ef444435;}
+.route-card.complete{border-color:#22c55e20;}
+.route-header{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;}
+.route-entities{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.entity-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;}
+.e-bj{background:#4f46e518;color:#818cf8;border:1px solid #4f46e530;}
+.e-tw{background:#0284c718;color:#38bdf8;border:1px solid #0284c730;}
+.e-hk{background:#d9770618;color:#fbbf24;border:1px solid #d9770630;}
+.e-sz{background:#16a34a18;color:#4ade80;border:1px solid #16a34a30;}
+.e-bkk{background:#9333ea18;color:#c084fc;border:1px solid #9333ea30;}
+.arrow{font-size:12px;color:var(--txt-lo);}
+.route-info{flex:1;min-width:0;margin-left:4px;}
+.route-name{font-size:12px;font-weight:700;}
+.route-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.route-right{text-align:right;flex-shrink:0;}
+.route-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:3px;}
+.rs-complete{background:var(--ok-dim);color:var(--ok);}
+.rs-warn{background:var(--warn-dim);color:var(--warn);}
+.rs-missing{background:var(--danger-dim);color:var(--danger);}
+.route-updated{font-size:9px;color:var(--txt-lo);}
+
+/* ROUTE DETAIL */
+.route-detail{display:none;border-top:1px solid var(--border);padding:16px;background:var(--card2);}
+.route-detail.open{display:block;}
+.tp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.tp-field{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.tp-field-label{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.tp-field-val{font-size:13px;font-weight:700;}
+.tp-field-val.editable{background:transparent;border:none;color:var(--txt-hi);width:100%;font-family:inherit;font-size:13px;font-weight:700;outline:none;}
+.tp-field-val.editable:focus{color:var(--accent);}
+select.tp-field-val{background:var(--card);border:none;color:var(--txt-hi);width:100%;font-family:inherit;font-size:13px;font-weight:700;outline:none;cursor:pointer;}
+select.tp-field-val option{background:var(--card2);}
+
+.tp-ips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.ip-chip{font-size:10px;font-weight:700;padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;transition:all .15s;user-select:none;}
+.ip-chip.active{background:var(--tp-dim);border-color:#7c3aed60;color:#c4b5fd;}
+.ip-chip:not(.active){color:var(--txt-lo);}
+
+.markup-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;}
+.markup-label{font-size:11px;color:var(--txt-mid);flex:1;}
+.markup-val{font-size:15px;font-weight:800;color:var(--ok);}
+.markup-input{background:transparent;border:none;font-size:15px;font-weight:800;color:var(--ok);width:60px;text-align:right;font-family:inherit;outline:none;}
+.markup-unit{font-size:12px;color:var(--txt-mid);margin-left:2px;}
+
+.tp-note{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:14px;}
+.tp-note textarea{background:transparent;border:none;color:var(--txt-hi);width:100%;font-family:inherit;font-size:12px;line-height:1.6;resize:none;outline:none;min-height:54px;}
+
+.audit-log{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;}
+.audit-title{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.audit-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;}
+.audit-row:last-child{margin-bottom:0;}
+.audit-time{font-size:10px;color:var(--txt-lo);white-space:nowrap;}
+.audit-text{font-size:11px;color:var(--txt-mid);line-height:1.5;}
+.audit-text strong{color:var(--txt-hi);}
+
+.detail-actions{display:flex;gap:8px;}
+.da-btn{font-size:11px;font-weight:700;padding:8px 16px;border-radius:9px;cursor:pointer;border:1px solid;transition:opacity .15s;}
+.da-btn:active{opacity:.75;}
+.da-save{background:var(--tp-dim);color:#c4b5fd;border-color:#7c3aed50;}
+.da-warn{background:var(--warn-dim);color:var(--warn);border-color:#f59e0b40;}
+.da-grey{background:var(--card);color:var(--txt-mid);border-color:var(--border-hi);}
+
+/* UNSET WARNING BANNER */
+.unset-banner{background:var(--danger-dim);border:1px solid #ef444430;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:none;}
+.unset-banner.show{display:block;}
+.ub-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px;}
+.ub-list{font-size:11px;color:#fca5a5;line-height:1.8;}
+
+/* SUMMARY ROW */
+.summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.sum-card{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;}
+.sum-val{font-size:20px;font-weight:800;margin-bottom:3px;}
+.sum-val.ok{color:var(--ok);}
+.sum-val.warn{color:var(--warn);}
+.sum-val.danger{color:var(--danger);}
+.sum-label{font-size:10px;color:var(--txt-lo);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#0009;z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:560px;padding:20px 20px 36px;max-height:88vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border-hi);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;line-height:1.5;}
+.mf{margin-bottom:12px;}
+.mf label{font-size:10px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.mf input,.mf select,.mf textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.mf input:focus,.mf select:focus{border-color:var(--tp);}
+.mf select option{background:var(--card2);}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-actions{display:flex;gap:10px;margin-top:16px;}
+.mbtn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+.mbtn.primary{background:var(--tp);color:#fff;}
+.mbtn.ghost{background:var(--card2);color:var(--txt-mid);}
+
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">Transfer Pricing 設定</div>
+  </div>
+  <div class="topbar-right">
+    <span id="tb-name" style="font-size:11px;color:var(--txt-mid)">—</span>
+    <a href="erp-finance.html" class="btn-sm">← 財務工作台</a>
+    <a href="erp-lobby.html" class="btn-sm">大廳</a>
+    <a href="login.html" class="btn-sm danger" onclick="localStorage.removeItem('erp_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="page-hdr">
+    <div class="page-title">跨境內部定價（Transfer Pricing）</div>
+    <div class="page-sub">設定各法律實體間的貨品買賣內部定價基準。此定價作為跨境報關商業發票的依據，<br>須符合稅務機關的「公平交易原則（Arm's Length Principle）」。</div>
+  </div>
+
+  <div class="info-box">
+    <p>⚠ <strong>為什麼需要設定 TP？</strong> 蕪解跨五個法律實體運作。當北京蕪解的貨物出口至台灣悍草或泰國 UJ BKK，海關要求商業發票標示「交易價格」。若此價格與真實成本差異過大、或各次申報不一致，將觸發稅務稽查風險。統一在此設定後，高維在建立物流批次時系統自動帶入，避免每次人工填寫導致的不一致。</p>
+  </div>
+
+  <!-- 統計摘要 -->
+  <div class="summary-row" id="summary-row">
+    <div class="sum-card"><div class="sum-val ok" id="sum-complete">—</div><div class="sum-label">已設定路徑</div></div>
+    <div class="sum-card"><div class="sum-val warn" id="sum-partial">—</div><div class="sum-label">需要更新</div></div>
+    <div class="sum-card"><div class="sum-val danger" id="sum-missing">—</div><div class="sum-label">尚未設定</div></div>
+  </div>
+
+  <!-- 缺設定警告 -->
+  <div class="unset-banner" id="unset-banner">
+    <div class="ub-title">⚠ 以下路徑尚未設定內部定價，高維報關時將觸發紅色警示</div>
+    <div class="ub-list" id="unset-list">—</div>
+  </div>
+
+  <!-- 路徑清單 -->
+  <div class="sec-hdr">
+    <div class="sec-title">跨境定價路徑</div>
+    <span class="sec-link" onclick="openNewRouteModal()">+ 新增路徑</span>
+  </div>
+
+  <div id="routes-container"></div>
+
+</div><!-- /main -->
+
+<!-- NEW ROUTE MODAL -->
+<div class="modal-overlay" id="new-route-modal" onclick="if(event.target===this)closeModal('new-route-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">新增定價路徑</div>
+    <div class="modal-sub">設定兩個法律實體之間的貨品內部定價規則。</div>
+    <div class="mrow">
+      <div class="mf">
+        <label>出口方</label>
+        <select id="nr-from">
+          <option value="北京蕪解">北京蕪解</option>
+          <option value="台灣悍草">台灣悍草</option>
+          <option value="香港 JV">香港 JV</option>
+          <option value="深圳子公司">深圳子公司</option>
+          <option value="泰國 UJ BKK">泰國 UJ BKK</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>進口方</label>
+        <select id="nr-to">
+          <option value="台灣悍草">台灣悍草</option>
+          <option value="泰國 UJ BKK">泰國 UJ BKK</option>
+          <option value="香港 JV">香港 JV</option>
+          <option value="北京蕪解">北京蕪解</option>
+          <option value="深圳子公司">深圳子公司</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <label>適用 IP 品類</label>
+      <select id="nr-ip">
+        <option value="全品類">全品類（適用所有 IP）</option>
+        <option value="Snoopy">Snoopy</option>
+        <option value="貓福珊迪">貓福珊迪（Mofusand）</option>
+        <option value="Chiikawa">Chiikawa</option>
+        <option value="Opanchu">Opanchu</option>
+        <option value="Maniani World">Maniani World</option>
+        <option value="飯糰與梅子">飯糰與梅子</option>
+        <option value="Muzik Tiger">Muzik Tiger</option>
+      </select>
+    </div>
+    <div class="mrow">
+      <div class="mf">
+        <label>定價方法</label>
+        <select id="nr-method">
+          <option value="成本加成法">成本加成法（Cost Plus）</option>
+          <option value="轉售價格法">轉售價格法（Resale Price）</option>
+          <option value="可比非受控價格法">可比非受控價格法（CUP）</option>
+          <option value="協議固定定價">協議固定定價</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>加成率（%）</label>
+        <input id="nr-markup" type="number" min="0" max="200" placeholder="例：15" value="15">
+      </div>
+    </div>
+    <div class="mf">
+      <label>說明備注</label>
+      <textarea id="nr-note" rows="2" placeholder="例：依成本加成 15%，符合蕪解集團跨境商品定價政策"></textarea>
+    </div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="saveNewRoute()">建立定價路徑</button>
+      <button class="mbtn ghost" onclick="closeModal('new-route-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(!s||Date.now()-s.ts>7*86400000){location.replace('login.html');return null;}
+  return s;
+}
+const SESS = requireAuth();
+const ALLOWED = ['ray','yuming'];
+if(SESS){
+  document.getElementById('tb-name').textContent = SESS.name;
+  if(!ALLOWED.includes(SESS.user)){
+    document.querySelector('.main').innerHTML = `<div style="text-align:center;padding:60px 20px;">
+      <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px;">此頁面僅限 Ray 與躍明使用</div>
+      <div style="font-size:12px;color:var(--txt-lo);margin-bottom:20px;">Transfer Pricing 設定涉及稅務合規，需授權人員操作</div>
+      <a href="erp-lobby.html" style="font-size:12px;color:var(--accent);">← 返回大廳</a>
+    </div>`;
+  }
+}
+
+const ENTITY_CLASS = {
+  '北京蕪解':'e-bj','台灣悍草':'e-tw','香港 JV':'e-hk',
+  '深圳子公司':'e-sz','泰國 UJ BKK':'e-bkk'
+};
+
+const DEFAULT_ROUTES = [
+  {
+    id:'r1', from:'北京蕪解', to:'台灣悍草',
+    ip:'全品類', method:'成本加成法', markup:15,
+    status:'complete',
+    note:'依成本加成 15%，符合蕪解集團跨境商品定價政策。台灣悍草作為台灣總代，加成率合理反映物流、關稅及管理費用。',
+    updatedBy:'躍明', updatedAt:'2026-04-15',
+    history:[
+      {time:'2026-04-15',user:'躍明',msg:'初始設定，加成率 15%，Ray 確認'},
+      {time:'2026-03-01',user:'Ray',msg:'批准此路徑納入集團 TP 政策'}
+    ]
+  },
+  {
+    id:'r2', from:'北京蕪解', to:'泰國 UJ BKK',
+    ip:'全品類', method:'成本加成法', markup:18,
+    status:'complete',
+    note:'曼谷倉儲及東南亞市場開拓費用較高，加成率設為 18%。Shawn 確認符合泰國進口稅務規範。',
+    updatedBy:'躍明', updatedAt:'2026-04-20',
+    history:[
+      {time:'2026-04-20',user:'躍明',msg:'Shawn 確認泰國加成率 18%'},
+      {time:'2026-04-01',user:'Ray',msg:'初步設定 20%，Shawn 建議降至 18%'}
+    ]
+  },
+  {
+    id:'r3', from:'北京蕪解', to:'香港 JV',
+    ip:'全品類', method:'協議固定定價', markup:0,
+    status:'warn',
+    note:'香港 JV 尚未正式成立，暫用協議定價。JV 成立後需重新依股東協議設定 TP，此處定價需過審計。',
+    updatedBy:'Ray', updatedAt:'2026-05-01',
+    history:[
+      {time:'2026-05-01',user:'Ray',msg:'JV 未成立，暫時標記，待正式簽約後更新'},
+    ]
+  },
+  {
+    id:'r4', from:'北京蕪解', to:'深圳子公司',
+    ip:'全品類', method:'成本加成法', markup:5,
+    status:'complete',
+    note:'深圳子公司為北京蕪解的全資子公司，國內關聯交易，加成率 5% 主要反映管理費用分攤。',
+    updatedBy:'躍明', updatedAt:'2026-04-10',
+    history:[
+      {time:'2026-04-10',user:'躍明',msg:'國內關聯交易，5% 加成符合稅務局指引'}
+    ]
+  },
+  {
+    id:'r5', from:'台灣悍草', to:'香港 JV',
+    ip:'全品類', method:'成本加成法', markup:0,
+    status:'missing',
+    note:'',
+    updatedBy:'—', updatedAt:'—',
+    history:[]
+  },
+];
+
+function seedRoutes(){
+  if(!localStorage.getItem('tp_routes_v1')){
+    localStorage.setItem('tp_routes_v1', JSON.stringify(DEFAULT_ROUTES));
+  }
+}
+
+function getRoutes(){ return JSON.parse(localStorage.getItem('tp_routes_v1')||'[]'); }
+function saveRoutes(r){ localStorage.setItem('tp_routes_v1', JSON.stringify(r)); }
+
+function entityBadge(name){
+  return `<span class="entity-badge ${ENTITY_CLASS[name]||''}">${name}</span>`;
+}
+
+const STATUS_LABEL = {complete:'✓ 已設定', warn:'⚠ 需確認', missing:'× 未設定'};
+const STATUS_CLASS = {complete:'rs-complete', warn:'rs-warn', missing:'rs-missing'};
+
+function renderRoutes(){
+  const routes = getRoutes();
+  const container = document.getElementById('routes-container');
+
+  let complete=0, warn=0, missing=0;
+  const missingNames=[];
+
+  routes.forEach(r=>{
+    if(r.status==='complete') complete++;
+    else if(r.status==='warn') warn++;
+    else { missing++; missingNames.push(`${r.from} → ${r.to}（${r.ip}）`); }
+  });
+
+  document.getElementById('sum-complete').textContent = complete;
+  document.getElementById('sum-partial').textContent = warn;
+  document.getElementById('sum-missing').textContent = missing;
+
+  const banner = document.getElementById('unset-banner');
+  if(missing > 0){
+    banner.classList.add('show');
+    document.getElementById('unset-list').innerHTML = missingNames.map(n=>`• ${n}`).join('<br>');
+  } else { banner.classList.remove('show'); }
+
+  container.innerHTML = routes.map(r => `
+    <div class="route-card ${r.status==='missing'?'has-warning':r.status==='complete'?'complete':''}" id="card-${r.id}">
+      <div class="route-header" onclick="toggleDetail('${r.id}')">
+        <div class="route-entities">
+          ${entityBadge(r.from)}
+          <span class="arrow">→</span>
+          ${entityBadge(r.to)}
+        </div>
+        <div class="route-info">
+          <div class="route-name">${r.ip}</div>
+          <div class="route-meta">${r.method}${r.markup>0?' · 加成 '+r.markup+'%':''}</div>
+        </div>
+        <div class="route-right">
+          <div class="route-status ${STATUS_CLASS[r.status]}">${STATUS_LABEL[r.status]}</div>
+          <div class="route-updated">更新：${r.updatedAt}</div>
+        </div>
+      </div>
+      <div class="route-detail" id="detail-${r.id}">
+        ${r.status==='warn'?`<div style="background:var(--warn-dim);border:1px solid #f59e0b30;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:11px;color:var(--warn);">⚠ ${r.note}</div>`:''}
+        ${r.status==='missing'?`<div style="background:var(--danger-dim);border:1px solid #ef444430;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:11px;color:var(--danger);">× 此路徑尚未設定內部定價。高維在此跨境路徑報關時，系統將觸發紅色警示，需人工填寫。請盡快設定。</div>`:''}
+        <div class="tp-grid">
+          <div class="tp-field">
+            <div class="tp-field-label">定價方法</div>
+            <select class="tp-field-val" onchange="updateRoute('${r.id}','method',this.value)">
+              ${['成本加成法','轉售價格法','可比非受控價格法','協議固定定價'].map(m=>`<option ${m===r.method?'selected':''}>${m}</option>`).join('')}
+            </select>
+          </div>
+          <div class="tp-field">
+            <div class="tp-field-label">加成率</div>
+            <div style="display:flex;align-items:center">
+              <input class="tp-field-val editable markup-input" type="number" value="${r.markup}" min="0" max="200" onchange="updateRoute('${r.id}','markup',parseFloat(this.value)||0)">
+              <span class="markup-unit">%</span>
+            </div>
+          </div>
+          <div class="tp-field">
+            <div class="tp-field-label">最後更新</div>
+            <div class="tp-field-val" style="font-size:12px">${r.updatedAt}</div>
+          </div>
+          <div class="tp-field">
+            <div class="tp-field-label">更新人</div>
+            <div class="tp-field-val" style="font-size:12px">${r.updatedBy}</div>
+          </div>
+        </div>
+        <div class="tp-note">
+          <div class="tp-field-label" style="margin-bottom:6px;font-size:9px;color:var(--txt-lo)">定價說明 / 稽核備注</div>
+          <textarea class="tp-field-val editable" rows="2" placeholder="說明定價依據，供稅務稽查時使用..." onchange="updateRoute('${r.id}','note',this.value)">${r.note}</textarea>
+        </div>
+        ${r.history.length>0?`
+        <div class="audit-log">
+          <div class="audit-title">修改記錄</div>
+          ${r.history.map(h=>`
+            <div class="audit-row">
+              <span class="audit-time">${h.time}</span>
+              <span class="audit-text"><strong>${h.user}</strong> ${h.msg}</span>
+            </div>
+          `).join('')}
+        </div>`:''}
+        <div class="detail-actions">
+          <button class="da-btn da-save" onclick="confirmRoute('${r.id}')">✓ 確認並儲存</button>
+          <button class="da-btn da-warn" onclick="flagRoute('${r.id}')">⚠ 標記待確認</button>
+          <button class="da-btn da-grey" onclick="toggleDetail('${r.id}')">收起</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleDetail(id){
+  document.getElementById('detail-'+id).classList.toggle('open');
+}
+
+function updateRoute(id, field, value){
+  const routes = getRoutes();
+  const r = routes.find(x=>x.id===id);
+  if(!r) return;
+  r[field] = value;
+  saveRoutes(routes);
+}
+
+function confirmRoute(id){
+  const routes = getRoutes();
+  const r = routes.find(x=>x.id===id);
+  if(!r) return;
+  r.status = 'complete';
+  r.updatedBy = SESS ? SESS.name : '—';
+  r.updatedAt = new Date().toISOString().slice(0,10);
+  r.history.unshift({time:r.updatedAt, user:r.updatedBy, msg:`確認並儲存（${r.method}，加成率 ${r.markup}%）`});
+  saveRoutes(routes);
+  renderRoutes();
+  showToast('✅ 定價路徑已確認儲存，高維報關時將自動帶入');
+}
+
+function flagRoute(id){
+  const routes = getRoutes();
+  const r = routes.find(x=>x.id===id);
+  if(!r) return;
+  r.status = 'warn';
+  r.updatedBy = SESS ? SESS.name : '—';
+  r.updatedAt = new Date().toISOString().slice(0,10);
+  r.history.unshift({time:r.updatedAt, user:r.updatedBy, msg:'標記為待確認'});
+  saveRoutes(routes);
+  renderRoutes();
+  showToast('⚠ 已標記為待確認');
+}
+
+function openNewRouteModal(){ document.getElementById('new-route-modal').classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function saveNewRoute(){
+  const from = document.getElementById('nr-from').value;
+  const to = document.getElementById('nr-to').value;
+  if(from===to){ alert('出口方與進口方不能相同'); return; }
+  const routes = getRoutes();
+  const newRoute = {
+    id: 'r'+(Date.now()),
+    from, to,
+    ip: document.getElementById('nr-ip').value,
+    method: document.getElementById('nr-method').value,
+    markup: parseFloat(document.getElementById('nr-markup').value)||0,
+    status: 'complete',
+    note: document.getElementById('nr-note').value,
+    updatedBy: SESS ? SESS.name : '—',
+    updatedAt: new Date().toISOString().slice(0,10),
+    history:[{time:new Date().toISOString().slice(0,10), user: SESS?SESS.name:'—', msg:'新建定價路徑'}]
+  };
+  routes.push(newRoute);
+  saveRoutes(routes);
+  closeModal('new-route-modal');
+  renderRoutes();
+  showToast('✅ 新定價路徑已建立');
+}
+
+function showToast(msg){
+  let t=document.getElementById('tp-toast');
+  if(!t){t=document.createElement('div');t.id='tp-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--tp);color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+seedRoutes();
+renderRoutes();
+</script>
+</body>
+</html>

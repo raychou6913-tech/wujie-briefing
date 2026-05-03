@@ -127,14 +127,25 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .sidebar{}
 .sidebar-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
 .sidebar-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;margin-bottom:12px;text-transform:uppercase;}
-.todo-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.todo-item{padding:8px 6px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:6px;transition:background .15s;}
 .todo-item:last-child{border-bottom:none;padding-bottom:0;}
+.todo-item:hover{background:var(--card2);}
+.todo-item-top{display:flex;align-items:flex-start;gap:10px;}
 .todo-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
 .todo-body{flex:1;}
 .todo-text{font-size:11px;color:var(--txt-hi);line-height:1.4;font-weight:600;}
 .todo-due{font-size:9px;color:var(--txt-lo);margin-top:2px;}
 .todo-due.urgent{color:var(--danger);font-weight:700;}
 .todo-due.soon{color:var(--warn);font-weight:700;}
+.todo-expand{display:none;margin-top:8px;padding:10px 12px;background:var(--card2);border-radius:8px;font-size:11px;color:var(--txt-mid);line-height:1.7;}
+.todo-expand.open{display:block;}
+.te-text{margin-bottom:8px;}
+.te-actions{display:flex;flex-wrap:wrap;gap:6px;}
+.te-btn{font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1px solid;cursor:pointer;transition:opacity .15s;}
+.te-btn:hover{opacity:.8;}
+.te-ok{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
+.te-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.te-grey{background:var(--card);border-color:var(--border);color:var(--txt-mid);}
 
 /* DETAIL PANEL */
 .detail-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:12px;}
@@ -222,6 +233,7 @@ select.inp option{background:var(--card2);}
 .nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
 .nav-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
 </style>
+<script src="mock-data.js"></script>
 </head>
 <body>
 
@@ -236,6 +248,9 @@ function requireAuth(){
 }
 const SESS = requireAuth();
 if(!SESS) throw new Error('redirect');
+
+// 可標記階段完成的角色：設計/採購負責人 + Ray；Shawn 只能看進度
+const CAN_MARK_DONE = ['ray','bevis','peilin','shetong','laige','muzi'].includes(SESS.user);
 </script>
 
 <div class="topbar">
@@ -248,6 +263,7 @@ if(!SESS) throw new Error('redirect');
       <div class="sess-name" id="sess-name">—</div>
       <div class="sess-role" id="sess-role">—</div>
     </div>
+    <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 大廳</a>
     <a class="nav-back" href="erp-war-room.html">⌂ 戰情室</a>
     <a class="btn-switch" href="login.html">切換帳號</a>
     <button class="btn-logout" onclick="doLogout()">登出</button>
@@ -475,32 +491,70 @@ if(!SESS) throw new Error('redirect');
       <!-- Month TODO -->
       <div class="sidebar-card">
         <div class="sidebar-title">本月待辦清單</div>
-        <div class="todo-item">
-          <div class="todo-icon">📋</div>
-          <div class="todo-body">
-            <div class="todo-text">Snoopy 大貨 PO 送賴哥確認</div>
-            <div class="todo-due soon">5/05 前</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-expand').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">📋</div>
+            <div class="todo-body">
+              <div class="todo-text">Snoopy 大貨 PO 送賴哥確認</div>
+              <div class="todo-due soon">5/05 前</div>
+            </div>
+          </div>
+          <div class="todo-expand">
+            <div class="te-text">Snoopy 夏季大貨 PO#322，賴哥需確認數量與付款條件再下單。<br>目前設計稿已過版權審核，等採購啟動。</div>
+            <div class="te-actions">
+              <button class="te-btn te-ok" onclick="event.stopPropagation();this.textContent='✓ 已送出';this.disabled=true">✓ 已送賴哥</button>
+              <button class="te-btn te-grey" onclick="event.stopPropagation()">今天完成</button>
+            </div>
           </div>
         </div>
-        <div class="todo-item">
-          <div class="todo-icon">📨</div>
-          <div class="todo-body">
-            <div class="todo-text">Muziktiger 催促回信</div>
-            <div class="todo-due urgent">今天</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-expand').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">📨</div>
+            <div class="todo-body">
+              <div class="todo-text">Muziktiger 催促回信</div>
+              <div class="todo-due urgent">今天</div>
+            </div>
+          </div>
+          <div class="todo-expand">
+            <div class="te-text">2D 送審已寄出 8 天，Muziktiger 版權方尚未回覆。<br>珮玲負責跟進，可透過安然協助加急聯繫。</div>
+            <div class="te-actions">
+              <button class="te-btn te-ok" onclick="event.stopPropagation();this.textContent='✓ 已催';this.disabled=true">✓ 已發催促信</button>
+              <button class="te-btn te-warn" onclick="event.stopPropagation()">請安然協助加催</button>
+              <button class="te-btn te-grey" onclick="event.stopPropagation()">明天再追</button>
+            </div>
           </div>
         </div>
-        <div class="todo-item">
-          <div class="todo-icon">📐</div>
-          <div class="todo-body">
-            <div class="todo-text">Opanchu 2D 修改版確認</div>
-            <div class="todo-due soon">5/08 前</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-expand').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">📐</div>
+            <div class="todo-body">
+              <div class="todo-text">Opanchu 2D 修改版確認</div>
+              <div class="todo-due soon">5/08 前</div>
+            </div>
+          </div>
+          <div class="todo-expand">
+            <div class="te-text">版權方要求修改角色頭身比例與配色，詩彤已在修改中。<br>需珮玲確認修改版符合版權方意見再送審。</div>
+            <div class="te-actions">
+              <button class="te-btn te-ok" onclick="event.stopPropagation();this.textContent='✓ 已確認送審';this.disabled=true">✓ 確認，送第3輪審</button>
+              <button class="te-btn te-grey" onclick="event.stopPropagation()">需再修改</button>
+            </div>
           </div>
         </div>
-        <div class="todo-item">
-          <div class="todo-icon">📦</div>
-          <div class="todo-body">
-            <div class="todo-text">Chiikawa 市場調研簡報</div>
-            <div class="todo-due">5/12 前</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-expand').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">📦</div>
+            <div class="todo-body">
+              <div class="todo-text">Chiikawa 市場調研簡報</div>
+              <div class="todo-due">5/12 前</div>
+            </div>
+          </div>
+          <div class="todo-expand">
+            <div class="te-text">評估 Chiikawa 在大陸+東南亞市場的商品化潛力。<br>珮玲負責收集競品數據，預計做成 1 頁 brief 給 Ray 決策是否洽談授權。</div>
+            <div class="te-actions">
+              <button class="te-btn te-ok" onclick="event.stopPropagation();this.textContent='✓ 已提交';this.disabled=true">✓ 已提交 brief</button>
+              <button class="te-btn te-grey" onclick="event.stopPropagation()">本週完成</button>
+              <button class="te-btn te-grey" onclick="event.stopPropagation()">需延期至 5/15</button>
+            </div>
           </div>
         </div>
       </div>
@@ -705,6 +759,8 @@ initDemoBars();
 /* ─── LOAD FROM FEISHU ─── */
 async function loadProjects(){
   try{
+    const mock = window._mockCheck && window._mockCheck('product_pipeline');
+    if(mock){ _projects=mock; _fromFeishu=true; renderAllFromFeishu(); updateKPIsFromFeishu(); updateBlockedBannerFromFeishu(); return; }
     const items=await _getRecords();
     if(!items||items.length===0) return; // Keep demo data
     _projects=items;
@@ -913,7 +969,7 @@ function renderDemoDetail(key, d){
       } else {
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong> 階段。負責人：${s.owner}。</div>
         <div class="tc-actions">
-          <button class="tc-btn tcb-primary" onclick="this.textContent='✓ 已記錄（Demo 模式）';this.disabled=true;this.style.opacity='0.5'">✓ 標記此階段完成</button>
+          ${CAN_MARK_DONE ? `<button class="tc-btn tcb-primary" onclick="this.textContent='✓ 已記錄（Demo 模式）';this.disabled=true;this.style.opacity='0.5'">✓ 標記此階段完成</button>` : `<span style="font-size:10px;color:var(--txt-lo)">（僅設計/採購負責人可標記）</span>`}
           <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
         </div>`;
       }
@@ -1036,7 +1092,7 @@ function renderDetailFromFeishu(proj){
       } else {
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong>。負責人：${s.owner}。</div>
         <div class="tc-actions">
-          <button class="tc-btn tcb-primary" onclick="_markDone('${rid}','${s.key}')">✓ 標記此階段完成</button>
+          ${CAN_MARK_DONE ? `<button class="tc-btn tcb-primary" onclick="_markDone('${rid}','${s.key}')">✓ 標記此階段完成</button>` : `<span style="font-size:10px;color:var(--txt-lo)">（僅設計/採購負責人可標記）</span>`}
           <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
         </div>`;
       }
@@ -1152,5 +1208,128 @@ async function createProject(){
 /* ─── AUTO-LOAD ─── */
 loadProjects();
 </script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
 </body>
 </html>

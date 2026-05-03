@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>蕪解 ERP · 物流更新</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --accent:#818cf8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.brand-name{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+/* SHIPMENT SELECTOR */
+.selector{padding:16px;}
+.sel-label{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.sel-list{display:flex;flex-direction:column;gap:6px;}
+.sel-item{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:12px;}
+.sel-item:active{background:var(--card2);}
+.sel-item.selected{border-color:var(--ok);}
+.sel-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.sel-body{flex:1;}
+.sel-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.sel-meta{font-size:10px;color:var(--txt-mid);}
+.sel-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0;}
+.st-transit{background:#f59e0b18;color:var(--warn);}
+.st-customs{background:#ef444418;color:var(--danger);}
+.st-arrived{background:#22c55e18;color:var(--ok);}
+.st-pending{background:#818cf818;color:var(--accent);}
+
+/* BIG ACTION BUTTONS */
+.action-area{padding:0 16px 24px;}
+.action-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;}
+.big-btns{display:grid;grid-template-columns:1fr;gap:10px;}
+.big-btn{border:none;border-radius:16px;padding:22px 20px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;transition:opacity .12s,transform .1s;width:100%;-webkit-tap-highlight-color:transparent;}
+.big-btn:active{opacity:.85;transform:scale(.98);}
+.big-btn .btn-icon{font-size:28px;flex-shrink:0;}
+.big-btn .btn-text{flex:1;}
+.big-btn .btn-main{display:block;font-size:16px;font-weight:800;margin-bottom:3px;}
+.big-btn .btn-sub{display:block;font-size:11px;font-weight:400;opacity:.7;}
+.btn-shipped{background:linear-gradient(135deg,#065f46,#16a34a);color:#fff;}
+.btn-arrived{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;}
+.btn-customs{background:linear-gradient(135deg,#92400e,#f59e0b);color:#fff;}
+.btn-issue{background:var(--card2);color:var(--txt-hi);border:1.5px solid var(--border-hi);}
+
+/* NOTE INPUT */
+.note-area{padding:0 16px 16px;}
+.note-label{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.note-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--txt-hi);outline:none;resize:none;font-family:inherit;}
+.note-input:focus{border-color:var(--accent);}
+.note-input::placeholder{color:var(--txt-lo);}
+
+/* RECENT LOG */
+.log-area{padding:0 16px 80px;}
+.log-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+.log-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.log-item:last-child{border-bottom:none;}
+.log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.log-body{flex:1;}
+.log-event{font-size:12px;font-weight:700;margin-bottom:2px;}
+.log-meta{font-size:10px;color:var(--txt-lo);}
+
+/* CONFIRM SHEET */
+.confirm-overlay{position:fixed;inset:0;background:#0009;z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.confirm-overlay.open{display:flex;}
+.confirm-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:24px 20px 36px;}
+.confirm-icon{font-size:40px;text-align:center;margin-bottom:12px;}
+.confirm-title{font-size:16px;font-weight:800;text-align:center;margin-bottom:6px;}
+.confirm-sub{font-size:12px;color:var(--txt-mid);text-align:center;margin-bottom:20px;line-height:1.5;}
+.confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cbtn{padding:14px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s;}
+.cbtn:active{opacity:.8;}
+.cbtn-ok{background:var(--ok);color:#fff;}
+.cbtn-cancel{background:var(--card2);color:var(--txt-mid);}
+
+/* TOAST */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;font-size:13px;font-weight:700;padding:12px 24px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div style="width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 6px #16a34a;flex-shrink:0"></div>
+    <div class="brand-name">物流更新</div>
+  </div>
+  <div class="topbar-right">
+    <span id="tb-name" style="font-size:11px;color:var(--txt-mid)">—</span>
+    <a href="erp-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="login.html" class="btn-sm danger" onclick="localStorage.removeItem('erp_sess');return true;">登出</a>
+  </div>
+</div>
+
+<!-- SHIPMENT SELECTOR -->
+<div class="selector">
+  <div class="sel-label">選擇批次</div>
+  <div class="sel-list" id="sel-list">
+    <div class="sel-item selected" onclick="selectShipment(this,'PO-2604-A','Snoopy 夏日系列 3,500件 → 名創上海','transit')">
+      <div class="sel-dot" style="background:var(--warn)"></div>
+      <div class="sel-body">
+        <div class="sel-name">PO-2604-A</div>
+        <div class="sel-meta">Snoopy 夏日系列 3,500 件 → 名創上海</div>
+      </div>
+      <div class="sel-status st-transit">運輸中</div>
+    </div>
+    <div class="sel-item" onclick="selectShipment(this,'PO-2604-B','貓福珊迪 春日款 1,200件 → 酷動城廣州','customs')">
+      <div class="sel-dot" style="background:var(--danger)"></div>
+      <div class="sel-body">
+        <div class="sel-name">PO-2604-B</div>
+        <div class="sel-meta">貓福珊迪 春日款 1,200 件 → 酷動城廣州</div>
+      </div>
+      <div class="sel-status st-customs">報關中</div>
+    </div>
+    <div class="sel-item" onclick="selectShipment(this,'PO-2603-C','Opanchu 烏龜 800件 → 台北快閃備貨倉','pending')">
+      <div class="sel-dot" style="background:var(--accent)"></div>
+      <div class="sel-body">
+        <div class="sel-name">PO-2603-C</div>
+        <div class="sel-meta">Opanchu 烏龜 800 件 → 台北快閃備貨倉</div>
+      </div>
+      <div class="sel-status st-pending">準備出港</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="action-area">
+  <div class="action-title" id="action-title">更新 PO-2604-A 狀態</div>
+  <div class="big-btns">
+    <button class="big-btn btn-shipped" onclick="confirmAction('shipped')">
+      <div class="btn-icon">🚢</div>
+      <div class="btn-text">
+        <span class="btn-main">已出港 / 已發貨</span>
+        <span class="btn-sub">貨物離廠、啟運，通知收貨方</span>
+      </div>
+    </button>
+    <button class="big-btn btn-arrived" onclick="confirmAction('arrived')">
+      <div class="btn-icon">📦</div>
+      <div class="btn-text">
+        <span class="btn-main">已到港 / 已入庫</span>
+        <span class="btn-sub">貨到目的地，準備報關或入庫</span>
+      </div>
+    </button>
+    <button class="big-btn btn-customs" onclick="confirmAction('customs')">
+      <div class="btn-icon">📋</div>
+      <div class="btn-text">
+        <span class="btn-main">報關完成 / 可提貨</span>
+        <span class="btn-sub">海關清關，通知客戶安排提貨</span>
+      </div>
+    </button>
+    <button class="big-btn btn-issue" onclick="confirmAction('issue')">
+      <div class="btn-icon">⚠️</div>
+      <div class="btn-text">
+        <span class="btn-main">有問題 / 需回報</span>
+        <span class="btn-sub">延誤、破損、扣關等異常狀況</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- NOTE -->
+<div class="note-area">
+  <div class="note-label">備注（選填）</div>
+  <textarea class="note-input" id="note-input" rows="2" placeholder="例：預計 5/8 到港、海關要補件、貨在廈門港..."></textarea>
+</div>
+
+<!-- RECENT LOG -->
+<div class="log-area">
+  <div class="log-title">最近記錄</div>
+  <div id="log-list">
+    <div class="log-item">
+      <div class="log-dot" style="background:var(--ok)"></div>
+      <div class="log-body">
+        <div class="log-event">PO-2603-B 已到港 — 台北快閃備貨倉收貨完成</div>
+        <div class="log-meta">2026-04-30 14:22 · 高維</div>
+      </div>
+    </div>
+    <div class="log-item">
+      <div class="log-dot" style="background:var(--warn)"></div>
+      <div class="log-body">
+        <div class="log-event">PO-2604-A 已出港 — 青島港啟運，ETA 5/9</div>
+        <div class="log-meta">2026-04-28 09:15 · 高維</div>
+      </div>
+    </div>
+    <div class="log-item">
+      <div class="log-dot" style="background:var(--danger)"></div>
+      <div class="log-body">
+        <div class="log-event">PO-2604-B 報關中 — 廣州海關補件，預計延誤 3 天</div>
+        <div class="log-meta">2026-04-27 16:40 · 高維</div>
+      </div>
+    </div>
+    <div class="log-item">
+      <div class="log-dot" style="background:var(--ok)"></div>
+      <div class="log-body">
+        <div class="log-event">PO-2603-A 報關完成 — 客戶可安排提貨</div>
+        <div class="log-meta">2026-04-25 11:03 · 高維</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM SHEET -->
+<div class="confirm-overlay" id="confirm-overlay" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-sheet">
+    <div class="confirm-icon" id="confirm-icon">🚢</div>
+    <div class="confirm-title" id="confirm-title">確認更新狀態</div>
+    <div class="confirm-sub" id="confirm-sub">批次 PO-2604-A<br>更新為「已出港」並通知 Shawn/安然</div>
+    <div class="confirm-btns">
+      <button class="cbtn cbtn-ok" id="confirm-ok-btn" onclick="doUpdate()">確認送出</button>
+      <button class="cbtn cbtn-cancel" onclick="closeConfirm()">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(!s||Date.now()-s.ts>7*86400000){location.replace('login.html');return null;}
+  return s;
+}
+const SESS = requireAuth();
+if(SESS) document.getElementById('tb-name').textContent = SESS.name;
+
+let _curPO = 'PO-2604-A';
+let _curDesc = 'Snoopy 夏日系列 3,500件 → 名創上海';
+let _pendingAction = '';
+
+const ACTION_META = {
+  shipped:  {icon:'🚢', label:'已出港 / 已發貨', color:'var(--ok)'},
+  arrived:  {icon:'📦', label:'已到港 / 已入庫', color:'#3b82f6'},
+  customs:  {icon:'📋', label:'報關完成 / 可提貨', color:'var(--warn)'},
+  issue:    {icon:'⚠️', label:'異常回報',          color:'var(--danger)'},
+};
+
+function selectShipment(el, po, desc, status){
+  document.querySelectorAll('.sel-item').forEach(i=>i.classList.remove('selected'));
+  el.classList.add('selected');
+  _curPO = po;
+  _curDesc = desc;
+  document.getElementById('action-title').textContent = `更新 ${po} 狀態`;
+}
+
+function confirmAction(type){
+  _pendingAction = type;
+  const meta = ACTION_META[type];
+  document.getElementById('confirm-icon').textContent = meta.icon;
+  document.getElementById('confirm-title').textContent = meta.label;
+  const note = document.getElementById('note-input').value.trim();
+  document.getElementById('confirm-sub').innerHTML =
+    `批次 <strong>${_curPO}</strong><br>${_curDesc}${note?'<br><span style="font-size:10px;color:var(--txt-lo)">備注：'+note+'</span>':''}<br><br><span style="font-size:11px;color:var(--txt-mid)">→ 同步更新飛書 · 通知 Shawn / 安然</span>`;
+  document.getElementById('confirm-ok-btn').style.background = meta.color;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+}
+
+function doUpdate(){
+  closeConfirm();
+  const meta = ACTION_META[_pendingAction];
+  const note = document.getElementById('note-input').value.trim();
+  const now = new Date().toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const name = SESS ? SESS.name : '高維';
+
+  // 加入記錄列表頂部
+  const logList = document.getElementById('log-list');
+  const newItem = document.createElement('div');
+  newItem.className = 'log-item';
+  newItem.innerHTML = `
+    <div class="log-dot" style="background:${meta.color}"></div>
+    <div class="log-body">
+      <div class="log-event">${_curPO} ${meta.label}${note?' — '+note:''}</div>
+      <div class="log-meta">${now} · ${name}</div>
+    </div>`;
+  logList.insertBefore(newItem, logList.firstChild);
+
+  document.getElementById('note-input').value = '';
+  showToast(`✅ ${_curPO} 已更新 · Shawn/安然已收到通知`);
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

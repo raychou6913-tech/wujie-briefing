@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 電商中心</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+  --cyan:#06b6d4;--pink:#ec4899;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.tb-back{background:none;border:1px solid var(--border);border-radius:8px;color:var(--txt-mid);padding:6px 12px;font-size:12px;cursor:pointer;}
+.tb-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.tb-title{font-size:14px;font-weight:700;}
+.tb-user{margin-left:auto;font-size:11px;color:var(--txt-mid);}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;}
+.dot-ok{background:var(--ok);box-shadow:0 0 6px var(--ok);}
+.dot-warn{background:var(--warn);}
+.dot-danger{background:var(--danger);}
+
+.main{padding:16px;max-width:900px;margin:0 auto;}
+
+/* Channel tabs */
+.tabs{display:flex;gap:6px;margin-bottom:16px;}
+.tab{padding:8px 16px;border-radius:10px;border:1px solid var(--border);background:var(--card2);font-size:12px;font-weight:600;cursor:pointer;color:var(--txt-mid);transition:all .15s;}
+.tab.active{border-color:var(--cyan);color:var(--cyan);background:#06b6d408;}
+.tab-all.active{border-color:var(--accent);color:var(--accent);background:#818cf808;}
+
+/* Alert banner */
+.alert-banner{background:#ef444412;border:1px solid #ef444440;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.alert-banner .icon{font-size:18px;flex-shrink:0;}
+.alert-banner .txt{font-size:13px;}
+.alert-banner .txt strong{color:var(--danger);}
+.alert-banner .txt .sub{font-size:11px;color:var(--txt-mid);margin-top:2px;}
+
+/* Section header */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-title{font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;}
+.sec-action{font-size:11px;color:var(--accent);cursor:pointer;border:none;background:none;padding:0;}
+.sec-action:hover{opacity:.8;}
+
+/* Campaign cards */
+.campaign-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.c-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.c-head{padding:13px 15px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.c-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.c-live{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+.c-upcoming{background:var(--warn);}
+.c-draft{background:var(--txt-lo);}
+.c-info{flex:1;min-width:0;}
+.c-name{font-size:13px;font-weight:700;}
+.c-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.c-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.c-channel-tag{font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px;}
+.tag-dy{background:#06b6d420;color:var(--cyan);}
+.tag-xhs{background:#ec489920;color:var(--pink);}
+.tag-tb{background:#f59e0b20;color:var(--warn);}
+.c-stock-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.stock-ok{background:#22c55e20;color:var(--ok);}
+.stock-low{background:#f59e0b20;color:var(--warn);}
+.stock-none{background:#ef444420;color:var(--danger);}
+.c-chevron{color:var(--txt-lo);font-size:12px;transition:transform .2s;}
+.c-card.open .c-chevron{transform:rotate(180deg);}
+
+.c-body{display:none;border-top:1px solid var(--border);padding:14px 15px;}
+.c-card.open .c-body{display:block;}
+
+.c-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:500px){.c-body-grid{grid-template-columns:1fr;}}
+.c-detail-block{background:var(--card2);border-radius:10px;padding:12px;}
+.c-detail-label{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+.c-detail-val{font-size:13px;font-weight:700;}
+.c-detail-sub{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+
+.c-sku-list{margin-bottom:12px;}
+.c-sku-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.c-sku-row:last-child{border-bottom:none;}
+.c-sku-name{flex:1;font-size:12px;}
+.c-sku-qty{font-size:11px;font-weight:700;}
+.c-sku-qty.low{color:var(--warn);}
+.c-sku-qty.zero{color:var(--danger);}
+.c-sku-qty.ok{color:var(--ok);}
+.c-sku-loc{font-size:10px;color:var(--txt-lo);}
+
+.c-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-sm{font-size:11px;font-weight:700;padding:7px 13px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s;}
+.btn-sm:hover{opacity:.85;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-warn{background:var(--warn);color:#000;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-outline{background:none;border:1px solid var(--border-hi);color:var(--txt-mid);}
+.btn-cyan{background:var(--cyan);color:#000;}
+
+/* Stock overview */
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px;}
+.stock-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.s-ip{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.s-name{font-size:13px;font-weight:700;margin-bottom:8px;}
+.s-locs{display:flex;flex-direction:column;gap:4px;}
+.s-loc-row{display:flex;justify-content:space-between;font-size:11px;}
+.s-loc-name{color:var(--txt-mid);}
+.s-loc-qty{font-weight:700;}
+.s-loc-qty.zero{color:var(--danger);}
+.s-loc-qty.low{color:var(--warn);}
+.s-total-row{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.s-reserve-info{font-size:10px;color:var(--txt-lo);margin-top:4px;}
+
+/* Coordination quick-send */
+.coord-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px;}
+.coord-title{font-size:12px;font-weight:700;margin-bottom:12px;color:var(--txt-mid);}
+.coord-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.coord-btn{display:flex;flex-direction:column;gap:3px;padding:12px 16px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;flex:1;min-width:140px;transition:border-color .15s;}
+.coord-btn:hover{border-color:var(--border-hi);}
+.coord-btn .cb-to{font-size:10px;color:var(--txt-lo);}
+.coord-btn .cb-action{font-size:12px;font-weight:700;}
+
+/* Sales snapshot */
+.sales-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;}
+@media(max-width:480px){.sales-row{grid-template-columns:1fr 1fr;}}
+.sales-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+.sales-label{font-size:10px;color:var(--txt-lo);margin-bottom:4px;}
+.sales-num{font-size:20px;font-weight:800;}
+.sales-num.up{color:var(--ok);}
+.sales-num.flat{color:var(--warn);}
+.sales-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:#00000080;z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:16px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:5px;letter-spacing:.04em;}
+.field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--txt-hi);outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field select option{background:var(--card2);}
+.field textarea{resize:vertical;min-height:70px;}
+.modal-footer{display:flex;gap:8px;margin-top:16px;}
+.btn-full{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-submit{background:var(--accent);color:#fff;}
+.btn-cancel{background:var(--card2);color:var(--txt-mid);border:1px solid var(--border);}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ok);color:#000;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:22px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #818cf840;z-index:150;display:flex;align-items:center;justify-content:center;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:32px;color:var(--txt-lo);font-size:13px;}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="location.href='erp-lobby.html'">← 大廳</button>
+  <span class="tb-title">🛒 電商中心</span>
+  <span class="tb-user" id="tb-user"></span>
+  <button class="tb-back" onclick="logout()" style="margin-left:8px;">登出</button>
+</div>
+
+<div class="main">
+
+  <!-- Alert banner -->
+  <div class="alert-banner" id="alert-no-stock" style="display:none;">
+    <div class="icon">⚠️</div>
+    <div class="txt">
+      <strong id="alert-msg">有活動即將上線但庫存未確認</strong>
+      <div class="sub" id="alert-sub"></div>
+    </div>
+  </div>
+
+  <!-- Channel tabs -->
+  <div class="tabs">
+    <button class="tab tab-all active" onclick="setTab('all')">全部</button>
+    <button class="tab" onclick="setTab('dy')" id="tab-dy" style="display:none;">抖音</button>
+    <button class="tab" onclick="setTab('xhs')" id="tab-xhs" style="display:none;">小紅書</button>
+    <button class="tab" onclick="setTab('tb')" id="tab-tb" style="display:none;">淘寶</button>
+  </div>
+
+  <!-- Today's sales snapshot -->
+  <div class="sec-hd"><span class="sec-title">本月電商數據</span></div>
+  <div class="sales-row">
+    <div class="sales-card">
+      <div class="sales-label">本月訂單</div>
+      <div class="sales-num up" id="s-orders">342</div>
+      <div class="sales-sub">↑ 18% vs 上月</div>
+    </div>
+    <div class="sales-card">
+      <div class="sales-label">本月GMV</div>
+      <div class="sales-num up" id="s-gmv">¥68,400</div>
+      <div class="sales-sub">抖音 + 小紅書 + 淘寶</div>
+    </div>
+    <div class="sales-card">
+      <div class="sales-label">待出貨</div>
+      <div class="sales-num flat" id="s-pending">12</div>
+      <div class="sales-sub">需協調高維</div>
+    </div>
+  </div>
+
+  <!-- Active campaigns -->
+  <div class="sec-hd">
+    <span class="sec-title">活動管理</span>
+    <button class="sec-action" onclick="openNewCampaign()">+ 新增活動</button>
+  </div>
+  <div class="campaign-grid" id="campaign-grid"></div>
+
+  <!-- Stock overview -->
+  <div class="sec-hd">
+    <span class="sec-title">庫存快照</span>
+    <button class="sec-action" onclick="openStockRequest()">申請備貨</button>
+  </div>
+  <div class="stock-grid" id="stock-grid"></div>
+
+  <!-- Coordination -->
+  <div class="sec-hd"><span class="sec-title">快速協調</span></div>
+  <div class="coord-card">
+    <div class="coord-title">聯絡物流 / 採購</div>
+    <div class="coord-btns">
+      <div class="coord-btn" onclick="quickNotify('gaowei','確認出貨')">
+        <span class="cb-to">→ 高維</span>
+        <span class="cb-action">📦 確認出貨進度</span>
+      </div>
+      <div class="coord-btn" onclick="quickNotify('laige','備貨申請')">
+        <span class="cb-to">→ 賴哥</span>
+        <span class="cb-action">🏭 申請補貨</span>
+      </div>
+      <div class="coord-btn" onclick="quickNotify('gaowei','緊急催貨')">
+        <span class="cb-to">→ 高維</span>
+        <span class="cb-action">⚡ 緊急催貨</span>
+      </div>
+      <div class="coord-btn" onclick="openShipCoord()">
+        <span class="cb-to">→ 高維 + 賴哥</span>
+        <span class="cb-action">📋 活動備貨計劃單</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAB: New campaign -->
+<button class="fab" onclick="openNewCampaign()" title="新增活動">+</button>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- New Campaign Modal -->
+<div class="modal-bg" id="modal-campaign">
+  <div class="modal">
+    <div class="modal-title">新增電商活動</div>
+    <div class="field"><label>活動名稱</label><input id="nc-name" placeholder="例：貓福珊迪 618 爆款組合"></div>
+    <div class="field"><label>平台渠道</label>
+      <select id="nc-channel">
+        <option value="">選擇平台</option>
+        <option value="dy">抖音</option>
+        <option value="xhs">小紅書</option>
+        <option value="tb">淘寶</option>
+      </select>
+    </div>
+    <div class="field"><label>上線日期</label><input id="nc-date" type="date"></div>
+    <div class="field"><label>主打 SKU（每行一個）</label><textarea id="nc-skus" placeholder="貓福珊迪 公仔 S&#10;貓福珊迪 亞克力立牌&#10;..."></textarea></div>
+    <div class="field"><label>預計銷售目標</label><input id="nc-target" placeholder="例：500 件 / ¥15,000"></div>
+    <div class="field"><label>需要備貨嗎？</label>
+      <select id="nc-need-stock">
+        <option value="yes">是，需要通知高維/賴哥確認庫存</option>
+        <option value="no">否，庫存已確認</option>
+      </select>
+    </div>
+    <div class="field"><label>備註</label><textarea id="nc-note" placeholder="特殊要求、配合貼文時程等..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeModal('modal-campaign')">取消</button>
+      <button class="btn-full btn-submit" onclick="saveCampaign()">建立活動</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Request Modal -->
+<div class="modal-bg" id="modal-stock">
+  <div class="modal">
+    <div class="modal-title">申請備貨</div>
+    <div class="field"><label>關聯活動</label>
+      <select id="sr-campaign"><option value="">選擇活動</option></select>
+    </div>
+    <div class="field"><label>需求 SKU 與數量（每行一個，格式：品名 數量）</label>
+      <textarea id="sr-skus" placeholder="貓福珊迪 公仔 S  200件&#10;貓福珊迪 亞克力立牌  150件"></textarea>
+    </div>
+    <div class="field"><label>需要到貨日期</label><input id="sr-date" type="date"></div>
+    <div class="field"><label>備註</label><textarea id="sr-note" placeholder="說明用途、緊急程度..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeModal('modal-stock')">取消</button>
+      <button class="btn-full btn-warn" onclick="saveStockRequest()">送出申請給賴哥</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ship Coord Modal -->
+<div class="modal-bg" id="modal-shipcoord">
+  <div class="modal">
+    <div class="modal-title">📋 活動備貨計劃單</div>
+    <div class="field"><label>關聯活動</label>
+      <select id="sc-campaign"><option value="">選擇活動</option></select>
+    </div>
+    <div class="field"><label>上線日期（需在此之前到貨）</label><input id="sc-deadline" type="date"></div>
+    <div class="field"><label>出貨形式</label>
+      <select id="sc-warehouse">
+        <option value="factory">工廠直發</option>
+        <option value="flash">快閃店備貨倉</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+    <div class="field"><label>收件地址</label><textarea id="sc-addr" placeholder="活動發貨收件人與地址..."></textarea></div>
+    <div class="field"><label>給高維 / 賴哥的備註</label><textarea id="sc-note" placeholder="特殊包裝需求、報關備注等..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeModal('modal-shipcoord')">取消</button>
+      <button class="btn-full btn-submit" onclick="saveShipCoord()">送出計劃單</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('erp_sess')||'null');
+function requireAuth(){
+  if(!SESS||Date.now()-SESS.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; return false; }
+  return true;
+}
+if(!requireAuth()) throw new Error('unauth');
+function logout(){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
+
+const ECOMM_USERS = ['chunlei','jiaying'];
+const IS_ECOMM = ECOMM_USERS.includes(SESS.user);
+const IS_MGMT = ['ray','shawn','anran'].includes(SESS.user);
+
+// Show user
+document.getElementById('tb-user').textContent = SESS.name + ' · ' + SESS.role;
+
+// Channel visibility
+const USER_CHANNELS = {
+  chunlei: ['dy','xhs'],
+  jiaying: ['tb'],
+};
+const myChannels = USER_CHANNELS[SESS.user] || ['dy','xhs','tb'];
+
+if(myChannels.includes('dy')) document.getElementById('tab-dy').style.display='';
+if(myChannels.includes('xhs')) document.getElementById('tab-xhs').style.display='';
+if(myChannels.includes('tb')) document.getElementById('tab-tb').style.display='';
+
+let activeTab = 'all';
+function setTab(t){
+  activeTab = t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  const tabEl = t==='all' ? document.querySelector('.tab-all') : document.getElementById('tab-'+t);
+  if(tabEl) tabEl.classList.add('active');
+  renderCampaigns();
+}
+
+// ── Data ──────────────────────────────────────────────────
+const STORAGE_KEY = 'ecomm_campaigns_v1';
+function loadCampaigns(){ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+function saveCampaigns(arr){ localStorage.setItem(STORAGE_KEY,JSON.stringify(arr)); }
+
+// Demo seed if empty
+function seedIfEmpty(){
+  if(loadCampaigns().length>0) return;
+  const today = new Date().toISOString().slice(0,10);
+  const tomorrow = new Date(Date.now()+86400000).toISOString().slice(0,10);
+  const nextWeek = new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const seed = [
+    {
+      id:'c1',user:'chunlei',name:'貓福珊迪 五月限定包',channel:'dy',date:today,
+      skus:[{name:'貓福珊迪 公仔 S',qty:120,loc:'廠內備貨',status:'ok'},
+            {name:'貓福珊迪 文具組',qty:60,loc:'廠內備貨',status:'ok'}],
+      target:'300件 / ¥9,000',stockOk:true,status:'live',note:'主力直播品，保持庫存',
+      gmv:'¥5,280',orders:176
+    },
+    {
+      id:'c2',user:'chunlei',name:'小紅書 Snoopy 早C晚A 套裝',channel:'xhs',date:tomorrow,
+      skus:[{name:'Snoopy 護膚禮盒',qty:0,loc:'廠內備貨',status:'zero'},
+            {name:'Snoopy 帆布包',qty:30,loc:'廠內備貨',status:'low'}],
+      target:'200件 / ¥12,000',stockOk:false,status:'upcoming',note:'明天發圖文，庫存未確認',
+      gmv:'—',orders:0
+    },
+    {
+      id:'c3',user:'jiaying',name:'淘寶 618 大促 Snoopy 旗艦套',channel:'tb',date:nextWeek,
+      skus:[{name:'Snoopy 旗艦禮盒',qty:200,loc:'廠內備貨',status:'ok'},
+            {name:'Snoopy 公仔 M',qty:150,loc:'廠內備貨',status:'ok'}],
+      target:'500件 / ¥35,000',stockOk:true,status:'upcoming',note:'618 提前佈局',
+      gmv:'—',orders:0
+    },
+  ];
+  saveCampaigns(seed);
+}
+seedIfEmpty();
+
+// ── Render ────────────────────────────────────────────────
+const CHANNEL_LABEL = {dy:'抖音',xhs:'小紅書',tb:'淘寶'};
+const CHANNEL_TAG = {dy:'tag-dy',xhs:'tag-xhs',tb:'tag-tb'};
+const STATUS_LABEL = {live:'直播中',upcoming:'即將上線',draft:'草稿',ended:'已結束'};
+const STATUS_DOT = {live:'c-live',upcoming:'c-upcoming',draft:'c-draft',ended:'c-draft'};
+
+function renderCampaigns(){
+  const grid = document.getElementById('campaign-grid');
+  let campaigns = loadCampaigns();
+
+  // Filter by tab
+  if(activeTab !== 'all') campaigns = campaigns.filter(c=>c.channel===activeTab);
+
+  // Filter by user (ecomm users only see own channel; mgmt sees all)
+  if(IS_ECOMM && !IS_MGMT){
+    campaigns = campaigns.filter(c=> myChannels.includes(c.channel));
+  }
+
+  // Sort: live first, then upcoming by date, then draft
+  const order = {live:0,upcoming:1,draft:2,ended:3};
+  campaigns.sort((a,b)=> order[a.status]-order[b.status] || (a.date||'').localeCompare(b.date||''));
+
+  if(!campaigns.length){
+    grid.innerHTML='<div class="empty-state">此渠道目前無活動，點右上角 + 新增</div>';
+    return;
+  }
+
+  grid.innerHTML = campaigns.map(c=>{
+    const badStock = c.skus && c.skus.some(s=>s.status==='zero'||s.status==='low');
+    const stockBadge = !c.stockOk
+      ? '<span class="c-stock-badge stock-none">⚠ 庫存未確認</span>'
+      : badStock
+        ? '<span class="c-stock-badge stock-low">庫存偏低</span>'
+        : '<span class="c-stock-badge stock-ok">庫存 OK</span>';
+
+    const skuRows = (c.skus||[]).map(s=>`
+      <div class="c-sku-row">
+        <span class="c-sku-name">${s.name}</span>
+        <span class="c-sku-loc">${s.loc||''}</span>
+        <span class="c-sku-qty ${s.status}">${s.qty} 件</span>
+      </div>`).join('');
+
+    const editBtn = (IS_ECOMM && myChannels.includes(c.channel)) || IS_MGMT
+      ? `<button class="btn-sm btn-outline" onclick="event.stopPropagation();editCampaign('${c.id}')">編輯</button>`
+      : '';
+
+    const liveInfo = c.status==='live' && c.gmv
+      ? `<div class="c-body-grid">
+          <div class="c-detail-block"><div class="c-detail-label">本期 GMV</div><div class="c-detail-val" style="color:var(--ok)">${c.gmv}</div></div>
+          <div class="c-detail-block"><div class="c-detail-label">本期訂單</div><div class="c-detail-val">${c.orders}</div></div>
+        </div>`
+      : '';
+
+    return `<div class="c-card" id="card-${c.id}">
+      <div class="c-head" onclick="toggleCard('${c.id}')">
+        <div class="c-status-dot ${STATUS_DOT[c.status]||'c-draft'}"></div>
+        <div class="c-info">
+          <div class="c-name">${c.name}</div>
+          <div class="c-meta">${STATUS_LABEL[c.status]||c.status} · 上線 ${c.date} · 目標 ${c.target||'—'}</div>
+        </div>
+        <div class="c-right">
+          <span class="c-channel-tag ${CHANNEL_TAG[c.channel]||''}">${CHANNEL_LABEL[c.channel]||c.channel}</span>
+          ${stockBadge}
+          <span class="c-chevron">▼</span>
+        </div>
+      </div>
+      <div class="c-body">
+        ${liveInfo}
+        <div style="font-size:11px;font-weight:700;color:var(--txt-mid);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">主打 SKU 庫存</div>
+        <div class="c-sku-list">${skuRows||'<div style="color:var(--txt-lo);font-size:12px;">尚未填寫 SKU</div>'}</div>
+        ${c.note?`<div style="font-size:11px;color:var(--txt-lo);margin-bottom:12px;">${c.note}</div>`:''}
+        <div class="c-actions">
+          ${!c.stockOk ? `<button class="btn-sm btn-danger" onclick="event.stopPropagation();requestStock('${c.id}')">⚠ 申請確認庫存</button>` : ''}
+          <button class="btn-sm btn-cyan" onclick="event.stopPropagation();notifyLogistics('${c.id}')">📦 通知高維出貨</button>
+          ${editBtn}
+          ${(IS_ECOMM&&myChannels.includes(c.channel))||IS_MGMT ? `<button class="btn-sm btn-outline" onclick="event.stopPropagation();deleteCampaign('${c.id}')">刪除</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Alert banner
+  const urgentList = campaigns.filter(c=> !c.stockOk && (c.status==='live'||c.status==='upcoming'));
+  const alertEl = document.getElementById('alert-no-stock');
+  if(urgentList.length>0){
+    alertEl.style.display='flex';
+    document.getElementById('alert-msg').textContent=`${urgentList.length} 個活動即將上線但庫存未確認`;
+    document.getElementById('alert-sub').textContent=urgentList.map(c=>c.name).join('、');
+  } else {
+    alertEl.style.display='none';
+  }
+}
+
+function renderStockGrid(){
+  const grid = document.getElementById('stock-grid');
+  // Aggregate SKUs from campaigns
+  const stockMap = {};
+  loadCampaigns().forEach(c=>{
+    if(!myChannels.includes(c.channel) && !IS_MGMT) return;
+    (c.skus||[]).forEach(s=>{
+      if(!stockMap[s.name]){
+        stockMap[s.name]={name:s.name,locs:{},reserved:0,ip:c.name.split(' ')[0]};
+      }
+      stockMap[s.name].locs[s.loc||'未指定']=(stockMap[s.name].locs[s.loc||'未指定']||0)+s.qty;
+      if(c.status==='upcoming'||c.status==='live') stockMap[s.name].reserved+=s.qty;
+    });
+  });
+  const items = Object.values(stockMap);
+  if(!items.length){
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1">建立活動後即可看到庫存快照</div>';
+    return;
+  }
+  grid.innerHTML = items.map(item=>{
+    const total = Object.values(item.locs).reduce((a,b)=>a+b,0);
+    const locRows = Object.entries(item.locs).map(([loc,qty])=>`
+      <div class="s-loc-row">
+        <span class="s-loc-name">${loc}</span>
+        <span class="s-loc-qty ${qty===0?'zero':qty<30?'low':''}">${qty} 件</span>
+      </div>`).join('');
+    return `<div class="stock-card">
+      <div class="s-ip">${item.ip}</div>
+      <div class="s-name">${item.name}</div>
+      <div class="s-locs">${locRows}</div>
+      <div class="s-total-row"><span>合計</span><span>${total} 件</span></div>
+      ${item.reserved>0?`<div class="s-reserve-info">已為活動預留 ${item.reserved} 件</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id){
+  const el = document.getElementById('card-'+id);
+  if(el) el.classList.toggle('open');
+}
+
+// ── Actions ────────────────────────────────────────────────
+function openNewCampaign(){
+  // Pre-set date to today
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('nc-date').value = today;
+  document.getElementById('nc-channel').value = myChannels[0]||'';
+  document.getElementById('nc-name').value = '';
+  document.getElementById('nc-skus').value = '';
+  document.getElementById('nc-target').value = '';
+  document.getElementById('nc-note').value = '';
+  document.getElementById('modal-campaign').classList.add('show');
+}
+
+function saveCampaign(){
+  const name = document.getElementById('nc-name').value.trim();
+  const channel = document.getElementById('nc-channel').value;
+  const date = document.getElementById('nc-date').value;
+  if(!name||!channel||!date){ showToast('請填完必填欄位'); return; }
+
+  const skusRaw = document.getElementById('nc-skus').value.trim();
+  const skus = skusRaw ? skusRaw.split('\n').map(s=>({name:s.trim(),qty:0,loc:'廠內備貨',status:'zero'})).filter(s=>s.name) : [];
+  const needStock = document.getElementById('nc-need-stock').value==='yes';
+
+  const campaigns = loadCampaigns();
+  campaigns.unshift({
+    id: 'c'+Date.now(),
+    user: SESS.user,
+    name, channel, date, skus,
+    target: document.getElementById('nc-target').value.trim(),
+    stockOk: !needStock,
+    status: new Date(date)<=new Date() ? 'live' : 'upcoming',
+    note: document.getElementById('nc-note').value.trim(),
+    gmv:'—', orders:0
+  });
+  saveCampaigns(campaigns);
+  closeModal('modal-campaign');
+  renderAll();
+  showToast('活動已建立' + (needStock ? '，已提醒確認庫存' : ''));
+}
+
+function deleteCampaign(id){
+  const campaigns = loadCampaigns().filter(c=>c.id!==id);
+  saveCampaigns(campaigns);
+  renderAll();
+  showToast('活動已刪除');
+}
+
+function editCampaign(id){
+  showToast('編輯功能開發中，目前請刪除後重新建立');
+}
+
+function requestStock(id){
+  const campaigns = loadCampaigns();
+  const c = campaigns.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('sr-campaign').innerHTML=`<option value="${c.id}">${c.name}</option>`;
+  document.getElementById('sr-skus').value=(c.skus||[]).map(s=>s.name+'  需確認數量').join('\n');
+  document.getElementById('sr-date').value=c.date;
+  document.getElementById('sr-note').value='';
+  document.getElementById('modal-stock').classList.add('show');
+}
+
+function saveStockRequest(){
+  closeModal('modal-stock');
+  showToast('備貨申請已送給賴哥（模擬通知）');
+}
+
+function openStockRequest(){
+  const campaigns = loadCampaigns();
+  const sel = document.getElementById('sr-campaign');
+  sel.innerHTML='<option value="">選擇活動</option>'+campaigns.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('sr-skus').value='';
+  document.getElementById('sr-date').value='';
+  document.getElementById('sr-note').value='';
+  document.getElementById('modal-stock').classList.add('show');
+}
+
+function notifyLogistics(id){
+  const campaigns = loadCampaigns();
+  const c = campaigns.find(x=>x.id===id);
+  showToast(`已通知高維：《${c?c.name:''}》出貨需求（模擬）`);
+}
+
+function quickNotify(to,action){
+  const names = {gaowei:'高維',laige:'賴哥'};
+  showToast(`已通知 ${names[to]||to}：${action}（模擬）`);
+}
+
+function openShipCoord(){
+  const campaigns = loadCampaigns();
+  const sel = document.getElementById('sc-campaign');
+  sel.innerHTML='<option value="">選擇活動</option>'+campaigns.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('sc-deadline').value='';
+  document.getElementById('sc-addr').value='';
+  document.getElementById('sc-note').value='';
+  document.getElementById('modal-shipcoord').classList.add('show');
+}
+
+function saveShipCoord(){
+  closeModal('modal-shipcoord');
+  showToast('備貨計劃單已同時送給高維和賴哥（模擬）');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function renderAll(){
+  renderCampaigns();
+  renderStockGrid();
+}
+
+renderAll();
+</script>
+</body>
+</html>

@@ -206,6 +206,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   .appr-action{display:none;}
 }
 </style>
+<script src="mock-data.js"></script>
 </head>
 <body>
 
@@ -219,11 +220,13 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
   <div class="topbar-right">
-    <span class="date-badge">2026年 5月 1日（週四）</span>
-    <div class="user-chip">
-      <div class="user-av">R</div>
-      Ray
+    <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 大廳</a>
+    <span class="date-badge" id="wr-date"></span>
+    <div class="user-chip" id="wr-user-chip">
+      <div class="user-av" id="wr-av">R</div>
+      <span id="wr-name">Ray</span>
     </div>
+    <a href="login.html" onclick="localStorage.removeItem('erp_sess');return true;" style="font-size:11px;color:var(--danger);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--danger-dim);border-radius:20px;">登出</a>
   </div>
 </div>
 
@@ -374,6 +377,59 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="mini-prog">
         <div class="mini-prog-fill" style="width:28.3%;background:var(--accent)"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ② AI & 技術投資 -->
+  <div class="section-title">AI & 技術投資 · 費用歸屬追蹤</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="background:var(--card2);border-radius:8px;padding:12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">本月已使用</div>
+        <div style="font-size:22px;font-weight:800;color:var(--txt-hi);" id="ai-used">$204</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">USD · 截至今日</div>
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">月度 Soft Cap</div>
+        <div style="font-size:22px;font-weight:800;color:var(--txt-mid);">$250</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">USD · MJ 自主授權上限</div>
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">剩餘額度</div>
+        <div style="font-size:22px;font-weight:800;color:var(--ok);" id="ai-remain">$46</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">本月可用</div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+        <span style="color:var(--txt-mid);">月度使用率</span>
+        <span style="font-weight:600;" id="ai-pct">81.6%</span>
+      </div>
+      <div style="background:var(--card2);border-radius:4px;height:7px;overflow:hidden;">
+        <div id="ai-prog-fill" style="width:81.6%;height:100%;border-radius:4px;background:linear-gradient(90deg,#b45309,var(--warn));"></div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--txt-lo);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">費用歸屬明細</div>
+    <div id="ai-attribution">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
+        <span style="color:var(--txt-mid);">Claude Code（MJ 系統維運）</span>
+        <span style="font-weight:700;color:var(--txt-hi);">$89 <span style="color:var(--txt-lo);font-weight:400;">→ 營運費用</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
+        <span style="color:var(--txt-mid);">Gemini API（採購台報價 OCR）</span>
+        <span style="font-weight:700;color:var(--txt-hi);">$32 <span style="color:var(--txt-lo);font-weight:400;">→ 採購作業費用</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
+        <span style="color:var(--txt-mid);">生圖費（Snoopy 夏季概念視覺）</span>
+        <span style="font-weight:700;color:var(--warn);">$45 <span style="color:var(--txt-lo);font-weight:400;">→ 開模費（Snoopy 夏季）</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:11px;">
+        <span style="color:var(--txt-mid);">生圖費（Opanchu 秋冬概念視覺）</span>
+        <span style="font-weight:700;color:var(--warn);">$38 <span style="color:var(--txt-lo);font-weight:400;">→ 開模費（Opanchu 秋冬）</span></span>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--txt-lo);">
+      📌 生圖費已歸屬至各專案開模費，不計入一般行政 AI 費用。超過 $250 Soft Cap 需 Ray 額外授權。
     </div>
   </div>
 
@@ -766,6 +822,8 @@ let _tk = null;
 (function(){
   const s = JSON.parse(localStorage.getItem("erp_sess")||localStorage.getItem("wujie_session")||"null");
   if(!s||(s.expires&&Date.now()>s.expires)||(s.ts&&Date.now()-s.ts>7*86400000)){ localStorage.removeItem("erp_sess"); localStorage.removeItem("wujie_session"); location.replace("login.html"); return; }
+  const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
+  if(!WAR_ROOM_ROLES.includes(s.user)){ location.replace("erp-lobby.html"); return; }
   const now = new Date();
   const days = ["日","一","二","三","四","五","六"];
   document.querySelector(".date-badge").textContent =
@@ -786,6 +844,8 @@ async function _getToken(){
   return _tk;
 }
 async function _fetchAll(tbl){
+  const mock = window._mockCheck && window._mockCheck(tbl);
+  if(mock) return mock;
   const tk = await _getToken();
   const items=[]; let cur="";
   while(true){
@@ -1050,7 +1110,7 @@ async function loadContractAlerts(){
   if(el) el.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px">
   <div style="background:var(--ok-dim);border-radius:7px;padding:9px 11px;font-size:11px"><span style="color:var(--ok);font-weight:700">Snoopy</span> <span style="color:var(--txt-mid)">到期 2027-03 · 距今 10 個月</span></div>
   <div style="background:var(--warn-dim);border-radius:7px;padding:9px 11px;font-size:11px"><span style="color:var(--warn);font-weight:700">⚠ Opanchu</span> <span style="color:var(--txt-mid)">到期 2026-09 · 距今 4 個月，需洽談續約</span></div>
-  <div style="background:var(--warn-dim);border-radius:7px;padding:9px 11px;font-size:11px"><span style="color:var(--warn);font-weight:700">⚠ Gudetama</span> <span style="color:var(--txt-mid)">到期 2026-11 · 距今 6 個月</span></div>
+  <div style="background:var(--warn-dim);border-radius:7px;padding:9px 11px;font-size:11px"><span style="color:var(--warn);font-weight:700">⚠ Muziktiger</span> <span style="color:var(--txt-mid)">到期 2026-12 · 距今 7 個月</span></div>
 </div>`;
   try{
     const items=await _fetchAll(_TBLS.contract);
@@ -1082,7 +1142,7 @@ async function loadContractAlerts(){
 
 /* ── LOAD VAM PROGRESS ── */
 async function loadVamProgress(){
-  const VAM_YR  = 7500000;   // 750萬 / year
+  const VAM_YR  = 8000000;   // 800萬 / year
   const VAM_2YR = 16000000;  // 1600萬 / 2 years
   try{
     const items = await _fetchAll(_TBLS.budget);

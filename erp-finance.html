@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>蕪解 ERP · 財務工作台</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --fin:#0284c7;--fin-dim:#0284c718;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--fin);box-shadow:0 0 6px var(--fin);flex-shrink:0;}
+.brand-name{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:720px;margin:0 auto;padding:16px;}
+
+/* TODAY TASK */
+.today-hdr{padding:12px 0 16px;}
+.today-date{font-size:11px;color:var(--txt-lo);margin-bottom:4px;}
+.today-title{font-size:20px;font-weight:800;margin-bottom:4px;}
+.today-sub{font-size:12px;color:var(--txt-mid);}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:11px;color:var(--fin);cursor:pointer;font-weight:700;}
+
+/* TASK CARDS */
+.task-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .15s;}
+.task-card:hover{border-color:var(--border-hi);}
+.task-card.urgent{border-color:#ef444435;}
+.task-card.warn{border-color:#f59e0b35;}
+.task-card.done{opacity:.5;}
+.tc-row{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;}
+.tc-urgency{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.tc-icon{font-size:18px;flex-shrink:0;}
+.tc-body{flex:1;min-width:0;}
+.tc-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.tc-sub{font-size:10px;color:var(--txt-mid);}
+.tc-right{text-align:right;flex-shrink:0;}
+.tc-due{font-size:10px;font-weight:700;}
+.tc-due.red{color:var(--danger);}
+.tc-due.yellow{color:var(--warn);}
+.tc-due.green{color:var(--ok);}
+.tc-detail{display:none;padding:12px 14px 14px;border-top:1px solid var(--border);background:var(--card2);}
+.tc-detail.open{display:block;}
+.tc-desc{font-size:11px;color:var(--txt-mid);line-height:1.6;margin-bottom:10px;}
+.tc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ta-btn{font-size:11px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;border:1px solid;transition:opacity .15s;}
+.ta-btn:active{opacity:.75;}
+.ta-ok{background:var(--ok-dim);color:var(--ok);border-color:#22c55e40;}
+.ta-fin{background:var(--fin-dim);color:var(--fin);border-color:#0284c740;}
+.ta-warn{background:var(--warn-dim);color:var(--warn);border-color:#f59e0b40;}
+.ta-grey{background:var(--card);color:var(--txt-mid);border-color:var(--border-hi);}
+
+/* REMITTANCE TIMELINE */
+.remit-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.remit-card.arriving{border-color:#22c55e35;}
+.remit-card.pending{border-color:#f59e0b35;}
+.remit-card.needs-contract{border-color:#ef444435;}
+.remit-header{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;}
+.remit-entities{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.entity-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;}
+.arrow{font-size:12px;color:var(--txt-lo);}
+.remit-body{flex:1;min-width:0;margin-left:4px;}
+.remit-amount{font-size:14px;font-weight:800;}
+.remit-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.remit-right{text-align:right;flex-shrink:0;}
+.remit-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;margin-bottom:3px;display:inline-block;}
+.rs-arriving{background:var(--ok-dim);color:var(--ok);}
+.rs-pending{background:var(--warn-dim);color:var(--warn);}
+.rs-contract{background:var(--danger-dim);color:var(--danger);}
+.rs-done{background:var(--card2);color:var(--txt-lo);}
+.remit-eta{font-size:9px;color:var(--txt-lo);}
+
+/* REMIT DETAIL */
+.remit-detail{display:none;border-top:1px solid var(--border);padding:14px;background:var(--card2);}
+.remit-detail.open{display:block;}
+.rate-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;}
+.rate-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.rate-row:last-child{margin-bottom:0;}
+.rate-label{font-size:10px;color:var(--txt-lo);}
+.rate-val{font-size:12px;font-weight:700;}
+.rate-locked{font-size:9px;color:var(--ok);font-weight:700;margin-left:6px;}
+.rate-warn{font-size:9px;color:var(--warn);font-weight:700;margin-left:6px;}
+.contract-link{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;cursor:pointer;text-decoration:none;}
+.contract-link:hover{border-color:var(--border-hi);}
+.cl-icon{font-size:16px;}
+.cl-body{flex:1;}
+.cl-title{font-size:11px;font-weight:700;}
+.cl-sub{font-size:10px;color:var(--txt-lo);margin-top:1px;}
+.cl-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;}
+
+/* ADVANCE TRACKER */
+.advance-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;}
+.advance-row{display:flex;align-items:center;gap:12px;padding:13px 14px;}
+.adv-entities{display:flex;align-items:center;gap:6px;}
+.adv-body{flex:1;}
+.adv-amount{font-size:13px;font-weight:800;}
+.adv-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.adv-right{text-align:right;}
+.adv-due{font-size:11px;font-weight:700;}
+.adv-due.overdue{color:var(--danger);}
+.adv-due.soon{color:var(--warn);}
+.adv-due.ok{color:var(--ok);}
+.adv-locked{font-size:9px;color:var(--ok);}
+
+/* ENTITY COLORS */
+.e-bj{background:#4f46e518;color:#818cf8;border:1px solid #4f46e530;}
+.e-tw{background:#0284c718;color:#38bdf8;border:1px solid #0284c730;}
+.e-hk{background:#d9770618;color:#fbbf24;border:1px solid #d9770630;}
+.e-sz{background:#16a34a18;color:#4ade80;border:1px solid #16a34a30;}
+.e-bkk{background:#9333ea18;color:#c084fc;border:1px solid #9333ea30;}
+
+/* CROSS-ENTITY BALANCE */
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.balance-entity-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;}
+.bec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.bec-name{font-size:12px;font-weight:800;}
+.bec-net{font-size:13px;font-weight:800;}
+.bec-net.positive{color:var(--ok);}
+.bec-net.negative{color:var(--danger);}
+.bec-net.zero{color:var(--txt-lo);}
+.bec-rows{border-top:1px solid var(--border);padding-top:8px;}
+.bec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.bec-row:last-child{margin-bottom:0;}
+.bec-peer{font-size:10px;color:var(--txt-mid);}
+.bec-amt{font-size:10px;font-weight:700;}
+.bec-amt.recv{color:var(--ok);}
+.bec-amt.owed{color:var(--danger);}
+.balance-summary{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+.bs-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.bs-row:last-child{border-bottom:none;}
+.bs-entities{display:flex;align-items:center;gap:6px;flex:1;}
+.bs-dir{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;}
+.bs-dir.recv{background:var(--ok-dim);color:var(--ok);}
+.bs-dir.owed{background:var(--danger-dim);color:var(--danger);}
+.bs-amt{font-size:12px;font-weight:800;white-space:nowrap;}
+.bs-note{font-size:9px;color:var(--txt-lo);}
+.bs-settle-btn{font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--fin-dim);color:var(--fin);border:1px solid #0284c740;cursor:pointer;}
+.bs-settle-btn:active{opacity:.75;}
+
+/* ADVANCE SETTLE */
+.adv-settle-btn{font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;margin-top:6px;}
+.adv-settle-btn:active{opacity:.75;}
+
+/* CHIP */
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-fin{background:var(--fin-dim);color:var(--fin);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#0009;z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:560px;padding:20px 20px 36px;max-height:88vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border-hi);border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;line-height:1.5;}
+.mf{margin-bottom:12px;}
+.mf label{font-size:10px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.mf input,.mf select,.mf textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.mf input:focus,.mf select:focus{border-color:var(--fin);}
+.mf select option{background:var(--card2);}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rate-preview{background:var(--card2);border:1px solid var(--fin-dim);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--txt-mid);line-height:1.8;}
+.rate-preview strong{color:var(--fin);font-size:13px;}
+.rate-lock-note{font-size:10px;color:var(--ok);margin-top:6px;display:flex;align-items:center;gap:4px;}
+.m-actions{display:flex;gap:10px;margin-top:16px;}
+.mbtn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+.mbtn.primary{background:var(--fin);color:#fff;}
+.mbtn.ghost{background:var(--card2);color:var(--txt-mid);}
+</style>
+<script src="mock-data.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">財務工作台</div>
+  </div>
+  <div class="topbar-right">
+    <span id="tb-name" style="font-size:11px;color:var(--txt-mid)">—</span>
+    <a href="erp-anran.html" class="btn-sm">合約庫</a>
+    <a href="erp-transfer-pricing.html" class="btn-sm" style="border-color:#7c3aed50;color:#c4b5fd;">TP 設定</a>
+    <a href="erp-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="login.html" class="btn-sm danger" onclick="localStorage.removeItem('erp_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- TODAY HEADER -->
+  <div class="today-hdr">
+    <div class="today-date" id="today-date">—</div>
+    <div class="today-title" id="today-title">躍明，今天有 3 件財務待辦</div>
+    <div class="today-sub">1 筆匯款今天預計到帳・1 張合約下月到期・月結報表本週截止</div>
+  </div>
+
+  <!-- 今日財務待辦 -->
+  <div class="sec-hdr">
+    <div class="sec-title">今日財務待辦</div>
+    <span class="sec-link" onclick="openNewRemitModal()">+ 新增匯款記錄</span>
+  </div>
+
+  <div class="task-card urgent">
+    <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="tc-urgency" style="background:var(--danger)"></div>
+      <div class="tc-icon">📋</div>
+      <div class="tc-body">
+        <div class="tc-title">5月北京現金流報表</div>
+        <div class="tc-sub">北京蕪解 + 深圳子公司 · 截止明天 · 需同步 Shawn 月報</div>
+      </div>
+      <div class="tc-right">
+        <div class="tc-due red">明天截止</div>
+      </div>
+    </div>
+    <div class="tc-detail">
+      <div class="tc-desc">每月 1-2 日完成上月損益表、現金流預測、帳款核對。北京蕪解 + 深圳子公司合併版。需確認賴哥的採購付款時間點是否已入帳。</div>
+      <div class="tc-actions">
+        <button class="ta-btn ta-ok" onclick="markTaskDone(this,'report1')">✓ 已完成，送 Shawn</button>
+        <button class="ta-btn ta-warn" onclick="alert('已通知 Shawn 延期 1 天')">⚠ 申請延期</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card warn">
+    <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="tc-urgency" style="background:var(--ok)"></div>
+      <div class="tc-icon">💸</div>
+      <div class="tc-body">
+        <div class="tc-title">確認到帳：台灣悍草 → 北京蕪解 貨款</div>
+        <div class="tc-sub">TWD 420,000 · 預計今天入帳 · 安然 4/28 發起</div>
+      </div>
+      <div class="tc-right">
+        <div class="tc-due green">今天到帳</div>
+      </div>
+    </div>
+    <div class="tc-detail">
+      <div class="rate-box">
+        <div class="rate-row">
+          <span class="rate-label">原始金額</span>
+          <span class="rate-val">TWD 420,000</span>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">結算幣別</span>
+          <span class="rate-val">RMB <span class="rate-locked">🔒 鎖定</span></span>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">鎖定匯率（發生日 4/28）</span>
+          <span class="rate-val">1 TWD = 0.2218 RMB <span class="rate-locked">台銀牌告</span></span>
+        </div>
+        <div class="rate-row">
+          <span class="rate-label">應入帳金額</span>
+          <span class="rate-val" style="color:var(--ok)">≈ RMB 93,156</span>
+        </div>
+      </div>
+      <div class="tc-desc">Q1 貨款結算，台灣悍草向北京蕪解採購 Snoopy 台灣代理商品的對應款項。合約：TWN-BJ-2025-003。</div>
+      <div class="tc-actions">
+        <button class="ta-btn ta-ok" onclick="markTaskDone(this,'remit1')">✓ 已確認到帳</button>
+        <button class="ta-btn ta-fin" onclick="alert('差異記錄已建立')">記錄匯差</button>
+        <button class="ta-btn ta-grey">聯繫銀行</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card warn">
+    <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="tc-urgency" style="background:var(--warn)"></div>
+      <div class="tc-icon">⚠️</div>
+      <div class="tc-body">
+        <div class="tc-title">合約到期預警：Snoopy 北京代理合約</div>
+        <div class="tc-sub">2026-06-30 到期 · 需提前 3 個月啟動續簽 · 安然主辦</div>
+      </div>
+      <div class="tc-right">
+        <div class="tc-due yellow">59 天後</div>
+      </div>
+    </div>
+    <div class="tc-detail">
+      <div class="tc-desc">此合約為北京蕪解與 Peanuts Worldwide 的版權授權合約，同時也是多筆跨境匯款的合規依據。合約到期前必須完成續簽，否則相關匯款可能被外管局攔截。</div>
+      <div class="tc-actions">
+        <button class="ta-btn ta-warn" onclick="alert('已通知安然啟動續簽流程')">→ 通知安然續簽</button>
+        <button class="ta-btn ta-grey">查看合約詳情</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 跨境匯款時間軸 -->
+  <div class="sec-hdr" style="margin-top:8px">
+    <div class="sec-title">跨境匯款追蹤</div>
+    <span class="sec-link" onclick="openNewRemitModal()">+ 新增</span>
+  </div>
+
+  <!-- 匯款 1 -->
+  <div class="remit-card arriving">
+    <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="remit-entities">
+        <span class="entity-badge e-tw">台灣悍草</span>
+        <span class="arrow">→</span>
+        <span class="entity-badge e-bj">北京蕪解</span>
+      </div>
+      <div class="remit-body">
+        <div class="remit-amount">TWD 420,000 <span style="font-size:10px;color:var(--txt-lo)">≈ RMB 93,156</span></div>
+        <div class="remit-meta">Q1 貨款 · TWN-BJ-2025-003</div>
+      </div>
+      <div class="remit-right">
+        <div class="remit-status rs-arriving">今天到帳</div>
+        <div class="remit-eta">ETA 2026-05-02</div>
+      </div>
+    </div>
+    <div class="remit-detail">
+      <div class="rate-box">
+        <div class="rate-row"><span class="rate-label">鎖定日期</span><span class="rate-val">2026-04-28 <span class="rate-locked">🔒</span></span></div>
+        <div class="rate-row"><span class="rate-label">鎖定匯率</span><span class="rate-val">1 TWD = 0.2218 RMB（台銀牌告）</span></div>
+        <div class="rate-row"><span class="rate-label">匯差處理</span><span class="rate-val">由台灣方吸收</span></div>
+      </div>
+      <a class="contract-link" href="#">
+        <div class="cl-icon">📄</div>
+        <div class="cl-body">
+          <div class="cl-title">TWN-BJ-2025-003 · 台灣悍草採購框架合約</div>
+          <div class="cl-sub">有效期至 2026-12-31 · 安然管理</div>
+        </div>
+        <span class="cl-status chip chip-ok">有效</span>
+      </a>
+      <div class="tc-actions">
+        <button class="ta-btn ta-ok" onclick="alert('到帳確認已記錄')">✓ 確認到帳</button>
+        <button class="ta-btn ta-fin">記錄匯差</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 匯款 2 -->
+  <div class="remit-card pending">
+    <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="remit-entities">
+        <span class="entity-badge e-bj">北京蕪解</span>
+        <span class="arrow">→</span>
+        <span class="entity-badge e-bkk">泰國 UJ BKK</span>
+      </div>
+      <div class="remit-body">
+        <div class="remit-amount">RMB 280,000 <span style="font-size:10px;color:var(--txt-lo)">≈ THB 1,386,000</span></div>
+        <div class="remit-meta">Q2 備貨預付款 · 銀行處理中</div>
+      </div>
+      <div class="remit-right">
+        <div class="remit-status rs-pending">銀行處理中</div>
+        <div class="remit-eta">ETA 5/5～5/7</div>
+      </div>
+    </div>
+    <div class="remit-detail">
+      <div class="rate-box">
+        <div class="rate-row"><span class="rate-label">鎖定日期</span><span class="rate-val">2026-04-30 <span class="rate-locked">🔒</span></span></div>
+        <div class="rate-row"><span class="rate-label">鎖定匯率</span><span class="rate-val">1 RMB = 4.95 THB（實際成交）</span></div>
+        <div class="rate-row"><span class="rate-label">匯差處理</span><span class="rate-val">各自吸收 50%</span></div>
+      </div>
+      <a class="contract-link" href="#">
+        <div class="cl-icon">📄</div>
+        <div class="cl-body">
+          <div class="cl-title">BJ-BKK-2026-001 · 北京→泰國備貨調撥合約</div>
+          <div class="cl-sub">有效期至 2026-09-30 · 安然管理</div>
+        </div>
+        <span class="cl-status chip chip-ok">有效</span>
+      </a>
+      <div class="tc-actions">
+        <button class="ta-btn ta-fin" onclick="alert('已聯繫銀行查詢進度')">查詢銀行進度</button>
+        <button class="ta-btn ta-grey">通知 Shawn</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 匯款 3 — 缺合約 -->
+  <div class="remit-card needs-contract">
+    <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
+      <div class="remit-entities">
+        <span class="entity-badge e-hk">香港 JV</span>
+        <span class="arrow">→</span>
+        <span class="entity-badge e-bj">北京蕪解</span>
+      </div>
+      <div class="remit-body">
+        <div class="remit-amount">HKD 150,000 <span style="font-size:10px;color:var(--txt-lo)">≈ RMB 138,000</span></div>
+        <div class="remit-meta">JV 首筆資本注入 · 待合約支撐</div>
+      </div>
+      <div class="remit-right">
+        <div class="remit-status rs-contract">⚠ 缺合約</div>
+        <div class="remit-eta">外管局可能攔截</div>
+      </div>
+    </div>
+    <div class="remit-detail">
+      <div style="background:var(--danger-dim);border:1px solid #ef444430;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--danger);line-height:1.6;">
+        ⚠ 此筆匯款目前沒有對應的貿易/服務合約。跨境人民幣匯款無合同支撐，大陸外管局有機率攔截退款，請在匯款前聯繫安然補簽合約。
+      </div>
+      <div class="rate-box">
+        <div class="rate-row"><span class="rate-label">預計鎖定匯率</span><span class="rate-val">待建立 <span class="rate-warn">⚠ 尚未鎖定</span></span></div>
+        <div class="rate-row"><span class="rate-label">結算幣別</span><span class="rate-val">RMB（建議）</span></div>
+      </div>
+      <div class="tc-actions">
+        <button class="ta-btn ta-warn" onclick="alert('已通知安然補簽 HK→BJ 服務合約')">→ 通知安然補合約</button>
+        <button class="ta-btn ta-grey">暫緩匯款</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 代墊款追蹤 -->
+  <div class="sec-hdr" style="margin-top:8px">
+    <div class="sec-title">代墊款追蹤</div>
+    <span class="sec-link" onclick="openAdvanceModal()">+ 新增代墊</span>
+  </div>
+
+  <div class="advance-card" id="adv-1">
+    <div class="advance-row">
+      <div class="adv-entities">
+        <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
+        <span style="font-size:10px;color:var(--txt-lo);margin:0 4px">代墊</span>
+        <span class="entity-badge e-bkk" style="font-size:9px">泰國 UJ BKK</span>
+      </div>
+      <div class="adv-body" style="margin-left:10px">
+        <div class="adv-amount">TWD 100,000 <span style="font-size:9px;color:var(--txt-lo)">≈ THB 109,000</span></div>
+        <div class="adv-meta">曼谷展場費代墊 · 鎖定 4/15 台銀匯率 1 TWD=1.09 THB <span style="color:var(--ok)">🔒</span></div>
+      </div>
+      <div class="adv-right">
+        <div class="adv-due soon">5/15 還款</div>
+        <div class="adv-locked" style="margin-top:2px">匯率已鎖定</div>
+        <button class="adv-settle-btn" onclick="openSettleModal('adv-1','台灣悍草','泰國 UJ BKK','TWD','THB',100000,1.09,'曼谷展場費代墊')">核銷</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="advance-card" id="adv-2">
+    <div class="advance-row">
+      <div class="adv-entities">
+        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+        <span style="font-size:10px;color:var(--txt-lo);margin:0 4px">代墊</span>
+        <span class="entity-badge e-sz" style="font-size:9px">深圳子公司</span>
+      </div>
+      <div class="adv-body" style="margin-left:10px">
+        <div class="adv-amount">RMB 45,000</div>
+        <div class="adv-meta">深圳辦公室押金代墊 · 同幣別無匯差</div>
+      </div>
+      <div class="adv-right">
+        <div class="adv-due overdue">逾期 5 天</div>
+        <button class="adv-settle-btn" onclick="openSettleModal('adv-2','北京蕪解','深圳子公司','RMB','RMB',45000,1,'深圳辦公室押金代墊')">核銷</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 跨實體資產負債一覽 -->
+  <div class="sec-hdr" style="margin-top:20px">
+    <div class="sec-title">跨實體資產負債一覽</div>
+    <span class="sec-link" id="balance-toggle" onclick="toggleBalanceDetail()">展開明細</span>
+  </div>
+
+  <div class="balance-summary">
+    <div class="bs-row">
+      <div class="bs-entities">
+        <span class="entity-badge e-bkk" style="font-size:9px">泰國 UJ BKK</span>
+        <span class="bs-dir owed">欠</span>
+        <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
+      </div>
+      <div style="flex:1;padding:0 8px">
+        <div class="bs-amt">TWD 100,000</div>
+        <div class="bs-note">曼谷展場費代墊 · 到期 5/15</div>
+      </div>
+      <button class="bs-settle-btn" onclick="openSettleModal('adv-1','台灣悍草','泰國 UJ BKK','TWD','THB',100000,1.09,'曼谷展場費代墊')">核銷</button>
+    </div>
+    <div class="bs-row">
+      <div class="bs-entities">
+        <span class="entity-badge e-sz" style="font-size:9px">深圳子公司</span>
+        <span class="bs-dir owed">欠</span>
+        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+      </div>
+      <div style="flex:1;padding:0 8px">
+        <div class="bs-amt">RMB 45,000</div>
+        <div class="bs-note">辦公室押金代墊 · <span style="color:var(--danger)">逾期 5 天</span></div>
+      </div>
+      <button class="bs-settle-btn" onclick="openSettleModal('adv-2','北京蕪解','深圳子公司','RMB','RMB',45000,1,'深圳辦公室押金代墊')">核銷</button>
+    </div>
+    <div class="bs-row">
+      <div class="bs-entities">
+        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+        <span class="bs-dir owed">欠</span>
+        <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
+      </div>
+      <div style="flex:1;padding:0 8px">
+        <div class="bs-amt">TWD 420,000</div>
+        <div class="bs-note">Q1 貨款 · <span style="color:var(--ok)">今天到帳確認中</span></div>
+      </div>
+      <button class="bs-settle-btn" onclick="alert('此筆由匯款追蹤管理，請在「跨境匯款追蹤」確認到帳')">查看</button>
+    </div>
+    <div class="bs-row">
+      <div class="bs-entities">
+        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+        <span class="bs-dir recv">待收</span>
+        <span class="entity-badge e-hk" style="font-size:9px">香港 JV</span>
+      </div>
+      <div style="flex:1;padding:0 8px">
+        <div class="bs-amt">HKD 150,000</div>
+        <div class="bs-note">JV 首筆資本注入 · <span style="color:var(--danger)">待合約補簽</span></div>
+      </div>
+      <button class="bs-settle-btn" onclick="alert('此筆缺合約，請先通知安然補簽')">補合約</button>
+    </div>
+  </div>
+
+  <!-- 各實體淨部位（預設收起） -->
+  <div id="balance-detail" style="display:none">
+    <div class="balance-grid">
+      <div class="balance-entity-card">
+        <div class="bec-header">
+          <span class="entity-badge e-bj" style="font-size:10px">北京蕪解</span>
+          <span class="bec-net negative">淨欠出 RMB 68,000</span>
+        </div>
+        <div class="bec-rows">
+          <div class="bec-row"><span class="bec-peer">應付 台灣悍草</span><span class="bec-amt owed">−RMB 93,156</span></div>
+          <div class="bec-row"><span class="bec-peer">應收 深圳子公司</span><span class="bec-amt recv">+RMB 45,000</span></div>
+          <div class="bec-row"><span class="bec-peer">應付 泰國BKK（在途）</span><span class="bec-amt owed">−RMB 19,844</span></div>
+        </div>
+      </div>
+      <div class="balance-entity-card">
+        <div class="bec-header">
+          <span class="entity-badge e-tw" style="font-size:10px">台灣悍草</span>
+          <span class="bec-net positive">淨應收 TWD 520,000</span>
+        </div>
+        <div class="bec-rows">
+          <div class="bec-row"><span class="bec-peer">應收 北京蕪解</span><span class="bec-amt recv">+TWD 420,000</span></div>
+          <div class="bec-row"><span class="bec-peer">應收 泰國BKK</span><span class="bec-amt recv">+TWD 100,000</span></div>
+        </div>
+      </div>
+      <div class="balance-entity-card">
+        <div class="bec-header">
+          <span class="entity-badge e-bkk" style="font-size:10px">泰國 UJ BKK</span>
+          <span class="bec-net negative">淨欠出 TWD 100,000</span>
+        </div>
+        <div class="bec-rows">
+          <div class="bec-row"><span class="bec-peer">欠 台灣悍草</span><span class="bec-amt owed">−TWD 100,000</span></div>
+          <div class="bec-row"><span class="bec-peer">應收 北京蕪解（在途）</span><span class="bec-amt recv">+RMB 280,000</span></div>
+        </div>
+      </div>
+      <div class="balance-entity-card">
+        <div class="bec-header">
+          <span class="entity-badge e-hk" style="font-size:10px">香港 JV</span>
+          <span class="bec-net negative">淨欠出 HKD 150,000</span>
+        </div>
+        <div class="bec-rows">
+          <div class="bec-row"><span class="bec-peer">欠 北京蕪解</span><span class="bec-amt owed">−HKD 150,000</span></div>
+          <div class="bec-row" style="color:var(--danger);font-size:10px">⚠ 待合約補簽</div>
+        </div>
+      </div>
+    </div>
+    <div class="balance-entity-card" style="margin-bottom:8px">
+      <div class="bec-header">
+        <span class="entity-badge e-sz" style="font-size:10px">深圳子公司</span>
+        <span class="bec-net negative">淨欠出 RMB 45,000</span>
+      </div>
+      <div class="bec-rows" style="border-top:none;padding-top:0">
+        <div class="bec-row"><span class="bec-peer">欠 北京蕪解</span><span class="bec-amt owed">−RMB 45,000 <span style="color:var(--danger);font-size:9px">逾期</span></span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- NEW REMITTANCE MODAL -->
+<div class="modal-overlay" id="remit-modal" onclick="if(event.target===this)closeModal('remit-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">新增跨境匯款記錄</div>
+    <div class="modal-sub">建立記錄時鎖定當日匯率，確保對帳有絕對基準，不因後續匯率變動產生爭議。</div>
+    <div class="mrow">
+      <div class="mf">
+        <label>付款方</label>
+        <select id="r-from">
+          <option>北京蕪解</option><option>台灣悍草</option>
+          <option>香港 JV</option><option>深圳子公司</option><option>泰國 UJ BKK</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>收款方</label>
+        <select id="r-to">
+          <option>台灣悍草</option><option>北京蕪解</option>
+          <option>香港 JV</option><option>深圳子公司</option><option>泰國 UJ BKK</option>
+        </select>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mf">
+        <label>金額</label>
+        <input id="r-amount" type="number" placeholder="例：420000" oninput="calcRate()">
+      </div>
+      <div class="mf">
+        <label>付款幣別</label>
+        <select id="r-currency" onchange="calcRate()">
+          <option value="TWD">TWD 台幣</option>
+          <option value="RMB">RMB 人民幣</option>
+          <option value="HKD">HKD 港幣</option>
+          <option value="THB">THB 泰銖</option>
+        </select>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mf">
+        <label>結算基準幣別</label>
+        <select id="r-base" onchange="calcRate()">
+          <option value="RMB">RMB 人民幣</option>
+          <option value="TWD">TWD 台幣</option>
+          <option value="HKD">HKD 港幣</option>
+          <option value="THB">THB 泰銖</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>匯率來源</label>
+        <select id="r-rate-src">
+          <option>台銀牌告匯率</option>
+          <option>實際成交匯率</option>
+          <option>協議固定匯率</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <label>今日參考匯率（將鎖定）</label>
+      <input id="r-rate" type="number" step="0.0001" placeholder="例：0.2218" oninput="calcRate()">
+      <div id="rate-preview" class="rate-preview" style="display:none"></div>
+      <div class="rate-lock-note">🔒 建立後匯率鎖定，還款金額固定，不受後續匯率波動影響</div>
+    </div>
+    <div class="mf">
+      <label>匯差由誰吸收</label>
+      <select id="r-diff">
+        <option>付款方吸收</option>
+        <option>收款方吸收</option>
+        <option>各自吸收 50%</option>
+        <option>協議另定</option>
+      </select>
+    </div>
+    <div class="mf">
+      <label>對應合約</label>
+      <select id="r-contract">
+        <option value="">— 選擇合約（必填）—</option>
+        <option>TWN-BJ-2025-003 · 台灣悍草採購框架合約</option>
+        <option>BJ-BKK-2026-001 · 北京→泰國備貨調撥合約</option>
+        <option>BJ-SZ-2026-002 · 深圳子公司資金調撥協議</option>
+        <option value="none">⚠ 暫無合約（需通知安然補簽）</option>
+      </select>
+    </div>
+    <div class="mf">
+      <label>備注</label>
+      <input id="r-note" placeholder="例：Q1 貨款、展場代墊、資本注入...">
+    </div>
+    <div class="mf">
+      <label>預計到帳日期</label>
+      <input id="r-eta" type="date">
+    </div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="saveRemit()">建立並鎖定匯率</button>
+      <button class="mbtn ghost" onclick="closeModal('remit-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTLEMENT MODAL -->
+<div class="modal-overlay" id="settle-modal" onclick="if(event.target===this)closeModal('settle-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">代墊款核銷</div>
+    <div class="modal-sub" id="settle-sub">計算還款日匯率差異，自動生成匯兌損益分錄。</div>
+
+    <div class="rate-box" id="settle-locked-box" style="margin-bottom:12px">
+      <div class="rate-row"><span class="rate-label">代墊方</span><span class="rate-val" id="settle-from-name">—</span></div>
+      <div class="rate-row"><span class="rate-label">被代墊方</span><span class="rate-val" id="settle-to-name">—</span></div>
+      <div class="rate-row"><span class="rate-label">原始金額</span><span class="rate-val" id="settle-orig-amt">—</span></div>
+      <div class="rate-row"><span class="rate-label">鎖定匯率（發生日）</span><span class="rate-val" id="settle-locked-rate">— <span class="rate-locked">🔒</span></span></div>
+      <div class="rate-row"><span class="rate-label">鎖定應還金額</span><span class="rate-val" id="settle-locked-result" style="color:var(--ok)">—</span></div>
+    </div>
+
+    <div id="settle-same-currency-note" style="display:none;background:var(--ok-dim);border:1px solid #22c55e30;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--ok);">
+      ✓ 同幣別代墊，無匯率風險，直接核銷原始金額即可。
+    </div>
+
+    <div id="settle-rate-section">
+      <div class="mf">
+        <label>還款日實際匯率（今日）</label>
+        <input id="settle-actual-rate" type="number" step="0.0001" placeholder="輸入今日匯率" oninput="calcSettleDiff()">
+        <div style="font-size:10px;color:var(--txt-lo);margin-top:4px">用於計算匯兌差額，不影響鎖定金額</div>
+      </div>
+      <div id="settle-diff-box" class="rate-box" style="display:none;margin-bottom:12px">
+        <div class="rate-row"><span class="rate-label">按今日匯率還款金額</span><span class="rate-val" id="settle-today-amt">—</span></div>
+        <div class="rate-row"><span class="rate-label">鎖定應還金額</span><span class="rate-val" id="settle-locked-amt2">—</span></div>
+        <div class="rate-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px">
+          <span class="rate-label" style="font-weight:700">匯兌損益</span>
+          <span class="rate-val" id="settle-diff-amt" style="font-size:14px;font-weight:800">—</span>
+        </div>
+        <div class="rate-row"><span class="rate-label">損益歸屬</span><span class="rate-val" id="settle-diff-owner">—</span></div>
+      </div>
+    </div>
+
+    <div class="mf">
+      <label>匯兌差額由誰吸收</label>
+      <select id="settle-absorb">
+        <option>代墊方吸收（台灣悍草/北京蕪解）</option>
+        <option>被代墊方吸收</option>
+        <option>各自吸收 50%</option>
+        <option>協議另定</option>
+      </select>
+    </div>
+    <div class="mf">
+      <label>核銷備注</label>
+      <input id="settle-note" placeholder="例：5月結算、雙方確認">
+    </div>
+    <div id="settle-diff-summary" style="display:none;background:var(--card2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--txt-mid);line-height:1.8"></div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="confirmSettle()">確認核銷並記帳</button>
+      <button class="mbtn ghost" onclick="closeModal('settle-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCE MODAL -->
+<div class="modal-overlay" id="advance-modal" onclick="if(event.target===this)closeModal('advance-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">新增代墊款記錄</div>
+    <div class="modal-sub">建立時鎖定幣別與匯率，還款日金額有絕對基準。</div>
+    <div class="mrow">
+      <div class="mf"><label>代墊方</label>
+        <select><option>北京蕪解</option><option>台灣悍草</option><option>香港 JV</option><option>泰國 UJ BKK</option></select>
+      </div>
+      <div class="mf"><label>被代墊方</label>
+        <select><option>泰國 UJ BKK</option><option>北京蕪解</option><option>台灣悍草</option><option>深圳子公司</option></select>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mf"><label>代墊金額 + 幣別</label><input type="number" placeholder="100000"></div>
+      <div class="mf"><label>幣別</label>
+        <select><option>TWD</option><option>RMB</option><option>HKD</option><option>THB</option></select>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mf"><label>結算基準幣別</label>
+        <select><option>TWD</option><option>RMB</option><option>THB</option></select>
+      </div>
+      <div class="mf"><label>當日參考匯率（鎖定）</label><input type="number" step="0.0001" placeholder="例：0.2218"></div>
+    </div>
+    <div class="mrow">
+      <div class="mf"><label>代墊原因</label><input placeholder="例：展場費、墊付押金..."></div>
+      <div class="mf"><label>預計還款日</label><input type="date"></div>
+    </div>
+    <div class="m-actions">
+      <button class="mbtn primary" onclick="closeModal('advance-modal');showToast('✅ 代墊款記錄已建立，匯率已鎖定')">建立並鎖定匯率</button>
+      <button class="mbtn ghost" onclick="closeModal('advance-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(!s||Date.now()-s.ts>7*86400000){location.replace('login.html');return null;}
+  return s;
+}
+const SESS = requireAuth();
+if(SESS){
+  document.getElementById('tb-name').textContent = SESS.name;
+  const d = new Date();
+  const wd = ['日','一','二','三','四','五','六'];
+  document.getElementById('today-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 星期${wd[d.getDay()]}`;
+  document.getElementById('today-title').textContent = `${SESS.name}，今天有 3 件財務待辦`;
+}
+
+// 匯率即時計算預覽
+function calcRate(){
+  const amt = parseFloat(document.getElementById('r-amount').value)||0;
+  const rate = parseFloat(document.getElementById('r-rate').value)||0;
+  const from = document.getElementById('r-currency').value;
+  const to = document.getElementById('r-base').value;
+  const preview = document.getElementById('rate-preview');
+  if(amt && rate && from !== to){
+    const result = (amt * rate).toLocaleString('zh-TW',{maximumFractionDigits:0});
+    preview.style.display = 'block';
+    preview.innerHTML = `${from} ${amt.toLocaleString()} × ${rate} = <strong>${to} ${result}</strong>
+<br><span style="font-size:10px;color:var(--txt-lo)">此金額將作為還款基準，不因未來匯率變動調整</span>`;
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function openNewRemitModal(){
+  const d = new Date(); d.setDate(d.getDate()+3);
+  document.getElementById('r-eta').value = d.toISOString().slice(0,10);
+  document.getElementById('remit-modal').classList.add('open');
+}
+function openAdvanceModal(){ document.getElementById('advance-modal').classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function saveRemit(){
+  const contract = document.getElementById('r-contract').value;
+  if(!contract){ alert('請選擇對應合約。若暫無合約請選「暫無合約」並通知安然補簽。'); return; }
+  if(contract === 'none') showToast('⚠ 記錄已建立，已標記待安然補簽合約');
+  else showToast('✅ 匯款記錄已建立，匯率鎖定完成');
+  closeModal('remit-modal');
+}
+
+function markTaskDone(btn, id){
+  const card = btn.closest('.task-card');
+  card.classList.add('done');
+  showToast('✅ 已完成');
+}
+
+function toggleBalanceDetail(){
+  const detail = document.getElementById('balance-detail');
+  const btn = document.getElementById('balance-toggle');
+  const open = detail.style.display === 'none';
+  detail.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? '收起明細' : '展開明細';
+}
+
+let _settleData = {};
+function openSettleModal(cardId, fromName, toName, fromCcy, toCcy, origAmt, lockedRate, desc){
+  _settleData = {cardId, fromName, toName, fromCcy, toCcy, origAmt, lockedRate, desc};
+  const sameCcy = fromCcy === toCcy;
+  const lockedResult = sameCcy ? origAmt : origAmt * lockedRate;
+  const lockedLabel = sameCcy ? `${fromCcy} ${origAmt.toLocaleString()}` : `${toCcy} ${lockedResult.toLocaleString('zh-TW',{maximumFractionDigits:0})}`;
+
+  document.getElementById('settle-sub').textContent = `${desc} · ${fromCcy} ${origAmt.toLocaleString()} → ${toCcy}`;
+  document.getElementById('settle-from-name').textContent = fromName;
+  document.getElementById('settle-to-name').textContent = toName;
+  document.getElementById('settle-orig-amt').textContent = `${fromCcy} ${origAmt.toLocaleString()}`;
+  document.getElementById('settle-locked-rate').innerHTML = sameCcy
+    ? `同幣別，無需換算 <span class="rate-locked">✓</span>`
+    : `1 ${fromCcy} = ${lockedRate} ${toCcy} <span class="rate-locked">🔒</span>`;
+  document.getElementById('settle-locked-result').textContent = lockedLabel;
+
+  document.getElementById('settle-same-currency-note').style.display = sameCcy ? 'block' : 'none';
+  document.getElementById('settle-rate-section').style.display = sameCcy ? 'none' : 'block';
+  document.getElementById('settle-diff-box').style.display = 'none';
+  document.getElementById('settle-diff-summary').style.display = 'none';
+  document.getElementById('settle-actual-rate').value = '';
+
+  document.getElementById('settle-modal').classList.add('open');
+}
+
+function calcSettleDiff(){
+  const d = _settleData;
+  const actualRate = parseFloat(document.getElementById('settle-actual-rate').value)||0;
+  if(!actualRate) { document.getElementById('settle-diff-box').style.display='none'; return; }
+
+  const lockedAmt = d.origAmt * d.lockedRate;
+  const todayAmt = d.origAmt * actualRate;
+  const diff = todayAmt - lockedAmt;
+  const diffAbs = Math.abs(diff).toLocaleString('zh-TW',{maximumFractionDigits:0});
+  const isGain = diff > 0;
+
+  document.getElementById('settle-today-amt').textContent = `${d.toCcy} ${todayAmt.toLocaleString('zh-TW',{maximumFractionDigits:0})}（今日匯率）`;
+  document.getElementById('settle-locked-amt2').textContent = `${d.toCcy} ${lockedAmt.toLocaleString('zh-TW',{maximumFractionDigits:0})}（鎖定金額）`;
+  const diffEl = document.getElementById('settle-diff-amt');
+  diffEl.textContent = `${isGain ? '+' : '−'}${d.toCcy} ${diffAbs}`;
+  diffEl.style.color = isGain ? 'var(--ok)' : 'var(--danger)';
+  document.getElementById('settle-diff-owner').textContent = isGain ? `${d.fromName} 匯兌收益` : `${d.fromName} 匯兌損失`;
+
+  const summaryEl = document.getElementById('settle-diff-summary');
+  if(Math.abs(diff) < 1){
+    summaryEl.style.display='none';
+  } else {
+    summaryEl.style.display='block';
+    summaryEl.innerHTML = `<strong style="color:var(--txt-hi)">自動分錄建議：</strong><br>
+借：應收帳款（${d.toName}）${d.toCcy} ${lockedAmt.toLocaleString('zh-TW',{maximumFractionDigits:0})}<br>
+貸：現金/銀行存款 ${d.toCcy} ${todayAmt.toLocaleString('zh-TW',{maximumFractionDigits:0})}<br>
+${isGain
+  ? `借：現金差額 ${d.toCcy} ${diffAbs}　→　貸：<span style="color:var(--ok)">匯兌收益</span>`
+  : `借：<span style="color:var(--danger)">匯兌損失</span> ${d.toCcy} ${diffAbs}　→　貸：應付差額`}`;
+  }
+  document.getElementById('settle-diff-box').style.display='block';
+}
+
+function confirmSettle(){
+  const actualRate = parseFloat(document.getElementById('settle-actual-rate').value)||0;
+  const d = _settleData;
+  const sameCcy = d.fromCcy === d.toCcy;
+  if(!sameCcy && !actualRate){ alert('請輸入今日實際匯率，用於計算匯兌損益'); return; }
+  closeModal('settle-modal');
+  const lockedAmt = d.origAmt * d.lockedRate;
+  const todayAmt = sameCcy ? d.origAmt : d.origAmt * actualRate;
+  const diff = todayAmt - lockedAmt;
+  const msg = sameCcy
+    ? `✅ 核銷完成：${d.desc} ${d.fromCcy} ${d.origAmt.toLocaleString()}，無匯差，已記帳。`
+    : `✅ 核銷完成：${d.desc}，匯兌${diff >= 0 ? '收益' : '損失'} ${d.toCcy} ${Math.abs(diff).toLocaleString('zh-TW',{maximumFractionDigits:0})}，分錄已生成。`;
+  showToast(msg);
+  const card = document.getElementById(d.cardId);
+  if(card){ card.style.opacity='.45'; card.style.pointerEvents='none'; }
+}
+
+function showToast(msg){
+  let t=document.getElementById('fin-toast');
+  if(!t){t=document.createElement('div');t.id='fin-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+</script>
+</body>
+</html>

@@ -103,13 +103,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* ── TODO LIST ── */
 .todo-list{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
-.todo-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.todo-item{padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;}
 .todo-item:last-child{border-bottom:none;padding-bottom:0;}
+.todo-item:hover{background:var(--card2);}
+.todo-item-top{display:flex;align-items:flex-start;gap:10px;}
 .todo-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
 .todo-body{flex:1;min-width:0;}
 .todo-title{font-size:12px;font-weight:700;margin-bottom:2px;}
 .todo-sub{font-size:10px;color:var(--txt-mid);}
 .todo-badge{flex-shrink:0;}
+.todo-detail{display:none;margin-top:8px;padding:10px 12px;background:var(--card2);border-radius:8px;font-size:11px;color:var(--txt-mid);line-height:1.7;}
+.todo-detail.open{display:block;}
+.todo-detail-text{margin-bottom:10px;}
+.todo-actions{display:flex;flex-wrap:wrap;gap:6px;}
+.tda-btn{font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid;cursor:pointer;transition:opacity .15s;}
+.tda-btn:hover{opacity:.8;}
+.tda-ok{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
+.tda-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.tda-grey{background:var(--card);border-color:var(--border);color:var(--txt-mid);}
 
 /* ── AI BANNER ── */
 .ai-banner{background:linear-gradient(135deg,#4f46e515,#818cf810);border:1px solid #4f46e540;border-radius:12px;padding:16px 20px;margin-top:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .2s;}
@@ -134,6 +145,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   .user-pill{display:none;}
 }
 </style>
+<script src="mock-data.js"></script>
 </head>
 <body>
 
@@ -147,6 +159,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
   <div class="topbar-right">
+    <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 大廳</a>
     <div class="user-pill" id="user-pill">載入中</div>
     <a class="btn-topbar" href="erp-war-room.html">← 戰情室</a>
     <button class="btn-topbar" onclick="location.href='login.html'">切換帳號</button>
@@ -158,17 +171,17 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 <div class="main">
 
   <!-- ① KPI 三大卡 -->
-  <div class="sec-head"><span class="sec-title">北京業績總覽 · 安然核心指標</span></div>
+  <div class="sec-head"><span class="sec-title">全集團業績總覽 · 安然核心指標</span><span style="font-size:10px;color:var(--txt-lo);margin-left:8px;">北京蕪解 · UJ BKK · 台灣悍草 · 香港JV · 深圳子公司</span></div>
   <div class="kpi-row">
 
     <div class="kpi-card">
-      <div class="kpi-label">本月業績（北京批發）</div>
+      <div class="kpi-label">本月業績（集團批發合計）</div>
       <div class="kpi-val" id="kpi-rev" style="color:var(--warn)">¥ 328 萬</div>
-      <div class="kpi-sub" id="kpi-rev-sub">目標 ¥450 萬</div>
+      <div class="kpi-sub" id="kpi-rev-sub">目標 ¥450 萬（Shawn 預算表）</div>
       <span class="kpi-trend trend-warn" id="kpi-rev-trend">73% 達成</span>
       <div class="prog"><div id="kpi-rev-bar" class="prog-fill" style="width:73%;background:var(--warn)"></div></div>
       <div class="kpi-footer">
-        <span>北京蕪解批發</span>
+        <span>集團批發合計</span>
         <span>5 月目標 450 萬</span>
       </div>
     </div>
@@ -366,40 +379,79 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
       <div class="todo-list" style="background:transparent;border:none;padding:0;margin:0;">
 
-        <div class="todo-item">
-          <div class="todo-icon">🔔</div>
-          <div class="todo-body">
-            <div class="todo-title">LOG-ON 尾款催收</div>
-            <div class="todo-sub">逾期 3 天 · ¥ 180,000 尾款未到帳</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">🔔</div>
+            <div class="todo-body">
+              <div class="todo-title">LOG-ON 尾款催收</div>
+              <div class="todo-sub">逾期 3 天 · ¥ 180,000 尾款未到帳</div>
+            </div>
+            <div class="todo-badge"><span class="chip chip-danger">緊急</span></div>
           </div>
-          <div class="todo-badge"><span class="chip chip-danger">緊急</span></div>
+          <div class="todo-detail">
+            <div class="todo-detail-text">訂單 #BJ-2026-038 · 深圳 LOG-ON · Opanchu 80箱<br>應收 ¥180,000 尾款，付款期限 4/29 已逾期 3 天。<br>德寶負責跟進，建議直接電話催付。</div>
+            <div class="todo-actions">
+              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已催款';this.disabled=true">✓ 已催款，記錄</button>
+              <button class="tda-btn tda-warn" onclick="event.stopPropagation()">轉交德寶跟進</button>
+              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">上報 Ray</button>
+            </div>
+          </div>
         </div>
 
-        <div class="todo-item">
-          <div class="todo-icon">📝</div>
-          <div class="todo-body">
-            <div class="todo-title">Opanchu 續約洽談啟動</div>
-            <div class="todo-sub">4 個月後到期 · 需提前洽談續約</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">📝</div>
+            <div class="todo-body">
+              <div class="todo-title">Opanchu 續約洽談啟動</div>
+              <div class="todo-sub">4 個月後到期 · 需提前洽談續約</div>
+            </div>
+            <div class="todo-badge"><span class="chip chip-warn">重要</span></div>
           </div>
-          <div class="todo-badge"><span class="chip chip-warn">重要</span></div>
+          <div class="todo-detail">
+            <div class="todo-detail-text">Opanchu 授權到期：2026/09/30<br>建議最遲 6 月啟動洽談，留 3 個月談判空間。<br>現行：MG ¥20 萬 / 年，抽成 12%，大陸+台灣。<br>目標：爭取延長至 3 年並加入東南亞市場。</div>
+            <div class="todo-actions">
+              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已啟動';this.disabled=true">✓ 已聯繫版權方</button>
+              <button class="tda-btn tda-warn" onclick="event.stopPropagation()">下週再啟動</button>
+              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">需 Ray 先拍板方向</button>
+            </div>
+          </div>
         </div>
 
-        <div class="todo-item">
-          <div class="todo-icon">📊</div>
-          <div class="todo-body">
-            <div class="todo-title">5 月批發業績彙整 → 送 Shawn</div>
-            <div class="todo-sub">5/10 前完成 · 包含所有批發訂單明細</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">📊</div>
+            <div class="todo-body">
+              <div class="todo-title">5 月批發業績彙整 → 送 Shawn</div>
+              <div class="todo-sub">5/10 前完成 · 包含所有批發訂單明細</div>
+            </div>
+            <div class="todo-badge"><span class="chip chip-info">5/10 前</span></div>
           </div>
-          <div class="todo-badge"><span class="chip chip-info">5/10 前</span></div>
+          <div class="todo-detail">
+            <div class="todo-detail-text">每月 10 日前整理上月批發訂單彙整表送 Shawn。<br>內容：訂單列表、收款狀態、未出貨訂單、本月預測。<br>目前已確認 8 筆，尚有 3 筆等確認。</div>
+            <div class="todo-actions">
+              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已送出';this.disabled=true">✓ 已送 Shawn</button>
+              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">今天完成</button>
+              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">需延至 5/12</button>
+            </div>
+          </div>
         </div>
 
-        <div class="todo-item">
-          <div class="todo-icon">🤝</div>
-          <div class="todo-body">
-            <div class="todo-title">上海客戶新詢盤跟進</div>
-            <div class="todo-sub">老董出差回來後確認 · 2 家新詢盤待回覆</div>
+        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+          <div class="todo-item-top">
+            <div class="todo-icon">🤝</div>
+            <div class="todo-body">
+              <div class="todo-title">上海客戶新詢盤跟進</div>
+              <div class="todo-sub">老董出差回來後確認 · 2 家新詢盤待回覆</div>
+            </div>
+            <div class="todo-badge"><span class="chip chip-grey">待確認</span></div>
           </div>
-          <div class="todo-badge"><span class="chip chip-grey">待確認</span></div>
+          <div class="todo-detail">
+            <div class="todo-detail-text">上海玩具展帶回 2 家新詢盤：<br>① 上海美陳（IP周邊零售）— 問 Snoopy + Mofusand<br>② 虹橋 IP 精選（快閃場地）— 問場地合作條件<br>老董今天回北京，確認後填入 CRM。</div>
+            <div class="todo-actions">
+              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已填入CRM';this.disabled=true">✓ 已填入 CRM</button>
+              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">等老董回覆</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -551,6 +603,8 @@ async function tok(){
   return _tok;
 }
 async function query(tbl,extra=''){
+  const mock = window._mockCheck && window._mockCheck(tbl);
+  if(mock) return mock;
   const t=await tok();
   const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,
     {headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
@@ -704,5 +758,128 @@ async function loadOrdersFromFeishu(){
 checkContractExpiry();
 loadOrdersFromFeishu();
 </script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
 </body>
 </html>

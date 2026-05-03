@@ -150,6 +150,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   .kpi-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
+<script src="mock-data.js"></script>
 </head>
 <body>
 
@@ -164,10 +165,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <span class="sess-name" id="sess-name">—</span>
       <span class="sess-role" id="sess-role"></span>
     </div>
-    <a class="nav-back" href="erp-war-room.html">⌂ 戰情室</a>
-    <button class="btn-topbar" onclick="switchAccount()">切換帳號</button>
+    <a href="erp-lobby.html" class="btn-topbar">← 大廳</a>
     <button class="btn-topbar danger" onclick="doLogout()">登出</button>
-    <a class="btn-topbar" href="erp-war-room.html">← 戰情室</a>
   </div>
 </div>
 
@@ -254,9 +253,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           </tr>
         </tbody>
       </table>
+      <!-- 箱規資訊 -->
+      <div style="background:var(--card2);border-radius:10px;padding:12px;margin:10px 0;">
+        <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📦 箱規資訊（供高維報關用）</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">每箱數量</div><input id="po1-box-qty" value="48" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:12px;font-weight:700;color:var(--txt-hi);outline:none;"></div>
+          <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">毛重/箱(kg)</div><input id="po1-box-weight" value="8.5" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:12px;font-weight:700;color:var(--txt-hi);outline:none;"></div>
+          <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">體積/箱(CBM)</div><input id="po1-box-cbm" value="0.12" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:12px;font-weight:700;color:var(--txt-hi);outline:none;"></div>
+          <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">總箱數</div><input id="po1-box-total" value="30" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:12px;font-weight:700;color:var(--txt-hi);outline:none;"></div>
+        </div>
+        <div style="font-size:10px;color:var(--txt-lo);margin-top:6px;">⬆ 工廠確認後填入，高維建立物流批次時自動帶入</div>
+      </div>
       <div class="compare-footer">
         <div class="compare-note">比價完成 · 賴哥確認品質無問題 · 建議即時送審</div>
-        <button class="btn-send-shawn" id="btn-shawn-po1" onclick="sendToShawn('btn-shawn-po1','Snoopy 夏季大貨 PO')">✓ 送 Shawn 審核</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-send-shawn" id="btn-shawn-po1" onclick="sendToShawn('btn-shawn-po1','Snoopy 夏季大貨 PO')">✓ 送 Shawn 審核</button>
+          <button style="background:var(--ok);color:#000;border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;" onclick="notifyGaowei('Snoopy 夏季大貨 PO','PO-318')">🚢 通知高維建立批次</button>
+        </div>
       </div>
     </div>
   </div>
@@ -420,12 +433,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
             <td class="recommended">北京德榮包裝 <span class="recommend-badge">✓ 長期合作</span></td>
             <td class="recommended">¥ 12,000</td>
             <td>禮盒 × 1000 / 提袋 × 2000</td>
-            <td style="color:var(--ok)">✓ 已入庫</td>
+            <td style="color:var(--ok)">✓ 廠端已備妥</td>
           </tr>
         </tbody>
       </table>
       <div class="compare-footer">
-        <div class="compare-note">5/01 已確認入庫 · 張作興簽收</div>
+        <div class="compare-note">5/01 廠端備妥確認 · 張作興核對</div>
       </div>
     </div>
   </div>
@@ -558,6 +571,18 @@ if(!SESS) throw new Error('redirect');
 document.getElementById('sess-name').textContent = SESS.name || '—';
 document.getElementById('sess-role').textContent = SESS.role || '';
 
+// 設計團隊唯讀：隱藏所有寫入操作按鈕
+const DESIGN_READONLY = ['bevis','peilin','shetong'];
+const IS_READONLY = DESIGN_READONLY.includes(SESS.user);
+if(IS_READONLY){
+  document.querySelectorAll('.btn-send-shawn,.btn-send,.upload-zone,.paste-hint,#ai-file').forEach(el=>el.style.display='none');
+  const banner = document.createElement('div');
+  banner.style.cssText='background:#818cf810;border:1px solid #818cf830;border-radius:8px;padding:8px 14px;font-size:11px;color:var(--txt-mid);margin-bottom:16px;';
+  banner.textContent='👁 唯讀視角：你可以查看所有報價與成本資訊，操作功能由採購團隊使用';
+  const main = document.querySelector('.main');
+  if(main) main.prepend(banner);
+}
+
 function doLogout(){
   localStorage.removeItem(ERP_SESS_KEY);
   location.href='login.html';
@@ -580,6 +605,8 @@ async function tok(){
   return _tok;
 }
 async function query(tbl,extra=''){
+  const mock = window._mockCheck && window._mockCheck(tbl);
+  if(mock) return mock;
   const t=await tok();
   const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,
     {headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
@@ -621,6 +648,10 @@ async function loadKPIsFromFeishu(){
 }
 
 /* ── PO TOGGLE ── */
+function notifyGaowei(poName, poNum){
+  alert(`✓ 已通知高維\n《${poName}》箱規已確認\nPO：${poNum}\n\n高維的物流作業台將自動出現此批次卡片（正式版串接後生效）`);
+}
+
 function togglePO(id){
   const panel = document.getElementById(id);
   const toggle = document.getElementById(id+'-toggle');
@@ -727,11 +758,19 @@ async function callGemini(base64, mime){
 
 function renderAiResult(p, container){
   const safe=v=>(v!=null&&v!=='')?""+v:"—";
+  const pid='ai-'+Date.now();
   container.innerHTML=`
   <div style="background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:12px;">
+    <div style="background:#ef444415;border:1px solid #ef444440;border-radius:8px;padding:8px 10px;margin-bottom:10px;display:flex;align-items:flex-start;gap:8px;">
+      <span style="font-size:14px;flex-shrink:0;">⚠️</span>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--danger);margin-bottom:2px;">AI 解析結果 · 尚未寫入飛書主表</div>
+        <div style="font-size:9px;color:var(--txt-mid);">請逐欄確認正確後才能送出。寫入後狀態為「AI草稿-待確認」，不會直接進入 Ray 批核佇列。</div>
+      </div>
+    </div>
     <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
       <span style="background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;">✨ AI 解析完成</span>
-      <span style="font-size:10px;color:var(--warn)">請賴哥確認數字</span>
+      <span style="font-size:10px;color:var(--warn)">請賴哥逐欄確認</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;">
       <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">供應商</div><div style="font-size:12px;font-weight:700;">${safe(p.supplier)}</div></div>
@@ -742,7 +781,11 @@ function renderAiResult(p, container){
       <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">MOQ</div><div style="font-size:12px;font-weight:700;">${safe(p.moq)}</div></div>
     </div>
     ${p.notes?`<div style="font-size:10px;color:var(--txt-mid);margin-bottom:8px;">📝 ${p.notes}</div>`:''}
-    <button onclick="saveAiToCompare(${JSON.stringify(p).replace(/"/g,'&quot;')})" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;">💾 存入比價庫 → 送 Ray</button>
+    <label id="${pid}-chk" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border-radius:8px;cursor:pointer;margin-bottom:8px;border:1px solid var(--border);">
+      <input type="checkbox" id="${pid}-cb" onchange="document.getElementById('${pid}-btn').disabled=!this.checked;document.getElementById('${pid}-btn').style.opacity=this.checked?'1':'0.4';" style="width:16px;height:16px;cursor:pointer;">
+      <span style="font-size:11px;color:var(--txt-mid);">已逐欄確認，AI 解析結果與原始報價單一致</span>
+    </label>
+    <button id="${pid}-btn" disabled onclick="saveAiToCompare(${JSON.stringify(p).replace(/"/g,'&quot;')})" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;opacity:0.4;">💾 確認無誤 · 存入草稿佇列（AI草稿-待確認）</button>
   </div>`;
 }
 
@@ -755,7 +798,7 @@ function saveAiToCompare(p){
     '申請說明': `AI解析報價單\n供應商：${p.supplier||'?'}\n品項：${p.item||'?'}\n總金額：${p.total||'?'} ${p.currency||'RMB'}\n交期：${p.lead_time_days||'?'}天\n付款條件：${p.payment_terms||'?'}`,
     '金額': p.total?Number(String(p.total).replace(/[^0-9.]/g,'')):null,
     '幣別': p.currency||'RMB',
-    '審批狀態': '待審批',
+    '審批狀態': 'AI草稿-待確認',
   };
   Object.keys(fields).forEach(k=>{if(fields[k]===null)delete fields[k];});
   createRec(_T.approval, fields).then(d=>{
@@ -771,5 +814,128 @@ function saveAiToCompare(p){
 /* ── INIT ── */
 loadKPIsFromFeishu();
 </script>
+
+<!-- ── EXPENSE FAB ── -->
+<style>
+.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab:active{transform:scale(.92);}
+.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
+.exp-overlay.open{display:flex;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
+.exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
+.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
+.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
+.exp-field{margin-bottom:12px;}
+.exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
+.exp-field textarea{resize:vertical;font-family:inherit;}
+.exp-amt-row{display:flex;gap:6px;}
+.exp-amt-row input{flex:1;}
+.exp-amt-row select{width:90px;}
+.exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
+.exp-routing strong{color:#10b981;}
+.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+.exp-submit:active{opacity:.85;}
+</style>
+<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
+<div class="exp-sheet">
+  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-type-row" id="expTypeRow">
+    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  </div>
+  <div id="expPersonalFields">
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+  </div>
+  <div id="expSupplierFields" style="display:none">
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+  </div>
+  <div class="exp-routing" id="expRouting">載入中...</div>
+  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+</div>
+</div>
+<script>
+(function(){
+const EXP_ROUTES={
+  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
+  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
+  laodong:{next:'anran',nextLabel:'安然',cc:null},
+  debao:{next:'anran',nextLabel:'安然',cc:null},
+  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
+  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  yangzi:{next:'anran',nextLabel:'安然',cc:null},
+  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  leo:{next:'ray',nextLabel:'Ray',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+};
+const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+let expType='personal';
+function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
+function openExpModal(){
+  const u=getUser();const r=EXP_ROUTES[u];
+  const hint=document.getElementById('expRouting');
+  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
+  else{hint.innerHTML='送審路徑：楊子';}
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  document.getElementById('expDate').valueAsDate=new Date();
+  setExpType('personal');
+  document.getElementById('expOverlay').classList.add('open');
+}
+function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+function setExpType(t){
+  expType=t;
+  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
+  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
+  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+}
+function submitExpense(){
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  let rec;
+  if(expType==='personal'){
+    const amt=document.getElementById('expAmt').value;
+    const ccy=document.getElementById('expCcy').value;
+    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+    const date=document.getElementById('expDate').value;
+    const desc=document.getElementById('expDesc').value;
+    if(!amt||!date){alert('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }else{
+    const name=document.getElementById('expSupName').value;
+    const po=document.getElementById('expSupPO').value;
+    const amt=document.getElementById('expSupAmt').value;
+    const ccy=document.getElementById('expSupCcy').value;
+    const desc=document.getElementById('expSupDesc').value;
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+  }
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  closeExpModal();
+  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+}
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+})();
+</script>
+
 </body>
 </html>
