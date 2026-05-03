@@ -538,6 +538,43 @@ HALLS.filter(h=>h.roles.includes(user)).forEach(h=>{
 function goToHall(){ location.href = effectiveHall; }
 
 // ── Init ──────────────────────────────────────────────
+// Sync pulse KPIs from MOCK_DB if available
+(function syncPulseFromMock(){
+  const db = window.MOCK_DB;
+  if(!db) return;
+
+  // VAM 進度
+  const netRows = (db.budget||[]).filter(r=>String(r.fields["預算科目"]).includes("淨利"));
+  const actual  = netRows.reduce((s,r)=>s+(parseFloat(r.fields["實際金額"])||0),0);
+  const VAM_YR  = 8000000;
+  const vamPct  = Math.round(actual/VAM_YR*100*10)/10;
+  const monthPassed = new Date().getMonth()+1;
+  const expPct  = Math.round(monthPassed/12*100*10)/10;
+  const isAhead = vamPct >= expPct;
+  const el1v = document.getElementById('pulse-c1-val');
+  const el1s = document.getElementById('pulse-c1-sub');
+  const el1b = document.getElementById('pulse-c1-bar');
+  if(el1v){ el1v.textContent = vamPct+'%'; el1v.style.color = isAhead?'var(--ok)':'var(--warn)'; }
+  if(el1s){ el1s.textContent = isAhead?'✅ 超前進度':'⚠ 稍落後進度'; }
+  if(el1b){ el1b.style.cssText = `width:${Math.min(vamPct,100)}%;background:linear-gradient(90deg,${isAhead?'#16a34a,var(--ok)':'#b45309,var(--warn)'})`; }
+
+  // 活躍訂單
+  const activeOrders = (db.sales||[]).filter(r=>r.fields["收款狀態"]!=="全款已收"&&r.fields["收款狀態"]!=="已完結").length;
+  const el2v = document.getElementById('pulse-c2-val');
+  const el2b = document.getElementById('pulse-c2-bar');
+  if(el2v){ el2v.textContent = activeOrders+' 筆'; el2v.style.color='var(--ok)'; }
+  if(el2b){ el2b.style.cssText = `width:${Math.min(activeOrders/15*100,100)}%;background:linear-gradient(90deg,#16a34a,var(--ok))`; }
+
+  // 待批核
+  const pendingAppr = (db.approval||[]).filter(r=>r.fields["審批狀態"]==="待審批").length;
+  const el4v = document.getElementById('pulse-c4-val');
+  const el4s = document.getElementById('pulse-c4-sub');
+  const el4b = document.getElementById('pulse-c4-bar');
+  if(el4v){ el4v.textContent = pendingAppr+' 項'; el4v.style.color = pendingAppr>4?'var(--danger)':'var(--warn)'; }
+  if(el4s){ el4s.textContent = '等待 Ray 決定'; }
+  if(el4b){ el4b.style.cssText = `width:${Math.min(pendingAppr/10*100,100)}%;background:linear-gradient(90deg,#b91c1c,var(--danger))`; }
+})();
+
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
 if(WAR_ROOM_ROLES.includes(user)){
   document.getElementById('war-room-link').style.display = 'block';
