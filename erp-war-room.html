@@ -516,7 +516,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- ④ 待 Ray 批核佇列 -->
   <div class="queue-card">
     <div class="queue-header">
-      <span class="section-title" style="margin:0">待我批核 · Pending Approvals</span>
+      <span class="section-title" style="margin:0" id="queue-section-title">待我批核 · Pending Approvals</span>
       <span class="queue-count" id="queue-badge">載入中...</span>
     </div>
     <div id="approval-queue-inner">
@@ -819,8 +819,9 @@ const _TBLS  = {
 let _tk = null;
 
 /* ── SESSION CHECK ── */
+const _SESS = JSON.parse(localStorage.getItem("erp_sess")||localStorage.getItem("wujie_session")||"null");
 (function(){
-  const s = JSON.parse(localStorage.getItem("erp_sess")||localStorage.getItem("wujie_session")||"null");
+  const s = _SESS;
   if(!s||(s.expires&&Date.now()>s.expires)||(s.ts&&Date.now()-s.ts>7*86400000)){ localStorage.removeItem("erp_sess"); localStorage.removeItem("wujie_session"); location.replace("login.html"); return; }
   const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
   if(!WAR_ROOM_ROLES.includes(s.user)){ location.replace("erp-lobby.html"); return; }
@@ -830,7 +831,6 @@ let _tk = null;
     now.getFullYear()+"年"+(now.getMonth()+1)+"月"+now.getDate()+"日（週"+days[now.getDay()]+"）";
   document.querySelector(".user-chip").innerHTML =
     `<div class="user-av">${s.name.charAt(0)}</div>${s.name}${s.role?`<span style="font-size:10px;color:var(--txt-mid);margin-left:2px">· ${s.role}</span>`:""}`;
-
 })();
 
 /* ── FEISHU TOKEN ── */
@@ -870,22 +870,54 @@ function _fv(f,k){
 async function loadApprovals(){
   const container = document.getElementById("approval-queue-inner");
   if(!container) return;
+  const viewer = _SESS?.user || 'ray';
+
   try{
     const items = await _fetchAll(_TBLS.approval);
-    const pending = items.filter(r=>{
-      const st = _fv(r.fields,"審批狀態");
-      return st==="待審批"||st==="待批核"||st==="待核准";
-    }).sort((a,b)=>{
-      const ta=typeof a.fields["申請日期"]==="number"?a.fields["申請日期"]:0;
-      const tb=typeof b.fields["申請日期"]==="number"?b.fields["申請日期"]:0;
-      return tb-ta;
-    });
+
+    // ── 依登入者決定看什麼 ──
+    let pending, queueTitle, emptyMsg;
+    if(viewer === 'shawn'){
+      // Shawn 的複核佇列：Shawn 尚未複核的項目
+      pending = items.filter(r=>_fv(r.fields,"Shawn複核")==="待複核");
+      queueTitle = "待複核佇列";
+      emptyMsg = "🎉 目前無待複核項目";
+    } else if(viewer === 'anran'){
+      // 安然追蹤自己提交的申請
+      pending = items.filter(r=>["安然","anran"].includes(_fv(r.fields,"申請人")));
+      queueTitle = "我的申請追蹤";
+      emptyMsg = "✅ 目前無進行中的申請";
+    } else if(viewer === 'yuming'){
+      // 躍明看已批准、待財務入帳的項目
+      pending = items.filter(r=>_fv(r.fields,"審批狀態")==="已批准");
+      queueTitle = "財務待入帳";
+      emptyMsg = "🎉 目前無待入帳項目";
+    } else {
+      // Ray：所有待審批，Shawn 已複核的排前面
+      pending = items.filter(r=>{
+        const st = _fv(r.fields,"審批狀態");
+        return st==="待審批"||st==="待批核"||st==="待核准";
+      }).sort((a,b)=>{
+        const aReviewed = _fv(a.fields,"Shawn複核")==="已複核"?0:1;
+        const bReviewed = _fv(b.fields,"Shawn複核")==="已複核"?0:1;
+        if(aReviewed!==bReviewed) return aReviewed-bReviewed;
+        const ta=typeof a.fields["申請日期"]==="number"?a.fields["申請日期"]:0;
+        const tb=typeof b.fields["申請日期"]==="number"?b.fields["申請日期"]:0;
+        return tb-ta;
+      });
+      queueTitle = "待批核佇列";
+      emptyMsg = "🎉 目前無待批項目";
+    }
+
+    // 更新區塊標題
+    const titleEl = document.getElementById("queue-section-title");
+    if(titleEl) titleEl.textContent = queueTitle;
 
     const badge = document.getElementById("queue-badge");
-    if(badge) badge.textContent = pending.length+" 項待批";
+    if(badge) badge.textContent = pending.length+" 項"+(viewer==='yuming'?"待入帳":viewer==='shawn'?"待複核":viewer==='anran'?"申請中":"待批");
 
     if(!pending.length){
-      container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--txt-mid);font-size:13px">🎉 目前無待批項目</div>`;
+      container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--txt-mid);font-size:13px">${emptyMsg}</div>`;
       return;
     }
 
@@ -907,22 +939,41 @@ async function loadApprovals(){
       const ageStr=ageDays>=2?`等待 ${ageDays} 天`:ageDays===1?"等待 1 天":"今天";
       const ageColor=ageDays>=3?"var(--warn)":"var(--txt-mid)";
       const ccyCls=CCY_CLS[cur]||"";
+      const shawnReviewed=_fv(f,"Shawn複核")==="已複核";
+      const metaNote = viewer==='ray'&&shawnReviewed
+        ? `${who?who+" 申請 · ":""}Shawn 已複核`
+        : viewer==='ray'
+        ? `${who?who+" 申請 · ":""}等 Shawn 複核`
+        : viewer==='shawn'
+        ? `${who?who+" 申請 · ":""}等你複核後送 Ray`
+        : viewer==='anran'
+        ? `${_fv(f,"審批狀態")||"進行中"}`
+        : `${who?who+" 申請 · ":""}Ray 已批准`;
+
+      // 按鈕邏輯
+      let actionHtml = '';
+      if(viewer==='ray'){
+        actionHtml=`<button class="btn-approve" onclick="approveItem('${r.record_id}',this)">✓ 批准</button><button class="btn-reject" onclick="rejectItem('${r.record_id}',this)">✗</button>`;
+      } else if(viewer==='shawn'){
+        actionHtml=`<button class="btn-approve" onclick="shawnReviewItem('${r.record_id}',this)">✓ 複核</button><button class="btn-reject" onclick="rejectItem('${r.record_id}',this)">✗</button>`;
+      } else if(viewer==='yuming'){
+        actionHtml=`<button class="btn-approve" onclick="financeItem('${r.record_id}',this)">✓ 已入帳</button>`;
+      }
+      // anran: read-only, no action buttons
+
       return `<div class="approval-row-wrap">
         <div class="approval-row" onclick="toggleAppr('${id}')">
           <div class="appr-icon ${TYPE_CLASS[type]||'expense'}">${TYPE_ICON[type]||"🔔"}</div>
           <div class="appr-body">
             <div class="appr-title">${type} · ${title}</div>
-            <div class="appr-meta">${who?who+" 申請 · ":""}等 Ray 批核</div>
+            <div class="appr-meta">${metaNote}</div>
           </div>
           <div>
             <div class="appr-amount" style="color:var(--txt-hi)">${amt?'¥ '+Number(amt).toLocaleString()+" ":""}<span class="ccy ${ccyCls}">${cur}</span></div>
             <div class="appr-age" style="color:${ageColor}">${ageStr}</div>
           </div>
           <span class="appr-expand-hint" id="hint-${id}">▼ 展開</span>
-          <div class="appr-action" onclick="event.stopPropagation()">
-            <button class="btn-approve" onclick="approveItem('${r.record_id}',this)">✓ 批准</button>
-            <button class="btn-reject" onclick="rejectItem('${r.record_id}',this)">✗</button>
-          </div>
+          ${actionHtml?`<div class="appr-action" onclick="event.stopPropagation()">${actionHtml}</div>`:''}
         </div>
         <div class="appr-detail" id="${id}">
           <div class="appr-detail-title">申請說明</div>
@@ -998,6 +1049,32 @@ async function rejectItem(rid, btn){
     btn.closest(".approval-row-wrap").style.opacity="0.5";
     setTimeout(loadApprovals, 1500);
   }catch(e){ btn.disabled=false; btn.textContent="✗"; }
+}
+async function shawnReviewItem(rid, btn){
+  btn.disabled=true; btn.textContent="處理中...";
+  try{
+    const tk=await _getToken();
+    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"Shawn複核":"已複核"}})
+    });
+    btn.textContent="✓ 已複核"; btn.style.background="var(--ok)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 1500);
+  }catch(e){ btn.disabled=false; btn.textContent="✓ 複核"; }
+}
+async function financeItem(rid, btn){
+  btn.disabled=true; btn.textContent="處理中...";
+  try{
+    const tk=await _getToken();
+    await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
+      method:"PUT",headers:{"Authorization":"Bearer "+tk,"Content-Type":"application/json"},
+      body:JSON.stringify({fields:{"審批狀態":"財務已入帳"}})
+    });
+    btn.textContent="✓ 已入帳"; btn.style.background="var(--ok)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 1500);
+  }catch(e){ btn.disabled=false; btn.textContent="✓ 已入帳"; }
 }
 
 /* ── UI HELPERS ── */
