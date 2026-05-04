@@ -823,6 +823,12 @@ function saveAiToCompare(p){
     '審批狀態': 'AI草稿-待確認',
   };
   Object.keys(fields).forEach(k=>{if(fields[k]===null)delete fields[k];});
+  if(window.USE_MOCK){
+    _addToApprovalMock(fields);
+    const btn=document.querySelector('#ai-parse-result button');
+    if(btn){btn.textContent='✓ 已存入（Demo 模式）';btn.disabled=true;btn.style.opacity='0.6';}
+    return;
+  }
   createRec(_T.approval, fields).then(d=>{
     const btn = document.querySelector('#ai-parse-result button');
     if(btn){

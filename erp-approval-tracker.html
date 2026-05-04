@@ -340,8 +340,8 @@ function renderList(){
         ${fbHtml ? `<div style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">版權方意見記錄</div><div class="fb-log">${fbHtml}</div>` : ''}
         <div class="ip-actions">
           <button class="ia-btn ia-ok" onclick="openFeedbackModal('${a.id}','${a.ip} · ${a.theme}')">+ 記錄回覆</button>
-          <button class="ia-btn ia-pur" onclick="alert('已通知 Bevis + 安然')">→ 通知 Bevis/安然</button>
-          ${a.status==='pass' ? `<button class="ia-btn ia-warn" onclick="alert('已通知賴哥採購可以啟動')">→ 通知採購啟動</button>` : ''}
+          <button class="ia-btn ia-pur" onclick="notifyTeam('${a.id}','${a.ip}','bevis_anran')">→ 通知 Bevis/安然</button>
+          ${a.status==='pass' ? `<button class="ia-btn ia-warn" onclick="notifyTeam('${a.id}','${a.ip}','laige')">→ 通知採購啟動</button>` : ''}
           <button class="ia-btn ia-grey">📎 附件管理</button>
         </div>
       </div>
@@ -380,15 +380,44 @@ function openFeedbackModal(id, ipName){
 }
 function closeModal(){ document.getElementById('fb-modal').classList.remove('open'); }
 
+const FB_KEY = 'approval_feedback_v1';
+
 function saveFeedback(){
   const notes = document.getElementById('fb-notes').value.trim();
   const next = document.getElementById('fb-next').value.trim();
   const result = document.getElementById('fb-result').value;
   const notify = document.getElementById('fb-notify').value;
+  if(!notes){ showToast('⚠️ 請填寫版權方意見'); return; }
   closeModal();
+
+  const entry = {
+    ts: Date.now(),
+    id: _modalId,
+    ip: _modalIP,
+    result, notes, next,
+    notify,
+    by: '珮玲',
+    date: `${new Date().getMonth()+1}/${new Date().getDate()}`,
+    dot: 'var(--pur)',
+    from: '珮玲',
+    text: notes,
+  };
+  const arr = JSON.parse(localStorage.getItem(FB_KEY)||'[]');
+  arr.unshift(entry);
+  localStorage.setItem(FB_KEY, JSON.stringify(arr));
+
+  // update in-memory APPROVALS so card re-renders with new feedback
+  const item = APPROVALS.find(a=>a.id===_modalId);
+  if(item){
+    item.feedback = item.feedback||[];
+    item.feedback.unshift({from:'珮玲', date:entry.date, dot:'var(--pur)', text:notes});
+    if(result!=='waiting') item.status = {pass:'pass',revise:'active',reject:'waiting',submitted:'active'}[result]||item.status;
+  }
+  renderList();
+
   const resultLabel = {pass:'✅ 通過',revise:'🔄 需修改',reject:'❌ 不通過',waiting:'⏳ 尚未回覆',submitted:'📤 已送審'}[result];
-  const notifyLabel = {bevis_anran:'Bevis+安然',all:'全體相關人',bevis:'Bevis',none:''}[notify]||'Bevis+安然';
-  showToast(`${resultLabel} · 已通知${notifyLabel}`);
+  const notifyLabel = {bevis_anran:'Bevis+安然',all:'全體相關人',bevis:'Bevis',none:'（未通知）'}[notify]||'Bevis+安然';
+  showToast(`${resultLabel} · 已記錄 · 通知${notifyLabel}`);
 }
 
 function showToast(msg){
@@ -398,6 +427,16 @@ function showToast(msg){
     document.body.appendChild(t);}
   t.textContent=msg;t.style.opacity='1';
   clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+const NOTIF_KEY = 'erp_notif_queue_v1';
+function notifyTeam(id, ip, target){
+  const labels = {bevis_anran:'Bevis + 安然', bevis:'Bevis', laige:'賴哥', all:'全體相關人'};
+  const q = JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]');
+  q.unshift({ ts: Date.now(), from:'珮玲', to: target, ip, refId: id,
+    msg: target==='laige' ? `${ip} 通過送審，採購可啟動` : `${ip} 送審狀態更新，請確認` });
+  localStorage.setItem(NOTIF_KEY, JSON.stringify(q));
+  showToast(`→ 已通知 ${labels[target]||target}`);
 }
 
 renderList();
@@ -504,7 +543,7 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){alert('請填寫金額與日期');return;}
+    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }else{
     const name=document.getElementById('expSupName').value;
@@ -512,14 +551,14 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   closeExpModal();
-  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();

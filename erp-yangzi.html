@@ -472,6 +472,20 @@ function openForm(id){
 }
 
 function submitForm(){
+  const f = FORMS.find(x=>x.id===currentFormId);
+  if(f){
+    const data = {};
+    f.fields.forEach(field=>{
+      const el = document.getElementById(`nf-${field.id}`);
+      if(el) data[field.label] = el.value;
+    });
+    const rec = { ts: Date.now(), formId: currentFormId, formName: f.name,
+      route: f.route, data, by: SESS?.name||'楊子' };
+    const key = 'yangzi_form_queue_v1';
+    const q = JSON.parse(localStorage.getItem(key)||'[]');
+    q.unshift(rec);
+    localStorage.setItem(key, JSON.stringify(q));
+  }
   closeForm();
   showToast('申請已送出，審核中...');
 }
@@ -588,7 +602,7 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){alert('請填寫金額與日期');return;}
+    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }else{
     const name=document.getElementById('expSupName').value;
@@ -596,14 +610,14 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   closeExpModal();
-  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();

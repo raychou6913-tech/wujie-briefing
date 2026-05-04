@@ -178,7 +178,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <div class="modal">
     <div class="modal-title" id="upload-title">上傳設計稿</div>
     <div class="modal-sub" id="upload-sub"></div>
-    <div class="upload-zone" onclick="showToast('檔案上傳功能在正式版啟用')">
+    <input type="file" id="up-file" accept=".png,.jpg,.pdf,.ai,.psd" style="display:none" onchange="handleFileSelect(this)">
+    <div class="upload-zone" id="upload-zone-label" onclick="document.getElementById('up-file').click()">
       📎 點擊上傳設計稿<br>
       <span style="font-size:10px;margin-top:4px;display:block;">支援 PNG / PDF / AI / PSD</span>
     </div>
@@ -414,11 +415,40 @@ function openUpload(id){
   document.getElementById('modal-upload').classList.add('show');
 }
 
+let _selectedFileName = '';
+function handleFileSelect(input){
+  if(input.files&&input.files[0]){
+    _selectedFileName = input.files[0].name;
+    document.getElementById('upload-zone-label').innerHTML =
+      `✅ 已選擇：${_selectedFileName}<br><span style="font-size:10px;margin-top:4px;display:block;">點擊重新選擇</span>`;
+  }
+}
+
+const UPLOAD_KEY = 'shetong_uploads_v1';
 function submitUpload(){
-  closeModal();
   const t = TASKS.find(x=>x.id===currentUploadId);
+  const version = document.getElementById('up-version').value.trim();
+  const note = document.getElementById('up-note').value.trim();
+  const notify = document.getElementById('up-notify').value;
+  const rec = {
+    ts: Date.now(),
+    taskId: currentUploadId,
+    ip: t?.ip||'',
+    title: t?.title||'',
+    fileName: _selectedFileName || '(未選擇檔案)',
+    version, note, notify,
+    by: SESS?.name||'詩彤',
+  };
+  const arr = JSON.parse(localStorage.getItem(UPLOAD_KEY)||'[]');
+  arr.unshift(rec);
+  localStorage.setItem(UPLOAD_KEY, JSON.stringify(arr));
+  _selectedFileName = '';
+  document.getElementById('upload-zone-label').innerHTML =
+    '📎 點擊上傳設計稿<br><span style="font-size:10px;margin-top:4px;display:block;">支援 PNG / PDF / AI / PSD</span>';
+  closeModal();
   if(t) markDone(currentUploadId);
-  showToast('已上傳並通知 Bevis ✓');
+  const notifyLabel = {bevis:'Bevis',['bevis-peilin']:'Bevis + 珮玲',['bevis-ray']:'Bevis + Ray'}[notify]||'Bevis';
+  showToast(`已記錄並通知 ${notifyLabel} ✓`);
 }
 
 function closeModal(){ document.getElementById('modal-upload').classList.remove('show'); }
@@ -533,7 +563,7 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){alert('請填寫金額與日期');return;}
+    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }else{
     const name=document.getElementById('expSupName').value;
@@ -541,14 +571,14 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   closeExpModal();
-  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();

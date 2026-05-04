@@ -611,15 +611,24 @@ function openStockRequest(){
   document.getElementById('modal-stock').classList.add('show');
 }
 
+function _saveNotif(to, msg){
+  const q = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  q.unshift({ ts: Date.now(), from: SESS?.name||'電商', to, msg });
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(q));
+}
+
 function notifyLogistics(id){
   const campaigns = loadCampaigns();
   const c = campaigns.find(x=>x.id===id);
-  showToast(`已通知高維：《${c?c.name:''}》出貨需求（模擬）`);
+  const name = c?c.name:'';
+  _saveNotif('gaowei', `《${name}》出貨需求，請確認備貨`);
+  showToast(`已通知高維：《${name}》出貨需求`);
 }
 
 function quickNotify(to,action){
   const names = {gaowei:'高維',laige:'賴哥'};
-  showToast(`已通知 ${names[to]||to}：${action}（模擬）`);
+  _saveNotif(to, action);
+  showToast(`已通知 ${names[to]||to}：${action}`);
 }
 
 function openShipCoord(){
@@ -633,8 +642,17 @@ function openShipCoord(){
 }
 
 function saveShipCoord(){
+  const camId = document.getElementById('sc-campaign').value;
+  const deadline = document.getElementById('sc-deadline').value;
+  const addr = document.getElementById('sc-addr').value;
+  const note = document.getElementById('sc-note').value;
+  const campaigns = loadCampaigns();
+  const c = campaigns.find(x=>x.id===camId);
+  const msg = `備貨計劃：《${c?c.name:camId}》截止${deadline}，地址：${addr||'待定'}`;
+  _saveNotif('gaowei', msg);
+  _saveNotif('laige', msg);
   closeModal('modal-shipcoord');
-  showToast('備貨計劃單已同時送給高維和賴哥（模擬）');
+  showToast('備貨計劃單已同時送給高維和賴哥');
 }
 
 function closeModal(id){ document.getElementById(id).classList.remove('show'); }
