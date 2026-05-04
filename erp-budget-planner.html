@@ -103,6 +103,34 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .econ-row-val{font-weight:700;}
 .econ-margin{font-size:15px;font-weight:800;margin-top:4px;}
 
+/* OPEX PANEL */
+.opex-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;font-weight:700;color:var(--txt-hi);transition:.15s;}
+.opex-chip:hover{border-color:var(--accent);color:var(--accent);}
+.opex-panel{border-top:1px solid var(--border);background:#0e0f18;}
+.opex-panel table{width:100%;border-collapse:collapse;font-size:11px;}
+.opex-panel td{padding:5px 16px;vertical-align:middle;}
+.opex-panel td:nth-child(2){text-align:right;}
+.opex-panel td:nth-child(3){text-align:right;color:var(--txt-lo);font-size:10px;width:52px;}
+.opex-panel tr.opex-total td{border-top:1px solid var(--border-hi);font-weight:700;padding-top:7px;padding-bottom:7px;}
+
+/* ADD PRODUCT MODAL */
+.modal-bg{position:fixed;inset:0;background:#00000088;z-index:200;display:flex;align-items:center;justify-content:center;}
+.modal-box{background:var(--card);border:1px solid var(--border-hi);border-radius:12px;padding:24px;width:480px;max-width:95vw;}
+.modal-title{font-size:14px;font-weight:800;margin-bottom:16px;}
+.modal-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.modal-tab{flex:1;padding:10px;border:1px solid var(--border-hi);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--txt-mid);background:var(--card2);text-align:center;transition:.15s;}
+.modal-tab.active{background:var(--accent2);border-color:var(--accent);color:var(--txt-hi);}
+.modal-field{margin-bottom:12px;}
+.modal-lbl{font-size:11px;color:var(--txt-mid);margin-bottom:4px;}
+.modal-inp{width:100%;background:var(--surface);border:1px solid var(--border-hi);color:var(--txt-hi);font-size:12px;padding:7px 10px;border-radius:6px;}
+.modal-inp:focus{outline:none;border-color:var(--accent);}
+.modal-hint{font-size:10px;color:var(--txt-lo);margin-top:8px;line-height:1.5;}
+.modal-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end;}
+.btn-primary{background:var(--accent2);border:1px solid var(--accent);color:var(--txt-hi);font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px;cursor:pointer;}
+.btn-primary:hover{background:var(--accent);}
+.btn-cancel{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);font-size:12px;padding:7px 14px;border-radius:6px;cursor:pointer;}
+.btn-cancel:hover{color:var(--txt-hi);}
+
 /* VIEW TOGGLE */
 .view-bar{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
 .vbtn{background:var(--card2);border:1px solid var(--border);color:var(--txt-mid);font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:.15s;}
@@ -188,12 +216,15 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
       <div class="global-bar">
         <div class="gl-grp">
           <span class="gl-lbl">OPEX / 月</span>
-          <span style="font-size:11px;color:var(--txt-lo);">¥</span>
-          <input class="gl-inp" id="gOpex" value="300,000" oninput="opexChange()">
+          <span class="opex-chip" onclick="toggleOpexPanel()" id="opexChip">
+            <span id="opexDisplay">¥300,000</span>
+            <span id="opexArrow" style="font-size:10px;color:var(--txt-lo);">▾ 展開明細</span>
+          </span>
         </div>
         <button class="btn-sm" onclick="resetAll()">↩ 重置所有預設值</button>
         <span style="font-size:10px;color:var(--txt-lo);">⚠ 僅供管理層討論參考，非正式財務預測</span>
       </div>
+      <div class="opex-panel" id="opexPanel" style="display:none;"></div>
       <div style="overflow-x:auto;">
         <table class="prod-tbl" id="paramTbl">
           <thead>
@@ -210,6 +241,10 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
           </thead>
           <tbody id="paramBody"></tbody>
         </table>
+      </div>
+      <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--card2);display:flex;align-items:center;gap:10px;">
+        <button class="btn-sm" onclick="openAddModal()" style="font-size:12px;color:var(--accent);border-color:var(--accent);padding:5px 14px;">＋ 新增項目</button>
+        <span style="font-size:10px;color:var(--txt-lo);">追加批次 或 全新產品</span>
       </div>
     </div>
   </div>
@@ -231,6 +266,78 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
     </table>
   </div>
 
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-bg" id="addModal" style="display:none;" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal-box">
+    <div class="modal-title">新增預算項目</div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tabReorder" onclick="switchAddTab('reorder')">
+        📦 追加批次<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">既有產品再生產</span>
+      </div>
+      <div class="modal-tab" id="tabNew" onclick="switchAddTab('new')">
+        ✨ 全新產品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">新 IP / 新設計</span>
+      </div>
+    </div>
+
+    <!-- REORDER PANEL -->
+    <div id="panelReorder">
+      <div class="modal-field">
+        <div class="modal-lbl">選擇基礎產品（複製變動成本，一次性費用不再計）</div>
+        <select class="modal-inp" id="rBase"></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="modal-field">
+          <div class="modal-lbl">追加批次上市月</div>
+          <select class="modal-inp" id="rLaunch"></select>
+        </div>
+        <div class="modal-field">
+          <div class="modal-lbl">追加批次數量（件）</div>
+          <input class="modal-inp" id="rVol" type="number" min="0" placeholder="e.g. 50000">
+        </div>
+      </div>
+      <div class="modal-hint">⚠ 追加批次不再計包裝設計/打稿/建模/打樣/模具費；版稅率、批發折扣、SRP 與原產品相同。</div>
+    </div>
+
+    <!-- NEW PRODUCT PANEL -->
+    <div id="panelNew" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="modal-field">
+          <div class="modal-lbl">IP 名稱</div>
+          <input class="modal-inp" id="nIp" placeholder="e.g. Maniani">
+        </div>
+        <div class="modal-field">
+          <div class="modal-lbl">IP 顯示色（hex）</div>
+          <input class="modal-inp" id="nColor" value="#a78bfa" placeholder="#a78bfa">
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-lbl">產品名稱</div>
+        <input class="modal-inp" id="nName" placeholder="e.g. 首款盲袋 XX款">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="modal-field">
+          <div class="modal-lbl">上市月</div>
+          <select class="modal-inp" id="nLaunch"></select>
+        </div>
+        <div class="modal-field">
+          <div class="modal-lbl">SRP（¥）</div>
+          <input class="modal-inp" id="nSrp" type="number" value="29.9">
+        </div>
+        <div class="modal-field">
+          <div class="modal-lbl">首批數量（件）</div>
+          <input class="modal-inp" id="nVol" type="number" value="60000">
+        </div>
+      </div>
+      <div class="modal-hint">其餘成本細節（模具費、版稅等）在新增後展開列展開調整。預設套用通用成本範本。</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">取消</button>
+      <button class="btn-primary" onclick="confirmAdd()">確認新增</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -343,12 +450,62 @@ const DEFAULTS = [
     royalty:{type:'std', d:0.40, r:0.14} },
 ];
 
+// ── OPEX BREAKDOWN ───────────────────────────────────────────────
+const OPEX_ITEM_DEFAULTS = [
+  {key:'salary',  label:'人事費用（薪資＋社保）', val:220000},
+  {key:'rent',    label:'辦公室租金',             val:30000},
+  {key:'tools',   label:'系統工具費',             val:10000},
+  {key:'travel',  label:'交通差旅',               val:25000},
+  {key:'mktg',    label:'市場行銷',               val:10000},
+  {key:'misc',    label:'雜支',                   val:5000},
+];
+let opexItems = OPEX_ITEM_DEFAULTS.map(o=>({...o}));
+let opexPanelOpen = false;
+
+function calcOpex(){ return opexItems.reduce((s,o)=>s+o.val,0); }
+
+function renderOpexPanel(){
+  const total = calcOpex();
+  document.getElementById('opexDisplay').textContent = '¥'+total.toLocaleString();
+  const el = document.getElementById('opexPanel');
+  if(!el) return;
+  el.innerHTML = `<table>
+    ${opexItems.map((o,i)=>`<tr>
+      <td style="color:var(--txt-mid);padding:5px 16px;">${o.label}</td>
+      <td><input class="gl-inp" style="width:110px;" value="${o.val.toLocaleString()}" oninput="opexItemChange(${i},this.value)"></td>
+      <td>${((o.val/Math.max(total,1))*100).toFixed(0)}%</td>
+    </tr>`).join('')}
+    <tr class="opex-total">
+      <td style="padding:7px 16px;color:var(--txt-hi);">合計 / 月</td>
+      <td style="color:var(--danger);font-weight:700;padding:7px 16px;">¥${total.toLocaleString()}</td>
+      <td style="color:var(--txt-lo);font-size:10px;padding:7px 16px;">100%</td>
+    </tr>
+  </table>`;
+}
+
+function toggleOpexPanel(){
+  opexPanelOpen = !opexPanelOpen;
+  const panel = document.getElementById('opexPanel');
+  if(panel) panel.style.display = opexPanelOpen ? '' : 'none';
+  const arrow = document.getElementById('opexArrow');
+  if(arrow) arrow.textContent = opexPanelOpen ? '▴ 收起' : '▾ 展開明細';
+  if(opexPanelOpen) renderOpexPanel();
+}
+
+function opexItemChange(i, rawVal){
+  opexItems[i].val = parseFloat(rawVal.replace(/,/g,''))||0;
+  opex = calcOpex();
+  renderOpexPanel();
+  renderTable();
+}
+
 // ── STATE ─────────────────────────────────────────────────────────
 let prods = DEFAULTS.map(p=>({...p, royalty:{...p.royalty}}));
 let opex = 300000;
 let viewMode = 'gross';
 let assumeOpen = true;
 let openRows = new Set();
+let addTab = 'reorder';
 
 // ── CALCULATIONS ─────────────────────────────────────────────────
 function mIdx(ym){ return MONTHS.indexOf(ym); }
@@ -672,8 +829,59 @@ function updateCompactMargin(i){
   el.style.color=color;
 }
 
-function opexChange(){
-  opex=parseFloat(document.getElementById('gOpex').value.replace(/,/g,''))||300000;
+// ── ADD PRODUCT MODAL ─────────────────────────────────────────────
+function openAddModal(){
+  // Populate dropdowns
+  const baseOpts = prods.map((p,i)=>`<option value="${i}">[${p.ipShort}] ${p.name}</option>`).join('');
+  document.getElementById('rBase').innerHTML = baseOpts;
+  const monthOpts = MONTHS.slice(0,21).map(m=>`<option>${m}</option>`).join('');
+  document.getElementById('rLaunch').innerHTML = monthOpts;
+  document.getElementById('nLaunch').innerHTML = monthOpts;
+  document.getElementById('addModal').style.display='flex';
+}
+function closeAddModal(){ document.getElementById('addModal').style.display='none'; }
+
+function switchAddTab(tab){
+  addTab = tab;
+  document.getElementById('tabReorder').classList.toggle('active', tab==='reorder');
+  document.getElementById('tabNew').classList.toggle('active', tab==='new');
+  document.getElementById('panelReorder').style.display = tab==='reorder'?'':'none';
+  document.getElementById('panelNew').style.display = tab==='new'?'':'none';
+}
+
+function confirmAdd(){
+  const uid = 'cust_'+Date.now();
+  if(addTab==='reorder'){
+    const baseIdx = parseInt(document.getElementById('rBase').value)||0;
+    const base = prods[baseIdx];
+    const vol = parseFloat(document.getElementById('rVol').value)||50000;
+    const launch = document.getElementById('rLaunch').value;
+    if(!vol||!launch){ alert('請填寫上市月與數量'); return; }
+    // Copy from base: variable costs + royalty, zero all one-time costs
+    const newProd = { ...base, id:uid,
+      name: base.name + '（追加批次）',
+      launch, volFirst:vol, volReorder:0,
+      costDesign:0, cost2D:0, cost3D:0, costRender:0,
+      costSample:0, costMold:0, costQA:0,
+      royalty:{...base.royalty} };
+    prods.push(newProd);
+  } else {
+    const ip = document.getElementById('nIp').value.trim() || '新IP';
+    const name = document.getElementById('nName').value.trim() || '新產品';
+    const launch = document.getElementById('nLaunch').value;
+    const srp = parseFloat(document.getElementById('nSrp').value)||29.9;
+    const vol = parseFloat(document.getElementById('nVol').value)||60000;
+    const color = document.getElementById('nColor').value.trim()||'#a78bfa';
+    prods.push({ id:uid, ip, ipShort:ip, color,
+      name, launch, volFirst:vol, volReorder:0, srp, wsDiscount:0.46,
+      costDesign:5000, cost2D:3000, cost3D:18000, costRender:6000,
+      costSample:27120, costMold:150000, costQA:1100,
+      unitMfg:4.0, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
+      unitWarehouse:0.056, unitOther:0,
+      royalty:{type:'std', d:0.40, r:0.12} });
+  }
+  closeAddModal();
+  renderParams();
   renderTable();
 }
 
@@ -691,9 +899,11 @@ function toggleAssume(){
 
 function resetAll(){
   prods=DEFAULTS.map(p=>({...p,royalty:{...p.royalty}}));
-  opex=300000;
+  opexItems=OPEX_ITEM_DEFAULTS.map(o=>({...o}));
+  opex=calcOpex();
   openRows.clear();
-  document.getElementById('gOpex').value='300,000';
+  if(opexPanelOpen) renderOpexPanel();
+  document.getElementById('opexDisplay').textContent='¥'+opex.toLocaleString();
   renderParams(); renderTable();
 }
 
