@@ -877,6 +877,11 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div style="font-size:13px;font-weight:700;color:var(--txt-hi);">Shawn 營運總看板</div>
         <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">三城 / 人員 / 快閃店 / 物流</div>
       </a>
+      <a href="erp-budget-planner.html" style="text-decoration:none;display:block;background:var(--card);border:1px solid var(--accent2);border-radius:10px;padding:14px 16px;transition:.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--accent2)'">
+        <div style="font-size:16px;margin-bottom:6px;">📊</div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt-hi);">兩年預算規劃</div>
+        <div style="font-size:10px;color:var(--accent);margin-top:2px;">VAM 達標推演 · 產品損益試算</div>
+      </a>
     </div>
   </div>
 
@@ -1233,15 +1238,22 @@ async function loadCashflow(){
     }
     const coColors={"北京蕪解":"var(--beijing)","台灣悍草":"var(--taipei)","UJ BKK":"var(--bangkok)","香港蕪解":"var(--hk)","深圳蕪解":"var(--sz)"};
     const rows=Object.entries(latest).map(([co,d])=>{
-      const bal=_fv(d.f,"現金餘額")||_fv(d.f,"餘額");
+      const bal=parseFloat(_fv(d.f,"期末餘額"))||0;
+      const rec=parseFloat(_fv(d.f,"應收帳款"))||0;
+      const pay=parseFloat(_fv(d.f,"應付帳款"))||0;
       const dot=coColors[co]||"var(--txt-mid)";
+      const netPos=bal+rec-pay;
+      const balColor=bal>500000?"var(--ok)":bal>200000?"var(--warn)":"var(--danger)";
+      function f(n){return n?(n/10000).toFixed(1)+"萬":"—";}
       return `<div class="cash-row">
         <div class="cash-entity"><div class="cash-dot" style="background:${dot}"></div>${co}</div>
-        <div><div class="cash-amt">${bal?Number(bal).toLocaleString():"—"}</div>
-        <div class="cash-trend">${_fv(d.f,"備注")||""}</div></div>
+        <div>
+          <div class="cash-amt" style="color:${balColor}">¥${f(bal)}</div>
+          <div class="cash-trend" style="font-size:9px;color:var(--txt-lo);">應收+${f(rec)} ｜ 應付-${f(pay)}</div>
+        </div>
       </div>`;
     }).join("");
-    if(rows) container.innerHTML = rows; // only override if Feishu returned data
+    if(rows) container.innerHTML = rows;
   }catch(e){ console.error("cashflow",e); /* keep fallback on error */ }
 }
 
@@ -1250,9 +1262,10 @@ async function loadBudgetKPI(){
   try{
     const items=await _fetchAll(_TBLS.budget);
     if(!items.length) return;
-    const yr=new Date().getFullYear().toString();
-    const yItems=items.filter(r=>String(_fv(r.fields,"月份")).startsWith(yr));
-    const incRows=yItems.filter(r=>(_fv(r.fields,"預算科目")||"").includes("收入"));
+    const yr=new Date().getFullYear();
+    const yItems=items.filter(r=>(parseFloat(_fv(r.fields,"年度"))||0)===yr);
+    // 收入行：預算性質 = "收入"
+    const incRows=yItems.filter(r=>_fv(r.fields,"預算性質")==="收入");
     const target=incRows.reduce((s,r)=>s+(parseFloat(_fv(r.fields,"預算金額"))||0),0);
     const actual=incRows.reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0),0);
     if(!target) return;
@@ -1334,10 +1347,17 @@ async function loadVamProgress(){
     const items = await _fetchAll(_TBLS.budget);
     if(!items.length) return;
 
-    // Sum 實際金額 where 預算科目 contains 淨利
-    const netRows = items.filter(r=>(_fv(r.fields,"預算科目")||"").includes("淨利"));
-    const actual  = netRows.reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0), 0);
-    if(!actual && actual!==0) return; // skip if no data at all
+    // 淨利 = 收入實際 - 支出實際（預算管理表按預算性質欄分類）
+    const yr = new Date().getFullYear();
+    const yItems = items.filter(r=>(parseFloat(_fv(r.fields,"年度"))||0)===yr);
+    const incActual = yItems.filter(r=>_fv(r.fields,"預算性質")==="收入")
+                           .reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0), 0);
+    const expActual = yItems.filter(r=>_fv(r.fields,"預算性質")==="支出")
+                           .reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0), 0);
+    const actual = incActual - expActual;
+    // VAM 未開始（2026-07-01前）且無實際入帳，保留預填值
+    const VAM_START = new Date("2026-07-01").getTime();
+    if(!incActual && Date.now() < VAM_START) return;
 
     // ── Derived numbers ──
     const now        = new Date();
