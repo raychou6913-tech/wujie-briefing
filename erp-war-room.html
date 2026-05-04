@@ -806,15 +806,16 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 <script>
 /* ── CONFIG ── */
+window.USE_MOCK = false; // v2 real data
 const _PROXY = "https://feishu-proxy.raychou6913.workers.dev";
-const _AT    = "YlVkb0ACjacJVqsgRT5j4c6gpeh";
+const _AT    = "Sg7ObNELHaAdZzshGIFjWPVhpce";
 const _TBLS  = {
-  approval:        "tblD6acV3m2ZXJHe",
-  product_pipeline:"tblfX6fsMshb7KL0",
-  cashflow:        "tblxaiogh3tYlZUz",
-  budget:          "tblteo2QEO0jP8j9",
-  sales:           "tblRtqmbO9TO3sYZ",
-  contract:        "tbltnJNDhRNwVkZC",
+  approval:        "tbl4OBNvsNkqS4mQ",
+  product_pipeline:"tblTqAZIdt2ViAma",
+  cashflow:        "tblN0AwYtb2IvOcq",
+  budget:          "tblmlUoyZ6Bip6S3",
+  sales:           "tblndRlEjmOgh5lk",
+  contract:        "tblWn4PwOVRgt7c1",
 };
 let _tk = null;
 
@@ -1023,9 +1024,22 @@ async function loadPipeline(){
   }
 }
 
+/* ── MOCK WRITE HELPER ── */
+function _mockWrite(rid, patch){
+  if(!window.MOCK_DB?.approval) return;
+  const item = window.MOCK_DB.approval.find(r=>r.record_id===rid);
+  if(item) Object.assign(item.fields, patch);
+}
+
 /* ── APPROVE / REJECT ── */
 async function approveItem(rid, btn){
   btn.disabled=true; btn.textContent="處理中...";
+  if(window.USE_MOCK){
+    _mockWrite(rid,{"審批狀態":"已批准"});
+    btn.textContent="✓ 已批准"; btn.style.background="var(--ok)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 800); return;
+  }
   try{
     const tk=await _getToken();
     await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
@@ -1039,6 +1053,12 @@ async function approveItem(rid, btn){
 }
 async function rejectItem(rid, btn){
   btn.disabled=true; btn.textContent="處理中...";
+  if(window.USE_MOCK){
+    _mockWrite(rid,{"審批狀態":"已拒絕"});
+    btn.textContent="✗ 已拒絕"; btn.style.background="var(--danger)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 800); return;
+  }
   try{
     const tk=await _getToken();
     await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
@@ -1052,6 +1072,12 @@ async function rejectItem(rid, btn){
 }
 async function shawnReviewItem(rid, btn){
   btn.disabled=true; btn.textContent="處理中...";
+  if(window.USE_MOCK){
+    _mockWrite(rid,{"Shawn複核":"已複核"});
+    btn.textContent="✓ 已複核"; btn.style.background="var(--ok)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 800); return;
+  }
   try{
     const tk=await _getToken();
     await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{
@@ -1065,6 +1091,12 @@ async function shawnReviewItem(rid, btn){
 }
 async function financeItem(rid, btn){
   btn.disabled=true; btn.textContent="處理中...";
+  if(window.USE_MOCK){
+    _mockWrite(rid,{"審批狀態":"財務已入帳"});
+    btn.textContent="✓ 已入帳"; btn.style.background="var(--ok)";
+    btn.closest(".approval-row-wrap").style.opacity="0.5";
+    setTimeout(loadApprovals, 800); return;
+  }
   try{
     const tk=await _getToken();
     await fetch(_PROXY+"/open-apis/bitable/v1/apps/"+_AT+"/tables/"+_TBLS.approval+"/records/"+rid,{

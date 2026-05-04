@@ -556,7 +556,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   </div>
 
   <!-- ④ AI 合約解析入口 -->
-  <div class="ai-banner" onclick="location.href='erp-anran.html#ip-contracts'">
+  <input type="file" id="contract-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleContractUpload(this)">
+  <div class="ai-banner" onclick="document.getElementById('contract-file-input').click()" style="cursor:pointer">
     <div class="ai-banner-icon">📄</div>
     <div class="ai-banner-text">
       <div class="ai-banner-title">上傳新合約 → AI 自動解析條款 → 一鍵存入合約庫</div>
@@ -588,10 +589,10 @@ function doLogout(){
 
 /* ── FEISHU CONFIG ── */
 const _P  = 'https://feishu-proxy.raychou6913.workers.dev';
-const _AT = 'YlVkb0ACjacJVqsgRT5j4c6gpeh';
+const _AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
 const _T  = {
-  sales:    'tblRtqmbO9TO3sYZ',
-  approval: 'tblD6acV3m2ZXJHe',
+  sales:    'tblndRlEjmOgh5lk',
+  approval: 'tbl4OBNvsNkqS4mQ',
 };
 let _tok=null, _tokExp=0;
 
@@ -621,6 +622,26 @@ function fv(f,k){
   return String(v);
 }
 function wan(n){ const v=parseFloat(n)||0; return Math.abs(v)>=10000?(v/10000).toFixed(1)+'萬':v.toLocaleString(); }
+
+/* ── CONTRACT UPLOAD ── */
+function handleContractUpload(input){
+  if(!input.files||!input.files[0]) return;
+  const file = input.files[0];
+  const rec = { ts: Date.now(), fileName: file.name, fileSize: file.size,
+    status: 'AI草稿-待解析', by: SESS?.name||'安然' };
+  const key = 'anran_contract_uploads_v1';
+  const arr = JSON.parse(localStorage.getItem(key)||'[]');
+  arr.unshift(rec);
+  localStorage.setItem(key, JSON.stringify(arr));
+  input.value = '';
+  // show inline toast
+  let t=document.getElementById('anran-toast');
+  if(!t){t=document.createElement('div');t.id='anran-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#818cf8;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=`📄 ${file.name} 已排隊，AI 解析完成後通知你`;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3000);
+}
 
 /* ── ORDER TOGGLE ── */
 function toggleOrder(id){
@@ -860,7 +881,7 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){alert('請填寫金額與日期');return;}
+    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }else{
     const name=document.getElementById('expSupName').value;
@@ -868,14 +889,14 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   closeExpModal();
-  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();

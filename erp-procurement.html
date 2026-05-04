@@ -593,8 +593,8 @@ function switchAccount(){
 
 /* ── FEISHU ── */
 const _P  = 'https://feishu-proxy.raychou6913.workers.dev';
-const _AT = 'YlVkb0ACjacJVqsgRT5j4c6gpeh';
-const _T  = { approval: 'tblD6acV3m2ZXJHe' };
+const _AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const _T  = { approval: 'tbl4OBNvsNkqS4mQ' };
 let _tok=null, _tokExp=0;
 
 async function tok(){
@@ -647,9 +647,23 @@ async function loadKPIsFromFeishu(){
   }catch(e){ /* keep prefill */ }
 }
 
+/* ── TOAST ── */
+function _toast(msg){
+  let t=document.getElementById('proc-toast');
+  if(!t){t=document.createElement('div');t.id='proc-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2800);
+}
+
 /* ── PO TOGGLE ── */
 function notifyGaowei(poName, poNum){
-  alert(`✓ 已通知高維\n《${poName}》箱規已確認\nPO：${poNum}\n\n高維的物流作業台將自動出現此批次卡片（正式版串接後生效）`);
+  const q = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  q.unshift({ ts: Date.now(), from: SESS?.name||'賴哥', to:'gaowei',
+    msg:`《${poName}》箱規已確認，PO：${poNum}，請安排物流` });
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(q));
+  _toast(`✓ 已通知高維 · 《${poName}》PO：${poNum}`);
 }
 
 function togglePO(id){
@@ -664,6 +678,12 @@ function togglePO(id){
 }
 
 /* ── SEND TO SHAWN ── */
+function _addToApprovalMock(fields){
+  if(!window.MOCK_DB?.approval) return;
+  const newId = 'recA0'+String(Date.now()).slice(-3);
+  window.MOCK_DB.approval.unshift({ record_id: newId, fields });
+}
+
 function sendToShawn(btnId, title){
   const btn = document.getElementById(btnId);
   if(!btn||btn.disabled) return;
@@ -673,15 +693,16 @@ function sendToShawn(btnId, title){
   btn.style.background = 'var(--card2)';
   btn.style.color = 'var(--txt-mid)';
   btn.style.border = '1px solid var(--border)';
-  // attempt Feishu write (non-blocking)
   const fields = {
     '審批標題': '採購審批 · '+title,
     '審批類型': '採購審批',
     '申請人': SESS.name||'賴哥',
     '申請日期': Date.now(),
     '審批狀態': '待審批',
+    'Shawn複核': '待複核',
     '申請說明': '由賴哥/木子完成比價後送 Shawn 複核 → 再送 Ray 最終批核',
   };
+  if(window.USE_MOCK){ _addToApprovalMock(fields); _toast('已送出 Shawn 複核佇列 ✓'); return; }
   createRec(_T.approval, fields).catch(()=>{});
 }
 
@@ -693,7 +714,6 @@ function sendToShawnMain(){
   btn.style.background = 'var(--card2)';
   btn.style.color = 'var(--txt-mid)';
   btn.style.cursor = 'not-allowed';
-  // mirror: also update the PO1 button
   const b1 = document.getElementById('btn-shawn-po1');
   if(b1){ b1.disabled=true; b1.textContent='已送出 ✓'; b1.style.opacity='0.5'; }
   const fields = {
@@ -702,10 +722,12 @@ function sendToShawnMain(){
     '申請人': SESS.name||'賴哥',
     '申請日期': Date.now(),
     '審批狀態': '待審批',
+    'Shawn複核': '待複核',
     '申請說明': '三家比價完成，賴哥推薦東莞永盛玩具 ¥148,000，30/40/30 付款，交期 45 天，熟悉 Snoopy 授權標準。請 Shawn 複核後送 Ray 最終批核。',
     '金額': 148000,
     '幣別': 'RMB',
   };
+  if(window.USE_MOCK){ _addToApprovalMock(fields); _toast('採購審批已送出 · Shawn 佇列已更新 ✓'); return; }
   createRec(_T.approval, fields).catch(()=>{});
 }
 
@@ -916,7 +938,7 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){alert('請填寫金額與日期');return;}
+    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }else{
     const name=document.getElementById('expSupName').value;
@@ -924,14 +946,14 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
+    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   closeExpModal();
-  alert(`✅ 申請已送出，待 ${r.nextLabel} 審核`);
+  _toast(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();
