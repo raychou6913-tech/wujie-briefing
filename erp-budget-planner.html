@@ -451,34 +451,64 @@ const DEFAULTS = [
 ];
 
 // ── OPEX BREAKDOWN ───────────────────────────────────────────────
+// salary is locked — source of truth is 楊子 HR module (Feishu Bitable)
 const OPEX_ITEM_DEFAULTS = [
-  {key:'salary',  label:'人事費用（薪資＋社保）', val:220000},
-  {key:'rent',    label:'辦公室租金',             val:30000},
-  {key:'tools',   label:'系統工具費',             val:10000},
-  {key:'travel',  label:'交通差旅',               val:25000},
-  {key:'mktg',    label:'市場行銷',               val:10000},
-  {key:'misc',    label:'雜支',                   val:5000},
+  {key:'salary', label:'人事費用（薪資＋社保）', val:220000, locked:true},
+  {key:'rent',   label:'辦公室租金',             val:30000,  locked:false},
+  {key:'tools',  label:'系統工具費',             val:10000,  locked:false},
+  {key:'travel', label:'交通差旅',               val:25000,  locked:false},
+  {key:'mktg',   label:'市場行銷',               val:10000,  locked:false},
+  {key:'misc',   label:'雜支',                   val:5000,   locked:false},
 ];
 let opexItems = OPEX_ITEM_DEFAULTS.map(o=>({...o}));
+let opexScenarioHC = 0;   // what-if headcount delta: extra people × avg salary
 let opexPanelOpen = false;
 
-function calcOpex(){ return opexItems.reduce((s,o)=>s+o.val,0); }
+function calcOpex(){
+  return opexItems.reduce((s,o)=>s+o.val,0) + opexScenarioHC;
+}
 
 function renderOpexPanel(){
   const total = calcOpex();
   document.getElementById('opexDisplay').textContent = '¥'+total.toLocaleString();
   const el = document.getElementById('opexPanel');
   if(!el) return;
-  el.innerHTML = `<table>
-    ${opexItems.map((o,i)=>`<tr>
+  const rows = opexItems.map((o,i)=>{
+    const pct = ((o.val/Math.max(total,1))*100).toFixed(0);
+    if(o.locked){
+      return `<tr>
+        <td style="padding:5px 16px;">
+          <span style="color:var(--txt-mid);">${o.label}</span>
+          <span style="margin-left:6px;font-size:9px;background:#818cf820;color:var(--accent);border:1px solid #818cf840;border-radius:4px;padding:1px 5px;vertical-align:middle;">HR 模組・飛書接入後自動同步</span>
+        </td>
+        <td style="text-align:right;padding:5px 16px;font-weight:700;color:var(--txt-hi);">¥${o.val.toLocaleString()}</td>
+        <td style="text-align:right;color:var(--txt-lo);font-size:10px;padding:5px 16px;">${pct}%</td>
+      </tr>
+      <tr>
+        <td style="padding:3px 16px 6px 28px;">
+          <span style="font-size:10px;color:var(--txt-lo);">└ 場景增員（what-if）</span>
+        </td>
+        <td style="text-align:right;padding:3px 16px 6px;">
+          <input class="gl-inp" style="width:110px;" value="${opexScenarioHC.toLocaleString()}"
+            placeholder="0" oninput="opexScenarioChange(this.value)">
+        </td>
+        <td style="text-align:right;color:var(--txt-lo);font-size:9px;padding:3px 16px 6px;">¥/月 增量</td>
+      </tr>`;
+    }
+    return `<tr>
       <td style="color:var(--txt-mid);padding:5px 16px;">${o.label}</td>
-      <td><input class="gl-inp" style="width:110px;" value="${o.val.toLocaleString()}" oninput="opexItemChange(${i},this.value)"></td>
-      <td>${((o.val/Math.max(total,1))*100).toFixed(0)}%</td>
-    </tr>`).join('')}
+      <td style="text-align:right;padding:5px 16px;">
+        <input class="gl-inp" style="width:110px;" value="${o.val.toLocaleString()}" oninput="opexItemChange(${i},this.value)">
+      </td>
+      <td style="text-align:right;color:var(--txt-lo);font-size:10px;padding:5px 16px;">${pct}%</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table>
+    ${rows}
     <tr class="opex-total">
       <td style="padding:7px 16px;color:var(--txt-hi);">合計 / 月</td>
-      <td style="color:var(--danger);font-weight:700;padding:7px 16px;">¥${total.toLocaleString()}</td>
-      <td style="color:var(--txt-lo);font-size:10px;padding:7px 16px;">100%</td>
+      <td style="text-align:right;color:var(--danger);font-weight:700;padding:7px 16px;">¥${total.toLocaleString()}</td>
+      <td style="text-align:right;color:var(--txt-lo);font-size:10px;padding:7px 16px;">100%</td>
     </tr>
   </table>`;
 }
@@ -494,6 +524,13 @@ function toggleOpexPanel(){
 
 function opexItemChange(i, rawVal){
   opexItems[i].val = parseFloat(rawVal.replace(/,/g,''))||0;
+  opex = calcOpex();
+  renderOpexPanel();
+  renderTable();
+}
+
+function opexScenarioChange(rawVal){
+  opexScenarioHC = parseFloat(rawVal.replace(/,/g,''))||0;
   opex = calcOpex();
   renderOpexPanel();
   renderTable();
@@ -900,6 +937,7 @@ function toggleAssume(){
 function resetAll(){
   prods=DEFAULTS.map(p=>({...p,royalty:{...p.royalty}}));
   opexItems=OPEX_ITEM_DEFAULTS.map(o=>({...o}));
+  opexScenarioHC=0;
   opex=calcOpex();
   openRows.clear();
   if(opexPanelOpen) renderOpexPanel();
