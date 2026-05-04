@@ -205,6 +205,21 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   .abc-grid{grid-template-columns:1fr;}
   .appr-action{display:none;}
 }
+
+/* ── OPEX BREAKDOWN ── */
+.opex-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
+.opex-row.opex-total{border-bottom:none;border-top:1px solid var(--border-hi);padding-top:10px;margin-top:4px;}
+.opex-label{font-size:11px;color:var(--txt-mid);}
+.opex-val{font-size:12px;font-weight:700;}
+
+/* ── FORECAST ROWS ── */
+.forecast-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.forecast-row:last-child{border:none;}
+.fc-ip{width:80px;font-size:11px;font-weight:700;color:var(--txt-hi);flex-shrink:0;}
+.fc-client{flex:1;font-size:11px;color:var(--txt-mid);line-height:1.4;}
+.fc-amt{font-size:12px;font-weight:700;color:var(--txt-hi);min-width:90px;text-align:right;}
+.fc-margin{font-size:11px;font-weight:700;min-width:72px;text-align:right;}
+.fc-light{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -325,6 +340,16 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
 
     <div class="vam-note" id="vam-note">📌 若本月（5月）達成 80 萬淨利，整體進度可追回至預期值。</div>
+
+    <!-- Block 4: OPEX 調整驗算 -->
+    <div style="margin-top:14px;padding:12px 14px;background:var(--card2);border-radius:8px;border-left:3px solid var(--accent2)">
+      <div style="font-size:9px;color:var(--txt-lo);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">OPEX 調整驗算 · 毛利貢獻還原</div>
+      <div id="vam-opex-rows">
+        <div class="opex-row"><span class="opex-label">估算毛利（淨利還原 OPEX）</span><span class="opex-val" style="color:var(--txt-hi)">—</span></div>
+        <div class="opex-row"><span class="opex-label">扣除 OPEX（¥30萬/月）</span><span class="opex-val" style="color:var(--danger)">—</span></div>
+        <div class="opex-row opex-total"><span class="opex-label" style="color:var(--txt-hi)">＝ 確認 VAM 淨利</span><span class="opex-val">—</span></div>
+      </div>
+    </div>
   </div>
 
   <!-- ② 業績 & 利潤 -->
@@ -378,6 +403,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="mini-prog-fill" style="width:28.3%;background:var(--accent)"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Block 2: 在途訂單前向預測 -->
+  <div class="section-title">在途訂單前向預測 · Pipeline Forecast</div>
+  <div class="abc-card" style="margin-bottom:24px">
+    <div class="abc-header">
+      <span class="abc-title">📦 在途訂單 → 預期毛利貢獻</span>
+      <span class="abc-tag warn" id="forecast-tag">計算中</span>
+    </div>
+    <div id="forecast-inner">
+      <div style="padding:12px;text-align:center;color:var(--txt-lo);font-size:12px">載入中…</div>
+    </div>
+    <div id="forecast-summary" style="margin-top:10px;padding:10px 12px;background:var(--card2);border-radius:8px;font-size:11px;display:none;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"></div>
   </div>
 
   <!-- ② AI & 技術投資 -->
@@ -509,7 +547,47 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div id="ip-alerts-inner">
         <div class="ip-row"><div class="ip-row-top"><span class="ip-name">載入中…</span></div></div>
       </div>
-      <a href="erp-anran.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看完整合約清單 → 安然廳</a>
+      <a href="erp-ip-vault.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">進入 IP 版權庫 →</a>
+    </div>
+  </div>
+
+  <!-- 有你共創 JV前應付帳款 -->
+  <div class="section-title">有你共創 · JV 前應付帳款敞口</div>
+  <div style="background:var(--card);border:1px solid var(--warn);border-radius:10px;padding:16px;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--txt-hi);">有你共創 JV 前應付帳款（Mock 估算）</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">Mofusand MG 確認現金應付；Muziktiger / 飯糰與梅子 投資貢獻處理方式待與有你共創確認</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:22px;font-weight:800;color:var(--warn);">≈ ¥527 萬</div>
+        <div style="font-size:10px;color:var(--txt-mid);">RMB 合計估算</div>
+      </div>
+    </div>
+    <div style="background:var(--card2);border-radius:8px;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:1fr auto auto;border-bottom:1px solid var(--border);">
+        <div style="padding:5px 10px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;">項目</div>
+        <div style="padding:5px 10px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">金額（RMB）</div>
+        <div style="padding:5px 10px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;">狀態</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;border-bottom:1px solid var(--border);">
+        <div style="padding:9px 10px;font-size:12px;color:var(--txt-hi);">Mofusand MG 墊付</div>
+        <div style="padding:9px 10px;font-size:13px;font-weight:700;color:var(--danger);text-align:right;white-space:nowrap;">¥ 29.8 萬</div>
+        <div style="padding:9px 10px;font-size:10px;"><span style="background:var(--danger-dim);color:var(--danger);padding:2px 7px;border-radius:8px;font-weight:700;border:1px solid var(--danger);">現金應付</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;border-bottom:1px solid var(--border);">
+        <div style="padding:9px 10px;font-size:12px;color:var(--txt-hi);">Muziktiger 投資貢獻（70% 份額估算）</div>
+        <div style="padding:9px 10px;font-size:13px;font-weight:700;color:var(--warn);text-align:right;white-space:nowrap;">¥ 163.8 萬</div>
+        <div style="padding:9px 10px;font-size:10px;"><span style="background:var(--warn-dim);color:var(--warn);padding:2px 7px;border-radius:8px;font-weight:700;border:1px solid var(--warn);">待確認</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;">
+        <div style="padding:9px 10px;font-size:12px;color:var(--txt-hi);">飯糰與梅子 投資貢獻（70% 份額估算）</div>
+        <div style="padding:9px 10px;font-size:13px;font-weight:700;color:var(--warn);text-align:right;white-space:nowrap;">¥ 334.2 萬</div>
+        <div style="padding:9px 10px;font-size:10px;"><span style="background:var(--warn-dim);color:var(--warn);padding:2px 7px;border-radius:8px;font-weight:700;border:1px solid var(--warn);">待確認</span></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:var(--txt-lo);line-height:1.6;">
+      ⚠ Muziktiger / 飯糰與梅子 的處理方式（現金歸還 / 股權抵扣 / 其他）尚未與有你共創確認。¥29.8 萬 Mofusand MG 為確認現金應付，JV 啟動後歸還。
     </div>
   </div>
 
@@ -606,8 +684,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="approval-row" onclick="toggleAppr('a3')">
         <div class="appr-icon project">🚀</div>
         <div class="appr-body">
-          <div class="appr-title">新項目申請 · Gudetama 泰國快閃系列</div>
-          <div class="appr-meta">Shawn 提案 · 預算 ¥32 萬 · 目標 Q3 快閃店 · 等 Ray 拍板</div>
+          <div class="appr-title">新項目申請 · Muziktiger & Opanchu 泰國快閃系列</div>
+          <div class="appr-meta">Shawn 提案 · 預算 ¥28 萬 · 目標 8月 Siam Paragon · 待模具確認</div>
         </div>
         <div>
           <div class="appr-amount" style="color:var(--accent)">¥ 320,000 <span class="ccy ccy-rmb">RMB</span></div>
@@ -623,11 +701,11 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="appr-detail-title">項目摘要 · Shawn 提案</div>
         <div class="detail-grid">
           <div class="detail-cell"><div class="detail-cell-label">目標地點</div><div class="detail-cell-val">曼谷 Siam Paragon</div></div>
-          <div class="detail-cell"><div class="detail-cell-label">預計時間</div><div class="detail-cell-val">2026-Q3（7-8月）</div></div>
-          <div class="detail-cell"><div class="detail-cell-label">預算（北京→泰國）</div><div class="detail-cell-val">¥ 32 萬 RMB</div></div>
-          <div class="detail-cell"><div class="detail-cell-label">預計銷售</div><div class="detail-cell-val">฿ 85 萬 THB</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">預計時間</div><div class="detail-cell-val">2026-08（8月）</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">預算（北京→泰國）</div><div class="detail-cell-val">¥ 28 萬 RMB</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">預計銷售</div><div class="detail-cell-val">฿ 90 萬 THB</div></div>
         </div>
-        <div class="detail-quote-row"><span style="color:var(--txt-mid)">備貨成本</span><span>¥ 18 萬 RMB</span></div>
+        <div class="detail-quote-row"><span style="color:var(--txt-mid)">備貨成本（Muziktiger + Opanchu 各 50 箱）</span><span>¥ 16 萬 RMB</span></div>
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">場地費（UJ BKK 支付）</span><span>฿ 12 萬 THB</span></div>
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">物流+報關</span><span>¥ 2.8 萬 RMB</span></div>
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">金流方式</span><span style="color:var(--txt-hi)">北京發貨→UJ BKK賣後付款</span></div>
@@ -759,17 +837,17 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </a>
     <a class="pipe-link" href="erp-pipeline.html">
     <div class="pipeline-row">
-      <div class="pipe-ip">Gudetama 泰國</div>
+      <div class="pipe-ip">Mofusand 10月款</div>
       <div class="pipe-stages">
-        <div class="pipe-stage ps-active">洽談中</div>
-        <div class="pipe-stage ps-wait">—</div>
-        <div class="pipe-stage ps-wait">—</div>
+        <div class="pipe-stage ps-done">✓</div>
+        <div class="pipe-stage ps-done">✓</div>
+        <div class="pipe-stage ps-active">2D 送審中</div>
         <div class="pipe-stage ps-wait">—</div>
         <div class="pipe-stage ps-wait">—</div>
         <div class="pipe-stage ps-wait">—</div>
         <div class="pipe-stage ps-wait">—</div>
       </div>
-      <div class="pipe-status" style="color:var(--txt-mid)">版權條件洽談 →</div>
+      <div class="pipe-status" style="color:var(--accent)">等版權方回覆 →</div>
     </div>
     </a>
     </div><!-- /pipeline-inner -->
@@ -1360,10 +1438,90 @@ async function loadVamProgress(){
       }
     }
 
+    // ── Block 4: OPEX 調整驗算 ──
+    window._vamActual = actual;
+    const opexTotal = 300000 * monthPassed;
+    const grossEst  = actual + opexTotal;
+    const opexRows  = document.getElementById("vam-opex-rows");
+    if(opexRows){
+      opexRows.innerHTML = `
+        <div class="opex-row"><span class="opex-label">估算毛利（淨利還原 OPEX）</span><span class="opex-val" style="color:var(--txt-hi)">¥${fmt(grossEst)} 萬</span></div>
+        <div class="opex-row"><span class="opex-label">扣除 OPEX（¥30萬 × ${monthPassed} 個月）</span><span class="opex-val" style="color:var(--danger)">− ¥${fmt(opexTotal)} 萬</span></div>
+        <div class="opex-row opex-total"><span class="opex-label" style="color:var(--txt-hi)">＝ 確認 VAM 淨利</span><span class="opex-val" style="color:${isAhead?'var(--ok)':'var(--warn)'}">¥${fmt(actual)} 萬 ✓</span></div>`;
+    }
+
   }catch(e){
     console.error("loadVamProgress", e);
     // Fallback: leave hardcoded values untouched
   }
+}
+
+/* ── LOAD PIPELINE FORECAST (Block 2) ── */
+async function loadForecast(){
+  const el    = document.getElementById("forecast-inner");
+  const tagEl = document.getElementById("forecast-tag");
+  const summEl= document.getElementById("forecast-summary");
+  if(!el) return;
+
+  const MARGIN={"Snoopy":0.42,"Muziktiger":0.38,"Opanchu":0.38,"褲褲兔":0.38,"Mofusand":0.40,"貓福珊迪":0.40};
+  const CCY_RATE={"RMB":1,"THB":0.196,"HKD":0.90,"TWD":0.22,"USD":7.25};
+  function getMargin(ip){ const k=Object.keys(MARGIN).find(k=>ip&&ip.includes(k)); return k?MARGIN[k]:0.28; }
+
+  try{
+    const items=await _fetchAll(_TBLS.sales);
+    const pending=items.filter(r=>{
+      const st=_fv(r.fields,"收款狀態")||"";
+      return st&&st!=="全款已收"&&st!=="已完結"&&st!=="取消";
+    });
+
+    if(!pending.length){
+      el.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px">暫無在途訂單</div>';
+      return;
+    }
+
+    let totalRmb=0;
+    const rows=pending.map(r=>{
+      const f=r.fields;
+      const client=_fv(f,"客戶名稱")||"—";
+      const ip    =_fv(f,"IP品牌")||"";
+      const ipShort=ip.split("（")[0].trim()||ip.substring(0,8);
+      const amt   =parseFloat(_fv(f,"總金額"))||0;
+      const ccy   =_fv(f,"幣別")||"RMB";
+      const status=_fv(f,"收款狀態")||"";
+      const margin=getMargin(ip);
+      const rate  =CCY_RATE[ccy]||1;
+      const mgnRmb=amt*rate*margin;
+      totalRmb+=mgnRmb;
+
+      const dotColor=status==="訂金已收"?"var(--warn)":status==="未收款"?"var(--danger)":"var(--ok)";
+      const ccyCls={"RMB":"ccy-rmb","THB":"ccy-thb","HKD":"ccy-hkd","TWD":"ccy-twd","USD":"ccy-rmb"}[ccy]||"";
+      const amtLbl={"RMB":"¥","THB":"฿","HKD":"HK$","TWD":"NT$","USD":"$"}[ccy]||"";
+      return `<div class="forecast-row">
+        <div class="fc-ip">${ipShort}</div>
+        <div class="fc-client">${client}<span style="display:block;font-size:9px;color:var(--txt-lo)">${status}</span></div>
+        <div class="fc-amt">${amtLbl}${(amt/10000).toFixed(1)}萬 <span class="ccy ${ccyCls}">${ccy}</span></div>
+        <div class="fc-margin" style="color:var(--ok)">+¥${(mgnRmb/10000).toFixed(1)}萬</div>
+        <div class="fc-light" style="background:${dotColor}"></div>
+      </div>`;
+    }).join("");
+    el.innerHTML=rows;
+
+    const VAM_YR=8000000;
+    const actualNet=window._vamActual||2624000;
+    const mLeft=12-(new Date().getMonth()+1);
+    const monthlyNeed=mLeft>0?(VAM_YR-actualNet)/mLeft:VAM_YR;
+    const coverPct=monthlyNeed>0?Math.round(totalRmb/monthlyNeed*100):100;
+    const isGreen=coverPct>=100;
+
+    if(summEl){
+      summEl.style.display="flex";
+      summEl.innerHTML=`
+        <span style="color:var(--txt-mid)">在途訂單預估毛利合計</span>
+        <span style="font-size:15px;font-weight:800;color:${isGreen?"var(--ok)":"var(--warn)"}">¥${(totalRmb/10000).toFixed(1)}萬</span>
+        <span style="color:${isGreen?"var(--ok)":"var(--warn)"}">${isGreen?"✅ 覆蓋":"⚠ 僅覆蓋"} 月度 VAM 需求 ${coverPct}%</span>`;
+    }
+    if(tagEl){ tagEl.textContent=isGreen?"覆蓋充足":"需補充訂單"; tagEl.className="abc-tag "+(isGreen?"ok":"warn"); }
+  }catch(e){ console.error("loadForecast",e); }
 }
 
 /* ── INIT ── */
@@ -1374,6 +1532,7 @@ loadBudgetKPI();
 loadOrderStats();
 loadContractAlerts();
 loadVamProgress();
+loadForecast();
 </script>
 </body>
 </html>

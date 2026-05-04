@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 兩年預算規劃</title>
+<style>
+:root {
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--accent2:#4f56b0;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:.05em;}
+.brand-sub{font-size:11px;color:var(--txt-mid);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+
+.main{max-width:1600px;margin:0 auto;padding:24px 20px;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin-bottom:12px;}
+
+/* VAM summary strip */
+.vam-strip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.vam-item-label{font-size:10px;color:var(--txt-mid);margin-bottom:4px;display:flex;justify-content:space-between;}
+.vam-item-val{font-size:20px;font-weight:800;margin-bottom:6px;}
+.prog-track{background:var(--card2);border-radius:4px;height:8px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;transition:.4s;}
+.prog-fill.ok{background:linear-gradient(90deg,#16a34a,var(--ok));}
+.prog-fill.warn{background:linear-gradient(90deg,#b45309,var(--warn));}
+.prog-fill.danger{background:linear-gradient(90deg,#b91c1c,var(--danger));}
+
+/* Assumption panel */
+.assume-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.assume-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.assume-hdr:hover{background:var(--card2);}
+.assume-body{padding:12px 16px 16px;}
+.global-params{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.param-group{display:flex;align-items:center;gap:6px;}
+.param-label{font-size:11px;color:var(--txt-mid);}
+.param-input{background:var(--card2);border:1px solid var(--border-hi);color:var(--txt-hi);font-size:12px;font-weight:700;padding:4px 8px;border-radius:6px;width:90px;text-align:right;}
+.param-input:focus{outline:none;border-color:var(--accent);}
+.btn-sm{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--accent);}
+
+.prod-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.prod-tbl th{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.04em;padding:4px 8px;border-bottom:1px solid var(--border);text-align:right;}
+.prod-tbl th:first-child{text-align:left;}
+.prod-tbl td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.prod-tbl td:not(:first-child){text-align:right;}
+.prod-tbl tr:last-child td{border:none;}
+.prod-tbl tr:hover td{background:#ffffff05;}
+.ip-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;margin-right:4px;}
+.pinput{background:var(--card2);border:1px solid transparent;color:var(--txt-hi);font-size:12px;font-weight:700;padding:2px 6px;border-radius:4px;text-align:right;}
+.pinput:hover,.pinput:focus{border-color:var(--accent);outline:none;background:var(--surface);}
+.pinput-sm{width:80px;}
+.pinput-md{width:110px;}
+.msel{background:var(--card2);border:1px solid transparent;color:var(--txt-hi);font-size:11px;padding:2px 4px;border-radius:4px;}
+.msel:focus{outline:none;border-color:var(--accent);}
+
+/* View toggle */
+.view-bar{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.vbtn{background:var(--card2);border:1px solid var(--border);color:var(--txt-mid);font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:.15s;}
+.vbtn.active{background:var(--accent2);border-color:var(--accent);color:var(--txt-hi);}
+.vbtn:hover:not(.active){color:var(--txt-hi);}
+
+/* Budget table */
+.tbl-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--border);border-radius:10px;}
+table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
+
+/* Sticky name column */
+.btbl .stickyCol{position:sticky;left:0;z-index:2;}
+.btbl thead .stickyCol{background:var(--surface);}
+.btbl tbody .stickyCol{background:var(--card);}
+.btbl tfoot .stickyCol{background:var(--card);}
+
+/* Column headers */
+.btbl thead th{background:var(--surface);padding:6px 4px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;text-align:center;border-bottom:1px solid var(--border);width:62px;}
+.btbl thead th.stickyCol{text-align:left;padding-left:12px;width:168px;font-size:10px;color:var(--txt-mid);}
+.btbl thead th.y2-start{border-left:2px solid var(--accent);}
+.yr-label{font-size:8px;font-weight:800;letter-spacing:.06em;}
+.yr-y1{color:var(--ok);}
+.yr-y2{color:var(--accent);}
+
+/* IP header rows */
+.btbl tbody tr.ip-hdr td{padding:4px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+
+/* Product data rows */
+.btbl tbody tr.prod-row td{height:30px;padding:0 4px;font-size:11px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;}
+.btbl tbody tr.prod-row td.stickyCol{text-align:left;padding:0 8px 0 12px;font-size:11px;color:var(--txt-mid);max-width:168px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.btbl tbody tr.prod-row:hover td{opacity:.85;}
+.btbl tbody tr.prod-row td.y2-start{border-left:2px solid #818cf820;}
+
+/* Summary footer */
+.btbl tfoot tr td{padding:5px 4px;font-size:11px;text-align:right;white-space:nowrap;}
+.btbl tfoot tr td.stickyCol{text-align:left;padding-left:12px;font-weight:700;}
+.btbl tfoot tr.row-gross td{border-top:1px solid var(--border-hi);}
+.btbl tfoot tr.row-opex td{background:#ef444406;}
+.btbl tfoot tr.row-opex td.stickyCol{background:#ef444406;color:var(--danger);}
+.btbl tfoot tr.row-net td{background:#22c55e06;}
+.btbl tfoot tr.row-net td.stickyCol{background:#22c55e06;color:var(--ok);}
+.btbl tfoot tr.row-cum td{background:var(--card2);font-size:10px;}
+.btbl tfoot tr.row-cum td.stickyCol{background:var(--card2);color:var(--accent);}
+.btbl tfoot td.y2-start{border-left:2px solid #818cf820;}
+
+/* Value colours */
+.v-hi{color:var(--ok);font-weight:700;}
+.v-ok{color:#86efac;}
+.v-warn{color:var(--warn);}
+.v-neg{color:var(--danger);}
+.v-zero{color:var(--txt-lo);}
+
+/* Responsive */
+@media(max-width:600px){.main{padding:16px 12px;}.global-params{flex-direction:column;align-items:flex-start;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-dot"></div>
+    <div>
+      <span class="brand-name">蕪解 ERP</span>
+      <span class="brand-sub">兩年預算規劃</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <a href="erp-war-room.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 戰情室</a>
+    <span style="font-size:11px;color:var(--txt-mid);" id="bp-date"></span>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="section-title">VAM 對賭達標預測 · 基於當前假設</div>
+  <div class="vam-strip">
+    <div>
+      <div class="vam-item-label">
+        <span>Year 1 淨利　2026-07 ～ 2027-06</span>
+        <span id="v1pct" style="font-weight:700;"></span>
+      </div>
+      <div class="vam-item-val" id="v1val">—</div>
+      <div class="prog-track"><div class="prog-fill warn" id="v1bar" style="width:0%"></div></div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:4px;">目標 ¥800 萬　<span id="v1gap"></span></div>
+    </div>
+    <div>
+      <div class="vam-item-label">
+        <span>Year 2 淨利　2027-07 ～ 2028-06</span>
+        <span id="v2pct" style="font-weight:700;"></span>
+      </div>
+      <div class="vam-item-val" id="v2val">—</div>
+      <div class="prog-track"><div class="prog-fill warn" id="v2bar" style="width:0%"></div></div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:4px;">目標 ¥800 萬　<span id="v2gap"></span></div>
+    </div>
+    <div>
+      <div class="vam-item-label">
+        <span>兩年合計　2026-07 ～ 2028-06</span>
+        <span id="vtpct" style="font-weight:700;"></span>
+      </div>
+      <div class="vam-item-val" id="vtval">—</div>
+      <div class="prog-track"><div class="prog-fill warn" id="vtbar" style="width:0%"></div></div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:4px;">目標 ¥1,600 萬　<span id="vtgap"></span></div>
+    </div>
+  </div>
+
+  <!-- Assumption panel -->
+  <div class="assume-card">
+    <div class="assume-hdr" onclick="toggleAssume()">
+      <span style="font-size:12px;font-weight:700;">⚙ 假設參數　<span style="font-weight:400;color:var(--txt-mid);font-size:11px;">點擊折疊 / 展開</span></span>
+      <span id="aArrow" style="color:var(--txt-mid);">▲</span>
+    </div>
+    <div id="aBody" class="assume-body">
+      <div class="global-params">
+        <div class="param-group">
+          <span class="param-label">OPEX / 月</span>
+          <span style="font-size:11px;color:var(--txt-lo);">¥</span>
+          <input class="param-input" id="gOpex" value="300,000" oninput="updateGlobal()">
+        </div>
+        <div class="param-group">
+          <span class="param-label">批發折扣</span>
+          <input class="param-input" id="gWS" value="46%" oninput="updateGlobal()" style="width:60px;">
+        </div>
+        <button class="btn-sm" onclick="resetAll()">↩ 重置預設值</button>
+        <span style="font-size:10px;color:var(--txt-lo);margin-left:4px;">⚠ 僅供管理層討論參考，非正式財務預測</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="prod-tbl">
+          <thead>
+            <tr>
+              <th style="text-align:left;min-width:260px;">產品</th>
+              <th style="min-width:110px;">上市月</th>
+              <th style="min-width:80px;">SRP（¥）</th>
+              <th style="min-width:110px;">預計銷量（件）</th>
+              <th style="min-width:70px;">COGS%</th>
+              <th style="min-width:150px;text-align:right;">版稅計算方式</th>
+            </tr>
+          </thead>
+          <tbody id="paramBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- View toggle + table -->
+  <div class="view-bar">
+    <span style="font-size:11px;color:var(--txt-lo);">顯示：</span>
+    <button class="vbtn" id="btnRev" onclick="setView('rev')">批發收入</button>
+    <button class="vbtn active" id="btnGross" onclick="setView('gross')">毛利</button>
+    <button class="vbtn" id="btnNet" onclick="setView('net')">月度淨利</button>
+    <span style="margin-left:auto;font-size:10px;color:var(--txt-lo);">單位：萬元 RMB　│　Hover 單元格查看明細</span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="btbl" id="btbl">
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+      <tfoot id="tfoot"></tfoot>
+    </table>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────
+const DEFAULTS = [
+  { id:'muz1', ip:'Muziktiger', ipShort:'無業老虎', color:'#38bdf8',
+    name:'再懶一下下 盲袋 15+1款', launch:'2026-07',
+    vol:75000, srp:49, cogs:0.58,
+    royalty:{ type:'std', d:0.26, r:0.08 } },
+
+  { id:'oni1', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
+    name:'生活日記 盲袋 15+1款', launch:'2026-07',
+    vol:150000, srp:19.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.12 } },
+  { id:'oni2', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
+    name:'忙得糊糊轉 盲袋 12+1款', launch:'2026-08',
+    vol:100000, srp:29.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.12 } },
+  { id:'oni3', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
+    name:'閒鹹梅事做 盲盒 10+1款', launch:'2026-10',
+    vol:90000, srp:29.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.12 } },
+  { id:'oni4', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
+    name:'充滿幹勁的一天 盲盒 12+1款', launch:'2026-11',
+    vol:120000, srp:39.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.12 } },
+
+  { id:'opa1', ip:'Opanchu 褲褲兔', ipShort:'褲褲兔', color:'#818cf8',
+    name:'眼鏡兔超級變變變 磁吸盲盒 5+1款', launch:'2026-08',
+    vol:108000, srp:34.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.14 } },
+  { id:'opa2', ip:'Opanchu 褲褲兔', ipShort:'褲褲兔', color:'#818cf8',
+    name:'美味大暴走 盲袋', launch:'2026-10',
+    vol:80000, srp:39.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.14 } },
+
+  { id:'mof1', ip:'Mofusand 貓福珊迪', ipShort:'貓福珊迪', color:'#fb923c',
+    name:'10月款 盲盒（估）', launch:'2026-10',
+    vol:48000, srp:59, cogs:0.58,
+    royalty:{ type:'ws', r:0.14 } },
+  { id:'mof2', ip:'Mofusand 貓福珊迪', ipShort:'貓福珊迪', color:'#fb923c',
+    name:'12月款 盲袋（估）', launch:'2026-12',
+    vol:48000, srp:59, cogs:0.58,
+    royalty:{ type:'ws', r:0.14 } },
+
+  { id:'sno1', ip:'Snoopy 史努比', ipShort:'Snoopy', color:'#fbbf24',
+    name:'聖誕限定盲袋 8款', launch:'2026-12',
+    vol:6000, srp:59.9, cogs:0.58,
+    royalty:{ type:'std', d:0.40, r:0.14 } },
+];
+
+// 24 months: 2026-07 → 2028-06
+const MONTHS = [];
+for (let y=2026;y<=2028;y++) for (let m=1;m<=12;m++) {
+  const ym = `${y}-${String(m).padStart(2,'0')}`;
+  if (ym>='2026-07' && ym<='2028-06') MONTHS.push(ym);
+}
+const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MNC = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+// Volume distribution: 12 months from launch (sums to 1.0)
+// Front-loaded: strong launch, gradual fade
+const VDIST = [0.20,0.16,0.12,0.10,0.10,0.08,0.07,0.06,0.05,0.03,0.02,0.01];
+
+// ── STATE ─────────────────────────────────────────────────────────
+let prods = DEFAULTS.map(p=>({...p, royalty:{...p.royalty}}));
+let opex = 300000;
+let ws = 0.46;
+let viewMode = 'gross';
+let assumeOpen = true;
+
+// ── CALC ──────────────────────────────────────────────────────────
+function mIdx(ym){ return MONTHS.indexOf(ym); }
+
+function calcProd(p) {
+  const li = mIdx(p.launch);
+  return MONTHS.map((_,mi)=>{
+    const off = mi - li;
+    if (li===-1 || off<0 || off>=VDIST.length) return {rev:0,roy:0,cogs:0,gross:0};
+    const vol = p.vol * VDIST[off];
+    const rev = vol * p.srp * ws;
+    const roy = p.royalty.type==='ws' ? rev*p.royalty.r : vol*p.srp*p.royalty.d*p.royalty.r;
+    const cogsAmt = rev * p.cogs;
+    const gross = rev - cogsAmt - roy;
+    return {rev, roy, cogs:cogsAmt, gross};
+  });
+}
+
+// ── FORMAT ────────────────────────────────────────────────────────
+function fv(n){ return n===0 ? '—' : (n/10000).toFixed(1); }
+function vcls(n, isNet=false){
+  if (n===0) return 'v-zero';
+  if (isNet){ return n>=500000?'v-hi':n>=0?'v-ok':n>=-200000?'v-warn':'v-neg'; }
+  return n>=500000?'v-hi':n>=100000?'v-ok':n>=0?'v-warn':'v-neg';
+}
+function tipTxt(d){
+  return `批發收入 ¥${(d.rev/10000).toFixed(1)}万\n版稅 ¥${(d.roy/10000).toFixed(1)}万\n毛利 ¥${(d.gross/10000).toFixed(1)}万`;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────
+function renderAll(){
+  renderParams();
+  renderHead();
+  renderBody();
+  renderFoot();
+  renderVAM();
+}
+
+function renderParams(){
+  const rl = p => p.royalty.type==='ws'
+    ? `批發額 × ${(p.royalty.r*100).toFixed(0)}%`
+    : `SRP×${(p.royalty.d*100).toFixed(0)}% × ${(p.royalty.r*100).toFixed(0)}% = ${(p.royalty.d*p.royalty.r*100).toFixed(2)}%`;
+
+  document.getElementById('paramBody').innerHTML = prods.map((p,i)=>`
+    <tr>
+      <td>
+        <span class="ip-badge" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.ipShort}</span>${p.name}
+      </td>
+      <td>
+        <select class="msel" onchange="upd(${i},'launch',this.value)">
+          ${MONTHS.slice(0,18).map(m=>`<option${m===p.launch?' selected':''}>${m}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="pinput pinput-sm" value="${p.srp}" oninput="upd(${i},'srp',+this.value||p.srp)"></td>
+      <td><input class="pinput pinput-md" value="${p.vol.toLocaleString()}" oninput="upd(${i},'vol',+this.value.replace(/,/g,'')||p.vol)"></td>
+      <td><input class="pinput pinput-sm" value="${(p.cogs*100).toFixed(0)}%" oninput="upd(${i},'cogs',parseFloat(this.value)/100||p.cogs)" style="width:60px;"></td>
+      <td style="color:var(--txt-mid);font-size:10px;">${rl(p)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderHead(){
+  const cells = MONTHS.map((ym,i)=>{
+    const [y,m] = ym.split('-');
+    const isY2 = i===12;
+    const yr = i===0?`<span class="yr-label yr-y1">Y1</span><br>`:isY2?`<span class="yr-label yr-y2">Y2</span><br>`:'';
+    return `<th class="${isY2?'y2-start':''}" title="${ym}">${yr}${MNC[+m-1]}<br><span style="font-size:8px;font-weight:400;color:var(--txt-lo)">${y}</span></th>`;
+  }).join('');
+  document.getElementById('thead').innerHTML =
+    `<tr><th class="stickyCol">產品</th>${cells}</tr>`;
+}
+
+function renderBody(){
+  const allD = prods.map(p=>calcProd(p));
+  // Group by IP preserving order
+  const groups = [], seen = {};
+  prods.forEach((p,i)=>{
+    if (!seen[p.ip]){ seen[p.ip]=true; groups.push({ip:p.ip,color:p.color,items:[]}); }
+    groups.find(g=>g.ip===p.ip).items.push({p,d:allD[i]});
+  });
+
+  let html='';
+  groups.forEach(g=>{
+    html+=`<tr class="ip-hdr"><td colspan="${MONTHS.length+1}" style="background:${g.color}12;color:${g.color};border-left:3px solid ${g.color};border-bottom:1px solid ${g.color}30;">${g.ip}</td></tr>`;
+    g.items.forEach(({p,d})=>{
+      const cells = d.map((cell,i)=>{
+        const val = viewMode==='rev'?cell.rev:viewMode==='net'?cell.gross-opex/prods.length:cell.gross;
+        if (val===0) return `<td class="v-zero${i===12?' y2-start':''}">—</td>`;
+        return `<td class="${vcls(val)}${i===12?' y2-start':''}" title="${tipTxt(cell)}">${fv(val)}</td>`;
+      }).join('');
+      html+=`<tr class="prod-row"><td class="stickyCol" title="${p.ip} / ${p.name}">${p.name}</td>${cells}</tr>`;
+    });
+  });
+  document.getElementById('tbody').innerHTML = html;
+}
+
+function renderFoot(){
+  const allD = prods.map(p=>calcProd(p));
+  const mGross = MONTHS.map((_,mi)=>allD.reduce((s,d)=>s+d[mi].gross,0));
+  const mRev   = MONTHS.map((_,mi)=>allD.reduce((s,d)=>s+d[mi].rev,0));
+  const mNet   = mGross.map(g=>g-opex);
+
+  // Cumulative: reset at Y2 boundary
+  let cy1=0, cy2=0;
+  const cum = MONTHS.map((_,mi)=>{
+    if (mi<12){ cy1+=mNet[mi]; return cy1; }
+    else{ cy2+=mNet[mi]; return cy2; }
+  });
+
+  const gc = mGross.map((v,i)=>`<td class="${vcls(v)}${i===12?' y2-start':''}">${fv(v)}</td>`).join('');
+  const oc = MONTHS.map((_,i)=>`<td style="color:var(--danger);font-weight:700;${i===12?'border-left:2px solid #818cf820;':''}">-${(opex/10000).toFixed(0)}</td>`).join('');
+  const nc = mNet.map((v,i)=>`<td class="${vcls(v,true)}" style="font-weight:800;${i===12?'border-left:2px solid #818cf820;':''}">${fv(v)}</td>`).join('');
+  const cc = cum.map((v,i)=>{
+    const isY1=i<12, tgt=8000000;
+    const pct=(v/tgt*100).toFixed(0);
+    const cls = v>=tgt?'v-hi':v>=0?'v-ok':v>=-1000000?'v-warn':'v-neg';
+    return `<td class="${cls}${i===12?' y2-start':''}" style="font-size:10px;">${fv(v)}<br><span style="font-size:8px;color:var(--txt-lo);">${isY1?'Y1':'Y2'} ${pct}%</span></td>`;
+  }).join('');
+
+  document.getElementById('tfoot').innerHTML = `
+    <tr class="row-gross"><td class="stickyCol">合計毛利</td>${gc}</tr>
+    <tr class="row-opex"><td class="stickyCol">OPEX（-¥${(opex/10000).toFixed(0)}万/月）</td>${oc}</tr>
+    <tr class="row-net"><td class="stickyCol">當月淨利</td>${nc}</tr>
+    <tr class="row-cum"><td class="stickyCol" style="color:var(--accent);">累計淨利（Y1 / Y2）</td>${cc}</tr>
+  `;
+}
+
+function renderVAM(){
+  const allD = prods.map(p=>calcProd(p));
+  const mNet = MONTHS.map((_,mi)=>allD.reduce((s,d)=>s+d[mi].gross,0)-opex);
+  const y1 = mNet.slice(0,12).reduce((a,b)=>a+b,0);
+  const y2 = mNet.slice(12,24).reduce((a,b)=>a+b,0);
+  const tot = y1+y2;
+  const VAM = 8000000;
+
+  const setBar=(sfx,val,tgt)=>{
+    const pct=Math.min(100,Math.max(0,val/tgt*100));
+    const cls=val>=tgt?'ok':val>=tgt*.7?'warn':'danger';
+    const color=val>=tgt?'var(--ok)':val>=0?'var(--warn)':'var(--danger)';
+    const gap=val-tgt;
+    document.getElementById(`${sfx}val`).textContent=`¥${(val/10000).toFixed(0)}万`;
+    document.getElementById(`${sfx}val`).style.color=color;
+    document.getElementById(`${sfx}pct`).textContent=pct.toFixed(1)+'%';
+    document.getElementById(`${sfx}pct`).style.color=color;
+    document.getElementById(`${sfx}bar`).className=`prog-fill ${cls}`;
+    document.getElementById(`${sfx}bar`).style.width=pct+'%';
+    const gapEl=document.getElementById(`${sfx}gap`);
+    gapEl.textContent=gap>=0?`✓ 超標 ¥${(gap/10000).toFixed(0)}万`:`差距 ¥${(Math.abs(gap)/10000).toFixed(0)}万`;
+    gapEl.style.color=gap>=0?'var(--ok)':'var(--warn)';
+  };
+  setBar('v1',y1,VAM);
+  setBar('v2',y2,VAM);
+  setBar('vt',tot,VAM*2);
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────
+function setView(mode){
+  viewMode=mode;
+  ['rev','gross','net'].forEach(m=>document.getElementById('btn'+m[0].toUpperCase()+m.slice(1)).classList.toggle('active',m===mode));
+  // fix btn ids
+  document.getElementById('btnRev').classList.toggle('active',mode==='rev');
+  document.getElementById('btnGross').classList.toggle('active',mode==='gross');
+  document.getElementById('btnNet').classList.toggle('active',mode==='net');
+  renderBody();
+  renderFoot();
+}
+
+function toggleAssume(){
+  assumeOpen=!assumeOpen;
+  document.getElementById('aBody').style.display=assumeOpen?'':'none';
+  document.getElementById('aArrow').textContent=assumeOpen?'▲':'▼';
+}
+
+function upd(i,key,val){
+  prods[i][key]=val;
+  renderAll();
+}
+
+function updateGlobal(){
+  opex=+(document.getElementById('gOpex').value.replace(/,/g,''))||300000;
+  ws=(+(document.getElementById('gWS').value.replace('%',''))||46)/100;
+  renderAll();
+}
+
+function resetAll(){
+  prods=DEFAULTS.map(p=>({...p,royalty:{...p.royalty}}));
+  opex=300000; ws=0.46;
+  document.getElementById('gOpex').value='300,000';
+  document.getElementById('gWS').value='46%';
+  renderAll();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.getElementById('bp-date').textContent=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric'});
+renderAll();
+</script>
+</body>
+</html>
