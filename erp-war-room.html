@@ -1425,6 +1425,9 @@ async function loadVamProgress(){
     const VAM_START = new Date("2026-07-01").getTime();
     if(!incActual && Date.now() < VAM_START) return;
 
+    // ── _vamActual 立即設值（確保 loadPipelineCoverage 能讀到，不受後面 DOM 操作影響）──
+    window._vamActual = actual;
+
     // ── Derived numbers ──
     const now        = new Date();
     const monthPassed= now.getMonth()+1;         // 1-12, months elapsed (current month counts)
@@ -1527,7 +1530,6 @@ async function loadVamProgress(){
     }
 
     // ── Block 4: OPEX 調整驗算 ──
-    window._vamActual = actual;
     const opexTotal = 300000 * monthPassed;
     const grossEst  = actual + opexTotal;
     const opexRows  = document.getElementById("vam-opex-rows");
