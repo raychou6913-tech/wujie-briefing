@@ -232,8 +232,8 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
               <th style="text-align:left;min-width:260px;">產品</th>
               <th style="min-width:108px;">上市月</th>
               <th style="min-width:72px;">SRP（¥）</th>
-              <th style="min-width:108px;">首批數量</th>
-              <th style="min-width:100px;">追加單</th>
+              <th style="min-width:108px;">首批（箱）</th>
+              <th style="min-width:100px;">追加單（箱）</th>
               <th style="min-width:68px;">批發折扣</th>
               <th style="min-width:110px;text-align:center;">首批毛利率</th>
               <th style="min-width:30px;"></th>
@@ -293,7 +293,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
           <select class="modal-inp" id="rLaunch"></select>
         </div>
         <div class="modal-field">
-          <div class="modal-lbl">新品首批數量（件）</div>
+          <div class="modal-lbl">新品首批數量（箱）</div>
           <input class="modal-inp" id="rVol" type="number" min="0" placeholder="e.g. 50000">
         </div>
       </div>
@@ -326,7 +326,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
           <input class="modal-inp" id="nSrp" type="number" value="29.9">
         </div>
         <div class="modal-field">
-          <div class="modal-lbl">首批數量（件）</div>
+          <div class="modal-lbl">首批數量（箱）</div>
           <input class="modal-inp" id="nVol" type="number" value="60000">
         </div>
       </div>
@@ -645,10 +645,13 @@ function renderParams(){
         </td>
         <td><input class="pi pi-sm" value="${p.srp}" onclick="event.stopPropagation()" oninput="fc(${i},'srp',this.value)"></td>
         <td>
-          <input class="pi pi-md" value="${p.volFirst.toLocaleString()}" onclick="event.stopPropagation()" oninput="fc(${i},'volFirst',this.value)">
-          <div style="font-size:9px;color:var(--txt-lo);text-align:right;margin-top:1px;">≈ ${Math.round(p.volFirst/_piecesPerCarton(p))} 箱</div>
+          <input class="pi pi-md" value="${Math.round(p.volFirst/_piecesPerCarton(p))}" onclick="event.stopPropagation()" oninput="fcBox(${i},'volFirst',this.value)" title="填箱數">
+          <div style="font-size:9px;color:var(--txt-lo);text-align:right;margin-top:1px;">= ${p.volFirst.toLocaleString()} 件</div>
         </td>
-        <td><input class="pi pi-md" value="${p.volReorder.toLocaleString()}" onclick="event.stopPropagation()" oninput="fc(${i},'volReorder',this.value)"></td>
+        <td>
+          <input class="pi pi-md" value="${Math.round(p.volReorder/_piecesPerCarton(p))}" onclick="event.stopPropagation()" oninput="fcBox(${i},'volReorder',this.value)" title="填箱數">
+          <div style="font-size:9px;color:var(--txt-lo);text-align:right;margin-top:1px;">= ${p.volReorder.toLocaleString()} 件</div>
+        </td>
         <td><input class="pi pi-xs" value="${Math.round(p.wsDiscount*100)}%" onclick="event.stopPropagation()" oninput="fc(${i},'wsDiscount',this.value)"></td>
         <td style="text-align:center;font-size:12px;font-weight:800;color:${mgnColor};" id="mgn-${p.id}">${fp(e.mgnFirst)}</td>
         <td><button class="expand-btn" id="ebtn-${p.id}">${isOpen?'▲':'▼'}</button></td>
@@ -975,6 +978,15 @@ function fc(i, key, rawVal){
   renderTable();
 }
 
+// Box input → convert to pieces then store
+function fcBox(i, key, rawVal){
+  const boxes = parseInt(rawVal.replace(/,/g,''))||0;
+  prods[i][key] = boxes * _piecesPerCarton(prods[i]);
+  refreshEconPreview(i);
+  updateCompactMargin(i);
+  renderTable();
+}
+
 // Detail cost change
 function dc(i, key, rawVal){
   prods[i][key]=parseFloat(rawVal)||0;
@@ -1136,10 +1148,10 @@ function confirmAdd(){
   if(addTab==='reorder'){
     const baseIdx = parseInt(document.getElementById('rBase').value)||0;
     const base = prods[baseIdx];
-    const vol = parseFloat(document.getElementById('rVol').value)||50000;
+    const volBoxes = parseInt(document.getElementById('rVol').value)||0;
     const launch = document.getElementById('rLaunch').value;
-    if(!vol||!launch){ alert('請填寫上市月與數量'); return; }
-    // Copy base's var costs + royalty; keep OT fields but zero mold/sample (can tweak in detail)
+    if(!volBoxes||!launch){ alert('請填寫上市月與箱數'); return; }
+    const ppc = _piecesPerCarton(base);
     const newProd = { ...base, ..._bp({
       hiddenOT:[...( base.hiddenOT||[])],
       hiddenVar:[...(base.hiddenVar||[])],
@@ -1147,7 +1159,7 @@ function confirmAdd(){
       reorderLeadDays:base.reorderLeadDays||45,
     }), id:uid,
       name: base.name + '（新品）',
-      launch, volFirst:vol, volReorder:0,
+      launch, volFirst:volBoxes*ppc, volReorder:0,
       royalty:{...base.royalty} };
     prods.push(newProd);
   } else {
@@ -1155,10 +1167,11 @@ function confirmAdd(){
     const name = document.getElementById('nName').value.trim() || '新產品';
     const launch = document.getElementById('nLaunch').value;
     const srp = parseFloat(document.getElementById('nSrp').value)||29.9;
-    const vol = parseFloat(document.getElementById('nVol').value)||60000;
+    const volBoxes = parseInt(document.getElementById('nVol').value)||250;
     const color = document.getElementById('nColor').value.trim()||'#a78bfa';
+    const _ppc = 15*16; // default 240件/箱 before product-specific box rule applies
     prods.push({ ..._bp(), id:uid, ip, ipShort:ip, color,
-      name, launch, volFirst:vol, volReorder:0, srp, wsDiscount:0.46,
+      name, launch, volFirst:volBoxes*_ppc, volReorder:0, srp, wsDiscount:0.46,
       costDesign:5000, cost2D:3000, cost3D:18000, costRender:6000,
       costSample:27120, costMold:150000, costQA:1100,
       unitMfg:4.0, unitAntiForge:0.106,
