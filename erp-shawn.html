@@ -642,11 +642,13 @@ const MONTHS_ELAPSED = new Date().getMonth()+1; // 1-12
 // ── BUDGET + KPI ────────────────────────────────────────────────
 async function loadBudget(){
   const rows = await query(_T.budget);
-  const incomeRows = rows.filter(r=>String(fv(r.fields,'預算科目')).includes('收入'));
-  const profitRows = rows.filter(r=>String(fv(r.fields,'預算科目')).includes('淨利'));
+  const yr = new Date().getFullYear();
+  const yItems = rows.filter(r=>(parseFloat(fv(r.fields,'年度'))||0)===yr);
+  const incomeRows  = yItems.filter(r=>fv(r.fields,'預算性質')==='收入');
+  const expenseRows = yItems.filter(r=>fv(r.fields,'預算性質')==='支出');
 
   const coMap = { '北京蕪解':'bj', '台灣悍草':'tw', 'UJ BKK':'bk' };
-  let totalRevT=0, totalRevA=0, totalProfT=0, totalProfA=0;
+  let totalRevT=0, totalRevA=0;
 
   for(const [co,pre] of Object.entries(coMap)){
     const cr = incomeRows.filter(r=>fv(r.fields,'所屬公司')===co);
@@ -656,7 +658,6 @@ async function loadBudget(){
     const pct = t>0?Math.round(a/t*100):0;
     const cc = pctColor(pct);
     if(pre==='tw'){
-      // TW card shows IP review progress, not revenue
       document.getElementById('tw-val').textContent = '4 個 IP';
       document.getElementById('tw-val').style.color = 'var(--taipei)';
       document.getElementById('tw-bar').style.width = '25%';
@@ -671,11 +672,6 @@ async function loadBudget(){
         document.getElementById(pre+'-pct').style.color = cc;
       }
     }
-    // BKK: count unshipped
-    if(pre==='bj'&&document.getElementById('bj-ship')){
-      // set placeholder; overridden by loadOrders
-    }
-    // BKK
     if(pre==='bk'&&document.getElementById('bk-pct')){
       const p2 = t>0?pct:46;
       document.getElementById('bk-pct').textContent = p2+'%（無快閃月）';
@@ -683,16 +679,14 @@ async function loadBudget(){
     }
   }
 
-  // profit rows
-  for(const [co] of Object.entries(coMap)){
-    const pr = profitRows.filter(r=>fv(r.fields,'所屬公司')===co);
-    totalProfT += pr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    totalProfA += pr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+  if(document.getElementById('bj-sub')&&totalRevT>0){
+    const bjT=incomeRows.filter(r=>fv(r.fields,'所屬公司')==='北京蕪解').reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+    if(bjT>0) document.getElementById('bj-sub').textContent=`YTD目標 ${wan(bjT)}`;
   }
 
-  // Global revenue KPI — compare YTD actual vs full-year target (paced)
+  // Global revenue KPI
   const FULL_YEAR_REV = 24000000;
-  const revActual = totalRevA||7920000; // fallback: Jan-May mock YTD
+  const revActual = totalRevA||7920000;
   const gRevPct = Math.round(revActual/FULL_YEAR_REV*100);
   const expPct  = Math.round(MONTHS_ELAPSED/12*100);
   const ahead   = gRevPct - expPct;
@@ -707,19 +701,19 @@ async function loadBudget(){
   if(ahead>0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-up'; trendEl.textContent=`+${ahead}% 超前`; }
   else if(ahead<0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-dn'; trendEl.textContent=`落後 ${Math.abs(ahead)}%`; }
   else { trendEl.style.display='none'; }
-  // BJ sub shows YTD budget target
-  if(document.getElementById('bj-sub')&&totalRevT>0){
-    const bjT=incomeRows.filter(r=>fv(r.fields,'所屬公司')==='北京蕪解').reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    if(bjT>0) document.getElementById('bj-sub').textContent=`YTD目標 ${wan(bjT)}`;
-  }
 
-  // Profit KPI — VAM target 800萬
+  // Profit KPI — income minus expenses; fallback to mock until VAM starts 2026-07-01
   const VAM_TARGET = 8000000;
-  const profA = totalProfA||2624000; // fallback: mock YTD Jan-May = ¥262.4万
-  const profT = totalProfT||VAM_TARGET;
+  const VAM_START = new Date('2026-07-01').getTime();
+  const totalActualInc = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+  const totalActualExp = expenseRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+  const totalBudgetInc = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+  const totalBudgetExp = expenseRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+  const profA = (!totalActualInc && Date.now()<VAM_START) ? 2624000 : (totalActualInc - totalActualExp);
+  const profT = (totalBudgetInc - totalBudgetExp)||VAM_TARGET;
   const profPct = Math.round(profA/profT*100);
   const profExp = Math.round(MONTHS_ELAPSED/12*100);
-  const profDiff = profA - profT*(MONTHS_ELAPSED/12); // positive = ahead
+  const profDiff = profA - profT*(MONTHS_ELAPSED/12);
   document.getElementById('g-profit').textContent = wan(profA);
   document.getElementById('g-profit').style.color = profPct>=profExp?'var(--ok)':'var(--warn)';
   document.getElementById('g-profit-sub').textContent = `/ ${wan(profT)}`;
