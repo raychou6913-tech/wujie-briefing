@@ -229,7 +229,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .vam-compact-sub{font-size:11px;color:var(--txt-mid);margin-top:3px;}
 
 /* ── PIPELINE COVERAGE ── */
-.cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.cover-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:14px;}
 @media(max-width:720px){.cover-grid{grid-template-columns:1fr;}}
 .cover-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
 .cover-table{width:100%;border-collapse:collapse;margin-top:8px;}
@@ -420,12 +420,14 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div id="popup-cover-inner"><div style="font-size:11px;color:var(--txt-lo);padding:12px 0;text-align:center">載入中…</div></div>
       <div class="cover-footer" id="popup-cover-footer"></div>
     </div>
-  </div>
-
-  <!-- ② 執行節奏 -->
-  <div class="section-title">執行節奏 · 各項目有沒有按計劃推進</div>
-  <div id="cadence-list" class="cadence-list">
-    <div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px">載入中…</div>
+    <div class="cover-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">🏬 庫存待售</span>
+        <span class="abc-tag" id="stock-cover-tag">計算中</span>
+      </div>
+      <div id="stock-cover-inner"><div style="font-size:11px;color:var(--txt-lo);padding:12px 0;text-align:center">載入中…</div></div>
+      <div class="cover-footer" id="stock-cover-footer"></div>
+    </div>
   </div>
 
   <!-- ③ 業績 & 利潤 -->
@@ -478,72 +480,6 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="mini-prog">
         <div class="mini-prog-fill" style="width:28.3%;background:var(--accent)"></div>
       </div>
-    </div>
-  </div>
-
-  <!-- Block 2: 在途訂單前向預測 -->
-  <div class="section-title">在途訂單前向預測 · Pipeline Forecast</div>
-  <div class="abc-card" style="margin-bottom:24px">
-    <div class="abc-header">
-      <span class="abc-title">📦 在途訂單 → 預期毛利貢獻</span>
-      <span class="abc-tag warn" id="forecast-tag">計算中</span>
-    </div>
-    <div id="forecast-inner">
-      <div style="padding:12px;text-align:center;color:var(--txt-lo);font-size:12px">載入中…</div>
-    </div>
-    <div id="forecast-summary" style="margin-top:10px;padding:10px 12px;background:var(--card2);border-radius:8px;font-size:11px;display:none;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"></div>
-  </div>
-
-  <!-- ② AI & 技術投資 -->
-  <div class="section-title">AI & 技術投資 · 費用歸屬追蹤</div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
-      <div style="background:var(--card2);border-radius:8px;padding:12px;">
-        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">本月已使用</div>
-        <div style="font-size:22px;font-weight:800;color:var(--txt-hi);" id="ai-used">$204</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">USD · 截至今日</div>
-      </div>
-      <div style="background:var(--card2);border-radius:8px;padding:12px;">
-        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">月度 Soft Cap</div>
-        <div style="font-size:22px;font-weight:800;color:var(--txt-mid);">$250</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">USD · MJ 自主授權上限</div>
-      </div>
-      <div style="background:var(--card2);border-radius:8px;padding:12px;">
-        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">剩餘額度</div>
-        <div style="font-size:22px;font-weight:800;color:var(--ok);" id="ai-remain">$46</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">本月可用</div>
-      </div>
-    </div>
-    <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
-        <span style="color:var(--txt-mid);">月度使用率</span>
-        <span style="font-weight:600;" id="ai-pct">81.6%</span>
-      </div>
-      <div style="background:var(--card2);border-radius:4px;height:7px;overflow:hidden;">
-        <div id="ai-prog-fill" style="width:81.6%;height:100%;border-radius:4px;background:linear-gradient(90deg,#b45309,var(--warn));"></div>
-      </div>
-    </div>
-    <div style="font-size:10px;color:var(--txt-lo);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">費用歸屬明細</div>
-    <div id="ai-attribution">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
-        <span style="color:var(--txt-mid);">Claude Code（MJ 系統維運）</span>
-        <span style="font-weight:700;color:var(--txt-hi);">$89 <span style="color:var(--txt-lo);font-weight:400;">→ 營運費用</span></span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
-        <span style="color:var(--txt-mid);">Gemini API（採購台報價 OCR）</span>
-        <span style="font-weight:700;color:var(--txt-hi);">$32 <span style="color:var(--txt-lo);font-weight:400;">→ 採購作業費用</span></span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
-        <span style="color:var(--txt-mid);">生圖費（Snoopy 夏季概念視覺）</span>
-        <span style="font-weight:700;color:var(--warn);">$45 <span style="color:var(--txt-lo);font-weight:400;">→ 開模費（Snoopy 夏季）</span></span>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:11px;">
-        <span style="color:var(--txt-mid);">生圖費（Opanchu 秋冬概念視覺）</span>
-        <span style="font-weight:700;color:var(--warn);">$38 <span style="color:var(--txt-lo);font-weight:400;">→ 開模費（Opanchu 秋冬）</span></span>
-      </div>
-    </div>
-    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--txt-lo);">
-      📌 生圖費已歸屬至各專案開模費，不計入一般行政 AI 費用。超過 $250 Soft Cap 需 Ray 額外授權。
     </div>
   </div>
 
@@ -667,47 +603,13 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
-  <!-- ④ 待 Ray 批核佇列 -->
+  <!-- ④ 重大決策待拍板 -->
   <div class="queue-card">
     <div class="queue-header">
-      <span class="section-title" style="margin:0" id="queue-section-title">待我批核 · Pending Approvals</span>
-      <span class="queue-count" id="queue-badge">載入中...</span>
+      <span class="section-title" style="margin:0" id="queue-section-title">重大決策待拍板 · 高金額 · 合約 · 卡關中</span>
+      <span class="queue-count" id="queue-badge">3 項</span>
     </div>
     <div id="approval-queue-inner">
-    <!-- Row 1: expense -->
-    <div class="approval-row-wrap">
-      <div class="approval-row" onclick="toggleAppr('a1')">
-        <div class="appr-icon expense">💸</div>
-        <div class="appr-body">
-          <div class="appr-title">費用報銷 · 詩彤 — 授權展交通住宿</div>
-          <div class="appr-meta">Bevis 已審 · 安然+躍明已複核 · 等 Ray 最終批核</div>
-        </div>
-        <div>
-          <div class="appr-amount" style="color:var(--txt-hi)">¥ 8,400 <span class="ccy ccy-rmb">RMB</span></div>
-          <div class="appr-age" style="color:var(--warn)">等待 3 天</div>
-        </div>
-        <span class="appr-expand-hint" id="hint-a1">▼ 展開</span>
-        <div class="appr-action" onclick="event.stopPropagation()">
-          <button class="btn-approve">✓ 批准</button>
-          <button class="btn-reject">✗ 拒絕</button>
-        </div>
-      </div>
-      <div class="appr-detail" id="a1">
-        <div class="appr-detail-title">費用明細</div>
-        <div class="detail-grid">
-          <div class="detail-cell"><div class="detail-cell-label">申請人</div><div class="detail-cell-val">詩彤</div></div>
-          <div class="detail-cell"><div class="detail-cell-label">所屬公司</div><div class="detail-cell-val">台灣悍草 <span class="ccy ccy-rmb">RMB等值</span></div></div>
-          <div class="detail-cell"><div class="detail-cell-label">費用類型</div><div class="detail-cell-val">出差（授權展）</div></div>
-          <div class="detail-cell"><div class="detail-cell-label">費用日期</div><div class="detail-cell-val">2026-04-28</div></div>
-        </div>
-        <div style="font-size:11px;color:var(--txt-mid);margin-bottom:6px;">費用項目</div>
-        <div class="detail-quote-row"><span>高鐵來回（台北↔台南）</span><span>NT$ 1,760</span></div>
-        <div class="detail-quote-row"><span>住宿 2晚（授權展展期）</span><span>NT$ 5,600</span></div>
-        <div class="detail-quote-row"><span>餐飲（展期工作餐）</span><span>NT$ 1,200</span></div>
-        <div class="detail-quote-row" style="font-weight:700;color:var(--txt-hi)"><span>合計</span><span>NT$ 8,560 ≈ <span style="color:var(--warn)">¥ 1,900 RMB</span></span></div>
-      </div>
-    </div>
-
     <!-- Row 2: purchase PO (most important - has comparison) -->
     <div class="approval-row-wrap">
       <div class="approval-row" onclick="toggleAppr('a2')">
@@ -785,32 +687,6 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">場地費（UJ BKK 支付）</span><span>฿ 12 萬 THB</span></div>
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">物流+報關</span><span>¥ 2.8 萬 RMB</span></div>
         <div class="detail-quote-row"><span style="color:var(--txt-mid)">金流方式</span><span style="color:var(--txt-hi)">北京發貨→UJ BKK賣後付款</span></div>
-      </div>
-    </div>
-
-    <!-- Row 4: small expense -->
-    <div class="approval-row-wrap">
-      <div class="approval-row" onclick="toggleAppr('a4')">
-        <div class="appr-icon expense">💸</div>
-        <div class="appr-body">
-          <div class="appr-title">費用報銷 · 老董 — 客戶拜訪出差費</div>
-          <div class="appr-meta">安然已審 · 躍明已複核 · 等 Ray 批核</div>
-        </div>
-        <div>
-          <div class="appr-amount" style="color:var(--txt-hi)">¥ 3,200 <span class="ccy ccy-rmb">RMB</span></div>
-          <div class="appr-age">等待 1 天</div>
-        </div>
-        <span class="appr-expand-hint" id="hint-a4">▼ 展開</span>
-        <div class="appr-action" onclick="event.stopPropagation()">
-          <button class="btn-approve">✓ 批准</button>
-          <button class="btn-reject">✗ 拒絕</button>
-        </div>
-      </div>
-      <div class="appr-detail" id="a4">
-        <div class="detail-quote-row"><span style="color:var(--txt-mid)">火車票（北京→上海）</span><span>¥ 1,200</span></div>
-        <div class="detail-quote-row"><span style="color:var(--txt-mid)">客戶餐敘</span><span>¥ 1,500</span></div>
-        <div class="detail-quote-row"><span style="color:var(--txt-mid)">交通（計程車）</span><span>¥ 500</span></div>
-        <div class="detail-quote-row" style="font-weight:700;color:var(--txt-hi)"><span>合計</span><span>¥ 3,200 RMB</span></div>
       </div>
     </div>
 
@@ -927,6 +803,59 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
     </a>
     </div><!-- /pipeline-inner -->
+  </div>
+
+  <!-- AI & 技術投資 -->
+  <div class="section-title">AI & 技術投資 · 費用歸屬追蹤</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="background:var(--card2);border-radius:8px;padding:12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">本月已使用</div>
+        <div style="font-size:22px;font-weight:800;color:var(--txt-hi);" id="ai-used">$204</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">USD · 截至今日</div>
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">月度 Soft Cap</div>
+        <div style="font-size:22px;font-weight:800;color:var(--txt-mid);">$250</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">USD · MJ 自主授權上限</div>
+      </div>
+      <div style="background:var(--card2);border-radius:8px;padding:12px;">
+        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">剩餘額度</div>
+        <div style="font-size:22px;font-weight:800;color:var(--ok);" id="ai-remain">$46</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">本月可用</div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
+        <span style="color:var(--txt-mid);">月度使用率</span>
+        <span style="font-weight:600;" id="ai-pct">81.6%</span>
+      </div>
+      <div style="background:var(--card2);border-radius:4px;height:7px;overflow:hidden;">
+        <div id="ai-prog-fill" style="width:81.6%;height:100%;border-radius:4px;background:linear-gradient(90deg,#b45309,var(--warn));"></div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--txt-lo);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">費用歸屬明細</div>
+    <div id="ai-attribution">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
+        <span style="color:var(--txt-mid);">Claude Code（MJ 系統維運）</span>
+        <span style="font-weight:700;color:var(--txt-hi);">$89 <span style="color:var(--txt-lo);font-weight:400;">→ 營運費用</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
+        <span style="color:var(--txt-mid);">Gemini API（採購台報價 OCR）</span>
+        <span style="font-weight:700;color:var(--txt-hi);">$32 <span style="color:var(--txt-lo);font-weight:400;">→ 採購作業費用</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;">
+        <span style="color:var(--txt-mid);">生圖費（Snoopy 夏季概念視覺）</span>
+        <span style="font-weight:700;color:var(--warn);">$45 <span style="color:var(--txt-lo);font-weight:400;">→ 開模費（Snoopy 夏季）</span></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:11px;">
+        <span style="color:var(--txt-mid);">生圖費（Opanchu 秋冬概念視覺）</span>
+        <span style="font-weight:700;color:var(--warn);">$38 <span style="color:var(--txt-lo);font-weight:400;">→ 開模費（Opanchu 秋冬）</span></span>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--txt-lo);">
+      📌 生圖費已歸屬至各專案開模費，不計入一般行政 AI 費用。超過 $250 Soft Cap 需 Ray 額外授權。
+    </div>
   </div>
 
   <!-- 各廳快速導航 -->
@@ -1701,6 +1630,37 @@ async function loadPipelineCoverage(){
     const pTg=document.getElementById('popup-cover-tag');
     if(pTg){ if(!popups.length){ pTg.textContent='尚無計劃'; pTg.className='abc-tag'; }else{ const p=Math.round(pTotal/VAM_YR*100); pTg.textContent=`全年估算覆蓋 ${p}%`; pTg.className=`abc-tag ${p>=20?'ok':'warn'}`; } }
 
+    // ── 庫存待售卡（批發銷售中 + 快閃進行中）──
+    const stockRows = products.filter(r=>STOCK_STAGES.has(_fv(r.fields,'當前階段'))).map(r=>{
+      const f=r.fields;
+      const ip   = (_fv(f,'IP品牌')||'').split('（')[0];
+      const name = (_fv(f,'產品名稱')||'').substring(0,14);
+      const vol  = parseFloat(_fv(f,'預計銷量'))||0;
+      const srp  = parseFloat(_fv(f,'建議零售價'))||0;
+      const stage= _fv(f,'當前階段')||'—';
+      const net  = vol * srp * 0.40 * MARGIN;
+      const col  = ST_COLOR[stage]||'var(--txt-mid)';
+      return `<tr><td style="color:var(--txt-mid)">${ip}</td><td title="${_fv(f,'產品名稱')}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px">${name}</td><td style="color:${col}">${stage}</td><td style="color:var(--warn);font-weight:700;text-align:right">${net?'¥'+fmt1(net)+'萬':'—'}</td></tr>`;
+    });
+    const popupStockRows = popups.filter(r=>_fv(r.fields,'狀態')==='進行中').map(r=>{
+      const f=r.fields;
+      const city  = _fv(f,'城市')||'—';
+      const actual= parseFloat(_fv(f,'實際營收'))||0;
+      const target= parseFloat(_fv(f,'目標營收'))||0;
+      const net   = (actual>0?actual:target)*TWD2RMB_R*POPUP_MARGIN;
+      const rev   = actual>0?`NT$${(actual/10000).toFixed(0)}萬`:`NT$${(target/10000).toFixed(0)}萬`;
+      return `<tr><td style="color:var(--txt-mid)">快閃</td><td>${city}</td><td style="color:var(--warn)">進行中</td><td style="color:var(--warn);font-weight:700;text-align:right">${net?'¥'+fmt1(net)+'萬':'—'}</td></tr>`;
+    });
+    const allStockRows = [...stockRows, ...popupStockRows];
+    const sEl=document.getElementById('stock-cover-inner');
+    if(sEl) sEl.innerHTML = allStockRows.length
+      ? `<table class="cover-table"><tr><th>IP/類型</th><th>產品/城市</th><th>狀態</th><th style="text-align:right">估算淨貢獻</th></tr>${allStockRows.join('')}</table>`
+      : `<div style="font-size:11px;color:var(--txt-lo);padding:16px;text-align:center">目前無庫存待售項目</div>`;
+    const sFt=document.getElementById('stock-cover-footer');
+    if(sFt) sFt.innerHTML=`<span style="color:var(--txt-mid)">批發 ¥${fmt1(wStock)}萬 &nbsp;+&nbsp; 快閃 ¥${fmt1(pStock)}萬</span><span style="font-size:13px;font-weight:800;color:var(--warn)">合計 ¥${fmt1(wStock+pStock)}萬</span>`;
+    const sTg=document.getElementById('stock-cover-tag');
+    if(sTg){ const p=Math.round((wStock+pStock)/VAM_YR*100); sTg.textContent=`佔年目標 ${p}%`; sTg.className=`abc-tag ${p>=15?'ok':'warn'}`; }
+
     // ── 三層合計 ──
     const ytdActual  = window._vamActual || 0;
     const stockEst   = wStock + pStock;
@@ -1794,8 +1754,6 @@ loadBudgetKPI();
 loadOrderStats();
 loadContractAlerts();
 loadVamProgress().then(() => loadPipelineCoverage());
-loadForecast();
-loadCadenceTracker();
 </script>
 </body>
 </html>
