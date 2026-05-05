@@ -95,6 +95,42 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .p-count{font-size:20px;font-weight:800;}
 .p-amt{font-size:9px;color:var(--txt-lo);margin-top:2px;}
 
+/* KPI ROW */
+.kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.kpi-mini{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.kmi-label{font-size:9px;color:var(--txt-lo);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.kmi-val{font-size:22px;font-weight:800;line-height:1;}
+.kmi-sub{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+
+/* PRODUCT ORDERS */
+.prod-block{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.prod-block-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
+.prod-block-hd:hover{background:var(--card2);}
+.prod-block-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.prod-block-info{flex:1;}
+.prod-block-name{font-size:12px;font-weight:700;}
+.prod-block-meta{font-size:10px;color:var(--txt-mid);}
+.prod-block-right{font-size:13px;font-weight:800;flex-shrink:0;}
+.prod-block-body{display:none;border-top:1px solid var(--border);}
+.prod-block.open .prod-block-body{display:block;}
+.ord-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.ord-tbl th{padding:5px 10px;font-size:9px;font-weight:700;text-transform:uppercase;color:var(--txt-lo);border-bottom:1px solid var(--border);text-align:left;background:var(--card2);}
+.ord-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);}
+.ord-tbl tr:last-child td{border-bottom:none;}
+.ord-nth{display:inline-block;font-size:9px;font-weight:700;background:#818cf820;color:var(--accent);padding:1px 6px;border-radius:6px;}
+.ord-nth.first{background:var(--ok-dim);color:var(--ok);}
+
+/* INTENT REPORT */
+.intent-form{background:var(--card2);border-radius:10px;padding:14px;margin-bottom:8px;}
+.if-title{font-size:12px;font-weight:700;margin-bottom:10px;color:var(--txt-hi);}
+.if-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.if-field label{display:block;font-size:9px;font-weight:700;color:var(--txt-lo);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.if-field input,.if-field select,.if-field textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.if-field input:focus,.if-field select:focus,.if-field textarea:focus{border-color:var(--crm);}
+.if-submit{width:100%;padding:10px;background:var(--crm);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px;}
+.intent-log-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.intent-log-item:last-child{border-bottom:none;}
+
 /* BOTTOM FAB */
 .fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--crm);border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px #f9731660;display:flex;align-items:center;justify-content:center;z-index:50;transition:transform .12s;}
 .fab:active{transform:scale(.92);}
@@ -150,6 +186,99 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="today-sub" id="today-sub">—</div>
   </div>
 
+  <!-- 個人業績 KPI -->
+  <div class="kpi-strip">
+    <div class="kpi-mini">
+      <div class="kmi-label">本月成交金額</div>
+      <div class="kmi-val" id="my-month-val" style="color:var(--ok)">¥ 62 萬</div>
+      <div class="kmi-sub" id="my-month-sub">已確認訂單合計</div>
+    </div>
+    <div class="kpi-mini">
+      <div class="kmi-label">本季累計</div>
+      <div class="kmi-val" id="my-quarter-val" style="color:var(--accent)">¥ 148 萬</div>
+      <div class="kmi-sub" id="my-quarter-sub">Q2（4–6月）</div>
+    </div>
+    <div class="kpi-mini">
+      <div class="kmi-label">未收款金額</div>
+      <div class="kmi-val" id="my-ar-val" style="color:var(--warn)">¥ 35 萬</div>
+      <div class="kmi-sub" id="my-ar-sub">訂金到尾款待收</div>
+    </div>
+  </div>
+
+  <!-- 在售產品 — 我的客戶訂單 -->
+  <div class="sec-hdr">
+    <div class="sec-title">在售產品 — 我的客戶</div>
+  </div>
+  <div id="my-prod-orders">
+    <!-- Snoopy 夏季 -->
+    <div class="prod-block open" id="pb-snoopy">
+      <div class="prod-block-hd" onclick="this.closest('.prod-block').classList.toggle('open')">
+        <div class="prod-block-icon" style="background:var(--ok-dim)">🐾</div>
+        <div class="prod-block-info">
+          <div class="prod-block-name">Snoopy 夏季盲盒</div>
+          <div class="prod-block-meta">大貨銷售中</div>
+        </div>
+        <div class="prod-block-right" id="pb-snoopy-total" style="color:var(--ok)">¥ 107 萬</div>
+      </div>
+      <div class="prod-block-body">
+        <table class="ord-tbl">
+          <thead><tr>
+            <th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
+          </tr></thead>
+          <tbody id="pb-snoopy-rows">
+            <!-- Filled by JS based on session user -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Mofusand -->
+    <div class="prod-block" id="pb-mofu">
+      <div class="prod-block-hd" onclick="this.closest('.prod-block').classList.toggle('open')">
+        <div class="prod-block-icon" style="background:#818cf820">🐱</div>
+        <div class="prod-block-info">
+          <div class="prod-block-name">Mofusand 貓福珊迪</div>
+          <div class="prod-block-meta">持續銷售</div>
+        </div>
+        <div class="prod-block-right" id="pb-mofu-total" style="color:var(--accent)">¥ 17.6 萬</div>
+      </div>
+      <div class="prod-block-body">
+        <table class="ord-tbl">
+          <thead><tr>
+            <th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
+          </tr></thead>
+          <tbody id="pb-mofu-rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Opanchu (德寶 only) -->
+    <div class="prod-block" id="pb-opanchu" style="display:none">
+      <div class="prod-block-hd" onclick="this.closest('.prod-block').classList.toggle('open')">
+        <div class="prod-block-icon" style="background:var(--danger-dim)">🐰</div>
+        <div class="prod-block-info">
+          <div class="prod-block-name">Opanchu 褲褲兔</div>
+          <div class="prod-block-meta">大貨追加中 · ⚠ 有尾款逾期</div>
+        </div>
+        <div class="prod-block-right" style="color:var(--danger)">¥ 18 萬</div>
+      </div>
+      <div class="prod-block-body">
+        <table class="ord-tbl">
+          <thead><tr>
+            <th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700;color:var(--danger)">深圳 LOG-ON</td>
+              <td>80 箱</td>
+              <td style="color:var(--danger);font-weight:700">¥ 18 萬</td>
+              <td><span class="chip chip-danger">尾款逾期 3天</span></td>
+              <td><span class="ord-nth">第 2 筆</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- QUICK LOG -->
   <div class="quick-log" onclick="openLogModal()">
     <div class="ql-top">
@@ -174,6 +303,65 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="sec-title">即將到期（<span id="upcoming-count">0</span> 項）</div>
   </div>
   <div id="upcoming-list"></div>
+
+  <!-- 新品客戶意向回報 -->
+  <div class="sec-hdr" style="margin-top:28px">
+    <div class="sec-title">新品客戶意向回報</div>
+    <span style="font-size:9px;color:var(--ok)">安然即時看到</span>
+  </div>
+  <div class="intent-form">
+    <div class="if-title">📣 回報客戶對即將上市新品的反應</div>
+    <div class="if-row">
+      <div class="if-field">
+        <label>即將上市新品</label>
+        <select id="if-product">
+          <option value="Muziktiger新系列">Muziktiger 新系列（7月）</option>
+          <option value="Opanchu秋冬">Opanchu 秋冬系列（9月）</option>
+          <option value="Mofusand10月">Mofusand 10月秋季款（10月）</option>
+        </select>
+      </div>
+      <div class="if-field">
+        <label>客戶名稱</label>
+        <input id="if-client" placeholder="例：廣州名創優品" list="intent-client-datalist">
+        <datalist id="intent-client-datalist">
+          <option value="廣州名創優品">
+          <option value="北京華糖">
+          <option value="上海萌趣文化">
+          <option value="泡泡瑪特北京">
+          <option value="首爾 SMTOWN COEX">
+          <option value="酷動城（廣州）">
+          <option value="天猫旗艦店">
+          <option value="深圳 LOG-ON">
+        </datalist>
+      </div>
+    </div>
+    <div class="if-row">
+      <div class="if-field">
+        <label>客戶意向</label>
+        <select id="if-intent">
+          <option value="有強烈興趣">有強烈興趣，要樣品</option>
+          <option value="有意向">有意向，需更多資料</option>
+          <option value="詢價中">在問價格/交期</option>
+          <option value="暫無興趣">目前暫無興趣</option>
+        </select>
+      </div>
+      <div class="if-field">
+        <label>預估採購量（選填）</label>
+        <input id="if-qty" placeholder="例：100箱、500件">
+      </div>
+    </div>
+    <div class="if-field">
+      <label>備注（客戶說了什麼）</label>
+      <textarea id="if-notes" rows="2" placeholder="例：問能否 7 月底前出貨、要先看樣品再決定..."></textarea>
+    </div>
+    <button class="if-submit" onclick="submitIntent()">送出 → 安然即時收到</button>
+  </div>
+
+  <!-- 已回報記錄 -->
+  <div id="intent-log-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+    <div style="font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">我的回報記錄</div>
+    <div id="intent-log-list"></div>
+  </div>
 
   <!-- PIPELINE — 給管理層看，放最後 -->
   <div class="sec-hdr" style="margin-top:28px">
@@ -581,8 +769,138 @@ function showToast(msg){
   clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0', 2500);
 }
 
+/* ── 個人業績 KPI ── */
+function renderMyKPI(){
+  if(!SESS) return;
+  const myUser = SESS.user;
+  // Demo data: per-user order totals
+  const MY_DATA = {
+    laodong: { month: 107, quarter: 243, ar: 0,   arSub:'全部已收款' },
+    debao:   { month: 36,  quarter: 98,  ar: 18,  arSub:'LOG-ON 尾款逾期 3天' },
+  };
+  const d = MY_DATA[myUser] || { month: 62, quarter: 148, ar: 35, arSub:'訂金待尾款' };
+  const fmt = v => v >= 100 ? `¥ ${v} 萬` : `¥ ${v} 萬`;
+  document.getElementById('my-month-val').textContent = fmt(d.month);
+  document.getElementById('my-month-val').style.color = d.month >= 80 ? 'var(--ok)' : 'var(--warn)';
+  document.getElementById('my-quarter-val').textContent = fmt(d.quarter);
+  document.getElementById('my-ar-val').textContent = d.ar > 0 ? fmt(d.ar) : '— 全收';
+  document.getElementById('my-ar-val').style.color = d.ar > 0 ? 'var(--danger)' : 'var(--ok)';
+  document.getElementById('my-ar-sub').textContent = d.arSub;
+}
+
+/* ── 在售產品訂單（按業務過濾）── */
+function renderMyProductOrders(){
+  if(!SESS) return;
+  const myUser = SESS.user;
+
+  const ORDERS = {
+    laodong: {
+      snoopy: [
+        { client:'廣州名創優品', qty:'180 箱', amt:'¥ 42 萬', cs:'全款已收', nth:'第 3 筆', cs_cls:'chip-ok' },
+        { client:'北京華糖',     qty:'300 箱', amt:'¥ 65 萬', cs:'全款已收', nth:'第 5 筆', cs_cls:'chip-ok' },
+        { client:'首爾 SMTOWN', qty:'樣品中',  amt:'待報價',  cs:'樣品確認中', nth:'首次詢盤', cs_cls:'chip-grey' },
+      ],
+      mofu: [
+        { client:'（台北誠品由珮玲負責）', qty:'—', amt:'—', cs:'—', nth:'—', cs_cls:'chip-grey' },
+      ],
+    },
+    debao: {
+      snoopy: [],
+      mofu: [
+        { client:'上海萌趣文化', qty:'80 箱', amt:'¥ 17.6 萬', cs:'訂金已收', nth:'第 1 筆', cs_cls:'chip-warn' },
+      ],
+      opanchu: true,
+    },
+  };
+
+  const d = ORDERS[myUser];
+  if(!d) return;
+
+  function buildRows(rows){
+    if(!rows||!rows.length) return '<tr><td colspan="5" style="color:var(--txt-lo);text-align:center;padding:12px">無我的訂單</td></tr>';
+    return rows.map(r=>`<tr>
+      <td style="font-weight:700">${r.client}</td>
+      <td>${r.qty}</td>
+      <td style="font-weight:700">${r.amt}</td>
+      <td><span class="chip ${r.cs_cls}">${r.cs}</span></td>
+      <td><span class="ord-nth${r.nth==='首次詢盤'?' first':''}">${r.nth}</span></td>
+    </tr>`).join('');
+  }
+
+  const snRows = document.getElementById('pb-snoopy-rows');
+  if(snRows) snRows.innerHTML = buildRows(d.snoopy);
+
+  const mfRows = document.getElementById('pb-mofu-rows');
+  if(mfRows) mfRows.innerHTML = buildRows(d.mofu);
+
+  // Opanchu block: only show for debao
+  const opBlock = document.getElementById('pb-opanchu');
+  if(opBlock) opBlock.style.display = d.opanchu ? '' : 'none';
+
+  // Update totals
+  const snTotal = document.getElementById('pb-snoopy-total');
+  if(snTotal){
+    if(myUser==='laodong'){ snTotal.textContent='¥ 107 萬'; snTotal.style.color='var(--ok)'; }
+    else { snTotal.textContent='—'; snTotal.style.color='var(--txt-lo)'; }
+  }
+}
+
+/* ── 新品意向回報 ── */
+function submitIntent(){
+  const product = document.getElementById('if-product').value;
+  const client  = document.getElementById('if-client').value.trim();
+  const intent  = document.getElementById('if-intent').value;
+  const qty     = document.getElementById('if-qty').value.trim();
+  const notes   = document.getElementById('if-notes').value.trim();
+  if(!client){ alert('請填寫客戶名稱'); return; }
+
+  const rec = {
+    product, client, intent, qty, notes,
+    sales: SESS?.name || '—',
+    salesUser: SESS?.user || '—',
+    ts: Date.now(),
+  };
+  const key = 'crm_intent_v1';
+  const arr = JSON.parse(localStorage.getItem(key)||'[]');
+  // replace if same product+client
+  const idx = arr.findIndex(x=>x.product===product && x.client===client);
+  if(idx>=0) arr[idx]=rec; else arr.unshift(rec);
+  localStorage.setItem(key, JSON.stringify(arr));
+
+  document.getElementById('if-client').value='';
+  document.getElementById('if-qty').value='';
+  document.getElementById('if-notes').value='';
+  renderIntentLog();
+  showToast(`✅ 已回報 ${client.split('（')[0]} 的意向 → 安然可見`);
+}
+
+function renderIntentLog(){
+  const key = 'crm_intent_v1';
+  const all = JSON.parse(localStorage.getItem(key)||'[]');
+  const myUser = SESS?.user;
+  const mine = all.filter(x=>x.salesUser===myUser);
+  const section = document.getElementById('intent-log-section');
+  const list = document.getElementById('intent-log-list');
+  if(!mine.length){ if(section) section.style.display='none'; return; }
+  if(section) section.style.display='';
+  const INTENT_MAP = {'有強烈興趣':'✅','有意向':'🔵','詢價中':'🟡','暫無興趣':'⬜'};
+  list.innerHTML = mine.slice(0,10).map(r=>{
+    const d = new Date(r.ts).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
+    return `<div class="intent-log-item">
+      <span style="color:var(--txt-hi);font-weight:700">${r.client}</span>
+      <span style="color:var(--txt-mid)"> · ${r.product} · </span>
+      <span>${INTENT_MAP[r.intent]||''} ${r.intent}</span>
+      ${r.qty?`<span style="color:var(--txt-mid)"> · ${r.qty}</span>`:''}
+      <span style="float:right;color:var(--txt-lo)">${d}</span>
+    </div>`;
+  }).join('');
+}
+
 // Init
 renderLists();
+renderMyKPI();
+renderMyProductOrders();
+renderIntentLog();
 </script>
 
 <!-- ── EXPENSE FAB ── -->

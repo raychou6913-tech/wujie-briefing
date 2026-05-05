@@ -39,12 +39,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .sec-link{font-size:10px;color:var(--accent);text-decoration:none;cursor:pointer;}
 
 /* ── KPI CARDS ── */
-.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
-.kpi-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:10px;}
-.kpi-val{font-size:32px;font-weight:800;line-height:1;margin-bottom:2px;}
-.kpi-sub{font-size:11px;color:var(--txt-mid);margin-bottom:8px;}
-.kpi-trend{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.kpi-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:8px;}
+.kpi-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:2px;}
+.kpi-sub{font-size:11px;color:var(--txt-mid);margin-bottom:6px;}
+.kpi-trend{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:8px;}
 .trend-up{background:var(--ok-dim);color:var(--ok);}
 .trend-dn{background:var(--danger-dim);color:var(--danger);}
 .trend-warn{background:var(--warn-dim);color:var(--warn);}
@@ -52,7 +52,37 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .prog-fill{height:100%;border-radius:3px;transition:width .6s ease;}
 .kpi-footer{display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo);margin-top:5px;}
 
-/* ── TWO COLUMNS ── */
+/* ── PRODUCT ORDERS PANEL ── */
+.prod-section{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.prod-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .1s;}
+.prod-header:hover{background:var(--card2);}
+.prod-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.prod-info{flex:1;min-width:0;}
+.prod-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.prod-meta{font-size:10px;color:var(--txt-mid);}
+.prod-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.prod-total{font-size:15px;font-weight:800;}
+.prod-chevron{font-size:11px;color:var(--txt-lo);transition:transform .2s;}
+.prod-section.open .prod-chevron{transform:rotate(180deg);}
+.prod-orders{display:none;border-top:1px solid var(--border);}
+.prod-section.open .prod-orders{display:block;}
+.ord-table{width:100%;border-collapse:collapse;}
+.ord-th{padding:6px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--txt-lo);border-bottom:1px solid var(--border);text-align:left;background:var(--card2);}
+.ord-td{padding:9px 10px;font-size:11px;border-bottom:1px solid var(--border);}
+.ord-tr:last-child .ord-td{border-bottom:none;}
+.ord-tr:hover .ord-td{background:var(--card2);}
+.ord-nth{display:inline-block;font-size:9px;font-weight:700;background:#818cf820;color:var(--accent);padding:1px 6px;border-radius:6px;white-space:nowrap;}
+.ord-nth.first{background:var(--ok-dim);color:var(--ok);}
+.ord-nth.repeat{background:var(--warn-dim);color:var(--warn);}
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-info{background:#818cf820;color:var(--accent);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+.chip-sea{background:#0284c720;color:#38bdf8;}
+
+/* ── PROSPECT PANEL ── */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .col-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
 .panel-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
@@ -62,47 +92,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .badge-ok{background:var(--ok-dim);color:var(--ok);}
 .badge-info{background:#818cf820;color:var(--accent);}
 
-/* ── ORDER ITEMS ── */
-.order-item{padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
-.order-item:last-child{border-bottom:none;padding-bottom:0;}
-.order-top{display:flex;align-items:flex-start;gap:8px;}
-.order-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.order-body{flex:1;min-width:0;}
-.order-client{font-size:12px;font-weight:700;margin-bottom:1px;}
-.order-meta{font-size:10px;color:var(--txt-lo);margin-top:1px;}
-.order-right{text-align:right;flex-shrink:0;}
-.order-amt{font-size:13px;font-weight:700;}
-.order-detail{display:none;background:var(--card2);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:10px;color:var(--txt-mid);line-height:1.7;}
-.order-detail.open{display:block;}
-.order-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:6px;}
-.od-row{display:flex;justify-content:space-between;}
-.od-k{color:var(--txt-lo);}
-.od-v{font-weight:600;color:var(--txt-hi);}
-
-/* ── CHIP ── */
-.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;flex-shrink:0;}
-.chip-ok{background:var(--ok-dim);color:var(--ok);}
-.chip-warn{background:var(--warn-dim);color:var(--warn);}
-.chip-danger{background:var(--danger-dim);color:var(--danger);}
-.chip-info{background:#818cf820;color:var(--accent);}
-.chip-grey{background:var(--card2);color:var(--txt-mid);}
-.chip-sea{background:#0284c720;color:#38bdf8;}
-
-/* ── CONTRACT ROWS ── */
-.contract-row{padding:10px 0;border-bottom:1px solid var(--border);}
-.contract-row:last-child{border-bottom:none;padding-bottom:0;}
-.ct-top{display:flex;align-items:flex-start;gap:10px;}
-.ct-icon{width:36px;height:36px;border-radius:9px;background:#4f46e520;border:1px solid #4f46e540;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.ct-body{flex:1;min-width:0;}
-.ct-name{font-size:12px;font-weight:700;}
-.ct-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
-.ct-right{text-align:right;flex-shrink:0;}
-.ct-expiry{font-size:10px;color:var(--txt-mid);margin-top:3px;}
-.ct-warn-msg{font-size:10px;color:var(--warn);margin-top:5px;padding:6px 10px;background:var(--warn-dim);border-radius:6px;border-left:2px solid var(--warn);}
-.ct-danger-msg{font-size:10px;color:var(--danger);margin-top:5px;padding:6px 10px;background:var(--danger-dim);border-radius:6px;border-left:2px solid var(--danger);}
+.prospect-item{padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.prospect-item:last-child{border-bottom:none;padding-bottom:0;}
+.prospect-top{display:flex;align-items:flex-start;gap:8px;}
+.prospect-av{width:30px;height:30px;border-radius:8px;font-size:12px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.prospect-body{flex:1;min-width:0;}
+.prospect-name{font-size:12px;font-weight:700;margin-bottom:1px;}
+.prospect-meta{font-size:10px;color:var(--txt-lo);}
+.prospect-right{text-align:right;flex-shrink:0;}
+.prospect-last{font-size:10px;color:var(--txt-mid);}
+.prospect-detail{display:none;background:var(--card2);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:11px;color:var(--txt-mid);line-height:1.7;}
+.prospect-detail.open{display:block;}
 
 /* ── TODO LIST ── */
-.todo-list{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
 .todo-item{padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;}
 .todo-item:last-child{border-bottom:none;padding-bottom:0;}
 .todo-item:hover{background:var(--card2);}
@@ -122,6 +124,32 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .tda-warn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
 .tda-grey{background:var(--card);border-color:var(--border);color:var(--txt-mid);}
 
+/* ── NEW PRODUCT INTENT PANEL ── */
+.intent-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.intent-prod-header{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background .1s;}
+.intent-prod-header:hover{background:var(--card2);}
+.intent-prod-name{font-size:12px;font-weight:700;}
+.intent-prod-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.intent-prod-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.intent-body{display:none;border-top:1px solid var(--border);}
+.intent-card.open .intent-body{display:block;}
+.intent-body .ord-th{background:var(--card2);}
+.intent-chevron{font-size:11px;color:var(--txt-lo);transition:transform .2s;}
+.intent-card.open .intent-chevron{transform:rotate(180deg);}
+
+/* ── CONTRACT ROWS ── */
+.contract-row{padding:10px 0;border-bottom:1px solid var(--border);}
+.contract-row:last-child{border-bottom:none;padding-bottom:0;}
+.ct-top{display:flex;align-items:flex-start;gap:10px;}
+.ct-icon{width:36px;height:36px;border-radius:9px;background:#4f46e520;border:1px solid #4f46e540;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ct-body{flex:1;min-width:0;}
+.ct-name{font-size:12px;font-weight:700;}
+.ct-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.ct-right{text-align:right;flex-shrink:0;}
+.ct-expiry{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+.ct-warn-msg{font-size:10px;color:var(--warn);margin-top:5px;padding:6px 10px;background:var(--warn-dim);border-radius:6px;border-left:2px solid var(--warn);}
+.ct-danger-msg{font-size:10px;color:var(--danger);margin-top:5px;padding:6px 10px;background:var(--danger-dim);border-radius:6px;border-left:2px solid var(--danger);}
+
 /* ── AI BANNER ── */
 .ai-banner{background:linear-gradient(135deg,#4f46e515,#818cf810);border:1px solid #4f46e540;border-radius:12px;padding:16px 20px;margin-top:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .2s;}
 .ai-banner:hover{border-color:#818cf860;}
@@ -131,15 +159,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .ai-banner-sub{font-size:11px;color:var(--txt-mid);}
 .ai-banner-arrow{font-size:18px;color:var(--accent);flex-shrink:0;}
 
-/* ── LOADING ── */
-.loading{color:var(--txt-lo);font-size:11px;padding:16px 0;text-align:center;}
-
-@media(max-width:900px){
-  .kpi-row{grid-template-columns:1fr 1fr;}
-}
+@media(max-width:1000px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:640px){
   .main{padding:14px;}
-  .kpi-row{grid-template-columns:1fr;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
   .two-col{grid-template-columns:1fr;}
   .topbar{padding:0 14px;}
   .user-pill{display:none;}
@@ -162,213 +185,297 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <div class="topbar-right">
     <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 大廳</a>
     <div class="user-pill" id="user-pill">載入中</div>
-    <a class="btn-topbar" href="erp-war-room.html">← 戰情室</a>
-    <button class="btn-topbar" onclick="location.href='login.html'">切換帳號</button>
-    <button class="btn-topbar" onclick="doLogout()">登出</button>
     <a class="btn-topbar" href="erp-war-room.html">⌂ 戰情室</a>
+    <button class="btn-topbar" onclick="doLogout()">登出</button>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- ① KPI 三大卡 -->
-  <div class="sec-head"><span class="sec-title">全集團業績總覽 · 安然核心指標</span><span style="font-size:10px;color:var(--txt-lo);margin-left:8px;">北京蕪解 · UJ BKK · 台灣悍草 · 香港JV · 深圳子公司</span></div>
+  <!-- ① KPI 四大卡 -->
+  <div class="sec-head"><span class="sec-title">全集團業績總覽 · 安然核心指標</span><span style="font-size:10px;color:var(--txt-lo);">北京蕪解 · UJ BKK · 台灣悍草 · 香港JV</span></div>
   <div class="kpi-row">
 
     <div class="kpi-card">
-      <div class="kpi-label">本月業績（集團批發合計）</div>
-      <div class="kpi-val" id="kpi-rev" style="color:var(--warn)">¥ 328 萬</div>
-      <div class="kpi-sub" id="kpi-rev-sub">目標 ¥450 萬（Shawn 預算表）</div>
-      <span class="kpi-trend trend-warn" id="kpi-rev-trend">73% 達成</span>
-      <div class="prog"><div id="kpi-rev-bar" class="prog-fill" style="width:73%;background:var(--warn)"></div></div>
-      <div class="kpi-footer">
-        <span>集團批發合計</span>
-        <span>5 月目標 450 萬</span>
-      </div>
+      <div class="kpi-label">本月業績（批發合計）</div>
+      <div class="kpi-val" id="kpi-rev-month" style="color:var(--warn)">¥ 328 萬</div>
+      <div class="kpi-sub" id="kpi-rev-month-sub">目標 ¥450 萬 · 5 月</div>
+      <span class="kpi-trend trend-warn" id="kpi-rev-month-trend">73% 達成</span>
+      <div class="prog"><div id="kpi-rev-month-bar" class="prog-fill" style="width:73%;background:var(--warn)"></div></div>
+      <div class="kpi-footer"><span>集團批發合計</span><span id="kpi-rev-month-foot">5 月</span></div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">本季業績（Q2 累計）</div>
+      <div class="kpi-val" id="kpi-rev-quarter" style="color:var(--accent)">¥ 892 萬</div>
+      <div class="kpi-sub" id="kpi-rev-quarter-sub">Q2 目標 ¥1,350 萬</div>
+      <span class="kpi-trend trend-warn" id="kpi-rev-quarter-trend">66% 達成</span>
+      <div class="prog"><div id="kpi-rev-quarter-bar" class="prog-fill" style="width:66%;background:var(--accent)"></div></div>
+      <div class="kpi-footer"><span>Q2（4–6月）</span><span id="kpi-rev-quarter-foot">還剩 1 個月</span></div>
     </div>
 
     <div class="kpi-card">
       <div class="kpi-label">活躍授權合約</div>
       <div class="kpi-val" id="kpi-contract" style="color:var(--accent)">5 份</div>
-      <div class="kpi-sub" id="kpi-contract-sub">Snoopy / Mofusand / Opanchu / Muziktiger / 飯糰與梅子</div>
+      <div class="kpi-sub" id="kpi-contract-sub">Snoopy · Mofusand · Opanchu · Muziktiger · 飯糰梅子</div>
       <span class="kpi-trend trend-warn" id="kpi-contract-warn">⚠ Opanchu 4 個月後到期</span>
     </div>
 
     <div class="kpi-card">
-      <div class="kpi-label">待跟進客戶</div>
-      <div class="kpi-val" id="kpi-followup" style="color:var(--danger)">3 家</div>
-      <div class="kpi-sub">逾期未回 1 · 新詢盤 2</div>
-      <span class="kpi-trend trend-dn">需安然處理</span>
+      <div class="kpi-label">應收帳款預警</div>
+      <div class="kpi-val" id="kpi-ar" style="color:var(--danger)">¥ 18 萬</div>
+      <div class="kpi-sub" id="kpi-ar-sub">逾期未收 1 筆 · 訂金待尾款 2 筆</div>
+      <span class="kpi-trend trend-dn" id="kpi-ar-trend">需跟進催收</span>
+      <div class="kpi-footer" id="kpi-ar-foot"><span>逾期：LOG-ON ¥18萬</span><span style="color:var(--warn)">3天前</span></div>
     </div>
 
   </div>
 
-  <!-- ② 訂單執行 + 待辦清單 -->
+  <!-- ② 在售產品 × 收單動態 -->
+  <div class="sec-head">
+    <span class="sec-title">在售產品 × 收單動態</span>
+    <span style="font-size:10px;color:var(--txt-lo);">點擊展開各產品的客戶訂單明細</span>
+  </div>
+
+  <!-- Snoopy 夏季 -->
+  <div class="prod-section open" id="ps-snoopy">
+    <div class="prod-header" onclick="toggleProd('ps-snoopy')">
+      <div class="prod-icon" style="background:var(--ok-dim)">🐾</div>
+      <div class="prod-info">
+        <div class="prod-name">Snoopy 夏季盲盒</div>
+        <div class="prod-meta">大貨銷售中 · 老董負責主線 · 5,000 件出貨</div>
+      </div>
+      <div class="prod-right">
+        <span class="chip chip-ok">銷售中</span>
+        <div class="prod-total" style="color:var(--ok)">¥ 107 萬</div>
+        <div class="prod-chevron">▼</div>
+      </div>
+    </div>
+    <div class="prod-orders">
+      <table class="ord-table">
+        <thead><tr>
+          <th class="ord-th">客戶</th>
+          <th class="ord-th">業務</th>
+          <th class="ord-th">數量</th>
+          <th class="ord-th">金額</th>
+          <th class="ord-th">收款狀態</th>
+          <th class="ord-th">累計訂單</th>
+        </tr></thead>
+        <tbody>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">廣州名創優品</td>
+            <td class="ord-td" style="color:var(--txt-mid)">老董</td>
+            <td class="ord-td">180 箱</td>
+            <td class="ord-td" style="color:var(--ok);font-weight:700">¥ 42 萬</td>
+            <td class="ord-td"><span class="chip chip-ok">全款已收</span></td>
+            <td class="ord-td"><span class="ord-nth repeat">第 3 筆</span></td>
+          </tr>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">北京華糖</td>
+            <td class="ord-td" style="color:var(--txt-mid)">老董</td>
+            <td class="ord-td">300 箱</td>
+            <td class="ord-td" style="color:var(--ok);font-weight:700">¥ 65 萬</td>
+            <td class="ord-td"><span class="chip chip-ok">全款已收</span></td>
+            <td class="ord-td"><span class="ord-nth repeat">第 5 筆</span></td>
+          </tr>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">首爾 SMTOWN COEX</td>
+            <td class="ord-td" style="color:var(--txt-mid)">老董</td>
+            <td class="ord-td">樣品中</td>
+            <td class="ord-td" style="color:var(--txt-lo)">待報價</td>
+            <td class="ord-td"><span class="chip chip-grey">樣品確認中</span></td>
+            <td class="ord-td"><span class="ord-nth first">首次詢盤</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mofusand -->
+  <div class="prod-section" id="ps-mofu">
+    <div class="prod-header" onclick="toggleProd('ps-mofu')">
+      <div class="prod-icon" style="background:#818cf820">🐱</div>
+      <div class="prod-info">
+        <div class="prod-name">Mofusand 貓福珊迪（持續銷售）</div>
+        <div class="prod-meta">持續銷售 · 珮玲負責台灣 / 老董負責大陸</div>
+      </div>
+      <div class="prod-right">
+        <span class="chip chip-info">持續在售</span>
+        <div class="prod-total" style="color:var(--accent)">¥ 22 萬</div>
+        <div class="prod-chevron">▼</div>
+      </div>
+    </div>
+    <div class="prod-orders">
+      <table class="ord-table">
+        <thead><tr>
+          <th class="ord-th">客戶</th>
+          <th class="ord-th">業務</th>
+          <th class="ord-th">數量</th>
+          <th class="ord-th">金額</th>
+          <th class="ord-th">收款狀態</th>
+          <th class="ord-th">累計訂單</th>
+        </tr></thead>
+        <tbody>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">台北誠品</td>
+            <td class="ord-td" style="color:var(--txt-mid)">珮玲</td>
+            <td class="ord-td">NT$ 9.5萬</td>
+            <td class="ord-td" style="color:var(--ok);font-weight:700">NT$ 95,000</td>
+            <td class="ord-td"><span class="chip chip-ok">全款已收</span></td>
+            <td class="ord-td"><span class="ord-nth first">第 1 筆</span></td>
+          </tr>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">上海萌趣文化</td>
+            <td class="ord-td" style="color:var(--txt-mid)">德寶</td>
+            <td class="ord-td">80 箱</td>
+            <td class="ord-td" style="color:var(--warn);font-weight:700">¥ 17.6 萬</td>
+            <td class="ord-td"><span class="chip chip-warn">訂金已收</span></td>
+            <td class="ord-td"><span class="ord-nth first">第 1 筆</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Opanchu -->
+  <div class="prod-section" id="ps-opanchu">
+    <div class="prod-header" onclick="toggleProd('ps-opanchu')">
+      <div class="prod-icon" style="background:var(--danger-dim)">🐰</div>
+      <div class="prod-info">
+        <div class="prod-name">Opanchu 褲褲兔（大貨追加中）</div>
+        <div class="prod-meta">大貨追加中 · 德寶負責 · ⚠ 有尾款逾期</div>
+      </div>
+      <div class="prod-right">
+        <span class="chip chip-danger">有尾款逾期</span>
+        <div class="prod-total" style="color:var(--danger)">¥ 18 萬</div>
+        <div class="prod-chevron">▼</div>
+      </div>
+    </div>
+    <div class="prod-orders">
+      <table class="ord-table">
+        <thead><tr>
+          <th class="ord-th">客戶</th>
+          <th class="ord-th">業務</th>
+          <th class="ord-th">數量</th>
+          <th class="ord-th">金額</th>
+          <th class="ord-th">收款狀態</th>
+          <th class="ord-th">累計訂單</th>
+        </tr></thead>
+        <tbody>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700;color:var(--danger)">深圳 LOG-ON</td>
+            <td class="ord-td" style="color:var(--txt-mid)">德寶</td>
+            <td class="ord-td">80 箱</td>
+            <td class="ord-td" style="color:var(--danger);font-weight:700">¥ 18 萬</td>
+            <td class="ord-td"><span class="chip chip-danger">尾款逾期 3天</span></td>
+            <td class="ord-td"><span class="ord-nth repeat">第 2 筆</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ③ 潛客追蹤 + 待辦 -->
   <div class="two-col">
 
-    <!-- 訂單執行 -->
+    <!-- 潛客追蹤 -->
     <div class="col-card">
       <div class="panel-title">
-        訂單執行（全集團）
-        <span class="panel-badge badge-info" id="order-badge">6 筆</span>
+        潛在客戶追蹤
+        <span class="panel-badge badge-info" id="prospect-badge">5 家</span>
       </div>
-      <div id="order-list">
-        <!-- demo prefilled, replaced by Feishu if success -->
-        <div class="order-item" onclick="toggleOrder('od1')">
-          <div class="order-top">
-            <div class="order-icon" style="background:var(--ok-dim)">🐾</div>
-            <div class="order-body">
-              <div class="order-client">廣州名創優品</div>
-              <div class="order-meta">Snoopy · 180箱 · 老董 · <span style="color:#38bdf8">海運中</span></div>
+      <div id="prospect-list">
+
+        <div class="prospect-item" onclick="this.querySelector('.prospect-detail').classList.toggle('open')">
+          <div class="prospect-top">
+            <div class="prospect-av" style="background:#6366f1">名</div>
+            <div class="prospect-body">
+              <div class="prospect-name">上海美陳（IP周邊零售）</div>
+              <div class="prospect-meta">老董 · 問 Snoopy + Mofusand · 報價中</div>
             </div>
-            <div class="order-right">
-              <div class="order-amt" style="color:var(--ok)">¥ 420,000</div>
-              <div style="margin-top:3px"><span class="chip chip-ok">全款已收</span></div>
+            <div class="prospect-right">
+              <div class="prospect-last" style="color:var(--warn)">今天跟進</div>
+              <div style="margin-top:2px"><span class="chip chip-warn">報價中</span></div>
             </div>
           </div>
-          <div class="order-detail" id="od1">
-            <div class="order-detail-grid">
-              <div class="od-row"><span class="od-k">客戶</span><span class="od-v">廣州名創優品</span></div>
-              <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">Snoopy</span></div>
-              <div class="od-row"><span class="od-k">數量</span><span class="od-v">180 箱</span></div>
-              <div class="od-row"><span class="od-k">金額</span><span class="od-v">¥ 420,000</span></div>
-              <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:var(--ok)">全款已收</span></div>
-              <div class="od-row"><span class="od-k">物流</span><span class="od-v" style="color:#38bdf8">海運中</span></div>
-              <div class="od-row"><span class="od-k">負責業務</span><span class="od-v">老董</span></div>
-              <div class="od-row"><span class="od-k">狀態</span><span class="od-v">出貨中</span></div>
-            </div>
+          <div class="prospect-detail">
+            上海玩具展帶回，問 Snoopy 夏日 + Mofusand 各 50 箱起訂。老董今天回覆報價。<br>
+            <span style="color:var(--warn)">下一步：</span>老董今天發正式報價，3 天內確認意向。
           </div>
         </div>
 
-        <div class="order-item" onclick="toggleOrder('od2')">
-          <div class="order-top">
-            <div class="order-icon" style="background:var(--warn-dim)">🎵</div>
-            <div class="order-body">
-              <div class="order-client">上海萌趣文化</div>
-              <div class="order-meta">Muziktiger · 80箱 · 德寶 · <span style="color:var(--txt-mid)">待出貨</span></div>
+        <div class="prospect-item" onclick="this.querySelector('.prospect-detail').classList.toggle('open')">
+          <div class="prospect-top">
+            <div class="prospect-av" style="background:#0891b2">虹</div>
+            <div class="prospect-body">
+              <div class="prospect-name">虹橋 IP 精選（快閃場地）</div>
+              <div class="prospect-meta">老董 · 問快閃場地合作 · 有意向</div>
             </div>
-            <div class="order-right">
-              <div class="order-amt" style="color:var(--warn)">¥ 176,000</div>
-              <div style="margin-top:3px"><span class="chip chip-warn">訂金已收</span></div>
+            <div class="prospect-right">
+              <div class="prospect-last" style="color:var(--txt-mid)">2天後跟進</div>
+              <div style="margin-top:2px"><span class="chip chip-info">有意向</span></div>
             </div>
           </div>
-          <div class="order-detail" id="od2">
-            <div class="order-detail-grid">
-              <div class="od-row"><span class="od-k">客戶</span><span class="od-v">上海萌趣文化</span></div>
-              <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">Muziktiger（無業老虎）</span></div>
-              <div class="od-row"><span class="od-k">數量</span><span class="od-v">80 箱</span></div>
-              <div class="od-row"><span class="od-k">金額</span><span class="od-v">¥ 176,000</span></div>
-              <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:var(--warn)">訂金已收 · 待尾款</span></div>
-              <div class="od-row"><span class="od-k">物流</span><span class="od-v">待出貨（7月發）</span></div>
-              <div class="od-row"><span class="od-k">負責業務</span><span class="od-v">德寶</span></div>
-              <div class="od-row"><span class="od-k">備注</span><span class="od-v">首款 7 月上市，模具製作中</span></div>
-            </div>
+          <div class="prospect-detail">
+            虹橋 T2 快閃場地方，可談 Q3 合作。需 Shawn 確認是否排進快閃計劃。<br>
+            <span style="color:var(--accent)">下一步：</span>等 Shawn 確認 Q3 排期後回覆。
           </div>
         </div>
 
-        <div class="order-item" onclick="toggleOrder('od3')">
-          <div class="order-top">
-            <div class="order-icon" style="background:var(--ok-dim)">🐾</div>
-            <div class="order-body">
-              <div class="order-client">北京華糖</div>
-              <div class="order-meta">Snoopy · 300箱 · 老董 · <span style="color:var(--ok)">已完成</span></div>
+        <div class="prospect-item" onclick="this.querySelector('.prospect-detail').classList.toggle('open')">
+          <div class="prospect-top">
+            <div class="prospect-av" style="background:#16a34a">泡</div>
+            <div class="prospect-body">
+              <div class="prospect-name">泡泡瑪特北京</div>
+              <div class="prospect-meta">老董 · Muziktiger 盲盒合作提案 · 初接觸</div>
             </div>
-            <div class="order-right">
-              <div class="order-amt" style="color:var(--ok)">¥ 650,000</div>
-              <div style="margin-top:3px"><span class="chip chip-ok">全款已收</span></div>
+            <div class="prospect-right">
+              <div class="prospect-last" style="color:var(--ok)">等回覆</div>
+              <div style="margin-top:2px"><span class="chip chip-grey">初接觸</span></div>
             </div>
           </div>
-          <div class="order-detail" id="od3">
-            <div class="order-detail-grid">
-              <div class="od-row"><span class="od-k">客戶</span><span class="od-v">北京華糖</span></div>
-              <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">Snoopy</span></div>
-              <div class="od-row"><span class="od-k">數量</span><span class="od-v">300 箱</span></div>
-              <div class="od-row"><span class="od-k">金額</span><span class="od-v">¥ 650,000</span></div>
-              <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:var(--ok)">全款已收</span></div>
-              <div class="od-row"><span class="od-k">物流</span><span class="od-v" style="color:var(--ok)">已完成</span></div>
-              <div class="od-row"><span class="od-k">負責業務</span><span class="od-v">老董</span></div>
-              <div class="od-row"><span class="od-k">狀態</span><span class="od-v" style="color:var(--ok)">已完成</span></div>
-            </div>
+          <div class="prospect-detail">
+            提案已送出 3 天。王總說會看，尚未回覆。需確認授權範圍含盲盒品類再正式報價。<br>
+            <span style="color:var(--txt-mid)">下一步：</span>老董今天下午追問收到沒。
           </div>
         </div>
 
-        <div class="order-item" onclick="toggleOrder('od4')">
-          <div class="order-top">
-            <div class="order-icon" style="background:var(--danger-dim)">🐰</div>
-            <div class="order-body">
-              <div class="order-client">深圳 LOG-ON</div>
-              <div class="order-meta">Opanchu · 80箱 · 德寶 · <span style="color:var(--danger)">逾期</span></div>
+        <div class="prospect-item" onclick="this.querySelector('.prospect-detail').classList.toggle('open')">
+          <div class="prospect-top">
+            <div class="prospect-av" style="background:#7c3aed">酷</div>
+            <div class="prospect-body">
+              <div class="prospect-name">酷動城（廣州）</div>
+              <div class="prospect-meta">德寶 · Q3 補貨意向 · Snoopy 系列</div>
             </div>
-            <div class="order-right">
-              <div class="order-amt" style="color:var(--danger)">¥ 180,000</div>
-              <div style="margin-top:3px"><span class="chip chip-danger">尾款未到</span></div>
+            <div class="prospect-right">
+              <div class="prospect-last" style="color:var(--warn)">今天</div>
+              <div style="margin-top:2px"><span class="chip chip-warn">有意向</span></div>
             </div>
           </div>
-          <div class="order-detail" id="od4">
-            <div class="order-detail-grid">
-              <div class="od-row"><span class="od-k">客戶</span><span class="od-v">深圳 LOG-ON</span></div>
-              <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">Opanchu</span></div>
-              <div class="od-row"><span class="od-k">數量</span><span class="od-v">80 箱</span></div>
-              <div class="od-row"><span class="od-k">金額</span><span class="od-v">¥ 180,000</span></div>
-              <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:var(--danger)">尾款未到 · 逾期 3 天</span></div>
-              <div class="od-row"><span class="od-k">物流</span><span class="od-v" style="color:var(--danger)">逾期</span></div>
-              <div class="od-row"><span class="od-k">負責業務</span><span class="od-v">德寶</span></div>
-              <div class="od-row"><span class="od-k">行動</span><span class="od-v" style="color:var(--danger)">⚠ 立刻催收</span></div>
-            </div>
+          <div class="prospect-detail">
+            林總說 Q3 有 3,000 件補貨需求。德寶今天電話確認報價，問 7月活動配合意向。<br>
+            <span style="color:var(--warn)">下一步：</span>德寶今天發報價，本週確認。
           </div>
         </div>
 
-        <div class="order-item" onclick="toggleOrder('od5')">
-          <div class="order-top">
-            <div class="order-icon" style="background:var(--ok-dim)">🐾</div>
-            <div class="order-body">
-              <div class="order-client">曼谷 Siam Discovery</div>
-              <div class="order-meta">Snoopy · 快閃店 · Den · <span style="color:var(--ok)">已結算</span></div>
+        <div class="prospect-item" onclick="this.querySelector('.prospect-detail').classList.toggle('open')">
+          <div class="prospect-top">
+            <div class="prospect-av" style="background:#0284c7">天</div>
+            <div class="prospect-body">
+              <div class="prospect-name">天猫旗艦店（618備貨）</div>
+              <div class="prospect-meta">德寶 ↔ 春雷 · 618 活動 SKU 確認</div>
             </div>
-            <div class="order-right">
-              <div class="order-amt" style="color:var(--ok)">฿ 682,000</div>
-              <div style="margin-top:3px"><span class="chip chip-ok">已完成結算</span></div>
+            <div class="prospect-right">
+              <div class="prospect-last" style="color:var(--ok)">2天後</div>
+              <div style="margin-top:2px"><span class="chip chip-info">報價中</span></div>
             </div>
           </div>
-          <div class="order-detail" id="od5">
-            <div class="order-detail-grid">
-              <div class="od-row"><span class="od-k">客戶</span><span class="od-v">曼谷 Siam Discovery</span></div>
-              <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">Snoopy</span></div>
-              <div class="od-row"><span class="od-k">類型</span><span class="od-v">快閃店銷售</span></div>
-              <div class="od-row"><span class="od-k">金額</span><span class="od-v">฿ 682,000</span></div>
-              <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:var(--ok)">已完成結算</span></div>
-              <div class="od-row"><span class="od-k">負責人</span><span class="od-v">Den（曼谷）</span></div>
-              <div class="od-row"><span class="od-k">狀態</span><span class="od-v" style="color:var(--ok)">已完成</span></div>
-              <div class="od-row"><span class="od-k">備注</span><span class="od-v">春節快閃 19 天</span></div>
-            </div>
+          <div class="prospect-detail">
+            618 活動備貨清單需要確認，德寶對接春雷了解電商端庫存需求。<br>
+            <span style="color:var(--accent)">下一步：</span>確認 618 備貨 SKU 和數量。
           </div>
         </div>
 
-        <div class="order-item" onclick="toggleOrder('od6')">
-          <div class="order-top">
-            <div class="order-icon" style="background:var(--ok-dim)">🐱</div>
-            <div class="order-body">
-              <div class="order-client">台北誠品</div>
-              <div class="order-meta">Mofusand · 試賣 · 珮玲 · <span style="color:var(--ok)">已出貨</span></div>
-            </div>
-            <div class="order-right">
-              <div class="order-amt" style="color:var(--ok)">NT$ 95,000</div>
-              <div style="margin-top:3px"><span class="chip chip-ok">全款已收</span></div>
-            </div>
-          </div>
-          <div class="order-detail" id="od6">
-            <div class="order-detail-grid">
-              <div class="od-row"><span class="od-k">客戶</span><span class="od-v">台北誠品</span></div>
-              <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">Mofusand</span></div>
-              <div class="od-row"><span class="od-k">類型</span><span class="od-v">試賣</span></div>
-              <div class="od-row"><span class="od-k">金額</span><span class="od-v">NT$ 95,000</span></div>
-              <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:var(--ok)">全款已收</span></div>
-              <div class="od-row"><span class="od-k">物流</span><span class="od-v" style="color:var(--ok)">已出貨</span></div>
-              <div class="od-row"><span class="od-k">負責業務</span><span class="od-v">珮玲</span></div>
-              <div class="od-row"><span class="od-k">狀態</span><span class="od-v" style="color:var(--ok)">已完成</span></div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -376,91 +483,188 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="col-card">
       <div class="panel-title">
         待辦清單
-        <span class="panel-badge badge-danger" id="todo-badge">4 項待處理</span>
+        <span class="panel-badge badge-danger">3 項待處理</span>
       </div>
-      <div class="todo-list" style="background:transparent;border:none;padding:0;margin:0;">
 
-        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
-          <div class="todo-item-top">
-            <div class="todo-icon">🔔</div>
-            <div class="todo-body">
-              <div class="todo-title">LOG-ON 尾款催收</div>
-              <div class="todo-sub">逾期 3 天 · ¥ 180,000 尾款未到帳</div>
-            </div>
-            <div class="todo-badge"><span class="chip chip-danger">緊急</span></div>
+      <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+        <div class="todo-item-top">
+          <div class="todo-icon">🔔</div>
+          <div class="todo-body">
+            <div class="todo-title">LOG-ON 尾款催收</div>
+            <div class="todo-sub">逾期 3 天 · ¥ 180,000 尾款 · 德寶跟進</div>
           </div>
-          <div class="todo-detail">
-            <div class="todo-detail-text">訂單 #BJ-2026-038 · 深圳 LOG-ON · Opanchu 80箱<br>應收 ¥180,000 尾款，付款期限 4/29 已逾期 3 天。<br>德寶負責跟進，建議直接電話催付。</div>
-            <div class="todo-actions">
-              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已催款';this.disabled=true">✓ 已催款，記錄</button>
-              <button class="tda-btn tda-warn" onclick="event.stopPropagation()">轉交德寶跟進</button>
-              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">上報 Ray</button>
-            </div>
+          <div class="todo-badge"><span class="chip chip-danger">緊急</span></div>
+        </div>
+        <div class="todo-detail">
+          <div class="todo-detail-text">訂單 #BJ-2026-038 · 深圳 LOG-ON · Opanchu 80箱<br>應收 ¥180,000 尾款，付款期限 4/29 已逾期 3 天。<br>德寶負責跟進，建議直接電話催付。</div>
+          <div class="todo-actions">
+            <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已催款';this.disabled=true">✓ 已催款，記錄</button>
+            <button class="tda-btn tda-warn" onclick="event.stopPropagation()">轉交德寶跟進</button>
+            <button class="tda-btn tda-grey" onclick="event.stopPropagation()">上報 Ray</button>
           </div>
         </div>
-
-        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
-          <div class="todo-item-top">
-            <div class="todo-icon">📝</div>
-            <div class="todo-body">
-              <div class="todo-title">Opanchu 續約洽談啟動</div>
-              <div class="todo-sub">4 個月後到期 · 需提前洽談續約</div>
-            </div>
-            <div class="todo-badge"><span class="chip chip-warn">重要</span></div>
-          </div>
-          <div class="todo-detail">
-            <div class="todo-detail-text">Opanchu 授權到期：2026/09/30<br>建議最遲 6 月啟動洽談，留 3 個月談判空間。<br>現行：MG ¥20 萬 / 年，抽成 12%，大陸+台灣。<br>目標：爭取延長至 3 年並加入東南亞市場。</div>
-            <div class="todo-actions">
-              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已啟動';this.disabled=true">✓ 已聯繫版權方</button>
-              <button class="tda-btn tda-warn" onclick="event.stopPropagation()">下週再啟動</button>
-              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">需 Ray 先拍板方向</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
-          <div class="todo-item-top">
-            <div class="todo-icon">📊</div>
-            <div class="todo-body">
-              <div class="todo-title">5 月批發業績彙整 → 送 Shawn</div>
-              <div class="todo-sub">5/10 前完成 · 包含所有批發訂單明細</div>
-            </div>
-            <div class="todo-badge"><span class="chip chip-info">5/10 前</span></div>
-          </div>
-          <div class="todo-detail">
-            <div class="todo-detail-text">每月 10 日前整理上月批發訂單彙整表送 Shawn。<br>內容：訂單列表、收款狀態、未出貨訂單、本月預測。<br>目前已確認 8 筆，尚有 3 筆等確認。</div>
-            <div class="todo-actions">
-              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已送出';this.disabled=true">✓ 已送 Shawn</button>
-              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">今天完成</button>
-              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">需延至 5/12</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
-          <div class="todo-item-top">
-            <div class="todo-icon">🤝</div>
-            <div class="todo-body">
-              <div class="todo-title">上海客戶新詢盤跟進</div>
-              <div class="todo-sub">老董出差回來後確認 · 2 家新詢盤待回覆</div>
-            </div>
-            <div class="todo-badge"><span class="chip chip-grey">待確認</span></div>
-          </div>
-          <div class="todo-detail">
-            <div class="todo-detail-text">上海玩具展帶回 2 家新詢盤：<br>① 上海美陳（IP周邊零售）— 問 Snoopy + Mofusand<br>② 虹橋 IP 精選（快閃場地）— 問場地合作條件<br>老董今天回北京，確認後填入 CRM。</div>
-            <div class="todo-actions">
-              <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已填入CRM';this.disabled=true">✓ 已填入 CRM</button>
-              <button class="tda-btn tda-grey" onclick="event.stopPropagation()">等老董回覆</button>
-            </div>
-          </div>
-        </div>
-
       </div>
+
+      <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+        <div class="todo-item-top">
+          <div class="todo-icon">📝</div>
+          <div class="todo-body">
+            <div class="todo-title">Opanchu 續約洽談啟動</div>
+            <div class="todo-sub">4 個月後到期 · 需提前洽談續約</div>
+          </div>
+          <div class="todo-badge"><span class="chip chip-warn">重要</span></div>
+        </div>
+        <div class="todo-detail">
+          <div class="todo-detail-text">Opanchu 授權到期：2026/09/30<br>建議最遲 6 月啟動洽談，留 3 個月談判空間。<br>現行：MG ¥20 萬 / 年，抽成 12%。<br>目標：爭取延長至 3 年並加入東南亞市場。</div>
+          <div class="todo-actions">
+            <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已啟動';this.disabled=true">✓ 已聯繫版權方</button>
+            <button class="tda-btn tda-warn" onclick="event.stopPropagation()">下週再啟動</button>
+            <button class="tda-btn tda-grey" onclick="event.stopPropagation()">需 Ray 先拍板方向</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="todo-item" onclick="this.querySelector('.todo-detail').classList.toggle('open')">
+        <div class="todo-item-top">
+          <div class="todo-icon">📊</div>
+          <div class="todo-body">
+            <div class="todo-title">5 月批發業績彙整 → 送 Shawn</div>
+            <div class="todo-sub">5/10 前完成 · 包含所有批發訂單明細</div>
+          </div>
+          <div class="todo-badge"><span class="chip chip-info">5/10 前</span></div>
+        </div>
+        <div class="todo-detail">
+          <div class="todo-detail-text">每月 10 日前整理上月批發訂單彙整表送 Shawn。<br>目前已確認 8 筆，尚有 3 筆等確認。</div>
+          <div class="todo-actions">
+            <button class="tda-btn tda-ok" onclick="event.stopPropagation();this.textContent='✓ 已送出';this.disabled=true">✓ 已送 Shawn</button>
+            <button class="tda-btn tda-grey" onclick="event.stopPropagation()">今天完成</button>
+          </div>
+        </div>
+      </div>
+
     </div>
-
   </div>
 
-  <!-- ③ IP 授權合約快覽 -->
+  <!-- ④ 即將上市新品 · 客戶意向追蹤 -->
+  <div class="sec-head">
+    <span class="sec-title">即將上市新品 · 客戶意向追蹤</span>
+    <span style="font-size:10px;color:var(--txt-lo);">業務從 CRM 回報 → 安然這裡彙整</span>
+  </div>
+
+  <!-- Muziktiger 新系列 -->
+  <div class="intent-card open" id="ic-muz">
+    <div class="intent-prod-header" onclick="toggleIntent('ic-muz')">
+      <div class="prod-icon" style="background:#818cf820;margin-right:4px">🎵</div>
+      <div>
+        <div class="intent-prod-name">Muziktiger 新系列盲盒</div>
+        <div class="intent-prod-meta">預計 7月上市 · 模具確認中 · 老董主攻大陸連鎖渠道</div>
+      </div>
+      <div class="intent-prod-right">
+        <span class="chip chip-warn">意向蒐集中</span>
+        <div style="font-size:11px;color:var(--txt-mid)">已回報 3 家</div>
+        <div class="intent-chevron">▼</div>
+      </div>
+    </div>
+    <div class="intent-body">
+      <table class="ord-table">
+        <thead><tr>
+          <th class="ord-th">客戶</th>
+          <th class="ord-th">業務</th>
+          <th class="ord-th">意向程度</th>
+          <th class="ord-th">預估量</th>
+          <th class="ord-th">回報時間</th>
+          <th class="ord-th">備注</th>
+        </tr></thead>
+        <tbody>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">泡泡瑪特北京</td>
+            <td class="ord-td" style="color:var(--txt-mid)">老董</td>
+            <td class="ord-td"><span class="chip chip-info">有意向</span></td>
+            <td class="ord-td">待確認</td>
+            <td class="ord-td" style="color:var(--txt-lo)">5/02</td>
+            <td class="ord-td" style="color:var(--txt-mid)">等提案回覆，王總感興趣</td>
+          </tr>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">廣州名創優品</td>
+            <td class="ord-td" style="color:var(--txt-mid)">老董</td>
+            <td class="ord-td"><span class="chip chip-warn">詢價中</span></td>
+            <td class="ord-td">200 箱</td>
+            <td class="ord-td" style="color:var(--txt-lo)">5/04</td>
+            <td class="ord-td" style="color:var(--txt-mid)">問能否 6月底前出貨</td>
+          </tr>
+          <tr class="ord-tr">
+            <td class="ord-td" style="font-weight:700">上海萌趣文化</td>
+            <td class="ord-td" style="color:var(--txt-mid)">德寶</td>
+            <td class="ord-td"><span class="chip chip-ok">有興趣</span></td>
+            <td class="ord-td">80 箱</td>
+            <td class="ord-td" style="color:var(--txt-lo)">5/03</td>
+            <td class="ord-td" style="color:var(--txt-mid)">要先看樣品</td>
+          </tr>
+          <tr class="ord-tr" style="opacity:.5">
+            <td class="ord-td" style="color:var(--txt-lo)" colspan="6">⋯ 尚有 4 家潛客未詢問意向，業務待跟進</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Opanchu 秋冬 -->
+  <div class="intent-card" id="ic-opanchu">
+    <div class="intent-prod-header" onclick="toggleIntent('ic-opanchu')">
+      <div class="prod-icon" style="background:var(--warn-dim);margin-right:4px">🐰</div>
+      <div>
+        <div class="intent-prod-name">Opanchu 秋冬系列</div>
+        <div class="intent-prod-meta">預計 9月上市 · 2D 概念生圖中 · 德寶主攻</div>
+      </div>
+      <div class="intent-prod-right">
+        <span class="chip chip-grey">尚未蒐集</span>
+        <div style="font-size:11px;color:var(--txt-lo)">待業務回報</div>
+        <div class="intent-chevron">▼</div>
+      </div>
+    </div>
+    <div class="intent-body">
+      <table class="ord-table">
+        <thead><tr>
+          <th class="ord-th">客戶</th><th class="ord-th">業務</th><th class="ord-th">意向</th><th class="ord-th">預估量</th><th class="ord-th">回報時間</th><th class="ord-th">備注</th>
+        </tr></thead>
+        <tbody>
+          <tr class="ord-tr" style="opacity:.5">
+            <td class="ord-td" style="color:var(--txt-lo)" colspan="6">尚無意向回報 · 業務請在 CRM 頁面填入客戶反饋</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mofusand 10月款 -->
+  <div class="intent-card" id="ic-mofu10">
+    <div class="intent-prod-header" onclick="toggleIntent('ic-mofu10')">
+      <div class="prod-icon" style="background:#818cf820;margin-right:4px">🐱</div>
+      <div>
+        <div class="intent-prod-name">Mofusand 10月秋季款</div>
+        <div class="intent-prod-meta">預計 10月上市 · 2D 送審中 · 老董 + 德寶 共同開拓</div>
+      </div>
+      <div class="intent-prod-right">
+        <span class="chip chip-grey">早期規劃</span>
+        <div style="font-size:11px;color:var(--txt-lo)">7月前開始蒐集</div>
+        <div class="intent-chevron">▼</div>
+      </div>
+    </div>
+    <div class="intent-body">
+      <table class="ord-table">
+        <thead><tr>
+          <th class="ord-th">客戶</th><th class="ord-th">業務</th><th class="ord-th">意向</th><th class="ord-th">預估量</th><th class="ord-th">回報時間</th><th class="ord-th">備注</th>
+        </tr></thead>
+        <tbody>
+          <tr class="ord-tr" style="opacity:.5">
+            <td class="ord-td" style="color:var(--txt-lo)" colspan="6">尚未開始蒐集 · 計劃 7 月開始詢問老客戶意向</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑤ IP 授權合約快覽 -->
   <div class="sec-head" id="ip-contracts">
     <span class="sec-title">IP 授權合約快覽</span>
     <a class="sec-link" href="erp-ip-vault.html">管理合約庫 →</a>
@@ -468,7 +672,6 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
     <div id="contract-list">
-      <!-- demo contracts, replaced by Feishu if success -->
       <div class="contract-row" id="ct-snoopy">
         <div class="ct-top">
           <div class="ct-icon">🐾</div>
@@ -542,9 +745,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
-  <!-- ④ AI 合約解析入口 -->
+  <!-- ⑥ AI 合約解析入口 -->
   <input type="file" id="contract-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleContractUpload(this)">
-  <div class="ai-banner" onclick="document.getElementById('contract-file-input').click()" style="cursor:pointer">
+  <div class="ai-banner" onclick="document.getElementById('contract-file-input').click()">
     <div class="ai-banner-icon">📄</div>
     <div class="ai-banner-text">
       <div class="ai-banner-title">上傳新合約 → AI 自動解析條款 → 一鍵存入合約庫</div>
@@ -565,8 +768,6 @@ function requireAuth(){
 }
 const SESS = requireAuth();
 if(!SESS) throw new Error('redirect');
-
-/* ── TOPBAR USER INFO ── */
 document.getElementById('user-pill').innerHTML = `<strong>${SESS.name}</strong>&nbsp;${SESS.role}`;
 
 function doLogout(){
@@ -574,12 +775,19 @@ function doLogout(){
   location.href='login.html';
 }
 
+/* ── TOGGLE PANELS ── */
+function toggleProd(id){
+  document.getElementById(id).classList.toggle('open');
+}
+function toggleIntent(id){
+  document.getElementById(id).classList.toggle('open');
+}
+
 /* ── FEISHU CONFIG ── */
 const _P  = 'https://feishu-proxy.raychou6913.workers.dev';
 const _AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
 const _T  = {
   sales:    'tblndRlEjmOgh5lk',
-  approval: 'tbl4OBNvsNkqS4mQ',
   budget:   'tblmlUoyZ6Bip6S3',
   ipvault:  'tblt9DOm4hf5Mr5r',
 };
@@ -623,19 +831,12 @@ function handleContractUpload(input){
   arr.unshift(rec);
   localStorage.setItem(key, JSON.stringify(arr));
   input.value = '';
-  // show inline toast
   let t=document.getElementById('anran-toast');
   if(!t){t=document.createElement('div');t.id='anran-toast';
     t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#818cf8;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
     document.body.appendChild(t);}
   t.textContent=`📄 ${file.name} 已排隊，AI 解析完成後通知你`;t.style.opacity='1';
   clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3000);
-}
-
-/* ── ORDER TOGGLE ── */
-function toggleOrder(id){
-  const el=document.getElementById(id);
-  if(el) el.classList.toggle('open');
 }
 
 /* ── CONTRACT EXPIRY CHECK ── */
@@ -654,39 +855,23 @@ function checkContractExpiry(){
     const row = document.getElementById(ct.id);
     if(!row) return;
     const chipEl = row.querySelector('.chip');
-    // remove old warn msg if exists (except opanchu which has demo)
     const existingMsg = row.querySelector('.ct-warn-msg,.ct-danger-msg');
-    // Only add dynamic msg if days < 120 AND no static demo msg for opanchu
     if(days < 60){
       if(chipEl){ chipEl.className='chip chip-danger'; chipEl.textContent='即將到期'; }
       const expEl = row.querySelector('.ct-expiry');
       if(expEl) expEl.style.color='var(--danger)';
       if(!existingMsg){
-        const msg=document.createElement('div');
-        msg.className='ct-danger-msg';
-        msg.textContent=`⚠ 距到期僅 ${days} 天，請立即洽談續約！`;
-        row.appendChild(msg);
+        const msg=document.createElement('div'); msg.className='ct-danger-msg';
+        msg.textContent=`⚠ 距到期僅 ${days} 天，請立即洽談續約！`; row.appendChild(msg);
       }
     } else if(days < 120){
       if(chipEl){ chipEl.className='chip chip-warn'; chipEl.textContent='快到期'; }
       const expEl = row.querySelector('.ct-expiry');
       if(expEl) expEl.style.color='var(--warn)';
       if(!existingMsg){
-        const msg=document.createElement('div');
-        msg.className='ct-warn-msg';
-        msg.textContent=`⚠ 距到期 ${days} 天，需提前洽談續約`;
-        row.appendChild(msg);
-      } else {
-        existingMsg.textContent=`⚠ 距到期 ${days} 天，需提前洽談續約`;
-      }
-    } else {
-      if(chipEl && chipEl.textContent!=='有效'){
-        chipEl.className='chip chip-ok'; chipEl.textContent='有效';
-      }
-      // remove warn msg for non-expiring contracts (but keep opanchu demo static)
-      if(existingMsg && ct.id !== 'ct-opanchu'){
-        existingMsg.remove();
-      }
+        const msg=document.createElement('div'); msg.className='ct-warn-msg';
+        msg.textContent=`⚠ 距到期 ${days} 天，需提前洽談續約`; row.appendChild(msg);
+      } else { existingMsg.textContent=`⚠ 距到期 ${days} 天，需提前洽談續約`; }
     }
   });
 }
@@ -696,100 +881,109 @@ async function loadRevKPI(){
   try{
     const rows = await query(_T.budget);
     const yr = new Date().getFullYear();
+    const mo = new Date().getMonth(); // 0-indexed
+    const q  = Math.floor(mo / 3);   // current quarter 0-indexed
     const yItems = rows.filter(r=>(parseFloat(fv(r.fields,'年度'))||0)===yr);
     const incomeRows  = yItems.filter(r=>fv(r.fields,'預算性質')==='收入');
     const actualRev   = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
     const budgetRev   = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    if(!actualRev) return; // keep demo
-    const monthBudget = budgetRev/12;
-    const monthActual = actualRev/(new Date().getMonth()+1);
-    const pct = monthBudget>0?Math.round(monthActual/monthBudget*100):0;
-    const cc  = pct>=80?'var(--ok)':pct>=50?'var(--warn)':'var(--danger)';
-    document.getElementById('kpi-rev').textContent = '¥ '+wan(monthActual);
-    document.getElementById('kpi-rev').style.color = cc;
-    document.getElementById('kpi-rev-sub').textContent = `目標 ¥ ${wan(monthBudget)}（月均預算）`;
-    document.getElementById('kpi-rev-trend').textContent = pct+'% 達成';
-    document.getElementById('kpi-rev-trend').className = 'kpi-trend '+(pct>=80?'trend-up':pct>=50?'trend-warn':'trend-dn');
-    document.getElementById('kpi-rev-bar').style.width = Math.min(pct,100)+'%';
-    document.getElementById('kpi-rev-bar').style.background = cc;
+    if(!actualRev) return;
+
+    // monthly avg
+    const monthsElapsed = mo + 1;
+    const monthAvg = actualRev / monthsElapsed;
+    const monthBudget = budgetRev / 12;
+    const monthPct = monthBudget>0?Math.round(monthAvg/monthBudget*100):0;
+    const mColor = monthPct>=80?'var(--ok)':monthPct>=50?'var(--warn)':'var(--danger)';
+    const mTrend = monthPct>=80?'trend-up':monthPct>=50?'trend-warn':'trend-dn';
+    document.getElementById('kpi-rev-month').textContent = '¥ '+wan(monthAvg);
+    document.getElementById('kpi-rev-month').style.color = mColor;
+    document.getElementById('kpi-rev-month-sub').textContent = `目標 ¥ ${wan(monthBudget)} / 月`;
+    document.getElementById('kpi-rev-month-trend').textContent = monthPct+'% 達成';
+    document.getElementById('kpi-rev-month-trend').className = 'kpi-trend '+mTrend;
+    document.getElementById('kpi-rev-month-bar').style.width = Math.min(monthPct,100)+'%';
+    document.getElementById('kpi-rev-month-bar').style.background = mColor;
+
+    // quarterly
+    const qMonths = mo - q*3 + 1; // months elapsed in current quarter
+    const qActual = monthAvg * qMonths;
+    const qBudget = monthBudget * 3;
+    const qPct = qBudget>0?Math.round(qActual/qBudget*100):0;
+    const qColor = qPct>=80?'var(--ok)':qPct>=50?'var(--warn)':'var(--danger)';
+    const qTrend = qPct>=80?'trend-up':qPct>=50?'trend-warn':'trend-dn';
+    const qLabels = ['Q1','Q2','Q3','Q4'];
+    document.getElementById('kpi-rev-quarter').textContent = '¥ '+wan(qActual);
+    document.getElementById('kpi-rev-quarter').style.color = qColor;
+    document.getElementById('kpi-rev-quarter-sub').textContent = `${qLabels[q]} 目標 ¥ ${wan(qBudget)}`;
+    document.getElementById('kpi-rev-quarter-trend').textContent = qPct+'% 達成';
+    document.getElementById('kpi-rev-quarter-trend').className = 'kpi-trend '+qTrend;
+    document.getElementById('kpi-rev-quarter-bar').style.width = Math.min(qPct,100)+'%';
+    document.getElementById('kpi-rev-quarter-bar').style.background = qColor;
+    const qRemain = 3 - qMonths;
+    document.getElementById('kpi-rev-quarter-foot').textContent = qRemain>0?`還剩 ${qRemain} 個月`:'本季最後一個月';
   }catch(e){}
 }
 
-/* ── FEISHU: LOAD ORDERS (overrides demo if success) ── */
-async function loadOrdersFromFeishu(){
-  try{
-    const rows = await query(_T.sales);
-    if(!rows||rows.length===0) return; // keep demo
+/* ── LOAD INTENT FROM CRM ── */
+function loadIntentReports(){
+  const intents = JSON.parse(localStorage.getItem('crm_intent_v1')||'[]');
+  if(!intents.length) return;
 
-    const STATUS_COLOR = {
-      '全款已收':'var(--ok)','訂金已收':'var(--warn)','訂金已收·待尾款':'var(--warn)',
-      '尾款未到':'var(--danger)','未收款':'var(--txt-mid)','已完成結算':'var(--ok)'
-    };
-    const LOGI_COLOR = {
-      '海運中':'#38bdf8','待出貨':'var(--txt-mid)','已完成':'var(--ok)',
-      '逾期':'var(--danger)','已出貨':'var(--ok)','已結算':'var(--ok)'
-    };
-    const IP_ICON = {'Snoopy':'🐾','Mofusand':'🐱','Opanchu':'🐰','Muziktiger':'🎵'};
+  const byProd = {};
+  intents.forEach(i=>{
+    if(!byProd[i.product]) byProd[i.product]=[];
+    byProd[i.product].push(i);
+  });
 
-    const html = rows.map((r,i)=>{
-      const f=r.fields;
-      const client=fv(f,'客戶名稱')||'未知客戶';
-      const ip=fv(f,'IP品牌')||'';
-      const amt=parseFloat(fv(f,'總金額'))||0;
-      const ccy=fv(f,'幣別')||'¥';
-      const qty=fv(f,'數量')||'—';
-      const cs=fv(f,'收款狀態')||'未收款';
-      const sales=fv(f,'負責業務')||'—';
-      const logi=fv(f,'物流狀態')||fv(f,'物流單號')||'—';
-      const icon=Object.entries(IP_ICON).find(([k])=>ip.includes(k))?.[1]||'📦';
-      const csColor=STATUS_COLOR[cs]||'var(--txt-mid)';
-      const logiColor=LOGI_COLOR[logi]||'var(--txt-mid)';
-      const chipCls=cs==='全款已收'||cs==='已完成結算'?'chip-ok':cs.includes('訂金')?'chip-warn':cs.includes('未')||cs.includes('逾')?'chip-danger':'chip-grey';
-      const id='od_fs_'+i;
-      return `<div class="order-item" onclick="toggleOrder('${id}')">
-        <div class="order-top">
-          <div class="order-icon" style="background:${chipCls==='chip-ok'?'var(--ok-dim)':chipCls==='chip-danger'?'var(--danger-dim)':'var(--warn-dim)'}">${icon}</div>
-          <div class="order-body">
-            <div class="order-client">${client}</div>
-            <div class="order-meta">${ip} · ${qty}箱 · ${sales} · <span style="color:${logiColor}">${logi}</span></div>
-          </div>
-          <div class="order-right">
-            <div class="order-amt" style="color:${csColor}">${ccy!=='¥'?ccy:''} ${amt?'¥'+wan(amt):'—'}</div>
-            <div style="margin-top:3px"><span class="chip ${chipCls}">${cs}</span></div>
-          </div>
-        </div>
-        <div class="order-detail" id="${id}">
-          <div class="order-detail-grid">
-            <div class="od-row"><span class="od-k">客戶</span><span class="od-v">${client}</span></div>
-            <div class="od-row"><span class="od-k">IP 品牌</span><span class="od-v">${ip||'—'}</span></div>
-            <div class="od-row"><span class="od-k">數量</span><span class="od-v">${qty}</span></div>
-            <div class="od-row"><span class="od-k">金額</span><span class="od-v">${ccy} ${amt?amt.toLocaleString():'—'}</span></div>
-            <div class="od-row"><span class="od-k">收款</span><span class="od-v" style="color:${csColor}">${cs}</span></div>
-            <div class="od-row"><span class="od-k">物流</span><span class="od-v" style="color:${logiColor}">${logi}</span></div>
-            <div class="od-row"><span class="od-k">負責業務</span><span class="od-v">${sales}</span></div>
-          </div>
-        </div>
-      </div>`;
+  // Try to inject into relevant intent card tables
+  // Uses product name matching
+  const PROD_MAP = {
+    'Muziktiger': 'ic-muz',
+    'Opanchu秋冬': 'ic-opanchu',
+    'Mofusand10月': 'ic-mofu10',
+  };
+
+  Object.entries(byProd).forEach(([prod, reports])=>{
+    const cardId = Object.keys(PROD_MAP).find(k=>prod.includes(k));
+    if(!cardId) return;
+    const card = document.getElementById(PROD_MAP[cardId]);
+    if(!card) return;
+    const tbody = card.querySelector('tbody');
+    if(!tbody) return;
+
+    const INTENT_CHIP = {
+      '有強烈興趣':'<span class="chip chip-ok">強烈興趣</span>',
+      '有意向':'<span class="chip chip-info">有意向</span>',
+      '詢價中':'<span class="chip chip-warn">詢價中</span>',
+      '暫無興趣':'<span class="chip chip-grey">暫無興趣</span>',
+    };
+
+    const html = reports.map(r=>{
+      const d = new Date(r.ts).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
+      const chip = INTENT_CHIP[r.intent]||`<span class="chip chip-grey">${r.intent}</span>`;
+      return `<tr class="ord-tr" style="background:var(--ok-dim)">
+        <td class="ord-td" style="font-weight:700">${r.client}</td>
+        <td class="ord-td" style="color:var(--txt-mid)">${r.sales}</td>
+        <td class="ord-td">${chip}</td>
+        <td class="ord-td">${r.qty||'待確認'}</td>
+        <td class="ord-td" style="color:var(--txt-lo)">${d}</td>
+        <td class="ord-td" style="color:var(--txt-mid)">${r.notes||'—'}</td>
+      </tr>`;
     }).join('');
 
-    document.getElementById('order-list').innerHTML = html;
-    document.getElementById('order-badge').textContent = rows.length+' 筆';
-
-    // Update KPI: unpaid count
-    const unpaid = rows.filter(r=>{ const cs=fv(r.fields,'收款狀態'); return cs && cs!=='全款已收' && cs!=='已完成結算'; });
-    if(unpaid.length){
-      document.getElementById('kpi-followup').textContent = unpaid.length+' 筆';
-    }
-
-  }catch(e){
-    // Feishu failed → keep demo data as-is
-    console.warn('Feishu load failed, keeping demo:', e.message);
-  }
+    // Clear placeholder and insert
+    tbody.innerHTML = html;
+    const badge = card.querySelector('.chip-grey,.chip-warn');
+    if(badge){ badge.className='chip chip-warn'; badge.textContent='意向蒐集中'; }
+    const countEl = card.querySelector('.intent-prod-right div:nth-child(2)');
+    if(countEl) countEl.textContent = `已回報 ${reports.length} 家`;
+  });
 }
 
 /* ── INIT ── */
 checkContractExpiry();
-Promise.allSettled([loadRevKPI(), loadOrdersFromFeishu()]);
+loadRevKPI();
+loadIntentReports();
 </script>
 
 <!-- ── EXPENSE FAB ── -->
@@ -837,41 +1031,20 @@ Promise.allSettled([loadRevKPI(), loadOrdersFromFeishu()]);
     <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
     <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
   </div>
-  <div class="exp-routing" id="expRouting">載入中...</div>
+  <div class="exp-routing" id="expRouting">送審路徑：楊子付款</div>
   <button class="exp-submit" onclick="submitExpense()">送出申請</button>
 </div>
 </div>
 <script>
 (function(){
 const EXP_ROUTES={
-  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
-  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
-  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
-  laodong:{next:'anran',nextLabel:'安然',cc:null},
-  debao:{next:'anran',nextLabel:'安然',cc:null},
-  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
-  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yangzi:{next:'anran',nextLabel:'安然',cc:null},
   anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  leo:{next:'ray',nextLabel:'Ray',cc:null},
-  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
 };
-const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
 let expType='personal';
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
 function openExpModal(){
-  const u=getUser();const r=EXP_ROUTES[u];
-  const hint=document.getElementById('expRouting');
-  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
-  else{hint.innerHTML='送審路徑：楊子';}
-  const supBtn=document.getElementById('expTypeSupplier');
-  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:'Ray'};
+  document.getElementById('expRouting').innerHTML=`送審路徑：<strong>${r.nextLabel}</strong>${r.cc?` · 抄送 <strong>${r.cc}</strong>`:''}`;
   document.getElementById('expDate').valueAsDate=new Date();
   setExpType('personal');
   document.getElementById('expOverlay').classList.add('open');
@@ -885,7 +1058,7 @@ function setExpType(t){
   document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
 }
 function submitExpense(){
-  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:'Ray'};
   let rec;
   if(expType==='personal'){
     const amt=document.getElementById('expAmt').value;
@@ -893,7 +1066,7 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
+    if(!amt||!date){alert('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }else{
     const name=document.getElementById('expSupName').value;
@@ -901,14 +1074,14 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
+    if(!name||!amt){alert('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
   }
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   closeExpModal();
-  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
+  alert(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();
