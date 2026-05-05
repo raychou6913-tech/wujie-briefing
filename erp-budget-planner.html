@@ -358,7 +358,8 @@ const VDIST=[0.20,0.16,0.12,0.10,0.10,0.08,0.07,0.06,0.05,0.03,0.02,0.01];
 // One-time: 包裝設計 / 2D打稿 / 3D建模 / 3D渲染 / 打樣費 / 模具費 / QA驗貨
 // Variable/件: 公仔本體 / 通路包材 / 物流 / 防偽標 / 雲倉費 / 其他
 // _BOX: default box structure helper (同一套箱規可複用)
-const BOX_STD = { logisticsPerBox:30, piecesPerBox:240, pkgPerBox:10, piecesPerBoxPkg:15 };
+const BOX_STD = { logisticsPerBox:30, pkgPerBox:10, piecesPerBoxPkg:15, innerPerBox:16 };
+// piecesPerBox (件/箱) is derived: piecesPerBoxPkg × innerPerBox
 function _bp(extra={}){ return { reorderLeadDays:45, hiddenOT:[], hiddenVar:[], extraOT:[], extraVar:[], ...BOX_STD, ...extra }; }
 
 const DEFAULTS = [
@@ -555,7 +556,8 @@ const VAR_STD = [
   {key:'unitOther',     label:'其他'},
 ];
 function _pkgUnit(p){ return (p.pkgPerBox||0)/Math.max(p.piecesPerBoxPkg||1,1); }
-function _logUnit(p){ return (p.logisticsPerBox||0)/Math.max(p.piecesPerBox||1,1); }
+function _piecesPerCarton(p){ return Math.max(p.piecesPerBoxPkg||1,1)*Math.max(p.innerPerBox||1,1); }
+function _logUnit(p){ return (p.logisticsPerBox||0)/Math.max(_piecesPerCarton(p),1); }
 
 function oneTimeCost(p){
   const hidden = new Set(p.hiddenOT||[]);
@@ -730,10 +732,10 @@ function buildDetHTML(p,i){
         <table class="det-tbl">
           <tr><td>公仔本體</td><td><input class="det-inp" value="${p.unitMfg}" oninput="dc(${i},'unitMfg',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp((p.unitMfg||0)/ws)}</td></tr>
           <tr>
-            <td style="white-space:nowrap;">通路包材（盒）</td>
+            <td style="white-space:nowrap;">通路包材（中盒）</td>
             <td style="white-space:nowrap;">
               ¥<input class="det-inp" style="width:42px;" value="${p.pkgPerBox||0}" oninput="dc(${i},'pkgPerBox',this.value)">/盒 ÷
-              <input class="det-inp" style="width:32px;" value="${p.piecesPerBoxPkg||15}" oninput="dc(${i},'piecesPerBoxPkg',this.value)">件
+              <input class="det-inp" style="width:28px;" value="${p.piecesPerBoxPkg||15}" oninput="dc(${i},'piecesPerBoxPkg',this.value)">件/盒
             </td>
             <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(pkg,3)}/件 · ${fp(pkg/ws)}</td>
           </tr>
@@ -741,9 +743,10 @@ function buildDetHTML(p,i){
             <td style="white-space:nowrap;">物流（箱）</td>
             <td style="white-space:nowrap;">
               ¥<input class="det-inp" style="width:42px;" value="${p.logisticsPerBox||0}" oninput="dc(${i},'logisticsPerBox',this.value)">/箱 ÷
-              <input class="det-inp" style="width:32px;" value="${p.piecesPerBox||240}" oninput="dc(${i},'piecesPerBox',this.value)">件
+              (<input class="det-inp" style="width:28px;" value="${p.piecesPerBoxPkg||15}" oninput="dc(${i},'piecesPerBoxPkg',this.value)">件×
+              <input class="det-inp" style="width:28px;" value="${p.innerPerBox||16}" oninput="dc(${i},'innerPerBox',this.value)">盒)
             </td>
-            <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(logistics,3)}/件 · ${fp(logistics/ws)}</td>
+            <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(logistics,3)}/件 · ${fp(logistics/ws)}<br><span style="font-size:9px;opacity:.6;">${p.piecesPerBoxPkg||15}件/中盒 × ${p.innerPerBox||16}盒/箱 = ${_piecesPerCarton(p)}件/箱</span></td>
           </tr>
           ${varRows}
           ${extraVarRows}
