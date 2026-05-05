@@ -249,8 +249,17 @@ function requireAuth(){
 const SESS = requireAuth();
 if(!SESS) throw new Error('redirect');
 
-// 可標記階段完成的角色：設計/採購負責人 + Ray；Shawn 只能看進度
+// 寫入權限：設計/採購負責人 + Ray；其他人查閱進度
 const CAN_MARK_DONE = ['ray','bevis','peilin','shetong','laige','muzi'].includes(SESS.user);
+if(!CAN_MARK_DONE){
+  document.addEventListener('DOMContentLoaded',()=>{
+    const banner = document.createElement('div');
+    banner.style.cssText='background:#818cf810;border:1px solid #818cf830;border-radius:8px;padding:8px 14px;font-size:11px;color:var(--txt-mid);margin-bottom:16px;';
+    banner.textContent='👁 查閱視角：可查看所有產品的開發進度與階段狀態，標記操作由設計 / 採購負責人執行';
+    const main = document.querySelector('.main');
+    if(main) main.prepend(banner);
+  });
+}
 </script>
 
 <div class="topbar">

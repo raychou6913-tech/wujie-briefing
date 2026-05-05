@@ -571,14 +571,14 @@ if(!SESS) throw new Error('redirect');
 document.getElementById('sess-name').textContent = SESS.name || '—';
 document.getElementById('sess-role').textContent = SESS.role || '';
 
-// 設計團隊唯讀：隱藏所有寫入操作按鈕
-const DESIGN_READONLY = ['bevis','peilin','shetong'];
-const IS_READONLY = DESIGN_READONLY.includes(SESS.user);
+// 寫入權限：僅採購團隊 + Ray；其他人唯讀查閱
+const CAN_WRITE_PROC = ['laige','muzi','ray'].includes(SESS.user);
+const IS_READONLY = !CAN_WRITE_PROC;
 if(IS_READONLY){
   document.querySelectorAll('.btn-send-shawn,.btn-send,.upload-zone,.paste-hint,#ai-file').forEach(el=>el.style.display='none');
   const banner = document.createElement('div');
   banner.style.cssText='background:#818cf810;border:1px solid #818cf830;border-radius:8px;padding:8px 14px;font-size:11px;color:var(--txt-mid);margin-bottom:16px;';
-  banner.textContent='👁 唯讀視角：你可以查看所有報價與成本資訊，操作功能由採購團隊使用';
+  banner.textContent='👁 查閱視角：可查看所有報價與採購進度，提交 PO 及操作功能由採購台（賴哥 / 木子）負責';
   const main = document.querySelector('.main');
   if(main) main.prepend(banner);
 }
