@@ -244,7 +244,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
       </div>
       <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--card2);display:flex;align-items:center;gap:10px;">
         <button class="btn-sm" onclick="openAddModal()" style="font-size:12px;color:var(--accent);border-color:var(--accent);padding:5px 14px;">＋ 新增項目</button>
-        <span style="font-size:10px;color:var(--txt-lo);">追加批次 或 全新產品</span>
+        <span style="font-size:10px;color:var(--txt-lo);">同 IP 新品 或 全新產品</span>
       </div>
     </div>
   </div>
@@ -274,7 +274,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
     <div class="modal-title">新增預算項目</div>
     <div class="modal-tabs">
       <div class="modal-tab active" id="tabReorder" onclick="switchAddTab('reorder')">
-        📦 追加批次<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">既有產品再生產</span>
+        📦 同 IP 新品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">同 IP 不同產品線</span>
       </div>
       <div class="modal-tab" id="tabNew" onclick="switchAddTab('new')">
         ✨ 全新產品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">新 IP / 新設計</span>
@@ -289,15 +289,15 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="modal-field">
-          <div class="modal-lbl">追加批次上市月</div>
+          <div class="modal-lbl">新品上市月</div>
           <select class="modal-inp" id="rLaunch"></select>
         </div>
         <div class="modal-field">
-          <div class="modal-lbl">追加批次數量（件）</div>
+          <div class="modal-lbl">新品首批數量（件）</div>
           <input class="modal-inp" id="rVol" type="number" min="0" placeholder="e.g. 50000">
         </div>
       </div>
-      <div class="modal-hint">⚠ 追加批次不再計包裝設計/打稿/建模/打樣/模具費；版稅率、批發折扣、SRP 與原產品相同。</div>
+      <div class="modal-hint">⚠ 同 IP 新品複製原產品的變動成本與版稅參數；一次性費用（設計/建模/模具）可在展開詳細後自行調整。</div>
     </div>
 
     <!-- NEW PRODUCT PANEL -->
@@ -357,97 +357,90 @@ const VDIST=[0.20,0.16,0.12,0.10,0.10,0.08,0.07,0.06,0.05,0.03,0.02,0.01];
 // Cost structure mirrors 褲褲兔眼鏡兔 Excel (東莞堃鸿, 2026/4/6)
 // One-time: 包裝設計 / 2D打稿 / 3D建模 / 3D渲染 / 打樣費 / 模具費 / QA驗貨
 // Variable/件: 公仔本體 / 通路包材 / 物流 / 防偽標 / 雲倉費 / 其他
+// _BOX: default box structure helper (同一套箱規可複用)
+const BOX_STD = { logisticsPerBox:30, piecesPerBox:240, pkgPerBox:10, piecesPerBoxPkg:15 };
+function _bp(extra={}){ return { reorderLeadDays:45, hiddenOT:[], hiddenVar:[], extraOT:[], extraVar:[], ...BOX_STD, ...extra }; }
+
 const DEFAULTS = [
   { id:'muz1', ip:'Muziktiger', ipShort:'無業老虎', color:'#38bdf8',
     name:'再懶一下下 盲袋 15+1款', launch:'2026-07',
     volFirst:75000, volReorder:0, srp:49, wsDiscount:0.46,
     costDesign:6000, cost2D:3750, cost3D:22500, costRender:7500,
     costSample:33900, costMold:175000, costQA:1100,
-    unitMfg:6.2, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.26, r:0.08} },
+    unitMfg:6.2, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.26, r:0.08}, ..._bp() },
 
   { id:'oni1', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
     name:'生活日記 盲袋 15+1款', launch:'2026-07',
     volFirst:150000, volReorder:0, srp:19.9, wsDiscount:0.46,
     costDesign:5000, cost2D:3750, cost3D:22500, costRender:7500,
     costSample:33900, costMold:155000, costQA:1100,
-    unitMfg:2.8, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.12} },
+    unitMfg:2.8, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.12}, ..._bp() },
 
   { id:'oni2', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
     name:'忙得糊糊轉 盲袋 12+1款', launch:'2026-08',
     volFirst:100000, volReorder:0, srp:29.9, wsDiscount:0.46,
     costDesign:5000, cost2D:3000, cost3D:18000, costRender:6000,
     costSample:27120, costMold:148000, costQA:1100,
-    unitMfg:3.8, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.12} },
+    unitMfg:3.8, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.12}, ..._bp() },
 
   { id:'oni3', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
     name:'閒鹹梅事做 盲盒 10+1款', launch:'2026-10',
     volFirst:90000, volReorder:0, srp:29.9, wsDiscount:0.46,
     costDesign:5000, cost2D:2500, cost3D:15000, costRender:5000,
     costSample:22600, costMold:130000, costQA:1100,
-    unitMfg:3.8, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.12} },
+    unitMfg:3.8, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.12}, ..._bp() },
 
   { id:'oni4', ip:'飯糰與梅子', ipShort:'おにうめ', color:'#f472b6',
     name:'充滿幹勁的一天 盲盒 12+1款', launch:'2026-11',
     volFirst:120000, volReorder:0, srp:39.9, wsDiscount:0.46,
     costDesign:5500, cost2D:3000, cost3D:18000, costRender:6000,
     costSample:27120, costMold:152000, costQA:1100,
-    unitMfg:5.2, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.12} },
+    unitMfg:5.2, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.12}, ..._bp() },
 
   { id:'opa1', ip:'Opanchu 褲褲兔', ipShort:'褲褲兔', color:'#818cf8',
-    // ↓ 真實數字來自東莞堃鸿報價單 2026/4/6
     name:'眼鏡兔超級變變變 磁吸盲盒 5+1款', launch:'2026-08',
     volFirst:108000, volReorder:0, srp:34.9, wsDiscount:0.46,
     costDesign:6500, cost2D:4000, cost3D:24000, costRender:8000,
     costSample:36160, costMold:194360, costQA:1100,
-    unitMfg:4.71, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.14} },
+    unitMfg:4.71, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.14}, ..._bp() },
 
   { id:'opa2', ip:'Opanchu 褲褲兔', ipShort:'褲褲兔', color:'#818cf8',
     name:'美味大暴走 盲袋', launch:'2026-10',
     volFirst:80000, volReorder:0, srp:39.9, wsDiscount:0.46,
     costDesign:6000, cost2D:3500, cost3D:21000, costRender:7000,
     costSample:33900, costMold:175000, costQA:1100,
-    unitMfg:5.2, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.14} },
+    unitMfg:5.2, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.14}, ..._bp() },
 
   { id:'mof1', ip:'Mofusand 貓福珊迪', ipShort:'貓福珊迪', color:'#fb923c',
     name:'10月款 盲盒（估）', launch:'2026-10',
     volFirst:48000, volReorder:0, srp:59, wsDiscount:0.46,
     costDesign:7000, cost2D:4500, cost3D:27000, costRender:9000,
     costSample:40680, costMold:210000, costQA:1100,
-    unitMfg:7.5, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'ws', d:1, r:0.14} },
+    unitMfg:7.5, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'ws', d:1, r:0.14}, ..._bp() },
 
   { id:'mof2', ip:'Mofusand 貓福珊迪', ipShort:'貓福珊迪', color:'#fb923c',
     name:'12月款 盲袋（估）', launch:'2026-12',
     volFirst:48000, volReorder:0, srp:59, wsDiscount:0.46,
     costDesign:7000, cost2D:4500, cost3D:27000, costRender:9000,
     costSample:40680, costMold:210000, costQA:1100,
-    unitMfg:7.5, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'ws', d:1, r:0.14} },
+    unitMfg:7.5, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'ws', d:1, r:0.14}, ..._bp() },
 
   { id:'sno1', ip:'Snoopy 史努比', ipShort:'Snoopy', color:'#fbbf24',
     name:'聖誕限定盲袋 8款', launch:'2026-12',
     volFirst:6000, volReorder:0, srp:59.9, wsDiscount:0.46,
     costDesign:8000, cost2D:2000, cost3D:12000, costRender:4000,
     costSample:18080, costMold:200000, costQA:1500,
-    unitMfg:8.0, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
-    unitWarehouse:0.056, unitOther:0,
-    royalty:{type:'std', d:0.40, r:0.14} },
+    unitMfg:8.0, unitAntiForge:0.106, unitWarehouse:0.056, unitOther:0,
+    royalty:{type:'std', d:0.40, r:0.14}, ..._bp() },
 ];
 
 // ── OPEX BREAKDOWN ───────────────────────────────────────────────
@@ -547,11 +540,36 @@ let addTab = 'reorder';
 // ── CALCULATIONS ─────────────────────────────────────────────────
 function mIdx(ym){ return MONTHS.indexOf(ym); }
 
+const OT_STD = [
+  {key:'costDesign',  label:'包裝設計'},
+  {key:'cost2D',      label:'2D 打稿'},
+  {key:'cost3D',      label:'3D 建模'},
+  {key:'costRender',  label:'3D 渲染'},
+  {key:'costSample',  label:'打樣費'},
+  {key:'costMold',    label:'模具費'},
+  {key:'costQA',      label:'QA 驗貨'},
+];
+const VAR_STD = [
+  {key:'unitAntiForge', label:'防偽標'},
+  {key:'unitWarehouse', label:'雲倉費'},
+  {key:'unitOther',     label:'其他'},
+];
+function _pkgUnit(p){ return (p.pkgPerBox||0)/Math.max(p.piecesPerBoxPkg||1,1); }
+function _logUnit(p){ return (p.logisticsPerBox||0)/Math.max(p.piecesPerBox||1,1); }
+
 function oneTimeCost(p){
-  return p.costDesign+p.cost2D+p.cost3D+p.costRender+p.costSample+p.costMold+p.costQA;
+  const hidden = new Set(p.hiddenOT||[]);
+  const std = OT_STD.filter(r=>!hidden.has(r.key)).reduce((s,r)=>s+(p[r.key]||0),0);
+  const extra = (p.extraOT||[]).reduce((s,r)=>s+r.val,0);
+  return std+extra;
 }
 function varCostPerUnit(p){
-  return p.unitMfg+p.unitPkg+p.unitLogistics+p.unitAntiForge+p.unitWarehouse+p.unitOther;
+  const hidden = new Set(p.hiddenVar||[]);
+  const pkg      = hidden.has('unitPkg')       ? 0 : _pkgUnit(p);
+  const logistics= hidden.has('unitLogistics') ? 0 : _logUnit(p);
+  const std = VAR_STD.filter(r=>!hidden.has(r.key)).reduce((s,r)=>s+(p[r.key]||0),0);
+  const extra = (p.extraVar||[]).reduce((s,r)=>s+r.val,0);
+  return (p.unitMfg||0)+pkg+logistics+std+extra;
 }
 function royaltyPerUnit(p){
   const ws = p.srp * p.wsDiscount;
@@ -579,8 +597,8 @@ function calcProd(p){
     const off = mi-li;
     if (li===-1||off<0||off>=VDIST.length) return {rev:0,roy:0,cogs:0,gross:0};
     const volF = p.volFirst*VDIST[off];
-    // Reorder starts 6 months after first launch
-    const offR = off-6;
+    const reorderMonths = Math.max(1, Math.ceil((p.reorderLeadDays||45)/30));
+    const offR = off-reorderMonths;
     const volR = (p.volReorder>0&&offR>=0&&offR<VDIST.length) ? p.volReorder*VDIST[offR] : 0;
     const vol = volF+volR;
     const rev = vol*e.ws;
@@ -633,22 +651,76 @@ function renderParams(){
   }).join('');
 }
 
+const _XB = `background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:10px;padding:0 3px;opacity:.6;`;
+const _XBH = `onmouseenter="this.style.opacity='1';this.style.color='var(--danger)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--txt-lo)'"`;
+
 function buildDetHTML(p,i){
   const e = unitEcon(p);
   const ws = p.srp*p.wsDiscount;
+  const hiddenOT  = new Set(p.hiddenOT||[]);
+  const hiddenVar = new Set(p.hiddenVar||[]);
+  const pkg      = _pkgUnit(p);
+  const logistics= _logUnit(p);
+  const reorderMonths = Math.max(1, Math.ceil((p.reorderLeadDays||45)/30));
+
+  // Build one-time rows
+  const otRows = OT_STD.filter(r=>!hiddenOT.has(r.key)).map(r=>{
+    const v = p[r.key]||0;
+    return `<tr>
+      <td>
+        <button style="${_XB}" ${_XBH} title="隱藏此列" onclick="event.stopPropagation();hideRow(${i},'OT','${r.key}')">✕</button>
+        ${r.label}
+      </td>
+      <td><input class="det-inp" value="${v}" oninput="dc(${i},'${r.key}',this.value)"></td>
+      <td style="color:var(--txt-lo);font-size:10px;">${fp(v/Math.max(p.volFirst,1)/ws)}/件</td>
+    </tr>`;
+  }).join('');
+  const extraOTRows = (p.extraOT||[]).map(r=>`<tr>
+    <td>
+      <button style="${_XB}" ${_XBH} title="刪除" onclick="event.stopPropagation();delCustomRow(${i},'OT','${r.id}')">✕</button>
+      <input class="det-inp" style="width:80px;display:inline-block;" value="${r.label}" oninput="renameCustomRow(${i},'OT','${r.id}',this.value)">
+    </td>
+    <td><input class="det-inp" value="${r.val}" oninput="updateCustomRow(${i},'OT','${r.id}',this.value)"></td>
+    <td style="color:var(--txt-lo);font-size:10px;">${fp(r.val/Math.max(p.volFirst,1)/ws)}/件</td>
+  </tr>`).join('');
+  const otHiddenCount = hiddenOT.size;
+
+  // Build variable rows
+  const varRows = VAR_STD.filter(r=>!hiddenVar.has(r.key)).map(r=>{
+    const v = p[r.key]||0;
+    return `<tr>
+      <td>
+        <button style="${_XB}" ${_XBH} title="隱藏此列" onclick="event.stopPropagation();hideRow(${i},'Var','${r.key}')">✕</button>
+        ${r.label}
+      </td>
+      <td><input class="det-inp" value="${v}" oninput="dc(${i},'${r.key}',this.value)"></td>
+      <td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(v/ws)}</td>
+    </tr>`;
+  }).join('');
+  const extraVarRows = (p.extraVar||[]).map(r=>`<tr>
+    <td>
+      <button style="${_XB}" ${_XBH} title="刪除" onclick="event.stopPropagation();delCustomRow(${i},'Var','${r.id}')">✕</button>
+      <input class="det-inp" style="width:80px;display:inline-block;" value="${r.label}" oninput="renameCustomRow(${i},'Var','${r.id}',this.value)">
+    </td>
+    <td><input class="det-inp" value="${r.val}" oninput="updateCustomRow(${i},'Var','${r.id}',this.value)"></td>
+    <td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(r.val/ws)}</td>
+  </tr>`).join('');
+  const varHiddenCount = new Set(p.hiddenVar||[]).size;
+
   return `<div class="det-body">
     <div class="det-grid">
       <!-- LEFT: One-time costs -->
       <div>
-        <div class="det-col-title">一次性費用（首批攤提，追加單不再計）</div>
+        <div class="det-col-title">一次性費用（首批攤提，再追加不再計）</div>
         <table class="det-tbl">
-          <tr><td>包裝設計</td><td><input class="det-inp" value="${p.costDesign}" oninput="dc(${i},'costDesign',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.costDesign/Math.max(p.volFirst,1)/ws)}/件</td></tr>
-          <tr><td>2D 打稿</td><td><input class="det-inp" value="${p.cost2D}" oninput="dc(${i},'cost2D',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.cost2D/Math.max(p.volFirst,1)/ws)}/件</td></tr>
-          <tr><td>3D 建模</td><td><input class="det-inp" value="${p.cost3D}" oninput="dc(${i},'cost3D',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.cost3D/Math.max(p.volFirst,1)/ws)}/件</td></tr>
-          <tr><td>3D 渲染</td><td><input class="det-inp" value="${p.costRender}" oninput="dc(${i},'costRender',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.costRender/Math.max(p.volFirst,1)/ws)}/件</td></tr>
-          <tr><td>打樣費</td><td><input class="det-inp" value="${p.costSample}" oninput="dc(${i},'costSample',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.costSample/Math.max(p.volFirst,1)/ws)}/件</td></tr>
-          <tr><td>模具費</td><td><input class="det-inp" value="${p.costMold}" oninput="dc(${i},'costMold',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.costMold/Math.max(p.volFirst,1)/ws)}/件</td></tr>
-          <tr><td>QA 驗貨</td><td><input class="det-inp" value="${p.costQA}" oninput="dc(${i},'costQA',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">${fp(p.costQA/Math.max(p.volFirst,1)/ws)}/件</td></tr>
+          ${otRows}
+          ${extraOTRows}
+          <tr>
+            <td colspan="3" style="padding:4px 0;">
+              <button onclick="event.stopPropagation();addCustomRow(${i},'OT')" style="font-size:10px;color:var(--accent);background:none;border:1px dashed var(--border-hi);border-radius:5px;padding:2px 8px;cursor:pointer;">＋ 加一行</button>
+              ${otHiddenCount>0?`<button onclick="event.stopPropagation();restoreRows(${i},'OT')" style="font-size:10px;color:var(--txt-lo);background:none;border:none;cursor:pointer;margin-left:6px;">↩ 還原隱藏 (${otHiddenCount})</button>`:''}
+            </td>
+          </tr>
           <tr class="det-total"><td>合計</td><td style="color:var(--warn);">¥${oneTimeCost(p).toLocaleString()}</td><td style="color:var(--warn);font-size:10px;" id="otp-${p.id}">攤提 ¥${fn(e.oneTime,2)}/件</td></tr>
         </table>
       </div>
@@ -656,12 +728,31 @@ function buildDetHTML(p,i){
       <div>
         <div class="det-col-title">每件變動成本（每批都有）</div>
         <table class="det-tbl">
-          <tr><td>公仔本體</td><td><input class="det-inp" value="${p.unitMfg}" oninput="dc(${i},'unitMfg',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(p.unitMfg/ws)}</td></tr>
-          <tr><td>通路包材（盒）</td><td><input class="det-inp" value="${p.unitPkg}" oninput="dc(${i},'unitPkg',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(p.unitPkg/ws)}</td></tr>
-          <tr><td>物流（箱）</td><td><input class="det-inp" value="${p.unitLogistics}" oninput="dc(${i},'unitLogistics',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(p.unitLogistics/ws)}</td></tr>
-          <tr><td>防偽標</td><td><input class="det-inp" value="${p.unitAntiForge}" oninput="dc(${i},'unitAntiForge',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(p.unitAntiForge/ws)}</td></tr>
-          <tr><td>雲倉費</td><td><input class="det-inp" value="${p.unitWarehouse}" oninput="dc(${i},'unitWarehouse',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(p.unitWarehouse/ws)}</td></tr>
-          <tr><td>其他</td><td><input class="det-inp" value="${p.unitOther}" oninput="dc(${i},'unitOther',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件</td></tr>
+          <tr><td>公仔本體</td><td><input class="det-inp" value="${p.unitMfg}" oninput="dc(${i},'unitMfg',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp((p.unitMfg||0)/ws)}</td></tr>
+          <tr>
+            <td style="white-space:nowrap;">通路包材（盒）</td>
+            <td style="white-space:nowrap;">
+              ¥<input class="det-inp" style="width:42px;" value="${p.pkgPerBox||0}" oninput="dc(${i},'pkgPerBox',this.value)">/盒 ÷
+              <input class="det-inp" style="width:32px;" value="${p.piecesPerBoxPkg||15}" oninput="dc(${i},'piecesPerBoxPkg',this.value)">件
+            </td>
+            <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(pkg,3)}/件 · ${fp(pkg/ws)}</td>
+          </tr>
+          <tr>
+            <td style="white-space:nowrap;">物流（箱）</td>
+            <td style="white-space:nowrap;">
+              ¥<input class="det-inp" style="width:42px;" value="${p.logisticsPerBox||0}" oninput="dc(${i},'logisticsPerBox',this.value)">/箱 ÷
+              <input class="det-inp" style="width:32px;" value="${p.piecesPerBox||240}" oninput="dc(${i},'piecesPerBox',this.value)">件
+            </td>
+            <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(logistics,3)}/件 · ${fp(logistics/ws)}</td>
+          </tr>
+          ${varRows}
+          ${extraVarRows}
+          <tr>
+            <td colspan="3" style="padding:4px 0;">
+              <button onclick="event.stopPropagation();addCustomRow(${i},'Var')" style="font-size:10px;color:var(--accent);background:none;border:1px dashed var(--border-hi);border-radius:5px;padding:2px 8px;cursor:pointer;">＋ 加一行</button>
+              ${varHiddenCount>0?`<button onclick="event.stopPropagation();restoreRows(${i},'Var')" style="font-size:10px;color:var(--txt-lo);background:none;border:none;cursor:pointer;margin-left:6px;">↩ 還原隱藏 (${varHiddenCount})</button>`:''}
+            </td>
+          </tr>
           <tr class="det-total"><td>小計</td><td style="color:var(--txt-hi);">¥${fn(e.varC,3)}/件</td><td style="color:var(--txt-lo);font-size:10px;">${fp(e.varC/ws)}</td></tr>
         </table>
         <div style="margin-top:10px;">
@@ -680,6 +771,11 @@ function buildDetHTML(p,i){
             <input class="det-inp det-inp-xs" value="${Math.round(p.royalty.r*100)}%" oninput="rc(${i},'r',this.value)">
             <span style="color:var(--txt-lo);font-size:10px;">→ ¥${fn(e.roy,3)}/件 · ${fp(e.roy/ws)}</span>
           </div>
+        </div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--txt-mid);">追加批交期：</span>
+          <input class="det-inp det-inp-xs" style="width:46px;" value="${p.reorderLeadDays||45}" oninput="setReorderLead(${i},this.value)">
+          <span style="font-size:10px;color:var(--txt-lo);">天（最少30）≈ ${reorderMonths} 個月後出貨</span>
         </div>
       </div>
     </div>
@@ -866,6 +962,66 @@ function updateCompactMargin(i){
   el.style.color=color;
 }
 
+// ── PARAM ROW HELPERS ─────────────────────────────────────────────
+function _redetail(i){
+  const p=prods[i];
+  const detRow=document.getElementById(`det-${p.id}`);
+  if(detRow&&detRow.classList.contains('open')){
+    detRow.querySelector('td').innerHTML=buildDetHTML(p,i);
+  }
+  refreshEconPreview(i);
+  updateCompactMargin(i);
+  renderTable();
+}
+
+function hideRow(i, side, key){
+  const arr = side==='OT' ? 'hiddenOT' : 'hiddenVar';
+  if(!prods[i][arr]) prods[i][arr]=[];
+  if(!prods[i][arr].includes(key)){
+    prods[i][arr].push(key);
+    if(side==='OT') prods[i][key]=0; else prods[i][key]=0;
+  }
+  _redetail(i);
+}
+
+function restoreRows(i, side){
+  const arr = side==='OT' ? 'hiddenOT' : 'hiddenVar';
+  prods[i][arr]=[];
+  _redetail(i);
+}
+
+function addCustomRow(i, side){
+  const label = prompt('欄位名稱（例如：印刷費）');
+  if(!label) return;
+  const arr = side==='OT' ? 'extraOT' : 'extraVar';
+  if(!prods[i][arr]) prods[i][arr]=[];
+  prods[i][arr].push({ id:'cr_'+Date.now(), label, val:0 });
+  _redetail(i);
+}
+
+function delCustomRow(i, side, id){
+  const arr = side==='OT' ? 'extraOT' : 'extraVar';
+  prods[i][arr]=(prods[i][arr]||[]).filter(r=>r.id!==id);
+  _redetail(i);
+}
+
+function updateCustomRow(i, side, id, rawVal){
+  const arr = side==='OT' ? 'extraOT' : 'extraVar';
+  const row=(prods[i][arr]||[]).find(r=>r.id===id);
+  if(row){ row.val=parseFloat(rawVal)||0; refreshEconPreview(i); updateCompactMargin(i); renderTable(); }
+}
+
+function renameCustomRow(i, side, id, val){
+  const arr = side==='OT' ? 'extraOT' : 'extraVar';
+  const row=(prods[i][arr]||[]).find(r=>r.id===id);
+  if(row) row.label=val;
+}
+
+function setReorderLead(i, rawVal){
+  prods[i].reorderLeadDays = Math.max(30, parseInt(rawVal)||45);
+  refreshEconPreview(i); renderTable();
+}
+
 // ── ADD PRODUCT MODAL ─────────────────────────────────────────────
 function openAddModal(){
   // Populate dropdowns
@@ -894,12 +1050,15 @@ function confirmAdd(){
     const vol = parseFloat(document.getElementById('rVol').value)||50000;
     const launch = document.getElementById('rLaunch').value;
     if(!vol||!launch){ alert('請填寫上市月與數量'); return; }
-    // Copy from base: variable costs + royalty, zero all one-time costs
-    const newProd = { ...base, id:uid,
-      name: base.name + '（追加批次）',
+    // Copy base's var costs + royalty; keep OT fields but zero mold/sample (can tweak in detail)
+    const newProd = { ...base, ..._bp({
+      hiddenOT:[...( base.hiddenOT||[])],
+      hiddenVar:[...(base.hiddenVar||[])],
+      extraOT:[],extraVar:[],
+      reorderLeadDays:base.reorderLeadDays||45,
+    }), id:uid,
+      name: base.name + '（新品）',
       launch, volFirst:vol, volReorder:0,
-      costDesign:0, cost2D:0, cost3D:0, costRender:0,
-      costSample:0, costMold:0, costQA:0,
       royalty:{...base.royalty} };
     prods.push(newProd);
   } else {
@@ -909,11 +1068,11 @@ function confirmAdd(){
     const srp = parseFloat(document.getElementById('nSrp').value)||29.9;
     const vol = parseFloat(document.getElementById('nVol').value)||60000;
     const color = document.getElementById('nColor').value.trim()||'#a78bfa';
-    prods.push({ id:uid, ip, ipShort:ip, color,
+    prods.push({ ..._bp(), id:uid, ip, ipShort:ip, color,
       name, launch, volFirst:vol, volReorder:0, srp, wsDiscount:0.46,
       costDesign:5000, cost2D:3000, cost3D:18000, costRender:6000,
       costSample:27120, costMold:150000, costQA:1100,
-      unitMfg:4.0, unitPkg:0.667, unitLogistics:0.125, unitAntiForge:0.106,
+      unitMfg:4.0, unitAntiForge:0.106,
       unitWarehouse:0.056, unitOther:0,
       royalty:{type:'std', d:0.40, r:0.12} });
   }
