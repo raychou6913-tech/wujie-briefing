@@ -360,7 +360,12 @@ const VDIST=[0.20,0.16,0.12,0.10,0.10,0.08,0.07,0.06,0.05,0.03,0.02,0.01];
 // _BOX: default box structure helper (同一套箱規可複用)
 const BOX_STD = { logisticsPerBox:30, pkgPerBox:10, piecesPerBoxPkg:15, innerPerBox:16 };
 // piecesPerBox (件/箱) is derived: piecesPerBoxPkg × innerPerBox
-function _bp(extra={}){ return { reorderLeadDays:45, hiddenOT:[], hiddenVar:[], extraOT:[], extraVar:[], ...BOX_STD, ...extra }; }
+const CH_DEFAULTS = ()=>[
+  { id:'ch_ka',  label:'KA 客戶',  count:3, boxPerCh:10 },
+  { id:'ch_br',  label:'品牌客戶', count:5, boxPerCh:5  },
+  { id:'ch_di',  label:'流通客戶', count:8, boxPerCh:3  },
+];
+function _bp(extra={}){ return { reorderLeadDays:45, hiddenOT:[], hiddenVar:[], extraOT:[], extraVar:[], channels:CH_DEFAULTS(), ...BOX_STD, ...extra }; }
 
 const DEFAULTS = [
   { id:'muz1', ip:'Muziktiger', ipShort:'無業老虎', color:'#38bdf8',
@@ -639,7 +644,10 @@ function renderParams(){
           </select>
         </td>
         <td><input class="pi pi-sm" value="${p.srp}" onclick="event.stopPropagation()" oninput="fc(${i},'srp',this.value)"></td>
-        <td><input class="pi pi-md" value="${p.volFirst.toLocaleString()}" onclick="event.stopPropagation()" oninput="fc(${i},'volFirst',this.value)"></td>
+        <td>
+          <input class="pi pi-md" value="${p.volFirst.toLocaleString()}" onclick="event.stopPropagation()" oninput="fc(${i},'volFirst',this.value)">
+          <div style="font-size:9px;color:var(--txt-lo);text-align:right;margin-top:1px;">≈ ${Math.round(p.volFirst/_piecesPerCarton(p))} 箱</div>
+        </td>
         <td><input class="pi pi-md" value="${p.volReorder.toLocaleString()}" onclick="event.stopPropagation()" oninput="fc(${i},'volReorder',this.value)"></td>
         <td><input class="pi pi-xs" value="${Math.round(p.wsDiscount*100)}%" onclick="event.stopPropagation()" oninput="fc(${i},'wsDiscount',this.value)"></td>
         <td style="text-align:center;font-size:12px;font-weight:800;color:${mgnColor};" id="mgn-${p.id}">${fp(e.mgnFirst)}</td>
@@ -655,6 +663,50 @@ function renderParams(){
 
 const _XB = `background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:10px;padding:0 3px;opacity:.6;`;
 const _XBH = `onmouseenter="this.style.opacity='1';this.style.color='var(--danger)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--txt-lo)'"`;
+
+function buildChannelHTML(p,i){
+  const ppc = _piecesPerCarton(p);
+  const chs = p.channels||[];
+  const totalBoxes = chs.reduce((s,c)=>s+(c.count||0)*(c.boxPerCh||0),0);
+  const totalPieces = totalBoxes * ppc;
+  const rows = chs.map(c=>`
+    <tr>
+      <td><button style="${_XB}" ${_XBH} onclick="event.stopPropagation();delChannel(${i},'${c.id}')">✕</button>
+          <input class="det-inp" style="width:72px;" value="${c.label}" oninput="updateChannel(${i},'${c.id}','label',this.value)"></td>
+      <td><input class="det-inp" style="width:44px;text-align:right;" value="${c.count}" oninput="updateChannel(${i},'${c.id}','count',this.value)"> 個</td>
+      <td><input class="det-inp" style="width:44px;text-align:right;" value="${c.boxPerCh}" oninput="updateChannel(${i},'${c.id}','boxPerCh',this.value)"> 箱</td>
+      <td style="text-align:right;color:var(--txt-mid);font-size:11px;">${((c.count||0)*(c.boxPerCh||0)).toLocaleString()} 箱</td>
+    </tr>`).join('');
+  return `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div class="det-col-title" style="margin:0;">首批鋪貨渠道規劃（以箱為單位）</div>
+      <button onclick="event.stopPropagation();addChannel(${i})" style="font-size:10px;color:var(--accent);background:none;border:1px dashed var(--border-hi);border-radius:5px;padding:2px 8px;cursor:pointer;">＋ 渠道</button>
+    </div>
+    <table class="det-tbl" style="width:auto;">
+      <tr style="font-size:9px;color:var(--txt-lo);">
+        <th style="text-align:left;padding:3px 6px;">渠道類型</th>
+        <th style="padding:3px 6px;">渠道數</th>
+        <th style="padding:3px 6px;">每渠道</th>
+        <th style="padding:3px 6px;text-align:right;">小計</th>
+      </tr>
+      ${rows}
+      <tr style="border-top:1px solid var(--border);">
+        <td colspan="3" style="color:var(--txt-mid);font-size:11px;padding-top:6px;">合計</td>
+        <td style="text-align:right;font-weight:700;color:var(--txt-hi);font-size:12px;padding-top:6px;" id="ch-total-${p.id}">
+          ${totalBoxes.toLocaleString()} 箱
+          <span style="color:var(--txt-lo);font-weight:400;font-size:10px;margin-left:4px;">= ${totalPieces.toLocaleString()} 件</span>
+        </td>
+      </tr>
+    </table>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--txt-lo);">${ppc} 件/箱（${p.piecesPerBoxPkg||15}件/中盒 × ${p.innerPerBox||16}中盒/箱）</span>
+      <button onclick="event.stopPropagation();applyChannelToVol(${i})"
+        style="font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-dim);border:1px solid var(--ok);border-radius:6px;padding:4px 12px;cursor:pointer;">
+        ✓ 套用 ${totalPieces.toLocaleString()} 件 到首批
+      </button>
+    </div>
+  </div>`;
+}
 
 function buildDetHTML(p,i){
   const e = unitEcon(p);
@@ -782,6 +834,8 @@ function buildDetHTML(p,i){
         </div>
       </div>
     </div>
+    <!-- CHANNEL PLANNING -->
+    <div id="ch-${p.id}">${buildChannelHTML(p,i)}</div>
     <!-- ECONOMICS PREVIEW -->
     <div id="econ-${p.id}">${buildEconHTML(e, p)}</div>
   </div>`;
@@ -1023,6 +1077,38 @@ function renameCustomRow(i, side, id, val){
 function setReorderLead(i, rawVal){
   prods[i].reorderLeadDays = Math.max(30, parseInt(rawVal)||45);
   refreshEconPreview(i); renderTable();
+}
+
+function _refreshChannel(i){
+  const p=prods[i];
+  const el=document.getElementById(`ch-${p.id}`);
+  if(el) el.innerHTML=buildChannelHTML(p,i);
+}
+
+function updateChannel(i, cid, field, rawVal){
+  const ch=(prods[i].channels||[]).find(c=>c.id===cid);
+  if(!ch) return;
+  ch[field] = (field==='label') ? rawVal : (parseInt(rawVal)||0);
+  _refreshChannel(i);
+}
+
+function addChannel(i){
+  if(!prods[i].channels) prods[i].channels=[];
+  prods[i].channels.push({ id:'ch_'+Date.now(), label:'新渠道', count:1, boxPerCh:5 });
+  _refreshChannel(i);
+}
+
+function delChannel(i, cid){
+  prods[i].channels=(prods[i].channels||[]).filter(c=>c.id!==cid);
+  _refreshChannel(i);
+}
+
+function applyChannelToVol(i){
+  const p=prods[i];
+  const ppc=_piecesPerCarton(p);
+  const totalBoxes=(p.channels||[]).reduce((s,c)=>s+(c.count||0)*(c.boxPerCh||0),0);
+  prods[i].volFirst=totalBoxes*ppc;
+  renderParams(); renderTable();
 }
 
 // ── ADD PRODUCT MODAL ─────────────────────────────────────────────
