@@ -326,9 +326,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="vam-compact-sub" id="vam-ytd-sub">/ ¥800萬 年目標</div>
       </div>
       <div class="vam-compact-stat">
-        <div class="vam-compact-label">節奏快慢</div>
-        <div class="vam-compact-val warn" id="vam-gap-val">−¥46 萬</div>
-        <div class="vam-compact-sub" id="vam-gap-sub">落後節奏</div>
+        <div class="vam-compact-label">月均淨利</div>
+        <div class="vam-compact-val warn" id="vam-gap-val">¥ — 萬/月</div>
+        <div class="vam-compact-sub" id="vam-gap-sub">目標 ¥66.7萬/月</div>
       </div>
       <div class="vam-compact-stat">
         <div class="vam-compact-label">今年還差</div>
@@ -384,10 +384,18 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ① 計劃覆蓋率 -->
   <div class="section-title">計劃覆蓋率 · 手頭項目能否填滿年度目標</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;" id="cover-summary-block">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:13px;font-weight:700;color:var(--txt-hi);">已實現 + 在建項目 合計</span>
+      <div id="cover-total-label" style="font-size:13px;font-weight:800;color:var(--warn)">計算中…</div>
+    </div>
+    <div style="background:var(--card2);border-radius:4px;height:10px;overflow:hidden;margin-bottom:8px;"><div id="cover-total-fill" style="height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,#16a34a,var(--ok));transition:.3s;"></div></div>
+    <div id="cover-total-note" style="font-size:12px;color:var(--txt-mid)"></div>
+  </div>
   <div class="cover-grid">
     <div class="cover-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">📦 批發產品管道</span>
+        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">📦 批發產品</span>
         <span class="abc-tag" id="wholesale-cover-tag">計算中</span>
       </div>
       <div id="wholesale-cover-inner"><div style="font-size:11px;color:var(--txt-lo);padding:12px 0;text-align:center">載入中…</div></div>
@@ -395,20 +403,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
     <div class="cover-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">🏪 快閃店管道</span>
+        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">🏪 快閃店</span>
         <span class="abc-tag" id="popup-cover-tag">計算中</span>
       </div>
       <div id="popup-cover-inner"><div style="font-size:11px;color:var(--txt-lo);padding:12px 0;text-align:center">載入中…</div></div>
       <div class="cover-footer" id="popup-cover-footer"></div>
     </div>
-  </div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;" id="cover-summary-block">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
-      <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">手頭項目合計覆蓋率（批發 + 快閃）</span>
-      <div id="cover-total-label" style="font-size:13px;font-weight:800;color:var(--warn)">計算中…</div>
-    </div>
-    <div style="background:var(--card2);border-radius:4px;height:10px;overflow:hidden;margin-bottom:8px;"><div id="cover-total-fill" style="height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,#16a34a,var(--ok));transition:.3s;"></div></div>
-    <div id="cover-total-note" style="font-size:12px;color:var(--txt-mid)"></div>
   </div>
 
   <!-- ② 執行節奏 -->
@@ -1462,14 +1462,16 @@ async function loadVamProgress(){
     const ytdSub = document.getElementById("vam-ytd-sub");
     if(ytdSub) ytdSub.textContent = `/ ¥800萬 年目標（節奏應達 ¥${fmt(expectedYr)} 萬）`;
 
+    const monthlyAvg    = monthPassed > 0 ? actual / monthPassed : 0;
+    const monthlyTarget = VAM_YR / 12;
+    const monthlyOK     = monthlyAvg >= monthlyTarget;
     const gapVal = document.getElementById("vam-gap-val");
     if(gapVal){
-      const gapFmt = isAhead ? `+¥${fmt(Math.abs(gap))} 萬` : `−¥${fmt(Math.abs(gap))} 萬`;
-      gapVal.textContent = gapFmt;
-      gapVal.className   = "vam-compact-val "+(isAhead?"ok":"warn");
+      gapVal.textContent = `¥ ${fmt(monthlyAvg)} 萬/月`;
+      gapVal.className   = "vam-compact-val "+(monthlyOK?"ok":"warn");
     }
     const gapSub = document.getElementById("vam-gap-sub");
-    if(gapSub) gapSub.textContent = isAhead ? `超前節奏，繼續保持` : `落後節奏，剩 ${monthsLeft} 個月追`;
+    if(gapSub) gapSub.textContent = `目標 ¥${fmt(monthlyTarget)} 萬/月 · ${monthlyOK?'達標':'偏慢'}`;
 
     const remVal = document.getElementById("vam-remain-val");
     if(remVal){ remVal.textContent = `¥ ${fmt(remain)} 萬`; remVal.className = "vam-compact-val neutral"; }
@@ -1613,8 +1615,10 @@ async function loadForecast(){
 /* ── PIPELINE COVERAGE ── */
 async function loadPipelineCoverage(){
   const VAM_YR = 8000000;
-  const MARGIN = 0.30; // avg wholesale net margin
+  const MARGIN = 0.30;
   const TWD2RMB_R = 0.22; const POPUP_MARGIN = 0.28;
+  // 已在銷售/完成階段的產品：它們的收入已計入 YTD actual，不重複計算
+  const SELLING_STAGES = new Set(['大貨銷售中','持續銷售','大貨追加中','清貨期','完成']);
 
   const ST_COLOR = {'持續銷售':'var(--ok)','大貨銷售中':'var(--ok)','大貨追加中':'var(--ok)','清貨期':'var(--txt-mid)','已確認':'var(--accent)'};
   const ST_ICON  = {'持續銷售':'🟢','大貨銷售中':'🟢','大貨追加中':'🟡','清貨期':'⬜','已確認':'🔵'};
@@ -1625,8 +1629,9 @@ async function loadPipelineCoverage(){
     const products = await _fetchAll(_TBLS.product_pipeline);
     const popups   = await _fetchAll(_TBLS.popup_stores);
 
-    // ── 批發 ──
-    let wholesaleRMB = 0;
+    // ── 批發（顯示所有產品，但合計只算在建的，避免與 YTD actual 重複）──
+    let wholesaleRMB = 0;      // 在建（未進銷售）的預估，用於合計
+    let wholesaleTotal = 0;    // 全部估算，用於卡片展示
     const wRows = products.filter(r=>_fv(r.fields,'當前階段')!=='取消').map(r=>{
       const f=r.fields;
       const ip   = (_fv(f,'IP品牌')||'').split('（')[0];
@@ -1635,7 +1640,8 @@ async function loadPipelineCoverage(){
       const srp  = parseFloat(_fv(f,'建議零售價'))||0;
       const stage= _fv(f,'當前階段')||'—';
       const net  = vol * srp * 0.40 * MARGIN;
-      wholesaleRMB += net;
+      wholesaleTotal += net;
+      if(!SELLING_STAGES.has(stage)) wholesaleRMB += net; // 在建才加入合計
       const col = ST_COLOR[stage]||'var(--txt-mid)';
       const icon= ST_ICON[stage]||'◻';
       return `<tr><td style="color:var(--txt-mid)">${ip}</td><td title="${_fv(f,'產品名稱')}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px">${name}</td><td style="color:${col}">${icon} ${stage}</td><td style="color:var(--ok);font-weight:700;text-align:right">${net?'¥'+(net/10000).toFixed(1)+'萬':'—'}</td></tr>`;
@@ -1643,12 +1649,13 @@ async function loadPipelineCoverage(){
     const wEl=document.getElementById('wholesale-cover-inner');
     if(wEl) wEl.innerHTML=`<table class="cover-table"><tr><th>IP</th><th>產品</th><th>狀態</th><th style="text-align:right">預估淨貢獻</th></tr>${wRows.join('')}</table>`;
     const wFt=document.getElementById('wholesale-cover-footer');
-    if(wFt) wFt.innerHTML=`<span style="color:var(--txt-mid)">批發合計預估淨利</span><span style="font-size:14px;font-weight:800;color:var(--ok)">¥${(wholesaleRMB/10000).toFixed(1)}萬</span>`;
+    if(wFt) wFt.innerHTML=`<span style="color:var(--txt-mid)">在建產品預估淨利</span><span style="font-size:14px;font-weight:800;color:var(--ok)">¥${(wholesaleRMB/10000).toFixed(1)}萬</span>`;
     const wTg=document.getElementById('wholesale-cover-tag');
-    if(wTg){ const p=Math.round(wholesaleRMB/VAM_YR*100); wTg.textContent=`覆蓋目標 ${p}%`; wTg.className=`abc-tag ${p>=50?'ok':'warn'}`; }
+    if(wTg){ const p=Math.round(wholesaleTotal/VAM_YR*100); wTg.textContent=`全年估算覆蓋 ${p}%`; wTg.className=`abc-tag ${p>=50?'ok':'warn'}`; }
 
-    // ── 快閃店 ──
-    let popupRMB = 0;
+    // ── 快閃店（已結案的已計入 YTD actual，只算未完成的加入合計）──
+    let popupRMB = 0;       // 未結案的（在建），用於合計
+    let popupTotal = 0;     // 全部，用於卡片展示
     const pRows = popups.map(r=>{
       const f=r.fields;
       const city  = _fv(f,'城市')||'—';
@@ -1658,7 +1665,8 @@ async function loadPipelineCoverage(){
       const wave  = _fv(f,'Wave')||'';
       const base  = actual>0?actual:target;
       const net   = base*TWD2RMB_R*POPUP_MARGIN;
-      popupRMB   += net;
+      popupTotal += net;
+      if(status !== '已結案') popupRMB += net; // 未結案才加入合計
       const col   = PP_COLOR[status]||'var(--txt-mid)';
       const icon  = PP_ICON[status]||'•';
       const rev   = actual>0?`NT$${(actual/10000).toFixed(0)}萬`:`NT$${(target/10000).toFixed(0)}萬 目標`;
@@ -1669,12 +1677,14 @@ async function loadPipelineCoverage(){
       ? `<table class="cover-table"><tr><th>批次</th><th>城市</th><th>狀態</th><th>流水</th><th style="text-align:right">預估淨貢獻</th></tr>${pRows.join('')}</table>`
       : `<div style="font-size:11px;color:var(--txt-lo);padding:16px;text-align:center">尚無快閃店計劃</div>`;
     const pFt=document.getElementById('popup-cover-footer');
-    if(pFt) pFt.innerHTML=`<span style="color:var(--txt-mid)">快閃店合計預估淨利</span><span style="font-size:14px;font-weight:800;color:${popupRMB>0?'var(--ok)':'var(--txt-lo)'}">¥${(popupRMB/10000).toFixed(1)}萬</span>`;
+    if(pFt) pFt.innerHTML=`<span style="color:var(--txt-mid)">在建快閃預估淨利</span><span style="font-size:14px;font-weight:800;color:${popupRMB>0?'var(--ok)':'var(--txt-lo)'}">¥${(popupRMB/10000).toFixed(1)}萬</span>`;
     const pTg=document.getElementById('popup-cover-tag');
-    if(pTg){ if(!popups.length){ pTg.textContent='尚無計劃'; pTg.className='abc-tag'; }else{ const p=Math.round(popupRMB/VAM_YR*100); pTg.textContent=`覆蓋目標 ${p}%`; pTg.className=`abc-tag ${p>=20?'ok':'warn'}`; } }
+    if(pTg){ if(!popups.length){ pTg.textContent='尚無計劃'; pTg.className='abc-tag'; }else{ const p=Math.round(popupTotal/VAM_YR*100); pTg.textContent=`全年估算覆蓋 ${p}%`; pTg.className=`abc-tag ${p>=20?'ok':'warn'}`; } }
 
-    // ── 合計 ──
-    const total = wholesaleRMB+popupRMB;
+    // ── 合計：YTD actual（已實現）+ 在建預估（未重複計算）──
+    const ytdActual = window._vamActual || 0;
+    const forwardEst = wholesaleRMB + popupRMB;
+    const total = ytdActual + forwardEst;
     const pct   = Math.min(Math.round(total/VAM_YR*100), 200);
     const lb = document.getElementById('cover-total-label');
     const fi = document.getElementById('cover-total-fill');
@@ -1682,8 +1692,8 @@ async function loadPipelineCoverage(){
     if(lb){ lb.textContent=`¥${(total/10000).toFixed(1)}萬 / ¥${VAM_YR/10000}萬 = ${pct}%`; lb.style.color=pct>=100?'var(--ok)':'var(--warn)'; }
     if(fi){ fi.style.width=Math.min(pct,100)+'%'; fi.style.background=pct>=100?'linear-gradient(90deg,#16a34a,var(--ok))':'linear-gradient(90deg,#b45309,var(--warn))'; }
     if(no) no.textContent = pct>=100
-      ? `✅ 已規劃項目可覆蓋全年目標（批發 ¥${(wholesaleRMB/10000).toFixed(1)}萬 + 快閃 ¥${(popupRMB/10000).toFixed(1)}萬）`
-      : `⚠ 仍有 ¥${((VAM_YR-total)/10000).toFixed(1)}萬 未有項目覆蓋，需新增批發訂單或快閃店計劃`;
+      ? `✅ 已實現 ¥${(ytdActual/10000).toFixed(1)}萬（YTD）+ 在建估算 ¥${(forwardEst/10000).toFixed(1)}萬 = 全年目標已覆蓋`
+      : `⚠ 已實現 ¥${(ytdActual/10000).toFixed(1)}萬 + 在建 ¥${(forwardEst/10000).toFixed(1)}萬，仍缺 ¥${((VAM_YR-total)/10000).toFixed(1)}萬`;
   }catch(e){ console.error('loadPipelineCoverage',e); }
 }
 
@@ -1748,9 +1758,8 @@ loadCashflow();
 loadBudgetKPI();
 loadOrderStats();
 loadContractAlerts();
-loadVamProgress();
+loadVamProgress().then(() => loadPipelineCoverage());
 loadForecast();
-loadPipelineCoverage();
 loadCadenceTracker();
 </script>
 </body>
