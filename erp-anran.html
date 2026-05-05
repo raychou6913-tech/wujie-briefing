@@ -188,8 +188,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
     <div class="kpi-card">
       <div class="kpi-label">活躍授權合約</div>
-      <div class="kpi-val" id="kpi-contract" style="color:var(--accent)">4 份</div>
-      <div class="kpi-sub" id="kpi-contract-sub">Snoopy / Mofusand / Opanchu / Muziktiger</div>
+      <div class="kpi-val" id="kpi-contract" style="color:var(--accent)">5 份</div>
+      <div class="kpi-sub" id="kpi-contract-sub">Snoopy / Mofusand / Opanchu / Muziktiger / 飯糰與梅子</div>
       <span class="kpi-trend trend-warn" id="kpi-contract-warn">⚠ Opanchu 4 個月後到期</span>
     </div>
 
@@ -486,8 +486,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="ct-top">
           <div class="ct-icon">🎵</div>
           <div class="ct-body">
-            <div class="ct-name">Muziktiger</div>
-            <div class="ct-meta">Musicdog Japan · 已用 ¥ 100K · 中港台</div>
+            <div class="ct-name">Muziktiger（無業老虎）</div>
+            <div class="ct-meta">佳盛（JIASHENG） · MG ¥80,000 · 中國大陸</div>
           </div>
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
@@ -500,8 +500,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="ct-top">
           <div class="ct-icon">🐱</div>
           <div class="ct-body">
-            <div class="ct-name">Mofusand</div>
-            <div class="ct-meta">Mofusand Inc. · 已用 ¥ 200K · 中港台+東南亞</div>
+            <div class="ct-name">Mofusand（貓福珊迪）</div>
+            <div class="ct-meta">Mofusand Inc. · MG ¥297,637 · 中國大陸 · 有你共創代簽</div>
           </div>
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
@@ -514,8 +514,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="ct-top">
           <div class="ct-icon">🐰</div>
           <div class="ct-body">
-            <div class="ct-name">Opanchu</div>
-            <div class="ct-meta">Opanchu Studio · 已用 ¥ 60K · 中港台</div>
+            <div class="ct-name">Opanchu（褲褲兔）</div>
+            <div class="ct-meta">Opanchu Co. Ltd. · MG ¥200,000 · 中國大陸+港澳</div>
           </div>
           <div class="ct-right">
             <span class="chip chip-warn">快到期</span>
@@ -525,16 +525,16 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="ct-warn-msg" id="opanchu-warn">⚠ 距到期 4 個月，需提前洽談續約</div>
       </div>
 
-      <div class="contract-row" id="ct-mofusand2" style="border-bottom:none;padding-bottom:0;">
+      <div class="contract-row" id="ct-onigiri" style="border-bottom:none;padding-bottom:0;">
         <div class="ct-top">
-          <div class="ct-icon">🐱</div>
+          <div class="ct-icon">🍙</div>
           <div class="ct-body">
-            <div class="ct-name">Mofusand（貓福珊迪）</div>
-            <div class="ct-meta">Mofusand Inc. · 已用 ¥ 68K · 中國大陸</div>
+            <div class="ct-name">飯糰與梅子（おにうめ）</div>
+            <div class="ct-meta">More Friends（多個朋友） · MG ¥200,000 · 中國大陸+港澳 · 有你共創代簽</div>
           </div>
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
-            <div class="ct-expiry">到期：2027-06</div>
+            <div class="ct-expiry">到期：確認中</div>
           </div>
         </div>
       </div>
@@ -579,6 +579,8 @@ const _AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
 const _T  = {
   sales:    'tblndRlEjmOgh5lk',
   approval: 'tbl4OBNvsNkqS4mQ',
+  budget:   'tblmlUoyZ6Bip6S3',
+  ipvault:  'tblt9DOm4hf5Mr5r',
 };
 let _tok=null, _tokExp=0;
 
@@ -641,8 +643,8 @@ function checkContractExpiry(){
     { id:'ct-snoopy',    expiry:'2027-03-31', name:'Snoopy' },
     { id:'ct-muziktiger',expiry:'2026-12-31', name:'Muziktiger' },
     { id:'ct-mofusand',  expiry:'2027-06-30', name:'Mofusand' },
-    { id:'ct-opanchu',   expiry:'2026-09-30', name:'Opanchu' },
-    { id:'ct-mofusand2', expiry:'2027-06-30', name:'Mofusand' },
+    { id:'ct-opanchu',   expiry:'2026-09-30', name:'Opanchu（褲褲兔）' },
+    { id:'ct-onigiri',   expiry:'2027-06-30', name:'飯糰與梅子' },
   ];
   const now = Date.now();
   contracts.forEach(ct=>{
@@ -686,6 +688,30 @@ function checkContractExpiry(){
       }
     }
   });
+}
+
+/* ── FEISHU: REV KPI ── */
+async function loadRevKPI(){
+  try{
+    const rows = await query(_T.budget);
+    const yr = new Date().getFullYear();
+    const yItems = rows.filter(r=>(parseFloat(fv(r.fields,'年度'))||0)===yr);
+    const incomeRows  = yItems.filter(r=>fv(r.fields,'預算性質')==='收入');
+    const actualRev   = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+    const budgetRev   = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+    if(!actualRev) return; // keep demo
+    const monthBudget = budgetRev/12;
+    const monthActual = actualRev/(new Date().getMonth()+1);
+    const pct = monthBudget>0?Math.round(monthActual/monthBudget*100):0;
+    const cc  = pct>=80?'var(--ok)':pct>=50?'var(--warn)':'var(--danger)';
+    document.getElementById('kpi-rev').textContent = '¥ '+wan(monthActual);
+    document.getElementById('kpi-rev').style.color = cc;
+    document.getElementById('kpi-rev-sub').textContent = `目標 ¥ ${wan(monthBudget)}（月均預算）`;
+    document.getElementById('kpi-rev-trend').textContent = pct+'% 達成';
+    document.getElementById('kpi-rev-trend').className = 'kpi-trend '+(pct>=80?'trend-up':pct>=50?'trend-warn':'trend-dn');
+    document.getElementById('kpi-rev-bar').style.width = Math.min(pct,100)+'%';
+    document.getElementById('kpi-rev-bar').style.background = cc;
+  }catch(e){}
 }
 
 /* ── FEISHU: LOAD ORDERS (overrides demo if success) ── */
@@ -762,7 +788,7 @@ async function loadOrdersFromFeishu(){
 
 /* ── INIT ── */
 checkContractExpiry();
-loadOrdersFromFeishu();
+Promise.allSettled([loadRevKPI(), loadOrdersFromFeishu()]);
 </script>
 
 <!-- ── EXPENSE FAB ── -->
