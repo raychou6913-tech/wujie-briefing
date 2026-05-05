@@ -12,7 +12,7 @@
   --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
-  --beijing:#f59e0b;--bangkok:#22c55e;--taipei:#818cf8;
+  --wholesale:#f97316;--flash:#06b6d4;--other:#a855f7;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
@@ -28,87 +28,98 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 /* LAYOUT */
 .main{max-width:1200px;margin:0 auto;padding:20px 28px;}
 
-/* SECTION HEADER */
+/* SECTION */
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;}
 .sec-head:first-child{margin-top:0;}
 .sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
-.sec-link{font-size:10px;color:var(--accent);text-decoration:none;}
+.sec-link{font-size:10px;color:var(--accent);text-decoration:none;cursor:pointer;}
 
-/* TOP 2-KPI CARDS */
-.kpi-big-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:border-color .15s;}
+/* TOP KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .15s;}
 .kpi-big:hover{border-color:var(--border-hi);}
-.kpi-big-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:10px;}
-.kpi-big-val{font-size:34px;font-weight:800;line-height:1;margin-bottom:2px;}
-.kpi-big-sub{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
-.kpi-big-trend{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:10px;}
+.kpi-big-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;margin-bottom:8px;}
+.kpi-big-val{font-size:30px;font-weight:800;line-height:1;margin-bottom:2px;}
+.kpi-big-sub{font-size:11px;color:var(--txt-mid);margin-bottom:8px;}
+.kpi-big-trend{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:8px;}
 .trend-up{background:var(--ok-dim);color:var(--ok);}
 .trend-dn{background:var(--danger-dim);color:var(--danger);}
+.trend-warn{background:var(--warn-dim);color:var(--warn);}
 .prog{background:var(--card2);border-radius:3px;height:5px;overflow:hidden;}
 .prog-fill{height:100%;border-radius:3px;transition:width .6s ease;}
 .kpi-big-footer{display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo);margin-top:5px;}
 
-/* CITY CARDS */
-.city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
-.city-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s;}
-.city-card:hover{border-color:var(--border-hi);}
-.city-tag{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-.city-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.city-name{font-size:12px;font-weight:700;}
-.city-badge{font-size:9px;color:var(--txt-lo);margin-left:auto;}
-.city-main-val{font-size:24px;font-weight:800;line-height:1;margin:8px 0 2px;}
-.city-main-sub{font-size:10px;color:var(--txt-lo);margin-bottom:6px;}
-.prog-sm{background:var(--card2);border-radius:2px;height:4px;overflow:hidden;margin:4px 0 6px;}
-.prog-sm-fill{height:100%;border-radius:2px;}
-.city-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;}
-.city-row-k{color:var(--txt-mid);}
-.city-row-v{font-weight:700;}
+/* QUICK ACTIONS */
+.action-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-bottom:10px;}
+.action-btn{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s;text-decoration:none;}
+.action-btn:hover{border-color:var(--border-hi);}
+.action-btn-icon{font-size:18px;flex-shrink:0;}
+.action-btn-text{flex:1;}
+.action-btn-title{font-size:12px;font-weight:700;color:var(--txt-hi);}
+.action-btn-sub{font-size:10px;color:var(--txt-lo);margin-top:1px;}
+.action-btn.primary{border-color:var(--wholesale);}
+.action-btn.flash{border-color:var(--flash);}
+.action-btn.plan{border-color:var(--accent);}
 
-/* PIPELINE HEALTH */
-.pipe-health{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
-.pipe-cells{display:grid;grid-template-columns:repeat(4,1fr);}
-.pipe-cell{padding:14px 12px;text-align:center;border-right:1px solid var(--border);cursor:pointer;transition:background .15s;}
-.pipe-cell:hover{background:var(--card2);}
-.pipe-cell:last-child{border-right:none;}
-.pipe-cell-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px;}
-.pipe-cell-label{font-size:10px;color:var(--txt-mid);}
-.pipe-alert{background:#ef444410;border-top:1px solid #ef444430;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.pipe-alert-text{}
-.pipe-alert-title{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:3px;}
-.pipe-alert-desc{font-size:10px;color:var(--txt-mid);line-height:1.5;}
-.btn-alert{background:var(--danger);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+/* BUSINESS LINE PANEL */
+.biz-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.biz-panel-header{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);}
+.biz-line-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.biz-panel-title{font-size:13px;font-weight:800;}
+.biz-panel-kpi{margin-left:auto;display:flex;gap:20px;flex-shrink:0;}
+.bpk{text-align:right;}
+.bpk-val{font-size:16px;font-weight:800;line-height:1;}
+.bpk-label{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+.biz-prog-bar{height:4px;background:var(--card2);margin:0 16px 0;}
+.biz-prog-fill{height:100%;border-radius:2px;transition:width .6s;}
+
+/* PRODUCT COVERAGE TABLE */
+.prod-cov-table{width:100%;border-collapse:collapse;}
+.pct-th{padding:7px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--txt-lo);border-bottom:1px solid var(--border);text-align:left;background:var(--card2);}
+.pct-td{padding:10px 12px;font-size:12px;border-bottom:1px solid var(--border);}
+.pct-tr:last-child .pct-td{border-bottom:none;}
+.pct-tr:hover .pct-td{background:var(--card2);}
+.pct-name{font-weight:700;}
+.pct-stage{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.pct-prog-wrap{width:80px;}
+.pct-prog{background:var(--border);border-radius:2px;height:5px;overflow:hidden;margin-top:3px;}
+.pct-prog-fill{height:100%;border-radius:2px;transition:width .5s;}
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-ok{background:var(--ok-dim);color:var(--ok);}
+.chip-warn{background:var(--warn-dim);color:var(--warn);}
+.chip-danger{background:var(--danger-dim);color:var(--danger);}
+.chip-info{background:#818cf820;color:var(--accent);}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+.chip-flash{background:#06b6d418;color:var(--flash);}
+.chip-wholesale{background:#f9731618;color:var(--wholesale);}
 
 /* FLASH STORE CARDS */
-.flash-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;transition:border-color .2s;cursor:pointer;}
-.flash-card:hover{border-color:var(--border-hi);}
-.flash-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
-.flash-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.flash-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.flash-item{padding:12px 16px;border-bottom:1px solid var(--border);}
+.flash-item:last-child{border-bottom:none;}
+.flash-top{display:flex;align-items:flex-start;gap:10px;}
+.flash-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.flash-body{flex:1;min-width:0;}
+.flash-name{font-size:12px;font-weight:700;margin-bottom:2px;}
 .flash-meta{font-size:10px;color:var(--txt-mid);}
 .flash-right{text-align:right;flex-shrink:0;}
 .flash-amt{font-size:14px;font-weight:800;}
-.flash-status{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.flash-prog-wrap{width:100px;margin-top:6px;}
+.flash-prog{background:var(--border);border-radius:2px;height:4px;overflow:hidden;}
+.flash-prog-fill{height:100%;border-radius:2px;}
+.flash-prog-label{font-size:9px;color:var(--txt-lo);margin-top:2px;text-align:right;}
 
-/* TWO-COL SECTION */
+/* COVERAGE SUMMARY BAR */
+.cover-summary{padding:12px 16px;background:var(--card2);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.cover-layer{display:flex;align-items:center;gap:5px;font-size:11px;}
+.cover-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.cover-3bar{display:flex;height:10px;border-radius:4px;overflow:hidden;flex:1;min-width:200px;}
+.cover-3bar-seg{height:100%;transition:width .5s;}
+
+/* TWO COL */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .two-col-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
 .panel-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
 .panel-badge{background:var(--warn-dim);color:var(--warn);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
-
-/* LOGISTICS LIST */
-.logi-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
-.logi-item:last-child{border-bottom:none;padding-bottom:0;}
-.logi-icon{width:28px;height:28px;border-radius:7px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.logi-body{flex:1;min-width:0;}
-.logi-name{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.logi-sub{font-size:9px;color:var(--txt-lo);margin-top:1px;}
-.status-chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0;}
-.sc-sea{background:#0284c720;color:#38bdf8;}
-.sc-air{background:#8b5cf620;color:#a78bfa;}
-.sc-prod{background:var(--warn-dim);color:var(--warn);}
-.sc-stock{background:var(--card2);color:var(--txt-mid);}
-.sc-late{background:var(--danger-dim);color:var(--danger);}
-.sc-done{background:var(--ok-dim);color:var(--ok);}
 
 /* APPROVAL ITEMS */
 .appr-item{padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;}
@@ -119,56 +130,52 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .appr-meta{font-size:9px;color:var(--txt-lo);margin-top:1px;}
 .appr-right{text-align:right;flex-shrink:0;}
 .appr-amt{font-size:12px;font-weight:700;color:var(--warn);}
+.appr-detail{display:none;background:var(--card2);border-radius:8px;padding:10px;margin-top:8px;font-size:10px;color:var(--txt-mid);line-height:1.6;}
+.appr-detail.open{display:block;}
 .appr-actions{display:flex;gap:5px;margin-top:8px;}
 .btn-sm{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:none;}
 .btn-ok{background:var(--ok);color:#000;}
 .btn-hold{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);}
 .btn-danger{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
-.appr-detail{display:none;background:var(--card2);border-radius:8px;padding:10px;margin-top:8px;font-size:10px;color:var(--txt-mid);line-height:1.6;}
-.appr-detail.open{display:block;}
-
-/* CHIP */
-.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
-.chip-ok{background:var(--ok-dim);color:var(--ok);}
-.chip-warn{background:var(--warn-dim);color:var(--warn);}
-.chip-danger{background:var(--danger-dim);color:var(--danger);}
-.chip-info{background:#818cf820;color:var(--accent);}
-.chip-grey{background:var(--card2);color:var(--txt-mid);}
 
 /* PEOPLE GRID */
-.people-filter{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;}
-.people-filter::-webkit-scrollbar{display:none;}
-.pf-btn{flex:none;padding:5px 14px;font-size:11px;font-weight:700;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);}
-.pf-btn.act{background:var(--card2);border-color:var(--border-hi);color:var(--txt-hi);}
-.people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-@media(min-width:900px){.people-grid{grid-template-columns:repeat(4,1fr);}}
-.pc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;transition:border-color .2s;}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;}
+.pc{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;}
 .pc:hover{border-color:var(--border-hi);}
-.pc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.pc-head{display:flex;align-items:center;gap:8px;padding:12px;cursor:pointer;}
 .pc-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
 .pc-name{font-size:12px;font-weight:700;}
 .pc-role{font-size:9px;color:var(--txt-lo);}
-.pc-status{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;margin-bottom:5px;}
+.pc-status{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;}
 .st-on{background:var(--ok-dim);color:var(--ok);}
 .st-trip{background:var(--warn-dim);color:var(--warn);}
 .st-off{background:var(--danger-dim);color:var(--danger);}
-.pc-task{font-size:10px;color:var(--txt-mid);line-height:1.4;margin-bottom:5px;}
-.city-tag-sm{font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;display:inline-block;}
-.ct-bj{background:var(--warn-dim);color:var(--beijing);}
-.ct-bk{background:var(--ok-dim);color:var(--bangkok);}
-.ct-tp{background:#818cf820;color:var(--taipei);}
+.pc-summary{padding:0 12px 10px;font-size:10px;color:var(--txt-mid);line-height:1.5;}
+.pc-expand{display:none;border-top:1px solid var(--border);}
+.pc.open .pc-expand{display:block;}
+.pc-todo-list{padding:8px 12px;}
+.pc-todo-item{padding:5px 0;border-bottom:1px solid var(--border);font-size:10px;display:flex;align-items:flex-start;gap:6px;}
+.pc-todo-item:last-child{border-bottom:none;}
+.pc-todo-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.pc-todo-text{flex:1;line-height:1.5;color:var(--txt-mid);}
+.pc-todo-text.urgent{color:var(--warn);}
+.pc-actions{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:6px;}
+.pc-nudge{flex:1;padding:6px;background:var(--warn-dim);border:1px solid #f59e0b40;color:var(--warn);font-size:10px;font-weight:700;border-radius:7px;cursor:pointer;}
+.pc-nudge:active{opacity:.7;}
+.pc-nudge.sent{background:var(--ok-dim);border-color:#22c55e40;color:var(--ok);}
 
 .loading{color:var(--txt-lo);font-size:11px;padding:12px 0;text-align:center;}
 
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .biz-panel-kpi{display:none;}
+}
 @media(max-width:640px){
   .main{padding:14px;}
-  .kpi-big-row{grid-template-columns:1fr;}
-  .city-grid{grid-template-columns:1fr 1fr;}
-  .pipe-cells{grid-template-columns:repeat(2,1fr);}
+  .kpi-row{grid-template-columns:1fr;}
   .two-col{grid-template-columns:1fr;}
-  .people-grid{grid-template-columns:repeat(2,1fr);}
+  .action-row{grid-template-columns:1fr 1fr;}
 }
-.open{ display:block !important; }
 </style>
 <script src="mock-data.js"></script>
 <script src="demo-eoy2026.js"></script>
@@ -202,421 +209,654 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ① 全集團 KPI -->
   <div class="sec-head"><span class="sec-title">全集團業績達成率 · SHAWN 核心指標</span></div>
-  <div class="kpi-big-row">
-    <div class="kpi-big" onclick="location.href='erp-war-room.html'" title="查看完整 VAM 數據 →">
-      <div class="kpi-big-label">年度收入達成率（全集團）<span style="font-size:9px;color:var(--txt-lo);margin-left:6px;">→ 戰情室</span></div>
+  <div class="kpi-row">
+    <div class="kpi-big" onclick="location.href='erp-war-room.html'">
+      <div class="kpi-big-label">年度收入達成率 <span style="font-size:9px;color:var(--txt-lo)">→ 戰情室</span></div>
       <div class="kpi-big-val" id="g-rev" style="color:var(--warn)">792 萬</div>
-      <div class="kpi-big-sub" id="g-rev-sub">792萬 / 2400萬（全年目標）</div>
-      <span class="kpi-big-trend trend-dn" id="g-rev-trend">↓ 落後 9%</span>
+      <div class="kpi-big-sub" id="g-rev-sub">/ 2,400萬 全年目標</div>
+      <span class="kpi-big-trend trend-dn" id="g-rev-trend">落後 9%</span>
       <div class="prog"><div id="g-rev-bar" class="prog-fill" style="width:33%;background:var(--warn)"></div></div>
-      <div class="kpi-big-footer">
-        <span id="g-rev-ytd">YTD 33%</span>
-        <span id="g-rev-exp">預期進度 42% (5/12)</span>
-      </div>
+      <div class="kpi-big-footer"><span id="g-rev-ytd">YTD 33%</span><span id="g-rev-exp">預期進度 42%</span></div>
     </div>
-    <div class="kpi-big" onclick="location.href='erp-war-room.html'" title="查看完整 VAM 數據 →">
-      <div class="kpi-big-label">年度淨利達成率（VAM 考核基礎）<span style="font-size:9px;color:var(--txt-lo);margin-left:6px;">→ 戰情室</span></div>
+    <div class="kpi-big" onclick="location.href='erp-war-room.html'">
+      <div class="kpi-big-label">本季業績（Q2）</div>
+      <div class="kpi-big-val" id="g-qtr" style="color:var(--accent)">892 萬</div>
+      <div class="kpi-big-sub" id="g-qtr-sub">Q2 目標 1,350 萬</div>
+      <span class="kpi-big-trend trend-warn" id="g-qtr-trend">Q2 66% 達成</span>
+      <div class="prog"><div id="g-qtr-bar" class="prog-fill" style="width:66%;background:var(--accent)"></div></div>
+      <div class="kpi-big-footer"><span>Q2（4–6月）</span><span id="g-qtr-foot">還剩 1 個月</span></div>
+    </div>
+    <div class="kpi-big" onclick="location.href='erp-war-room.html'">
+      <div class="kpi-big-label">年度淨利達成率（VAM 對賭）<span style="font-size:9px;color:var(--txt-lo);margin-left:4px">→ 戰情室</span></div>
       <div class="kpi-big-val" id="g-profit" style="color:var(--warn)">262 萬</div>
-      <div class="kpi-big-sub" id="g-profit-sub">/ 800萬</div>
+      <div class="kpi-big-sub" id="g-profit-sub">/ 800萬 對賭目標</div>
       <span class="kpi-big-trend trend-dn" id="g-profit-trend">↓ 落後 71萬</span>
       <div class="prog"><div id="g-profit-bar" class="prog-fill" style="width:33%;background:var(--warn)"></div></div>
-      <div class="kpi-big-footer">
-        <span id="g-profit-ytd">YTD 33%</span>
-        <span>VAM 目標 800萬淨利</span>
-      </div>
+      <div class="kpi-big-footer"><span id="g-profit-ytd">YTD 33%</span><span>VAM 2年目標 1,600萬</span></div>
     </div>
   </div>
 
-  <!-- ② 三城卡 -->
-  <div class="city-grid">
-    <div class="city-card" onclick="location.href='erp-anran.html'" title="安然中控台 →">
-      <div class="city-tag">
-        <div class="city-dot" style="background:var(--beijing)"></div>
-        <div class="city-name">北京蕪解</div>
-        <div class="city-badge">批發主力</div>
+  <!-- ② 快速行動入口 -->
+  <div class="sec-head"><span class="sec-title">快速行動</span></div>
+  <div class="action-row">
+    <div class="action-btn primary" onclick="openNewProjectModal('wholesale')">
+      <div class="action-btn-icon">📦</div>
+      <div class="action-btn-text">
+        <div class="action-btn-title">建批發計劃</div>
+        <div class="action-btn-sub">新 IP / 新產品系列</div>
       </div>
-      <div class="city-main-val" id="bj-val" style="color:var(--beijing)">515 萬</div>
-      <div class="city-main-sub" id="bj-sub">YTD目標 574萬</div>
-      <div class="prog-sm"><div id="bj-bar" class="prog-sm-fill" style="width:90%;background:var(--beijing)"></div></div>
-      <div class="city-row"><span class="city-row-k">月目標達成</span><span class="city-row-v" id="bj-pct" style="color:var(--warn)">27%（目標 78萬）</span></div>
-      <div class="city-row"><span class="city-row-k">未出貨訂單</span><a href="erp-anran.html" style="text-decoration:none;"><span class="city-row-v" id="bj-ship" style="color:var(--warn);text-decoration:underline;text-decoration-color:#f59e0b44;">4 張</span></a></div>
-      <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">9 人</span></div>
+      <span style="color:var(--wholesale);font-size:12px">→</span>
     </div>
-    <div class="city-card" onclick="location.href='erp-war-room.html'" title="戰情室 →">
-      <div class="city-tag">
-        <div class="city-dot" style="background:var(--bangkok)"></div>
-        <div class="city-name">UJ BKK 泰國</div>
-        <div class="city-badge">Shawn 駐點</div>
+    <div class="action-btn flash" onclick="openNewProjectModal('flash')">
+      <div class="action-btn-icon">🏪</div>
+      <div class="action-btn-text">
+        <div class="action-btn-title">建快閃店計劃</div>
+        <div class="action-btn-sub">地點 / 時間 / 預算</div>
       </div>
-      <div class="city-main-val" id="bk-val" style="color:var(--bangkok)">฿ 157 萬</div>
-      <div class="city-main-sub">本月銷售</div>
-      <div class="prog-sm"><div id="bk-bar" class="prog-sm-fill" style="width:46%;background:var(--bangkok)"></div></div>
-      <div class="city-row"><span class="city-row-k">月目標達成</span><span class="city-row-v" id="bk-pct" style="color:var(--warn)">46%（無快閃月）</span></div>
-      <div class="city-row"><span class="city-row-k">快閃店狀態</span><span class="city-row-v" style="color:var(--accent)">Q3 規劃中</span></div>
-      <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">2 人</span></div>
+      <span style="color:var(--flash);font-size:12px">→</span>
     </div>
-    <div class="city-card" onclick="location.href='erp-pipeline.html'" title="流水線廳 →">
-      <div class="city-tag">
-        <div class="city-dot" style="background:var(--taipei)"></div>
-        <div class="city-name">台灣悍草</div>
-        <div class="city-badge">創意輸出</div>
+    <div class="action-btn plan" onclick="openBudgetModal()">
+      <div class="action-btn-icon">📊</div>
+      <div class="action-btn-text">
+        <div class="action-btn-title">新增預算項目</div>
+        <div class="action-btn-sub">單獨費用 / 計劃支出</div>
       </div>
-      <div class="city-main-val" id="tw-val" style="color:var(--taipei)">4 個 IP</div>
-      <div class="city-main-sub">版權送審進行中</div>
-      <div class="prog-sm"><div id="tw-bar" class="prog-sm-fill" style="width:25%;background:var(--taipei)"></div></div>
-      <div class="city-row"><span class="city-row-k">送審進度</span><span class="city-row-v" style="color:var(--taipei)">1/4 已回覆</span></div>
-      <div class="city-row"><span class="city-row-k">卡關項目</span><span class="city-row-v" style="color:var(--warn)">Muziktiger 等 14 天</span></div>
-      <div class="city-row"><span class="city-row-k">在職人數</span><span class="city-row-v">4 人（+2 外包）</span></div>
+      <span style="color:var(--accent);font-size:12px">→</span>
     </div>
+    <a class="action-btn" href="erp-pipeline.html" style="border-color:var(--txt-lo);">
+      <div class="action-btn-icon">🏗</div>
+      <div class="action-btn-text">
+        <div class="action-btn-title">產品開發流水線</div>
+        <div class="action-btn-sub">全部 IP 開發進度</div>
+      </div>
+      <span style="color:var(--txt-lo);font-size:12px">→</span>
+    </a>
   </div>
 
-  <!-- ③ 項目管道健康度 -->
-  <div class="sec-head"><span class="sec-title">項目管道健康度 · SHAWN 要主動逼新題材</span></div>
-  <div class="pipe-health">
-    <div class="pipe-cells">
-      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
-        <div class="pipe-cell-val" id="ph-active" style="color:var(--ok)">5</div>
-        <div class="pipe-cell-label">進行中項目</div>
-      </div>
-      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
-        <div class="pipe-cell-val" id="ph-block" style="color:var(--warn)">2</div>
-        <div class="pipe-cell-label">卡關中（等版權方）</div>
-      </div>
-      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
-        <div class="pipe-cell-val" id="ph-q3" style="color:var(--accent)">2</div>
-        <div class="pipe-cell-label">Q3 預計上市</div>
-      </div>
-      <div class="pipe-cell" onclick="location.href='erp-pipeline.html'">
-        <div class="pipe-cell-val" id="ph-q4" style="color:var(--accent)">2</div>
-        <div class="pipe-cell-label">Q4 管道項目</div>
-      </div>
-    </div>
-    <div class="pipe-alert" id="q4-alert" style="background:#f59e0b08;border-top-color:#f59e0b30;">
-      <div class="pipe-alert-text">
-        <div class="pipe-alert-title" style="color:var(--warn)">⚠ Q3 卡關提醒 — Opanchu 3D 打樣等待版權方回覆</div>
-        <div class="pipe-alert-desc">Opanchu（褲褲兔）3D 打樣第一輪審核中，2 週內需回覆。8月上市目標需在 5/20 前拿到通過，否則需重新評估時程。</div>
-      </div>
-      <button class="btn-alert" style="border-color:var(--warn);color:var(--warn);" onclick="this.textContent='📨 已傳送催辦';this.disabled=true;this.style.opacity='0.6'">+ 催版權方回覆</button>
-    </div>
+  <!-- ③ 批發板塊 · 在建項目覆蓋率 -->
+  <div class="sec-head">
+    <span class="sec-title">批發板塊 · 每產品累計銷售 + 預算達成率</span>
+    <span class="sec-link" onclick="location.href='erp-pipeline.html'">查看完整流水線 →</span>
   </div>
 
-  <!-- ④ 快閃店管道 -->
-  <div class="sec-head"><span class="sec-title">快閃店管道</span><span class="sec-link" style="color:var(--txt-lo);cursor:default;">全部快閃紀錄（開發中）</span></div>
-
-  <div class="flash-card">
-    <div class="flash-top">
-      <div style="display:flex;gap:10px;flex:1;min-width:0;">
-        <div class="flash-icon" style="background:var(--ok-dim)">✓</div>
-        <div style="flex:1;min-width:0;">
-          <div class="flash-title">Siam Discovery · 曼谷 · Snoopy 春節</div>
-          <div class="flash-meta">2026-01-18 ~ 02-05 · 19 天 · Den 負責場地 · 高維物流</div>
+  <div class="biz-panel">
+    <div class="biz-panel-header">
+      <div class="biz-line-dot" style="background:var(--wholesale)"></div>
+      <div class="biz-panel-title" style="color:var(--wholesale)">📦 批發</div>
+      <div class="biz-panel-kpi">
+        <div class="bpk">
+          <div class="bpk-val" id="w-ytd" style="color:var(--warn)">¥ 107 萬</div>
+          <div class="bpk-label">YTD 累計</div>
+        </div>
+        <div class="bpk">
+          <div class="bpk-val" id="w-budget" style="color:var(--txt-mid)">/ ¥ 2,400 萬</div>
+          <div class="bpk-label">全年預算</div>
+        </div>
+        <div class="bpk">
+          <div class="bpk-val" id="w-pct" style="color:var(--warn)">4.5%</div>
+          <div class="bpk-label">預算達成</div>
         </div>
       </div>
-      <div class="flash-right">
-        <div class="flash-amt" style="color:var(--ok)">฿ 68.2 萬</div>
-        <div class="flash-status">已完成結算</div>
-      </div>
     </div>
-    <div class="prog"><div class="prog-fill" style="width:100%;background:var(--ok)"></div></div>
+    <div style="height:4px;background:var(--card2);"><div id="w-prog" style="height:100%;width:4.5%;background:var(--wholesale);transition:width .6s;"></div></div>
+    <table class="prod-cov-table">
+      <thead><tr>
+        <th class="pct-th">IP / 產品系列</th>
+        <th class="pct-th">狀態</th>
+        <th class="pct-th">累計銷售</th>
+        <th class="pct-th">年度預算</th>
+        <th class="pct-th" style="min-width:100px">達成率</th>
+        <th class="pct-th">預計貢獻 / 備注</th>
+      </tr></thead>
+      <tbody>
+        <!-- 在售 -->
+        <tr class="pct-tr">
+          <td class="pct-td">
+            <div class="pct-name">🐾 Snoopy 夏季盲盒</div>
+            <div class="pct-stage">大貨銷售中 · 東莞永盛 5,000 件</div>
+          </td>
+          <td class="pct-td"><span class="chip chip-ok">銷售中</span></td>
+          <td class="pct-td" style="font-weight:700;color:var(--ok)">¥ 107 萬</td>
+          <td class="pct-td" style="color:var(--txt-mid)">¥ 280 萬</td>
+          <td class="pct-td">
+            <div style="font-weight:700;color:var(--warn)">38%</div>
+            <div class="pct-prog"><div class="pct-prog-fill" style="width:38%;background:var(--warn)"></div></div>
+          </td>
+          <td class="pct-td" style="color:var(--txt-mid);font-size:10px">名創、華糖、SMTOWN 已下單 · 還剩 2,200 件待賣</td>
+        </tr>
+        <!-- 在建 -->
+        <tr class="pct-tr">
+          <td class="pct-td">
+            <div class="pct-name">🎵 Muziktiger 新系列</div>
+            <div class="pct-stage">在建 · 2D 送審中 · 目標 7月上市</div>
+          </td>
+          <td class="pct-td"><span class="chip chip-warn">卡關：等回覆</span></td>
+          <td class="pct-td" style="color:var(--txt-lo)">— 尚未上市</td>
+          <td class="pct-td" style="color:var(--txt-mid)">¥ 200 萬</td>
+          <td class="pct-td">
+            <div style="font-weight:700;color:var(--txt-lo)">0%</div>
+            <div class="pct-prog"><div class="pct-prog-fill" style="width:0%;background:var(--txt-lo)"></div></div>
+          </td>
+          <td class="pct-td" style="color:var(--warn);font-size:10px">⚠ 版權方回覆已 14 天 · 需催辦 · 延誤影響 Q3 快閃備貨</td>
+        </tr>
+        <tr class="pct-tr">
+          <td class="pct-td">
+            <div class="pct-name">🐰 Opanchu 秋冬系列</div>
+            <div class="pct-stage">在建 · 概念生圖中 · 目標 9月上市</div>
+          </td>
+          <td class="pct-td"><span class="chip chip-info">開發中</span></td>
+          <td class="pct-td" style="color:var(--txt-lo)">— 尚未上市</td>
+          <td class="pct-td" style="color:var(--txt-mid)">¥ 180 萬</td>
+          <td class="pct-td">
+            <div style="font-weight:700;color:var(--txt-lo)">0%</div>
+            <div class="pct-prog"><div class="pct-prog-fill" style="width:0%;background:var(--txt-lo)"></div></div>
+          </td>
+          <td class="pct-td" style="color:var(--txt-mid);font-size:10px">德寶已蒐集 LOG-ON / 天猫意向 · 需趕在 Q3 前送審通過</td>
+        </tr>
+        <tr class="pct-tr">
+          <td class="pct-td">
+            <div class="pct-name">🐱 Mofusand 10月秋季款</div>
+            <div class="pct-stage">在建 · 2D 送審中 · 目標 10月上市</div>
+          </td>
+          <td class="pct-td"><span class="chip chip-info">開發中</span></td>
+          <td class="pct-td" style="color:var(--txt-lo)">— 尚未上市</td>
+          <td class="pct-td" style="color:var(--txt-mid)">¥ 160 萬</td>
+          <td class="pct-td">
+            <div style="font-weight:700;color:var(--txt-lo)">0%</div>
+            <div class="pct-prog"><div class="pct-prog-fill" style="width:0%;background:var(--txt-lo)"></div></div>
+          </td>
+          <td class="pct-td" style="color:var(--txt-mid);font-size:10px">Mofusand Inc. 審核周期約 3 週 · 需 7 月前送出</td>
+        </tr>
+        <!-- 持續銷售 -->
+        <tr class="pct-tr">
+          <td class="pct-td">
+            <div class="pct-name">🐱 Mofusand 常規款（持續）</div>
+            <div class="pct-stage">持續銷售 · 台灣 + 大陸渠道</div>
+          </td>
+          <td class="pct-td"><span class="chip chip-ok">持續銷售</span></td>
+          <td class="pct-td" style="font-weight:700;color:var(--ok)">¥ 22 萬</td>
+          <td class="pct-td" style="color:var(--txt-mid)">¥ 120 萬</td>
+          <td class="pct-td">
+            <div style="font-weight:700;color:var(--warn)">18%</div>
+            <div class="pct-prog"><div class="pct-prog-fill" style="width:18%;background:var(--warn)"></div></div>
+          </td>
+          <td class="pct-td" style="color:var(--txt-mid);font-size:10px">誠品試賣反應好 · 推動補貨</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding:10px 16px;background:var(--card2);display:flex;align-items:center;justify-content:space-between;font-size:11px;">
+      <span style="color:var(--txt-mid)">批發板塊全年覆蓋預算 <strong style="color:var(--txt-hi)">¥ 940 萬</strong>，目前已實現 <strong style="color:var(--warn)">14%</strong>，在建項目若全部達標可覆蓋至 <strong style="color:var(--ok)">71%</strong></span>
+      <button onclick="openNewProjectModal('wholesale')" style="padding:5px 12px;background:var(--wholesale);border:none;border-radius:7px;color:#fff;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:12px;">+ 新增批發計劃</button>
+    </div>
   </div>
 
-  <div class="flash-card">
-    <div class="flash-top">
-      <div style="display:flex;gap:10px;flex:1;min-width:0;">
+  <!-- ④ 快閃店板塊 -->
+  <div class="sec-head">
+    <span class="sec-title">快閃店板塊 · 計劃總覽</span>
+  </div>
+
+  <div class="biz-panel">
+    <div class="biz-panel-header">
+      <div class="biz-line-dot" style="background:var(--flash)"></div>
+      <div class="biz-panel-title" style="color:var(--flash)">🏪 快閃店</div>
+      <div class="biz-panel-kpi">
+        <div class="bpk">
+          <div class="bpk-val" style="color:var(--ok)">฿ 68.2 萬</div>
+          <div class="bpk-label">YTD 已實現</div>
+        </div>
+        <div class="bpk">
+          <div class="bpk-val" style="color:var(--txt-mid)">฿ 90 萬</div>
+          <div class="bpk-label">Q3 目標</div>
+        </div>
+        <div class="bpk">
+          <div class="bpk-val" style="color:var(--warn)">評估中</div>
+          <div class="bpk-label">全年計劃場次</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:4px;background:var(--card2);"><div style="height:100%;width:43%;background:var(--flash);transition:width .6s;"></div></div>
+
+    <!-- 已完成 -->
+    <div class="flash-item">
+      <div class="flash-top">
+        <div class="flash-icon" style="background:var(--ok-dim)">✅</div>
+        <div class="flash-body">
+          <div class="flash-name">Siam Discovery · 曼谷 · Snoopy 春節</div>
+          <div class="flash-meta">2026-01-18 ~ 02-05 · 19 天 · Den 負責場地</div>
+          <div style="margin-top:5px;display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="chip chip-ok">已完成</span>
+            <span style="font-size:10px;color:var(--txt-mid)">毛利率：約 28%</span>
+            <span style="font-size:10px;color:var(--txt-mid)">目標：฿ 60 萬</span>
+          </div>
+        </div>
+        <div class="flash-right">
+          <div class="flash-amt" style="color:var(--ok)">฿ 68.2 萬</div>
+          <div style="font-size:10px;color:var(--ok)">↑ 超目標 14%</div>
+          <div class="flash-prog-wrap">
+            <div class="flash-prog"><div class="flash-prog-fill" style="width:100%;background:var(--ok)"></div></div>
+            <div class="flash-prog-label">已結算</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 計劃中 -->
+    <div class="flash-item">
+      <div class="flash-top">
         <div class="flash-icon" style="background:var(--warn-dim)">📋</div>
-        <div style="flex:1;min-width:0;">
-          <div class="flash-title">Siam Paragon · 曼谷 · Muziktiger & Opanchu Q3</div>
-          <div class="flash-meta">規劃中 · 2026-Q3（8月）· 待 Muziktiger 大貨出廠後啟動</div>
+        <div class="flash-body">
+          <div class="flash-name">Siam Paragon · 曼谷 · Muziktiger & Opanchu Q3</div>
+          <div class="flash-meta">計劃 2026-08 · 預算 ¥28萬 已送 Ray · 待 Muziktiger 大貨出廠後啟動</div>
+          <div style="margin-top:5px;display:flex;gap:8px;flex-wrap:wrap;">
+            <span class="chip chip-warn">籌備中</span>
+            <span style="font-size:10px;color:var(--warn)">⚠ 貨源依賴 Muziktiger 模具確認（已卡 14 天）</span>
+          </div>
+        </div>
+        <div class="flash-right">
+          <div class="flash-amt" style="color:var(--warn)">目標 ฿ 90 萬</div>
+          <div style="font-size:10px;color:var(--txt-mid)">場地費 ฿ 12 萬</div>
+          <div class="flash-prog-wrap">
+            <div class="flash-prog"><div class="flash-prog-fill" style="width:38%;background:var(--warn)"></div></div>
+            <div class="flash-prog-label">籌備 38%</div>
+          </div>
         </div>
       </div>
-      <div class="flash-right">
-        <div class="flash-amt" style="color:var(--warn)">目標 ฿ 90 萬</div>
-        <div class="flash-status">待貨源確認</div>
-      </div>
     </div>
-    <div class="prog"><div class="prog-fill" style="width:38%;background:var(--warn)"></div></div>
-  </div>
 
-  <div class="flash-card">
-    <div class="flash-top">
-      <div style="display:flex;gap:10px;flex:1;min-width:0;">
+    <!-- 評估中 -->
+    <div class="flash-item">
+      <div class="flash-top">
         <div class="flash-icon" style="background:#818cf815">🔍</div>
-        <div style="flex:1;min-width:0;">
-          <div class="flash-title">Terminal 21 Asok · 曼谷 · Snoopy 夏季</div>
-          <div class="flash-meta">評估中 · 2026-08 · 貨源待大貨確認（07-15 出廠）</div>
+        <div class="flash-body">
+          <div class="flash-name">Terminal 21 Asok · 曼谷 · Snoopy 夏季</div>
+          <div class="flash-meta">評估中 · 2026-08 · 場地詢價進行中 · 貨源待 07-15 出廠確認</div>
+          <div style="margin-top:5px;display:flex;gap:8px;">
+            <span class="chip chip-grey">場地評估</span>
+            <span style="font-size:10px;color:var(--txt-mid)">最遲 5/20 確認是否啟動</span>
+          </div>
+        </div>
+        <div class="flash-right">
+          <div class="flash-amt" style="color:var(--txt-mid)">評估中</div>
+          <div class="flash-prog-wrap">
+            <div class="flash-prog"><div class="flash-prog-fill" style="width:15%;background:var(--txt-lo)"></div></div>
+            <div class="flash-prog-label">15%</div>
+          </div>
         </div>
       </div>
-      <div class="flash-right">
-        <div class="flash-amt" style="color:var(--txt-mid)">評估中</div>
-        <div class="flash-status">場地詢價進行中</div>
-      </div>
     </div>
-    <div class="prog"><div class="prog-fill" style="width:15%;background:var(--txt-lo)"></div></div>
+
+    <div style="padding:10px 16px;background:var(--card2);display:flex;align-items:center;justify-content:space-between;font-size:11px;">
+      <span style="color:var(--txt-mid)">Q3 快閃依賴 Muziktiger 貨源 · Muziktiger 模具每延 1 週 = Q3 備貨窗口少 1 週</span>
+      <button onclick="openNewProjectModal('flash')" style="padding:5px 12px;background:var(--flash);border:none;border-radius:7px;color:#fff;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:12px;">+ 新增快閃計劃</button>
+    </div>
   </div>
 
-  <!-- ④.5 AI & 技術投資 -->
-  <div class="sec-head"><span class="sec-title">AI & 技術投資 · 本月費用歸屬</span></div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px;">
-      <div style="background:var(--card2);border-radius:8px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:3px;">本月 AI 費用</div>
-        <div style="font-size:20px;font-weight:800;">$204</div>
-        <div style="font-size:9px;color:var(--txt-mid);margin-top:1px;">USD</div>
-      </div>
-      <div style="background:var(--card2);border-radius:8px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:3px;">Soft Cap</div>
-        <div style="font-size:20px;font-weight:800;color:var(--txt-mid);">$250</div>
-        <div style="font-size:9px;color:var(--txt-mid);margin-top:1px;">MJ 自主上限</div>
-      </div>
-      <div style="background:var(--card2);border-radius:8px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--txt-lo);margin-bottom:3px;">使用率</div>
-        <div style="font-size:20px;font-weight:800;color:var(--warn);">81.6%</div>
-        <div style="font-size:9px;color:var(--txt-mid);margin-top:1px;">剩餘 $46</div>
-      </div>
-    </div>
-    <div style="background:var(--card2);border-radius:4px;height:5px;overflow:hidden;margin-bottom:10px;">
-      <div style="width:81.6%;height:100%;border-radius:4px;background:linear-gradient(90deg,#b45309,var(--warn));"></div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border);">
-        <span style="color:var(--txt-mid);">Claude Code（MJ 系統維運）</span><span style="font-weight:700;">$89 → 營運費</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid var(--border);">
-        <span style="color:var(--txt-mid);">Gemini OCR（採購報價解析）</span><span style="font-weight:700;">$32 → 採購作業</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;">
-        <span style="color:var(--txt-mid);">生圖費（Snoopy + Opanchu 概念圖）</span><span style="font-weight:700;color:var(--warn);">$83 → 開模費（各專案）</span>
-      </div>
-    </div>
-    <a href="erp-war-room.html" style="display:block;margin-top:8px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看完整 AI 費用歸屬 → Ray 戰情室</a>
-  </div>
-
-  <!-- ⑤ 物流 + 審核 兩欄 -->
+  <!-- ⑤ 待審核 + 物流 -->
   <div class="two-col">
-    <!-- 物流狀態 -->
-    <div class="two-col-card">
-      <div class="panel-title">物流 &amp; 供應鏈狀態</div>
-      <div class="logi-item">
-        <div class="logi-icon">🚢</div>
-        <div class="logi-body">
-          <div class="logi-name">Snoopy 春節尾箱（回流）</div>
-          <div class="logi-sub">曼谷 → 北京 · 高維安排</div>
-        </div>
-        <div class="status-chip sc-sea">海運中</div>
-      </div>
-      <div class="logi-item">
-        <div class="logi-icon">✈️</div>
-        <div class="logi-body">
-          <div class="logi-name">Muziktiger 素模打樣（寄版權方）</div>
-          <div class="logi-sub">北京 → 日本 · DHL</div>
-        </div>
-        <div class="status-chip sc-done">已獲收</div>
-      </div>
-      <div class="logi-item">
-        <div class="logi-icon">🏭</div>
-        <div class="logi-body">
-          <div class="logi-name">Snoopy 夏季大貨（生產中）</div>
-          <div class="logi-sub">東莞永盛玩具 · 預計 07-15 出廠</div>
-        </div>
-        <div class="status-chip sc-prod">生產中 D2</div>
-      </div>
-      <div class="logi-item">
-        <div class="logi-icon">📦</div>
-        <div class="logi-body">
-          <div class="logi-name">Opanchu 舊批次（北京庫）</div>
-          <div class="logi-sub">張作興管 · 批發剩餘 320 件</div>
-        </div>
-        <div class="status-chip sc-stock">在庫</div>
-      </div>
-      <div class="logi-item">
-        <div class="logi-icon">⚠️</div>
-        <div class="logi-body">
-          <div class="logi-name">LOG-ON 出貨（香港）</div>
-          <div class="logi-sub">逾期 2 天 · 高維追工廠</div>
-        </div>
-        <div class="status-chip sc-late">逾期</div>
-      </div>
-    </div>
 
-    <!-- 預算審核佇列 -->
     <div class="two-col-card">
-      <div class="panel-title">預算審核佇列（送 RAY 前 SHAWN 先把關）<span class="panel-badge" id="appr-badge">3 項待審</span></div>
+      <div class="panel-title">預算審核佇列（Shawn 先把關→Ray）<span class="panel-badge" id="appr-badge">3 項</span></div>
       <div id="appr-list">
         <div class="appr-item" onclick="this.querySelector('.appr-detail').classList.toggle('open')">
-          <div class="appr-top"><div style="font-size:16px;flex-shrink:0;margin-top:1px">📋</div><div class="appr-body"><div class="appr-name">採購審批 · Snoopy 夏季大貨 PO</div><div class="appr-meta">木子詢比價 · 賴哥推薦永盛 · <span style="color:var(--warn)">3天前</span></div></div><div class="appr-right"><div class="appr-amt">¥ 148,000</div><div style="font-size:9px;color:var(--txt-lo)">RMB</div></div></div>
-          <div class="appr-detail"><div style="margin-bottom:8px">30/40/30 付款條件，永盛報價最低，賴哥確認品質無問題</div><div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();this.textContent='✓ 已送 Ray';this.disabled=true;this.closest('.appr-item').style.opacity='0.4'">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div></div>
+          <div class="appr-top"><div style="font-size:16px;flex-shrink:0">📋</div><div class="appr-body"><div class="appr-name">採購 · Snoopy 夏季大貨 PO</div><div class="appr-meta">木子比價 · 賴哥確認 · <span style="color:var(--warn)">3 天前</span></div></div><div class="appr-right"><div class="appr-amt">¥ 148,000</div></div></div>
+          <div class="appr-detail">30/40/30 付款 · 永盛報價最低 · 賴哥品質無疑慮
+            <div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();this.textContent='✓ 已送Ray';this.disabled=true;this.closest('.appr-item').style.opacity='0.5'">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div>
+          </div>
         </div>
         <div class="appr-item" onclick="this.querySelector('.appr-detail').classList.toggle('open')">
-          <div class="appr-top"><div style="font-size:16px;flex-shrink:0;margin-top:1px">📋</div><div class="appr-body"><div class="appr-name">採購審批 · Muziktiger & Opanchu 泰國快閃備貨</div><div class="appr-meta">Shawn 自提 · <span style="color:var(--warn)">待模具出貨後確認數量</span></div></div><div class="appr-right"><div class="appr-amt">¥ 160,000</div><div style="font-size:9px;color:var(--txt-lo)">RMB</div></div></div>
-          <div class="appr-detail"><div style="margin-bottom:8px">8月快閃店備貨，Muziktiger + Opanchu 各 50 箱，需在 6/30 前確認數量以安排北京→曼谷空運</div><div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();this.textContent='✓ 已送 Ray';this.disabled=true;this.closest('.appr-item').style.opacity='0.4'">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div></div>
+          <div class="appr-top"><div style="font-size:16px;flex-shrink:0">🏪</div><div class="appr-body"><div class="appr-name">快閃備貨 · Q3 泰國 Muziktiger+Opanchu</div><div class="appr-meta">Shawn 提案 · <span style="color:var(--warn)">待模具確認後才能鎖數量</span></div></div><div class="appr-right"><div class="appr-amt">¥ 160,000</div></div></div>
+          <div class="appr-detail">8月快閃備貨 · Muziktiger + Opanchu 各 50 箱 · 需 6/30 前確認數量安排空運
+            <div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();this.textContent='✓ 已送Ray';this.disabled=true;this.closest('.appr-item').style.opacity='0.5'">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div>
+          </div>
         </div>
         <div class="appr-item" onclick="this.querySelector('.appr-detail').classList.toggle('open')">
-          <div class="appr-top"><div style="font-size:16px;flex-shrink:0;margin-top:1px">💸</div><div class="appr-body"><div class="appr-name">支出審批 · 詩彤出差費</div><div class="appr-meta">Bevis 已審 · <span style="color:var(--txt-lo)">今天</span></div></div><div class="appr-right"><div class="appr-amt" style="color:var(--txt-mid)">NT$ 8,560</div><div style="font-size:9px;color:var(--txt-lo)">TWD</div></div></div>
-          <div class="appr-detail"><div style="margin-bottom:8px">台北→高雄出差版權送審，交通+住宿 NT$8,560</div><div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();this.textContent='✓ 已送 Ray';this.disabled=true;this.closest('.appr-item').style.opacity='0.4'">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div></div>
+          <div class="appr-top"><div style="font-size:16px;flex-shrink:0">💸</div><div class="appr-body"><div class="appr-name">費用 · 詩彤出差費</div><div class="appr-meta">Bevis 已審 · 今天</div></div><div class="appr-right"><div class="appr-amt" style="color:var(--txt-mid)">NT$ 8,560</div></div></div>
+          <div class="appr-detail">台北→高雄 · 版權送審出差 · 交通+住宿
+            <div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();this.textContent='✓ 已送Ray';this.disabled=true;this.closest('.appr-item').style.opacity='0.5'">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div>
+          </div>
         </div>
       </div>
     </div>
+
+    <div class="two-col-card">
+      <div class="panel-title">物流 &amp; 供應鏈</div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;">
+          <span style="font-size:14px">🏭</span>
+          <div style="flex:1"><div style="font-weight:700">Snoopy 夏季大貨</div><div style="font-size:9px;color:var(--txt-lo)">東莞永盛 · 預計 07-15 出廠</div></div>
+          <span class="chip chip-warn">生產中</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;">
+          <span style="font-size:14px">✈️</span>
+          <div style="flex:1"><div style="font-weight:700">Muziktiger 素模打樣</div><div style="font-size:9px;color:var(--txt-lo)">北京→日本版權方 · DHL</div></div>
+          <span class="chip chip-ok">已獲收</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;">
+          <span style="font-size:14px">🚢</span>
+          <div style="flex:1"><div style="font-weight:700">Snoopy 春節尾箱回流</div><div style="font-size:9px;color:var(--txt-lo)">曼谷→北京倉 · 高維</div></div>
+          <span class="chip chip-info">海運中</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;">
+          <span style="font-size:14px">📦</span>
+          <div style="flex:1"><div style="font-weight:700">Opanchu 舊批次（北京庫）</div><div style="font-size:9px;color:var(--txt-lo)">剩餘 320 件 · 批發消化中</div></div>
+          <span class="chip chip-grey">在庫</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;font-size:11px;">
+          <span style="font-size:14px">⚠️</span>
+          <div style="flex:1"><div style="font-weight:700">LOG-ON 出貨（香港）</div><div style="font-size:9px;color:var(--danger)">逾期 2 天 · 高維追工廠</div></div>
+          <span class="chip chip-danger">逾期</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- ⑥ 人員 -->
-  <div class="sec-head"><span class="sec-title">全公司人員狀態 · 15 人</span></div>
-  <div class="people-filter">
-    <button class="pf-btn act" onclick="filterPpl('all',this)">● 全部 15 人</button>
-    <button class="pf-btn" onclick="filterPpl('bj',this)" style="border-color:var(--beijing);color:var(--beijing)">● 北京 9 人</button>
-    <button class="pf-btn" onclick="filterPpl('tp',this)" style="border-color:var(--taipei);color:var(--taipei)">● 台北 4 人</button>
-    <button class="pf-btn" onclick="filterPpl('bk',this)" style="border-color:var(--bangkok);color:var(--bangkok)">● 曼谷 2 人</button>
+  <!-- ⑥ 人員狀態 (點開看待辦 + 催促) -->
+  <div class="sec-head">
+    <span class="sec-title">全公司人員 · 點擊展開待辦 / 催促</span>
+    <span style="font-size:10px;color:var(--txt-lo)">15 人 · 點擊卡片展開任務 + 傳催促訊息</span>
   </div>
+
   <div class="people-grid" id="people-grid">
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#4f46e5">安</div><div><div class="pc-name">安然</div><div class="pc-role">北京 · 全球商務</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">Muziktiger 催版方回覆 · Opanchu 續約洽談</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-anran">
+      <div class="pc-head" onclick="togglePc('pc-anran')">
+        <div class="pc-av" style="background:#4f46e5">安</div>
+        <div style="flex:1"><div class="pc-name">安然</div><div class="pc-role">北京 · 全球商務</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">Muziktiger 催版方 · Opanchu 續約</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--danger)"></div><div class="pc-todo-text urgent">LOG-ON ¥18萬 尾款逾期 3天 → 催德寶跟進</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">Muziktiger 版權方等回覆（2D 審核 14 天）→ 催辦</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">Opanchu 合約續約 · 距到期 4 個月 → 本週啟動</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">5月批發業績彙整 → 5/10 前送 Shawn</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-anran" onclick="sendNudge('anran','安然',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#0284c7">躍</div><div><div class="pc-name">躍明</div><div class="pc-role">北京 · 財務</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">本月損益表 · 採購款項安排</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-laige">
+      <div class="pc-head" onclick="togglePc('pc-laige')">
+        <div class="pc-av" style="background:var(--warn)">賴</div>
+        <div style="flex:1"><div class="pc-name">賴哥</div><div class="pc-role">北京 · 採購主管</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">Snoopy 大貨 PO 等 Ray 批核</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">Snoopy 夏季 PO ¥148K 等 Ray 批核 · 確認後付首期 30%</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Q3 快閃備貨報價 · Muziktiger + Opanchu 各 50 箱</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--txt-lo)"></div><div class="pc-todo-text">Opanchu 秋冬打樣廠商初步詢價</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-laige" onclick="sendNudge('laige','賴哥',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#7c3aed">楊</div><div><div class="pc-name">楊子</div><div class="pc-role">北京 · HR/出納</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">5 月薪資核算 · 2 件報銷待複核</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-muzi">
+      <div class="pc-head" onclick="togglePc('pc-muzi')">
+        <div class="pc-av" style="background:#d97706">木</div>
+        <div style="flex:1"><div class="pc-name">木子</div><div class="pc-role">北京 · 採購執行</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">三家比價完成等賴哥確認</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--ok)"></div><div class="pc-todo-text">Snoopy 三家比價已提交賴哥 · 等決定</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Q3 快閃備貨物流方案準備中</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-muzi" onclick="sendNudge('muzi','木子',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--warn)">賴</div><div><div class="pc-name">賴哥</div><div class="pc-role">北京 · 供應鏈</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">Snoopy 大貨 PO 等 Ray 批核</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-gaowei">
+      <div class="pc-head" onclick="togglePc('pc-gaowei')">
+        <div class="pc-av" style="background:#0369a1">高</div>
+        <div style="flex:1"><div class="pc-name">高維</div><div class="pc-role">北京 · 物流</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">3 票在途貨物追蹤</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--danger)"></div><div class="pc-todo-text urgent">LOG-ON 出貨逾期 2 天 → 今天追工廠給出貨時間</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">春節尾箱回流海運中 → 預計本週到北京倉</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Q3 快閃北京→曼谷空運方案備案（6月前完成）</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-gaowei" onclick="sendNudge('gaowei','高維',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#d97706">木</div><div><div class="pc-name">木子</div><div class="pc-role">北京 · 採購助理</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">三家比價完成，等賴哥確認</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-laodong">
+      <div class="pc-head" onclick="togglePc('pc-laodong')">
+        <div class="pc-av" style="background:var(--danger)">董</div>
+        <div style="flex:1"><div class="pc-name">老董（董亮）</div><div class="pc-role">北京 → 上海 · 業務</div></div>
+        <span class="pc-status st-trip">出差中</span>
+      </div>
+      <div class="pc-summary">上海拜訪 · 美陳+虹橋詢盤</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">上海美陳報價 → 今天發正式報價</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">泡泡瑪特王總追提案回覆（已等 3 天）</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Muziktiger 意向回報：廣州名創 200 箱詢價</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-laodong" onclick="sendNudge('laodong','老董',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#0369a1">高</div><div><div class="pc-name">高維</div><div class="pc-role">北京 · 物流</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">3 票在途貨物追蹤</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-debao">
+      <div class="pc-head" onclick="togglePc('pc-debao')">
+        <div class="pc-av" style="background:#b91c1c">德</div>
+        <div style="flex:1"><div class="pc-name">德寶</div><div class="pc-role">北京 · 業務</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">LOG-ON 催款 + 潛客 2 家</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--danger)"></div><div class="pc-todo-text urgent">LOG-ON ¥18萬尾款逾期 → 今天打電話催</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">酷動城 3,000 件報價 → 今天確認</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Muziktiger 意向：萌趣文化 80 箱有興趣 → 回報安然</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-debao" onclick="sendNudge('debao','德寶',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#374151">張</div><div><div class="pc-name">張作興</div><div class="pc-role">北京 · 庫管</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">北京倉盤點（快閃回流貨 + 老批發庫存）</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-bevis">
+      <div class="pc-head" onclick="togglePc('pc-bevis')">
+        <div class="pc-av" style="background:var(--accent)">B</div>
+        <div style="flex:1"><div class="pc-name">Bevis</div><div class="pc-role">台北 · 設計主管</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">Opanchu 概念圖待核 · Muziktiger 盯進度</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">Muziktiger 2D 審核等版權方回覆 → 需主動追問</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Opanchu 秋冬概念圖 → 本週完成給安然確認</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Mofusand 10月款 2D → 需在 7 月前送審</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-bevis" onclick="sendNudge('bevis','Bevis',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:var(--danger)">董</div><div><div class="pc-name">老董（董亮）</div><div class="pc-role">北京 · 批發業務</div></div></div>
-      <span class="pc-status st-trip">出差中</span>
-      <div class="pc-task">上海客戶拜訪 · 費用報銷待 Ray</div>
-      <span class="city-tag-sm ct-bj">北京→上海</span>
+    <div class="pc" id="pc-peilin">
+      <div class="pc-head" onclick="togglePc('pc-peilin')">
+        <div class="pc-av" style="background:#6d28d9">珮</div>
+        <div style="flex:1"><div class="pc-name">珮玲</div><div class="pc-role">台北 · 企劃</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">Muziktiger 催版方 · Q3 快閃企劃</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--danger)"></div><div class="pc-todo-text urgent">Muziktiger 版權方 → 催辦審核進度（14 天未回）</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">Q3 曼谷快閃企劃書 → 5/15 前完成</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-peilin" onclick="sendNudge('peilin','珮玲',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="bj">
-      <div class="pc-top"><div class="pc-av" style="background:#b91c1c">德</div><div><div class="pc-name">德寶</div><div class="pc-role">北京 · 批發業務</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">跟進 2 個潛在客戶報價</div>
-      <span class="city-tag-sm ct-bj">北京</span>
+    <div class="pc" id="pc-shetong">
+      <div class="pc-head" onclick="togglePc('pc-shetong')">
+        <div class="pc-av" style="background:#9333ea">詩</div>
+        <div style="flex:1"><div class="pc-name">詩彤</div><div class="pc-role">台北 · 設計師</div></div>
+        <span class="pc-status st-off">請假</span>
+      </div>
+      <div class="pc-summary">今日請假（年假）· 明日回</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--txt-lo)"></div><div class="pc-todo-text">明天回來後：繼續 Opanchu 秋冬細節稿</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-shetong" onclick="sendNudge('shetong','詩彤',this)" disabled style="opacity:.4">請假中</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:var(--accent)">B</div><div><div class="pc-name">Bevis</div><div class="pc-role">台北 · 設計主管</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">Opanchu 概念圖待核准 · Muziktiger 主管盯進度</div>
-      <span class="city-tag-sm ct-tp">台北</span>
+    <div class="pc" id="pc-chunlei">
+      <div class="pc-head" onclick="togglePc('pc-chunlei')">
+        <div class="pc-av" style="background:#0369a1">春</div>
+        <div style="flex:1"><div class="pc-name">春雷</div><div class="pc-role">北京 · 電商（抖音）</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">618 備貨 SKU 確認中</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">618 活動備貨清單 → 本週給德寶確認採購計劃</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">抖音 5月活動素材需求 → 對接 Bevis</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-chunlei" onclick="sendNudge('chunlei','春雷',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:#6d28d9">珮</div><div><div class="pc-name">珮玲</div><div class="pc-role">台北 · 企劃</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">Muziktiger 催版權方 · Q3 快閃企劃撰寫中</div>
-      <span class="city-tag-sm ct-tp">台北</span>
+    <div class="pc" id="pc-yuming">
+      <div class="pc-head" onclick="togglePc('pc-yuming')">
+        <div class="pc-av" style="background:#0284c7">躍</div>
+        <div style="flex:1"><div class="pc-name">躍明</div><div class="pc-role">北京 · 財務</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">本月損益表 · 採購款安排</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--warn)"></div><div class="pc-todo-text">5月損益表 → 5/10 完成送 Shawn</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">Snoopy PO 首款備款安排（Ray 批後 24h 打出）</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-yuming" onclick="sendNudge('yuming','躍明',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:#9333ea">詩</div><div><div class="pc-name">詩彤</div><div class="pc-role">台北 · 設計師</div></div></div>
-      <span class="pc-status st-off">請假</span>
-      <div class="pc-task">今日請假（年假）· 明日回</div>
-      <span class="city-tag-sm ct-tp">台北</span>
+    <div class="pc" id="pc-yangzi">
+      <div class="pc-head" onclick="togglePc('pc-yangzi')">
+        <div class="pc-av" style="background:#7c3aed">楊</div>
+        <div style="flex:1"><div class="pc-name">楊子</div><div class="pc-role">北京 · HR/出納</div></div>
+        <span class="pc-status st-on">在線</span>
+      </div>
+      <div class="pc-summary">5月薪資核算 · 報銷複核</div>
+      <div class="pc-expand">
+        <div class="pc-todo-list">
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--accent)"></div><div class="pc-todo-text">5月薪資核算 → 5/12 完成</div></div>
+          <div class="pc-todo-item"><div class="pc-todo-dot" style="background:var(--txt-lo)"></div><div class="pc-todo-text">2 件報銷待複核</div></div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-nudge" id="nudge-yangzi" onclick="sendNudge('yangzi','楊子',this)">📨 催一下</button>
+        </div>
+      </div>
     </div>
 
-    <div class="pc" data-city="tp">
-      <div class="pc-top"><div class="pc-av" style="background:#374151">L</div><div><div class="pc-name">Leo</div><div class="pc-role">台北 · 出納</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">本月固定支出已同步躍明</div>
-      <span class="city-tag-sm ct-tp">台北</span>
-    </div>
-
-    <div class="pc" data-city="bk">
-      <div class="pc-top"><div class="pc-av" style="background:var(--ok)">S</div><div><div class="pc-name">Shawn</div><div class="pc-role">曼谷 · COO</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">Q3 快閃店規劃 · 預算審核佇列 3 項</div>
-      <span class="city-tag-sm ct-bk">曼谷</span>
-    </div>
-
-    <div class="pc" data-city="bk">
-      <div class="pc-top"><div class="pc-av" style="background:#16a34a">M</div><div><div class="pc-name">Meaw</div><div class="pc-role">曼谷 · 財務</div></div></div>
-      <span class="pc-status st-on">在線</span>
-      <div class="pc-task">UJ BKK 帳務月結中</div>
-      <span class="city-tag-sm ct-bk">曼谷</span>
-    </div>
-
-  </div><!-- /people-grid -->
+  </div>
 
 </div><!-- /main -->
 
+<!-- NEW PROJECT MODAL -->
+<div id="new-proj-modal" style="display:none;position:fixed;inset:0;background:#0009;z-index:200;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px 20px 36px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:800;" id="modal-title">建新項目</div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--txt-mid);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:9px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;">業務板塊</label>
+      <select id="proj-type" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt-hi);outline:none;">
+        <option value="wholesale">批發</option>
+        <option value="flash">快閃店</option>
+        <option value="other">其他（OEM/ODM）</option>
+      </select>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:9px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;">項目名稱</label>
+      <input id="proj-name" placeholder="例：Snoopy 秋冬系列 / 泰國 Centralworld 快閃" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt-hi);outline:none;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:9px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;">IP 品牌</label>
+        <select id="proj-ip" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt-hi);outline:none;">
+          <option>Snoopy</option><option>Mofusand</option><option>Muziktiger</option><option>Opanchu</option><option>飯糰與梅子</option><option>其他</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:9px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;">預計上市 / 開幕</label>
+        <input id="proj-date" type="month" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt-hi);outline:none;">
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:9px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;">預算（RMB）</label>
+      <input id="proj-budget" type="number" placeholder="預計成本 / 費用" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt-hi);outline:none;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="font-size:9px;font-weight:700;color:var(--txt-mid);display:block;margin-bottom:5px;text-transform:uppercase;">說明 / 背景</label>
+      <textarea id="proj-notes" rows="3" placeholder="這個項目的背景、目標、關鍵依賴..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--txt-hi);outline:none;resize:none;font-family:inherit;"></textarea>
+    </div>
+    <button onclick="saveNewProject()" style="width:100%;padding:13px;background:var(--ok);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">儲存項目計劃</button>
+  </div>
+</div>
+
 <script>
-// Auth check
+// Auth
 (function(){
   const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
   if(!s||Date.now()-s.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; return; }
-  const SESS=s;
   const av=document.getElementById('user-av');
   const nm=document.getElementById('user-name');
   const rl=document.getElementById('user-role');
-  if(av){ av.textContent=[...SESS.name][0]; av.style.background=SESS.color||'var(--accent)'; }
-  if(nm) nm.textContent=SESS.name;
-  if(rl) rl.textContent=SESS.role;
+  if(av){ av.textContent=[...s.name][0]; av.style.background=s.color||'var(--ok)'; }
+  if(nm) nm.textContent=s.name;
+  if(rl) rl.textContent=s.role;
 })();
 document.addEventListener('click', e=>{ const m=document.getElementById('user-menu'); if(m&&!m.contains(e.target)) document.getElementById('user-dropdown').classList.remove('open'); });
 
-const _P  = 'https://feishu-proxy.raychou6913.workers.dev';
-const _AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
-const _T  = {
-  budget:   'tblmlUoyZ6Bip6S3',
-  sales:    'tblndRlEjmOgh5lk',
-  pipeline: 'tblTqAZIdt2ViAma',
-  approval: 'tbl4OBNvsNkqS4mQ',
-};
-let _tok=null, _tokExp=0;
-
+// Feishu config
+const _P='https://feishu-proxy.raychou6913.workers.dev';
+const _AT='Sg7ObNELHaAdZzshGIFjWPVhpce';
+const _T={ budget:'tblmlUoyZ6Bip6S3', sales:'tblndRlEjmOgh5lk', pipeline:'tblTqAZIdt2ViAma', approval:'tbl4OBNvsNkqS4mQ' };
+let _tok=null,_tokExp=0;
 async function tok(){
   if(_tok&&Date.now()<_tokExp) return _tok;
   const r=await fetch(`${_P}/auth/token`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-  const d=await r.json();
-  _tok=d.tenant_access_token; _tokExp=Date.now()+6300000;
-  return _tok;
+  const d=await r.json(); _tok=d.tenant_access_token; _tokExp=Date.now()+6300000; return _tok;
 }
 async function query(tbl,extra=''){
-  const mock = window._mockCheck && window._mockCheck(tbl);
-  if(mock) return mock;
+  const mock=window._mockCheck&&window._mockCheck(tbl); if(mock) return mock;
   const t=await tok();
-  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,
-    {headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
-  const d=await r.json();
-  return (d.data&&d.data.items)||[];
+  const r=await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${tbl}/records?page_size=100${extra}`,{headers:{'Authorization':'Bearer '+t,'Origin':'https://raychou6913-tech.github.io'}});
+  const d=await r.json(); return (d.data&&d.data.items)||[];
 }
 async function putRec(tbl,rid,fields){
   const t=await tok();
@@ -624,218 +864,183 @@ async function putRec(tbl,rid,fields){
     method:'PUT',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json','Origin':'https://raychou6913-tech.github.io'},
     body:JSON.stringify({fields})}).then(r=>r.json());
 }
-function fv(f,k){
-  const v=f[k];
-  if(v===null||v===undefined) return '';
-  if(typeof v==='number') return v;
-  if(typeof v==='string') return v;
-  if(Array.isArray(v)) return v.map(x=>typeof x==='object'?(x.text||x.name||''):String(x)).join('');
-  if(typeof v==='object') return v.text||v.name||v.value||'';
-  return String(v);
-}
+function fv(f,k){ const v=f[k]; if(v===null||v===undefined) return ''; if(typeof v==='number') return v; if(typeof v==='string') return v; if(Array.isArray(v)) return v.map(x=>typeof x==='object'?(x.text||x.name||''):String(x)).join(''); if(typeof v==='object') return v.text||v.name||v.value||''; return String(v); }
 function wan(n){ const v=parseFloat(n)||0; return Math.abs(v)>=10000?(v/10000).toFixed(1)+'萬':v.toLocaleString(); }
 function pctColor(p){ return p>=80?'var(--ok)':p>=50?'var(--warn)':'var(--danger)'; }
+const MONTHS_ELAPSED=new Date().getMonth()+1;
 
-// Current month (YYYYMM as int)
-const NOW_YM = (() => { const d=new Date(); return d.getFullYear()*100+(d.getMonth()+1); })();
-const MONTHS_ELAPSED = new Date().getMonth()+1; // 1-12
-
-// ── BUDGET + KPI ────────────────────────────────────────────────
+// Load budget KPIs
 async function loadBudget(){
-  const rows = await query(_T.budget);
-  const yr = new Date().getFullYear();
-  const yItems = rows.filter(r=>(parseFloat(fv(r.fields,'年度'))||0)===yr);
-  const incomeRows  = yItems.filter(r=>fv(r.fields,'預算性質')==='收入');
-  const expenseRows = yItems.filter(r=>fv(r.fields,'預算性質')==='支出');
+  try{
+    const rows=await query(_T.budget);
+    const yr=new Date().getFullYear();
+    const mo=new Date().getMonth();
+    const q=Math.floor(mo/3);
+    const yItems=rows.filter(r=>(parseFloat(fv(r.fields,'年度'))||0)===yr);
+    const incomeRows=yItems.filter(r=>fv(r.fields,'預算性質')==='收入');
+    const expRows=yItems.filter(r=>fv(r.fields,'預算性質')==='支出');
+    const totA=incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+    const totT=incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+    const totExpA=expRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
+    const totExpT=expRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
+    const FULL_YEAR_REV=24000000;
+    const revA=totA||7920000; const expPct=Math.round(MONTHS_ELAPSED/12*100);
+    const revPct=Math.round(revA/FULL_YEAR_REV*100);
+    const ahead=revPct-expPct;
+    document.getElementById('g-rev').textContent=wan(revA);
+    document.getElementById('g-rev').style.color=ahead>=0?'var(--ok)':'var(--warn)';
+    document.getElementById('g-rev-sub').textContent=`/ ${wan(FULL_YEAR_REV)} 全年目標`;
+    document.getElementById('g-rev-bar').style.width=Math.min(revPct,100)+'%';
+    document.getElementById('g-rev-bar').style.background=ahead>=0?'var(--ok)':'var(--warn)';
+    document.getElementById('g-rev-ytd').textContent=`YTD ${revPct}%`;
+    document.getElementById('g-rev-exp').textContent=`預期進度 ${expPct}%`;
+    const tEl=document.getElementById('g-rev-trend');
+    if(ahead>0){tEl.className='kpi-big-trend trend-up';tEl.textContent=`+${ahead}% 超前`;}
+    else if(ahead<0){tEl.className='kpi-big-trend trend-dn';tEl.textContent=`落後 ${Math.abs(ahead)}%`;}
 
-  const coMap = { '北京蕪解':'bj', '台灣悍草':'tw', 'UJ BKK':'bk' };
-  let totalRevT=0, totalRevA=0;
+    // quarterly
+    const qMo=mo-q*3+1;
+    const qA=totA>0?(totA/MONTHS_ELAPSED)*qMo:8920000;
+    const qT=(totT/12)*3||13500000;
+    const qPct=Math.round(qA/qT*100);
+    const qEl=document.getElementById('g-qtr');
+    if(qEl){ qEl.textContent=wan(qA); qEl.style.color=qPct>=80?'var(--ok)':qPct>=50?'var(--warn)':'var(--danger)'; }
+    const qpEl=document.getElementById('g-qtr-bar');
+    if(qpEl){ qpEl.style.width=Math.min(qPct,100)+'%'; qpEl.style.background=qPct>=80?'var(--ok)':qPct>=50?'var(--warn)':'var(--danger)'; }
+    const qtEl=document.getElementById('g-qtr-trend');
+    if(qtEl){ qtEl.textContent=`Q${q+1} ${qPct}% 達成`; qtEl.className='kpi-big-trend '+(qPct>=80?'trend-up':qPct>=50?'trend-warn':'trend-dn'); }
 
-  for(const [co,pre] of Object.entries(coMap)){
-    const cr = incomeRows.filter(r=>fv(r.fields,'所屬公司')===co);
-    const t = cr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    const a = cr.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
-    totalRevT+=t; totalRevA+=a;
-    const pct = t>0?Math.round(a/t*100):0;
-    const cc = pctColor(pct);
-    if(pre==='tw'){
-      document.getElementById('tw-val').textContent = '4 個 IP';
-      document.getElementById('tw-val').style.color = 'var(--taipei)';
-      document.getElementById('tw-bar').style.width = '25%';
-      document.getElementById('tw-bar').style.background = 'var(--taipei)';
-    } else if(t>0&&document.getElementById(pre+'-val')){
-      document.getElementById(pre+'-val').textContent = wan(a);
-      document.getElementById(pre+'-val').style.color = cc;
-      document.getElementById(pre+'-bar').style.width = Math.min(pct,100)+'%';
-      document.getElementById(pre+'-bar').style.background = cc;
-      if(document.getElementById(pre+'-pct')){
-        document.getElementById(pre+'-pct').textContent = `${pct}%（目標 ${wan(t)}）`;
-        document.getElementById(pre+'-pct').style.color = cc;
-      }
+    // profit
+    const VAM_TARGET=8000000; const VAM_START=new Date('2026-07-01').getTime();
+    const profA=(!totA&&Date.now()<VAM_START)?2624000:(totA-totExpA);
+    const profT=(totT-totExpT)||VAM_TARGET;
+    const profPct=Math.round(profA/profT*100); const profDiff=profA-profT*(MONTHS_ELAPSED/12);
+    document.getElementById('g-profit').textContent=wan(profA);
+    document.getElementById('g-profit').style.color=pctColor(profPct);
+    document.getElementById('g-profit-bar').style.width=Math.min(profPct,100)+'%';
+    document.getElementById('g-profit-bar').style.background=pctColor(profPct);
+    document.getElementById('g-profit-ytd').textContent=`YTD ${profPct}%`;
+    const ppEl=document.getElementById('g-profit-trend');
+    if(profDiff<0){ppEl.className='kpi-big-trend trend-dn';ppEl.textContent=`↓ 落後 ${wan(Math.abs(profDiff))}`;}
+    else if(profDiff>0){ppEl.className='kpi-big-trend trend-up';ppEl.textContent=`↑ 超前 ${wan(profDiff)}`;}
+
+    // wholesale YTD update (based on actual if available)
+    if(totA>0){
+      const wA=Math.round(totA*0.12); // rough 12% of revenue = wholesale portion demo
+      document.getElementById('w-ytd').textContent='¥ '+wan(wA);
+      const wPct=Math.round(wA/24000000*100);
+      document.getElementById('w-pct').textContent=wPct+'%';
+      document.getElementById('w-prog').style.width=Math.min(wPct,100)+'%';
     }
-    if(pre==='bk'&&document.getElementById('bk-pct')){
-      const p2 = t>0?pct:46;
-      document.getElementById('bk-pct').textContent = p2+'%（無快閃月）';
-      document.getElementById('bk-pct').style.color = pctColor(p2);
-    }
-  }
-
-  if(document.getElementById('bj-sub')&&totalRevT>0){
-    const bjT=incomeRows.filter(r=>fv(r.fields,'所屬公司')==='北京蕪解').reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-    if(bjT>0) document.getElementById('bj-sub').textContent=`YTD目標 ${wan(bjT)}`;
-  }
-
-  // Global revenue KPI
-  const FULL_YEAR_REV = 24000000;
-  const revActual = totalRevA||7920000;
-  const gRevPct = Math.round(revActual/FULL_YEAR_REV*100);
-  const expPct  = Math.round(MONTHS_ELAPSED/12*100);
-  const ahead   = gRevPct - expPct;
-  document.getElementById('g-rev').textContent = wan(revActual);
-  document.getElementById('g-rev').style.color = ahead>=0?'var(--ok)':'var(--warn)';
-  document.getElementById('g-rev-sub').textContent = `${wan(revActual)} / 2400萬（全年目標）`;
-  document.getElementById('g-rev-bar').style.width = Math.min(gRevPct,100)+'%';
-  document.getElementById('g-rev-bar').style.background = ahead>=0?'var(--ok)':'var(--warn)';
-  document.getElementById('g-rev-ytd').textContent = `YTD ${gRevPct}%`;
-  document.getElementById('g-rev-exp').textContent = `預期進度 ${expPct}% (${MONTHS_ELAPSED}/12)`;
-  const trendEl = document.getElementById('g-rev-trend');
-  if(ahead>0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-up'; trendEl.textContent=`+${ahead}% 超前`; }
-  else if(ahead<0){ trendEl.style.display='inline-block'; trendEl.className='kpi-big-trend trend-dn'; trendEl.textContent=`落後 ${Math.abs(ahead)}%`; }
-  else { trendEl.style.display='none'; }
-
-  // Profit KPI — income minus expenses; fallback to mock until VAM starts 2026-07-01
-  const VAM_TARGET = 8000000;
-  const VAM_START = new Date('2026-07-01').getTime();
-  const totalActualInc = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
-  const totalActualExp = expenseRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'實際金額'))||0),0);
-  const totalBudgetInc = incomeRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-  const totalBudgetExp = expenseRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'預算金額'))||0),0);
-  const profA = (!totalActualInc && Date.now()<VAM_START) ? 2624000 : (totalActualInc - totalActualExp);
-  const profT = (totalBudgetInc - totalBudgetExp)||VAM_TARGET;
-  const profPct = Math.round(profA/profT*100);
-  const profExp = Math.round(MONTHS_ELAPSED/12*100);
-  const profDiff = profA - profT*(MONTHS_ELAPSED/12);
-  document.getElementById('g-profit').textContent = wan(profA);
-  document.getElementById('g-profit').style.color = profPct>=profExp?'var(--ok)':'var(--warn)';
-  document.getElementById('g-profit-sub').textContent = `/ ${wan(profT)}`;
-  document.getElementById('g-profit-bar').style.width = Math.min(profPct,100)+'%';
-  document.getElementById('g-profit-bar').style.background = profPct>=profExp?'var(--ok)':'var(--warn)';
-  document.getElementById('g-profit-ytd').textContent = `YTD ${profPct}%`;
-  const ptEl = document.getElementById('g-profit-trend');
-  if(profDiff<0&&profT){ ptEl.style.display='inline-block'; ptEl.className='kpi-big-trend trend-dn'; ptEl.textContent=`↓ 落後 ${wan(Math.abs(profDiff))}`; }
-  else if(profDiff>0){ ptEl.style.display='inline-block'; ptEl.className='kpi-big-trend trend-up'; ptEl.textContent=`↑ 超前 ${wan(profDiff)}`; }
+  }catch(e){}
 }
 
-// ── PIPELINE HEALTH ─────────────────────────────────────────────
-async function loadPipeline(){
-  const rows = await query(_T.pipeline);
-  const active = rows.filter(r=>{const s=fv(r.fields,'當前階段'); return s&&!s.includes('完成')&&!s.includes('下架');});
-  const blocked = rows.filter(r=>{const s=fv(r.fields,'當前階段'); return s&&(s.includes('等待')||s.includes('卡關')||s.includes('版權'));});
-  // Q3 = pipeline targeting 2026 Q3
-  const q3 = rows.filter(r=>{ const d=fv(r.fields,'預計上市'); return String(d).includes('Q3')||String(d).includes('07')||String(d).includes('08'); });
-  // Q4
-  const q4 = rows.filter(r=>{ const d=fv(r.fields,'預計上市'); return String(d).includes('Q4')||String(d).includes('10')||String(d).includes('11'); });
-  document.getElementById('ph-active').textContent = active.length||4;
-  document.getElementById('ph-block').textContent  = blocked.length||1;
-  document.getElementById('ph-q3').textContent     = q3.length||3;
-  const q4count = q4.length;
-  document.getElementById('ph-q4').textContent = q4count;
-  if(q4count>0){
-    document.querySelector('.pipe-alert').style.display='none';
-  }
-}
-
-// ── ORDERS → BJ unshipped count ─────────────────────────────────
-async function loadOrders(){
-  const rows = await query(_T.sales);
-  const bjRows = rows.filter(r=>fv(r.fields,'所屬公司')==='北京蕪解'||!fv(r.fields,'所屬公司'));
-  const unshipped = bjRows.filter(r=>!fv(r.fields,'物流單號')&&fv(r.fields,'收款狀態')!=='全款已收');
-  const shipEl = document.getElementById('bj-ship');
-  if(shipEl) shipEl.textContent = (unshipped.length||6)+' 張';
-}
-
-// ── APPROVALS ───────────────────────────────────────────────────
+// Load approvals
 async function loadApprovals(){
-  const rows = await query(_T.approval);
-  const pending = rows.filter(r=>fv(r.fields,'Shawn複核')==='待複核');
-  const badge = document.getElementById('appr-badge');
-  badge.textContent = pending.length+' 項待審';
-  badge.style.display = pending.length?'inline-block':'none';
-
-  const el = document.getElementById('appr-list');
-  if(!pending.length){
-    el.innerHTML='<div style="font-size:11px;color:var(--ok);padding:16px 0;text-align:center">✅ 無待複核項目</div>';
-    return;
-  }
-  const TYPE_ICON={'採購審批':'📋','支出審批':'💸','折扣審批':'🏷','合約審批':'🔗'};
-  const now=Date.now();
-  el.innerHTML=pending.map((r,i)=>{
-    const f=r.fields;
-    const type=fv(f,'審批類型')||'其他';
-    const title=fv(f,'審批標題')||'（無標題）';
-    const who=fv(f,'申請人');
-    const amt=parseFloat(fv(f,'金額'))||0;
-    const ccy=fv(f,'幣別')||'RMB';
-    const ts=typeof f['申請日期']==='number'?f['申請日期']:0;
-    const days=ts?Math.floor((now-ts)/86400000):0;
-    const desc=fv(f,'申請說明')||'';
-    const id='ap'+i;
-    return `<div class="appr-item" onclick="toggleAppr('${id}')">
-      <div class="appr-top">
-        <div style="font-size:16px;flex-shrink:0;margin-top:1px">${TYPE_ICON[type]||'🔔'}</div>
-        <div class="appr-body">
-          <div class="appr-name">${type} · ${title}</div>
-          <div class="appr-meta">${who?who+' · ':''}<span style="color:var(--warn)">${days>0?days+'天前':'今天'}</span></div>
+  try{
+    const rows=await query(_T.approval);
+    const pending=rows.filter(r=>fv(r.fields,'Shawn複核')==='待複核');
+    const badge=document.getElementById('appr-badge');
+    if(badge){ badge.textContent=pending.length+'項'; badge.style.display=pending.length?'':'none'; }
+    if(!pending.length) return;
+    const TYPE_ICON={'採購審批':'📋','支出審批':'💸','合約審批':'🔗','快閃店審批':'🏪'};
+    const now=Date.now();
+    const el=document.getElementById('appr-list');
+    el.innerHTML=pending.map((r,i)=>{
+      const f=r.fields;
+      const type=fv(f,'審批類型')||'其他';
+      const title=fv(f,'審批標題')||'（無標題）';
+      const who=fv(f,'申請人'); const amt=parseFloat(fv(f,'金額'))||0;
+      const ts=typeof f['申請日期']==='number'?f['申請日期']:0;
+      const days=ts?Math.floor((now-ts)/86400000):0;
+      const desc=fv(f,'申請說明')||'';
+      const id='ap'+i;
+      return `<div class="appr-item" onclick="this.querySelector('.appr-detail').classList.toggle('open')">
+        <div class="appr-top"><div style="font-size:16px;flex-shrink:0">${TYPE_ICON[type]||'🔔'}</div><div class="appr-body"><div class="appr-name">${type} · ${title}</div><div class="appr-meta">${who?who+' · ':''}<span style="color:var(--warn)">${days>0?days+'天前':'今天'}</span></div></div><div class="appr-right"><div class="appr-amt">${amt?'¥'+amt.toLocaleString():''}</div></div></div>
+        <div class="appr-detail" id="${id}">${desc?`<div style="margin-bottom:8px">${desc}</div>`:''}
+          <div class="appr-actions"><button class="btn-sm btn-ok" onclick="event.stopPropagation();apprAct('${r.record_id}','通過',this)">✓ 通過→Ray</button><button class="btn-sm btn-hold">暫緩</button><button class="btn-sm btn-danger">✕</button></div>
         </div>
-        <div class="appr-right">
-          <div class="appr-amt">${amt?'¥'+amt.toLocaleString():''}</div>
-          <div style="font-size:9px;color:var(--txt-lo)">${ccy}</div>
-        </div>
-      </div>
-      <div class="appr-detail" id="${id}">
-        ${desc?`<div style="margin-bottom:8px">${desc}</div>`:''}
-        <div class="appr-actions">
-          <button class="btn-sm btn-ok" onclick="event.stopPropagation();apprAct('${r.record_id}','通過','${id}')">✓ 通過→Ray</button>
-          <button class="btn-sm btn-hold" onclick="event.stopPropagation();apprAct('${r.record_id}','暫緩','${id}')">暫緩</button>
-          <button class="btn-sm btn-danger" onclick="event.stopPropagation();apprAct('${r.record_id}','退回','${id}')">✕</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+      </div>`;
+    }).join('');
+  }catch(e){}
 }
 
-async function apprAct(rid,action,detailId){
-  const el=document.getElementById(detailId);
-  if(el) el.innerHTML='<div style="font-size:11px;color:var(--txt-mid)">處理中…</div>';
+async function apprAct(rid,action,btn){
+  if(btn){ btn.textContent='處理中…'; btn.disabled=true; }
   try{
     if(window.USE_MOCK){
-      const item=window.MOCK_DB&&window.MOCK_DB.approval&&window.MOCK_DB.approval.find(r=>r.record_id===rid);
-      if(item) item.fields['Shawn複核']=action;
-      if(el) el.innerHTML=`<div style="font-size:11px;color:var(--ok)">✓ 已標記：${action}（Demo 模式）</div>`;
-      setTimeout(loadApprovals,1200); return;
+      if(btn){ btn.textContent='✓ 已送Ray'; } setTimeout(loadApprovals,800); return;
     }
     await putRec(_T.approval,rid,{'Shawn複核':action});
-    if(el) el.innerHTML=`<div style="font-size:11px;color:var(--ok)">✓ 已標記：${action}</div>`;
-    setTimeout(loadApprovals,1200);
-  }catch(e){ if(el) el.innerHTML=`<div style="color:var(--danger);font-size:11px">操作失敗</div>`; }
+    if(btn){ btn.textContent='✓ 已送Ray'; }
+    setTimeout(loadApprovals,800);
+  }catch(e){ if(btn) btn.textContent='操作失敗'; }
 }
 
-function toggleAppr(id){
-  const el=document.getElementById(id);
-  if(el) el.classList.toggle('open');
-}
-function filterPpl(city,btn){
-  document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('act'));
-  btn.classList.add('act');
-  document.querySelectorAll('#people-grid .pc').forEach(c=>{
-    c.style.display=(city==='all'||c.dataset.city===city)?'':'none';
-  });
+// People toggle
+function togglePc(id){
+  document.getElementById(id).classList.toggle('open');
 }
 
-Promise.allSettled([loadBudget(),loadPipeline(),loadOrders(),loadApprovals()]);
+// Nudge
+function sendNudge(user, name, btn){
+  const q=JSON.parse(localStorage.getItem('erp_nudge_queue_v1')||'[]');
+  q.unshift({ ts:Date.now(), from:'shawn', fromName:'Shawn', to:user, toName:name,
+    msg:`Shawn 提醒：請確認你的待辦事項`, read:false });
+  localStorage.setItem('erp_nudge_queue_v1', JSON.stringify(q));
+  btn.textContent='✓ 已傳送';
+  btn.classList.add('sent');
+  btn.disabled=true;
+  setTimeout(()=>{ btn.textContent='📨 催一下'; btn.classList.remove('sent'); btn.disabled=false; }, 5000);
+}
+
+// New project modal
+function openNewProjectModal(type){
+  const modal=document.getElementById('new-proj-modal');
+  modal.style.display='flex';
+  const sel=document.getElementById('proj-type');
+  if(sel) sel.value=type;
+  const title=document.getElementById('modal-title');
+  if(title) title.textContent=type==='wholesale'?'建批發計劃':type==='flash'?'建快閃店計劃':'建新項目';
+  document.getElementById('proj-name').value='';
+  document.getElementById('proj-budget').value='';
+  document.getElementById('proj-notes').value='';
+  const d=new Date(); d.setMonth(d.getMonth()+3);
+  document.getElementById('proj-date').value=d.toISOString().slice(0,7);
+}
+function openBudgetModal(){ openNewProjectModal('other'); }
+function closeModal(){ document.getElementById('new-proj-modal').style.display='none'; }
+document.getElementById('new-proj-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('new-proj-modal')) closeModal(); });
+
+function saveNewProject(){
+  const type=document.getElementById('proj-type').value;
+  const name=document.getElementById('proj-name').value.trim();
+  const ip=document.getElementById('proj-ip').value;
+  const date=document.getElementById('proj-date').value;
+  const budget=document.getElementById('proj-budget').value;
+  const notes=document.getElementById('proj-notes').value;
+  if(!name){ alert('請填寫項目名稱'); return; }
+  const key='erp_new_projects_v1';
+  const arr=JSON.parse(localStorage.getItem(key)||'[]');
+  arr.unshift({ type, name, ip, date, budget, notes, by:'shawn', ts:Date.now(), status:'規劃中' });
+  localStorage.setItem(key, JSON.stringify(arr));
+  closeModal();
+  showToast(`✅ 項目「${name}」已建立 · 待送 Ray 核准`);
+}
+
+function showToast(msg){
+  let t=document.getElementById('shawn-toast');
+  if(!t){ t=document.createElement('div'); t.id='shawn-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+Promise.allSettled([loadBudget(), loadApprovals()]);
 </script>
 
-<!-- ── EXPENSE FAB ── -->
+<!-- EXPENSE FAB -->
 <style>
 .exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
 .exp-fab:active{transform:scale(.92);}
@@ -845,116 +1050,40 @@ Promise.allSettled([loadBudget(),loadPipeline(),loadOrders(),loadApprovals()]);
 .exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
 .exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
-.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
-.exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
-.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
 .exp-field{margin-bottom:12px;}
 .exp-field label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
 .exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:8px 10px;outline:none;}
 .exp-field textarea{resize:vertical;font-family:inherit;}
-.exp-amt-row{display:flex;gap:6px;}
-.exp-amt-row input{flex:1;}
-.exp-amt-row select{width:90px;}
+.exp-amt-row{display:flex;gap:6px;} .exp-amt-row input{flex:1;} .exp-amt-row select{width:90px;}
 .exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
 .exp-routing strong{color:#10b981;}
 .exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
-.exp-submit:active{opacity:.85;}
 </style>
 <button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
 <div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
 <div class="exp-sheet">
   <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
-  <div class="exp-type-row" id="expTypeRow">
-    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
-    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
-  </div>
-  <div id="expPersonalFields">
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
-    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
-    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
-  </div>
-  <div id="expSupplierFields" style="display:none">
-    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
-    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
-  </div>
-  <div class="exp-routing" id="expRouting">載入中...</div>
+  <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>THB</option><option>TWD</option><option>HKD</option><option>USD</option></select></div></div>
+  <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+  <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+  <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明..."></textarea></div>
+  <div class="exp-routing">送審路徑：<strong>楊子付款</strong> · 抄送 <strong>Ray</strong></div>
   <button class="exp-submit" onclick="submitExpense()">送出申請</button>
 </div>
 </div>
 <script>
-(function(){
-const EXP_ROUTES={
-  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
-  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
-  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
-  laodong:{next:'anran',nextLabel:'安然',cc:null},
-  debao:{next:'anran',nextLabel:'安然',cc:null},
-  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
-  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yangzi:{next:'anran',nextLabel:'安然',cc:null},
-  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  leo:{next:'ray',nextLabel:'Ray',cc:null},
-  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
-};
-const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
-let expType='personal';
-function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
-function openExpModal(){
-  const u=getUser();const r=EXP_ROUTES[u];
-  const hint=document.getElementById('expRouting');
-  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
-  else{hint.innerHTML='送審路徑：楊子';}
-  const supBtn=document.getElementById('expTypeSupplier');
-  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
-  document.getElementById('expDate').valueAsDate=new Date();
-  setExpType('personal');
-  document.getElementById('expOverlay').classList.add('open');
-}
-function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
-function setExpType(t){
-  expType=t;
-  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
-  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
-  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
-  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
-}
+function openExpModal(){ document.getElementById('expDate').valueAsDate=new Date(); document.getElementById('expOverlay').classList.add('open'); }
+function closeExpModal(){ document.getElementById('expOverlay').classList.remove('open'); }
 function submitExpense(){
-  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
-  let rec;
-  if(expType==='personal'){
-    const amt=document.getElementById('expAmt').value;
-    const ccy=document.getElementById('expCcy').value;
-    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
-    const date=document.getElementById('expDate').value;
-    const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
-    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
-  }else{
-    const name=document.getElementById('expSupName').value;
-    const po=document.getElementById('expSupPO').value;
-    const amt=document.getElementById('expSupAmt').value;
-    const ccy=document.getElementById('expSupCcy').value;
-    const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
-    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
-  }
-  const key='erp_expense_queue';
-  const q=JSON.parse(localStorage.getItem(key)||'[]');
-  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
-  closeExpModal();
-  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
+  const amt=document.getElementById('expAmt').value; const date=document.getElementById('expDate').value;
+  if(!amt||!date){ alert('請填寫金額與日期'); return; }
+  const rec={ type:'個人報銷', user:'shawn', amt, ccy:document.getElementById('expCcy').value,
+    cat:document.getElementById('expCat').value, date, desc:document.getElementById('expDesc').value,
+    next:'yangzi', cc:'ray', ts:Date.now() };
+  const q=JSON.parse(localStorage.getItem('erp_expense_queue')||'[]');
+  q.push(rec); localStorage.setItem('erp_expense_queue',JSON.stringify(q));
+  closeExpModal(); showToast('✅ 費用申請已送出 · 待楊子審核');
 }
-window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
-})();
 </script>
 
 </body>
