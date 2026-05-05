@@ -220,6 +220,35 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .fc-amt{font-size:12px;font-weight:700;color:var(--txt-hi);min-width:90px;text-align:right;}
 .fc-margin{font-size:11px;font-weight:700;min-width:72px;text-align:right;}
 .fc-light{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── VAM COMPACT ── */
+.vam-compact{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.vam-compact-stat{background:var(--card2);border-radius:8px;padding:10px 14px;min-width:120px;flex:1;}
+.vam-compact-label{font-size:9px;color:var(--txt-lo);margin-bottom:3px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.vam-compact-val{font-size:18px;font-weight:800;line-height:1.1;}
+.vam-compact-sub{font-size:9px;color:var(--txt-mid);margin-top:2px;}
+
+/* ── PIPELINE COVERAGE ── */
+.cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:720px){.cover-grid{grid-template-columns:1fr;}}
+.cover-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.cover-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.cover-table th{padding:4px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--txt-lo);border-bottom:1px solid var(--border);text-align:left;}
+.cover-table td{padding:6px 8px;font-size:11px;border-bottom:1px solid var(--border);color:var(--txt-hi);}
+.cover-table tr:last-child td{border-bottom:none;}
+.cover-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;}
+
+/* ── CADENCE TRACKER ── */
+.cadence-list{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+.cadence-row{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.cadence-name{font-size:11px;font-weight:700;color:var(--txt-hi);min-width:150px;flex-shrink:0;}
+.cadence-stages{display:flex;align-items:center;gap:3px;flex:1;overflow:hidden;}
+.cstage{font-size:9px;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;}
+.cstage-done{background:var(--ok-dim);color:var(--ok);}
+.cstage-active{background:var(--accent2);color:#fff;font-weight:700;}
+.cstage-wait{background:var(--card2);color:var(--txt-lo);}
+.cadence-status{font-size:10px;font-weight:700;margin-left:auto;white-space:nowrap;flex-shrink:0;}
+.cadence-group-label{font-size:9px;color:var(--txt-lo);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:8px;margin-bottom:2px;}
 </style>
 <script src="mock-data.js"></script>
 <script src="demo-eoy2026.js"></script>
@@ -289,27 +318,27 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="vam-badge" id="vam-badge">⚠ 稍落後進度</div>
     </div>
 
-    <!-- Big Numbers -->
-    <div class="vam-numbers">
-      <div class="vam-num">
-        <div class="vam-num-label">今年累計實際淨利（截至4月）<span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val warn" id="vam-ytd-val">¥ 287 萬</div>
-        <div class="vam-num-sub" id="vam-ytd-sub">目標進度應達 ¥333 萬（5/12）</div>
+    <!-- Compact summary row (4 cards → 4 compact stats) -->
+    <div class="vam-compact">
+      <div class="vam-compact-stat">
+        <div class="vam-compact-label">YTD 淨利 <span class="ccy ccy-rmb">RMB</span></div>
+        <div class="vam-compact-val warn" id="vam-ytd-val">¥ 287 萬</div>
+        <div class="vam-compact-sub" id="vam-ytd-sub">/ ¥800萬 年目標</div>
       </div>
-      <div class="vam-num">
-        <div class="vam-num-label">今年目標缺口 <span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val warn" id="vam-gap-val">- ¥46 萬</div>
-        <div class="vam-num-sub" id="vam-gap-sub">需在剩餘 7 個月追回</div>
+      <div class="vam-compact-stat">
+        <div class="vam-compact-label">進度缺口</div>
+        <div class="vam-compact-val warn" id="vam-gap-val">−¥46 萬</div>
+        <div class="vam-compact-sub" id="vam-gap-sub">落後進度</div>
       </div>
-      <div class="vam-num">
-        <div class="vam-num-label">今年剩餘需達成 <span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val neutral" id="vam-remain-val">¥ 513 萬</div>
-        <div class="vam-num-sub" id="vam-remain-sub">月均需達 ¥73.3 萬</div>
+      <div class="vam-compact-stat">
+        <div class="vam-compact-label">剩餘需達成</div>
+        <div class="vam-compact-val neutral" id="vam-remain-val">¥ 513 萬</div>
+        <div class="vam-compact-sub" id="vam-remain-sub">月均需達 ¥73萬</div>
       </div>
-      <div class="vam-num">
-        <div class="vam-num-label">兩年累計進度 <span class="ccy ccy-rmb">RMB</span></div>
-        <div class="vam-num-val warn" id="vam-2yr-val">¥287 萬 / ¥1,600 萬</div>
-        <div class="vam-num-sub" id="vam-2yr-sub">整體完成度 17.9%</div>
+      <div class="vam-compact-stat" style="margin-left:auto;">
+        <div class="vam-compact-label">兩年累計</div>
+        <div class="vam-compact-val warn" id="vam-2yr-val" style="font-size:13px">¥287 / ¥1,600萬</div>
+        <div class="vam-compact-sub" id="vam-2yr-sub">整體 17.9%</div>
       </div>
     </div>
 
@@ -353,7 +382,42 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
-  <!-- ② 業績 & 利潤 -->
+  <!-- ① 計劃覆蓋率 -->
+  <div class="section-title">計劃覆蓋率 · 手頭項目能否填滿年度目標</div>
+  <div class="cover-grid">
+    <div class="cover-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">📦 批發產品管道</span>
+        <span class="abc-tag" id="wholesale-cover-tag">計算中</span>
+      </div>
+      <div id="wholesale-cover-inner"><div style="font-size:11px;color:var(--txt-lo);padding:12px 0;text-align:center">載入中…</div></div>
+      <div class="cover-footer" id="wholesale-cover-footer"></div>
+    </div>
+    <div class="cover-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">🏪 快閃店管道</span>
+        <span class="abc-tag" id="popup-cover-tag">計算中</span>
+      </div>
+      <div id="popup-cover-inner"><div style="font-size:11px;color:var(--txt-lo);padding:12px 0;text-align:center">載入中…</div></div>
+      <div class="cover-footer" id="popup-cover-footer"></div>
+    </div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;" id="cover-summary-block">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:12px;font-weight:700;color:var(--txt-hi);">合計覆蓋率（批發 + 快閃 → ¥800萬目標）</span>
+      <div id="cover-total-label" style="font-size:13px;font-weight:800;color:var(--warn)">計算中…</div>
+    </div>
+    <div style="background:var(--card2);border-radius:4px;height:10px;overflow:hidden;margin-bottom:8px;"><div id="cover-total-fill" style="height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,#16a34a,var(--ok));transition:.3s;"></div></div>
+    <div id="cover-total-note" style="font-size:10px;color:var(--txt-lo)"></div>
+  </div>
+
+  <!-- ② 執行節奏 -->
+  <div class="section-title">執行節奏 · 各項目有沒有按計劃推進</div>
+  <div id="cadence-list" class="cadence-list">
+    <div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px">載入中…</div>
+  </div>
+
+  <!-- ③ 業績 & 利潤 -->
   <div class="section-title">本年度業績 · 預算 vs 實際</div>
   <div class="perf-grid">
     <div class="perf-card">
@@ -899,6 +963,7 @@ const _TBLS  = {
   budget:          "tblmlUoyZ6Bip6S3",
   sales:           "tblndRlEjmOgh5lk",
   contract:        "tblWn4PwOVRgt7c1",
+  popup_stores:    "tblPopupStores2026",
 };
 let _tk = null;
 
@@ -1545,6 +1610,137 @@ async function loadForecast(){
   }catch(e){ console.error("loadForecast",e); }
 }
 
+/* ── PIPELINE COVERAGE ── */
+async function loadPipelineCoverage(){
+  const VAM_YR = 8000000;
+  const MARGIN = 0.30; // avg wholesale net margin
+  const TWD2RMB_R = 0.22; const POPUP_MARGIN = 0.28;
+
+  const ST_COLOR = {'持續銷售':'var(--ok)','大貨銷售中':'var(--ok)','大貨追加中':'var(--ok)','清貨期':'var(--txt-mid)','已確認':'var(--accent)'};
+  const ST_ICON  = {'持續銷售':'🟢','大貨銷售中':'🟢','大貨追加中':'🟡','清貨期':'⬜','已確認':'🔵'};
+  const PP_COLOR = {'已結案':'var(--ok)','進行中':'var(--warn)','籌備中':'var(--accent)'};
+  const PP_ICON  = {'已結案':'✅','進行中':'🟡','籌備中':'📋'};
+
+  try{
+    const products = await _fetchAll(_TBLS.product_pipeline);
+    const popups   = await _fetchAll(_TBLS.popup_stores);
+
+    // ── 批發 ──
+    let wholesaleRMB = 0;
+    const wRows = products.filter(r=>_fv(r.fields,'當前階段')!=='取消').map(r=>{
+      const f=r.fields;
+      const ip   = (_fv(f,'IP品牌')||'').split('（')[0];
+      const name = (_fv(f,'產品名稱')||'').substring(0,16);
+      const vol  = parseFloat(_fv(f,'預計銷量'))||0;
+      const srp  = parseFloat(_fv(f,'建議零售價'))||0;
+      const stage= _fv(f,'當前階段')||'—';
+      const net  = vol * srp * 0.40 * MARGIN;
+      wholesaleRMB += net;
+      const col = ST_COLOR[stage]||'var(--txt-mid)';
+      const icon= ST_ICON[stage]||'◻';
+      return `<tr><td style="color:var(--txt-mid)">${ip}</td><td title="${_fv(f,'產品名稱')}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px">${name}</td><td style="color:${col}">${icon} ${stage}</td><td style="color:var(--ok);font-weight:700;text-align:right">${net?'¥'+(net/10000).toFixed(1)+'萬':'—'}</td></tr>`;
+    });
+    const wEl=document.getElementById('wholesale-cover-inner');
+    if(wEl) wEl.innerHTML=`<table class="cover-table"><tr><th>IP</th><th>產品</th><th>狀態</th><th style="text-align:right">預估淨貢獻</th></tr>${wRows.join('')}</table>`;
+    const wFt=document.getElementById('wholesale-cover-footer');
+    if(wFt) wFt.innerHTML=`<span style="color:var(--txt-mid)">批發合計預估淨利</span><span style="font-size:14px;font-weight:800;color:var(--ok)">¥${(wholesaleRMB/10000).toFixed(1)}萬</span>`;
+    const wTg=document.getElementById('wholesale-cover-tag');
+    if(wTg){ const p=Math.round(wholesaleRMB/VAM_YR*100); wTg.textContent=`覆蓋目標 ${p}%`; wTg.className=`abc-tag ${p>=50?'ok':'warn'}`; }
+
+    // ── 快閃店 ──
+    let popupRMB = 0;
+    const pRows = popups.map(r=>{
+      const f=r.fields;
+      const city  = _fv(f,'城市')||'—';
+      const target= parseFloat(_fv(f,'目標營收'))||0;
+      const actual= parseFloat(_fv(f,'實際營收'))||0;
+      const status= _fv(f,'狀態')||'—';
+      const wave  = _fv(f,'Wave')||'';
+      const base  = actual>0?actual:target;
+      const net   = base*TWD2RMB_R*POPUP_MARGIN;
+      popupRMB   += net;
+      const col   = PP_COLOR[status]||'var(--txt-mid)';
+      const icon  = PP_ICON[status]||'•';
+      const rev   = actual>0?`NT$${(actual/10000).toFixed(0)}萬`:`NT$${(target/10000).toFixed(0)}萬 目標`;
+      return `<tr><td style="color:var(--txt-lo);font-size:9px">${wave}</td><td>${city}</td><td style="color:${col}">${icon} ${status}</td><td style="font-size:10px;color:var(--txt-mid)">${rev}</td><td style="color:var(--ok);font-weight:700;text-align:right">${net?'¥'+(net/10000).toFixed(1)+'萬':'—'}</td></tr>`;
+    });
+    const pEl=document.getElementById('popup-cover-inner');
+    if(pEl) pEl.innerHTML = popups.length
+      ? `<table class="cover-table"><tr><th>批次</th><th>城市</th><th>狀態</th><th>流水</th><th style="text-align:right">預估淨貢獻</th></tr>${pRows.join('')}</table>`
+      : `<div style="font-size:11px;color:var(--txt-lo);padding:16px;text-align:center">尚無快閃店計劃</div>`;
+    const pFt=document.getElementById('popup-cover-footer');
+    if(pFt) pFt.innerHTML=`<span style="color:var(--txt-mid)">快閃店合計預估淨利</span><span style="font-size:14px;font-weight:800;color:${popupRMB>0?'var(--ok)':'var(--txt-lo)'}">¥${(popupRMB/10000).toFixed(1)}萬</span>`;
+    const pTg=document.getElementById('popup-cover-tag');
+    if(pTg){ if(!popups.length){ pTg.textContent='尚無計劃'; pTg.className='abc-tag'; }else{ const p=Math.round(popupRMB/VAM_YR*100); pTg.textContent=`覆蓋目標 ${p}%`; pTg.className=`abc-tag ${p>=20?'ok':'warn'}`; } }
+
+    // ── 合計 ──
+    const total = wholesaleRMB+popupRMB;
+    const pct   = Math.min(Math.round(total/VAM_YR*100), 200);
+    const lb = document.getElementById('cover-total-label');
+    const fi = document.getElementById('cover-total-fill');
+    const no = document.getElementById('cover-total-note');
+    if(lb){ lb.textContent=`¥${(total/10000).toFixed(1)}萬 / ¥${VAM_YR/10000}萬 = ${pct}%`; lb.style.color=pct>=100?'var(--ok)':'var(--warn)'; }
+    if(fi){ fi.style.width=Math.min(pct,100)+'%'; fi.style.background=pct>=100?'linear-gradient(90deg,#16a34a,var(--ok))':'linear-gradient(90deg,#b45309,var(--warn))'; }
+    if(no) no.textContent = pct>=100
+      ? `✅ 已規劃項目可覆蓋全年目標（批發 ¥${(wholesaleRMB/10000).toFixed(1)}萬 + 快閃 ¥${(popupRMB/10000).toFixed(1)}萬）`
+      : `⚠ 仍有 ¥${((VAM_YR-total)/10000).toFixed(1)}萬 未有項目覆蓋，需新增批發訂單或快閃店計劃`;
+  }catch(e){ console.error('loadPipelineCoverage',e); }
+}
+
+/* ── CADENCE TRACKER ── */
+async function loadCadenceTracker(){
+  const el = document.getElementById('cadence-list');
+  if(!el) return;
+
+  const PROD_STAGES = ['立項','送審','打樣','大貨','上市','銷售'];
+  const STAGE_IDX = {'主題確認':1,'概念視覺':1,'2D送審':2,'3D建模':2,'打樣送審':3,'上色打樣':3,'大貨生產':4,'大貨銷售中':5,'持續銷售':5,'大貨追加中':5,'完成':5,'清貨期':5,'已確認':1};
+  const POPUP_STAGES = ['選址','簽約','搭建','開幕','進行中','結案'];
+  const POPUP_IDX = {'籌備中':2,'進行中':4,'已結案':5};
+  const ST_COLOR = {'持續銷售':'var(--ok)','大貨銷售中':'var(--ok)','大貨追加中':'var(--ok)','清貨期':'var(--txt-mid)','完成':'var(--ok)','已結案':'var(--ok)','進行中':'var(--warn)','籌備中':'var(--accent)'};
+
+  function dots(stages, idx){
+    return stages.map((s,i)=>
+      i<idx ? `<span class="cstage cstage-done">✓ ${s}</span>`
+      : i===idx ? `<span class="cstage cstage-active">${s}</span>`
+      : `<span class="cstage cstage-wait">${s}</span>`
+    ).join('');
+  }
+
+  try{
+    const products = await _fetchAll(_TBLS.product_pipeline);
+    const popups   = await _fetchAll(_TBLS.popup_stores);
+
+    const prodHtml = products.filter(r=>_fv(r.fields,'當前階段')!=='取消').slice(0,8).map(r=>{
+      const f=r.fields;
+      const ipShort = (_fv(f,'IP品牌')||'').split('（')[0];
+      const nameShort = (_fv(f,'產品名稱')||'').replace(ipShort,'').trim().substring(0,12);
+      const stage = _fv(f,'當前階段')||'—';
+      const launch = _fv(f,'預計上市')||'';
+      const idx   = STAGE_IDX[stage]??0;
+      const col   = ST_COLOR[stage]||'var(--txt-mid)';
+      const lbl   = launch ? ` · 上市 ${launch}` : '';
+      return `<div class="cadence-row"><div class="cadence-name">${ipShort} · ${nameShort}</div><div class="cadence-stages">${dots(PROD_STAGES,idx)}</div><div class="cadence-status" style="color:${col}">${stage}${lbl}</div></div>`;
+    }).join('');
+
+    const popupHtml = popups.map(r=>{
+      const f=r.fields;
+      const city  = _fv(f,'城市')||'—';
+      const wave  = _fv(f,'Wave')||'';
+      const status= _fv(f,'狀態')||'—';
+      const idx   = POPUP_IDX[status]??0;
+      const col   = ST_COLOR[status]||'var(--txt-mid)';
+      const open  = f['開幕日']?new Date(f['開幕日']).toLocaleDateString('zh-TW',{month:'short',day:'numeric'}):'';
+      const lbl   = open ? ` · 開幕 ${open}` : '';
+      return `<div class="cadence-row"><div class="cadence-name">🏪 ${city} (${wave})</div><div class="cadence-stages">${dots(POPUP_STAGES,idx)}</div><div class="cadence-status" style="color:${col}">${status}${lbl}</div></div>`;
+    }).join('');
+
+    let html = '';
+    if(prodHtml) html += `<div class="cadence-group-label">批發產品線</div>${prodHtml}`;
+    if(popupHtml) html += `<div class="cadence-group-label" style="margin-top:12px">快閃店計劃</div>${popupHtml}`;
+    el.innerHTML = html || '<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px">暫無進行中項目</div>';
+  }catch(e){ console.error('loadCadenceTracker',e); }
+}
+
 /* ── INIT ── */
 loadApprovals();
 loadPipeline();
@@ -1554,6 +1750,8 @@ loadOrderStats();
 loadContractAlerts();
 loadVamProgress();
 loadForecast();
+loadPipelineCoverage();
+loadCadenceTracker();
 </script>
 </body>
 </html>
