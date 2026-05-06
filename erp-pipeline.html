@@ -1624,21 +1624,31 @@ function renderDetailFromFeishu(proj){
     const badgeCls=iD?"tcb-done":iB?"tcb-blocked":iA?"tcb-active":"tcb-wait";
     const badgeTxt=iD?"✓ 完成":iB?"⚠ 卡關":iA?"⚡ 進行中":"待解鎖";
     let content="";
-    if(iD) content=`<div class="tc-desc" style="color:var(--txt-mid);font-size:11px;">已完成 ✓</div>`;
-    else if(iA){
+    const _fCloseBtn=`<button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>`;
+    if(iD){
+      content=`<div class="tc-desc" style="color:var(--txt-mid);font-size:11px;">已完成 ✓</div>
+      ${_renderUploadZone(rid,i,false)}
+      ${_renderStageNotes(rid,i,false)}`;
+    } else if(iA){
       if(iB){
         const fb=fv(f,"版權回饋說明")||"等版權方書面確認，請持續追催。";
         content=`<div class="tc-desc" style="color:var(--danger);">${fb}</div>
         <div class="tc-actions">
           <button class="tc-btn tcb-warn-btn">📨 升級催促</button>
-          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
-        </div>`;
+          ${i>0?`<button class="stage-rollback-btn" onclick="showPipelineToast('↩ 退回功能套用飛書 API 後生效')">← 退回上一階段</button>`:''}
+          ${_fCloseBtn}
+        </div>
+        ${_renderUploadZone(rid,i,false)}
+        ${_renderStageNotes(rid,i,false)}`;
       } else {
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong>。負責人：${s.owner}。</div>
         <div class="tc-actions">
           ${CAN_MARK_DONE ? `<button class="tc-btn tcb-primary" onclick="_markDone('${rid}','${s.key}')">✓ 標記此階段完成</button>` : `<span style="font-size:10px;color:var(--txt-lo)">（僅設計/採購負責人可標記）</span>`}
-          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
-        </div>`;
+          ${i>0?`<button class="stage-rollback-btn" onclick="showPipelineToast('↩ 退回功能套用飛書 API 後生效')">← 退回上一階段</button>`:''}
+          ${_fCloseBtn}
+        </div>
+        ${_renderUploadZone(rid,i,false)}
+        ${_renderStageNotes(rid,i,false)}`;
       }
     }
     return `<div class="tl-item">
