@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 系統管理</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
+.brand-name{font-size:14px;font-weight:700;}
+.brand-sub{font-size:10px;color:var(--txt-mid);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.sess-info{font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:6px;}
+.sess-name{font-weight:700;color:var(--txt-hi);}
+.btn-topbar{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt-mid);}
+.btn-topbar:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.btn-topbar.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:1100px;margin:0 auto;padding:20px 24px;}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tab{font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px 8px 0 0;cursor:pointer;color:var(--txt-mid);border:1px solid transparent;border-bottom:none;margin-bottom:-1px;transition:all .15s;}
+.tab.active{background:var(--card);border-color:var(--border);border-bottom-color:var(--card);color:var(--txt-hi);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* SECTION */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+
+/* USER TABLE */
+.user-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.user-table{width:100%;border-collapse:collapse;}
+.user-table th{padding:10px 14px;text-align:left;color:var(--txt-lo);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);background:var(--card2);}
+.user-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+.user-table tbody tr:last-child td{border-bottom:none;}
+.user-table tbody tr:hover td{background:var(--card2);}
+.u-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.u-name{font-weight:700;color:var(--txt-hi);}
+.u-id{font-size:10px;color:var(--txt-lo);font-family:monospace;}
+.chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
+.chip-purple{background:#818cf820;color:var(--accent);}
+.chip-green{background:var(--ok-dim);color:var(--ok);}
+.chip-yellow{background:var(--warn-dim);color:var(--warn);}
+.chip-blue{background:#0284c720;color:#38bdf8;}
+.chip-grey{background:var(--card2);color:var(--txt-mid);}
+
+/* MODULE TOGGLES */
+.mod-toggle{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none;}
+.mod-toggle.on{background:var(--ok-dim);border-color:#22c55e40;color:var(--ok);}
+.mod-toggle.off{background:transparent;color:var(--txt-lo);}
+.mod-toggle:hover{border-color:var(--border-hi);}
+.mods-cell{display:flex;flex-wrap:wrap;gap:4px;}
+
+/* SYSTEM STATUS */
+.status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:16px;}
+.status-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.status-card:hover{border-color:var(--border-hi);}
+.sc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.sc-title{font-size:13px;font-weight:700;}
+.sc-sub{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.sc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.sc-issues{font-size:10px;color:var(--txt-mid);}
+.sc-issue-item{display:flex;align-items:flex-start;gap:6px;padding:5px 0;border-top:1px solid var(--border);margin-top:5px;}
+.sc-issue-dot{width:6px;height:6px;border-radius:50%;margin-top:3px;flex-shrink:0;}
+.sc-issue-txt{font-size:10px;color:var(--txt-mid);line-height:1.4;}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--txt-mid);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+
+/* TOAST */
+#adm-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;}
+
+/* RESET BTN */
+.btn-reset{font-size:10px;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--danger);background:transparent;color:var(--danger);}
+.btn-reset:hover{background:var(--danger-dim);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div><div class="brand-name">蕪解 ERP</div><div class="brand-sub">系統管理</div></div>
+  </div>
+  <div class="topbar-right">
+    <div class="sess-info"><span class="sess-name" id="sess-name">—</span></div>
+    <a href="erp-lobby.html" class="btn-topbar">← 大廳</a>
+    <button class="btn-topbar danger" onclick="doLogout()">登出</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('accounts',this)">帳號管理</div>
+    <div class="tab" onclick="switchTab('system',this)">系統完整度</div>
+    <div class="tab" onclick="switchTab('matrix',this)">權限矩陣</div>
+  </div>
+
+  <!-- ── TAB 1: ACCOUNTS ── -->
+  <div class="tab-panel active" id="tab-accounts">
+    <div class="sec-head">
+      <span class="sec-title">所有帳號（共 17 個）</span>
+      <button class="btn-reset" onclick="resetPerms()">重置為預設</button>
+    </div>
+    <div class="user-table-wrap">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>帳號</th>
+            <th>姓名</th>
+            <th>職責</th>
+            <th>地點</th>
+            <th>預設廳入口</th>
+            <th>模組存取（點擊切換）</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody"></tbody>
+      </table>
+    </div>
+    <div style="font-size:10px;color:var(--txt-lo);padding:4px 2px;">
+      ⚠ 權限變更儲存於本機瀏覽器（localStorage）。目前為測試階段，後端接通後將以飛書為準。
+    </div>
+  </div>
+
+  <!-- ── TAB 2: SYSTEM ── -->
+  <div class="tab-panel" id="tab-system">
+    <div class="sec-head"><span class="sec-title">各模組完整度</span></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--ok)"></div> 已完成（飛書接通）</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div> Demo 數據（未接 API）</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div> 有待修問題</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--txt-lo)"></div> 建設中</div>
+    </div>
+    <div class="status-grid" id="status-grid"></div>
+  </div>
+
+  <!-- ── TAB 3: MATRIX ── -->
+  <div class="tab-panel" id="tab-matrix">
+    <div class="sec-head"><span class="sec-title">權限矩陣總覽</span></div>
+    <div style="overflow-x:auto;">
+      <table class="user-table" id="matrix-table" style="min-width:800px;">
+        <thead id="matrix-head"></thead>
+        <tbody id="matrix-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div id="adm-toast"></div>
+
+<script>
+/* ── AUTH ── */
+const ERP_SESS_KEY = 'erp_sess';
+const PERM_KEY = 'erp_perm_v1';
+function requireAuth(){
+  const s=JSON.parse(localStorage.getItem(ERP_SESS_KEY)||'null');
+  if(!s||Date.now()-s.ts>7*86400000){ location.href='login.html'; return null; }
+  return s;
+}
+const SESS = requireAuth();
+if(!SESS) throw new Error('redirect');
+
+const ADMIN_USERS = ['ray','shawn'];
+if(!ADMIN_USERS.includes(SESS.user)){
+  document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px;color:#7880a8;"><div style="font-size:40px">🔒</div><div style="font-size:14px;font-weight:700;">此頁面僅限系統管理員存取</div><a href="erp-lobby.html" style="color:#818cf8;font-size:12px;">← 返回大廳</a></div>';
+  throw new Error('unauthorized');
+}
+
+document.getElementById('sess-name').textContent = SESS.name || '—';
+
+function doLogout(){
+  localStorage.removeItem(ERP_SESS_KEY);
+  location.href='login.html';
+}
+
+/* ── DATA ── */
+const ALL_MODS = [
+  { id:'war-room',   label:'戰情室',    url:'erp-war-room.html' },
+  { id:'anran',      label:'安然廳',    url:'erp-anran.html' },
+  { id:'shawn',      label:'Shawn廳',   url:'erp-shawn.html' },
+  { id:'procurement',label:'採購台',    url:'erp-procurement.html' },
+  { id:'pipeline',   label:'流水線',    url:'erp-pipeline.html' },
+  { id:'finance',    label:'財務',      url:'erp-finance.html' },
+  { id:'crm',        label:'CRM',       url:'erp-crm.html' },
+  { id:'approval',   label:'送審追蹤',  url:'erp-approval-tracker.html' },
+  { id:'logistics',  label:'物流快查',  url:'erp-logistics-quick.html' },
+];
+
+const ACCOUNTS = [
+  { user:'ray',       name:'Ray',    initials:'Ray', color:'#818cf8', role:'老闆',       team:'管理層', teamColor:'chip-purple', hall:'erp-war-room.html',    defaultMods:['all'] },
+  { user:'yangzi',    name:'楊子',   initials:'楊',  color:'#22c55e', role:'財務主管',   team:'財務',   teamColor:'chip-green',  hall:'erp-finance.html',     defaultMods:['finance','war-room'] },
+  { user:'anran',     name:'安然',   initials:'然',  color:'#f59e0b', role:'北京負責人', team:'北京',   teamColor:'chip-yellow', hall:'erp-anran.html',       defaultMods:['anran','finance','procurement','war-room'] },
+  { user:'shawn',     name:'Shawn',  initials:'S',   color:'#818cf8', role:'COO',        team:'曼谷',   teamColor:'chip-purple', hall:'erp-shawn.html',       defaultMods:['all'] },
+  { user:'laige',     name:'賴哥',   initials:'賴',  color:'#f59e0b', role:'採購主管',   team:'北京',   teamColor:'chip-yellow', hall:'erp-procurement.html', defaultMods:['procurement','logistics'] },
+  { user:'muzi',      name:'木子',   initials:'木',  color:'#f59e0b', role:'採購執行',   team:'北京',   teamColor:'chip-yellow', hall:'erp-procurement.html', defaultMods:['procurement'] },
+  { user:'peilin',    name:'珮玲',   initials:'玲',  color:'#a78bfa', role:'設計師',     team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval'] },
+  { user:'shetong',   name:'詩彤',   initials:'彤',  color:'#a78bfa', role:'設計師',     team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval'] },
+  { user:'bevis',     name:'Bevis',  initials:'B',   color:'#a78bfa', role:'設計主管',   team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval','war-room'] },
+  { user:'gaowei',    name:'高維',   initials:'高',  color:'#38bdf8', role:'物流',       team:'曼谷',   teamColor:'chip-blue',   hall:'erp-logistics-quick.html', defaultMods:['logistics','procurement','shawn'] },
+  { user:'chunlei',   name:'春雷',   initials:'雷',  color:'#38bdf8', role:'曼谷團隊',   team:'曼谷',   teamColor:'chip-blue',   hall:'erp-shawn.html',       defaultMods:['shawn'] },
+  { user:'jiaying',   name:'嘉穎',   initials:'穎',  color:'#38bdf8', role:'曼谷團隊',   team:'曼谷',   teamColor:'chip-blue',   hall:'erp-shawn.html',       defaultMods:['shawn'] },
+  { user:'xiaochuan', name:'小川',   initials:'川',  color:'#38bdf8', role:'曼谷團隊',   team:'曼谷',   teamColor:'chip-blue',   hall:'erp-shawn.html',       defaultMods:['shawn'] },
+  { user:'debao',     name:'德寶',   initials:'寶',  color:'#f59e0b', role:'客戶/代理',  team:'北京',   teamColor:'chip-yellow', hall:'erp-anran.html',       defaultMods:['anran'] },
+  { user:'laodong',   name:'老董',   initials:'董',  color:'#f59e0b', role:'客戶/代理',  team:'北京',   teamColor:'chip-yellow', hall:'erp-anran.html',       defaultMods:['anran'] },
+  { user:'yuming',    name:'雨明',   initials:'明',  color:'#22c55e', role:'財務',       team:'財務',   teamColor:'chip-green',  hall:'erp-finance.html',     defaultMods:['finance'] },
+  { user:'leo',       name:'Leo',    initials:'L',   color:'#818cf8', role:'業務',       team:'管理層', teamColor:'chip-purple', hall:'erp-war-room.html',    defaultMods:['war-room','crm'] },
+];
+
+/* ── PERMISSIONS (localStorage) ── */
+function loadPerms(){
+  try{ return JSON.parse(localStorage.getItem(PERM_KEY)||'{}'); }
+  catch(e){ return {}; }
+}
+function savePerms(p){ localStorage.setItem(PERM_KEY, JSON.stringify(p)); }
+
+function getUserMods(user){
+  const p = loadPerms();
+  if(p[user]?.mods) return p[user].mods;
+  const acct = ACCOUNTS.find(a=>a.user===user);
+  return acct?.defaultMods || [];
+}
+function setUserMods(user, mods){
+  const p = loadPerms();
+  if(!p[user]) p[user]={};
+  p[user].mods = mods;
+  savePerms(p);
+}
+
+/* ── TOAST ── */
+function _toast(msg, color='#22c55e'){
+  const t = document.getElementById('adm-toast');
+  t.textContent = msg;
+  t.style.background = color;
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.style.opacity='0', 2400);
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(id, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+/* ── BUILD USER TABLE ── */
+function buildUserTable(){
+  const tbody = document.getElementById('user-tbody');
+  tbody.innerHTML = '';
+  ACCOUNTS.forEach(acct => {
+    const mods = getUserMods(acct.user);
+    const isAll = mods.includes('all');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="u-av" style="background:${acct.color}">${acct.initials}</div>
+          <div>
+            <div class="u-name">${acct.name}</div>
+            <div class="u-id">${acct.user}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="chip ${acct.teamColor}">${acct.role}</span></td>
+      <td><span style="font-size:11px;color:var(--txt-mid)">${acct.team}</span></td>
+      <td><a href="${acct.hall}" style="font-size:10px;color:var(--accent);text-decoration:none;">${acct.hall.replace('erp-','').replace('.html','')}</a></td>
+      <td class="mods-cell" id="mods-${acct.user}"></td>
+    `;
+    tbody.appendChild(tr);
+    renderModToggles(acct.user);
+  });
+}
+
+function renderModToggles(user){
+  const cell = document.getElementById('mods-'+user);
+  if(!cell) return;
+  const mods = getUserMods(user);
+  const isAll = mods.includes('all');
+  cell.innerHTML = '';
+
+  // "全部" super-toggle
+  const allBtn = document.createElement('span');
+  allBtn.className = 'mod-toggle ' + (isAll ? 'on' : 'off');
+  allBtn.innerHTML = (isAll ? '✓' : '○') + ' 全部';
+  allBtn.title = '切換全模組存取';
+  allBtn.onclick = () => {
+    const cur = getUserMods(user);
+    if(cur.includes('all')){
+      const acct = ACCOUNTS.find(a=>a.user===user);
+      setUserMods(user, acct?.defaultMods.filter(m=>m!=='all') || []);
+    } else {
+      setUserMods(user, ['all']);
+    }
+    renderModToggles(user);
+    buildMatrix();
+    _toast(`已更新 ${ACCOUNTS.find(a=>a.user===user)?.name} 的權限`);
+  };
+  cell.appendChild(allBtn);
+
+  if(!isAll){
+    ALL_MODS.forEach(mod => {
+      const on = mods.includes(mod.id);
+      const btn = document.createElement('span');
+      btn.className = 'mod-toggle ' + (on ? 'on' : 'off');
+      btn.innerHTML = (on ? '✓' : '○') + ' ' + mod.label;
+      btn.onclick = () => {
+        const cur = getUserMods(user);
+        const next = on ? cur.filter(m=>m!==mod.id) : [...cur, mod.id];
+        setUserMods(user, next);
+        renderModToggles(user);
+        buildMatrix();
+        _toast(`已更新 ${ACCOUNTS.find(a=>a.user===user)?.name} · ${mod.label}`);
+      };
+      cell.appendChild(btn);
+    });
+  }
+}
+
+function resetPerms(){
+  if(!confirm('確定重置所有帳號為預設權限？')) return;
+  localStorage.removeItem(PERM_KEY);
+  buildUserTable();
+  buildMatrix();
+  _toast('已重置為預設權限', '#f59e0b');
+}
+
+/* ── SYSTEM STATUS ── */
+const MODULES_STATUS = [
+  {
+    id:'war-room', title:'Ray 戰情室', url:'erp-war-room.html',
+    status:'demo', apiStatus:'partial',
+    issues:[
+      { level:'warn', txt:'VAM 進度條為 Demo 數字，未接飛書 budget 表' },
+      { level:'warn', txt:'批核佇列 accordion 未接飛書 approval 表' },
+    ]
+  },
+  {
+    id:'anran', title:'安然廳', url:'erp-anran.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'danger', txt:'¥328萬初始值閃現（JS 前 HTML 已渲染）' },
+      { level:'warn', txt:'現金流數字與 CRM 164.8萬 ≠ CRM 143萬，對不上' },
+    ]
+  },
+  {
+    id:'shawn', title:'Shawn 廳', url:'erp-shawn.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'warn', txt:'Coverage 表在 375px 需改 card 版型' },
+    ]
+  },
+  {
+    id:'procurement', title:'採購台', url:'erp-procurement.html',
+    status:'demo', apiStatus:'partial',
+    issues:[
+      { level:'ok', txt:'KPI 已嘗試接飛書 approval 表（部分）' },
+    ]
+  },
+  {
+    id:'pipeline', title:'產品流水線', url:'erp-pipeline.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'ok', txt:'珮玲/Bevis 分工邏輯已完成' },
+      { level:'warn', txt:'圖片上傳存 localStorage，非飛書附件' },
+    ]
+  },
+  {
+    id:'finance', title:'財務模組', url:'erp-finance.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'ok', txt:'業務報表 + 現金流時間範圍選擇器已完成' },
+      { level:'warn', txt:'所有數字為 Demo，未接飛書財務表' },
+    ]
+  },
+  {
+    id:'crm', title:'CRM 客戶管理', url:'erp-crm.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'warn', txt:'客戶數字（老董107萬+德寶36萬=143萬）與安然廳164.8萬不一致' },
+    ]
+  },
+  {
+    id:'approval', title:'送審追蹤', url:'erp-approval-tracker.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'warn', txt:'送審流程為 Demo，未接飛書 approval 表' },
+    ]
+  },
+  {
+    id:'logistics', title:'物流快查', url:'erp-logistics-quick.html',
+    status:'demo', apiStatus:'none',
+    issues:[
+      { level:'warn', txt:'物流狀態為 Demo 數據' },
+    ]
+  },
+  {
+    id:'lobby', title:'公司大廳', url:'erp-lobby.html',
+    status:'done', apiStatus:'none',
+    issues:[
+      { level:'ok', txt:'角色分流邏輯完整，登入後一律先進大廳' },
+    ]
+  },
+];
+
+const STATUS_LABEL = { done:'已完成', demo:'Demo中', partial:'部分完成', building:'建設中' };
+const STATUS_COLOR = { done:'var(--ok)', demo:'var(--warn)', partial:'var(--accent)', building:'var(--txt-lo)' };
+const API_LABEL    = { none:'未接API', partial:'部分接通', full:'已接通' };
+const API_COLOR    = { none:'var(--txt-lo)', partial:'var(--warn)', full:'var(--ok)' };
+const ISSUE_COLOR  = { ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)' };
+
+function buildSystemStatus(){
+  const grid = document.getElementById('status-grid');
+  grid.innerHTML = '';
+  MODULES_STATUS.forEach(mod => {
+    const issueHtml = mod.issues.map(iss=>`
+      <div class="sc-issue-item">
+        <div class="sc-issue-dot" style="background:${ISSUE_COLOR[iss.level]||'var(--txt-lo)'}"></div>
+        <div class="sc-issue-txt">${iss.txt}</div>
+      </div>`).join('');
+    const card = document.createElement('div');
+    card.className = 'status-card';
+    card.innerHTML = `
+      <div class="sc-head">
+        <div>
+          <div class="sc-title">${mod.title}</div>
+          <div class="sc-sub"><a href="${mod.url}" style="color:var(--accent);text-decoration:none;font-size:10px;">${mod.url}</a></div>
+        </div>
+      </div>
+      <div class="sc-badges">
+        <span class="chip" style="background:transparent;border:1px solid ${STATUS_COLOR[mod.status]};color:${STATUS_COLOR[mod.status]}">${STATUS_LABEL[mod.status]||mod.status}</span>
+        <span class="chip chip-grey">${API_LABEL[mod.apiStatus]||mod.apiStatus}</span>
+      </div>
+      ${issueHtml}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ── MATRIX TABLE ── */
+function buildMatrix(){
+  const head = document.getElementById('matrix-head');
+  const body = document.getElementById('matrix-body');
+
+  const modCols = ALL_MODS;
+  head.innerHTML = '<tr><th>帳號</th><th>姓名</th><th>職責</th>' +
+    modCols.map(m=>`<th>${m.label}</th>`).join('') + '</tr>';
+
+  body.innerHTML = '';
+  ACCOUNTS.forEach(acct => {
+    const mods = getUserMods(acct.user);
+    const isAll = mods.includes('all');
+    const tr = document.createElement('tr');
+    const cells = modCols.map(m => {
+      const has = isAll || mods.includes(m.id);
+      return `<td style="text-align:center;font-size:14px">${has ? '<span style="color:var(--ok)">✓</span>' : '<span style="color:var(--txt-lo)">—</span>'}</td>`;
+    }).join('');
+    tr.innerHTML = `
+      <td><span style="font-family:monospace;font-size:10px;color:var(--txt-lo)">${acct.user}</span></td>
+      <td><div style="display:flex;align-items:center;gap:6px;"><div class="u-av" style="background:${acct.color};width:22px;height:22px;font-size:9px;">${acct.initials}</div><span style="font-size:12px;font-weight:700">${acct.name}</span></div></td>
+      <td><span class="chip ${acct.teamColor}">${acct.role}</span></td>
+      ${cells}
+    `;
+    body.appendChild(tr);
+  });
+}
+
+/* ── INIT ── */
+buildUserTable();
+buildSystemStatus();
+buildMatrix();
+</script>
+</body>
+</html>

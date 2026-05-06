@@ -534,6 +534,14 @@ HALLS.filter(h=>h.roles.includes(user)).forEach(h=>{
   el.innerHTML = `<div class="hall-icon">${h.icon}</div><div class="hall-name">${h.name}${isMine?' <span style="font-size:9px;color:var(--accent)">我的</span>':''}</div><div class="hall-desc">${h.desc}</div>`;
   hallsGrid.appendChild(el);
 });
+if(['ray','shawn'].includes(user)){
+  const el = document.createElement('a');
+  el.href = 'erp-admin.html';
+  el.className = 'hall-card';
+  el.style.cssText = 'border-color:var(--accent2);background:var(--card2);';
+  el.innerHTML = `<div class="hall-icon">⚙️</div><div class="hall-name">系統管理 <span style="font-size:9px;color:var(--accent)">管理員</span></div><div class="hall-desc">帳號權限 · 系統完整度 · 矩陣總覽</div>`;
+  hallsGrid.appendChild(el);
+}
 
 function goToHall(){ location.href = effectiveHall; }
 
