@@ -258,6 +258,28 @@ select.inp option{background:var(--card2);}
 /* NAV BACK */
 .nav-back{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
 .nav-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+
+/* VIEW TOGGLE */
+.view-toggle{display:flex;gap:4px;align-items:center;}
+.view-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;transition:.12s;}
+.view-btn.active{background:var(--card2);border-color:var(--border-hi);color:var(--txt-hi);}
+.view-btn:hover:not(.active){border-color:var(--border-hi);}
+
+/* LIST VIEW */
+.ip-cards.list-view{grid-template-columns:1fr;}
+.ip-cards.list-view .ip-card{padding:12px 16px;}
+.ip-cards.list-view .card-img-wrap{display:none;}
+.ip-cards.list-view .ip-card-stats{display:none;}
+.ip-cards.list-view .blocked-alert{padding:7px 10px;margin-top:6px;}
+.ip-cards.list-view .ip-card-top{margin-bottom:6px;}
+.ip-cards.list-view .stage-prog-wrap{margin-bottom:0;}
+
+/* INLINE DETAIL (both views) */
+.card-detail-wrap{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.card-detail-wrap.open{display:block;}
+.expand-hint::after{content:' ▾';font-size:9px;}
+.expand-hint.open{color:var(--txt-mid);}
+.expand-hint.open::after{content:' ▴';}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -353,7 +375,13 @@ if(!CAN_MARK_DONE){
   <!-- MAIN CONTENT LAYOUT -->
   <div class="sec-head">
     <span class="sec-title">所有 IP 項目 · 點擊查看流水線</span>
-    <span class="sec-link" onclick="toggleNewForm()">+ 新增項目</span>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-view-card" onclick="setView('card')" title="卡片視圖">⊞ 卡片</button>
+        <button class="view-btn" id="btn-view-list" onclick="setView('list')" title="條列視圖">☰ 條列</button>
+      </div>
+      <span class="sec-link" onclick="toggleNewForm()">+ 新增項目</span>
+    </div>
   </div>
 
   <div class="content-layout">
@@ -361,7 +389,7 @@ if(!CAN_MARK_DONE){
     <div>
       <div class="ip-cards" id="ip-cards">
         <!-- ===== DEMO CARD 1: Snoopy ===== -->
-        <div class="ip-card" id="demo-snoopy" onclick="selectDemoCard(this,'snoopy')">
+        <div class="ip-card" id="demo-snoopy" onclick="toggleDemoCard(document.getElementById('hint-snoopy'),'snoopy')">
           <div class="ip-card-top">
             <div class="ip-card-left">
               <div class="ip-card-title">
@@ -394,11 +422,12 @@ if(!CAN_MARK_DONE){
             <div class="ip-stat"><span class="ip-stat-label">預計銷量</span><span class="ip-stat-val">3,000 件</span></div>
             <div class="ip-stat"><span class="ip-stat-label">毛利率</span><span class="ip-stat-val" style="color:var(--ok)">42%</span></div>
           </div>
-          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'snoopy')">展開詳情 ▾</div>
+          <div class="expand-hint" id="hint-snoopy" onclick="event.stopPropagation();toggleDemoCard(this,'snoopy')">展開詳情</div>
+          <div class="card-detail-wrap" id="cdet-snoopy"></div>
         </div>
 
         <!-- ===== DEMO CARD 2: Muziktiger ===== -->
-        <div class="ip-card blocked-card" id="demo-muziktiger" onclick="selectDemoCard(this,'muziktiger')">
+        <div class="ip-card blocked-card" id="demo-muziktiger" onclick="toggleDemoCard(document.getElementById('hint-muziktiger'),'muziktiger')">
           <div class="ip-card-top">
             <div class="ip-card-left">
               <div class="ip-card-title">
@@ -438,11 +467,12 @@ if(!CAN_MARK_DONE){
             <div class="ip-stat"><span class="ip-stat-label">卡關</span><span class="ip-stat-val" style="color:var(--danger)">14 天</span></div>
             <div class="ip-stat"><span class="ip-stat-label">Q4 上市</span><span class="ip-stat-val">2026-10</span></div>
           </div>
-          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'muziktiger')">展開詳情 ▾</div>
+          <div class="expand-hint" id="hint-muziktiger" onclick="event.stopPropagation();toggleDemoCard(this,'muziktiger')">展開詳情</div>
+          <div class="card-detail-wrap" id="cdet-muziktiger"></div>
         </div>
 
         <!-- ===== DEMO CARD 3: Opanchu ===== -->
-        <div class="ip-card" id="demo-opanchu" onclick="selectDemoCard(this,'opanchu')">
+        <div class="ip-card" id="demo-opanchu" onclick="toggleDemoCard(document.getElementById('hint-opanchu'),'opanchu')">
           <div class="ip-card-top">
             <div class="ip-card-left">
               <div class="ip-card-title">
@@ -474,11 +504,12 @@ if(!CAN_MARK_DONE){
             <div class="ip-stat"><span class="ip-stat-label">階段</span><span class="ip-stat-val">2D 設計</span></div>
             <div class="ip-stat"><span class="ip-stat-label">Q3 上市</span><span class="ip-stat-val">2026-09</span></div>
           </div>
-          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'opanchu')">展開詳情 ▾</div>
+          <div class="expand-hint" id="hint-opanchu" onclick="event.stopPropagation();toggleDemoCard(this,'opanchu')">展開詳情</div>
+          <div class="card-detail-wrap" id="cdet-opanchu"></div>
         </div>
 
         <!-- ===== DEMO CARD 4: Mofusand ===== -->
-        <div class="ip-card" id="demo-mofusand2" onclick="selectDemoCard(this,'mofusand2')">
+        <div class="ip-card" id="demo-mofusand2" onclick="toggleDemoCard(document.getElementById('hint-mofusand2'),'mofusand2')">
           <div class="ip-card-top">
             <div class="ip-card-left">
               <div class="ip-card-title">
@@ -510,7 +541,8 @@ if(!CAN_MARK_DONE){
             <div class="ip-stat"><span class="ip-stat-label">階段</span><span class="ip-stat-val">2D 送審</span></div>
             <div class="ip-stat"><span class="ip-stat-label">Q4 上市</span><span class="ip-stat-val">2026-10</span></div>
           </div>
-          <div class="expand-hint" onclick="event.stopPropagation();selectDemoCard(this.closest('.ip-card'),'mofusand2')">展開詳情 ▾</div>
+          <div class="expand-hint" id="hint-mofusand2" onclick="event.stopPropagation();toggleDemoCard(this,'mofusand2')">展開詳情</div>
+          <div class="card-detail-wrap" id="cdet-mofusand2"></div>
         </div>
       </div><!-- /ip-cards -->
 
@@ -1010,7 +1042,7 @@ function buildIPCard(proj){
     <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
   </div>`;
 
-  return `<div class="ip-card ${isBlocked?"blocked-card":""}" id="fs-card-${rid}" onclick="selectProject('${rid}')">
+  return `<div class="ip-card ${isBlocked?"blocked-card":""}" id="fs-card-${rid}" onclick="toggleFeishuCard(document.getElementById('hint-fs-${rid}'),'${rid}')">
     <div class="ip-card-top">
       <div class="ip-card-left">
         <div class="ip-card-title">
@@ -1040,34 +1072,70 @@ function buildIPCard(proj){
       ${statPrice}
       ${statQty}
     </div>
+    <div class="expand-hint" id="hint-fs-${rid}" onclick="event.stopPropagation();toggleFeishuCard(this,'${rid}')">展開詳情</div>
+    <div class="card-detail-wrap" id="cdet-fs-${rid}"></div>
   </div>`;
 }
 
-/* ─── SELECT PROJECT (Feishu record) ─── */
-function selectProject(rid){
-  document.querySelectorAll(".ip-card").forEach(c=>c.classList.remove("selected"));
-  const el=document.getElementById("fs-card-"+rid);
-  if(el) el.classList.add("selected");
+/* ─── TOGGLE FEISHU CARD (inline expand) ─── */
+function toggleFeishuCard(hintEl, rid){
+  const det=document.getElementById('cdet-fs-'+rid);
+  if(!det) return;
+  const isOpen=det.classList.contains('open');
+  document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});
+  document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));
+  document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'));
+  if(isOpen) return;
+  const card=document.getElementById('fs-card-'+rid);
+  if(card) card.classList.add('selected');
+  if(hintEl) hintEl.classList.add('open');
   const proj=_projects.find(p=>p.record_id===rid);
   if(proj){
-    const panel=document.getElementById("detail-panel");
-    panel.style.display="block";
-    panel.innerHTML=renderDetailFromFeishu(proj);
-    panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+    det.innerHTML=renderDetailFromFeishu(proj);
+    det.classList.add('open');
+    det.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
 }
 
-/* ─── SELECT DEMO CARD ─── */
-function selectDemoCard(el, key){
-  document.querySelectorAll(".ip-card").forEach(c=>c.classList.remove("selected"));
-  el.classList.add("selected");
+/* ─── SELECT PROJECT (legacy alias) ─── */
+function selectProject(rid){ toggleFeishuCard(document.getElementById('hint-fs-'+rid), rid);
+}
+
+/* ─── VIEW TOGGLE ─── */
+let _currentView = localStorage.getItem('pipeline_view')||'card';
+function setView(v){
+  _currentView=v;
+  localStorage.setItem('pipeline_view',v);
+  const cards=document.getElementById('ip-cards');
+  if(v==='list') cards.classList.add('list-view');
+  else cards.classList.remove('list-view');
+  document.getElementById('btn-view-card').classList.toggle('active',v==='card');
+  document.getElementById('btn-view-list').classList.toggle('active',v==='list');
+}
+
+/* ─── TOGGLE DEMO CARD (inline expand) ─── */
+function toggleDemoCard(hintEl, key){
+  const det=document.getElementById('cdet-'+key);
+  if(!det) return;
+  const isOpen=det.classList.contains('open');
+  // Close all others
+  document.querySelectorAll('.card-detail-wrap').forEach(d=>{ d.classList.remove('open'); d.innerHTML=''; });
+  document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));
+  document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'));
+  if(isOpen) return; // toggle off
+  // Open this one
+  const card=det.closest('.ip-card');
+  if(card) card.classList.add('selected');
+  hintEl.classList.add('open');
   const d=DEMO_PROJECTS[key];
   if(!d) return;
-  const panel=document.getElementById("detail-panel");
-  panel.style.display="block";
-  panel.innerHTML=renderDemoDetail(key, d);
-  panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+  det.innerHTML=renderDemoDetail(key,d);
+  det.classList.add('open');
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+
+/* ─── SELECT DEMO CARD (legacy, kept for Feishu cards) ─── */
+function selectDemoCard(el, key){ toggleDemoCard(document.getElementById('hint-'+key), key); }
 
 /* ─── RENDER DEMO DETAIL ─── */
 function renderDemoDetail(key, d){
@@ -1112,7 +1180,7 @@ function renderDemoDetail(key, d){
         content=`<div class="tc-desc" style="color:var(--danger);">版權方審核送出 14 天，Musicdog Japan 未給書面確認。珮玲需升級催促管道。</div>
         <div class="tc-actions">
           <button class="tc-btn tcb-warn-btn">📨 升級催促管道</button>
-          <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
         </div>`;
       } else {
         const _pending = _getPending();
@@ -1132,7 +1200,7 @@ function renderDemoDetail(key, d){
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong> 階段。負責人：${s.owner}。</div>
         <div class="tc-actions">
           ${_markBtnHtml}
-          <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
         </div>`;
       }
     }
@@ -1178,7 +1246,7 @@ function renderDemoDetail(key, d){
       ${statsRow}
       <div class="detail-actions">
         <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購詢價</button>
-        <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+        <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
       </div>
     </div>
 
@@ -1249,13 +1317,13 @@ function renderDetailFromFeishu(proj){
         content=`<div class="tc-desc" style="color:var(--danger);">${fb}</div>
         <div class="tc-actions">
           <button class="tc-btn tcb-warn-btn">📨 升級催促</button>
-          <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
         </div>`;
       } else {
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong>。負責人：${s.owner}。</div>
         <div class="tc-actions">
           ${CAN_MARK_DONE ? `<button class="tc-btn tcb-primary" onclick="_markDone('${rid}','${s.key}')">✓ 標記此階段完成</button>` : `<span style="font-size:10px;color:var(--txt-lo)">（僅設計/採購負責人可標記）</span>`}
-          <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
         </div>`;
       }
     }
@@ -1297,7 +1365,7 @@ function renderDetailFromFeishu(proj){
       <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;">${statPrice}${statQty}</div>
       <div class="detail-actions">
         <button class="tc-btn tcb-ghost" onclick="window.location.href='erp-procurement.html'">📦 採購詢價</button>
-        <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
+        <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
       </div>
     </div>
 
@@ -1381,6 +1449,7 @@ async function createProject(){
 
 /* ─── AUTO-LOAD ─── */
 loadProjects();
+setView(_currentView);
 </script>
 
 <!-- ── EXPENSE FAB ── -->
