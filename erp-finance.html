@@ -159,6 +159,54 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .adv-settle-btn{font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;margin-top:6px;}
 .adv-settle-btn:active{opacity:.75;}
 
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:16px;}
+.tab-btn{flex:1;padding:8px 12px;border-radius:9px;border:none;background:transparent;color:var(--txt-mid);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tab-btn.active{background:var(--card2);color:var(--txt-hi);box-shadow:0 1px 4px #0004;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* P&L REPORT */
+.report-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.report-kpi{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;}
+.rk-label{font-size:10px;color:var(--txt-lo);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.rk-val{font-size:18px;font-weight:800;margin-bottom:2px;}
+.rk-sub{font-size:10px;color:var(--txt-mid);}
+.rk-trend{font-size:10px;font-weight:700;margin-top:4px;}
+.rk-trend.ok{color:var(--ok);}
+.rk-trend.warn{color:var(--warn);}
+.rk-trend.danger{color:var(--danger);}
+
+.pl-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;}
+.pl-table th{font-size:10px;font-weight:700;color:var(--txt-lo);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em;}
+.pl-table td{padding:9px 10px;border-bottom:1px solid var(--border);}
+.pl-table tr:last-child td{border-bottom:none;}
+.pl-table .pl-total{font-weight:800;background:var(--card2);}
+.pl-biz{font-size:9px;padding:2px 7px;border-radius:6px;margin-left:6px;}
+.pl-biz.wholesale{background:#f9731618;color:#f97316;}
+.pl-biz.flash{background:#06b6d418;color:#06b6d4;}
+.pl-biz.ip{background:#a855f718;color:#a855f7;}
+
+.entity-pl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.entity-pl{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;}
+.epl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.epl-rows{border-top:1px solid var(--border);padding-top:8px;}
+.epl-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:11px;}
+.epl-row:last-child{margin-bottom:0;}
+.epl-label{color:var(--txt-mid);}
+.epl-val{font-weight:700;}
+.epl-val.rev{color:var(--ok);}
+.epl-val.cost{color:var(--danger);}
+.epl-val.profit{color:var(--fin);}
+
+.vam-bar-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+.vam-bar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.vam-bar-title{font-size:12px;font-weight:800;}
+.vam-bar-pct{font-size:18px;font-weight:800;}
+.vam-prog-track{height:10px;background:var(--card2);border-radius:5px;overflow:hidden;margin-bottom:6px;}
+.vam-prog-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--fin),var(--accent));transition:width .4s;}
+.vam-bar-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--txt-mid);}
+
 /* CHIP */
 .chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
 .chip-ok{background:var(--ok-dim);color:var(--ok);}
@@ -213,6 +261,166 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="today-title" id="today-title">躍明，今天有 3 件財務待辦</div>
     <div class="today-sub">1 筆匯款今天預計到帳・1 張合約下月到期・月結報表本週截止</div>
   </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('biz')">📊 業務報表</button>
+    <button class="tab-btn" onclick="switchTab('cash')">💸 現金流</button>
+  </div>
+
+  <!-- ══ TAB: 業務報表 ══ -->
+  <div class="tab-panel active" id="tab-biz">
+
+    <!-- VAM 進度 -->
+    <div class="vam-bar-wrap">
+      <div class="vam-bar-header">
+        <span class="vam-bar-title">年度淨利達成率（VAM 對賭）</span>
+        <span class="vam-bar-pct" style="color:var(--fin)">32.8%</span>
+      </div>
+      <div class="vam-prog-track"><div class="vam-prog-fill" style="width:32.8%"></div></div>
+      <div class="vam-bar-foot">
+        <span>實際淨利 ¥262 萬</span>
+        <span>目標 ¥800 萬（全年）</span>
+        <span>剩餘 ¥538 萬 · 還剩 7 個月</span>
+      </div>
+    </div>
+
+    <!-- 本月 KPI -->
+    <div class="sec-hdr"><div class="sec-title">本月業績（業務口徑）</div><span class="sec-link">5 月</span></div>
+    <div class="report-kpi-row">
+      <div class="report-kpi">
+        <div class="rk-label">總收入</div>
+        <div class="rk-val" style="color:var(--ok)">¥ 164.8 萬</div>
+        <div class="rk-sub">目標 ¥ 450 萬 / 月</div>
+        <div class="rk-trend warn">37% 達成</div>
+      </div>
+      <div class="report-kpi">
+        <div class="rk-label">總成本</div>
+        <div class="rk-val" style="color:var(--danger)">¥ 98.2 萬</div>
+        <div class="rk-sub">含 COGS + OPEX</div>
+        <div class="rk-trend warn">毛利率 40.4%</div>
+      </div>
+      <div class="report-kpi">
+        <div class="rk-label">本月淨利</div>
+        <div class="rk-val" style="color:var(--fin)">¥ 66.6 萬</div>
+        <div class="rk-sub">目標 ¥ 66.7 萬 / 月</div>
+        <div class="rk-trend ok">100% 達成</div>
+      </div>
+    </div>
+
+    <!-- 收入拆分 -->
+    <div class="sec-hdr"><div class="sec-title">收入拆分（業務口徑）</div></div>
+    <div class="report-kpi" style="margin-bottom:14px;padding:0;overflow:hidden;">
+      <table class="pl-table">
+        <thead>
+          <tr>
+            <th>業務線</th>
+            <th style="text-align:right">本月收入</th>
+            <th style="text-align:right">Q2 累計</th>
+            <th style="text-align:right">全年佔比</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>批發 <span class="pl-biz wholesale">批發</span></td>
+            <td style="text-align:right;font-weight:700;color:var(--ok)">¥ 107 萬</td>
+            <td style="text-align:right">¥ 329 萬</td>
+            <td style="text-align:right;color:var(--txt-mid)">55%</td>
+          </tr>
+          <tr>
+            <td>快閃店 <span class="pl-biz flash">快閃</span></td>
+            <td style="text-align:right;font-weight:700;color:var(--ok)">¥ 46.2 萬</td>
+            <td style="text-align:right">¥ 380 萬</td>
+            <td style="text-align:right;color:var(--txt-mid)">38%</td>
+          </tr>
+          <tr>
+            <td>IP 版稅 <span class="pl-biz ip">IP</span></td>
+            <td style="text-align:right;font-weight:700;color:var(--ok)">¥ 11.6 萬</td>
+            <td style="text-align:right">¥ 58 萬</td>
+            <td style="text-align:right;color:var(--txt-mid)">7%</td>
+          </tr>
+          <tr class="pl-total">
+            <td><strong>合計</strong></td>
+            <td style="text-align:right"><strong style="color:var(--ok)">¥ 164.8 萬</strong></td>
+            <td style="text-align:right"><strong>¥ 767 萬</strong></td>
+            <td style="text-align:right;color:var(--txt-mid)">100%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 成本拆分 -->
+    <div class="sec-hdr"><div class="sec-title">成本 + 費用拆分</div></div>
+    <div class="report-kpi" style="margin-bottom:14px;padding:0;overflow:hidden;">
+      <table class="pl-table">
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th style="text-align:right">本月</th>
+            <th style="text-align:right">Q2 累計</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>商品成本（COGS）</td><td style="text-align:right;color:var(--danger)">¥ 68.2 萬</td><td style="text-align:right">¥ 204 萬</td></tr>
+          <tr><td>IP 版稅攤銷</td><td style="text-align:right;color:var(--danger)">¥ 9.8 萬</td><td style="text-align:right">¥ 49 萬</td></tr>
+          <tr><td>固定費用（OPEX）</td><td style="text-align:right;color:var(--danger)">¥ 20.2 萬</td><td style="text-align:right">¥ 60.6 萬</td></tr>
+          <tr class="pl-total">
+            <td><strong>合計</strong></td>
+            <td style="text-align:right"><strong style="color:var(--danger)">¥ 98.2 萬</strong></td>
+            <td style="text-align:right"><strong>¥ 313.6 萬</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 各實體 P&L -->
+    <div class="sec-hdr"><div class="sec-title">各法人 P&L（本月）</div></div>
+    <div class="entity-pl-grid">
+      <div class="entity-pl">
+        <div class="epl-header">
+          <span class="entity-badge e-bj">北京蕪解</span>
+          <span style="font-size:10px;font-weight:700;color:var(--fin)">淨利 ¥ 38 萬</span>
+        </div>
+        <div class="epl-rows">
+          <div class="epl-row"><span class="epl-label">收入</span><span class="epl-val rev">¥ 107 萬</span></div>
+          <div class="epl-row"><span class="epl-label">成本</span><span class="epl-val cost">¥ 69 萬</span></div>
+        </div>
+      </div>
+      <div class="entity-pl">
+        <div class="epl-header">
+          <span class="entity-badge e-bkk">泰國 UJ BKK</span>
+          <span style="font-size:10px;font-weight:700;color:var(--fin)">淨利 ¥ 19 萬</span>
+        </div>
+        <div class="epl-rows">
+          <div class="epl-row"><span class="epl-label">收入</span><span class="epl-val rev">¥ 46.2 萬</span></div>
+          <div class="epl-row"><span class="epl-label">成本</span><span class="epl-val cost">¥ 27.2 萬</span></div>
+        </div>
+      </div>
+      <div class="entity-pl">
+        <div class="epl-header">
+          <span class="entity-badge e-tw">台灣悍草</span>
+          <span style="font-size:10px;font-weight:700;color:var(--fin)">淨利 ¥ 9.6 萬</span>
+        </div>
+        <div class="epl-rows">
+          <div class="epl-row"><span class="epl-label">收入（版稅）</span><span class="epl-val rev">¥ 11.6 萬</span></div>
+          <div class="epl-row"><span class="epl-label">成本</span><span class="epl-val cost">¥ 2 萬</span></div>
+        </div>
+      </div>
+      <div class="entity-pl">
+        <div class="epl-header">
+          <span class="entity-badge e-hk">香港 JV</span>
+          <span style="font-size:10px;font-weight:700;color:var(--txt-lo)">持平</span>
+        </div>
+        <div class="epl-rows">
+          <div class="epl-row"><span class="epl-label">尚未有營收</span><span class="epl-val" style="color:var(--txt-lo)">—</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-biz -->
+
+  <!-- ══ TAB: 現金流 ══ -->
+  <div class="tab-panel" id="tab-cash">
 
   <!-- 今日財務待辦 -->
   <div class="sec-hdr">
@@ -572,6 +780,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
+  </div><!-- /tab-cash -->
+
 </div><!-- /main -->
 
 <!-- NEW REMITTANCE MODAL -->
@@ -900,6 +1110,12 @@ function confirmSettle(){
   showToast(msg);
   const card = document.getElementById(d.cardId);
   if(card){ card.style.opacity='.45'; card.style.pointerEvents='none'; }
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['biz','cash'][i]===tab));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
 }
 
 function showToast(msg){
