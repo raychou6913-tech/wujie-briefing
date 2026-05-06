@@ -333,6 +333,46 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
       <div class="modal-hint">其餘成本細節（模具費、版稅等）在新增後展開列展開調整。預設套用通用成本範本。</div>
     </div>
 
+    <!-- 法人資訊（兩個 tab 共用） -->
+    <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:16px;">
+      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">法人資訊</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="modal-field">
+          <div class="modal-lbl">歸屬主體</div>
+          <select class="modal-inp" id="mEntity">
+            <option value="">— 請選擇 —</option>
+            <option value="香港JV">香港JV（VAM考核）</option>
+            <option value="深圳子公司">深圳子公司（VAM考核）</option>
+            <option value="北京蕪解">北京蕪解</option>
+            <option value="台灣悍草">台灣悍草</option>
+            <option value="UJ BKK">UJ BKK</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <div class="modal-lbl">計價幣別</div>
+          <select class="modal-inp" id="mCurrency">
+            <option value="RMB">RMB 人民幣</option>
+            <option value="HKD">HKD 港幣</option>
+            <option value="USD">USD 美元</option>
+            <option value="TWD">TWD 新台幣</option>
+            <option value="THB">THB 泰銖</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-lbl">合作模式（有關聯公司參與時填寫）</div>
+        <select class="modal-inp" id="mCoopMode" onchange="onCoopModeChange(this.value)">
+          <option value="">— 一般外部交易 —</option>
+          <option value="供應鏈發包">供應鏈發包（北京蕪解 → JV/深圳，報價×1.1）</option>
+          <option value="批發包銷">批發包銷（深圳包貨批發，零售價×4.3折）</option>
+          <option value="快閃店代運營">快閃店代運營（保底費＋營收抽成）</option>
+          <option value="共同投資">共同投資（按投資比例分潤）</option>
+          <option value="台灣代運營">台灣代運營（悍草代運營JV台灣項目）</option>
+        </select>
+      </div>
+      <div id="coopHint" style="display:none;background:var(--card2);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--warn);margin-top:4px;"></div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAddModal()">取消</button>
       <button class="btn-primary" onclick="confirmAdd()">確認新增</button>
@@ -904,7 +944,9 @@ function renderBody(){
         const tip=`批發收入¥${(cell.rev/10000).toFixed(1)}万\n版稅¥${(cell.roy/10000).toFixed(1)}万\n毛利¥${(cell.gross/10000).toFixed(1)}万`;
         return `<td class="${vcls(val)}${i===12?' y2s':''}" title="${tip}">${fv(val)}</td>`;
       }).join('');
-      html+=`<tr class="prod-row"><td class="sc" title="${p.name}">${p.name}</td>${cells}</tr>`;
+      const entityBadge = p.entity ? `<span style="font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:4px;background:${['香港JV','深圳子公司'].includes(p.entity)?'#22c55e20':'#7880a820'};color:${['香港JV','深圳子公司'].includes(p.entity)?'var(--ok)':'var(--txt-mid)'}">${p.entity}</span>` : '';
+      const coopBadge = p.coopMode ? `<span style="font-size:8px;padding:1px 4px;border-radius:3px;margin-left:2px;background:var(--warn-dim);color:var(--warn)">${p.coopMode}</span>` : '';
+      html+=`<tr class="prod-row"><td class="sc" title="${p.name} ${p.entity||''}">${p.name}${entityBadge}${coopBadge}</td>${cells}</tr>`;
     });
   });
   document.getElementById('tbody').innerHTML=html;
@@ -1125,15 +1167,35 @@ function applyChannelToVol(i){
 
 // ── ADD PRODUCT MODAL ─────────────────────────────────────────────
 function openAddModal(){
-  // Populate dropdowns
   const baseOpts = prods.map((p,i)=>`<option value="${i}">[${p.ipShort}] ${p.name}</option>`).join('');
   document.getElementById('rBase').innerHTML = baseOpts;
   const monthOpts = MONTHS.slice(0,21).map(m=>`<option>${m}</option>`).join('');
   document.getElementById('rLaunch').innerHTML = monthOpts;
   document.getElementById('nLaunch').innerHTML = monthOpts;
+  document.getElementById('mCoopMode').value = '';
+  document.getElementById('mEntity').value = '';
+  document.getElementById('mCurrency').value = 'RMB';
+  document.getElementById('coopHint').style.display='none';
   document.getElementById('addModal').style.display='flex';
 }
 function closeAddModal(){ document.getElementById('addModal').style.display='none'; }
+
+const COOP_HINTS = {
+  '供應鏈發包': '📦 北京蕪解 → JV/深圳　供貨價 ＝ 採購報價 × 1.1　成本已含加成，JV淨利正確計入VAM',
+  '批發包銷':   '🏷 深圳包貨批發　批發價 ＝ 零售SRP × 4.3折　深圳收入計入VAM',
+  '快閃店代運營':'⭐ 保底費 ＋ 營收抽成%　JV持有項目主體，淨利計入VAM；UJ BKK收服務費',
+  '共同投資':   '💼 JV ＋ UJ BKK 按投資比例出資，依分潤比例分配淨利',
+  '台灣代運營': '🇹🇼 悍草代運營JV台灣快閃項目　服務費/抽成待定，JV持有項目主體',
+};
+function onCoopModeChange(val){
+  const hint = document.getElementById('coopHint');
+  if(val && COOP_HINTS[val]){
+    hint.textContent = COOP_HINTS[val];
+    hint.style.display='block';
+  } else {
+    hint.style.display='none';
+  }
+}
 
 function switchAddTab(tab){
   addTab = tab;
@@ -1160,7 +1222,10 @@ function confirmAdd(){
     }), id:uid,
       name: base.name + '（新品）',
       launch, volFirst:volBoxes*ppc, volReorder:0,
-      royalty:{...base.royalty} };
+      royalty:{...base.royalty},
+      entity: document.getElementById('mEntity').value,
+      currency: document.getElementById('mCurrency').value || 'RMB',
+      coopMode: document.getElementById('mCoopMode').value };
     prods.push(newProd);
   } else {
     const ip = document.getElementById('nIp').value.trim() || '新IP';
@@ -1169,14 +1234,17 @@ function confirmAdd(){
     const srp = parseFloat(document.getElementById('nSrp').value)||29.9;
     const volBoxes = parseInt(document.getElementById('nVol').value)||250;
     const color = document.getElementById('nColor').value.trim()||'#a78bfa';
-    const _ppc = 15*16; // default 240件/箱 before product-specific box rule applies
+    const _ppc = 15*16;
     prods.push({ ..._bp(), id:uid, ip, ipShort:ip, color,
       name, launch, volFirst:volBoxes*_ppc, volReorder:0, srp, wsDiscount:0.46,
       costDesign:5000, cost2D:3000, cost3D:18000, costRender:6000,
       costSample:27120, costMold:150000, costQA:1100,
       unitMfg:4.0, unitAntiForge:0.106,
       unitWarehouse:0.056, unitOther:0,
-      royalty:{type:'std', d:0.40, r:0.12} });
+      royalty:{type:'std', d:0.40, r:0.12},
+      entity: document.getElementById('mEntity').value,
+      currency: document.getElementById('mCurrency').value || 'RMB',
+      coopMode: document.getElementById('mCoopMode').value });
   }
   closeAddModal();
   renderParams();
