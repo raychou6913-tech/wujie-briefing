@@ -141,6 +141,25 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .upload-sub{font-size:11px;color:var(--txt-mid);line-height:1.6;}
 .paste-hint{font-size:10px;color:var(--txt-lo);margin-top:8px;padding:5px 10px;background:var(--card2);border-radius:7px;display:inline-block;}
 
+/* PAYMENT PANEL */
+.pay-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.pay-panel.open{display:block;}
+.pay-panel-hdr{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.pay-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);}
+.pay-item:last-child{border-bottom:none;}
+.pay-bar{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.pay-body{flex:1;min-width:0;}
+.pay-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+.pay-meta{font-size:10px;color:var(--txt-mid);}
+.pay-right{text-align:right;flex-shrink:0;}
+.pay-amt{font-size:13px;font-weight:800;margin-bottom:2px;}
+.pay-due{font-size:10px;font-weight:700;}
+.pay-due.urgent{color:var(--danger);}
+.pay-due.soon{color:var(--warn);}
+.pay-due.later{color:var(--txt-lo);}
+.kpi-card.clickable{cursor:pointer;transition:border-color .15s;}
+.kpi-card.clickable:hover{border-color:var(--border-hi);}
+
 @media(max-width:900px){
   .kpi-grid{grid-template-columns:1fr 1fr;}
   .two-col{grid-template-columns:1fr;}
@@ -185,15 +204,71 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="kpi-val" id="kpi-compare" style="color:var(--accent)">2</div>
       <div class="kpi-sub">項詢價中</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">本月採購金額</div>
-      <div class="kpi-val" id="kpi-total" style="color:var(--ok)">¥ 42.8</div>
-      <div class="kpi-sub" id="kpi-total-sub">萬 RMB</div>
+    <div class="kpi-card clickable" onclick="togglePayPanel()">
+      <div class="kpi-label">需付款項目</div>
+      <div class="kpi-val" style="color:var(--warn)">4</div>
+      <div class="kpi-sub">筆待付 · <span style="color:var(--danger);font-weight:700;">1 筆本週到期</span></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">逾期跟進</div>
       <div class="kpi-val" id="kpi-overdue" style="color:var(--danger)">1</div>
       <div class="kpi-sub">項需即時處理</div>
+    </div>
+  </div>
+
+  <!-- PAYMENT PANEL -->
+  <div class="pay-panel" id="pay-panel">
+    <div class="pay-panel-hdr">
+      <span>需付款項目 · 按緊急程度排列</span>
+      <span style="font-size:10px;color:var(--txt-lo);cursor:pointer;" onclick="togglePayPanel()">收起 ▴</span>
+    </div>
+    <!-- 紅：3天後 -->
+    <div class="pay-item">
+      <div class="pay-bar" style="background:var(--danger)"></div>
+      <div class="pay-body">
+        <div class="pay-name">Snoopy 夏季大貨 · 首付款 30%</div>
+        <div class="pay-meta">東莞永盛玩具 · PO-318 · 下單即付</div>
+      </div>
+      <div class="pay-right">
+        <div class="pay-amt" style="color:var(--danger)">¥ 44,400</div>
+        <div class="pay-due urgent">5/09 · 3天後</div>
+      </div>
+    </div>
+    <!-- 橙：12天後 -->
+    <div class="pay-item">
+      <div class="pay-bar" style="background:var(--warn)"></div>
+      <div class="pay-body">
+        <div class="pay-name">Opanchu 抱枕布料 · 訂金 30%</div>
+        <div class="pay-meta">廣州博雅布料 · PO-321 · 下單付</div>
+      </div>
+      <div class="pay-right">
+        <div class="pay-amt" style="color:var(--warn)">¥ 18,600</div>
+        <div class="pay-due soon">5/18 · 12天後</div>
+      </div>
+    </div>
+    <!-- 灰：33天後 -->
+    <div class="pay-item">
+      <div class="pay-bar" style="background:var(--border-hi)"></div>
+      <div class="pay-body">
+        <div class="pay-name">Snoopy 夏季大貨 · 中期款 40%</div>
+        <div class="pay-meta">東莞永盛玩具 · PO-318 · 大貨出廠付</div>
+      </div>
+      <div class="pay-right">
+        <div class="pay-amt" style="color:var(--txt-mid)">¥ 59,200</div>
+        <div class="pay-due later">6/08 · 33天後</div>
+      </div>
+    </div>
+    <!-- 灰：45天後 -->
+    <div class="pay-item">
+      <div class="pay-bar" style="background:var(--border-hi)"></div>
+      <div class="pay-body">
+        <div class="pay-name">Muziktiger 公仔 · 模具費</div>
+        <div class="pay-meta">深圳萌趣玩具 · PO-322 · 3D稿確認後付</div>
+      </div>
+      <div class="pay-right">
+        <div class="pay-amt" style="color:var(--txt-mid)">¥ 32,000</div>
+        <div class="pay-due later">6/20 · 45天後</div>
+      </div>
     </div>
   </div>
 
@@ -669,6 +744,10 @@ function notifyGaowei(poName, poNum){
     msg:`《${poName}》箱規已確認，PO：${poNum}，請安排物流` });
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(q));
   _toast(`✓ 已通知高維 · 《${poName}》PO：${poNum}`);
+}
+
+function togglePayPanel(){
+  document.getElementById('pay-panel').classList.toggle('open');
 }
 
 function togglePO(id){
