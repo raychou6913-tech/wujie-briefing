@@ -233,6 +233,13 @@ select.inp option{background:var(--card2);}
 .card-img-placeholder-icon{font-size:24px;opacity:.4;}
 .card-img-placeholder-text{font-size:10px;color:var(--txt-lo);font-weight:600;}
 
+/* IMAGE UPLOAD BUTTON */
+.img-upload-btn{position:absolute;top:6px;right:6px;z-index:5;font-size:9px;font-weight:700;padding:4px 9px;border-radius:8px;background:#000a;border:1px solid #fff2;color:#fff;cursor:pointer;transition:background .15s;}
+.img-upload-btn:hover{background:#000d;}
+
+/* CONFIRM PENDING */
+.chip-pending{background:#f59e0b18;color:#f59e0b;}
+
 /* LIGHTBOX */
 .lightbox{position:fixed;inset:0;background:#000000d0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
 .lightbox.open{display:flex;}
@@ -268,13 +275,15 @@ function requireAuth(){
 const SESS = requireAuth();
 if(!SESS) throw new Error('redirect');
 
-// 寫入權限：設計/採購負責人 + Ray；其他人查閱進度
-const CAN_MARK_DONE = ['ray','bevis','peilin','shetong','laige','muzi'].includes(SESS.user);
+// 流水線分工：珮玲 = 唯一進度更新人，Bevis = 確認主管，其餘全員查閱
+const CAN_UPDATE  = SESS.user === 'peilin';
+const CAN_CONFIRM = SESS.user === 'bevis';
+const CAN_MARK_DONE = CAN_UPDATE || CAN_CONFIRM; // backward compat
 if(!CAN_MARK_DONE){
   document.addEventListener('DOMContentLoaded',()=>{
     const banner = document.createElement('div');
     banner.style.cssText='background:#818cf810;border:1px solid #818cf830;border-radius:8px;padding:8px 14px;font-size:11px;color:var(--txt-mid);margin-bottom:16px;';
-    banner.textContent='👁 查閱視角：可查看所有產品的開發進度與階段狀態，標記操作由設計 / 採購負責人執行';
+    banner.textContent='👁 查閱視角 · 進度更新由珮玲負責，Bevis 確認後生效';
     const main = document.querySelector('.main');
     if(main) main.prepend(banner);
   });
@@ -371,7 +380,7 @@ if(!CAN_MARK_DONE){
               <div class="ip-owner-val">珮玲 / 賴哥</div>
             </div>
           </div>
-          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/f59e0b?text=Snoopy+夏季盲盒+·+大貨確認中','Snoopy 夏季盲盒 · 第 6/7 輪')">
+          <div class="card-img-wrap" id="img-wrap-snoopy" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/f59e0b?text=Snoopy+夏季盲盒+·+大貨確認中','Snoopy 夏季盲盒 · 第 6/7 輪')">
             <img src="https://placehold.co/900x500/1e2130/f59e0b?text=Snoopy+夏季盲盒" alt="Snoopy 夏季設計稿">
             <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
           </div>
@@ -408,7 +417,7 @@ if(!CAN_MARK_DONE){
               <div class="ip-owner-val">珮玲 / 詩彤</div>
             </div>
           </div>
-          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/ef4444?text=Muziktiger+公仔+·+版權審核中','Muziktiger 公仔 · 版權卡關 14 天')">
+          <div class="card-img-wrap" id="img-wrap-muziktiger" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/ef4444?text=Muziktiger+公仔+·+版權審核中','Muziktiger 公仔 · 版權卡關 14 天')">
             <img src="https://placehold.co/900x500/1e2130/ef4444?text=Muziktiger+公仔" alt="Muziktiger 設計稿">
             <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
           </div>
@@ -452,7 +461,7 @@ if(!CAN_MARK_DONE){
               <div class="ip-owner-val">詩彤</div>
             </div>
           </div>
-          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/10b981?text=Opanchu+抱枕+·+2D設計送審','Opanchu 抱枕 · 2D 設計送審中')">
+          <div class="card-img-wrap" id="img-wrap-opanchu" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/10b981?text=Opanchu+抱枕+·+2D設計送審','Opanchu 抱枕 · 2D 設計送審中')">
             <img src="https://placehold.co/900x500/1e2130/10b981?text=Opanchu+抱枕" alt="Opanchu 設計稿">
             <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
           </div>
@@ -488,7 +497,7 @@ if(!CAN_MARK_DONE){
               <div class="ip-owner-val">詩彤</div>
             </div>
           </div>
-          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/a855f7?text=Mofusand+10月新款+·+2D送審中','Mofusand 10月新款 · 2D 送審中')">
+          <div class="card-img-wrap" id="img-wrap-mofusand2" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/a855f7?text=Mofusand+10月新款+·+2D送審中','Mofusand 10月新款 · 2D 送審中')">
             <img src="https://placehold.co/900x500/1e2130/a855f7?text=Mofusand+10月新款" alt="Mofusand 設計稿">
             <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
           </div>
@@ -628,31 +637,48 @@ if(!CAN_MARK_DONE){
 
       <!-- Roles Involved -->
       <div class="sidebar-card">
-        <div class="sidebar-title">本月負責人</div>
+        <div class="sidebar-title">設計部 · 管理分工</div>
+        <!-- 流程說明 -->
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:var(--txt-mid);line-height:1.6;">
+          珮玲 提交進度更新 → <strong style="color:var(--accent)">Bevis 確認</strong> 後生效<br>
+          其他人均為查閱視角，不操作進度
+        </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
+          <!-- Bevis：確認主管 -->
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#0284c7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">B</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:11px;font-weight:700;">Bevis <span style="font-size:9px;color:var(--txt-lo);">設計主管</span></div>
+              <div style="font-size:9px;color:var(--txt-lo);">進度確認主管 · 最終核准</div>
+            </div>
+            <span class="chip chip-fin" style="font-size:8px;">確認主管</span>
+          </div>
+          <!-- 珮玲：主窗口 -->
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:28px;height:28px;border-radius:50%;background:#6d28d9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">珮</div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:11px;font-weight:700;">珮玲</div>
-              <div style="font-size:9px;color:var(--txt-lo);">企劃·版權 / Snoopy·Muziktiger</div>
+              <div style="font-size:11px;font-weight:700;">珮玲 <span style="font-size:9px;color:var(--txt-lo);">設計師</span></div>
+              <div style="font-size:9px;color:var(--txt-lo);">唯一進度更新人 · 版權/企劃</div>
             </div>
             <span class="chip chip-danger" style="font-size:8px;">催版權</span>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <!-- 詩彤：查閱 -->
+          <div style="display:flex;align-items:center;gap:10px;opacity:.6;">
             <div style="width:28px;height:28px;border-radius:50%;background:#9333ea;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">詩</div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:11px;font-weight:700;">詩彤</div>
-              <div style="font-size:9px;color:var(--txt-lo);">設計師 / Muziktiger·Opanchu</div>
+              <div style="font-size:11px;font-weight:700;">詩彤 <span style="font-size:9px;color:var(--txt-lo);">設計師</span></div>
+              <div style="font-size:9px;color:var(--txt-lo);">查閱 · 設計執行</div>
             </div>
-            <span class="chip chip-info" style="font-size:8px;">送審中</span>
+            <span class="chip chip-grey" style="font-size:8px;">查閱</span>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <!-- 賴哥：查閱 -->
+          <div style="display:flex;align-items:center;gap:10px;opacity:.6;">
             <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">賴</div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:11px;font-weight:700;">賴哥</div>
-              <div style="font-size:9px;color:var(--txt-lo);">採購主管 / Snoopy 大貨 PO</div>
+              <div style="font-size:11px;font-weight:700;">賴哥 <span style="font-size:9px;color:var(--txt-lo);">採購主管</span></div>
+              <div style="font-size:9px;color:var(--txt-lo);">查閱 · Snoopy 大貨 PO</div>
             </div>
-            <span class="chip chip-ok" style="font-size:8px;">等確認</span>
+            <span class="chip chip-grey" style="font-size:8px;">查閱</span>
           </div>
         </div>
       </div>
@@ -799,6 +825,71 @@ function initDemoBars(){
   }
 }
 initDemoBars();
+
+/* ─── IMAGE UPLOAD (珮玲 / Bevis only) ─── */
+const _IMG_KEY = 'pipeline_imgs';
+function _getImgs(){ return JSON.parse(localStorage.getItem(_IMG_KEY)||'{}'); }
+function _saveImgs(o){ localStorage.setItem(_IMG_KEY, JSON.stringify(o)); }
+
+function handleUpload(cardKey, evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const imgs = _getImgs(); imgs[cardKey] = e.target.result; _saveImgs(imgs);
+    const wrap = document.getElementById('img-wrap-'+cardKey);
+    if(wrap){ const img = wrap.querySelector('img'); if(img) img.src = e.target.result; }
+    showPipelineToast('✅ 設計稿已更新，所有人可見');
+  };
+  reader.readAsDataURL(file);
+}
+
+if(CAN_UPDATE || CAN_CONFIRM){
+  const imgs = _getImgs();
+  ['snoopy','muziktiger','opanchu','mofusand2'].forEach(key => {
+    const wrap = document.getElementById('img-wrap-'+key);
+    if(!wrap) return;
+    // Restore uploaded image if any
+    if(imgs[key]){ const img = wrap.querySelector('img'); if(img) img.src = imgs[key]; }
+    // Add upload button (珮玲 only writes; Bevis can also upload)
+    const btn = document.createElement('button');
+    btn.className = 'img-upload-btn';
+    btn.textContent = '上傳設計稿';
+    btn.onclick = e => { e.stopPropagation(); inp.click(); };
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
+    inp.onchange = e => handleUpload(key, e);
+    wrap.appendChild(btn);
+    document.body.appendChild(inp);
+  });
+}
+
+/* ─── PENDING CONFIRMATION (珮玲 → Bevis) ─── */
+const _PEND_KEY = 'pipeline_pending';
+function _getPending(){ return JSON.parse(localStorage.getItem(_PEND_KEY)||'{}'); }
+function _savePending(o){ localStorage.setItem(_PEND_KEY, JSON.stringify(o)); }
+
+function markStageDone(cardKey){
+  const btn = document.getElementById('mark-btn-'+cardKey);
+  if(CAN_UPDATE){
+    const p = _getPending(); p[cardKey] = {by:'珮玲', ts:Date.now()}; _savePending(p);
+    if(btn){ btn.textContent='⏳ 已提交 · 待 Bevis 確認'; btn.disabled=true; btn.style.opacity='0.6'; }
+    showPipelineToast('✅ 進度已提交，待 Bevis 確認後生效');
+  } else if(CAN_CONFIRM){
+    const p = _getPending(); delete p[cardKey]; _savePending(p);
+    if(btn){ btn.textContent='✓ 已確認，進度生效'; btn.disabled=true; btn.style.opacity='0.6'; }
+    showPipelineToast('✅ Bevis 已確認，進度更新生效');
+  }
+}
+
+function showPipelineToast(msg){
+  let t=document.getElementById('pipe-toast');
+  if(!t){t=document.createElement('div');t.id='pipe-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:600;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
 
 /* ─── LOAD FROM FEISHU ─── */
 async function loadProjects(){
@@ -1024,9 +1115,23 @@ function renderDemoDetail(key, d){
           <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
         </div>`;
       } else {
+        const _pending = _getPending();
+        const _isPending = !!_pending[key];
+        let _markBtnHtml;
+        if(CAN_UPDATE){
+          _markBtnHtml = _isPending
+            ? `<button id="mark-btn-${key}" class="tc-btn tcb-ghost" disabled style="opacity:.5">⏳ 已提交 · 待 Bevis 確認</button>`
+            : `<button id="mark-btn-${key}" class="tc-btn tcb-primary" onclick="markStageDone('${key}')">提交進度更新 → 待 Bevis 確認</button>`;
+        } else if(CAN_CONFIRM){
+          _markBtnHtml = _isPending
+            ? `<button id="mark-btn-${key}" class="tc-btn tcb-primary" style="background:var(--warn);border-color:var(--warn);" onclick="markStageDone('${key}')">✅ 珮玲已提交 · 點擊確認生效</button>`
+            : `<button id="mark-btn-${key}" class="tc-btn tcb-primary" onclick="markStageDone('${key}')">✓ 確認此階段完成</button>`;
+        } else {
+          _markBtnHtml = `<span style="font-size:10px;color:var(--txt-lo)">進度更新由珮玲負責，Bevis 確認</span>`;
+        }
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong> 階段。負責人：${s.owner}。</div>
         <div class="tc-actions">
-          ${CAN_MARK_DONE ? `<button class="tc-btn tcb-primary" onclick="this.textContent='✓ 已記錄（Demo 模式）';this.disabled=true;this.style.opacity='0.5'">✓ 標記此階段完成</button>` : `<span style="font-size:10px;color:var(--txt-lo)">（僅設計/採購負責人可標記）</span>`}
+          ${_markBtnHtml}
           <button class="tc-btn tcb-ghost" onclick="document.getElementById('detail-panel').style.display='none'">✕ 關閉</button>
         </div>`;
       }
