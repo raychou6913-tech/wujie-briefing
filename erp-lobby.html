@@ -72,7 +72,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* ── PULSE STRIP ── */
 .pulse-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
-.pulse-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;}
+.pulse-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+.pulse-card:hover{border-color:var(--border-hi);background:#1e2130;}
+.pulse-card::after{content:'→';position:absolute;top:10px;right:11px;font-size:11px;color:var(--txt-lo);transition:color .15s,right .15s;}
+.pulse-card:hover::after{color:var(--accent);right:9px;}
 .pulse-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.05em;margin-bottom:6px;}
 .pulse-val{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px;}
 .pulse-sub{font-size:10px;color:var(--txt-mid);}
@@ -187,25 +190,25 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="sec-link" id="war-room-link" style="display:none" onclick="window.location='erp-war-room.html'">戰情室 ›</div>
   </div>
   <div class="pulse-strip">
-    <div class="pulse-card" id="pulse-c1">
+    <div class="pulse-card" id="pulse-c1" onclick="pulseClick('c1')">
       <div class="pulse-label" id="pulse-c1-label">全年利潤達標率</div>
       <div class="pulse-val" id="pulse-c1-val" style="color:var(--warn)">35.9%</div>
       <div class="pulse-sub" id="pulse-c1-sub">⚠ 稍落後進度</div>
       <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c1-bar" style="width:35.9%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
     </div>
-    <div class="pulse-card" id="pulse-c2">
+    <div class="pulse-card" id="pulse-c2" onclick="pulseClick('c2')">
       <div class="pulse-label" id="pulse-c2-label">活躍訂單</div>
       <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">12 筆</div>
       <div class="pulse-sub" id="pulse-c2-sub">本月執行中</div>
       <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c2-bar" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
     </div>
-    <div class="pulse-card">
+    <div class="pulse-card" onclick="location.href='erp-pipeline.html'">
       <div class="pulse-label">IP 開發進行</div>
       <div class="pulse-val" style="color:var(--accent)">4 個</div>
       <div class="pulse-sub">2 個本月出圖</div>
       <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
     </div>
-    <div class="pulse-card" id="pulse-card-approvals">
+    <div class="pulse-card" id="pulse-card-approvals" onclick="pulseClick('c4')">
       <div class="pulse-label" id="pulse-c4-label">待批核事項</div>
       <div class="pulse-val" id="pulse-c4-val" style="color:var(--danger)">5 項</div>
       <div class="pulse-sub" id="pulse-c4-sub">等待 Ray 決定</div>
@@ -612,6 +615,22 @@ if(WAR_ROOM_ROLES.includes(user)){
   document.getElementById('pulse-c4-bar').style.cssText = `width:${pct}%;background:linear-gradient(90deg,var(--accent2),var(--accent))`;
 }
 renderTodos(false);
+
+/* ── PULSE CARD CLICK ── */
+const _isWarRoomUser = WAR_ROOM_ROLES.includes(user);
+function pulseClick(card){
+  if(_isWarRoomUser){
+    const dest = {c1:'erp-war-room.html',c2:'erp-war-room.html',c4:'erp-war-room.html'}[card];
+    if(dest) location.href=dest;
+  } else {
+    if(card==='c1') location.href='erp-gaowei.html';
+    else if(card==='c2') location.href='erp-pipeline.html';
+    else if(card==='c4'){
+      const el=document.getElementById('todo-list');
+      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  }
+}
 </script>
 </body>
 </html>
