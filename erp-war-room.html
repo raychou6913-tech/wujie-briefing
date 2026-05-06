@@ -1302,7 +1302,15 @@ async function loadBudgetKPI(){
     const items=await _fetchAll(_TBLS.budget);
     if(!items.length) return;
     const yr=new Date().getFullYear();
-    const yItems=items.filter(r=>(parseFloat(_fv(r.fields,"年度"))||0)===yr);
+    const VAM_ENTITIES=["深圳子公司","香港JV"];
+    const yItems=items.filter(r=>{
+      if((parseFloat(_fv(r.fields,"年度"))||0)!==yr) return false;
+      const entity=_fv(r.fields,"歸屬主體");
+      if(entity && !VAM_ENTITIES.includes(entity)) return false;
+      const interco=r.fields["內部交易標籤"];
+      if(interco===true||interco===1) return false;
+      return true;
+    });
     // 收入行：預算性質 = "收入"
     const incRows=yItems.filter(r=>_fv(r.fields,"預算性質")==="收入");
     const target=incRows.reduce((s,r)=>s+(parseFloat(_fv(r.fields,"預算金額"))||0),0);
@@ -1310,7 +1318,7 @@ async function loadBudgetKPI(){
     if(!target) return;
     const pct=Math.round(actual/target*100);
     const el=document.getElementById("budget-kpi-hint");
-    if(el) el.textContent=`全集團收入達成率：${pct}%（實際 ${(actual/10000).toFixed(1)}萬 / 目標 ${(target/10000).toFixed(1)}萬）`;
+    if(el) el.textContent=`深圳+香港 收入達成率：${pct}%（實際 ${(actual/10000).toFixed(1)}萬 / 目標 ${(target/10000).toFixed(1)}萬）`;
   }catch(e){ console.error("budget",e); }
 }
 
@@ -1386,9 +1394,21 @@ async function loadVamProgress(){
     const items = await _fetchAll(_TBLS.budget);
     if(!items.length) return;
 
+    // VAM 口徑：深圳子公司 + 香港JV，排除內部交易（GG 建議，2026-05-07）
+    const VAM_ENTITIES = ["深圳子公司","香港JV"];
+    function isVamRecord(r){
+      const entity = _fv(r.fields,"歸屬主體");
+      const interco = r.fields["內部交易標籤"];
+      // 歸屬主體未填 = 舊資料，視為全部納入（相容過渡期）
+      if(entity && !VAM_ENTITIES.includes(entity)) return false;
+      // 內部交易標籤 = true 排除
+      if(interco===true || interco===1) return false;
+      return true;
+    }
+
     // 淨利 = 收入實際 - 支出實際（預算管理表按預算性質欄分類）
     const yr = new Date().getFullYear();
-    const yItems = items.filter(r=>(parseFloat(_fv(r.fields,"年度"))||0)===yr);
+    const yItems = items.filter(r=>(parseFloat(_fv(r.fields,"年度"))||0)===yr).filter(isVamRecord);
     const incActual = yItems.filter(r=>_fv(r.fields,"預算性質")==="收入")
                            .reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0), 0);
     const expActual = yItems.filter(r=>_fv(r.fields,"預算性質")==="支出")
