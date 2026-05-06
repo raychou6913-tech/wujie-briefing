@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 圖庫管理</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --lib:#a78bfa;--lib-dim:#a78bfa18;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--lib);box-shadow:0 0 7px var(--lib);}
+.brand-name{font-size:14px;font-weight:700;}
+.brand-sub{font-size:10px;color:var(--txt-mid);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.sess-name{font-size:12px;font-weight:700;}
+.sess-role{font-size:9px;color:var(--txt-lo);}
+.btn-topbar{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-topbar:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.btn-logout{color:var(--danger);background:var(--danger-dim);border-color:#ef444430;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 52px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;}
+.sb-section{margin-bottom:20px;}
+.sb-label{font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.08em;text-transform:uppercase;padding:0 16px;margin-bottom:6px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;border-radius:0;transition:background .12s;font-size:12px;color:var(--txt-mid);border-left:2px solid transparent;}
+.sb-item:hover{background:var(--card);color:var(--txt-hi);}
+.sb-item.active{background:var(--card);color:var(--lib);border-left-color:var(--lib);font-weight:700;}
+.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sb-count{margin-left:auto;font-size:9px;font-weight:700;background:var(--card2);border-radius:8px;padding:1px 6px;color:var(--txt-lo);}
+.sb-divider{height:1px;background:var(--border);margin:8px 16px;}
+
+/* MAIN */
+.main{padding:24px 28px;padding-bottom:80px;}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.kpi-label{font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+.kpi-val{font-size:28px;font-weight:800;line-height:1;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);margin-top:4px;}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-wrap{flex:1;min-width:200px;position:relative;}
+.search-inp{width:100%;background:var(--card);border:1px solid var(--border);color:var(--txt-hi);padding:9px 12px 9px 34px;border-radius:8px;font-size:13px;outline:none;}
+.search-inp:focus{border-color:var(--accent);}
+.search-inp::placeholder{color:var(--txt-lo);}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+.filter-select{background:var(--card);border:1px solid var(--border);color:var(--txt-mid);padding:8px 10px;border-radius:8px;font-size:12px;outline:none;cursor:pointer;}
+.filter-select:focus{border-color:var(--accent);}
+.view-toggle{display:flex;gap:4px;background:var(--card2);border-radius:8px;padding:3px;}
+.view-btn{font-size:13px;padding:5px 9px;border-radius:6px;border:none;background:transparent;color:var(--txt-lo);cursor:pointer;}
+.view-btn.active{background:var(--card);color:var(--txt-hi);}
+.btn-upload{font-size:12px;font-weight:700;padding:9px 16px;border-radius:8px;border:none;background:var(--lib);color:#fff;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.btn-upload:hover{opacity:.9;}
+
+/* UPLOAD DROP ZONE */
+.drop-zone{border:2px dashed var(--border-hi);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:20px;display:none;}
+.drop-zone.visible{display:block;}
+.drop-zone.drag-over{border-color:var(--lib);background:var(--lib-dim);}
+.dz-icon{font-size:32px;margin-bottom:10px;}
+.dz-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.dz-sub{font-size:11px;color:var(--txt-mid);}
+.dz-btns{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.dz-btn{font-size:11px;font-weight:700;padding:7px 16px;border-radius:8px;border:1px solid var(--border-hi);background:var(--card);color:var(--txt-mid);cursor:pointer;}
+.dz-btn:hover{border-color:var(--lib);color:var(--lib);}
+.dz-btn.primary{background:var(--lib);border-color:var(--lib);color:#fff;}
+
+/* ASSET GRID */
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.asset-grid.list-mode{grid-template-columns:1fr;}
+
+/* ASSET CARD */
+.asset-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .1s;}
+.asset-card:hover{border-color:var(--border-hi);transform:translateY(-1px);}
+.asset-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden;}
+.asset-thumb img{width:100%;height:100%;object-fit:cover;}
+.asset-thumb-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+.asset-type-badge{position:absolute;top:6px;left:6px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;backdrop-filter:blur(4px);}
+.asset-ip-badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;backdrop-filter:blur(4px);}
+.asset-body{padding:10px;}
+.asset-name{font-size:12px;font-weight:700;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.asset-meta{font-size:10px;color:var(--txt-lo);line-height:1.5;}
+
+/* ASSET CARD — list mode */
+.asset-grid.list-mode .asset-card{display:flex;align-items:center;border-radius:10px;}
+.asset-grid.list-mode .asset-thumb{width:56px;height:56px;flex-shrink:0;border-radius:0;aspect-ratio:unset;}
+.asset-grid.list-mode .asset-body{flex:1;display:flex;align-items:center;gap:16px;padding:10px 12px;}
+.asset-grid.list-mode .asset-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.asset-grid.list-mode .asset-meta{white-space:nowrap;}
+.asset-grid.list-mode .asset-type-badge,.asset-grid.list-mode .asset-ip-badge{display:none;}
+.asset-grid.list-mode .asset-list-badges{display:flex;gap:6px;}
+
+/* SECTION HEADER */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-title{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.07em;text-transform:uppercase;}
+.sec-count{font-size:10px;color:var(--txt-lo);}
+
+/* CHIP */
+.chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:7px;display:inline-flex;align-items:center;}
+.chip-ip-snoopy{background:#ef444418;color:#ef4444;}
+.chip-ip-mofusand{background:#f9731618;color:#f97316;}
+.chip-ip-muziktiger{background:#8b5cf618;color:#8b5cf6;}
+.chip-ip-opanchu{background:#0ea5e918;color:#0ea5e9;}
+.chip-ip-chiikawa{background:#ec489918;color:#ec4899;}
+.chip-ip-other{background:var(--card2);color:var(--txt-mid);}
+.chip-type-source{background:#818cf818;color:var(--accent);}
+.chip-type-concept{background:#22c55e18;color:var(--ok);}
+.chip-type-2d{background:#f59e0b18;color:var(--warn);}
+.chip-type-3d{background:#a78bfa18;color:#a78bfa;}
+.chip-type-sample{background:#ef444418;color:#ef4444;}
+.chip-type-production{background:#10b98118;color:#10b981;}
+.chip-type-package{background:#f9731618;color:#f97316;}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--txt-lo);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:#000000cc;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.lightbox.open{display:flex;}
+.lb-content{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:860px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.lb-close{position:absolute;top:12px;right:14px;font-size:20px;cursor:pointer;color:var(--txt-lo);z-index:10;}
+.lb-close:hover{color:var(--txt-hi);}
+.lb-img-wrap{background:var(--card2);border-radius:12px 12px 0 0;overflow:hidden;max-height:480px;display:flex;align-items:center;justify-content:center;}
+.lb-img-wrap img{max-width:100%;max-height:480px;object-fit:contain;}
+.lb-img-placeholder{height:280px;display:flex;align-items:center;justify-content:center;font-size:60px;}
+.lb-info{padding:20px;}
+.lb-name{font-size:18px;font-weight:800;margin-bottom:8px;}
+.lb-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.lb-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.lb-meta-item{}
+.lb-meta-label{font-size:9px;color:var(--txt-lo);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+.lb-meta-val{font-size:12px;font-weight:600;}
+.lb-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.lb-btn{font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;border:1px solid;cursor:pointer;}
+.lb-btn-primary{background:var(--lib);border-color:var(--lib);color:#fff;}
+.lb-btn-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
+.lb-btn-danger{background:var(--danger-dim);border-color:var(--danger);color:var(--danger);}
+.lb-desc-wrap{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+.lb-desc-label{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.lb-desc-ta{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:9px 11px;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:64px;outline:none;line-height:1.6;}
+.lb-desc-ta:focus{border-color:var(--lib);}
+.lb-desc-ta::placeholder{color:var(--txt-lo);}
+
+/* TOAST */
+#lib-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:600;opacity:0;transition:opacity .2s;white-space:nowrap;pointer-events:none;}
+
+/* UPLOAD PROGRESS */
+.up-progress{background:var(--card2);border-radius:8px;height:4px;overflow:hidden;margin-top:6px;display:none;}
+.up-progress-bar{height:100%;background:var(--lib);border-radius:8px;transition:width .3s;}
+
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .asset-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div>
+      <div class="brand-name">蕪解 ERP</div>
+      <div class="brand-sub">圖庫管理</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div style="text-align:right">
+      <div class="sess-name" id="sess-name">—</div>
+      <div class="sess-role" id="sess-role">—</div>
+    </div>
+    <a class="btn-topbar" href="erp-lobby.html">⌂ 大廳</a>
+    <button class="btn-topbar btn-logout" onclick="logout()">登出</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">全部</div>
+      <div class="sb-item active" onclick="filterBy('all',this)">
+        <span>📁</span> 所有圖檔
+        <span class="sb-count" id="sb-count-all">0</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">依 IP 品牌</div>
+      <div class="sb-item" onclick="filterBy('ip:Snoopy',this)">
+        <div class="sb-dot" style="background:#ef4444"></div> Snoopy
+        <span class="sb-count" id="sb-count-Snoopy">0</span>
+      </div>
+      <div class="sb-item" onclick="filterBy('ip:Mofusand',this)">
+        <div class="sb-dot" style="background:#f97316"></div> Mofusand
+        <span class="sb-count" id="sb-count-Mofusand">0</span>
+      </div>
+      <div class="sb-item" onclick="filterBy('ip:Muziktiger',this)">
+        <div class="sb-dot" style="background:#8b5cf6"></div> Muziktiger
+        <span class="sb-count" id="sb-count-Muziktiger">0</span>
+      </div>
+      <div class="sb-item" onclick="filterBy('ip:Opanchu',this)">
+        <div class="sb-dot" style="background:#0ea5e9"></div> Opanchu
+        <span class="sb-count" id="sb-count-Opanchu">0</span>
+      </div>
+      <div class="sb-item" onclick="filterBy('ip:Chiikawa',this)">
+        <div class="sb-dot" style="background:#ec4899"></div> Chiikawa
+        <span class="sb-count" id="sb-count-Chiikawa">0</span>
+      </div>
+      <div class="sb-item" onclick="filterBy('ip:其他',this)">
+        <div class="sb-dot" style="background:var(--txt-lo)"></div> 其他
+        <span class="sb-count" id="sb-count-其他">0</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">依圖檔類型</div>
+      <div class="sb-item" onclick="filterBy('type:版權方原圖',this)">🎨 版權方原圖<span class="sb-count" id="sb-count-版權方原圖">0</span></div>
+      <div class="sb-item" onclick="filterBy('type:概念圖',this)">💡 概念圖<span class="sb-count" id="sb-count-概念圖">0</span></div>
+      <div class="sb-item" onclick="filterBy('type:2D設計稿',this)">✏️ 2D設計稿<span class="sb-count" id="sb-count-2D設計稿">0</span></div>
+      <div class="sb-item" onclick="filterBy('type:3D建模',this)">🧊 3D建模<span class="sb-count" id="sb-count-3D建模">0</span></div>
+      <div class="sb-item" onclick="filterBy('type:打樣照',this)">📷 打樣照<span class="sb-count" id="sb-count-打樣照">0</span></div>
+      <div class="sb-item" onclick="filterBy('type:大貨照',this)">📦 大貨照<span class="sb-count" id="sb-count-大貨照">0</span></div>
+      <div class="sb-item" onclick="filterBy('type:包裝設計',this)">🛍️ 包裝設計<span class="sb-count" id="sb-count-包裝設計">0</span></div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+      <div class="sb-label">依上傳人</div>
+      <div class="sb-item" onclick="filterBy('by:珮玲',this)">珮玲<span class="sb-count" id="sb-count-珮玲">0</span></div>
+      <div class="sb-item" onclick="filterBy('by:詩彤',this)">詩彤<span class="sb-count" id="sb-count-詩彤">0</span></div>
+      <div class="sb-item" onclick="filterBy('by:Bevis',this)">Bevis<span class="sb-count" id="sb-count-Bevis">0</span></div>
+      <div class="sb-item" onclick="filterBy('by:賴哥',this)">賴哥<span class="sb-count" id="sb-count-賴哥">0</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">總圖檔數</div>
+        <div class="kpi-val" id="kpi-total" style="color:var(--lib)">0</div>
+        <div class="kpi-sub" id="kpi-total-sub">共 0 個 IP</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">本週新增</div>
+        <div class="kpi-val" id="kpi-week" style="color:var(--ok)">0</div>
+        <div class="kpi-sub">過去 7 天上傳</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">版權方原圖</div>
+        <div class="kpi-val" id="kpi-source" style="color:var(--accent)">0</div>
+        <div class="kpi-sub">授權圖檔</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">設計稿</div>
+        <div class="kpi-val" id="kpi-design" style="color:var(--warn)">0</div>
+        <div class="kpi-sub">2D + 3D + 概念圖</div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-inp" type="text" placeholder="搜尋圖檔名稱、IP、備注…" id="search-inp" oninput="onSearch()">
+      </div>
+      <select class="filter-select" id="sort-select" onchange="renderAssets()">
+        <option value="newest">最新上傳</option>
+        <option value="oldest">最早上傳</option>
+        <option value="name">名稱 A→Z</option>
+        <option value="ip">依 IP</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-btn active" id="vbtn-grid" onclick="setLibView('grid')">⊞</button>
+        <button class="view-btn" id="vbtn-list" onclick="setLibView('list')">☰</button>
+      </div>
+      <button class="btn-upload" onclick="toggleDropZone()">＋ 上傳圖檔</button>
+    </div>
+
+    <!-- DROP ZONE -->
+    <div class="drop-zone" id="drop-zone"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleLibDrop(event)">
+      <div class="dz-icon">🖼️</div>
+      <div class="dz-title">拖曳圖檔到這裡</div>
+      <div class="dz-sub">支援 PNG · JPG · PDF · AI · PSD · ZIP · SVG · 單檔 &lt;20MB</div>
+      <div class="dz-btns">
+        <button class="dz-btn primary" onclick="event.stopPropagation();document.getElementById('lib-file-inp').click()">💻 從本機選擇</button>
+        <button class="dz-btn" onclick="event.stopPropagation();showToast('⚠ 飛書雲端連結後即可從飛書匯入')">🗂 從飛書匯入</button>
+        <button class="dz-btn" onclick="event.stopPropagation();toggleDropZone()">✕ 收起</button>
+      </div>
+      <input type="file" id="lib-file-inp" multiple accept="image/*,.pdf,.ai,.psd,.zip,.svg,.sketch,.fig" style="display:none" onchange="handleLibFileInput(this)">
+
+      <!-- Upload meta fields (shown after selecting file) -->
+      <div id="upload-meta" style="display:none;margin-top:16px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div>
+            <div style="font-size:10px;color:var(--txt-lo);margin-bottom:4px;">IP 品牌</div>
+            <select class="filter-select" id="um-ip" style="width:100%">
+              <option value="Snoopy">Snoopy</option>
+              <option value="Mofusand">Mofusand</option>
+              <option value="Muziktiger">Muziktiger</option>
+              <option value="Opanchu">Opanchu</option>
+              <option value="Chiikawa">Chiikawa</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--txt-lo);margin-bottom:4px;">圖檔類型</div>
+            <select class="filter-select" id="um-type" style="width:100%">
+              <option value="版權方原圖">🎨 版權方原圖</option>
+              <option value="概念圖">💡 概念圖</option>
+              <option value="2D設計稿">✏️ 2D設計稿</option>
+              <option value="3D建模">🧊 3D建模</option>
+              <option value="打樣照">📷 打樣照</option>
+              <option value="大貨照">📦 大貨照</option>
+              <option value="包裝設計">🛍️ 包裝設計</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="font-size:10px;color:var(--txt-lo);margin-bottom:4px;">備注（選填）</div>
+          <input type="text" id="um-note" placeholder="例：2D正稿第3版，版權方已確認" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:8px 10px;border-radius:8px;font-size:12px;outline:none;">
+        </div>
+        <div id="um-file-list" style="font-size:11px;color:var(--txt-mid);margin-bottom:10px;"></div>
+        <button class="dz-btn primary" onclick="confirmUpload()" style="width:100%;padding:9px;">✓ 確認上傳</button>
+        <div class="up-progress" id="up-progress"><div class="up-progress-bar" id="up-progress-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- ASSET GRID -->
+    <div class="sec-head">
+      <div class="sec-title" id="grid-title">所有圖檔</div>
+      <div class="sec-count" id="grid-count">共 0 個</div>
+    </div>
+    <div class="asset-grid" id="asset-grid">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="lb-content" id="lb-content"></div>
+</div>
+
+<div id="lib-toast"></div>
+
+<script>
+const ERP_SESS_KEY='erp_sess';
+const LIB_KEY='erp_library_v1';
+
+/* ─── SESSION ─── */
+function getSession(){return JSON.parse(localStorage.getItem(ERP_SESS_KEY)||'null');}
+function logout(){localStorage.removeItem(ERP_SESS_KEY);location.href='login.html';}
+const sess=getSession();
+if(!sess){location.href='login.html';}
+document.getElementById('sess-name').textContent=sess?.displayName||sess?.username||'—';
+document.getElementById('sess-role').textContent=sess?.role||'—';
+
+/* ─── DATA ─── */
+function getLib(){return JSON.parse(localStorage.getItem(LIB_KEY)||'[]');}
+function saveLib(arr){localStorage.setItem(LIB_KEY,JSON.stringify(arr));}
+
+/* ─── DEMO DATA (pre-seeded) ─── */
+const DEMO_ASSETS=[
+  {id:'d1',name:'Snoopy_授權圖包_2025.zip',ip:'Snoopy',type:'版權方原圖',uploader:'安然',uploadedAt:'2025-11-15T09:00:00Z',size:4200000,dataUrl:null,note:'正式授權包，含角色正視圖/側視圖/動作包'},
+  {id:'d2',name:'Snoopy秋冬概念圖_v2.jpg',ip:'Snoopy',type:'概念圖',uploader:'詩彤',uploadedAt:'2026-03-10T10:30:00Z',size:1800000,dataUrl:'https://placehold.co/400x400/818cf8/ffffff?text=Snoopy+概念圖',note:'Ray 已確認方向，走秋冬暖色調'},
+  {id:'d3',name:'Snoopy盲袋2D正稿_珮玲_v3.ai',ip:'Snoopy',type:'2D設計稿',uploader:'珮玲',uploadedAt:'2026-04-02T14:00:00Z',size:6700000,dataUrl:null,note:'第3版，等版權方回覆中'},
+  {id:'d4',name:'Mofusand_授權圖庫_2026.zip',ip:'Mofusand',type:'版權方原圖',uploader:'安然',uploadedAt:'2026-01-20T08:00:00Z',size:9800000,dataUrl:null,note:'2026年最新授權包，已含貓咪系列全角色'},
+  {id:'d5',name:'Mofusand10月新款概念_v1.jpg',ip:'Mofusand',type:'概念圖',uploader:'詩彤',uploadedAt:'2026-04-28T11:00:00Z',size:2100000,dataUrl:'https://placehold.co/400x400/f97316/ffffff?text=Mofusand+概念',note:''},
+  {id:'d6',name:'Muziktiger夏季概念_詩彤.jpg',ip:'Muziktiger',type:'概念圖',uploader:'詩彤',uploadedAt:'2026-02-14T15:00:00Z',size:1600000,dataUrl:'https://placehold.co/400x400/8b5cf6/ffffff?text=Muziktiger',note:'夏季主題，藍綠色調'},
+  {id:'d7',name:'Muziktiger_2D設計稿_v2.ai',ip:'Muziktiger',type:'2D設計稿',uploader:'珮玲',uploadedAt:'2026-03-22T09:30:00Z',size:5400000,dataUrl:null,note:'已送版權方，等審核中'},
+  {id:'d8',name:'Muziktiger打樣照_廣州工廠.jpg',ip:'Muziktiger',type:'打樣照',uploader:'賴哥',uploadedAt:'2026-04-10T16:00:00Z',size:3200000,dataUrl:'https://placehold.co/400x400/ef4444/ffffff?text=打樣照',note:'第一次打樣，顏色偏深，要求工廠調整'},
+  {id:'d9',name:'Opanchu夏季設計送審稿.ai',ip:'Opanchu',type:'2D設計稿',uploader:'詩彤',uploadedAt:'2026-04-15T10:00:00Z',size:4800000,dataUrl:null,note:''},
+  {id:'d10',name:'Chiikawa主題確認圖_Ray.jpg',ip:'Chiikawa',type:'概念圖',uploader:'珮玲',uploadedAt:'2026-05-01T09:00:00Z',size:1200000,dataUrl:'https://placehold.co/400x400/ec4899/ffffff?text=Chiikawa',note:'Ray 確認使用正版色票'},
+  {id:'d11',name:'Snoopy盲袋大貨照_北京倉.jpg',ip:'Snoopy',type:'大貨照',uploader:'賴哥',uploadedAt:'2026-04-25T14:00:00Z',size:2800000,dataUrl:'https://placehold.co/400x400/22c55e/ffffff?text=大貨照',note:'北京倉收貨確認，共500箱'},
+  {id:'d12',name:'Mofusand包裝設計稿_珮玲.ai',ip:'Mofusand',type:'包裝設計',uploader:'珮玲',uploadedAt:'2026-03-05T11:00:00Z',size:7200000,dataUrl:null,note:'盲袋包裝，正面+背面+側面全套'},
+];
+
+// Seed demo data if library is empty
+(function seedDemo(){
+  if(getLib().length===0) saveLib(DEMO_ASSETS);
+})();
+
+/* ─── STATE ─── */
+let _filter='all';
+let _libView=localStorage.getItem('lib_view')||'grid';
+let _pendingFiles=[];
+
+/* ─── FILTER ─── */
+function filterBy(key, el){
+  _filter=key;
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderAssets();
+}
+
+function filteredAssets(){
+  let arr=getLib();
+  const q=document.getElementById('search-inp').value.trim().toLowerCase();
+  if(q) arr=arr.filter(a=>
+    a.name.toLowerCase().includes(q)||
+    a.ip.toLowerCase().includes(q)||
+    (a.note||'').toLowerCase().includes(q)||
+    a.uploader.toLowerCase().includes(q)
+  );
+  if(_filter==='all') return arr;
+  const [k,v]=_filter.split(':');
+  if(k==='ip') return arr.filter(a=>a.ip===v);
+  if(k==='type') return arr.filter(a=>a.type===v);
+  if(k==='by') return arr.filter(a=>a.uploader===v);
+  return arr;
+}
+
+/* ─── RENDER ─── */
+function renderAssets(){
+  const assets=filteredAssets();
+  const sort=document.getElementById('sort-select').value;
+  const sorted=[...assets].sort((a,b)=>{
+    if(sort==='newest') return new Date(b.uploadedAt)-new Date(a.uploadedAt);
+    if(sort==='oldest') return new Date(a.uploadedAt)-new Date(b.uploadedAt);
+    if(sort==='name') return a.name.localeCompare(b.name);
+    if(sort==='ip') return a.ip.localeCompare(b.ip);
+    return 0;
+  });
+
+  const grid=document.getElementById('asset-grid');
+  grid.className='asset-grid'+(_libView==='list'?' list-mode':'');
+
+  if(!sorted.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div>找不到符合的圖檔</div></div>`;
+    document.getElementById('grid-count').textContent='共 0 個';
+    return;
+  }
+
+  document.getElementById('grid-count').textContent='共 '+sorted.length+' 個';
+  grid.innerHTML=sorted.map(a=>renderAssetCard(a)).join('');
+  updateKPIs();
+  updateSidebarCounts();
+}
+
+const TYPE_CHIP={
+  '版權方原圖':'chip-type-source','概念圖':'chip-type-concept','2D設計稿':'chip-type-2d',
+  '3D建模':'chip-type-3d','打樣照':'chip-type-sample','大貨照':'chip-type-production','包裝設計':'chip-type-package'
+};
+const IP_CHIP={
+  'Snoopy':'chip-ip-snoopy','Mofusand':'chip-ip-mofusand','Muziktiger':'chip-ip-muziktiger',
+  'Opanchu':'chip-ip-opanchu','Chiikawa':'chip-ip-chiikawa'
+};
+const TYPE_ICON={'版權方原圖':'🎨','概念圖':'💡','2D設計稿':'✏️','3D建模':'🧊','打樣照':'📷','大貨照':'📦','包裝設計':'🛍️'};
+const FILE_ICON={pdf:'📄',zip:'🗜️',ai:'🎨',psd:'🎨',sketch:'💎',fig:'💎'};
+
+function getFileIcon(name){
+  const ext=(name.split('.').pop()||'').toLowerCase();
+  return FILE_ICON[ext]||'📎';
+}
+
+function renderAssetCard(a){
+  const isImg=a.dataUrl&&a.dataUrl.startsWith('http')||a.dataUrl&&a.dataUrl.startsWith('data:image');
+  const ipChip=IP_CHIP[a.ip]||'chip-ip-other';
+  const typeChip=TYPE_CHIP[a.type]||'';
+  const sz=a.size>1024*1024?(a.size/1024/1024).toFixed(1)+'MB':Math.round(a.size/1024)+'KB';
+  const when=new Date(a.uploadedAt).toLocaleDateString('zh-TW');
+
+  const thumbHtml=isImg
+    ?`<img src="${a.dataUrl}" loading="lazy">`
+    :`<div class="asset-thumb-placeholder">${getFileIcon(a.name)}</div>`;
+
+  const listBadgesHtml=_libView==='list'
+    ?`<div class="asset-list-badges">
+        <span class="chip ${ipChip}">${a.ip}</span>
+        <span class="chip ${typeChip}">${a.type}</span>
+      </div>`:'' ;
+
+  return `<div class="asset-card" onclick="openLightbox('${a.id}')">
+    <div class="asset-thumb">
+      ${thumbHtml}
+      <span class="asset-type-badge chip ${typeChip}">${TYPE_ICON[a.type]||''} ${a.type}</span>
+      <span class="asset-ip-badge chip ${ipChip}">${a.ip}</span>
+    </div>
+    <div class="asset-body">
+      <div class="asset-name">${a.name}</div>
+      ${listBadgesHtml}
+      <div class="asset-meta">${sz} · ${a.uploader} · ${when}</div>
+    </div>
+  </div>`;
+}
+
+function updateKPIs(){
+  const all=getLib();
+  const now=Date.now();
+  const week=all.filter(a=>now-new Date(a.uploadedAt)<7*86400*1000).length;
+  const source=all.filter(a=>a.type==='版權方原圖').length;
+  const design=all.filter(a=>['概念圖','2D設計稿','3D建模'].includes(a.type)).length;
+  const ips=[...new Set(all.map(a=>a.ip))].length;
+  document.getElementById('kpi-total').textContent=all.length;
+  document.getElementById('kpi-total-sub').textContent='共 '+ips+' 個 IP';
+  document.getElementById('kpi-week').textContent=week;
+  document.getElementById('kpi-source').textContent=source;
+  document.getElementById('kpi-design').textContent=design;
+}
+
+function updateSidebarCounts(){
+  const all=getLib();
+  document.getElementById('sb-count-all').textContent=all.length;
+  ['Snoopy','Mofusand','Muziktiger','Opanchu','Chiikawa','其他'].forEach(ip=>{
+    const el=document.getElementById('sb-count-'+ip);
+    if(el) el.textContent=all.filter(a=>a.ip===ip).length;
+  });
+  ['版權方原圖','概念圖','2D設計稿','3D建模','打樣照','大貨照','包裝設計'].forEach(t=>{
+    const el=document.getElementById('sb-count-'+t);
+    if(el) el.textContent=all.filter(a=>a.type===t).length;
+  });
+  ['珮玲','詩彤','Bevis','賴哥'].forEach(u=>{
+    const el=document.getElementById('sb-count-'+u);
+    if(el) el.textContent=all.filter(a=>a.uploader===u).length;
+  });
+}
+
+/* ─── VIEW TOGGLE ─── */
+function setLibView(v){
+  _libView=v;
+  localStorage.setItem('lib_view',v);
+  document.getElementById('vbtn-grid').classList.toggle('active',v==='grid');
+  document.getElementById('vbtn-list').classList.toggle('active',v==='list');
+  renderAssets();
+}
+
+/* ─── SEARCH ─── */
+function onSearch(){ renderAssets(); }
+
+/* ─── UPLOAD ─── */
+function toggleDropZone(){
+  const dz=document.getElementById('drop-zone');
+  dz.classList.toggle('visible');
+  if(!dz.classList.contains('visible')){
+    _pendingFiles=[];
+    document.getElementById('upload-meta').style.display='none';
+    document.getElementById('um-file-list').textContent='';
+  }
+}
+
+function handleLibDrop(evt){
+  evt.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  _pendingFiles=[...evt.dataTransfer.files];
+  showUploadMeta();
+}
+
+function handleLibFileInput(inp){
+  _pendingFiles=[...inp.files];
+  inp.value='';
+  showUploadMeta();
+}
+
+function showUploadMeta(){
+  if(!_pendingFiles.length) return;
+  document.getElementById('upload-meta').style.display='block';
+  document.getElementById('um-file-list').innerHTML=
+    _pendingFiles.map(f=>`<span style="margin-right:10px;">📎 ${f.name} (${Math.round(f.size/1024)}KB)</span>`).join('');
+}
+
+function confirmUpload(){
+  if(!_pendingFiles.length){showToast('⚠ 請先選擇檔案');return;}
+  const ip=document.getElementById('um-ip').value;
+  const type=document.getElementById('um-type').value;
+  const note=document.getElementById('um-note').value;
+  const uploader=sess?.displayName||sess?.username||'—';
+
+  const bar=document.getElementById('up-progress');
+  const barFill=document.getElementById('up-progress-bar');
+  bar.style.display='block'; barFill.style.width='0%';
+
+  let done=0;
+  const total=_pendingFiles.length;
+  const lib=getLib();
+
+  _pendingFiles.forEach(file=>{
+    if(file.size>20*1024*1024){
+      showToast('⚠ '+file.name+' 超過 20MB，跳過');
+      done++; barFill.style.width=Math.round(done/total*100)+'%';
+      if(done===total) finishUpload(lib);
+      return;
+    }
+    const reader=new FileReader();
+    reader.onload=e=>{
+      lib.push({
+        id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        name:file.name, ip, type, uploader, note,
+        size:file.size, uploadedAt:new Date().toISOString(),
+        dataUrl:file.type.startsWith('image/')?e.target.result:null
+      });
+      done++; barFill.style.width=Math.round(done/total*100)+'%';
+      if(done===total) finishUpload(lib);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function finishUpload(lib){
+  saveLib(lib);
+  showToast('✅ 已上傳 '+_pendingFiles.length+' 個圖檔');
+  _pendingFiles=[];
+  document.getElementById('upload-meta').style.display='none';
+  document.getElementById('um-note').value='';
+  setTimeout(()=>{
+    document.getElementById('drop-zone').classList.remove('visible');
+    document.getElementById('up-progress').style.display='none';
+    document.getElementById('up-progress-bar').style.width='0%';
+  },600);
+  _filter='all';
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.querySelector('.sb-item').classList.add('active');
+  renderAssets();
+}
+
+/* ─── LIGHTBOX ─── */
+function openLightbox(id){
+  const lib=getLib();
+  const a=lib.find(x=>x.id===id);
+  if(!a) return;
+  const lb=document.getElementById('lightbox');
+  const content=document.getElementById('lb-content');
+  const isImg=a.dataUrl&&(a.dataUrl.startsWith('data:image')||a.dataUrl.startsWith('http'));
+  const sz=a.size>1024*1024?(a.size/1024/1024).toFixed(1)+'MB':Math.round(a.size/1024)+'KB';
+  const when=new Date(a.uploadedAt).toLocaleString('zh-TW');
+  const ipChip=IP_CHIP[a.ip]||'chip-ip-other';
+  const typeChip=TYPE_CHIP[a.type]||'';
+
+  content.innerHTML=`
+    <span class="lb-close" onclick="closeLightbox()">✕</span>
+    <div class="lb-img-wrap">
+      ${isImg?`<img src="${a.dataUrl}">`:`<div class="lb-img-placeholder">${getFileIcon(a.name)}</div>`}
+    </div>
+    <div class="lb-info">
+      <div class="lb-name">${a.name}</div>
+      <div class="lb-badges">
+        <span class="chip ${ipChip}">${a.ip}</span>
+        <span class="chip ${typeChip}">${TYPE_ICON[a.type]||''} ${a.type}</span>
+      </div>
+      <div class="lb-meta-grid">
+        <div class="lb-meta-item"><div class="lb-meta-label">上傳者</div><div class="lb-meta-val">${a.uploader}</div></div>
+        <div class="lb-meta-item"><div class="lb-meta-label">上傳時間</div><div class="lb-meta-val">${when}</div></div>
+        <div class="lb-meta-item"><div class="lb-meta-label">檔案大小</div><div class="lb-meta-val">${sz}</div></div>
+        <div class="lb-meta-item"><div class="lb-meta-label">關聯項目</div><div class="lb-meta-val" style="color:var(--txt-mid)">— （飛書 API 接入後自動關聯）</div></div>
+      </div>
+      <div class="lb-actions">
+        ${isImg?`<button class="lb-btn lb-btn-primary" onclick="downloadAsset('${id}')">⬇ 下載</button>`:''}
+        <button class="lb-btn lb-btn-ghost" onclick="copyAssetName('${a.name}')">📋 複製檔名</button>
+        <button class="lb-btn lb-btn-danger" onclick="deleteAsset('${id}')">🗑 刪除</button>
+      </div>
+      <div class="lb-desc-wrap">
+        <div class="lb-desc-label">備注</div>
+        <textarea class="lb-desc-ta" id="lb-note-ta" placeholder="記錄版次、版權方意見、使用範圍…"
+          oninput="saveAssetNote('${id}',this.value)">${a.note||''}</textarea>
+      </div>
+    </div>`;
+  lb.classList.add('open');
+}
+
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+
+function downloadAsset(id){
+  const a=getLib().find(x=>x.id===id);
+  if(!a||!a.dataUrl){showToast('⚠ 非圖片格式無法直接下載，請從飛書雲端取用');return;}
+  const link=document.createElement('a');
+  link.href=a.dataUrl; link.download=a.name; link.click();
+}
+
+function copyAssetName(name){
+  navigator.clipboard.writeText(name).then(()=>showToast('✅ 已複製檔名'));
+}
+
+function deleteAsset(id){
+  if(!confirm('確認刪除此圖檔？此操作無法復原。')) return;
+  const lib=getLib().filter(a=>a.id!==id);
+  saveLib(lib);
+  closeLightbox();
+  renderAssets();
+  showToast('🗑 已刪除');
+}
+
+function saveAssetNote(id,text){
+  const lib=getLib();
+  const a=lib.find(x=>x.id===id);
+  if(a) a.note=text;
+  saveLib(lib);
+}
+
+/* ─── TOAST ─── */
+function showToast(msg){
+  const t=document.getElementById('lib-toast');
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+/* ─── INIT ─── */
+(function init(){
+  if(_libView==='list'){
+    document.getElementById('vbtn-grid').classList.remove('active');
+    document.getElementById('vbtn-list').classList.add('active');
+  }
+  renderAssets();
+})();
+</script>
+</body>
+</html>
