@@ -186,6 +186,50 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   .main{padding:14px;}
   .kpi-grid{grid-template-columns:1fr 1fr;}
 }
+
+/* QUOTE FORM MODAL */
+.qmodal-overlay{display:none;position:fixed;inset:0;background:#000000b0;z-index:300;align-items:flex-end;justify-content:center;}
+.qmodal-overlay.open{display:flex;}
+.qmodal{background:var(--surface);border:1px solid var(--border-hi);border-radius:20px 20px 0 0;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:0 0 env(safe-area-inset-bottom,16px);}
+.qmodal-handle{width:36px;height:4px;background:var(--border-hi);border-radius:2px;margin:12px auto 0;}
+.qmodal-head{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;}
+.qmodal-title{font-size:15px;font-weight:800;}
+.qmodal-close{background:none;border:none;color:var(--txt-mid);font-size:18px;cursor:pointer;padding:4px;}
+.qmodal-body{padding:12px 20px 20px;}
+.qform-section{font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.qform-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.qform-grid.single{grid-template-columns:1fr;}
+.qform-field{display:flex;flex-direction:column;gap:4px;}
+.qform-label{font-size:9px;font-weight:700;color:var(--txt-mid);letter-spacing:.05em;}
+.qform-label .req{color:var(--danger);}
+.qform-input,.qform-select,.qform-textarea{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);font-size:12px;padding:8px 10px;outline:none;font-family:inherit;transition:border-color .15s;}
+.qform-input:focus,.qform-select:focus,.qform-textarea:focus{border-color:var(--accent);}
+.qform-input.filled{border-color:#22c55e30;background:#22c55e06;}
+.qform-textarea{resize:vertical;min-height:60px;}
+.qform-footer{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+.btn-qsave{flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.btn-qsave:hover{opacity:.88;}
+.btn-qcancel{background:var(--card);color:var(--txt-mid);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;}
+.ai-source-banner{background:#818cf812;border:1px solid #818cf828;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:10px;color:var(--txt-mid);display:flex;align-items:flex-start;gap:7px;}
+.missing-field{border-color:var(--warn)!important;background:var(--warn-dim)!important;}
+
+/* QUOTES LIST */
+.quotes-list{margin-top:16px;}
+.quote-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;transition:border-color .15s;}
+.quote-item:hover{border-color:var(--border-hi);}
+.quote-item-body{flex:1;min-width:0;}
+.quote-item-name{font-size:12px;font-weight:700;margin-bottom:3px;}
+.quote-item-meta{font-size:10px;color:var(--txt-mid);}
+.quote-item-right{flex-shrink:0;text-align:right;}
+.quote-item-amt{font-size:13px;font-weight:800;color:var(--warn);}
+.quote-item-date{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+.btn-edit-quote{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--accent);cursor:pointer;margin-top:6px;}
+.btn-edit-quote:hover{background:var(--card2);}
+.btn-del-quote{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-lo);cursor:pointer;margin-top:6px;margin-left:4px;}
+.btn-del-quote:hover{color:var(--danger);border-color:var(--danger);}
+.status-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;}
+.sb-draft{background:#f59e0b18;color:var(--warn);}
+.sb-confirmed{background:var(--ok-dim);color:var(--ok);}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -631,8 +675,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <!-- AI 解析入口 -->
     <div class="two-col-card">
       <div class="panel-title">
-        <span>📸 AI 解析報價單</span>
-        <span class="chip chip-info">採購台特色</span>
+        <span>📸 報價單入庫</span>
+        <button id="btn-manual-add" onclick="openQuoteForm(null)" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--txt-mid);cursor:pointer;">＋ 手動新增</button>
       </div>
       <input type="file" id="ai-file" accept="image/*,.pdf" style="display:none" onchange="handleAiFile(this.files[0])">
       <div class="upload-zone" id="upload-zone"
@@ -642,14 +686,115 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         ondrop="event.preventDefault();this.classList.remove('drag-over');handleAiFile(event.dataTransfer.files[0])">
         <div class="upload-icon">📸</div>
         <div class="upload-title">貼上截圖 / 上傳報價單</div>
-        <div class="upload-sub">AI 自動解析 → 存入比價庫<br>品項、單價、MOQ、交期、付款條件</div>
+        <div class="upload-sub">AI 解析 → 進入可編輯表單<br>品項、單價、MOQ、交期、付款條件</div>
         <div class="paste-hint">💡 Ctrl+V 直接貼上微信截圖</div>
       </div>
-      <div id="ai-parse-result" style="display:none;margin-top:10px;"></div>
+      <div id="ai-loading" style="display:none;text-align:center;padding:14px;color:var(--txt-mid);font-size:11px;"><div style="font-size:26px;margin-bottom:6px">🤖</div>AI 解析中...</div>
+      <!-- Saved quotes list -->
+      <div class="quotes-list" id="quotes-list"></div>
     </div>
   </div>
 
 </div><!-- /main -->
+
+<!-- QUOTE FORM MODAL -->
+<div class="qmodal-overlay" id="qmodal-overlay" onclick="if(event.target===this)closeQuoteForm()">
+<div class="qmodal" id="qmodal">
+  <div class="qmodal-handle"></div>
+  <div class="qmodal-head">
+    <div class="qmodal-title" id="qmodal-title">新增報價單</div>
+    <button class="qmodal-close" onclick="closeQuoteForm()">✕</button>
+  </div>
+  <div class="qmodal-body">
+    <div id="qform-ai-banner" class="ai-source-banner" style="display:none">
+      <span>✨</span>
+      <div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:2px;">AI 已解析，請逐欄確認</div>
+        <div>橘色欄位代表 AI 沒找到，需手動補填。確認無誤後再儲存。</div>
+      </div>
+    </div>
+
+    <div class="qform-section">供應商資訊</div>
+    <div class="qform-grid">
+      <div class="qform-field">
+        <label class="qform-label">供應商名稱 <span class="req">*</span></label>
+        <input class="qform-input" id="qf-supplier" placeholder="例：東莞永盛玩具">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">公司全稱（合約/匯款用）</label>
+        <input class="qform-input" id="qf-company" placeholder="例：東莞市永盛玩具有限公司">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">聯絡人</label>
+        <input class="qform-input" id="qf-contact" placeholder="例：李總 / 王經理">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">電話 / 微信</label>
+        <input class="qform-input" id="qf-phone" placeholder="例：138 xxxx xxxx">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">開戶銀行</label>
+        <input class="qform-input" id="qf-bank" placeholder="例：中國建設銀行東莞支行">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">收款帳號</label>
+        <input class="qform-input" id="qf-account" placeholder="例：6227 xxxx xxxx xxxx">
+      </div>
+    </div>
+
+    <div class="qform-section">報價資訊</div>
+    <div class="qform-grid">
+      <div class="qform-field" style="grid-column:1/-1">
+        <label class="qform-label">品項名稱 <span class="req">*</span></label>
+        <input class="qform-input" id="qf-item" placeholder="例：Snoopy 公仔 15cm 夏季款">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">單價</label>
+        <input class="qform-input" id="qf-unit-price" type="text" placeholder="例：18.50">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">數量 / MOQ</label>
+        <input class="qform-input" id="qf-qty" type="text" placeholder="例：1000 / 最低 500">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">總金額 <span class="req">*</span></label>
+        <input class="qform-input" id="qf-total" type="text" placeholder="例：148000">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">幣別</label>
+        <select class="qform-select" id="qf-currency">
+          <option value="RMB">RMB ¥</option>
+          <option value="TWD">TWD NT$</option>
+          <option value="USD">USD $</option>
+          <option value="HKD">HKD HK$</option>
+          <option value="THB">THB ฿</option>
+        </select>
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">交期（天）</label>
+        <input class="qform-input" id="qf-lead-time" type="text" placeholder="例：45">
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">預計交貨日</label>
+        <input class="qform-input" id="qf-delivery-date" type="date">
+      </div>
+      <div class="qform-field" style="grid-column:1/-1">
+        <label class="qform-label">付款條件</label>
+        <input class="qform-input" id="qf-payment" placeholder="例：30% 訂金，40% 大貨出廠，30% 到貨">
+      </div>
+      <div class="qform-field" style="grid-column:1/-1">
+        <label class="qform-label">備注 / 其他條款</label>
+        <textarea class="qform-textarea" id="qf-notes" placeholder="例：含 IP 授權確認費；含運費；需提供品質報告..."></textarea>
+      </div>
+    </div>
+
+    <div class="qform-footer">
+      <button class="btn-qcancel" onclick="closeQuoteForm()">取消</button>
+      <button class="btn-qsave" onclick="saveQuoteForm()">💾 儲存報價單</button>
+    </div>
+  </div>
+</div>
+</div>
 
 <script>
 /* ── AUTH ── */
@@ -671,7 +816,7 @@ const CAN_CONFIRM_PO = ['laige','ray'].includes(SESS.user);
 const CAN_WRITE_PROC = CAN_UPDATE_PO || CAN_CONFIRM_PO;
 const IS_READONLY = !CAN_WRITE_PROC;
 if(IS_READONLY){
-  document.querySelectorAll('.btn-send-shawn,.btn-send,.upload-zone,.paste-hint,#ai-file').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.btn-send-shawn,.btn-send,.upload-zone,.paste-hint,#ai-file,#btn-manual-add').forEach(el=>el.style.display='none');
   const banner = document.createElement('div');
   banner.style.cssText='background:#818cf810;border:1px solid #818cf830;border-radius:8px;padding:8px 14px;font-size:11px;color:var(--txt-mid);margin-bottom:16px;';
   banner.textContent='👁 查閱視角：可查看所有報價與採購進度，提交 PO 及操作功能由採購台（賴哥 / 木子）負責';
@@ -865,18 +1010,20 @@ document.addEventListener('paste', e=>{
 
 function handleAiFile(file){
   if(!file) return;
-  const res = document.getElementById('ai-parse-result');
-  res.style.display='block';
-  res.innerHTML=`<div style="text-align:center;padding:14px;color:var(--txt-mid);font-size:11px;"><div style="font-size:26px;margin-bottom:6px">🤖</div>AI 解析中 · ${file.name||'截圖'}</div>`;
+  const loading = document.getElementById('ai-loading');
+  loading.style.display = 'block';
+  loading.querySelector('div:last-child').textContent = 'AI 解析中 · ' + (file.name||'截圖');
   const reader = new FileReader();
-  reader.onload = async e=>{
-    const base64 = e.target.result.split(',')[1];
+  reader.onload = async ev=>{
+    const base64 = ev.target.result.split(',')[1];
     const mime = file.type||'image/jpeg';
     try{
       const p = await callGemini(base64, mime);
-      renderAiResult(p, res);
+      loading.style.display = 'none';
+      openQuoteForm(p, true);
     }catch(err){
-      res.innerHTML=`<div style="color:var(--danger);font-size:11px;padding:10px;">解析失敗：${err.message}</div>`;
+      loading.style.display = 'none';
+      _toast('AI 解析失敗：' + err.message, '#ef4444');
     }
   };
   reader.readAsDataURL(file);
@@ -884,80 +1031,199 @@ function handleAiFile(file){
 
 async function callGemini(base64, mime){
   const prompt=`你是採購AI助理。從報價單圖片精確提取以下欄位，返回JSON（找不到填null）：
-{"supplier":"供應商名稱","item":"品項名稱","unit_price":"單價（僅數字）","qty":"建議數量（僅數字）","total":"總金額（僅數字）","currency":"幣別(RMB/TWD/USD等)","moq":"最小起訂量（僅數字）","lead_time_days":"交期工作天（僅數字）","payment_terms":"付款條件說明","delivery_date":"預計交貨日期","notes":"其他備注"}
-只返回JSON。`;
-  const body={contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:base64}}]}],generationConfig:{temperature:0.1,maxOutputTokens:512}};
+{"supplier":"供應商名稱","company_full":"公司全稱（法律名稱）","contact":"聯絡人姓名","phone":"聯絡電話或微信","bank":"開戶銀行名稱","account":"收款帳號","item":"品項名稱","unit_price":"單價（僅數字）","qty":"數量（僅數字）","total":"總金額（僅數字）","currency":"幣別(RMB/TWD/USD/HKD/THB)","moq":"最小起訂量（僅數字）","lead_time_days":"交期工作天（僅數字）","payment_terms":"付款條件說明","delivery_date":"預計交貨日期YYYY-MM-DD","notes":"其他備注"}
+只返回JSON，不加說明。`;
+  const body={contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:base64}}]}],generationConfig:{temperature:0.1,maxOutputTokens:600}};
   const r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   const d=await r.json();
   const text=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
   const m=text.match(/\{[\s\S]*\}/);
-  if(!m) throw new Error('AI 無法識別此報價單格式');
+  if(!m) throw new Error('無法識別報價單格式');
   return JSON.parse(m[0]);
 }
 
-function renderAiResult(p, container){
-  const safe=v=>(v!=null&&v!=='')?""+v:"—";
-  const pid='ai-'+Date.now();
-  container.innerHTML=`
-  <div style="background:var(--card2);border:1px solid var(--border-hi);border-radius:10px;padding:12px;">
-    <div style="background:#ef444415;border:1px solid #ef444440;border-radius:8px;padding:8px 10px;margin-bottom:10px;display:flex;align-items:flex-start;gap:8px;">
-      <span style="font-size:14px;flex-shrink:0;">⚠️</span>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--danger);margin-bottom:2px;">AI 解析結果 · 尚未寫入飛書主表</div>
-        <div style="font-size:9px;color:var(--txt-mid);">請逐欄確認正確後才能送出。寫入後狀態為「AI草稿-待確認」，不會直接進入 Ray 批核佇列。</div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
-      <span style="background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;">✨ AI 解析完成</span>
-      <span style="font-size:10px;color:var(--warn)">請賴哥逐欄確認</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;">
-      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">供應商</div><div style="font-size:12px;font-weight:700;">${safe(p.supplier)}</div></div>
-      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">品項</div><div style="font-size:12px;font-weight:700;">${safe(p.item)}</div></div>
-      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">總金額</div><div style="font-size:14px;font-weight:800;color:var(--warn);">${p.currency||'¥'} ${safe(p.total)}</div></div>
-      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">交期</div><div style="font-size:12px;font-weight:700;">${safe(p.lead_time_days)} 天</div></div>
-      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">付款條件</div><div style="font-size:11px;font-weight:600;">${safe(p.payment_terms)}</div></div>
-      <div style="background:var(--card);border-radius:7px;padding:8px;"><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">MOQ</div><div style="font-size:12px;font-weight:700;">${safe(p.moq)}</div></div>
-    </div>
-    ${p.notes?`<div style="font-size:10px;color:var(--txt-mid);margin-bottom:8px;">📝 ${p.notes}</div>`:''}
-    <label id="${pid}-chk" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border-radius:8px;cursor:pointer;margin-bottom:8px;border:1px solid var(--border);">
-      <input type="checkbox" id="${pid}-cb" onchange="document.getElementById('${pid}-btn').disabled=!this.checked;document.getElementById('${pid}-btn').style.opacity=this.checked?'1':'0.4';" style="width:16px;height:16px;cursor:pointer;">
-      <span style="font-size:11px;color:var(--txt-mid);">已逐欄確認，AI 解析結果與原始報價單一致</span>
-    </label>
-    <button id="${pid}-btn" disabled onclick="saveAiToCompare(${JSON.stringify(p).replace(/"/g,'&quot;')})" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;opacity:0.4;">💾 確認無誤 · 存入草稿佇列（AI草稿-待確認）</button>
-  </div>`;
+/* ── QUOTE FORM ── */
+const QUOTES_KEY = 'erp_quotes_v1';
+let _editId = null;
+
+function loadQuotes(){ try{ return JSON.parse(localStorage.getItem(QUOTES_KEY)||'[]'); }catch(e){ return []; } }
+function saveQuotes(q){ localStorage.setItem(QUOTES_KEY, JSON.stringify(q)); }
+
+function openQuoteForm(prefill, fromAi=false){
+  _editId = prefill?._id || null;
+  const modal = document.getElementById('qmodal-overlay');
+  const banner = document.getElementById('qform-ai-banner');
+  const title = document.getElementById('qmodal-title');
+
+  if(_editId){
+    title.textContent = '編輯報價單';
+    banner.style.display = 'none';
+  } else if(fromAi){
+    title.textContent = 'AI 解析結果 — 請確認並補填';
+    banner.style.display = 'flex';
+  } else {
+    title.textContent = '手動新增報價單';
+    banner.style.display = 'none';
+  }
+
+  const p = prefill || {};
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.value = val || '';
+    if(fromAi){
+      if(val) el.classList.add('filled');
+      else el.classList.add('missing-field');
+    } else {
+      el.classList.remove('filled','missing-field');
+    }
+  };
+
+  set('qf-supplier',      p.supplier || p.name || '');
+  set('qf-company',       p.company_full || '');
+  set('qf-contact',       p.contact || '');
+  set('qf-phone',         p.phone || '');
+  set('qf-bank',          p.bank || '');
+  set('qf-account',       p.account || '');
+  set('qf-item',          p.item || '');
+  set('qf-unit-price',    p.unit_price || '');
+  set('qf-qty',           p.qty || p.moq || '');
+  set('qf-total',         p.total || '');
+  set('qf-lead-time',     p.lead_time_days || '');
+  set('qf-delivery-date', p.delivery_date || '');
+  set('qf-payment',       p.payment_terms || '');
+  set('qf-notes',         p.notes || '');
+
+  const ccy = document.getElementById('qf-currency');
+  if(ccy) ccy.value = p.currency || 'RMB';
+
+  modal.classList.add('open');
+  setTimeout(()=> document.getElementById('qf-supplier').focus(), 120);
 }
 
-function saveAiToCompare(p){
-  const fields={
-    '審批標題': `採購審批 · ${p.item||'?'} · ${p.supplier||'?'}`,
-    '審批類型': '採購審批',
-    '申請人': SESS.name||'賴哥',
-    '申請日期': Date.now(),
-    '申請說明': `AI解析報價單\n供應商：${p.supplier||'?'}\n品項：${p.item||'?'}\n總金額：${p.total||'?'} ${p.currency||'RMB'}\n交期：${p.lead_time_days||'?'}天\n付款條件：${p.payment_terms||'?'}`,
-    '金額': p.total?Number(String(p.total).replace(/[^0-9.]/g,'')):null,
-    '幣別': p.currency||'RMB',
-    '審批狀態': 'AI草稿-待確認',
+function closeQuoteForm(){
+  document.getElementById('qmodal-overlay').classList.remove('open');
+  _editId = null;
+}
+
+function saveQuoteForm(){
+  const g = id => (document.getElementById(id)||{}).value?.trim() || '';
+  const supplier = g('qf-supplier');
+  const item     = g('qf-item');
+  const total    = g('qf-total');
+
+  if(!supplier){ _toast('請填寫供應商名稱', '#ef4444'); document.getElementById('qf-supplier').focus(); return; }
+  if(!item){     _toast('請填寫品項名稱',   '#ef4444'); document.getElementById('qf-item').focus(); return; }
+
+  const quotes = loadQuotes();
+  const record = {
+    _id:          _editId || ('q'+Date.now()),
+    _ts:          Date.now(),
+    _by:          SESS.name || SESS.user,
+    _status:      'draft',
+    supplier:     supplier,
+    company_full: g('qf-company'),
+    contact:      g('qf-contact'),
+    phone:        g('qf-phone'),
+    bank:         g('qf-bank'),
+    account:      g('qf-account'),
+    item:         item,
+    unit_price:   g('qf-unit-price'),
+    qty:          g('qf-qty'),
+    total:        total,
+    currency:     document.getElementById('qf-currency').value,
+    lead_time_days: g('qf-lead-time'),
+    delivery_date:  g('qf-delivery-date'),
+    payment_terms:  g('qf-payment'),
+    notes:          g('qf-notes'),
   };
-  Object.keys(fields).forEach(k=>{if(fields[k]===null)delete fields[k];});
-  if(window.USE_MOCK){
-    _addToApprovalMock(fields);
-    const btn=document.querySelector('#ai-parse-result button');
-    if(btn){btn.textContent='✓ 已存入（Demo 模式）';btn.disabled=true;btn.style.opacity='0.6';}
-    return;
+
+  if(_editId){
+    const idx = quotes.findIndex(q=>q._id===_editId);
+    if(idx>=0){ quotes[idx]={...quotes[idx],...record,_ts:Date.now()}; }
+    else { quotes.unshift(record); }
+  } else {
+    quotes.unshift(record);
   }
-  createRec(_T.approval, fields).then(d=>{
-    const btn = document.querySelector('#ai-parse-result button');
-    if(btn){
-      btn.textContent = d.code===0 ? '✓ 已存入，Ray 佇列已更新' : '存入失敗，請重試';
-      btn.disabled = true;
-      btn.style.opacity = '0.6';
-    }
-  }).catch(()=>{});
+  saveQuotes(quotes);
+  closeQuoteForm();
+  renderQuotesList();
+  _toast(_editId ? '已更新報價單 ✓' : '報價單已儲存 ✓');
+}
+
+function deleteQuote(id){
+  if(!confirm('確定刪除此報價單？')) return;
+  const quotes = loadQuotes().filter(q=>q._id!==id);
+  saveQuotes(quotes);
+  renderQuotesList();
+  _toast('已刪除', '#f59e0b');
+}
+
+function confirmQuote(id){
+  const quotes = loadQuotes();
+  const q = quotes.find(q=>q._id===id);
+  if(!q) return;
+  q._status = 'confirmed';
+  saveQuotes(quotes);
+  renderQuotesList();
+  _toast('已標記為已確認 ✓');
+}
+
+const CCY_SYM = {RMB:'¥',TWD:'NT$',USD:'$',HKD:'HK$',THB:'฿'};
+
+function renderQuotesList(){
+  const list = document.getElementById('quotes-list');
+  if(!list) return;
+  const quotes = loadQuotes();
+  if(!quotes.length){ list.innerHTML=''; return; }
+
+  const canEdit = CAN_WRITE_PROC;
+  list.innerHTML = '<div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;margin-top:4px;">報價單庫 · ' + quotes.length + ' 筆</div>';
+
+  quotes.forEach(q=>{
+    const sym = CCY_SYM[q.currency] || q.currency || '¥';
+    const dateStr = q._ts ? new Date(q._ts).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
+    const missing = [];
+    if(!q.company_full) missing.push('公司全稱');
+    if(!q.bank)         missing.push('開戶銀行');
+    if(!q.account)      missing.push('收款帳號');
+    if(!q.payment_terms) missing.push('付款條件');
+
+    const missingHtml = missing.length
+      ? `<div style="font-size:9px;color:var(--warn);margin-top:3px;">⚠ 待補：${missing.join('、')}</div>`
+      : '';
+
+    const statusBadge = q._status==='confirmed'
+      ? '<span class="status-badge sb-confirmed">✓ 已確認</span>'
+      : '<span class="status-badge sb-draft">草稿</span>';
+
+    const item = document.createElement('div');
+    item.className = 'quote-item';
+    item.innerHTML = `
+      <div class="quote-item-body">
+        <div class="quote-item-name">${q.supplier} · ${q.item} ${statusBadge}</div>
+        <div class="quote-item-meta">${q.contact||''}${q.contact&&q.phone?' · ':''}${q.phone||''}</div>
+        ${missingHtml}
+        ${canEdit ? `
+        <div style="display:flex;gap:0;margin-top:6px;">
+          <button class="btn-edit-quote" onclick="openQuoteForm(${JSON.stringify(q).replace(/"/g,'&quot;')})">編輯</button>
+          ${q._status!=='confirmed' ? `<button class="btn-edit-quote" style="color:var(--ok);border-color:var(--ok)30;" onclick="confirmQuote('${q._id}')">✓ 確認</button>` : ''}
+          <button class="btn-del-quote" onclick="deleteQuote('${q._id}')">刪除</button>
+        </div>` : ''}
+      </div>
+      <div class="quote-item-right">
+        <div class="quote-item-amt">${sym}${q.total||'—'}</div>
+        ${q.lead_time_days ? `<div style="font-size:9px;color:var(--txt-lo);margin-top:2px;">交期 ${q.lead_time_days} 天</div>` : ''}
+        <div class="quote-item-date">${q._by} · ${dateStr}</div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
 }
 
 /* ── INIT ── */
 loadKPIsFromFeishu();
+renderQuotesList();
 </script>
 
 
