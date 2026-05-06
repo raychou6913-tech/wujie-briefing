@@ -251,23 +251,26 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
     <div class="field-row">
       <div class="field"><label>出發地</label>
-        <select id="ns-from">
+        <select id="ns-from" onchange="onFromChange()">
           <option value="北京">北京（工廠提貨）</option>
           <option value="廣州">廣州（工廠提貨）</option>
           <option value="深圳">深圳（工廠提貨）</option>
           <option value="上海">上海中轉</option>
           <option value="台灣">台灣悍草</option>
+          <option value="__other__">其他（手動填入）</option>
         </select>
+        <input id="ns-from-custom" style="display:none;margin-top:6px;" placeholder="輸入出發地…">
       </div>
       <div class="field"><label id="ns-to-label">目的地（境外）</label>
-        <select id="ns-to-intl">
+        <select id="ns-to-intl" onchange="onToIntlChange()">
           <option value="泰國曼谷">泰國曼谷</option>
           <option value="台灣">台灣</option>
           <option value="香港">香港</option>
           <option value="深圳">深圳</option>
-          <option value="其他">其他</option>
+          <option value="其他">其他（手動填入）</option>
         </select>
-        <select id="ns-to-cn" style="display:none;">
+        <input id="ns-to-intl-custom" style="display:none;margin-top:6px;" placeholder="輸入目的地…">
+        <select id="ns-to-cn" style="display:none;" onchange="onToCnChange()">
           <option value="上海">上海</option>
           <option value="北京">北京（本地）</option>
           <option value="廣州">廣州</option>
@@ -276,8 +279,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <option value="深圳">深圳</option>
           <option value="武漢">武漢</option>
           <option value="南京">南京</option>
-          <option value="其他城市">其他城市</option>
+          <option value="其他城市">其他城市（手動填入）</option>
         </select>
+        <input id="ns-to-cn-custom" style="display:none;margin-top:6px;" placeholder="輸入目的城市…">
       </div>
     </div>
 
@@ -770,9 +774,79 @@ function setShipType(type){
     : '例：BKK-240501 Snoopy 夏日系列';
 }
 
+/* ── BUILD ORIGIN DROPDOWN FROM PROCUREMENT QUOTES ── */
+function buildOriginDropdown(){
+  const sel = document.getElementById('ns-from');
+  if(!sel) return;
+  // Read saved quotes from procurement
+  const quotes = JSON.parse(localStorage.getItem('erp_quotes_v1')||'[]');
+  // Deduplicate: key = supplier+city
+  const seen = new Set();
+  const supplierOpts = [];
+  quotes.forEach(q=>{
+    const name = q.supplier||'';
+    const city = q.city||'';
+    if(!name) return;
+    const key = name+'|'+city;
+    if(seen.has(key)) return;
+    seen.add(key);
+    supplierOpts.push({name, city});
+  });
+  // Rebuild options: static ones first, then supplier-derived, then 手動
+  const STATIC = [
+    {value:'北京',  label:'北京（工廠提貨）'},
+    {value:'廣州',  label:'廣州（工廠提貨）'},
+    {value:'深圳',  label:'深圳（工廠提貨）'},
+    {value:'上海',  label:'上海中轉'},
+    {value:'台灣',  label:'台灣悍草'},
+  ];
+  // Collect values already covered by static list
+  const staticCities = new Set(STATIC.map(s=>s.value));
+  sel.innerHTML = STATIC.map(s=>`<option value="${s.value}">${s.label}</option>`).join('');
+  supplierOpts.forEach(s=>{
+    const val = s.city ? `${s.name}·${s.city}` : s.name;
+    const label = s.city ? `${s.name}（${s.city}）` : s.name;
+    // Skip if city is already in static list and supplier doesn't add info
+    sel.innerHTML += `<option value="${val}">${label}</option>`;
+  });
+  sel.innerHTML += `<option value="__other__">其他（手動填入）</option>`;
+  // Reset custom input
+  const custom = document.getElementById('ns-from-custom');
+  if(custom){ custom.value=''; custom.style.display='none'; }
+}
+
+function onFromChange(){
+  const sel = document.getElementById('ns-from');
+  const custom = document.getElementById('ns-from-custom');
+  if(!custom) return;
+  if(sel.value==='__other__'){ custom.style.display='block'; custom.focus(); }
+  else { custom.style.display='none'; custom.value=''; }
+}
+
+function onToIntlChange(){
+  const sel = document.getElementById('ns-to-intl');
+  const custom = document.getElementById('ns-to-intl-custom');
+  if(!custom) return;
+  if(sel.value==='其他'){ custom.style.display='block'; custom.focus(); }
+  else { custom.style.display='none'; custom.value=''; }
+}
+
+function onToCnChange(){
+  const sel = document.getElementById('ns-to-cn');
+  const custom = document.getElementById('ns-to-cn-custom');
+  if(!custom) return;
+  if(sel.value==='其他城市'){ custom.style.display='block'; custom.focus(); }
+  else { custom.style.display='none'; custom.value=''; }
+}
+
 function openNewShipment(){
   ['ns-name','ns-po','ns-order','ns-boxes','ns-weight','ns-cbm','ns-freight','ns-customer','ns-tracking'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.value='';
+  });
+  buildOriginDropdown();
+  // Reset custom inputs
+  ['ns-from-custom','ns-to-intl-custom','ns-to-cn-custom'].forEach(id=>{
+    const el=document.getElementById(id); if(el){el.value='';el.style.display='none';}
   });
   setShipType('cross_border');
   const today = new Date().toISOString().slice(0,10);
@@ -793,8 +867,11 @@ function saveNewShipment(){
   const newShip = {
     id:'s'+Date.now(), type,
     name,
-    from: document.getElementById('ns-from').value,
-    to: isCN ? document.getElementById('ns-to-cn').value : document.getElementById('ns-to-intl').value,
+    from: (()=>{ const v=document.getElementById('ns-from').value; return v==='__other__' ? (document.getElementById('ns-from-custom').value.trim()||'未填') : v; })(),
+    to: (()=>{
+      if(isCN){ const v=document.getElementById('ns-to-cn').value; return v==='其他城市' ? (document.getElementById('ns-to-cn-custom').value.trim()||'其他') : v; }
+      else { const v=document.getElementById('ns-to-intl').value; return v==='其他' ? (document.getElementById('ns-to-intl-custom').value.trim()||'其他') : v; }
+    })(),
     customer: isCN ? document.getElementById('ns-customer').value.trim() : '',
     mode: isCN ? document.getElementById('ns-mode-cn').value : document.getElementById('ns-mode-intl').value,
     terms: isCN ? '' : document.getElementById('ns-terms').value,

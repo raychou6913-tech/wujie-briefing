@@ -721,6 +721,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <input class="qform-input" id="qf-supplier" placeholder="例：東莞永盛玩具">
       </div>
       <div class="qform-field">
+        <label class="qform-label">工廠城市（出發地用）</label>
+        <input class="qform-input" id="qf-city" placeholder="例：東莞、廣州、深圳、北京">
+      </div>
+      <div class="qform-field">
         <label class="qform-label">公司全稱（合約/匯款用）</label>
         <input class="qform-input" id="qf-company" placeholder="例：東莞市永盛玩具有限公司">
       </div>
@@ -1080,6 +1084,7 @@ function openQuoteForm(prefill, fromAi=false){
   };
 
   set('qf-supplier',      p.supplier || p.name || '');
+  set('qf-city',          p.city || '');
   set('qf-company',       p.company_full || '');
   set('qf-contact',       p.contact || '');
   set('qf-phone',         p.phone || '');
@@ -1122,6 +1127,7 @@ function saveQuoteForm(){
     _by:          SESS.name || SESS.user,
     _status:      'draft',
     supplier:     supplier,
+    city:         g('qf-city'),
     company_full: g('qf-company'),
     contact:      g('qf-contact'),
     phone:        g('qf-phone'),
