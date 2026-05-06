@@ -792,6 +792,46 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
     </div>
 
+    <div class="qform-section">法人資訊</div>
+    <div class="qform-grid">
+      <div class="qform-field">
+        <label class="qform-label">採購主體（哪間公司下單）</label>
+        <select class="qform-select" id="qf-entity">
+          <option value="">— 請選擇 —</option>
+          <option value="香港JV">香港JV</option>
+          <option value="深圳子公司">深圳子公司</option>
+          <option value="北京蕪解">北京蕪解</option>
+          <option value="台灣悍草">台灣悍草</option>
+          <option value="UJ BKK">UJ BKK</option>
+        </select>
+      </div>
+      <div class="qform-field">
+        <label class="qform-label">合作模式</label>
+        <select class="qform-select" id="qf-coop-mode" onchange="onProcCoopChange(this.value)">
+          <option value="">— 一般外部採購 —</option>
+          <option value="供應鏈發包">供應鏈發包（北京蕪解 → JV/深圳）</option>
+          <option value="批發包銷">批發包銷</option>
+          <option value="快閃店代運營">快閃店代運營</option>
+          <option value="共同投資">共同投資</option>
+          <option value="台灣代運營">台灣代運營</option>
+        </select>
+      </div>
+    </div>
+    <div id="proc-coop-hint" style="display:none;background:var(--warn-dim);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;margin-top:4px;font-size:11px;color:var(--warn);">
+      <div style="font-weight:700;margin-bottom:6px;">📦 供應鏈發包 — 自動計算供貨價</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
+        <div>
+          <div style="font-size:9px;color:var(--txt-mid);margin-bottom:2px;">採購報價（原廠）</div>
+          <input class="qform-input" id="proc-src-price" type="number" placeholder="0" oninput="calcSupplyPrice()" style="font-size:13px;font-weight:700;">
+        </div>
+        <div style="text-align:center;color:var(--txt-mid);font-size:18px;">× 1.1 ＝</div>
+        <div>
+          <div style="font-size:9px;color:var(--txt-mid);margin-bottom:2px;">供貨價給 JV/深圳</div>
+          <div id="proc-supply-price" style="font-size:18px;font-weight:800;color:var(--ok);">—</div>
+        </div>
+      </div>
+    </div>
+
     <div class="qform-footer">
       <button class="btn-qcancel" onclick="closeQuoteForm()">取消</button>
       <button class="btn-qsave" onclick="saveQuoteForm()">💾 儲存報價單</button>
@@ -1108,7 +1148,20 @@ function openQuoteForm(prefill, fromAi=false){
 
 function closeQuoteForm(){
   document.getElementById('qmodal-overlay').classList.remove('open');
+  document.getElementById('proc-coop-hint').style.display='none';
   _editId = null;
+}
+
+function onProcCoopChange(val){
+  const hint = document.getElementById('proc-coop-hint');
+  hint.style.display = val==='供應鏈發包' ? 'block' : 'none';
+  if(val==='供應鏈發包') calcSupplyPrice();
+}
+
+function calcSupplyPrice(){
+  const src = parseFloat(document.getElementById('proc-src-price').value)||0;
+  const supply = src * 1.1;
+  document.getElementById('proc-supply-price').textContent = src>0 ? `¥ ${supply.toFixed(2)}` : '—';
 }
 
 function saveQuoteForm(){
@@ -1138,6 +1191,9 @@ function saveQuoteForm(){
     qty:          g('qf-qty'),
     total:        total,
     currency:     document.getElementById('qf-currency').value,
+    entity:       g('qf-entity'),
+    coop_mode:    g('qf-coop-mode'),
+    supply_price: g('qf-coop-mode')==='供應鏈發包' ? (parseFloat(document.getElementById('proc-src-price').value)||0)*1.1 : null,
     lead_time_days: g('qf-lead-time'),
     delivery_date:  g('qf-delivery-date'),
     payment_terms:  g('qf-payment'),
