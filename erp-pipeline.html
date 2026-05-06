@@ -549,26 +549,6 @@ if(!CAN_MARK_DONE){
       <!-- DETAIL PANEL (hidden by default) -->
       <div id="detail-panel" style="display:none;"></div>
 
-      <!-- NEW PROJECT FORM -->
-      <div id="new-form" style="display:none;margin-top:14px;" class="detail-panel">
-        <div class="sec-title" style="margin-bottom:14px;">新增產品開發項目</div>
-        <input class="inp" id="nf-name" placeholder="產品名稱（例：Snoopy 夏季系列公仔）">
-        <select class="inp" id="nf-ip">
-          <option value="">選擇 IP 品牌</option>
-          <option>Snoopy</option><option>Mofusand</option><option>Muziktiger</option>
-          <option>Opanchu</option><option>SHRUG</option><option>其他</option>
-        </select>
-        <select class="inp" id="nf-type">
-          <option value="">產品類型（公仔 = 7輪 / 非公仔 = 5輪）</option>
-          <option>公仔</option><option>非公仔</option>
-        </select>
-        <input class="inp" id="nf-owner" placeholder="負責設計師（例：詩彤）">
-        <input class="inp" id="nf-launch" placeholder="預計上市（例：2026-Q3）">
-        <input class="inp" id="nf-price" type="number" placeholder="建議零售價（RMB）">
-        <input class="inp" id="nf-qty" type="number" placeholder="預計銷量（件）">
-        <button class="btn-ok-full" onclick="createProject()">✓ 建立項目</button>
-        <div id="nf-result" style="display:none;margin-top:10px;font-size:12px;text-align:center;"></div>
-      </div>
     </div><!-- /left -->
 
     <!-- RIGHT: Sidebar -->
@@ -718,6 +698,128 @@ if(!CAN_MARK_DONE){
   </div><!-- /content-layout -->
 
 </div><!-- /main -->
+
+<!-- ── NEW PROJECT MODAL ── -->
+<style>
+.nf-overlay{position:fixed;inset:0;background:#00000088;z-index:300;display:none;align-items:flex-end;justify-content:center;}
+.nf-overlay.open{display:flex;}
+.nf-sheet{background:#111318;border:1px solid #363b58;border-radius:16px 16px 0 0;width:100%;max-width:560px;padding:22px 20px 32px;max-height:90vh;overflow-y:auto;}
+.nf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.nf-title{font-size:15px;font-weight:800;color:#e8eaf8;}
+.nf-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;line-height:1;}
+/* Source toggle */
+.nf-src-row{display:flex;gap:8px;margin-bottom:16px;}
+.nf-src-btn{flex:1;padding:10px;border-radius:10px;border:1px solid #222535;background:#181a22;color:#7880a8;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;text-align:center;}
+.nf-src-btn.active-planned{border-color:#818cf8;color:#818cf8;background:#818cf810;}
+.nf-src-btn.active-adhoc{border-color:#f59e0b;color:#f59e0b;background:#f59e0b10;}
+.nf-src-hint{font-size:10px;padding:8px 12px;border-radius:8px;margin-bottom:14px;line-height:1.6;}
+.nf-src-hint.planned{background:#818cf808;border:1px solid #818cf820;color:#818cf8;}
+.nf-src-hint.adhoc{background:#f59e0b08;border:1px solid #f59e0b25;color:#f59e0b;}
+.nf-field{margin-bottom:12px;}
+.nf-label{display:block;font-size:10px;font-weight:700;color:#7880a8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
+.nf-input{width:100%;background:#181a22;border:1px solid #222535;border-radius:8px;color:#e8eaf8;font-size:13px;padding:9px 11px;outline:none;}
+.nf-input:focus{border-color:#818cf8;}
+.nf-input::placeholder{color:#3d4268;}
+.nf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.nf-divider{font-size:9px;font-weight:700;color:#3d4268;letter-spacing:.1em;text-transform:uppercase;border-top:1px solid #222535;padding-top:12px;margin-bottom:12px;}
+.nf-submit{width:100%;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;}
+.nf-submit.planned{background:#818cf8;color:#fff;}
+.nf-submit.adhoc{background:#f59e0b;color:#000;}
+.nf-result{display:none;margin-top:10px;font-size:12px;text-align:center;}
+</style>
+
+<div class="nf-overlay" id="nf-overlay" onclick="if(event.target===this)closeNewForm()">
+<div class="nf-sheet">
+  <div class="nf-header">
+    <span class="nf-title">新增產品開發項目</span>
+    <button class="nf-close" onclick="closeNewForm()">✕</button>
+  </div>
+
+  <!-- Source toggle -->
+  <div class="nf-src-row">
+    <button class="nf-src-btn active-planned" id="nf-src-planned" onclick="setNfSource('planned')">
+      📋 計劃內項目<br><span style="font-size:9px;font-weight:400;opacity:.8">已列入年度計劃 / 有預算</span>
+    </button>
+    <button class="nf-src-btn" id="nf-src-adhoc" onclick="setNfSource('adhoc')">
+      ⚡ 計劃外項目<br><span style="font-size:9px;font-weight:400;opacity:.8">OEM/ODM · 臨時單 · 補單</span>
+    </button>
+  </div>
+  <div class="nf-src-hint planned" id="nf-src-hint">
+    已在年度預算/計劃內的項目 · 走正常 7輪（公仔）或 5輪（非公仔）送審流程 · 版稅/採購已預算
+  </div>
+
+  <!-- 基本資訊 (共用) -->
+  <div class="nf-divider">基本資訊</div>
+  <div class="nf-field">
+    <label class="nf-label">產品名稱 <span style="color:#ef4444">*</span></label>
+    <input class="nf-input" id="nf-name" placeholder="例：Snoopy 夏季系列公仔">
+  </div>
+  <div class="nf-row">
+    <div class="nf-field">
+      <label class="nf-label">IP 品牌 <span style="color:#ef4444">*</span></label>
+      <select class="nf-input" id="nf-ip">
+        <option value="">選擇</option>
+        <option>Snoopy</option><option>Mofusand</option><option>Muziktiger</option>
+        <option>Opanchu</option><option>SHRUG</option><option>其他</option>
+      </select>
+    </div>
+    <div class="nf-field">
+      <label class="nf-label">產品類型 <span style="color:#ef4444">*</span></label>
+      <select class="nf-input" id="nf-type">
+        <option value="">選擇</option>
+        <option value="公仔">公仔（7 輪送審）</option>
+        <option value="非公仔">非公仔（5 輪送審）</option>
+      </select>
+    </div>
+  </div>
+  <div class="nf-row">
+    <div class="nf-field">
+      <label class="nf-label">負責設計師</label>
+      <input class="nf-input" id="nf-owner" placeholder="例：詩彤">
+    </div>
+    <div class="nf-field">
+      <label class="nf-label">預計上市</label>
+      <input class="nf-input" id="nf-launch" placeholder="例：2026-Q3">
+    </div>
+  </div>
+  <div class="nf-row">
+    <div class="nf-field">
+      <label class="nf-label">建議零售價（RMB）</label>
+      <input class="nf-input" id="nf-price" type="number" placeholder="例：49.9">
+    </div>
+    <div class="nf-field">
+      <label class="nf-label">預計銷量（件）</label>
+      <input class="nf-input" id="nf-qty" type="number" placeholder="例：5000">
+    </div>
+  </div>
+
+  <!-- 計劃外附加欄位 -->
+  <div id="nf-adhoc-fields" style="display:none;">
+    <div class="nf-divider">計劃外補充資訊</div>
+    <div class="nf-field">
+      <label class="nf-label">客戶 / 來源 <span style="color:#ef4444">*</span></label>
+      <input class="nf-input" id="nf-client" placeholder="例：日本代理商 A · 展會現場 ODM 詢單">
+    </div>
+    <div class="nf-row">
+      <div class="nf-field">
+        <label class="nf-label">客戶要求交期</label>
+        <input class="nf-input" id="nf-deadline" type="date">
+      </div>
+      <div class="nf-field">
+        <label class="nf-label">預估數量（件）</label>
+        <input class="nf-input" id="nf-adhoc-qty" type="number" placeholder="例：3000">
+      </div>
+    </div>
+    <div class="nf-field">
+      <label class="nf-label">特殊備注</label>
+      <input class="nf-input" id="nf-adhoc-note" placeholder="例：客戶提供設計稿 · 不走版權審核 · 僅需打樣確認">
+    </div>
+  </div>
+
+  <button class="nf-submit planned" id="nf-submit-btn" onclick="createProject()">✓ 建立計劃內項目</button>
+  <div class="nf-result" id="nf-result"></div>
+</div>
+</div>
 
 <script>
 /* ─── CONSTANTS ─── */
@@ -1409,38 +1511,78 @@ async function _markDone(rid, stageName){
 }
 
 /* ─── NEW PROJECT FORM ─── */
-function toggleNewForm(){
-  const f=document.getElementById("new-form");
-  f.style.display=f.style.display==="none"?"block":"none";
+let _nfSource = 'planned';
+function toggleNewForm(){ openNewForm(); }
+function openNewForm(){
+  _nfSource='planned';
+  ['nf-name','nf-owner','nf-launch','nf-client','nf-adhoc-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['nf-ip','nf-type'].forEach(id=>{const e=document.getElementById(id);if(e)e.selectedIndex=0;});
+  ['nf-price','nf-qty','nf-adhoc-qty'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('nf-deadline').value='';
+  document.getElementById('nf-result').style.display='none';
+  setNfSource('planned');
+  document.getElementById('nf-overlay').classList.add('open');
+}
+function closeNewForm(){
+  document.getElementById('nf-overlay').classList.remove('open');
+}
+function setNfSource(src){
+  _nfSource=src;
+  const isAdhoc = src==='adhoc';
+  document.getElementById('nf-src-planned').className='nf-src-btn'+(isAdhoc?'':' active-planned');
+  document.getElementById('nf-src-adhoc').className='nf-src-btn'+(isAdhoc?' active-adhoc':'');
+  const hint=document.getElementById('nf-src-hint');
+  hint.className='nf-src-hint '+(isAdhoc?'adhoc':'planned');
+  hint.textContent=isAdhoc
+    ?'計劃外項目 · 不在年度預算內 · OEM/ODM/臨時單 · 流程可視情況壓縮 · 建立後需 Ray 知會'
+    :'已在年度預算/計劃內的項目 · 走正常 7輪（公仔）或 5輪（非公仔）送審流程 · 版稅/採購已預算';
+  document.getElementById('nf-adhoc-fields').style.display=isAdhoc?'block':'none';
+  const btn=document.getElementById('nf-submit-btn');
+  btn.className='nf-submit '+(isAdhoc?'adhoc':'planned');
+  btn.textContent=isAdhoc?'⚡ 建立計劃外項目（通知 Ray）':'✓ 建立計劃內項目';
 }
 async function createProject(){
-  const name=document.getElementById("nf-name").value.trim();
-  const ip=document.getElementById("nf-ip").value;
-  const type=document.getElementById("nf-type").value;
-  const owner=document.getElementById("nf-owner").value.trim();
-  const launch=document.getElementById("nf-launch").value.trim();
-  const price=document.getElementById("nf-price").value;
-  const qty=document.getElementById("nf-qty").value;
-  if(!name||!ip||!type){alert("請填寫產品名稱、IP品牌和產品類型");return;}
+  const g=id=>(document.getElementById(id)||{}).value?.trim()||'';
+  const name=g("nf-name"), ip=g("nf-ip"), type=g("nf-type");
+  if(!name||!ip||!type){
+    const res=document.getElementById("nf-result");
+    res.style.display="block"; res.style.color="var(--danger)";
+    res.textContent="請填寫產品名稱、IP品牌和產品類型"; return;
+  }
+  if(_nfSource==='adhoc' && !g("nf-client")){
+    const res=document.getElementById("nf-result");
+    res.style.display="block"; res.style.color="var(--danger)";
+    res.textContent="計劃外項目請填寫客戶/來源"; return;
+  }
   const res=document.getElementById("nf-result");
-  res.style.display="block";
-  res.style.color="var(--txt-mid)";
-  res.textContent="建立中…";
+  res.style.display="block"; res.style.color="var(--txt-mid)"; res.textContent="建立中…";
   try{
-    const fields={"產品名稱":name,"IP品牌":ip,"產品類型":type,"設計負責人":owner,"預計上市":launch,"當前階段":"主題確認"};
+    const fields={
+      "產品名稱":name,"IP品牌":ip,"產品類型":type,
+      "設計負責人":g("nf-owner"),"預計上市":g("nf-launch"),
+      "當前階段":"主題確認",
+      "項目來源":_nfSource==='adhoc'?'計劃外':'計劃內',
+    };
+    const price=g("nf-price"), qty=g("nf-qty");
     if(price) fields["建議零售價"]=Number(price);
     if(qty)   fields["預計銷量"]=Number(qty);
+    if(_nfSource==='adhoc'){
+      fields["客戶來源"]=g("nf-client");
+      fields["客戶交期"]=g("nf-deadline");
+      fields["計劃外備注"]=g("nf-adhoc-note");
+      const aq=g("nf-adhoc-qty"); if(aq) fields["預計銷量"]=Number(aq);
+    }
     if(window.USE_MOCK){
       window.MOCK_DB.product_pipeline.unshift({record_id:"recP"+Date.now(),fields});
       res.style.color="var(--ok)";
-      res.textContent="✓ 已建立（Demo 模式）";
-      setTimeout(()=>{document.getElementById("new-form").style.display="none";loadProjects();},1000);
+      res.textContent=_nfSource==='adhoc'?"⚡ 已建立計劃外項目 · Ray 將收到通知":"✓ 已建立（Demo 模式）";
+      setTimeout(()=>{closeNewForm();loadProjects();},1000);
       return;
     }
     await _createRecord(fields);
     res.style.color="var(--ok)";
     res.textContent="✓ 已建立，重新整理中…";
-    setTimeout(()=>{document.getElementById("new-form").style.display="none";loadProjects();},1200);
+    setTimeout(()=>{closeNewForm();loadProjects();},1200);
   }catch(e){
     res.style.color="var(--danger)";
     res.textContent="建立失敗："+e.message;
