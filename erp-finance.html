@@ -342,8 +342,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- ══ TAB: 現金流 ══ -->
   <div class="tab-panel" id="tab-cash">
 
+  <!-- 時間範圍 -->
+  <div class="range-bar" id="cash-range-bar">
+    <button class="range-btn active" onclick="setCashRange('month',this)">本月</button>
+    <button class="range-btn" onclick="setCashRange('quarter',this)">本季</button>
+    <button class="range-btn" onclick="setCashRange('year',this)">全年</button>
+    <button class="range-btn" onclick="setCashRange('2year',this)">近兩年</button>
+  </div>
+
+  <!-- 動態彙總（全年/近兩年顯示） -->
+  <div id="cash-summary"></div>
+
   <!-- 今日財務待辦 -->
-  <div class="sec-hdr">
+  <div class="sec-hdr" id="cash-ops-section">
     <div class="sec-title">今日財務待辦</div>
     <span class="sec-link" onclick="openNewRemitModal()">+ 新增匯款記錄</span>
   </div>
@@ -1144,6 +1155,95 @@ function setBizRange(range,btn){
 
 // 初始化業務報表
 setBizRange('month', null);
+
+// ── 現金流月份資料（單位：萬元 RMB，現金口徑）──
+// 入帳=客戶實際到帳；出帳=供應商付款+OPEX+版稅
+const CASH_2025=[
+  {mo:'1月',  in:145, out:128, net:17,  future:false},
+  {mo:'2月',  in:78,  out:92,  net:-14, future:false},
+  {mo:'3月',  in:168, out:135, net:33,  future:false},
+  {mo:'4月',  in:210, out:158, net:52,  future:false},
+  {mo:'5月',  in:195, out:162, net:33,  future:false},
+  {mo:'6月',  in:162, out:148, net:14,  future:false},
+  {mo:'7月',  in:178, out:155, net:23,  future:false},
+  {mo:'8月',  in:148, out:132, net:16,  future:false},
+  {mo:'9月',  in:285, out:198, net:87,  future:false},
+  {mo:'10月', in:172, out:148, net:24,  future:false},
+  {mo:'11月', in:208, out:172, net:36,  future:false},
+  {mo:'12月', in:165, out:145, net:20,  future:false},
+];
+const CASH_2026=[
+  {mo:'1月',  in:268, out:212, net:56,  future:false},
+  {mo:'2月',  in:142, out:168, net:-26, future:false},
+  {mo:'3月',  in:225, out:182, net:43,  future:false},
+  {mo:'4月',  in:358, out:265, net:93,  future:false},
+  {mo:'5月',  in:288, out:225, net:63,  future:false},
+  {mo:'6月',  in:238, out:195, net:43,  future:true},
+  {mo:'7月',  in:255, out:205, net:50,  future:true},
+  {mo:'8月',  in:208, out:175, net:33,  future:true},
+  {mo:'9月',  in:322, out:245, net:77,  future:true},
+  {mo:'10月', in:262, out:208, net:54,  future:true},
+  {mo:'11月', in:295, out:228, net:67,  future:true},
+  {mo:'12月', in:225, out:185, net:40,  future:true},
+];
+
+function _cashKpis(months){
+  const totIn=months.reduce((s,m)=>s+m.in,0);
+  const totOut=months.reduce((s,m)=>s+m.out,0);
+  const totNet=months.reduce((s,m)=>s+m.net,0);
+  const netColor=totNet>=0?'var(--ok)':'var(--danger)';
+  return `<div class="report-kpi-row">
+    <div class="report-kpi"><div class="rk-label">入帳</div><div class="rk-val ft-rev">¥${totIn} 萬</div><div class="rk-sub">實際到帳（現金口徑）</div></div>
+    <div class="report-kpi"><div class="rk-label">出帳</div><div class="rk-val ft-cost">¥${totOut} 萬</div><div class="rk-sub">付款+OPEX+版稅</div></div>
+    <div class="report-kpi"><div class="rk-label">淨現金流</div><div class="rk-val" style="color:${netColor}">${totNet>=0?'+':''}¥${totNet} 萬</div><div class="rk-trend ${totNet>=0?'ok':'danger'}">${totNet>=0?'現金正向':'現金負向'}</div></div>
+  </div>`;
+}
+
+function _cashFullTable(yearGroups){
+  let rows='';
+  for(const g of yearGroups){
+    const totIn=g.months.reduce((s,m)=>s+m.in,0);
+    const totOut=g.months.reduce((s,m)=>s+m.out,0);
+    const totNet=g.months.reduce((s,m)=>s+m.net,0);
+    rows+=`<tr class="yr-head"><td colspan="5">${g.year} 年</td></tr>`;
+    for(const m of g.months){
+      const isCurr=g.isCurrent&&m.mo==='5月';
+      const cls=isCurr?' class="current"':m.future?' class="future"':'';
+      const netColor=m.net>=0?'var(--ok)':'var(--danger)';
+      rows+=`<tr${cls}><td>${m.mo}${m.future?' <span style="font-size:9px;color:var(--txt-lo)">(預)</span>':''}</td><td class="ft-rev">¥${m.in}</td><td class="ft-cost">¥${m.out}</td><td style="color:${netColor};font-weight:700;">${m.net>=0?'+':''}¥${m.net}</td></tr>`;
+    }
+    const netColor=totNet>=0?'var(--ok)':'var(--danger)';
+    rows+=`<tr class="yr-total"><td>${g.year} 年合計</td><td class="ft-rev">¥${totIn}</td><td class="ft-cost">¥${totOut}</td><td style="color:${netColor};font-weight:800;">${totNet>=0?'+':''}¥${totNet}</td></tr>`;
+  }
+  return `<div class="full-table-wrap"><table class="full-table">
+    <thead><tr><th>月份</th><th>入帳（萬）</th><th>出帳（萬）</th><th>淨現金流（萬）</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function setCashRange(range, btn){
+  document.querySelectorAll('#cash-range-bar .range-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const summary = document.getElementById('cash-summary');
+  const opsSection = document.getElementById('cash-ops-section');
+  if(range==='month'){
+    summary.innerHTML = _cashKpis([CASH_2026[4]]);
+    opsSection.style.display='';
+  } else if(range==='quarter'){
+    summary.innerHTML = _cashKpis(CASH_2026.slice(3,6)) + _cashFullTable([{year:'Q2',months:CASH_2026.slice(3,6),isCurrent:true}]);
+    opsSection.style.display='none';
+  } else if(range==='year'){
+    summary.innerHTML = _cashKpis(CASH_2026) + _cashFullTable([{year:'2026',months:CASH_2026,isCurrent:true}]);
+    opsSection.style.display='none';
+  } else {
+    summary.innerHTML = _cashFullTable([
+      {year:'2025',months:CASH_2025,isCurrent:false},
+      {year:'2026',months:CASH_2026,isCurrent:true}
+    ]);
+    opsSection.style.display='none';
+  }
+}
+
+setCashRange('month', null);
 </script>
 </body>
 </html>
