@@ -304,63 +304,84 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   </div>
   <div id="upcoming-list"></div>
 
-  <!-- 新品客戶意向回報 -->
+  <!-- 上市後銷售反饋 -->
   <div class="sec-hdr" style="margin-top:28px">
-    <div class="sec-title">新品客戶意向回報</div>
+    <div class="sec-title">上市後銷售反饋</div>
     <span style="font-size:9px;color:var(--ok)">安然即時看到</span>
   </div>
   <div class="intent-form">
-    <div class="if-title">📣 回報客戶對即將上市新品的反應</div>
+    <div class="if-title">📊 回報渠道端真實銷售狀況</div>
     <div class="if-row">
       <div class="if-field">
-        <label>即將上市新品</label>
-        <select id="if-product">
-          <option value="Muziktiger新系列">Muziktiger 新系列（7月）</option>
-          <option value="Opanchu秋冬">Opanchu 秋冬系列（9月）</option>
-          <option value="Mofusand10月">Mofusand 10月秋季款（10月）</option>
+        <label>產品</label>
+        <select id="st-product">
+          <option value="Snoopy夏季盲盒">Snoopy 夏季盲盒（銷售中）</option>
+          <option value="Mofusand貓福珊迪">Mofusand 貓福珊迪（銷售中）</option>
+          <option value="Opanchu褲褲兔">Opanchu 褲褲兔（銷售中）</option>
+          <option value="Muziktiger公仔">Muziktiger 公仔（銷售中）</option>
         </select>
       </div>
       <div class="if-field">
-        <label>客戶名稱</label>
-        <input id="if-client" placeholder="例：廣州名創優品" list="intent-client-datalist">
-        <datalist id="intent-client-datalist">
+        <label>客戶 / 渠道</label>
+        <input id="st-client" placeholder="例：廣州名創優品" list="st-client-datalist">
+        <datalist id="st-client-datalist">
           <option value="廣州名創優品">
           <option value="北京華糖">
           <option value="上海萌趣文化">
-          <option value="泡泡瑪特北京">
-          <option value="首爾 SMTOWN COEX">
           <option value="酷動城（廣州）">
-          <option value="天猫旗艦店">
           <option value="深圳 LOG-ON">
+          <option value="天猫旗艦店">
+          <option value="首爾 SMTOWN COEX">
         </datalist>
       </div>
     </div>
     <div class="if-row">
       <div class="if-field">
-        <label>客戶意向</label>
-        <select id="if-intent">
-          <option value="有強烈興趣">有強烈興趣，要樣品</option>
-          <option value="有意向">有意向，需更多資料</option>
-          <option value="詢價中">在問價格/交期</option>
-          <option value="暫無興趣">目前暫無興趣</option>
+        <label>本期銷售量</label>
+        <input id="st-sold" placeholder="例：240件、50箱">
+      </div>
+      <div class="if-field">
+        <label>動銷率（估算）</label>
+        <select id="st-rate">
+          <option value="暢銷>80%">暢銷 >80%</option>
+          <option value="良好60-80%">良好 60–80%</option>
+          <option value="一般40-60%" selected>一般 40–60%</option>
+          <option value="偏慢20-40%">偏慢 20–40%</option>
+          <option value="滯銷<20%">滯銷 &lt;20%</option>
+        </select>
+      </div>
+    </div>
+    <div class="if-row">
+      <div class="if-field">
+        <label>庫存 / 補貨信號</label>
+        <select id="st-stock">
+          <option value="正常">庫存正常</option>
+          <option value="快要缺貨-建議補">快要缺貨，建議補</option>
+          <option value="已缺貨-緊急補">已缺貨，緊急補</option>
+          <option value="滯銷-需處理">滯銷，需要處理</option>
         </select>
       </div>
       <div class="if-field">
-        <label>預估採購量（選填）</label>
-        <input id="if-qty" placeholder="例：100箱、500件">
+        <label>陳列位置</label>
+        <select id="st-display">
+          <option value="主推位">主推位 / 顯眼位置</option>
+          <option value="一般陳列">一般陳列</option>
+          <option value="角落位置">角落 / 邊角位置</option>
+          <option value="待陳列">尚未陳列</option>
+        </select>
       </div>
     </div>
     <div class="if-field">
-      <label>備注（客戶說了什麼）</label>
-      <textarea id="if-notes" rows="2" placeholder="例：問能否 7 月底前出貨、要先看樣品再決定..."></textarea>
+      <label>備注（客戶反饋、特殊狀況）</label>
+      <textarea id="st-notes" rows="2" placeholder="例：年輕女生很喜歡但男生少買、週末動銷比平日好、客戶想追加..."></textarea>
     </div>
-    <button class="if-submit" onclick="submitIntent()">送出 → 安然即時收到</button>
+    <button class="if-submit" onclick="submitSellThru()">送出 → 安然即時收到</button>
   </div>
 
   <!-- 已回報記錄 -->
-  <div id="intent-log-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
+  <div id="sellthru-log-section" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;">
     <div style="font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">我的回報記錄</div>
-    <div id="intent-log-list"></div>
+    <div id="sellthru-log-list"></div>
   </div>
 
   <!-- PIPELINE — 給管理層看，放最後 -->
@@ -845,52 +866,54 @@ function renderMyProductOrders(){
   }
 }
 
-/* ── 新品意向回報 ── */
-function submitIntent(){
-  const product = document.getElementById('if-product').value;
-  const client  = document.getElementById('if-client').value.trim();
-  const intent  = document.getElementById('if-intent').value;
-  const qty     = document.getElementById('if-qty').value.trim();
-  const notes   = document.getElementById('if-notes').value.trim();
+/* ── 上市後銷售反饋 ── */
+const RATE_COLOR = {'暢銷>80%':'var(--ok)','良好60-80%':'var(--ok)','一般40-60%':'var(--warn)','偏慢20-40%':'var(--warn)','滯銷<20%':'var(--danger)'};
+const STOCK_COLOR = {'正常':'var(--txt-mid)','快要缺貨-建議補':'var(--warn)','已缺貨-緊急補':'var(--danger)','滯銷-需處理':'var(--danger)'};
+
+function submitSellThru(){
+  const product = document.getElementById('st-product').value;
+  const client  = document.getElementById('st-client').value.trim();
+  const sold    = document.getElementById('st-sold').value.trim();
+  const rate    = document.getElementById('st-rate').value;
+  const stock   = document.getElementById('st-stock').value;
+  const display = document.getElementById('st-display').value;
+  const notes   = document.getElementById('st-notes').value.trim();
   if(!client){ alert('請填寫客戶名稱'); return; }
 
-  const rec = {
-    product, client, intent, qty, notes,
-    sales: SESS?.name || '—',
-    salesUser: SESS?.user || '—',
-    ts: Date.now(),
-  };
-  const key = 'crm_intent_v1';
-  const arr = JSON.parse(localStorage.getItem(key)||'[]');
-  // replace if same product+client
+  const rec = { product, client, sold, rate, stock, display, notes,
+    sales: SESS?.name||'—', salesUser: SESS?.user||'—', ts: Date.now() };
+  const arr = JSON.parse(localStorage.getItem('crm_sellthru_v1')||'[]');
   const idx = arr.findIndex(x=>x.product===product && x.client===client);
   if(idx>=0) arr[idx]=rec; else arr.unshift(rec);
-  localStorage.setItem(key, JSON.stringify(arr));
+  localStorage.setItem('crm_sellthru_v1', JSON.stringify(arr));
 
-  document.getElementById('if-client').value='';
-  document.getElementById('if-qty').value='';
-  document.getElementById('if-notes').value='';
-  renderIntentLog();
-  showToast(`✅ 已回報 ${client.split('（')[0]} 的意向 → 安然可見`);
+  // 通知安然
+  const q = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  q.unshift({ ts: Date.now(), from: SESS?.name||'CRM', to:'anran',
+    msg:`銷售反饋：${client.split('（')[0]} · ${product} · 動銷${rate} · ${stock}` });
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(q));
+
+  document.getElementById('st-client').value='';
+  document.getElementById('st-sold').value='';
+  document.getElementById('st-notes').value='';
+  renderSellThruLog();
+  showToast(`✅ 已回報 ${client.split('（')[0]} · ${product} → 安然可見`);
 }
 
-function renderIntentLog(){
-  const key = 'crm_intent_v1';
-  const all = JSON.parse(localStorage.getItem(key)||'[]');
-  const myUser = SESS?.user;
-  const mine = all.filter(x=>x.salesUser===myUser);
-  const section = document.getElementById('intent-log-section');
-  const list = document.getElementById('intent-log-list');
+function renderSellThruLog(){
+  const all = JSON.parse(localStorage.getItem('crm_sellthru_v1')||'[]');
+  const mine = all.filter(x=>x.salesUser===SESS?.user);
+  const section = document.getElementById('sellthru-log-section');
+  const list = document.getElementById('sellthru-log-list');
   if(!mine.length){ if(section) section.style.display='none'; return; }
   if(section) section.style.display='';
-  const INTENT_MAP = {'有強烈興趣':'✅','有意向':'🔵','詢價中':'🟡','暫無興趣':'⬜'};
   list.innerHTML = mine.slice(0,10).map(r=>{
     const d = new Date(r.ts).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'});
     return `<div class="intent-log-item">
       <span style="color:var(--txt-hi);font-weight:700">${r.client}</span>
       <span style="color:var(--txt-mid)"> · ${r.product} · </span>
-      <span>${INTENT_MAP[r.intent]||''} ${r.intent}</span>
-      ${r.qty?`<span style="color:var(--txt-mid)"> · ${r.qty}</span>`:''}
+      <span style="color:${RATE_COLOR[r.rate]||'var(--txt-mid)'}">動銷 ${r.rate}</span>
+      <span style="color:${STOCK_COLOR[r.stock]||'var(--txt-mid)'}"> · ${r.stock}</span>
       <span style="float:right;color:var(--txt-lo)">${d}</span>
     </div>`;
   }).join('');
@@ -900,12 +923,12 @@ function renderIntentLog(){
 renderLists();
 renderMyKPI();
 renderMyProductOrders();
-renderIntentLog();
+renderSellThruLog();
 </script>
 
-<!-- ── EXPENSE FAB ── -->
+<!-- ── EXPENSE FAB (removed) ── -->
 <style>
-.exp-fab{position:fixed;bottom:24px;right:84px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.exp-fab{display:none!important;position:fixed;bottom:24px;right:84px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
 .exp-fab:active{transform:scale(.92);}
 .exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
 .exp-overlay.open{display:flex;}

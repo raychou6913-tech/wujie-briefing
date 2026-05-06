@@ -375,6 +375,15 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
+  <!-- ② 渠道銷售反饋 -->
+  <div class="sec-head" style="margin-top:20px;">
+    <span class="sec-title">渠道銷售反饋</span>
+    <span style="font-size:10px;color:var(--txt-lo)">業務回報 · 即時更新</span>
+  </div>
+  <div id="sellthru-panel" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+    <div id="sellthru-anran-list"><div style="font-size:11px;color:var(--txt-lo);text-align:center;padding:10px 0">尚無銷售反饋 · 業務請至 CRM 頁面回報</div></div>
+  </div>
+
   <!-- ③ 潛客追蹤 + 待辦 -->
   <div class="two-col">
 
@@ -980,10 +989,41 @@ function loadIntentReports(){
   });
 }
 
+/* ── SELL-THROUGH REPORTS (from CRM) ── */
+const RATE_COLOR = { '暢銷>80%':'#10b981','良好60-80%':'#6ee7b7','普通40-60%':'#facc15','偏慢20-40%':'#f97316','滯銷<20%':'#ef4444' };
+const STOCK_COLOR = { '庫存充足':'#10b981','庫存偏低':'#facc15','需要補貨':'#f97316','已缺貨':'#ef4444','滯銷積壓':'#7880a8' };
+
+function loadSellThruReports(){
+  const list = document.getElementById('sellthru-anran-list');
+  if(!list) return;
+  const data = JSON.parse(localStorage.getItem('crm_sellthru_v1')||'[]');
+  if(!data.length){
+    list.innerHTML = '<div style="font-size:11px;color:var(--txt-lo);text-align:center;padding:10px 0">尚無銷售反饋 · 業務請至 CRM 頁面回報</div>';
+    return;
+  }
+  list.innerHTML = data.slice(0,12).map(r=>{
+    const rateClr = RATE_COLOR[r.rate]||'#7880a8';
+    const stockClr = STOCK_COLOR[r.stock]||'#7880a8';
+    const dt = r.ts ? new Date(r.ts).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #22253520;">
+      <div style="min-width:36px;font-size:9px;color:var(--txt-lo);padding-top:2px">${dt}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--txt-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.product||'—'}</div>
+        <div style="font-size:10px;color:var(--txt-lo);margin-top:1px">${r.client||''} · ${r.qty||0} 件</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+        <span style="font-size:9px;font-weight:700;color:${rateClr};background:${rateClr}18;padding:1px 6px;border-radius:4px">${r.rate||'—'}</span>
+        <span style="font-size:9px;color:${stockClr}">${r.stock||''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 /* ── INIT ── */
 checkContractExpiry();
 loadRevKPI();
 loadIntentReports();
+loadSellThruReports();
 </script>
 
 <!-- ── EXPENSE FAB ── -->

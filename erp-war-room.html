@@ -742,7 +742,18 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div><!-- /approval-queue-inner -->
   </div>
 
-  <!-- ⑤ 產品開發流水線快照 -->
+  <!-- ⑤ 動銷快覽 -->
+  <div class="queue-card" id="sellthru-warroom-card">
+    <div class="queue-header">
+      <span class="section-title" style="margin:0">動銷快覽 · 渠道銷售健康</span>
+      <a href="erp-crm.html" style="font-size:11px;color:var(--accent);text-decoration:none;">CRM 回報 →</a>
+    </div>
+    <div id="sellthru-warroom-inner" style="padding-top:4px">
+      <div style="font-size:11px;color:var(--txt-lo);text-align:center;padding:12px 0">尚無動銷數據 · 業務請至 CRM 回報上市後銷售反饋</div>
+    </div>
+  </div>
+
+  <!-- ⑥ 產品開發流水線快照 -->
   <div class="pipeline-card">
     <div class="queue-header">
       <span class="section-title" style="margin:0">產品開發流水線 · 進行中項目</span>
@@ -1768,6 +1779,53 @@ async function loadCadenceTracker(){
   }catch(e){ console.error('loadCadenceTracker',e); }
 }
 
+/* ── 動銷快覽 ── */
+function loadSellThruWarRoom(){
+  const el = document.getElementById('sellthru-warroom-inner');
+  if(!el) return;
+  const data = JSON.parse(localStorage.getItem('crm_sellthru_v1')||'[]');
+  if(!data.length) return;
+
+  // Sort by rate for top/bottom
+  const ORDER = ['暢銷>80%','良好60-80%','普通40-60%','偏慢20-40%','滯銷<20%'];
+  const sorted = [...data].sort((a,b)=> ORDER.indexOf(a.rate) - ORDER.indexOf(b.rate));
+  const top3 = sorted.slice(0,3);
+  const bottom3 = sorted.slice(-3).reverse();
+  const reorder = data.filter(r=> r.stock==='需要補貨'||r.stock==='已缺貨');
+  const slow = data.filter(r=> r.rate==='滯銷<20%'||r.rate==='偏慢20-40%');
+
+  const RATE_CLR = {'暢銷>80%':'#10b981','良好60-80%':'#6ee7b7','普通40-60%':'#facc15','偏慢20-40%':'#f97316','滯銷<20%':'#ef4444'};
+  const mkRow = (r,clr)=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;">
+    <span style="font-size:9px;font-weight:700;color:${clr};background:${clr}18;padding:1px 6px;border-radius:4px;min-width:62px;text-align:center">${r.rate||'—'}</span>
+    <span style="font-size:12px;color:var(--txt-hi);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.product||'—'}</span>
+    <span style="font-size:10px;color:var(--txt-lo)">${r.client||''}</span>
+  </div>`;
+
+  let html = '';
+
+  html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">`;
+  // Top movers
+  html += `<div><div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;margin-bottom:4px">TOP 動銷</div>${top3.map(r=>mkRow(r,RATE_CLR[r.rate]||'#10b981')).join('')}</div>`;
+  // Bottom movers
+  html += `<div><div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;margin-bottom:4px">待關注</div>${bottom3.map(r=>mkRow(r,RATE_CLR[r.rate]||'#ef4444')).join('')}</div>`;
+  html += `</div>`;
+
+  if(reorder.length){
+    html += `<div style="background:#f9731612;border:1px solid #f9731640;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
+      <div style="font-size:9px;font-weight:700;color:#f97316;margin-bottom:4px">⚠ 補貨信號 · ${reorder.length} 品項</div>
+      ${reorder.map(r=>`<div style="font-size:11px;color:var(--txt-mid)">${r.product} <span style="color:${r.stock==='已缺貨'?'#ef4444':'#f97316'}">${r.stock}</span> · ${r.client}</div>`).join('')}
+    </div>`;
+  }
+  if(slow.length){
+    html += `<div style="background:#ef444412;border:1px solid #ef444430;border-radius:8px;padding:8px 10px;">
+      <div style="font-size:9px;font-weight:700;color:#ef4444;margin-bottom:4px">🔴 動銷偏慢 · ${slow.length} 品項 · 建議關注</div>
+      ${slow.map(r=>`<div style="font-size:11px;color:var(--txt-mid)">${r.product} · ${r.client}</div>`).join('')}
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
 /* ── INIT ── */
 loadApprovals();
 loadPipeline();
@@ -1776,6 +1834,7 @@ loadBudgetKPI();
 loadOrderStats();
 loadContractAlerts();
 loadVamProgress().then(() => loadPipelineCoverage());
+loadSellThruWarRoom();
 </script>
 </body>
 </html>
