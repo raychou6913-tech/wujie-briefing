@@ -195,6 +195,33 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .tcb-warn-btn{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
 .tcb-ghost{background:transparent;border-color:var(--border-hi);color:var(--txt-mid);}
 
+/* STAGE FILE UPLOAD */
+.stage-section{margin-top:12px;}
+.stage-section-label{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.stage-upzone{border:1.5px dashed var(--border-hi);border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+.stage-upzone:hover,.stage-upzone.drag-over{border-color:var(--accent);background:#818cf810;}
+.stage-upzone-hint{font-size:11px;color:var(--txt-mid);line-height:1.7;pointer-events:none;}
+.stage-upzone-hint strong{color:var(--txt-hi);}
+.stage-up-btns{display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;}
+.stage-up-btn{font-size:10px;font-weight:700;padding:5px 11px;border-radius:7px;border:1px solid var(--border-hi);background:var(--card);color:var(--txt-mid);cursor:pointer;}
+.stage-up-btn:hover{border-color:var(--accent);color:var(--accent);}
+.stage-file-list{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.stage-file-item{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;}
+.sfi-thumb{width:38px;height:38px;border-radius:6px;object-fit:cover;flex-shrink:0;cursor:pointer;}
+.sfi-icon{width:38px;height:38px;border-radius:6px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sfi-body{flex:1;min-width:0;}
+.sfi-name{font-size:11px;font-weight:600;color:var(--txt-hi);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sfi-meta{font-size:9px;color:var(--txt-lo);margin-top:2px;}
+.sfi-del{font-size:14px;color:var(--txt-lo);cursor:pointer;padding:4px;flex-shrink:0;line-height:1;}
+.sfi-del:hover{color:var(--danger);}
+/* STAGE NOTES */
+.stage-notes-ta{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px 12px;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:72px;outline:none;line-height:1.6;margin-top:6px;}
+.stage-notes-ta:focus{border-color:var(--accent);}
+.stage-notes-ta::placeholder{color:var(--txt-lo);}
+.stage-notes-saved{font-size:10px;color:var(--ok);margin-top:4px;display:none;}
+.stage-rollback-btn{font-size:11px;font-weight:600;padding:7px 12px;border-radius:8px;border:1px solid var(--border-hi);background:transparent;color:var(--txt-mid);cursor:pointer;}
+.stage-rollback-btn:hover{border-color:var(--warn);color:var(--warn);}
+
 /* NEW PROJECT FORM */
 .inp{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);padding:10px 12px;border-radius:8px;font-size:14px;margin-bottom:8px;outline:none;}
 .inp:focus{border-color:var(--accent);}
@@ -1275,15 +1302,22 @@ function renderDemoDetail(key, d){
     const cardCls=isDone?"tc-done":isBlocked?"tc-blocked":isActive?"tc-active":"tc-wait";
     const badgeCls=isDone?"tcb-done":isBlocked?"tcb-blocked":isActive?"tcb-active":"tcb-wait";
     const badgeTxt=isDone?"✓ 完成":isBlocked?"⚠ 卡關":isActive?"⚡ 進行中":"待解鎖";
+    const _closeBtn=`<button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>`;
     let content="";
-    if(isDone) content=`<div class="tc-desc" style="color:var(--txt-mid);font-size:11px;">已完成 ✓</div>`;
-    else if(isActive){
+    if(isDone){
+      content=`<div class="tc-desc" style="color:var(--txt-mid);font-size:11px;">已完成 ✓</div>
+      ${_renderUploadZone(key,i,false)}
+      ${_renderStageNotes(key,i,false)}`;
+    } else if(isActive){
       if(isBlocked){
         content=`<div class="tc-desc" style="color:var(--danger);">版權方審核送出 14 天，Musicdog Japan 未給書面確認。珮玲需升級催促管道。</div>
         <div class="tc-actions">
           <button class="tc-btn tcb-warn-btn">📨 升級催促管道</button>
-          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
-        </div>`;
+          ${i>0?`<button class="stage-rollback-btn" onclick="rollbackStage('${key}')">← 退回上一階段</button>`:''}
+          ${_closeBtn}
+        </div>
+        ${_renderUploadZone(key,i,false)}
+        ${_renderStageNotes(key,i,false)}`;
       } else {
         const _pending = _getPending();
         const _isPending = !!_pending[key];
@@ -1302,8 +1336,11 @@ function renderDemoDetail(key, d){
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong> 階段。負責人：${s.owner}。</div>
         <div class="tc-actions">
           ${_markBtnHtml}
-          <button class="tc-btn tcb-ghost" onclick="document.querySelectorAll('.card-detail-wrap').forEach(d=>{d.classList.remove('open');d.innerHTML='';});document.querySelectorAll('.expand-hint').forEach(h=>h.classList.remove('open'));document.querySelectorAll('.ip-card').forEach(c=>c.classList.remove('selected'))">✕ 關閉</button>
-        </div>`;
+          ${i>0?`<button class="stage-rollback-btn" onclick="rollbackStage('${key}')">← 退回上一階段</button>`:''}
+          ${_closeBtn}
+        </div>
+        ${_renderUploadZone(key,i,false)}
+        ${_renderStageNotes(key,i,false)}`;
       }
     }
     return `<div class="tl-item">
@@ -1368,6 +1405,181 @@ function renderDemoDetail(key, d){
 
     <div class="timeline">${timelineHtml}</div>
   </div>`;
+}
+
+/* ─── STAGE FILES, NOTES, ROLLBACK ─── */
+const _SFILES_KEY='pipeline_stage_files_v1';
+const _SNOTES_KEY='pipeline_stage_notes_v1';
+const _SPROJ_KEY ='pipeline_proj_overrides_v1';
+function _getSFiles(){return JSON.parse(localStorage.getItem(_SFILES_KEY)||'{}');}
+function _saveSFiles(o){localStorage.setItem(_SFILES_KEY,JSON.stringify(o));}
+function _getSNotes(){return JSON.parse(localStorage.getItem(_SNOTES_KEY)||'{}');}
+function _saveSNotes(o){localStorage.setItem(_SNOTES_KEY,JSON.stringify(o));}
+function _getSProj(){return JSON.parse(localStorage.getItem(_SPROJ_KEY)||'{}');}
+function _saveSProj(o){localStorage.setItem(_SPROJ_KEY,JSON.stringify(o));}
+function _sfKey(pk,si){return pk+'__'+si;}
+
+// Apply any persisted stage overrides on load
+(function applyProjOverrides(){
+  const ov=_getSProj();
+  for(const [k,v] of Object.entries(ov)){
+    if(DEMO_PROJECTS[k]) Object.assign(DEMO_PROJECTS[k],v);
+  }
+})();
+
+function processStageFile(projKey,stageIdx,file){
+  if(file.size>8*1024*1024){showPipelineToast('⚠ 檔案超過 8MB，建議壓縮後再上傳');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const all=_getSFiles(); const k=_sfKey(projKey,stageIdx);
+    if(!all[k])all[k]=[];
+    all[k].push({id:Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      name:file.name,size:file.size,type:file.type,
+      dataUrl:file.type&&file.type.startsWith('image/')?e.target.result:null,
+      uploadedAt:new Date().toISOString(),source:'local'});
+    _saveSFiles(all);
+    refreshStageFiles(projKey,stageIdx);
+    showPipelineToast('✅ 已上傳：'+file.name);
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleStageDrop(projKey,stageIdx,evt){
+  evt.preventDefault();
+  const z=document.getElementById('upzone-'+projKey+'-'+stageIdx);
+  if(z)z.classList.remove('drag-over');
+  [...evt.dataTransfer.files].forEach(f=>processStageFile(projKey,stageIdx,f));
+}
+
+function handleStageFileInput(projKey,stageIdx,inp){
+  [...inp.files].forEach(f=>processStageFile(projKey,stageIdx,f));
+  inp.value='';
+}
+
+function removeStageFile(projKey,stageIdx,fileId){
+  const all=_getSFiles(); const k=_sfKey(projKey,stageIdx);
+  if(all[k])all[k]=all[k].filter(f=>f.id!==fileId);
+  _saveSFiles(all);
+  refreshStageFiles(projKey,stageIdx);
+}
+
+function refreshStageFiles(projKey,stageIdx){
+  const el=document.getElementById('sfl-'+projKey+'-'+stageIdx);
+  if(!el)return;
+  const files=(_getSFiles()[_sfKey(projKey,stageIdx)])||[];
+  el.innerHTML=files.map(f=>_renderFileItem(projKey,stageIdx,f)).join('');
+}
+
+function _renderFileItem(projKey,stageIdx,f){
+  const isImg=f.type&&f.type.startsWith('image/')&&f.dataUrl;
+  const thumb=isImg
+    ?`<img class="sfi-thumb" src="${f.dataUrl}" onclick="openLightbox('${f.dataUrl}','${f.name.replace(/'/g,"\\'")}')">`
+    :`<div class="sfi-icon">${f.type&&f.type.includes('pdf')?'📄':f.type&&(f.type.includes('zip')||f.type.includes('octet'))? '🗜️':'📎'}</div>`;
+  const sz=f.size>1024*1024?(f.size/1024/1024).toFixed(1)+'MB':Math.round(f.size/1024)+'KB';
+  const when=f.uploadedAt?new Date(f.uploadedAt).toLocaleDateString('zh-TW'):'';
+  const src=f.source==='drive'?' · Drive':'';
+  return `<div class="stage-file-item">
+    ${thumb}
+    <div class="sfi-body"><div class="sfi-name">${f.name}</div><div class="sfi-meta">${sz}${src} · ${when}</div></div>
+    <span class="sfi-del" onclick="removeStageFile('${projKey}',${stageIdx},'${f.id}')">✕</span>
+  </div>`;
+}
+
+function _renderUploadZone(projKey,stageIdx,readonly){
+  const files=(_getSFiles()[_sfKey(projKey,stageIdx)])||[];
+  const listHtml=`<div class="stage-file-list" id="sfl-${projKey}-${stageIdx}">${files.map(f=>_renderFileItem(projKey,stageIdx,f)).join('')}</div>`;
+  if(readonly){
+    return files.length?`<div class="stage-section"><div class="stage-section-label">📎 圖稿 / 附件（${files.length}）</div>${listHtml}</div>`:'';
+  }
+  return `<div class="stage-section">
+    <div class="stage-section-label">📎 圖稿 / 附件</div>
+    <div class="stage-upzone" id="upzone-${projKey}-${stageIdx}"
+         onclick="document.getElementById('sfu-${projKey}-${stageIdx}').click()"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleStageDrop('${projKey}',${stageIdx},event)">
+      <div class="stage-upzone-hint">🖼 <strong>拖曳圖稿到這裡</strong>，或點擊選擇檔案<br><span style="font-size:10px">PNG · JPG · PDF · AI · PSD · ZIP · 單檔 &lt;8MB</span></div>
+      <div class="stage-up-btns">
+        <button class="stage-up-btn" onclick="event.stopPropagation();document.getElementById('sfu-${projKey}-${stageIdx}').click()">💻 從本機上傳</button>
+        <button class="stage-up-btn" onclick="event.stopPropagation();openDrivePicker('${projKey}',${stageIdx})">▲ 從 Google Drive 匯入</button>
+      </div>
+    </div>
+    <input type="file" id="sfu-${projKey}-${stageIdx}" multiple accept="image/*,.pdf,.ai,.psd,.zip,.sketch,.fig" style="display:none" onchange="handleStageFileInput('${projKey}',${stageIdx},this)">
+    ${listHtml}
+  </div>`;
+}
+
+function _renderStageNotes(projKey,stageIdx,readonly){
+  const note=(_getSNotes()[_sfKey(projKey,stageIdx)])||'';
+  if(readonly){
+    return note?`<div class="stage-section"><div class="stage-section-label">📝 備注</div>
+      <div style="font-size:11px;color:var(--txt-mid);line-height:1.7;background:var(--card2);border-radius:8px;padding:10px 12px;">${note.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div></div>`:'';
+  }
+  return `<div class="stage-section">
+    <div class="stage-section-label">📝 備注 · 版權反饋 · 狀態說明</div>
+    <textarea class="stage-notes-ta" id="note-ta-${projKey}-${stageIdx}"
+      placeholder="例：版權方要求角色比例調整，珮玲正在修改 2D 稿。或記錄卡關原因、進度備注、版權方意見等。"
+      oninput="saveStageNote('${projKey}',${stageIdx},this.value)">${note}</textarea>
+    <div class="stage-notes-saved" id="note-saved-${projKey}-${stageIdx}">✓ 已儲存</div>
+  </div>`;
+}
+
+function saveStageNote(projKey,stageIdx,text){
+  const all=_getSNotes(); all[_sfKey(projKey,stageIdx)]=text; _saveSNotes(all);
+  const el=document.getElementById('note-saved-'+projKey+'-'+stageIdx);
+  if(el){el.style.display='block';clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',1500);}
+}
+
+function rollbackStage(key){
+  const d=DEMO_PROJECTS[key];
+  if(!d||d.stageIdx<=0){showPipelineToast('⚠ 已是第一階段，無法退回');return;}
+  const stages=d.type==='非公仔'?STAGES_NONFIG:STAGES_FIG;
+  const prevStage=stages[d.stageIdx-1];
+  if(!confirm(`確認退回到「${prevStage.key}」階段？\n\n此操作用於修正誤按確認，已上傳的圖稿和備注不會刪除。`))return;
+  d.stageIdx--;
+  const ov=_getSProj(); if(!ov[key])ov[key]={}; ov[key].stageIdx=d.stageIdx; _saveSProj(ov);
+  initDemoBars();
+  const det=document.getElementById('cdet-'+key);
+  if(det&&det.classList.contains('open')) det.innerHTML=renderDemoDetail(key,d);
+  showPipelineToast('↩ 已退回至「'+prevStage.key+'」階段');
+}
+
+// Google Drive Picker (requires DRIVE_CLIENT_ID + DRIVE_API_KEY to be configured)
+const DRIVE_CLIENT_ID=''; // TODO: paste Google OAuth 2.0 client ID
+const DRIVE_API_KEY='';   // TODO: paste Google API key
+function openDrivePicker(projKey,stageIdx){
+  if(!DRIVE_CLIENT_ID||!DRIVE_API_KEY){
+    showPipelineToast('⚠ Google Drive 尚未設定 — 請聯繫 Ray 配置 API 金鑰');
+    return;
+  }
+  if(!window.gapi){
+    const s=document.createElement('script');
+    s.src='https://apis.google.com/js/api.js';
+    s.onload=()=>_initDriveAndPick(projKey,stageIdx);
+    document.head.appendChild(s);
+  } else { _initDriveAndPick(projKey,stageIdx); }
+}
+function _initDriveAndPick(projKey,stageIdx){
+  gapi.load('client:auth2:picker',()=>{
+    gapi.client.init({apiKey:DRIVE_API_KEY,clientId:DRIVE_CLIENT_ID,scope:'https://www.googleapis.com/auth/drive.readonly'}).then(()=>{
+      const token=gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+      const picker=new google.picker.PickerBuilder()
+        .addView(new google.picker.DocsView().setIncludeFolders(true))
+        .setOAuthToken(token).setDeveloperKey(DRIVE_API_KEY)
+        .setCallback(data=>{
+          if(data.action!==google.picker.Action.PICKED)return;
+          const file=data.docs[0];
+          showPipelineToast('⏳ 正在從 Drive 匯入：'+file.name+'...');
+          fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'?alt=media',
+            {headers:{Authorization:'Bearer '+token}})
+            .then(r=>r.blob()).then(blob=>{
+              const f=new File([blob],file.name,{type:file.mimeType});
+              processStageFile(projKey,stageIdx,f);
+            }).catch(()=>showPipelineToast('⚠ Drive 匯入失敗，請重試'));
+        }).build();
+      picker.setVisible(true);
+    });
+  });
 }
 
 /* ─── RENDER DETAIL (Feishu record) ─── */
