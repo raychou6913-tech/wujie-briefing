@@ -222,6 +222,25 @@ select.inp option{background:var(--card2);}
   .kpi-big-row{grid-template-columns:1fr;}
 }
 
+/* PRODUCT IMAGE THUMBNAIL */
+.card-img-wrap{position:relative;width:100%;height:120px;border-radius:9px;overflow:hidden;margin-bottom:12px;background:var(--card2);cursor:pointer;flex-shrink:0;}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s;}
+.card-img-wrap:hover img{transform:scale(1.03);}
+.card-img-overlay{position:absolute;inset:0;background:#00000060;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;}
+.card-img-wrap:hover .card-img-overlay{opacity:1;}
+.card-img-overlay-text{font-size:11px;font-weight:700;color:#fff;background:#00000070;padding:4px 10px;border-radius:20px;}
+.card-img-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;}
+.card-img-placeholder-icon{font-size:24px;opacity:.4;}
+.card-img-placeholder-text{font-size:10px;color:var(--txt-lo);font-weight:600;}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:#000000d0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.lightbox.open{display:flex;}
+.lightbox-inner{position:relative;max-width:90vw;max-height:90vh;}
+.lightbox-inner img{max-width:100%;max-height:85vh;border-radius:12px;object-fit:contain;display:block;}
+.lightbox-close{position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border-hi);color:var(--txt-hi);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.lightbox-caption{position:absolute;bottom:-32px;left:0;right:0;text-align:center;font-size:12px;color:var(--txt-mid);}
+
 /* EXPAND HINT */
 .expand-hint{font-size:10px;color:var(--accent);cursor:pointer;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);text-align:center;transition:color .15s;}
 .expand-hint:hover{color:var(--txt-hi);}
@@ -352,6 +371,10 @@ if(!CAN_MARK_DONE){
               <div class="ip-owner-val">珮玲 / 賴哥</div>
             </div>
           </div>
+          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/f59e0b?text=Snoopy+夏季盲盒+·+大貨確認中','Snoopy 夏季盲盒 · 第 6/7 輪')">
+            <img src="https://placehold.co/900x500/1e2130/f59e0b?text=Snoopy+夏季盲盒" alt="Snoopy 夏季設計稿">
+            <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
+          </div>
           <div class="stage-prog-wrap">
             <div class="stage-prog-bar" id="bar-snoopy"></div>
             <div class="stage-prog-labels" id="labels-snoopy"></div>
@@ -384,6 +407,10 @@ if(!CAN_MARK_DONE){
               <div class="ip-launch-val" style="color:var(--warn)">2026-10</div>
               <div class="ip-owner-val">珮玲 / 詩彤</div>
             </div>
+          </div>
+          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/ef4444?text=Muziktiger+公仔+·+版權審核中','Muziktiger 公仔 · 版權卡關 14 天')">
+            <img src="https://placehold.co/900x500/1e2130/ef4444?text=Muziktiger+公仔" alt="Muziktiger 設計稿">
+            <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
           </div>
           <div class="stage-prog-wrap">
             <div class="stage-prog-bar" id="bar-muziktiger"></div>
@@ -425,6 +452,10 @@ if(!CAN_MARK_DONE){
               <div class="ip-owner-val">詩彤</div>
             </div>
           </div>
+          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/10b981?text=Opanchu+抱枕+·+2D設計送審','Opanchu 抱枕 · 2D 設計送審中')">
+            <img src="https://placehold.co/900x500/1e2130/10b981?text=Opanchu+抱枕" alt="Opanchu 設計稿">
+            <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
+          </div>
           <div class="stage-prog-wrap">
             <div class="stage-prog-bar" id="bar-opanchu"></div>
             <div class="stage-prog-labels" id="labels-opanchu"></div>
@@ -456,6 +487,10 @@ if(!CAN_MARK_DONE){
               <div class="ip-launch-val" style="color:var(--accent)">2026-10</div>
               <div class="ip-owner-val">詩彤</div>
             </div>
+          </div>
+          <div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/a855f7?text=Mofusand+10月新款+·+2D送審中','Mofusand 10月新款 · 2D 送審中')">
+            <img src="https://placehold.co/900x500/1e2130/a855f7?text=Mofusand+10月新款" alt="Mofusand 設計稿">
+            <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
           </div>
           <div class="stage-prog-wrap">
             <div class="stage-prog-bar" id="bar-mofusand2"></div>
@@ -872,6 +907,18 @@ function buildIPCard(proj){
   const launchColor=isDone?"var(--ok)":isBlocked?"var(--warn)":"var(--accent)";
   const totalRounds=isFig?7:5;
 
+  // Pick a placeholder color per IP
+  const IP_COLORS = {snoopy:'f59e0b',muziktiger:'818cf8',opanchu:'10b981',mofusand:'a855f7',shrug:'06b6d4'};
+  const ipKey = ip.toLowerCase().replace(/[^a-z]/g,'');
+  const thumbColor = IP_COLORS[ipKey] || '7880a8';
+  const thumbText = encodeURIComponent(name.slice(0,12));
+  const thumbSrc = `https://placehold.co/900x500/1e2130/${thumbColor}?text=${thumbText}`;
+  const lightboxSrc = `https://placehold.co/900x500/1e2130/${thumbColor}?text=${encodeURIComponent(name+' · '+stage)}`;
+  const thumbHtml = `<div class="card-img-wrap" onclick="event.stopPropagation();openLightbox('${lightboxSrc}','${name} · ${stage}')">
+    <img src="${thumbSrc}" alt="${name} 設計稿">
+    <div class="card-img-overlay"><span class="card-img-overlay-text">點擊看大圖</span></div>
+  </div>`;
+
   return `<div class="ip-card ${isBlocked?"blocked-card":""}" id="fs-card-${rid}" onclick="selectProject('${rid}')">
     <div class="ip-card-top">
       <div class="ip-card-left">
@@ -891,6 +938,7 @@ function buildIPCard(proj){
         <div class="ip-owner-val">${owner}</div>
       </div>
     </div>
+    ${thumbHtml}
     <div class="stage-prog-wrap">
       <div class="stage-prog-bar">${barSegs}</div>
       <div class="stage-prog-labels">${barLabels}</div>
@@ -1350,6 +1398,29 @@ function submitExpense(){
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();
+</script>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+</div>
+
+<script>
+function openLightbox(src, caption){
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-caption').textContent = caption || '';
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
 </script>
 
 </body>
