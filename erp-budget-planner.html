@@ -243,6 +243,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
         </table>
       </div>
       <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--card2);display:flex;align-items:center;gap:10px;">
+        <button class="btn-sm" onclick="openPricingSettings()" title="定價參數設定" style="padding:5px 10px;">⚙ 定價參數</button>
         <button class="btn-sm" onclick="openAddModal()" style="font-size:12px;color:var(--accent);border-color:var(--accent);padding:5px 14px;">＋ 新增項目</button>
         <span style="font-size:10px;color:var(--txt-lo);">同 IP 新品 或 全新產品</span>
       </div>
@@ -269,6 +270,32 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
 </div>
 
 <!-- ADD PRODUCT MODAL -->
+<!-- 定價參數設定 Modal -->
+<div class="modal-bg" id="pricingModal" style="display:none;" onclick="if(event.target===this)closePricingSettings()">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-title">⚙ 定價參數設定</div>
+    <div style="font-size:11px;color:var(--txt-mid);margin-bottom:16px;line-height:1.6;">這些參數控制跨主體合作的定價公式。修改後立即生效，儲存在本地。</div>
+    <div class="modal-field">
+      <div class="modal-lbl">供應鏈發包加成倍率（預設 1.1 = 報價×1.1）</div>
+      <input class="modal-inp" id="ps-supply-mult" type="number" step="0.01" min="1" max="2" value="1.1">
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;">北京蕪解供貨給JV/深圳的加成倍率</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-lbl">批發包銷折扣（預設 0.43 = SRP×43%）</div>
+      <input class="modal-inp" id="ps-ws-disc" type="number" step="0.01" min="0.1" max="1" value="0.43">
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;">深圳包貨批發給客戶的折扣率（SRP×折扣=批發價）</div>
+    </div>
+    <div style="margin-top:12px;padding:10px;background:var(--card2);border-radius:6px;font-size:10px;color:var(--txt-lo);line-height:1.7;">
+      💡 修改這裡的數字，預算表單中的自動計算結果會即時更新。<br>
+      未來可將參數移至飛書設定表，實現多裝置同步。
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePricingSettings()">取消</button>
+      <button class="btn-primary" onclick="savePricingSettings()">儲存</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="addModal" style="display:none;" onclick="if(event.target===this)closeAddModal()">
   <div class="modal-box">
     <div class="modal-title">新增預算項目</div>
@@ -338,8 +365,8 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
       <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">法人資訊</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="modal-field">
-          <div class="modal-lbl">歸屬主體</div>
-          <select class="modal-inp" id="mEntity">
+          <div class="modal-lbl">歸屬主體（項目主體公司）</div>
+          <select class="modal-inp" id="mEntity" onchange="onEntityChange(this.value)">
             <option value="">— 請選擇 —</option>
             <option value="香港JV">香港JV（VAM考核）</option>
             <option value="深圳子公司">深圳子公司（VAM考核）</option>
@@ -359,18 +386,113 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
           </select>
         </div>
       </div>
+
+      <!-- 稅率預覽 -->
+      <div id="m-tax-preview" style="display:none;margin-bottom:10px;padding:7px 10px;background:#818cf810;border:1px solid var(--border-hi);border-radius:6px;font-size:10px;color:var(--txt-mid);">
+        <span id="m-tax-text"></span>
+      </div>
+
       <div class="modal-field">
         <div class="modal-lbl">合作模式（有關聯公司參與時填寫）</div>
         <select class="modal-inp" id="mCoopMode" onchange="onCoopModeChange(this.value)">
-          <option value="">— 一般外部交易 —</option>
-          <option value="供應鏈發包">供應鏈發包（北京蕪解 → JV/深圳，報價×1.1）</option>
-          <option value="批發包銷">批發包銷（深圳包貨批發，零售價×4.3折）</option>
-          <option value="快閃店代運營">快閃店代運營（保底費＋營收抽成）</option>
-          <option value="共同投資">共同投資（按投資比例分潤）</option>
-          <option value="台灣代運營">台灣代運營（悍草代運營JV台灣項目）</option>
+          <option value="">— 一般外部交易（無關聯公司）—</option>
+          <option value="供應鏈發包">供應鏈發包（北京蕪解 → JV/深圳）</option>
+          <option value="批發包銷">批發包銷（深圳包貨批發給客戶）</option>
+          <option value="快閃店代運營">快閃店代運營（UJ BKK 代運營）</option>
+          <option value="共同投資">共同投資（JV + UJ BKK 按比例）</option>
+          <option value="台灣代運營">台灣代運營（悍草代運營 JV 台灣項目）</option>
         </select>
       </div>
-      <div id="coopHint" style="display:none;background:var(--card2);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--warn);margin-top:4px;"></div>
+
+      <!-- 動態合作條件表單 -->
+      <div id="coopExtFields" style="display:none;background:var(--card2);border-radius:8px;padding:12px;margin-top:4px;">
+
+        <!-- 供應鏈發包 -->
+        <div id="ext-supply" style="display:none;">
+          <div style="font-size:10px;font-weight:700;color:var(--warn);margin-bottom:8px;">📦 供應鏈發包條件</div>
+          <div class="modal-field">
+            <div class="modal-lbl">原廠採購報價（本幣）</div>
+            <input class="modal-inp" id="ext-supply-cost" type="number" placeholder="e.g. 150000" oninput="calcSupplyResult()">
+          </div>
+          <div id="ext-supply-result" style="font-size:11px;padding:5px 0;">
+            供貨成本（報價 × <span class="ext-supply-mult-lbl">1.1</span>）：<span style="color:var(--txt-lo)">請填入報價</span>
+          </div>
+        </div>
+
+        <!-- 批發包銷 -->
+        <div id="ext-wholesale" style="display:none;">
+          <div style="font-size:10px;font-weight:700;color:var(--warn);margin-bottom:8px;">🏷 批發包銷條件</div>
+          <div class="modal-field">
+            <div class="modal-lbl">SRP 零售建議價（¥ / 件）</div>
+            <input class="modal-inp" id="ext-ws-srp" type="number" placeholder="e.g. 79.9" oninput="calcWholesaleResult()">
+          </div>
+          <div id="ext-ws-result" style="font-size:11px;padding:5px 0;">
+            深圳批發價（SRP × <span class="ext-ws-disc-lbl">4.3</span>折）：<span style="color:var(--txt-lo)">請填入 SRP</span>
+          </div>
+        </div>
+
+        <!-- 快閃店代運營 -->
+        <div id="ext-flash" style="display:none;">
+          <div style="font-size:10px;font-weight:700;color:var(--warn);margin-bottom:8px;">⭐ 代運營條件（UJ BKK 費用）</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="modal-field">
+              <div class="modal-lbl">保底費（¥ / 月）</div>
+              <input class="modal-inp" id="ext-flash-base" type="number" placeholder="e.g. 50000">
+            </div>
+            <div class="modal-field">
+              <div class="modal-lbl">營收抽成（%）</div>
+              <input class="modal-inp" id="ext-flash-pct" type="number" placeholder="e.g. 15">
+            </div>
+          </div>
+          <div class="modal-field">
+            <div class="modal-lbl">快閃店預計月數</div>
+            <input class="modal-inp" id="ext-flash-months" type="number" placeholder="e.g. 3" value="3">
+          </div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">JV 持有項目主體；UJ BKK 收保底+抽成；快閃淨利計入 VAM</div>
+        </div>
+
+        <!-- 共同投資 -->
+        <div id="ext-joint" style="display:none;">
+          <div style="font-size:10px;font-weight:700;color:var(--warn);margin-bottom:8px;">💼 共同投資條件（按本項目個別約定）</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="modal-field">
+              <div class="modal-lbl">JV 投資比例（%）</div>
+              <input class="modal-inp" id="ext-jv-invest" type="number" placeholder="e.g. 60" oninput="calcJointResult()">
+            </div>
+            <div class="modal-field">
+              <div class="modal-lbl">UJ BKK 投資比例（%）</div>
+              <input class="modal-inp" id="ext-bkk-invest" type="number" placeholder="e.g. 40" oninput="calcJointResult()">
+            </div>
+            <div class="modal-field">
+              <div class="modal-lbl">JV 分潤比例（%）</div>
+              <input class="modal-inp" id="ext-jv-profit" type="number" placeholder="e.g. 60" oninput="calcJointResult()">
+            </div>
+            <div class="modal-field">
+              <div class="modal-lbl">UJ BKK 分潤比例（%）</div>
+              <input class="modal-inp" id="ext-bkk-profit" type="number" placeholder="e.g. 40" oninput="calcJointResult()">
+            </div>
+          </div>
+          <div id="ext-joint-result" style="font-size:11px;color:var(--txt-lo);padding:4px 0;">⚠ 請確認雙方比例合計為 100%</div>
+        </div>
+
+        <!-- 台灣代運營 -->
+        <div id="ext-tw" style="display:none;">
+          <div style="font-size:10px;font-weight:700;color:var(--warn);margin-bottom:8px;">🇹🇼 台灣代運營條件（悍草費用）</div>
+          <div class="modal-field">
+            <div class="modal-lbl">服務費模式</div>
+            <select class="modal-inp" id="ext-tw-mode">
+              <option value="fixed">固定服務費（¥ / 月）</option>
+              <option value="pct">營收抽成（%）</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <div class="modal-lbl">金額（¥）或百分比（%）</div>
+            <input class="modal-inp" id="ext-tw-val" type="number" placeholder="填入金額或百分比">
+          </div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">JV 持有台灣快閃項目主體；悍草收服務費；淨利計入 VAM</div>
+        </div>
+
+      </div>
     </div>
 
     <div class="modal-actions">
@@ -1175,26 +1297,106 @@ function openAddModal(){
   document.getElementById('mCoopMode').value = '';
   document.getElementById('mEntity').value = '';
   document.getElementById('mCurrency').value = 'RMB';
-  document.getElementById('coopHint').style.display='none';
+  document.getElementById('coopExtFields').style.display='none';
+  document.getElementById('m-tax-preview').style.display='none';
+  // reset ext fields
+  ['ext-supply-cost','ext-ws-srp','ext-flash-base','ext-flash-pct','ext-jv-invest','ext-bkk-invest','ext-jv-profit','ext-bkk-profit','ext-tw-val'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('addModal').style.display='flex';
 }
 function closeAddModal(){ document.getElementById('addModal').style.display='none'; }
 
-const COOP_HINTS = {
-  '供應鏈發包': '📦 北京蕪解 → JV/深圳　供貨價 ＝ 採購報價 × 1.1　成本已含加成，JV淨利正確計入VAM',
-  '批發包銷':   '🏷 深圳包貨批發　批發價 ＝ 零售SRP × 4.3折　深圳收入計入VAM',
-  '快閃店代運營':'⭐ 保底費 ＋ 營收抽成%　JV持有項目主體，淨利計入VAM；UJ BKK收服務費',
-  '共同投資':   '💼 JV ＋ UJ BKK 按投資比例出資，依分潤比例分配淨利',
-  '台灣代運營': '🇹🇼 悍草代運營JV台灣快閃項目　服務費/抽成待定，JV持有項目主體',
+// ── PRICING PARAMS（可調參數，存 localStorage）──────────────────
+let PRICING_PARAMS = (() => {
+  const saved = JSON.parse(localStorage.getItem('erp_pricing_params') || '{}');
+  return { supply_markup: saved.supply_markup ?? 1.1, wholesale_discount: saved.wholesale_discount ?? 0.43 };
+})();
+
+const TAX_RATES = {
+  '香港JV':     { rate: 0.0825, label: '利得稅 8.25%（前HKD 200萬）' },
+  '深圳子公司': { rate: 0.25,   label: '企業所得稅 25%' },
+  '北京蕪解':   { rate: 0.25,   label: '企業所得稅 25%' },
+  '台灣悍草':   { rate: 0.20,   label: '營利事業所得稅 20%' },
+  'UJ BKK':     { rate: 0.20,   label: '泰國企業所得稅 20%' },
 };
-function onCoopModeChange(val){
-  const hint = document.getElementById('coopHint');
-  if(val && COOP_HINTS[val]){
-    hint.textContent = COOP_HINTS[val];
-    hint.style.display='block';
+
+function onEntityChange(val){
+  const preview = document.getElementById('m-tax-preview');
+  const text    = document.getElementById('m-tax-text');
+  if(val && TAX_RATES[val]){
+    const t = TAX_RATES[val];
+    const keepPct = ((1 - t.rate) * 100).toFixed(2);
+    text.innerHTML = `📊 ${t.label}　稅後淨利估算 = 稅前淨利 × <strong>${keepPct}%</strong>（簡化估算，不含分紅匯回）`;
+    preview.style.display = 'block';
   } else {
-    hint.style.display='none';
+    preview.style.display = 'none';
   }
+}
+
+const EXT_PANELS = ['supply','wholesale','flash','joint','tw'];
+function onCoopModeChange(val){
+  const extFields = document.getElementById('coopExtFields');
+  EXT_PANELS.forEach(p => { const el=document.getElementById('ext-'+p); if(el) el.style.display='none'; });
+  // update live param display
+  document.querySelectorAll('.ext-supply-mult-lbl').forEach(el=>el.textContent=PRICING_PARAMS.supply_markup);
+  document.querySelectorAll('.ext-ws-disc-lbl').forEach(el=>el.textContent=(PRICING_PARAMS.wholesale_discount*10).toFixed(1));
+  if(!val){ extFields.style.display='none'; return; }
+  const map = { '供應鏈發包':'supply', '批發包銷':'wholesale', '快閃店代運營':'flash', '共同投資':'joint', '台灣代運營':'tw' };
+  if(map[val]){ extFields.style.display=''; document.getElementById('ext-'+map[val]).style.display=''; }
+  else { extFields.style.display='none'; }
+}
+
+function calcSupplyResult(){
+  const cost = parseFloat(document.getElementById('ext-supply-cost').value)||0;
+  const res  = cost * PRICING_PARAMS.supply_markup;
+  document.getElementById('ext-supply-result').innerHTML =
+    `供貨成本（報價 × <span class="ext-supply-mult-lbl">${PRICING_PARAMS.supply_markup}</span>）：<strong style="color:var(--ok)">¥ ${res.toLocaleString()}</strong>`;
+}
+
+function calcWholesaleResult(){
+  const srp  = parseFloat(document.getElementById('ext-ws-srp').value)||0;
+  const disc = PRICING_PARAMS.wholesale_discount;
+  const ws   = srp * disc;
+  document.getElementById('ext-ws-result').innerHTML =
+    `深圳批發價（SRP × <span class="ext-ws-disc-lbl">${(disc*10).toFixed(1)}</span>折）：<strong style="color:var(--ok)">¥ ${ws.toFixed(2)} / 件</strong>`;
+}
+
+function calcJointResult(){
+  const jvI  = parseFloat(document.getElementById('ext-jv-invest').value)||0;
+  const bkkI = parseFloat(document.getElementById('ext-bkk-invest').value)||0;
+  const jvP  = parseFloat(document.getElementById('ext-jv-profit').value)||0;
+  const bkkP = parseFloat(document.getElementById('ext-bkk-profit').value)||0;
+  const iSum = jvI+bkkI, pSum = jvP+bkkP;
+  const el   = document.getElementById('ext-joint-result');
+  const ok   = s => Math.abs(s-100)<0.1;
+  el.innerHTML = (iSum||pSum) ?
+    `投資比例合計：<strong style="color:${ok(iSum)?'var(--ok)':'var(--danger)'}">${iSum}%</strong>　分潤比例合計：<strong style="color:${ok(pSum)?'var(--ok)':'var(--danger)'}">${pSum}%</strong>` :
+    '⚠ 請確認雙方比例合計為 100%';
+}
+
+// ── PRICING SETTINGS MODAL ──────────────────────────────────────
+function openPricingSettings(){
+  document.getElementById('ps-supply-mult').value = PRICING_PARAMS.supply_markup;
+  document.getElementById('ps-ws-disc').value     = PRICING_PARAMS.wholesale_discount;
+  document.getElementById('pricingModal').style.display = 'flex';
+}
+function closePricingSettings(){ document.getElementById('pricingModal').style.display='none'; }
+function savePricingSettings(){
+  PRICING_PARAMS.supply_markup       = parseFloat(document.getElementById('ps-supply-mult').value)||1.1;
+  PRICING_PARAMS.wholesale_discount  = parseFloat(document.getElementById('ps-ws-disc').value)||0.43;
+  localStorage.setItem('erp_pricing_params', JSON.stringify(PRICING_PARAMS));
+  closePricingSettings();
+  document.querySelectorAll('.ext-supply-mult-lbl').forEach(el=>el.textContent=PRICING_PARAMS.supply_markup);
+  document.querySelectorAll('.ext-ws-disc-lbl').forEach(el=>el.textContent=(PRICING_PARAMS.wholesale_discount*10).toFixed(1));
+}
+
+function _readCoopParams(){
+  const mode = document.getElementById('mCoopMode').value;
+  if(mode==='供應鏈發包') return { supplyCost: parseFloat(document.getElementById('ext-supply-cost').value)||0, markup: PRICING_PARAMS.supply_markup };
+  if(mode==='批發包銷')   return { srp: parseFloat(document.getElementById('ext-ws-srp').value)||0, disc: PRICING_PARAMS.wholesale_discount };
+  if(mode==='快閃店代運營') return { base: parseFloat(document.getElementById('ext-flash-base').value)||0, pct: parseFloat(document.getElementById('ext-flash-pct').value)||0, months: parseFloat(document.getElementById('ext-flash-months').value)||3 };
+  if(mode==='共同投資')   return { jvInvest: parseFloat(document.getElementById('ext-jv-invest').value)||0, bkkInvest: parseFloat(document.getElementById('ext-bkk-invest').value)||0, jvProfit: parseFloat(document.getElementById('ext-jv-profit').value)||0, bkkProfit: parseFloat(document.getElementById('ext-bkk-profit').value)||0 };
+  if(mode==='台灣代運營') return { twMode: document.getElementById('ext-tw-mode').value, twVal: parseFloat(document.getElementById('ext-tw-val').value)||0 };
+  return {};
 }
 
 function switchAddTab(tab){
@@ -1225,7 +1427,8 @@ function confirmAdd(){
       royalty:{...base.royalty},
       entity: document.getElementById('mEntity').value,
       currency: document.getElementById('mCurrency').value || 'RMB',
-      coopMode: document.getElementById('mCoopMode').value };
+      coopMode: document.getElementById('mCoopMode').value,
+      coopParams: _readCoopParams() };
     prods.push(newProd);
   } else {
     const ip = document.getElementById('nIp').value.trim() || '新IP';
@@ -1244,7 +1447,8 @@ function confirmAdd(){
       royalty:{type:'std', d:0.40, r:0.12},
       entity: document.getElementById('mEntity').value,
       currency: document.getElementById('mCurrency').value || 'RMB',
-      coopMode: document.getElementById('mCoopMode').value });
+      coopMode: document.getElementById('mCoopMode').value,
+      coopParams: _readCoopParams() });
   }
   closeAddModal();
   renderParams();
