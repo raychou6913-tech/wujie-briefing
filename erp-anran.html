@@ -193,40 +193,130 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 <div class="main">
 
   <!-- ① KPI 四大卡 -->
-  <div class="sec-head"><span class="sec-title">全集團業績總覽 · 安然核心指標</span><span style="font-size:10px;color:var(--txt-lo);">北京蕪解 · UJ BKK · 台灣悍草 · 香港JV</span></div>
+  <div class="sec-head"><span class="sec-title">全集團業績總覽 · 安然核心指標</span><span style="font-size:10px;color:var(--txt-lo);">北京蕪解 · UJ BKK · 台灣悍草 · 香港JV · 點擊展開明細</span></div>
   <div class="kpi-row">
 
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="toggleKpiDetail('kd-month')" style="cursor:pointer;">
       <div class="kpi-label">本月業績（批發合計）</div>
       <div class="kpi-val" id="kpi-rev-month" style="color:var(--warn)">¥ 328 萬</div>
       <div class="kpi-sub" id="kpi-rev-month-sub">目標 ¥450 萬 · 5 月</div>
       <span class="kpi-trend trend-warn" id="kpi-rev-month-trend">73% 達成</span>
       <div class="prog"><div id="kpi-rev-month-bar" class="prog-fill" style="width:73%;background:var(--warn)"></div></div>
-      <div class="kpi-footer"><span>集團批發合計</span><span id="kpi-rev-month-foot">5 月</span></div>
+      <div class="kpi-footer"><span>集團批發合計</span><span id="kpi-rev-month-foot">▼ 展開明細</span></div>
+      <div id="kd-month" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;" onclick="event.stopPropagation()">
+        <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:6px;">本月 5 月 · 產品 × 客戶明細</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--card2);border-radius:4px;">
+            <span style="color:var(--txt-hi);">LOG-ON 香港 <span style="color:var(--txt-lo)">老董 · Snoopy · 46折</span></span>
+            <span style="font-weight:700;color:var(--ok);">¥199萬</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--card2);border-radius:4px;">
+            <span style="color:var(--txt-hi);">廣州名創優品 <span style="color:var(--txt-lo)">老董 · Snoopy · 46折</span></span>
+            <span style="font-weight:700;color:var(--ok);">¥58萬</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--card2);border-radius:4px;">
+            <span style="color:var(--txt-hi);">上海美陳超市 <span style="color:var(--txt-lo)">德寶 · Mofusand · 47折</span></span>
+            <span style="font-weight:700;color:var(--ok);">¥35萬</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--card2);border-radius:4px;">
+            <span style="color:var(--txt-hi);">泡泡瑪特北京 <span style="color:var(--txt-lo)">老董 · Snoopy · 46折</span></span>
+            <span style="font-weight:700;color:var(--txt-mid);">¥21萬</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;">
+            <span style="color:var(--txt-lo);">其他零散</span>
+            <span style="color:var(--txt-lo);">¥15萬</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="toggleKpiDetail('kd-quarter')" style="cursor:pointer;">
       <div class="kpi-label">本季業績（Q2 累計）</div>
       <div class="kpi-val" id="kpi-rev-quarter" style="color:var(--accent)">¥ 892 萬</div>
       <div class="kpi-sub" id="kpi-rev-quarter-sub">Q2 目標 ¥1,350 萬</div>
       <span class="kpi-trend trend-warn" id="kpi-rev-quarter-trend">66% 達成</span>
       <div class="prog"><div id="kpi-rev-quarter-bar" class="prog-fill" style="width:66%;background:var(--accent)"></div></div>
-      <div class="kpi-footer"><span>Q2（4–6月）</span><span id="kpi-rev-quarter-foot">還剩 1 個月</span></div>
+      <div class="kpi-footer"><span>Q2（4–6月）</span><span id="kpi-rev-quarter-foot">▼ 展開月度</span></div>
+      <div id="kd-quarter" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;" onclick="event.stopPropagation()">
+        <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:6px;">Q2 月度拆解</div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;padding:5px 6px;background:var(--card2);border-radius:4px;">
+            <span style="color:var(--txt-hi);">4 月</span>
+            <span style="font-weight:700;color:var(--ok);">¥564萬 <span style="font-size:9px;color:var(--ok)">+22% vs YTD預算</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;padding:5px 6px;background:var(--card2);border-radius:4px;">
+            <span style="color:var(--txt-hi);">5 月 <span style="font-size:9px;color:var(--txt-lo)">進行中</span></span>
+            <span style="font-weight:700;color:var(--warn);">¥328萬 <span style="font-size:9px;color:var(--txt-lo)">73%達成率</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;padding:5px 6px;opacity:.5;">
+            <span style="color:var(--txt-lo);">6 月 <span style="font-size:9px">計劃中</span></span>
+            <span style="color:var(--txt-lo);">—</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="toggleKpiDetail('kd-contract')" style="cursor:pointer;">
       <div class="kpi-label">活躍授權合約</div>
       <div class="kpi-val" id="kpi-contract" style="color:var(--accent)">5 份</div>
       <div class="kpi-sub" id="kpi-contract-sub">Snoopy · Mofusand · Opanchu · Muziktiger · 飯糰梅子</div>
       <span class="kpi-trend trend-warn" id="kpi-contract-warn">⚠ Opanchu 4 個月後到期</span>
+      <div class="kpi-footer"><span></span><span>▼ 展開合約</span></div>
+      <div id="kd-contract" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;" onclick="event.stopPropagation()">
+        <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:6px;">已簽約（5份）</div>
+        <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--ok-dim);border-radius:4px;">
+            <span style="color:var(--txt-hi);">Snoopy（史努比）</span><span style="color:var(--ok);">到期 2027-03</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--ok-dim);border-radius:4px;">
+            <span style="color:var(--txt-hi);">Mofusand（貓福珊迪）</span><span style="color:var(--ok);">到期 2027-01</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--warn-dim);border-radius:4px;">
+            <span style="color:var(--txt-hi);">⚠ Opanchu（褲褲兔）</span><span style="color:var(--warn);">到期 2026-09</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--warn-dim);border-radius:4px;">
+            <span style="color:var(--txt-hi);">Muziktiger（無業老虎）</span><span style="color:var(--warn);">到期 2026-12</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 6px;background:var(--ok-dim);border-radius:4px;">
+            <span style="color:var(--txt-hi);">飯糰與梅子</span><span style="color:var(--ok);">到期 2027-06</span>
+          </div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:4px;">洽談中</div>
+        <div style="font-size:10px;padding:4px 6px;background:var(--card2);border-radius:4px;color:var(--txt-mid);">Opanchu 續約草案已送 Ray 確認（recA004）</div>
+      </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="toggleKpiDetail('kd-ar')" style="cursor:pointer;">
       <div class="kpi-label">應收帳款預警</div>
       <div class="kpi-val" id="kpi-ar" style="color:var(--danger)">¥ 18 萬</div>
       <div class="kpi-sub" id="kpi-ar-sub">逾期未收 1 筆 · 訂金待尾款 2 筆</div>
       <span class="kpi-trend trend-dn" id="kpi-ar-trend">需跟進催收</span>
-      <div class="kpi-footer" id="kpi-ar-foot"><span>逾期：LOG-ON ¥18萬</span><span style="color:var(--warn)">3天前</span></div>
+      <div class="kpi-footer" id="kpi-ar-foot"><span>逾期：LOG-ON ¥18萬</span><span>▼ 展開</span></div>
+      <div id="kd-ar" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;" onclick="event.stopPropagation()">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div style="padding:6px 8px;background:var(--danger-dim);border-radius:5px;border-left:2px solid var(--danger);">
+            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;">
+              <span style="color:var(--txt-hi);">LOG-ON 香港 · Snoopy 尾款</span>
+              <span style="color:var(--danger);">¥18萬 逾期 3天</span>
+            </div>
+            <div style="font-size:9px;color:var(--txt-mid);margin-top:2px;">德寶負責跟進 · 今天須給出回款日期</div>
+          </div>
+          <div style="padding:6px 8px;background:var(--warn-dim);border-radius:5px;border-left:2px solid var(--warn);">
+            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;">
+              <span style="color:var(--txt-hi);">廣州博騰 · Opanchu 訂金</span>
+              <span style="color:var(--warn);">¥8.2萬 5/20到期</span>
+            </div>
+            <div style="font-size:9px;color:var(--txt-mid);margin-top:2px;">木子負責跟進 · 還有 12天</div>
+          </div>
+          <div style="padding:6px 8px;background:var(--card2);border-radius:5px;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;">
+              <span style="color:var(--txt-hi);">北京華糖 · Snoopy 尾款</span>
+              <span style="color:var(--txt-mid);">¥6.5萬 6/01到期</span>
+            </div>
+            <div style="font-size:9px;color:var(--txt-mid);margin-top:2px;">正常進行中</div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -567,6 +657,13 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div>
         <div class="intent-prod-name">Muziktiger 新系列盲盒</div>
         <div class="intent-prod-meta">預計 7月上市 · 模具確認中 · 老董主攻大陸連鎖渠道</div>
+        <!-- 預估量 gauge -->
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--card2);border-radius:3px;height:5px;overflow:hidden;">
+            <div style="height:100%;border-radius:3px;background:var(--ok);width:140%;" title="已超過最低門檻"></div>
+          </div>
+          <span style="font-size:10px;white-space:nowrap;color:var(--ok);font-weight:700;">客戶意向 280箱 / 最低門檻 200箱 ✅</span>
+        </div>
       </div>
       <div class="intent-prod-right">
         <span class="chip chip-warn">意向蒐集中</span>
@@ -624,6 +721,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div>
         <div class="intent-prod-name">Opanchu 秋冬系列</div>
         <div class="intent-prod-meta">預計 9月上市 · 2D 概念生圖中 · 德寶主攻</div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--card2);border-radius:3px;height:5px;overflow:hidden;">
+            <div style="height:100%;border-radius:3px;background:var(--txt-lo);width:0%;"></div>
+          </div>
+          <span style="font-size:10px;white-space:nowrap;color:var(--danger);font-weight:700;">客戶意向 0箱 / 最低門檻 200箱 ❌</span>
+        </div>
       </div>
       <div class="intent-prod-right">
         <span class="chip chip-grey">尚未蒐集</span>
@@ -652,6 +755,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div>
         <div class="intent-prod-name">Mofusand 10月秋季款</div>
         <div class="intent-prod-meta">預計 10月上市 · 2D 送審中 · 老董 + 德寶 共同開拓</div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--card2);border-radius:3px;height:5px;overflow:hidden;">
+            <div style="height:100%;border-radius:3px;background:var(--txt-lo);width:0%;"></div>
+          </div>
+          <span style="font-size:10px;white-space:nowrap;color:var(--txt-lo);">尚未開始蒐集 / 最低門檻 200箱</span>
+        </div>
       </div>
       <div class="intent-prod-right">
         <span class="chip chip-grey">早期規劃</span>
@@ -790,6 +899,17 @@ function toggleProd(id){
 }
 function toggleIntent(id){
   document.getElementById(id).classList.toggle('open');
+}
+function toggleKpiDetail(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : '';
+  const card = el.closest('.kpi-card');
+  const foot = card ? card.querySelector('.kpi-footer span:last-child') : null;
+  if (foot && (foot.textContent.startsWith('▼') || foot.textContent.startsWith('▲'))) {
+    foot.textContent = isOpen ? '▼ 展開明細' : '▲ 收起';
+  }
 }
 
 /* ── FEISHU CONFIG ── */
