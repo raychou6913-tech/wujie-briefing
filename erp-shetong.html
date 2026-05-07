@@ -561,6 +561,20 @@ const EXP_ROUTES={
   ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
 };
 const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+const _PROXY='https://feishu-proxy.raychou6913.workers.dev';
+const _AT2='Sg7ObNELHaAdZzshGIFjWPVhpce';
+const _APPR_TBL='tbl4OBNvsNkqS4mQ';
+const APPROVER_MAP={ray:'Ray',shawn:'Shawn',anran:'安然'};
+async function _writeApproval(fields){
+  try{
+    const tr=await fetch(_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const {tenant_access_token:tk}=await tr.json();
+    await fetch(_PROXY+'/open-apis/bitable/v1/apps/'+_AT2+'/tables/'+_APPR_TBL+'/records',{
+      method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},
+      body:JSON.stringify({fields})
+    });
+  }catch(e){console.warn('Feishu write skipped',e);}
+}
 let expType='personal';
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
 function openExpModal(){
@@ -615,6 +629,23 @@ function submitExpense(){
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+
+  // Fire-and-forget write to Feishu 審批記錄
+  const sess2=JSON.parse(localStorage.getItem('erp_sess')||'null');
+  const applicant=sess2?.name||u||'詩彤';
+  const approver=APPROVER_MAP[r.next]||'Ray';
+  const title=rec.type==='請假申請'
+    ? `【請假】${applicant} ${rec.leaveType||'年假'} ${rec.start}~${rec.end}`
+    : rec.type==='供應商付款申請'
+    ? `【付款】${applicant} ${rec.supplier} ¥${rec.amt}`
+    : `【費用】${applicant} ${rec.cat} ¥${rec.amt}${rec.ccy==='TWD'?' TWD':rec.ccy==='THB'?' THB':''}`;
+  const amt=parseFloat(rec.amt)||0;
+  const ccy={'TWD':'TWD','THB':'THB','HKD':'HKD','USD':'USD'}[rec.ccy]||'CNY';
+  _writeApproval({'標題':title,'審批標題':title,'審批類型':rec.type==='請假申請'?'其他':'費用申請',
+    '申請人':applicant,'申請日期':Date.now(),'金額':amt,'幣別':ccy,
+    '審批人':approver,'審批狀態':'待審批','Email已發送':'否',
+    '申請說明':rec.desc||rec.reason||`${rec.type} 申請`});
+
   closeExpModal();
   (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }

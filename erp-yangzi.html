@@ -213,6 +213,20 @@ function logout(){ localStorage.removeItem('erp_sess'); location.href='login.htm
 
 document.getElementById('tb-user').textContent = SESS.name + ' · ' + SESS.role;
 
+const _YZ_PROXY='https://feishu-proxy.raychou6913.workers.dev';
+const _YZ_AT='Sg7ObNELHaAdZzshGIFjWPVhpce';
+const _YZ_TBL='tbl4OBNvsNkqS4mQ';
+async function _yzWriteApproval(fields){
+  try{
+    const tr=await fetch(_YZ_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const {tenant_access_token:tk}=await tr.json();
+    await fetch(_YZ_PROXY+'/open-apis/bitable/v1/apps/'+_YZ_AT+'/tables/'+_YZ_TBL+'/records',{
+      method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},
+      body:JSON.stringify({fields})
+    });
+  }catch(e){console.warn('Feishu write skipped',e);}
+}
+
 // ── Inbox Data ─────────────────────────────────────────────
 const INBOX_KEY = 'yangzi_inbox_v1';
 function loadInbox(){
@@ -495,6 +509,14 @@ function submitForm(){
     const q = JSON.parse(localStorage.getItem(key)||'[]');
     q.unshift(rec);
     localStorage.setItem(key, JSON.stringify(q));
+    // Fire-and-forget → Feishu 審批記錄
+    const desc=Object.entries(data).map(([k,v])=>`${k}：${v}`).join(' · ');
+    const amt=parseFloat(Object.values(data).find(v=>!isNaN(parseFloat(v)))||0)||0;
+    _yzWriteApproval({'標題':`【採購】楊子 ${f.name}`,
+      '審批標題':`【採購申請】楊子 ${f.name}`,
+      '審批類型':'採購審批','申請人':'楊子','申請日期':Date.now(),
+      '金額':amt,'幣別':'CNY','審批人':'Ray',
+      '審批狀態':'待審批','Email已發送':'否','申請說明':desc||f.name});
   }
   closeForm();
   showToast('申請已送出，審核中...');
