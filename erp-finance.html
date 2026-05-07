@@ -297,6 +297,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('biz')">📊 業務報表</button>
     <button class="tab-btn" onclick="switchTab('cash')">💸 現金流</button>
+    <button class="tab-btn" onclick="switchTab('staff')">👥 人員分攤</button>
   </div>
 
   <!-- ══ TAB: 業務報表 ══ -->
@@ -733,6 +734,153 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   </div><!-- /tab-cash -->
 
+  <!-- ══ TAB: 人員分攤 ══ -->
+  <div class="tab-panel" id="tab-staff">
+
+    <!-- 說明 -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:11px;color:var(--txt-mid);line-height:1.7;">
+      <strong style="color:var(--txt-hi);">運作邏輯：</strong>北京蕪解、台灣悍草、UJ BKK 各自承擔本公司人員薪資與管銷開支，再向香港JV或深圳子公司收取服務費。服務費涵蓋成本並保留少量利潤，確保各非JV公司可正常運作，同時利潤最大化留在 JV ＋ 深圳（VAM考核主體）。
+    </div>
+
+    <!-- 定價參數提示 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--txt-mid);">各公司人員配置與費用</div>
+      <div style="font-size:10px;color:var(--txt-lo);">薪資為稅前基本薪，不含獎金。點擊各列可展開詳情。</div>
+    </div>
+
+    <!-- 北京蕪解 -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="toggleStaffSection('staff-bj')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:10px;height:10px;border-radius:3px;background:#60a5fa;flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:13px;font-weight:800;">北京蕪解</div>
+            <div style="font-size:10px;color:var(--txt-mid);">服務商 · 供應鏈發包 / 產品包銷　8 人</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:16px;font-weight:800;color:var(--txt-hi);">¥ 154,000 <span style="font-size:10px;color:var(--txt-lo);">/ 月</span></div>
+          <div style="font-size:10px;color:var(--txt-mid);">總OPEX（薪資＋管銷）</div>
+        </div>
+      </div>
+      <div id="staff-bj" style="display:none;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="background:var(--card2);">
+            <th style="text-align:left;padding:7px 14px;font-size:9px;color:var(--txt-lo);font-weight:700;letter-spacing:.04em;">人員</th>
+            <th style="text-align:left;padding:7px 10px;font-size:9px;color:var(--txt-lo);font-weight:700;">職位</th>
+            <th style="text-align:right;padding:7px 10px;font-size:9px;color:var(--txt-lo);font-weight:700;">月薪（稅前）</th>
+            <th style="text-align:left;padding:7px 10px;font-size:9px;color:var(--txt-lo);font-weight:700;">未來掛靠</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">安然</td><td style="padding:8px 10px;color:var(--txt-mid);">北京負責人</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 25,000</td><td style="padding:8px 10px;font-size:10px;color:var(--accent);">→ 深圳子公司</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">賴哥</td><td style="padding:8px 10px;color:var(--txt-mid);">採購主管</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 20,000</td><td style="padding:8px 10px;font-size:10px;color:var(--txt-lo);">—</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">老董</td><td style="padding:8px 10px;color:var(--txt-mid);">業務</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 15,000</td><td style="padding:8px 10px;font-size:10px;color:var(--txt-lo);">—</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">德寶</td><td style="padding:8px 10px;color:var(--txt-mid);">業務</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 12,000</td><td style="padding:8px 10px;font-size:10px;color:var(--txt-lo);">—</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">木子</td><td style="padding:8px 10px;color:var(--txt-mid);">採購執行</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 10,000</td><td style="padding:8px 10px;font-size:10px;color:var(--txt-lo);">—</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">高維</td><td style="padding:8px 10px;color:var(--txt-mid);">物流</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 10,000</td><td style="padding:8px 10px;font-size:10px;color:var(--txt-lo);">—</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">春雷</td><td style="padding:8px 10px;color:var(--txt-mid);">電商（抖音+小紅書）</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 12,000</td><td style="padding:8px 10px;font-size:10px;color:var(--accent);">→ 深圳子公司</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">佳音</td><td style="padding:8px 10px;color:var(--txt-mid);">電商（淘寶）</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 10,000</td><td style="padding:8px 10px;font-size:10px;color:var(--accent);">→ 深圳子公司</td></tr>
+            <tr style="border-top:1px solid var(--border);background:var(--card2);"><td style="padding:8px 14px;font-weight:700;color:var(--txt-mid);">小計（薪資）</td><td colspan="2" style="padding:8px 10px;text-align:right;font-weight:800;color:var(--txt-hi);">¥ 114,000</td><td></td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;color:var(--txt-mid);">辦公室租金＋水電</td><td colspan="2" style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 25,000</td><td></td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;color:var(--txt-mid);">其他管銷（差旅/招待/工具）</td><td colspan="2" style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 15,000</td><td></td></tr>
+            <tr style="border-top:2px solid var(--border-hi);background:var(--card2);"><td style="padding:10px 14px;font-weight:800;color:var(--txt-hi);">月度總OPEX</td><td colspan="2" style="padding:10px 10px;text-align:right;font-size:14px;font-weight:800;color:var(--txt-hi);">¥ 154,000</td><td></td></tr>
+          </tbody>
+        </table>
+        <div style="padding:12px 14px;background:var(--card2);border-top:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;">
+            <div><div style="color:var(--txt-lo);font-size:9px;margin-bottom:3px;">向JV收服務費</div><div style="font-weight:800;color:var(--ok);">¥ 176,100 / 月</div><div style="font-size:9px;color:var(--txt-lo);">OPEX × 1.14（含14%利潤）</div></div>
+            <div><div style="color:var(--txt-lo);font-size:9px;margin-bottom:3px;">北京蕪解月度利潤</div><div style="font-weight:800;color:var(--accent);">¥ 22,100</div><div style="font-size:9px;color:var(--txt-lo);">稅前（扣25%所得稅後≈¥16,600）</div></div>
+            <div><div style="color:var(--txt-lo);font-size:9px;margin-bottom:3px;">JV承擔服務費成本</div><div style="font-weight:800;color:var(--warn);">¥ 176,100 / 月</div><div style="font-size:9px;color:var(--txt-lo);">計入JV費用，淨利相應減少</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 台灣悍草 -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="toggleStaffSection('staff-tw')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:10px;height:10px;border-radius:3px;background:#f472b6;flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:13px;font-weight:800;">台灣悍草</div>
+            <div style="font-size:10px;color:var(--txt-mid);">台灣代運營 / 有你共創外包　4 人</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:16px;font-weight:800;color:var(--txt-hi);">NT$ 197,000 <span style="font-size:10px;color:var(--txt-lo);">/ 月</span></div>
+          <div style="font-size:10px;color:var(--txt-mid);">≈ ¥ 43,300 總OPEX</div>
+        </div>
+      </div>
+      <div id="staff-tw" style="display:none;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="background:var(--card2);">
+            <th style="text-align:left;padding:7px 14px;font-size:9px;color:var(--txt-lo);font-weight:700;">人員</th>
+            <th style="text-align:left;padding:7px 10px;font-size:9px;color:var(--txt-lo);font-weight:700;">職位</th>
+            <th style="text-align:right;padding:7px 10px;font-size:9px;color:var(--txt-lo);font-weight:700;">月薪（NT$ 稅前）</th>
+            <th style="text-align:right;padding:7px 10px;font-size:9px;color:var(--txt-lo);font-weight:700;">折算RMB</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">珮玲</td><td style="padding:8px 10px;color:var(--txt-mid);">設計師</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">NT$ 52,000</td><td style="padding:8px 10px;text-align:right;color:var(--txt-mid);">¥ 11,400</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">詩彤</td><td style="padding:8px 10px;color:var(--txt-mid);">設計師</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">NT$ 42,000</td><td style="padding:8px 10px;text-align:right;color:var(--txt-mid);">¥ 9,200</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">楊子</td><td style="padding:8px 10px;color:var(--txt-mid);">HR 行政</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">NT$ 38,000</td><td style="padding:8px 10px;text-align:right;color:var(--txt-mid);">¥ 8,400</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;font-weight:700;">Leo</td><td style="padding:8px 10px;color:var(--txt-mid);">出納</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">NT$ 38,000</td><td style="padding:8px 10px;text-align:right;color:var(--txt-mid);">¥ 8,400</td></tr>
+            <tr style="border-top:1px solid var(--border);background:var(--card2);"><td style="padding:8px 14px;font-weight:700;color:var(--txt-mid);">小計（薪資）</td><td></td><td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--txt-hi);">NT$ 170,000</td><td style="padding:8px 10px;text-align:right;font-weight:800;color:var(--txt-hi);">¥ 37,400</td></tr>
+            <tr style="border-top:1px solid var(--border);"><td style="padding:8px 14px;color:var(--txt-mid);">辦公室租金＋其他管銷</td><td></td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">NT$ 27,000</td><td style="padding:8px 10px;text-align:right;color:var(--txt-hi);">¥ 5,900</td></tr>
+            <tr style="border-top:2px solid var(--border-hi);background:var(--card2);"><td style="padding:10px 14px;font-weight:800;color:var(--txt-hi);">月度總OPEX</td><td></td><td style="padding:10px 10px;text-align:right;font-size:14px;font-weight:800;color:var(--txt-hi);">NT$ 197,000</td><td style="padding:10px 10px;text-align:right;font-size:14px;font-weight:800;color:var(--txt-hi);">¥ 43,300</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:12px 14px;background:var(--card2);border-top:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;">
+            <div><div style="color:var(--txt-lo);font-size:9px;margin-bottom:3px;">向JV收設計服務費</div><div style="font-weight:800;color:var(--ok);">NT$ 225,000 / 月</div><div style="font-size:9px;color:var(--txt-lo);">OPEX × 1.14（含14%利潤）</div></div>
+            <div><div style="color:var(--txt-lo);font-size:9px;margin-bottom:3px;">悍草月度利潤</div><div style="font-weight:800;color:var(--accent);">NT$ 28,000</div><div style="font-size:9px;color:var(--txt-lo);">稅前（扣20%所得稅後≈NT$22,400）</div></div>
+            <div><div style="color:var(--txt-lo);font-size:9px;margin-bottom:3px;">匯率假設</div><div style="font-weight:800;color:var(--txt-hi);">1 RMB ≈ 4.56 TWD</div><div style="font-size:9px;color:var(--txt-lo);">實際匯率以付款日為準</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 合計與VAM影響 -->
+    <div style="background:var(--card);border:1px solid var(--border-hi);border-radius:12px;padding:16px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--txt-mid);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">合計服務費 → JV每月成本負擔</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;text-align:center;">
+        <div style="padding:10px;background:var(--card2);border-radius:8px;">
+          <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">北京蕪解服務費</div>
+          <div style="font-size:16px;font-weight:800;color:var(--txt-hi);">¥ 17.6萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);">/ 月</div>
+        </div>
+        <div style="padding:10px;background:var(--card2);border-radius:8px;">
+          <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">台灣悍草服務費</div>
+          <div style="font-size:16px;font-weight:800;color:var(--txt-hi);">NT$ 22.5萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);">≈ ¥ 4.9萬 / 月</div>
+        </div>
+        <div style="padding:10px;background:var(--card2);border-radius:8px;">
+          <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">月度服務費合計</div>
+          <div style="font-size:16px;font-weight:800;color:var(--warn);">¥ 22.5萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);">JV費用（影響VAM）</div>
+        </div>
+        <div style="padding:10px;background:var(--card2);border-radius:8px;">
+          <div style="font-size:9px;color:var(--txt-lo);margin-bottom:4px;">全年服務費影響</div>
+          <div style="font-size:16px;font-weight:800;color:var(--warn);">¥ 270萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);">必須從毛利中覆蓋</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 12px;background:#f59e0b10;border:1px solid #f59e0b30;border-radius:8px;font-size:11px;color:var(--txt-mid);line-height:1.7;">
+        💡 <strong style="color:var(--txt-hi);">VAM 含義：</strong>JV ＋ 深圳淨利 ¥800萬 目標，已涵蓋支付所有服務費後的剩餘利潤。全年毛利至少需達 <strong style="color:var(--warn);">¥1,070萬（¥800萬目標 ＋ ¥270萬服務費）</strong> 才能完成對賭。
+      </div>
+    </div>
+
+    <!-- UJ BKK -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:800;margin-bottom:8px;">UJ BKK（泰國）</div>
+      <div style="font-size:11px;color:var(--txt-mid);line-height:1.7;">
+        UJ BKK 的運營費用（租金、本地員工薪資）由 UJ BKK 自行負擔，不向香港JV收服務費。<br>
+        JV 與 UJ BKK 合作時，透過保底費＋抽成或共同投資分潤方式結算，不另計人頭服務費。<br>
+        <span style="color:var(--txt-lo);">Meaw 等泰國本地員工薪資待確認後填入。</span>
+      </div>
+    </div>
+
+  </div><!-- /tab-staff -->
+
 </div><!-- /main -->
 
 <!-- NEW REMITTANCE MODAL -->
@@ -1064,9 +1212,14 @@ function confirmSettle(){
 }
 
 function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['biz','cash'][i]===tab));
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['biz','cash','staff'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
+}
+function toggleStaffSection(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.style.display=el.style.display==='none'?'':'none';
 }
 
 function showToast(msg){
