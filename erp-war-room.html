@@ -48,7 +48,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .entity-tab{padding:10px 16px;font-size:12px;font-weight:600;color:var(--txt-mid);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.15s;}
 .entity-tab.active{color:var(--txt-hi);border-bottom-color:var(--accent);}
 .entity-tab:hover:not(.active){color:var(--txt-hi);}
+.entity-tab[data-entity="vam"].active{color:var(--accent);border-bottom-color:var(--accent);}
 .e-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;}
+
+/* ── ENTITY CONTEXT STRIP ── */
+.ectx-panel{padding:8px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:36px;}
+.ectx-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.ectx-fact{font-size:11px;color:var(--txt-mid);}
+.ectx-sep{width:1px;height:14px;background:var(--border);flex-shrink:0;}
+
+/* ── ENTITY FLOW DIAGRAM ── */
+.ef-box{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:150px;}
+.ef-arrow{display:flex;align-items:center;justify-content:center;color:var(--txt-lo);font-size:18px;padding:0 6px;flex-shrink:0;}
+.ef-core{background:rgba(129,140,248,.07);border:2px solid var(--accent2);border-radius:10px;padding:14px 18px;flex:1.5;}
+.ef-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:5px;}
+.ef-name{font-size:13px;font-weight:800;color:var(--txt-hi);margin-bottom:2px;}
+.ef-role{font-size:10px;color:var(--txt-mid);}
+.ef-formula{font-size:10px;color:var(--warn);margin-top:6px;font-weight:600;}
 
 /* ── LAYOUT ── */
 .main{max-width:1080px;margin:0 auto;padding:24px 20px;}
@@ -283,25 +299,70 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 <!-- ENTITY TABS -->
 <div class="entity-bar">
-  <button class="entity-tab active" onclick="switchEntity(this)">
-    <span class="e-dot" style="background:var(--beijing)"></span>北京蕪解（更名中）
+  <button class="entity-tab active" data-entity="vam" onclick="switchEntity(this,'vam')" style="font-weight:800;">
+    🎯 VAM口徑（JV+深圳）
   </button>
-  <button class="entity-tab" onclick="switchEntity(this)">
+  <button class="entity-tab" data-entity="all" onclick="switchEntity(this,'all')">
+    📋 全集團合并
+  </button>
+  <button class="entity-tab" data-entity="beijing" onclick="switchEntity(this,'beijing')">
+    <span class="e-dot" style="background:var(--beijing)"></span>北京蕪解
+  </button>
+  <button class="entity-tab" data-entity="taiwan" onclick="switchEntity(this,'taiwan')">
     <span class="e-dot" style="background:var(--taipei)"></span>台灣悍草
   </button>
-  <button class="entity-tab" onclick="switchEntity(this)">
-    <span class="e-dot" style="background:var(--hk)"></span>香港蕪解
-  </button>
-  <button class="entity-tab" onclick="switchEntity(this)">
-    <span class="e-dot" style="background:var(--sz)"></span>深圳蕪解
-  </button>
-  <button class="entity-tab" onclick="switchEntity(this)">
+  <button class="entity-tab" data-entity="bkk" onclick="switchEntity(this,'bkk')">
     <span class="e-dot" style="background:var(--bangkok)"></span>UJ BKK（泰國）
   </button>
-  <button class="entity-tab active" onclick="switchEntity(this)" style="font-weight:800;color:var(--accent)">
-    ◎ 全集團合並
-  </button>
-  <span style="margin-left:auto;padding:0 16px;font-size:9px;color:var(--txt-lo);align-self:center;white-space:nowrap;">點擊 Tab 切換顯示（開發中）</span>
+</div>
+
+<!-- ENTITY CONTEXT STRIP -->
+<div style="background:var(--surface);border-bottom:1px solid var(--border);">
+  <div id="ectx-vam" class="ectx-panel">
+    <span class="ectx-badge" style="background:rgba(129,140,248,.15);color:var(--accent);">🎯 VAM考核主體</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact">香港JV ＋ 深圳子公司 · 稅前淨利合并計算</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--warn);font-weight:700;">目標：¥800萬/年 × 2年 = ¥1,600萬</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--txt-lo);">口徑：跨主體服務費已透過定價公式計入成本，不重複排除</span>
+  </div>
+  <div id="ectx-all" class="ectx-panel" style="display:none">
+    <span class="ectx-badge" style="background:rgba(255,255,255,.06);color:var(--txt-hi);">📋 全集團視角</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact">5間公司合計損益（含跨主體往來未對沖）</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact">VAM主體：<span style="color:var(--accent)">香港JV ＋ 深圳</span> · 服務商：<span style="color:var(--beijing)">北京蕪解</span> ＋ <span style="color:var(--taipei)">台灣悍草</span> · 合資：<span style="color:var(--bangkok)">UJ BKK</span></span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--txt-lo);">點擊「集團法人架構」卡片查看資金流向圖</span>
+  </div>
+  <div id="ectx-beijing" class="ectx-panel" style="display:none">
+    <span class="ectx-badge" style="background:rgba(245,158,11,.12);color:var(--beijing);">🏢 供應鏈服務商</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact">向香港JV / 深圳提供代採購 · 供應鏈發包服務</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--warn);font-weight:600;">定價公式：原廠報價 × 1.1 = 向JV報價（差價10%為服務費收入）</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--txt-lo);">現掛籍：安然 · 賴哥 · 木子 · 人員逐步轉移至深圳/香港</span>
+  </div>
+  <div id="ectx-taiwan" class="ectx-panel" style="display:none">
+    <span class="ectx-badge" style="background:rgba(129,140,248,.12);color:var(--taipei);">🇹🇼 台灣代運營</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact">代運營香港JV授權的台灣快閃店項目</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--warn);font-weight:600;">收費模式：保底費 ＋ 營收抽成%（各項目個案協商）</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--txt-lo);">現掛籍：Ray · 珮玲 · 詩彤 · 同時承接有你共創外包業務</span>
+  </div>
+  <div id="ectx-bkk" class="ectx-panel" style="display:none">
+    <span class="ectx-badge" style="background:rgba(34,197,94,.12);color:var(--bangkok);">🇹🇭 泰國合資</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact">北京蕪解轉投資 · 曼谷快閃店（Shawn駐點）</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--warn);font-weight:600;">模式A：代運營JV項目→保底費＋抽成% · 模式B：共同投資→按比例分潤</span>
+    <span class="ectx-sep"></span>
+    <span class="ectx-fact" style="color:var(--txt-lo);">JV持股份額對應分潤計入VAM · UJ BKK自身份額不計入</span>
+  </div>
 </div>
 
 <div class="main">
@@ -564,6 +625,85 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         </div>
       </div>
       <div style="font-size:10px;color:var(--txt-lo);">📌 4月 LOG-ON 出貨拉高單月收入，2月農曆年淡季屬正常。月度淨利率趨勢向上，Q2 均值預計可達 30%+。</div>
+    </div>
+  </div>
+
+  <!-- 集團法人架構 -->
+  <div style="margin-bottom:24px;">
+    <div onclick="toggleEntityFlow()" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-bottom:10px;user-select:none;" onmouseover="this.querySelector('span').style.color='var(--txt-mid)'" onmouseout="this.querySelector('span').style.color='var(--txt-lo)'">
+      <div class="section-title" style="margin:0;">集團法人架構 · 資金流向</div>
+      <span id="ef-arr" style="font-size:11px;color:var(--txt-lo);transition:.15s;">▼ 展開</span>
+    </div>
+    <div id="entity-flow-block" style="display:none;">
+      <!-- Top row: 北京蕪解 → JV+深圳 ← 台灣悍草 -->
+      <div style="display:flex;align-items:stretch;gap:0;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
+        <div class="ef-box">
+          <div class="ef-tag" style="background:rgba(245,158,11,.15);color:var(--beijing);">供應鏈服務商</div>
+          <div class="ef-name">北京蕪解</div>
+          <div class="ef-role">採購代發包 · 供應鏈管理</div>
+          <div class="ef-role" style="margin-top:4px;color:var(--txt-lo)">掛籍：安然 · 賴哥 · 木子</div>
+          <div class="ef-formula">定價：原廠報價 ×1.1 → JV</div>
+        </div>
+        <div class="ef-arrow">→</div>
+        <div class="ef-core">
+          <div class="ef-tag" style="background:rgba(129,140,248,.2);color:var(--accent);">🎯 VAM 考核核心</div>
+          <div class="ef-name">香港 JV ＋ 深圳子公司</div>
+          <div class="ef-role">主要業務主體 · 利潤中心</div>
+          <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:9px;color:var(--txt-lo);">年度目標</div>
+              <div style="font-size:18px;font-weight:800;color:var(--accent);">¥800萬</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--txt-lo);">兩年目標</div>
+              <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">¥1,600萬</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--txt-lo);">考核口徑</div>
+              <div style="font-size:12px;font-weight:700;color:var(--txt-mid);margin-top:2px;">稅前淨利（RMB）</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:10px;background:rgba(232,121,249,.1);color:var(--hk);padding:2px 8px;border-radius:4px;">香港 利得稅 8.25%</span>
+            <span style="font-size:10px;background:rgba(56,189,248,.08);color:#38bdf8;padding:2px 8px;border-radius:4px;">深圳 企業稅 25%</span>
+            <span style="font-size:10px;background:var(--card);color:var(--txt-lo);padding:2px 8px;border-radius:4px;">加權稅後估算 ≈ ×0.87</span>
+          </div>
+        </div>
+        <div class="ef-arrow">←</div>
+        <div class="ef-box">
+          <div class="ef-tag" style="background:rgba(129,140,248,.12);color:var(--taipei);">台灣代運營</div>
+          <div class="ef-name">台灣悍草</div>
+          <div class="ef-role">台灣快閃店代運營</div>
+          <div class="ef-role" style="margin-top:4px;color:var(--txt-lo)">掛籍：Ray · 珮玲 · 詩彤</div>
+          <div class="ef-formula">← 向JV收保底費＋抽成%</div>
+        </div>
+      </div>
+      <!-- Vertical connector -->
+      <div style="text-align:center;color:var(--txt-lo);font-size:11px;padding:3px 0;letter-spacing:.05em;">↕ 共同投資 · 按持股比例分潤（JV份額計入VAM）</div>
+      <!-- UJ BKK -->
+      <div style="display:flex;justify-content:center;">
+        <div class="ef-box" style="max-width:400px;flex:none;">
+          <div class="ef-tag" style="background:rgba(34,197,94,.12);color:var(--bangkok);">泰國合資</div>
+          <div class="ef-name">UJ BKK（泰國）</div>
+          <div class="ef-role">北京蕪解轉投資 · Shawn 駐曼谷</div>
+          <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="padding:6px 8px;background:var(--card);border-radius:5px;font-size:10px;">
+              <div style="color:var(--txt-lo);margin-bottom:2px;">模式 A</div>
+              <div style="color:var(--txt-hi);">代運營JV快閃店</div>
+              <div style="color:var(--warn);font-size:9px;margin-top:2px;">保底費 ＋ 營收抽成%</div>
+            </div>
+            <div style="padding:6px 8px;background:var(--card);border-radius:5px;font-size:10px;">
+              <div style="color:var(--txt-lo);margin-bottom:2px;">模式 B</div>
+              <div style="color:var(--txt-hi);">與JV共同投資項目</div>
+              <div style="color:var(--warn);font-size:9px;margin-top:2px;">按投資比例分潤 waterfall</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer note -->
+      <div style="margin-top:10px;padding:8px 12px;background:var(--card2);border-radius:6px;font-size:10px;color:var(--txt-lo);line-height:1.6;">
+        💡 <strong style="color:var(--txt-mid);">定價邏輯說明：</strong>北京蕪解向JV供應鏈發包，JV付 ×1.1 報價（差額是蕪解服務費），JV的淨利已正確扣除此成本，不影響VAM計算。台灣悍草/UJ BKK同理。各服務商的服務費收入是其自身利潤，不重複計入VAM。
+      </div>
     </div>
   </div>
 
@@ -1451,9 +1591,19 @@ async function financeItem(rid, btn){
 }
 
 /* ── UI HELPERS ── */
-function switchEntity(tab) {
+function switchEntity(tab, id) {
   document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
   tab.classList.add('active');
+  document.querySelectorAll('.ectx-panel').forEach(p => p.style.display = 'none');
+  const el = document.getElementById('ectx-' + id);
+  if (el) el.style.display = '';
+}
+function toggleEntityFlow() {
+  const block = document.getElementById('entity-flow-block');
+  const arr = document.getElementById('ef-arr');
+  const isOpen = block.style.display !== 'none';
+  block.style.display = isOpen ? 'none' : '';
+  arr.textContent = isOpen ? '▼ 展開' : '▲ 收起';
 }
 function switchKpiTab(btn, panelId) {
   document.querySelectorAll('.kpi-tab').forEach(t => t.classList.remove('active'));
