@@ -634,6 +634,34 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
       </div>
       <div id="budget-kpi-hint" style="margin-top:8px;font-size:10px;color:var(--txt-mid);padding-top:8px;border-top:1px solid var(--border);"></div>
+
+      <!-- 每月現金流展開 -->
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleCashflow()">
+          <span style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;">每月現金流 ＋ 預測</span>
+          <span id="cf-arr" style="font-size:10px;color:var(--txt-lo);">▼ 展開</span>
+        </div>
+        <div id="cf-monthly" style="display:none;margin-top:8px;">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;">
+            <thead>
+              <tr style="color:var(--txt-lo);font-size:9px;letter-spacing:.04em;">
+                <th style="text-align:left;padding:4px 4px 6px;font-weight:600;">月份</th>
+                <th style="text-align:right;padding:4px 4px 6px;font-weight:600;">收入</th>
+                <th style="text-align:right;padding:4px 4px 6px;font-weight:600;">支出</th>
+                <th style="text-align:right;padding:4px 4px 6px;font-weight:600;">淨現金</th>
+                <th style="text-align:right;padding:4px 4px 6px;font-weight:600;">累計餘額</th>
+              </tr>
+            </thead>
+            <tbody id="cf-tbody">
+              <!-- filled by renderCashflowTable() -->
+            </tbody>
+          </table>
+          <div style="margin-top:8px;padding:6px 8px;background:var(--card2);border-radius:6px;font-size:9px;color:var(--txt-lo);">
+            ▓ 實績 / <span style="opacity:.5;">░ 預測（基於當前 pipeline 節奏）</span>　· 接入飛書 API 後自動更新
+          </div>
+        </div>
+      </div>
+
       <!-- 採購付款預警 -->
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;">採購即將付款</div>
@@ -1417,6 +1445,46 @@ function toggleAppr(id) {
   const isOpen = panel.classList.contains('open');
   panel.classList.toggle('open', !isOpen);
   if(hint) hint.textContent = isOpen ? '▼ 展開' : '▲ 收起';
+}
+
+/* ── CASHFLOW MONTHLY TABLE ── */
+const CF_DATA = [
+  {mo:"1月",actual:true, rev:168, exp:132, net:36,  bal:36},
+  {mo:"2月",actual:true, rev:215, exp:148, net:67,  bal:103},
+  {mo:"3月",actual:true, rev:232, exp:155, net:77,  bal:180},
+  {mo:"4月",actual:true, rev:294, exp:176, net:118, bal:298},
+  {mo:"5月",actual:true, rev:328, exp:192, net:136, bal:434},
+  {mo:"6月",actual:false,rev:310, exp:185, net:125, bal:559},
+  {mo:"7月",actual:false,rev:280, exp:210, net:70,  bal:629},
+  {mo:"8月",actual:false,rev:340, exp:230, net:110, bal:739},
+  {mo:"9月",actual:false,rev:390, exp:240, net:150, bal:889},
+  {mo:"10月",actual:false,rev:420, exp:260, net:160, bal:1049},
+  {mo:"11月",actual:false,rev:460, exp:270, net:190, bal:1239},
+  {mo:"12月",actual:false,rev:480, exp:290, net:190, bal:1429},
+];
+function renderCashflowTable(){
+  const tbody=document.getElementById('cf-tbody');
+  if(!tbody) return;
+  tbody.innerHTML=CF_DATA.map(r=>{
+    const faded=r.actual?'':'opacity:.55;';
+    const badge=r.actual?'':'<span style="font-size:8px;color:var(--txt-lo);background:var(--card2);padding:1px 4px;border-radius:3px;margin-left:3px;">預測</span>';
+    const netCol=r.net>=0?'var(--ok)':'var(--danger)';
+    return `<tr style="${faded}border-bottom:1px solid var(--border)30;">
+      <td style="padding:5px 4px;color:var(--txt-mid);">${r.mo}${badge}</td>
+      <td style="text-align:right;padding:5px 4px;color:var(--txt-hi);">¥${r.rev}萬</td>
+      <td style="text-align:right;padding:5px 4px;color:var(--txt-mid);">¥${r.exp}萬</td>
+      <td style="text-align:right;padding:5px 4px;font-weight:700;color:${netCol};">${r.net>=0?'+':''}¥${r.net}萬</td>
+      <td style="text-align:right;padding:5px 4px;color:var(--txt-hi);">¥${r.bal}萬</td>
+    </tr>`;
+  }).join('');
+}
+function toggleCashflow(){
+  const panel=document.getElementById('cf-monthly');
+  const arr=document.getElementById('cf-arr');
+  const isOpen=panel.style.display!=='none';
+  panel.style.display=isOpen?'none':'';
+  if(arr) arr.textContent=isOpen?'▼ 展開':'▲ 收起';
+  if(!isOpen) renderCashflowTable();
 }
 
 /* ── LOAD CASHFLOW ── */
