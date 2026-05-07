@@ -1029,6 +1029,11 @@ const EXP_ROUTES={
   ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
 };
 const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+const _CR='https://feishu-proxy.raychou6913.workers.dev';
+const _CAT='Sg7ObNELHaAdZzshGIFjWPVhpce';
+const _CTBL='tbl4OBNvsNkqS4mQ';
+const _CAPPROVER={ray:'Ray',shawn:'Shawn',anran:'安然',yangzi:'楊子',laige:'賴哥'};
+async function _cWriteApproval(fields){try{const tr=await fetch(_CR+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const {tenant_access_token:tk}=await tr.json();await fetch(_CR+'/open-apis/bitable/v1/apps/'+_CAT+'/tables/'+_CTBL+'/records',{method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({fields})});}catch(e){console.warn('Feishu write skipped',e);}}
 let expType='personal';
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
 function openExpModal(){
@@ -1073,6 +1078,9 @@ function submitExpense(){
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  const _ccy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[rec.ccy]||'CNY';
+  const _approver=_CAPPROVER[rec.next]||'楊子';
+  _cWriteApproval({'標題':`【${rec.type}】${rec.user} ${rec.amt}${rec.ccy}`,'審批標題':`【${rec.type}】${rec.user} ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':rec.user,'申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':_ccy,'審批人':_approver,'審批狀態':'待審批','Email已發送':'否','申請說明':rec.desc||rec.cat||''});
   closeExpModal();
   (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
