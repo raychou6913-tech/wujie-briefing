@@ -329,6 +329,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- PROCUREMENT LIST -->
   <div class="sec-head"><span class="sec-title">採購單列表</span><span style="font-size:10px;color:var(--txt-lo)">點擊展開三家比價</span></div>
 
+  <!-- FEISHU LIVE POs (injected dynamically if Feishu has data) -->
+  <div id="feishu-po-list"></div>
+
   <!-- PO FILTER TABS -->
   <div class="po-filter-bar">
     <button class="po-filter-tab active" onclick="filterPO('all',this)">全部 <span style="color:var(--txt-lo)">5</span></button>
@@ -1284,7 +1287,44 @@ function renderQuotesList(){
 }
 
 /* ── INIT ── */
+/* ── FEISHU: PO LIST ── */
+async function loadPOsFromFeishu(){
+  try{
+    const rows = await query(_T.procurement);
+    if(!rows.length) return;
+    const STATUS_COLOR = {
+      '待審批':'var(--warn)', '審批中':'var(--warn)',
+      '已批核':'var(--ok)', '已完成':'var(--ok)',
+      '逾期':'var(--danger)', '取消':'var(--txt-lo)',
+    };
+    const container = document.getElementById('feishu-po-list');
+    if(!container) return;
+    container.innerHTML = `
+      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;padding:0 2px;">飛書即時記錄（${rows.length} 筆）</div>
+      ${rows.map((r,i)=>{
+        const f = r.fields;
+        const item = fv(f,'品項')||fv(f,'採購品項')||'—';
+        const supplier = fv(f,'供應商')||fv(f,'供應商名稱')||'—';
+        const amt = parseFloat(fv(f,'金額'))||0;
+        const status = fv(f,'審批狀態')||fv(f,'狀態')||'待處理';
+        const owner = fv(f,'負責人')||'賴哥';
+        const clr = STATUS_COLOR[status]||'var(--txt-mid)';
+        return `<div class="po-card" style="margin-bottom:6px;">
+          <div class="po-header" style="cursor:default;">
+            <div class="po-body" style="flex:1;">
+              <div class="po-name">${item} <span class="chip" style="background:${clr}18;color:${clr};border:1px solid ${clr}30;font-size:9px;padding:1px 6px;border-radius:4px;">${status}</span></div>
+              <div class="po-meta">供應商：${supplier} · 負責：${owner}</div>
+            </div>
+            <div class="po-right"><div class="po-amt" style="color:${clr}">${amt?'¥ '+(amt/10000).toFixed(1)+'萬':'—'}</div></div>
+          </div>
+        </div>`;
+      }).join('')}
+    `;
+  }catch(e){}
+}
+
 loadKPIsFromFeishu();
+loadPOsFromFeishu();
 renderQuotesList();
 </script>
 
