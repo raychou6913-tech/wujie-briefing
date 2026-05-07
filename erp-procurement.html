@@ -1293,20 +1293,21 @@ async function loadPOsFromFeishu(){
     const rows = await query(_T.procurement);
     if(!rows.length) return;
     const STATUS_COLOR = {
-      '待審批':'var(--warn)', '審批中':'var(--warn)',
-      '已批核':'var(--ok)', '已完成':'var(--ok)',
-      '逾期':'var(--danger)', '取消':'var(--txt-lo)',
+      '詢比價中':'var(--warn)', '確認中':'var(--warn)',
+      '已下單':'var(--accent)', '生產中':'var(--accent)',
+      '已完成':'var(--ok)', '已出貨':'var(--ok)',
+      '取消':'var(--txt-lo)', '逾期':'var(--danger)',
     };
     const container = document.getElementById('feishu-po-list');
     if(!container) return;
     container.innerHTML = `
-      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;padding:0 2px;">飛書即時記錄（${rows.length} 筆）</div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;padding:0 2px;">飛書採購記錄（${rows.length} 筆）</div>
       ${rows.map((r,i)=>{
         const f = r.fields;
-        const item = fv(f,'品項')||fv(f,'採購品項')||'—';
-        const supplier = fv(f,'供應商')||fv(f,'供應商名稱')||'—';
-        const amt = parseFloat(fv(f,'金額'))||0;
-        const status = fv(f,'審批狀態')||fv(f,'狀態')||'待處理';
+        const item = fv(f,'採購品項')||fv(f,'品項')||'—';
+        const supplier = fv(f,'供應商A')||fv(f,'供應商')||'—';
+        const amt = parseFloat(fv(f,'議定價格'))||parseFloat(fv(f,'金額'))||0;
+        const status = fv(f,'採購狀態')||fv(f,'審批狀態')||'待處理';
         const owner = fv(f,'負責人')||'賴哥';
         const clr = STATUS_COLOR[status]||'var(--txt-mid)';
         return `<div class="po-card" style="margin-bottom:6px;">

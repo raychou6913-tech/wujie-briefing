@@ -1264,12 +1264,14 @@ async function loadSales(){
     const yr = new Date().getFullYear();
     const VAM = ['香港JV','深圳子公司','香港','深圳'];
     const yRows = rows.filter(r=>{
-      const d = String(fv(r.fields,'訂單日期')||fv(r.fields,'交易日期')||'');
+      // 出貨日期 is stored as ms timestamp; check if it falls in current year
+      const ts = parseFloat(fv(r.fields,'出貨日期')||fv(r.fields,'預計交貨日')||0);
+      const rowYr = ts ? new Date(ts).getFullYear() : 0;
       const entity = String(fv(r.fields,'歸屬主體')||'');
-      return d.includes(String(yr)) && (VAM.some(e=>entity.includes(e)) || !entity);
+      return rowYr === yr && (VAM.some(e=>entity.includes(e)) || !entity);
     });
     if(!yRows.length) return;
-    const ytd = yRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'訂單金額'))||parseFloat(fv(r.fields,'金額'))||0),0);
+    const ytd = yRows.reduce((s,r)=>s+(parseFloat(fv(r.fields,'總金額'))||parseFloat(fv(r.fields,'訂單金額'))||0),0);
     if(!ytd) return;
     const wEl = document.getElementById('w-ytd');
     if(wEl) wEl.textContent = '¥ '+wan(ytd);

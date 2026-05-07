@@ -1268,7 +1268,7 @@ async function loadOrdersFromFeishu(){
     const VAM = ['香港JV','深圳子公司','香港','深圳'];
     const vRows = rows.filter(r=>{ const e=String(fv(r.fields,'歸屬主體')||''); return VAM.some(v=>e.includes(v))||!e; });
     const pending = vRows.filter(r=>{ const s=fv(r.fields,'收款狀態'); return s&&s!=='全款已收'&&s!=='已完結'; });
-    const arTotal = pending.reduce((s,r)=>s+(parseFloat(fv(r.fields,'訂單金額'))||parseFloat(fv(r.fields,'金額'))||0),0);
+    const arTotal = pending.reduce((s,r)=>s+(parseFloat(fv(r.fields,'總金額'))||parseFloat(fv(r.fields,'訂單金額'))||0),0);
     if(!arTotal) return;
     const el = document.getElementById('kpi-ar');
     if(el){ el.textContent='¥ '+wan(arTotal); el.style.color=arTotal>0?'var(--danger)':'var(--ok)'; }
@@ -1287,20 +1287,21 @@ async function loadContractFromFeishu(){
     const now = Date.now();
     // Update checkContractExpiry with real Feishu dates
     rows.forEach(r=>{
-      const name = fv(r.fields,'IP名稱')||fv(r.fields,'合約名稱')||'';
-      const expiry = fv(r.fields,'授權到期日')||fv(r.fields,'合約到期日')||'';
+      const name = fv(r.fields,'IP品牌')||fv(r.fields,'合約名稱')||'';
+      const expiryRaw = fv(r.fields,'到期日期')||fv(r.fields,'授權到期日')||0;
+      const expiry = expiryRaw ? new Date(parseFloat(expiryRaw)).toISOString().slice(0,10) : '';
       if(!expiry||!name) return;
       // Find matching row by IP name substring
       const allRows = document.querySelectorAll('.contract-row');
       allRows.forEach(rowEl=>{
         const rowName = rowEl.querySelector('.ct-ip-name,.ct-name')?.textContent||rowEl.textContent||'';
         if(!rowName.toLowerCase().includes(name.toLowerCase().slice(0,4))) return;
-        const expMs = new Date(expiry).getTime();
+        const expMs = expiry ? new Date(expiry).getTime() : 0;
         if(!expMs) return;
         const days = Math.round((expMs-now)/86400000);
         const chipEl = rowEl.querySelector('.chip');
         const expEl = rowEl.querySelector('.ct-expiry');
-        if(expEl) expEl.textContent = expiry.slice(0,10);
+        if(expEl) expEl.textContent = expiry;
         if(days<60&&chipEl){ chipEl.className='chip chip-danger'; chipEl.textContent='即將到期'; }
         else if(days<120&&chipEl){ chipEl.className='chip chip-warn'; chipEl.textContent='快到期'; }
         else if(chipEl&&days>=120){ chipEl.className='chip chip-ok'; chipEl.textContent='有效中'; }
