@@ -1231,7 +1231,7 @@ async function loadApprovals(){
       emptyMsg = "✅ 目前無進行中的申請";
     } else if(viewer === 'yuming'){
       // 躍明看已批准、待財務入帳的項目
-      pending = items.filter(r=>_fv(r.fields,"審批狀態")==="已批准");
+      pending = items.filter(r=>{ const s=_fv(r.fields,"審批狀態"); return s==="已通過"||s==="已批准"; });
       queueTitle = "財務待入帳";
       emptyMsg = "🎉 目前無待入帳項目";
     } else {
@@ -1274,7 +1274,7 @@ async function loadApprovals(){
       const type=_fv(f,"審批類型")||"其他";
       const who=_fv(f,"申請人");
       const desc=_fv(f,"申請說明");
-      const amt=_fv(f,"涉及金額");
+      const amt=_fv(f,"金額")||_fv(f,"涉及金額");
       const cur=_fv(f,"幣別")||"RMB";
       const ts=typeof f["申請日期"]==="number"?f["申請日期"]:0;
       const ageDays=ts?Math.floor((now-ts)/86400000):0;
@@ -1684,7 +1684,7 @@ async function loadContractAlerts(){
     const now=Date.now();
     const alerts=items
       .map(r=>{
-        const exp=r.fields["授權到期日"];
+        const exp=r.fields["到期日期"]??r.fields["授權到期日"];
         if(!exp) return null;
         const ms=typeof exp==="number"?exp:new Date(exp).getTime();
         const daysLeft=Math.round((ms-now)/86400000);
