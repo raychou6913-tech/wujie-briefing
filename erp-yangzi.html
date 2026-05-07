@@ -38,6 +38,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:24px;}
 .sec-hd:first-of-type{margin-top:0;}
 .sec-title{font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;}
+.sec-link{font-size:11px;color:var(--accent);cursor:pointer;font-weight:700;}
 
 /* Inbox — pending approvals */
 .inbox-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
@@ -147,6 +148,15 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   </div>
   <div class="inbox-list" id="inbox-list"></div>
 
+  <!-- 已批准・待付款 -->
+  <div class="sec-hd" style="margin-top:16px;">
+    <span class="sec-title" id="payment-title">已批准・待付款</span>
+    <span class="sec-link" onclick="loadPaymentList()">刷新</span>
+  </div>
+  <div id="payment-list">
+    <div style="padding:12px;text-align:center;color:var(--txt-lo);font-size:12px;">載入中…</div>
+  </div>
+
   <!-- Payroll tracker -->
   <div class="sec-hd"><span class="sec-title">薪資發放流程</span></div>
   <div class="payroll-card">
@@ -225,6 +235,39 @@ async function _yzWriteApproval(fields){
       body:JSON.stringify({fields})
     });
   }catch(e){console.warn('Feishu write skipped',e);}
+}
+
+async function loadPaymentList(){
+  const el=document.getElementById('payment-list');
+  if(!el) return;
+  const DEMO=[
+    {title:'安然廳 · 北京倉儲費',person:'安然',date:'2026-05-01',approver:'Ray',ccy:'CNY',amount:8500,note:'4月北京倉儲+物流費'},
+    {title:'採購台 · 打樣費',person:'賴哥',date:'2026-04-28',approver:'Ray',ccy:'CNY',amount:12000,note:'吉依卡哇盲袋打樣費用'},
+    {title:'高維 · 物流費',person:'高維',date:'2026-04-26',approver:'安然',ccy:'CNY',amount:3200,note:'在途批次物流費'},
+  ];
+  const renderItems=recs=>recs.length
+    ? recs.map(r=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:4px;align-self:stretch;border-radius:2px;background:var(--warn);flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;">${r.title||r['審批標題']||'—'}</div>
+          <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">${r.person||r['申請人']||'—'} · 審批人：${r.approver||r['審批人']||'—'} · ${r.date||r['申請日期']||''}</div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">${r.note||r['申請說明']||''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:14px;font-weight:800;color:var(--warn);">${r.ccy||r['幣別']||''} ${(r.amount||r['金額']||0).toLocaleString()}</div>
+          <button style="margin-top:6px;font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;" onclick="this.textContent='✓ 已付款';this.disabled=true;this.closest('[style]').style.opacity='.5';showToast('✅ 已標記付款')">付款 →</button>
+        </div>
+      </div>`).join('')
+    : '<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待付款申請</div>';
+  try{
+    const tr=await fetch(_YZ_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const {tenant_access_token:tk}=await tr.json();
+    const res=await fetch(_YZ_PROXY+'/bitable/records?appToken='+_YZ_AT+'&tableId='+_YZ_TBL,{headers:{'Authorization':'Bearer '+tk}});
+    const {data}=await res.json();
+    const recs=(data?.items||[]).filter(r=>['已批准','已通過'].includes(r.fields?.['審批狀態'])).map(r=>r.fields);
+    el.innerHTML=renderItems(recs);
+    document.getElementById('payment-title').textContent='已批准・待付款'+(recs.length?`（${recs.length}）`:'');
+  }catch(e){ el.innerHTML=renderItems(DEMO); document.getElementById('payment-title').textContent=`已批准・待付款（${DEMO.length}）`; }
 }
 
 // ── Inbox Data ─────────────────────────────────────────────
@@ -531,6 +574,7 @@ function showToast(msg){
 }
 
 render();
+loadPaymentList();
 </script>
 
 <!-- ── EXPENSE FAB ── -->

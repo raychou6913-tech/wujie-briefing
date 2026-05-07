@@ -295,73 +295,176 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('biz')">📊 業務報表</button>
-    <button class="tab-btn" onclick="switchTab('cash')">💸 現金流</button>
-    <button class="tab-btn" onclick="switchTab('staff')">👥 人員分攤</button>
+    <button class="tab-btn active" onclick="switchTab('entry')">📝 記帳工作台</button>
+    <button class="tab-btn" onclick="switchTab('pending')">📋 待入帳清單</button>
+    <button class="tab-btn" onclick="switchTab('cash')">📊 現金流</button>
   </div>
 
-  <!-- ══ TAB: 業務報表 ══ -->
-  <div class="tab-panel active" id="tab-biz">
+  <!-- ══ TAB: 記帳工作台 ══ -->
+  <div class="tab-panel active" id="tab-entry">
 
-    <!-- 預算編列入口 -->
-    <a class="budget-entry" href="erp-budget-planner.html">
-      <div class="be-icon">📊</div>
-      <div class="be-body">
-        <div class="be-title">預算編列</div>
-        <div class="be-sub">查看 / 新增 / 調整全年預算項目</div>
+    <!-- 現金流月結記帳表單 -->
+    <div style="background:var(--card);border:1.5px solid var(--fin);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--fin);margin-bottom:12px;letter-spacing:.04em;">📝 月度現金流記帳</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">公司主體</label>
+          <select id="cf-company" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+            <option value="香港JV">香港JV</option>
+            <option value="深圳子公司">深圳子公司</option>
+            <option value="北京蕪解">北京蕪解</option>
+            <option value="台灣悍草">台灣悍草</option>
+            <option value="UJ BKK（泰國）">UJ BKK（泰國）</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">月份</label>
+          <input id="cf-month" type="month" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;" value="2026-05">
+        </div>
       </div>
-      <div class="be-arrow">→</div>
-    </a>
-
-    <!-- VAM 進度 -->
-    <div class="vam-bar-wrap">
-      <div class="vam-bar-header">
-        <span class="vam-bar-title">年度淨利達成率（VAM 對賭）</span>
-        <span class="vam-bar-pct" style="color:var(--fin)">32.8%</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">期末現金餘額（萬）</label>
+          <input id="cf-balance" type="number" placeholder="例：128.5" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">主要收入（萬）</label>
+          <input id="cf-income" type="number" placeholder="例：85" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">主要支出（萬）</label>
+          <input id="cf-expense" type="number" placeholder="例：42" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+        </div>
       </div>
-      <div class="vam-prog-track"><div class="vam-prog-fill" style="width:32.8%"></div></div>
-      <div class="vam-bar-foot">
-        <span>實際淨利 ¥262 萬</span>
-        <span>目標 ¥800 萬（全年）</span>
-        <span>剩餘 ¥538 萬 · 還剩 7 個月</span>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">收支說明 / 備注</label>
+        <textarea id="cf-note" rows="2" placeholder="例：主要收入來自批發貨款 TWD 420,000；主要支出為採購付款及薪資" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;resize:none;line-height:1.5;"></textarea>
       </div>
-      <div style="font-size:9px;color:var(--txt-lo);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">📊 考核口徑：香港JV ＋ 深圳子公司淨利合併　合作模式成本已按定價規則計入</div>
+      <button onclick="submitCashflowEntry()" style="width:100%;background:var(--fin);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;" id="cf-submit-btn">寫入飛書 →</button>
     </div>
 
-    <!-- 法人分欄摘要 -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
-      <div style="background:var(--card);border:1px solid var(--ok);border-radius:10px;padding:12px;">
-        <div style="font-size:9px;font-weight:700;color:var(--ok);margin-bottom:6px;">香港JV ＋ 深圳（VAM考核）</div>
-        <div style="font-size:18px;font-weight:800;color:var(--ok);">¥ 262 萬</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">YTD 淨利 · HKD/RMB</div>
+    <!-- 今日財務待辦 -->
+    <div class="sec-hdr" id="cash-ops-section">
+      <div class="sec-title">今日財務待辦</div>
+    </div>
+
+    <div class="task-card urgent">
+      <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="tc-urgency" style="background:var(--danger)"></div>
+        <div class="tc-icon">📋</div>
+        <div class="tc-body">
+          <div class="tc-title">5月北京現金流報表</div>
+          <div class="tc-sub">北京蕪解 + 深圳子公司 · 截止明天 · 需同步 Shawn 月報</div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-due red">明天截止</div>
+        </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;">
-        <div style="font-size:9px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;">北京蕪解（服務商）</div>
-        <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">¥ 38 萬</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">YTD 服務費收入 · RMB</div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;">
-        <div style="font-size:9px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;">台灣悍草 ＋ UJ BKK</div>
-        <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">THB 1.2M</div>
-        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">快閃店代運營收入 · THB</div>
+      <div class="tc-detail">
+        <div class="tc-desc">每月 1-2 日完成上月損益表、現金流預測、帳款核對。北京蕪解 + 深圳子公司合併版。需確認賴哥的採購付款時間點是否已入帳。</div>
+        <div class="tc-actions">
+          <button class="ta-btn ta-fin" onclick="prefillAndScrollToForm('北京蕪解','2026-05')">📝 開始填寫北京蕪解記帳</button>
+          <button class="ta-btn ta-fin" onclick="prefillAndScrollToForm('深圳子公司','2026-05')">📝 開始填寫深圳子公司記帳</button>
+          <button class="ta-btn ta-ok" onclick="markTaskDone(this,'report1')">✓ 已完成，送 Shawn</button>
+        </div>
       </div>
     </div>
 
-    <!-- 時間範圍 -->
-    <div class="range-bar" id="biz-range-bar">
-      <button class="range-btn active" onclick="setBizRange('month',this)">本月</button>
-      <button class="range-btn" onclick="setBizRange('quarter',this)">本季</button>
-      <button class="range-btn" onclick="setBizRange('year',this)">全年</button>
-      <button class="range-btn" onclick="setBizRange('2year',this)">近兩年</button>
+    <div class="task-card warn">
+      <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="tc-urgency" style="background:var(--ok)"></div>
+        <div class="tc-icon">💸</div>
+        <div class="tc-body">
+          <div class="tc-title">確認到帳：台灣悍草 → 北京蕪解 貨款</div>
+          <div class="tc-sub">TWD 420,000 · 預計今天入帳 · 安然 4/28 發起</div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-due green">今天到帳</div>
+        </div>
+      </div>
+      <div class="tc-detail">
+        <div class="rate-box">
+          <div class="rate-row"><span class="rate-label">原始金額</span><span class="rate-val">TWD 420,000</span></div>
+          <div class="rate-row"><span class="rate-label">鎖定匯率（發生日 4/28）</span><span class="rate-val">1 TWD = 0.2218 RMB <span class="rate-locked">台銀牌告</span></span></div>
+          <div class="rate-row"><span class="rate-label">應入帳金額</span><span class="rate-val" style="color:var(--ok)">≈ RMB 93,156</span></div>
+        </div>
+        <div class="tc-desc">Q1 貨款結算，台灣悍草向北京蕪解採購 Snoopy 台灣代理商品的對應款項。合約：TWN-BJ-2025-003。</div>
+        <div class="tc-actions">
+          <button class="ta-btn ta-ok" onclick="markTaskDone(this,'remit1')">✓ 已確認到帳</button>
+          <button class="ta-btn ta-fin" onclick="showToast('✅ 匯差記錄已建立')">記錄匯差</button>
+        </div>
+      </div>
     </div>
 
-    <!-- 動態內容區 -->
-    <div id="biz-content"></div>
+    <div class="task-card warn">
+      <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="tc-urgency" style="background:var(--warn)"></div>
+        <div class="tc-icon">⚠️</div>
+        <div class="tc-body">
+          <div class="tc-title">合約到期預警：Snoopy 北京代理合約</div>
+          <div class="tc-sub">2026-06-30 到期 · 需提前 3 個月啟動續簽 · 安然主辦</div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-due yellow">59 天後</div>
+        </div>
+      </div>
+      <div class="tc-detail">
+        <div class="tc-desc">此合約為北京蕪解與 Peanuts Worldwide 的版權授權合約，同時也是多筆跨境匯款的合規依據。合約到期前必須完成續簽，否則相關匯款可能被外管局攔截。</div>
+        <div class="tc-actions">
+          <button class="ta-btn ta-warn" onclick="showToast('→ 已通知安然，續簽流程啟動')">→ 通知安然續簽</button>
+        </div>
+      </div>
+    </div>
 
-  </div><!-- /tab-biz -->
+  </div><!-- /tab-entry -->
+
+  <!-- ══ TAB: 待入帳清單 ══ -->
+  <div class="tab-panel" id="tab-pending">
+    <div style="margin-bottom:12px;">
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;padding:8px 10px;background:var(--card2);border-radius:7px;border-left:3px solid var(--fin);">
+        📋 以下是已經過 Ray 批准、等待躍明入帳或付款的費用申請。確認付款後點「標記已入帳」。
+      </div>
+    </div>
+    <div id="pending-list">
+      <div style="text-align:center;padding:30px;color:var(--txt-lo);font-size:12px;">載入中…</div>
+    </div>
+  </div><!-- /tab-pending -->
 
   <!-- ══ TAB: 現金流 ══ -->
   <div class="tab-panel" id="tab-cash">
+
+  <!-- VAM 進度 -->
+  <div class="vam-bar-wrap">
+    <div class="vam-bar-header">
+      <span class="vam-bar-title">年度淨利達成率（VAM 對賭）</span>
+      <span class="vam-bar-pct" style="color:var(--fin)">32.8%</span>
+    </div>
+    <div class="vam-prog-track"><div class="vam-prog-fill" style="width:32.8%"></div></div>
+    <div class="vam-bar-foot">
+      <span>實際淨利 ¥262 萬</span>
+      <span>目標 ¥800 萬（全年）</span>
+      <span>剩餘 ¥538 萬 · 還剩 7 個月</span>
+    </div>
+  </div>
+
+  <!-- 法人分欄摘要 -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+    <div style="background:var(--card);border:1px solid var(--ok);border-radius:10px;padding:12px;">
+      <div style="font-size:9px;font-weight:700;color:var(--ok);margin-bottom:6px;">香港JV ＋ 深圳（VAM考核）</div>
+      <div style="font-size:18px;font-weight:800;color:var(--ok);">¥ 262 萬</div>
+      <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">YTD 淨利</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;">
+      <div style="font-size:9px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;">北京蕪解（服務商）</div>
+      <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">¥ 38 萬</div>
+      <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">YTD 服務費收入</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;">
+      <div style="font-size:9px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;">台灣悍草 ＋ UJ BKK</div>
+      <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">THB 1.2M</div>
+      <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">快閃店代運營收入</div>
+    </div>
+  </div>
 
   <!-- 時間範圍 -->
   <div class="range-bar" id="cash-range-bar">
@@ -374,93 +477,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- 動態彙總（全年/近兩年顯示） -->
   <div id="cash-summary"></div>
 
-  <!-- 今日財務待辦 -->
-  <div class="sec-hdr" id="cash-ops-section">
-    <div class="sec-title">今日財務待辦</div>
-    <span class="sec-link" onclick="openNewRemitModal()">+ 新增匯款記錄</span>
-  </div>
-
-  <div class="task-card urgent">
-    <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
-      <div class="tc-urgency" style="background:var(--danger)"></div>
-      <div class="tc-icon">📋</div>
-      <div class="tc-body">
-        <div class="tc-title">5月北京現金流報表</div>
-        <div class="tc-sub">北京蕪解 + 深圳子公司 · 截止明天 · 需同步 Shawn 月報</div>
-      </div>
-      <div class="tc-right">
-        <div class="tc-due red">明天截止</div>
-      </div>
-    </div>
-    <div class="tc-detail">
-      <div class="tc-desc">每月 1-2 日完成上月損益表、現金流預測、帳款核對。北京蕪解 + 深圳子公司合併版。需確認賴哥的採購付款時間點是否已入帳。</div>
-      <div class="tc-actions">
-        <button class="ta-btn ta-ok" onclick="markTaskDone(this,'report1')">✓ 已完成，送 Shawn</button>
-        <button class="ta-btn ta-warn" onclick="showToast('→ 已通知 Shawn 延期 1 天')">⚠ 申請延期</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="task-card warn">
-    <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
-      <div class="tc-urgency" style="background:var(--ok)"></div>
-      <div class="tc-icon">💸</div>
-      <div class="tc-body">
-        <div class="tc-title">確認到帳：台灣悍草 → 北京蕪解 貨款</div>
-        <div class="tc-sub">TWD 420,000 · 預計今天入帳 · 安然 4/28 發起</div>
-      </div>
-      <div class="tc-right">
-        <div class="tc-due green">今天到帳</div>
-      </div>
-    </div>
-    <div class="tc-detail">
-      <div class="rate-box">
-        <div class="rate-row">
-          <span class="rate-label">原始金額</span>
-          <span class="rate-val">TWD 420,000</span>
-        </div>
-        <div class="rate-row">
-          <span class="rate-label">結算幣別</span>
-          <span class="rate-val">RMB <span class="rate-locked">🔒 鎖定</span></span>
-        </div>
-        <div class="rate-row">
-          <span class="rate-label">鎖定匯率（發生日 4/28）</span>
-          <span class="rate-val">1 TWD = 0.2218 RMB <span class="rate-locked">台銀牌告</span></span>
-        </div>
-        <div class="rate-row">
-          <span class="rate-label">應入帳金額</span>
-          <span class="rate-val" style="color:var(--ok)">≈ RMB 93,156</span>
-        </div>
-      </div>
-      <div class="tc-desc">Q1 貨款結算，台灣悍草向北京蕪解採購 Snoopy 台灣代理商品的對應款項。合約：TWN-BJ-2025-003。</div>
-      <div class="tc-actions">
-        <button class="ta-btn ta-ok" onclick="markTaskDone(this,'remit1')">✓ 已確認到帳</button>
-        <button class="ta-btn ta-fin" onclick="showToast('✅ 匯差記錄已建立')">記錄匯差</button>
-        <button class="ta-btn ta-grey">聯繫銀行</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="task-card warn">
-    <div class="tc-row" onclick="this.nextElementSibling.classList.toggle('open')">
-      <div class="tc-urgency" style="background:var(--warn)"></div>
-      <div class="tc-icon">⚠️</div>
-      <div class="tc-body">
-        <div class="tc-title">合約到期預警：Snoopy 北京代理合約</div>
-        <div class="tc-sub">2026-06-30 到期 · 需提前 3 個月啟動續簽 · 安然主辦</div>
-      </div>
-      <div class="tc-right">
-        <div class="tc-due yellow">59 天後</div>
-      </div>
-    </div>
-    <div class="tc-detail">
-      <div class="tc-desc">此合約為北京蕪解與 Peanuts Worldwide 的版權授權合約，同時也是多筆跨境匯款的合規依據。合約到期前必須完成續簽，否則相關匯款可能被外管局攔截。</div>
-      <div class="tc-actions">
-        <button class="ta-btn ta-warn" onclick="showToast('→ 已通知安然，續簽流程啟動')">→ 通知安然續簽</button>
-        <button class="ta-btn ta-grey">查看合約詳情</button>
-      </div>
-    </div>
-  </div>
+  <!-- 跨境匯款追蹤 header — skipping old task cards which are now in tab-entry -->
 
   <!-- 跨境匯款時間軸 -->
   <div class="sec-hdr" style="margin-top:8px">
@@ -1074,6 +1091,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 </div>
 
 <script>
+const _PROXY = 'https://feishu-proxy.raychou6913.workers.dev';
 function requireAuth(){
   const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
   if(!s||Date.now()-s.ts>7*86400000){location.replace('login.html');return null;}
@@ -1212,9 +1230,75 @@ function confirmSettle(){
 }
 
 function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['biz','cash','staff'][i]===tab));
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['entry','pending','cash'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
+  const el=document.getElementById('tab-'+tab);
+  if(el) el.classList.add('active');
+  if(tab==='pending') loadPendingList();
+}
+function prefillAndScrollToForm(company, month){
+  const sel=document.getElementById('cf-company');
+  const mon=document.getElementById('cf-month');
+  if(sel) sel.value=company;
+  if(mon) mon.value=month;
+  const bal=document.getElementById('cf-balance');
+  if(bal){ bal.focus(); bal.scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+async function submitCashflowEntry(){
+  const company=document.getElementById('cf-company').value;
+  const month=document.getElementById('cf-month').value;
+  const balance=document.getElementById('cf-balance').value;
+  const income=document.getElementById('cf-income').value;
+  const expense=document.getElementById('cf-expense').value;
+  const note=document.getElementById('cf-note').value;
+  if(!balance&&!income&&!expense){ showToast('⚠ 請至少填寫一個金額'); return; }
+  const btn=document.getElementById('cf-submit-btn');
+  btn.disabled=true; btn.textContent='寫入中…';
+  try {
+    const tr=await fetch(_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({app_id:'cli_a7e82de8d0f8100b',app_secret:'uFpPNWwmx7UusFjKaO3kZguMVNyh8x4r'})});
+    const {tenant_access_token:tok}=await tr.json();
+    await fetch(_PROXY+'/bitable/record',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
+      body:JSON.stringify({appToken:'Sg7ObNELHaAdZzshGIFjWPVhpce',tableId:'tblN0AwYtb2IvOcq',fields:{
+        '月份':month,'公司主體':company,'期末餘額（萬）':parseFloat(balance)||0,
+        '主要收入（萬）':parseFloat(income)||0,'主要支出（萬）':parseFloat(expense)||0,'備注':note
+      }})});
+    btn.textContent='✓ 已寫入飛書'; btn.style.background='var(--ok)';
+    showToast('✅ '+company+' '+month+' 現金流已記錄');
+    ['cf-balance','cf-income','cf-expense','cf-note'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='寫入飛書 →'; btn.style.background='var(--fin)'; },2000);
+  } catch(e) {
+    btn.disabled=false; btn.textContent='寫入飛書 →';
+    showToast('⚠ 暫時無法連線，請稍後再試');
+  }
+}
+async function loadPendingList(){
+  const el=document.getElementById('pending-list');
+  if(!el) return;
+  const DEMO=[
+    {title:'安然廳 · 北京倉儲費',person:'安然',date:'2026-05-01',approver:'Ray',ccy:'CNY',amount:8500,note:'4月北京倉儲+物流費用'},
+    {title:'採購台 · 吉依卡哇打樣費',person:'賴哥',date:'2026-04-28',approver:'Ray',ccy:'CNY',amount:12000,note:'第二批打樣，含盲袋模具修改'},
+    {title:'CRM · 廣州展展位費',person:'老董',date:'2026-04-25',approver:'Ray',ccy:'HKD',amount:6800,note:'2026 廣州展位訂金'},
+  ];
+  const render=recs=>recs.map(r=>`
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;">${r.title||r['審批標題']||r['標題']||'—'}</div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">${r.person||r['申請人']||'—'} · ${r.date||r['申請日期']||'—'} · 審批人：${r.approver||r['審批人']||'—'}</div>
+        </div>
+        <span style="font-size:13px;font-weight:800;color:var(--ok);white-space:nowrap;">${r.ccy||r['幣別']||''} ${(r.amount||r['金額']||0).toLocaleString()}</span>
+      </div>
+      <div style="font-size:10px;color:var(--txt-mid);margin-bottom:10px;">${r.note||r['申請說明']||''}</div>
+      <button style="font-size:11px;font-weight:700;padding:5px 14px;border-radius:7px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;" onclick="this.textContent='✓ 已入帳';this.disabled=true;this.closest('[style]').style.opacity='.5';showToast('✅ 已標記入帳')">✓ 標記已入帳</button>
+    </div>`).join('');
+  try {
+    const tr=await fetch(_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({app_id:'cli_a7e82de8d0f8100b',app_secret:'uFpPNWwmx7UusFjKaO3kZguMVNyh8x4r'})});
+    const {tenant_access_token:tok}=await tr.json();
+    const res=await fetch(_PROXY+'/bitable/records?appToken=Sg7ObNELHaAdZzshGIFjWPVhpce&tableId=tbl4OBNvsNkqS4mQ',{headers:{'Authorization':'Bearer '+tok}});
+    const {data}=await res.json();
+    const recs=(data?.items||[]).filter(r=>['已批准','已通過'].includes(r.fields?.['審批狀態'])).map(r=>r.fields);
+    el.innerHTML=recs.length?render(recs):'<div style="text-align:center;padding:30px;color:var(--txt-lo);font-size:12px;">目前沒有待入帳申請</div>';
+  } catch(e) { el.innerHTML=render(DEMO); }
 }
 function toggleStaffSection(id){
   const el=document.getElementById(id);
