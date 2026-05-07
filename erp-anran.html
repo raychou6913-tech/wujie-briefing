@@ -1373,6 +1373,8 @@ loadContractFromFeishu();
 const EXP_ROUTES={
   anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
 };
+const _APPR_TBL='tbl4OBNvsNkqS4mQ';
+async function _arWriteApproval(fields){try{const tr=await fetch(_P+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const {tenant_access_token:tk}=await tr.json();await fetch(_P+'/open-apis/bitable/v1/apps/'+_AT+'/tables/'+_APPR_TBL+'/records',{method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({fields})});}catch(e){console.warn('Feishu write skipped',e);}}
 let expType='personal';
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
 function openExpModal(){
@@ -1413,6 +1415,8 @@ function submitExpense(){
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+  const _acy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[rec.ccy]||'CNY';
+  _arWriteApproval({'標題':`【${rec.type}】安然 ${rec.amt}${rec.ccy}`,'審批標題':`【${rec.type}】安然 ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':'安然','申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':_acy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':rec.desc||rec.cat||''});
   closeExpModal();
   alert(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
