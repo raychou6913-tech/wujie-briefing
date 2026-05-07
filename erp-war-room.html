@@ -320,8 +320,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div style="display:flex;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;">
       <button class="kpi-tab active" onclick="switchKpiTab(this,'kpi-vam')">📊 淨利 VAM</button>
       <button class="kpi-tab" onclick="switchKpiTab(this,'kpi-revenue')">💰 業績收入</button>
-      <button class="kpi-tab" onclick="switchKpiTab(this,'kpi-vs-budget')">📈 業績 vs 預算</button>
-      <button class="kpi-tab" onclick="switchKpiTab(this,'kpi-profit-budget')">⚖️ 利潤 vs 預算</button>
+      <button class="kpi-tab" onclick="switchKpiTab(this,'kpi-vs-budget')">📅 季度業績</button>
+      <button class="kpi-tab" onclick="switchKpiTab(this,'kpi-profit-budget')">📊 月度趨勢</button>
     </div>
 
     <!-- Panel 1: 淨利 VAM -->
@@ -420,68 +420,97 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
     </div>
 
-    <!-- Panel 3: 業績 vs 預算 -->
+    <!-- Panel 3: 季度業績 -->
     <div id="kpi-vs-budget" class="kpi-panel" style="display:none;">
-      <div style="background:var(--card2);border-radius:8px;overflow:hidden;">
-        <div style="display:grid;grid-template-columns:1fr auto auto auto;border-bottom:1px solid var(--border);padding:8px 12px;font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.05em;">
-          <span>指標</span><span style="text-align:right;padding-left:24px;">實際</span><span style="text-align:right;padding-left:24px;">預算</span><span style="text-align:right;padding-left:24px;">差異</span>
+      <div style="background:var(--card2);border-radius:8px;overflow:hidden;margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);padding:8px 14px;font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.05em;gap:8px;">
+          <span>季度</span>
+          <span style="text-align:right;">收入實際</span>
+          <span style="text-align:right;">收入目標</span>
+          <span style="text-align:right;">淨利實際</span>
+          <span style="text-align:right;">淨利目標</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto auto auto;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;">
-          <span style="color:var(--txt-hi);">年度總收入</span>
-          <span style="text-align:right;padding-left:24px;font-weight:700;color:var(--ok);">982 萬</span>
-          <span style="text-align:right;padding-left:24px;color:var(--txt-mid);">2,400 萬</span>
-          <span style="text-align:right;padding-left:24px;"><span class="perf-delta ahead">+5.2% vs YTD預算</span></span>
+        <!-- Q1 -->
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;">
+          <span style="font-weight:700;color:var(--txt-hi);">Q1</span>
+          <span style="text-align:right;font-weight:700;color:var(--ok);">615 萬</span>
+          <span style="text-align:right;color:var(--txt-mid);">580 萬</span>
+          <span style="text-align:right;font-weight:700;color:var(--warn);">168 萬</span>
+          <span style="text-align:right;color:var(--txt-mid);">195 萬 <span class="perf-delta behind" style="font-size:9px">-14%</span></span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto auto auto;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;">
-          <span style="color:var(--txt-hi);">年度毛利</span>
-          <span style="text-align:right;padding-left:24px;font-weight:700;color:var(--ok);">384 萬</span>
-          <span style="text-align:right;padding-left:24px;color:var(--txt-mid);">960 萬</span>
-          <span style="text-align:right;padding-left:24px;"><span class="perf-delta ahead">毛利率 39.1%</span></span>
+        <!-- Q2 -->
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;">
+          <span style="font-weight:700;color:var(--txt-hi);">Q2 <span style="font-size:9px;font-weight:400;color:var(--txt-lo);">進行中</span></span>
+          <span style="text-align:right;font-weight:700;color:var(--txt-hi);">367 萬 <span style="font-size:9px;color:var(--txt-lo);">4月</span></span>
+          <span style="text-align:right;color:var(--txt-mid);">620 萬</span>
+          <span style="text-align:right;font-weight:700;color:var(--txt-hi);">119 萬</span>
+          <span style="text-align:right;color:var(--txt-mid);">213 萬</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto auto auto;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;">
-          <span style="color:var(--txt-hi);">年度淨利（VAM）</span>
-          <span style="text-align:right;padding-left:24px;font-weight:700;color:var(--warn);">287 萬</span>
-          <span style="text-align:right;padding-left:24px;color:var(--txt-mid);">800 萬</span>
-          <span style="text-align:right;padding-left:24px;"><span class="perf-delta behind">-13.9% vs YTD預算</span></span>
+        <!-- Q3 -->
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;opacity:.55;">
+          <span style="font-weight:700;color:var(--txt-hi);">Q3 <span style="font-size:9px;font-weight:400;color:var(--txt-lo);">計劃中</span></span>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
+          <span style="text-align:right;color:var(--txt-mid);">640 萬</span>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
+          <span style="text-align:right;color:var(--txt-mid);">217 萬</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto auto auto;padding:10px 12px;font-size:12px;align-items:center;">
-          <span style="color:var(--txt-hi);">版稅支出</span>
-          <span style="text-align:right;padding-left:24px;font-weight:700;color:var(--txt-hi);">68 萬</span>
-          <span style="text-align:right;padding-left:24px;color:var(--txt-mid);">240 萬</span>
-          <span style="text-align:right;padding-left:24px;"><span class="perf-delta ahead">控費良好</span></span>
+        <!-- Q4 -->
+        <div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr 1fr;padding:11px 14px;font-size:12px;align-items:center;gap:8px;opacity:.55;">
+          <span style="font-weight:700;color:var(--txt-hi);">Q4 <span style="font-size:9px;font-weight:400;color:var(--txt-lo);">計劃中</span></span>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
+          <span style="text-align:right;color:var(--txt-mid);">560 萬</span>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
+          <span style="text-align:right;color:var(--txt-mid);">175 萬</span>
         </div>
       </div>
-      <div style="margin-top:10px;font-size:10px;color:var(--txt-lo);">YTD = Year-to-date（1–4月實際累計）　預算欄為全年目標</div>
+      <div style="padding:10px 14px;background:var(--card2);border-radius:8px;font-size:11px;color:var(--txt-mid);">
+        💡 Q1 收入超標 +6%，但淨利落後 14%（主因：快閃店 Q1 規模小、固定成本比重高）。Q2 LOG-ON 出貨拉高 4月收入，Q3 泰國快閃店若啟動可追補淨利缺口。
+      </div>
     </div>
 
-    <!-- Panel 4: 利潤 vs 預算 -->
+    <!-- Panel 4: 月度趨勢 -->
     <div id="kpi-profit-budget" class="kpi-panel" style="display:none;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
-        <div class="perf-card">
-          <div class="perf-card-label">年度淨利（= VAM 考核基礎）</div>
-          <div class="perf-card-main">
-            <span class="perf-actual" style="color:var(--warn)">287 萬</span>
-            <span class="perf-budget">/ 800 萬</span>
-            <span class="perf-delta behind">↓ -13.9%</span>
-          </div>
-          <div style="font-size:10px;color:var(--txt-mid)">YTD 預算應達 333 萬</div>
-          <div class="mini-prog"><div class="mini-prog-fill" style="width:35.9%;background:var(--warn)"></div></div>
+      <div style="background:var(--card2);border-radius:8px;overflow:hidden;margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px;border-bottom:1px solid var(--border);padding:8px 14px;font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.05em;gap:8px;">
+          <span>月份</span><span>收入（萬）</span><span style="text-align:right;">淨利（萬）</span><span style="text-align:right;">淨利率</span><span style="text-align:right;">vs 目標</span>
         </div>
-        <div class="perf-card">
-          <div class="perf-card-label">版稅支出（IP 授權金）</div>
-          <div class="perf-card-main">
-            <span class="perf-actual" style="color:var(--txt-hi)">68 萬</span>
-            <span class="perf-budget">/ 240 萬</span>
-            <span class="perf-delta ahead">占收入 6.9%</span>
-          </div>
-          <div style="font-size:10px;color:var(--txt-mid)">MG 已付 3 筆，剩餘 5 筆待期限</div>
-          <div class="mini-prog"><div class="mini-prog-fill" style="width:28.3%;background:var(--accent)"></div></div>
+        <div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;">
+          <span style="color:var(--txt-mid);">1月</span>
+          <div style="display:flex;align-items:center;gap:6px;"><div style="height:6px;border-radius:3px;background:var(--ok);width:32%"></div><span style="font-weight:600;">195</span></div>
+          <span style="text-align:right;font-weight:700;color:var(--ok);">52</span>
+          <span style="text-align:right;color:var(--txt-mid);">26.7%</span>
+          <span style="text-align:right;"><span class="perf-delta ahead" style="font-size:9px;">+4%</span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;">
+          <span style="color:var(--txt-mid);">2月</span>
+          <div style="display:flex;align-items:center;gap:6px;"><div style="height:6px;border-radius:3px;background:var(--warn);width:27%"></div><span style="font-weight:600;">168</span></div>
+          <span style="text-align:right;font-weight:700;color:var(--warn);">45</span>
+          <span style="text-align:right;color:var(--txt-mid);">26.8%</span>
+          <span style="text-align:right;"><span class="perf-delta behind" style="font-size:9px;">-18%</span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;">
+          <span style="color:var(--txt-mid);">3月</span>
+          <div style="display:flex;align-items:center;gap:6px;"><div style="height:6px;border-radius:3px;background:var(--ok);width:41%"></div><span style="font-weight:600;">252</span></div>
+          <span style="text-align:right;font-weight:700;color:var(--ok);">71</span>
+          <span style="text-align:right;color:var(--txt-mid);">28.2%</span>
+          <span style="text-align:right;"><span class="perf-delta ahead" style="font-size:9px;">+2%</span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center;gap:8px;">
+          <span style="color:var(--txt-mid);">4月</span>
+          <div style="display:flex;align-items:center;gap:6px;"><div style="height:6px;border-radius:3px;background:var(--ok);width:60%"></div><span style="font-weight:600;color:var(--ok);">367</span></div>
+          <span style="text-align:right;font-weight:700;color:var(--ok);">119</span>
+          <span style="text-align:right;color:var(--ok);">32.4%</span>
+          <span style="text-align:right;"><span class="perf-delta ahead" style="font-size:9px;">+22%</span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px;padding:10px 14px;font-size:12px;align-items:center;gap:8px;opacity:.55;">
+          <span style="color:var(--txt-mid);">5月</span>
+          <div style="display:flex;align-items:center;gap:6px;"><div style="height:6px;border-radius:3px;background:var(--border);width:20%"></div><span style="color:var(--txt-lo);">進行中</span></div>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
+          <span style="text-align:right;color:var(--txt-lo);">—</span>
         </div>
       </div>
-      <div style="margin-top:14px;padding:12px 14px;background:var(--card2);border-radius:8px;border-left:3px solid var(--warn);">
-        <div style="font-size:11px;color:var(--txt-mid);font-weight:700;margin-bottom:6px;">利潤缺口分析</div>
-        <div style="font-size:11px;color:var(--txt-mid);">YTD 淨利 287萬，落後年度目標 13.9%。主因：快閃店 Q1 收入低於預期。若 Q3 泰國快閃店順利啟動，全年補差可行。</div>
-      </div>
+      <div style="font-size:10px;color:var(--txt-lo);">📌 4月 LOG-ON 出貨拉高單月收入，2月農曆年淡季屬正常。月度淨利率趨勢向上，Q2 均值預計可達 30%+。</div>
     </div>
   </div>
 
@@ -501,8 +530,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <!-- 圖例 -->
     <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
       <span style="font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--ok);flex-shrink:0;"></span>已實現（已入帳）<span id="cover-leg-actual" style="color:var(--txt-hi);font-weight:700;">—</span></span>
-      <span style="font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--warn);flex-shrink:0;"></span>庫存待售（已出貨銷售中）<span id="cover-leg-stock" style="color:var(--txt-hi);font-weight:700;">—</span></span>
-      <span style="font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent2);flex-shrink:0;"></span>在建項目（尚未出貨）<span id="cover-leg-fwd" style="color:var(--txt-hi);font-weight:700;">—</span></span>
+      <span style="font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--warn);flex-shrink:0;"></span>銷售進行中（已出貨或活躍中）<span id="cover-leg-stock" style="color:var(--txt-hi);font-weight:700;">—</span></span>
+      <span style="font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--accent2);flex-shrink:0;"></span>計劃中未發生<span id="cover-leg-fwd" style="color:var(--txt-hi);font-weight:700;">—</span></span>
     </div>
     <div id="cover-total-note" style="font-size:11px;color:var(--txt-lo)"></div>
   </div>
@@ -637,7 +666,37 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div id="orders-stats-inner">
         <div class="order-stat"><span class="order-label">載入中…</span><span class="order-val" style="color:var(--txt-lo)">—</span></div>
       </div>
-      <a href="erp-anran.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看完整訂單 → 安然廳</a>
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
+        <button onclick="toggleOrderDetail()" style="background:none;border:none;font-size:10px;color:var(--accent);cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;" id="order-detail-toggle">▼ 展開訂單摘要</button>
+        <div id="order-detail-panel" style="display:none;margin-top:10px;">
+          <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">未出貨訂單（3張）</div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 8px;background:var(--card2);border-radius:5px;">
+              <span style="color:var(--txt-hi);">LOG-ON 香港 · Snoopy 夏季 200件</span>
+              <span style="color:var(--warn);font-weight:700;">¥44,400 <span style="font-size:9px;color:var(--txt-lo);">6/15出貨</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 8px;background:var(--card2);border-radius:5px;">
+              <span style="color:var(--txt-hi);">泡泡瑪特北京 · Muziktiger 盲盒</span>
+              <span style="color:var(--txt-mid);font-weight:700;">待確認 <span style="font-size:9px;color:var(--txt-lo);">報價中</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 8px;background:var(--card2);border-radius:5px;">
+              <span style="color:var(--txt-hi);">廣州名創 · Opanchu 秋冬 200箱</span>
+              <span style="color:var(--txt-mid);font-weight:700;">詢價中 <span style="font-size:9px;color:var(--txt-lo);">Q3交期</span></span>
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">未到帳訂金（2筆）</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 8px;background:var(--danger-dim);border-radius:5px;border-left:2px solid var(--danger);">
+              <span style="color:var(--txt-hi);">LOG-ON 尾款 30%</span>
+              <span style="color:var(--danger);font-weight:700;">¥18萬 <span style="font-size:9px;">逾期 2天</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;padding:6px 8px;background:var(--card2);border-radius:5px;">
+              <span style="color:var(--txt-hi);">廣州博騰訂金 30%</span>
+              <span style="color:var(--warn);font-weight:700;">¥8.2萬 <span style="font-size:9px;color:var(--txt-lo);">5/20到期</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- C: 版權風險 -->
@@ -646,10 +705,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <span class="abc-title">⚖️ IP 授權到期提醒</span>
         <span class="abc-tag warn" id="ip-alert-tag">即時數據</span>
       </div>
-      <div id="ip-alerts-inner">
+      <div id="ip-alerts-inner" style="display:flex;flex-direction:column;gap:6px;">
         <div class="ip-row"><div class="ip-row-top"><span class="ip-name">載入中…</span></div></div>
       </div>
-      <a href="erp-ip-vault.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">進入 IP 版權庫 →</a>
+      <a href="erp-anran.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看完整合約管理 → 安然廳</a>
     </div>
   </div>
 
@@ -1321,6 +1380,22 @@ function switchKpiTab(btn, panelId) {
   btn.classList.add('active');
   document.getElementById(panelId).style.display = '';
 }
+function toggleOrderDetail() {
+  const panel = document.getElementById('order-detail-panel');
+  const btn = document.getElementById('order-detail-toggle');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : '';
+  btn.textContent = isOpen ? '▼ 展開訂單摘要' : '▲ 收起';
+}
+function toggleIpDetail(id) {
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : '';
+  const idx = id.split('-').pop();
+  const arr = document.getElementById('ip-arr-' + idx);
+  if (arr) arr.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
 function toggleCoverRow(id) {
   const body = document.getElementById(id);
   const arrowId = id.replace('cover-', 'cover-') + '-arrow';
@@ -1452,11 +1527,28 @@ async function loadOrderStats(){
 async function loadContractAlerts(){
   const el=document.getElementById("ip-alerts-inner");
   // Pre-fill fallback so panel never shows "載入中"
-  if(el) el.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px">
-  <div onclick="location.href='erp-anran.html'" style="background:var(--ok-dim);border-radius:7px;padding:9px 11px;font-size:11px;cursor:pointer;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><span style="color:var(--ok);font-weight:700">Snoopy</span> <span style="color:var(--txt-mid)">到期 2027-03 · 距今 10 個月</span></div>
-  <div onclick="location.href='erp-anran.html'" style="background:var(--warn-dim);border-radius:7px;padding:9px 11px;font-size:11px;cursor:pointer;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><span style="color:var(--warn);font-weight:700">⚠ Opanchu</span> <span style="color:var(--txt-mid)">到期 2026-09 · 距今 4 個月，需洽談續約</span></div>
-  <div onclick="location.href='erp-anran.html'" style="background:var(--warn-dim);border-radius:7px;padding:9px 11px;font-size:11px;cursor:pointer;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><span style="color:var(--warn);font-weight:700">⚠ Muziktiger</span> <span style="color:var(--txt-mid)">到期 2026-12 · 距今 7 個月</span></div>
-</div>`;
+  const ipFallback = [
+    {ip:"Opanchu（褲褲兔）",cls:"warn",label:"146 天後到期",licensor:"褲褲兔株式會社",territory:"台灣+香港",royalty:"9%",mg:"¥28萬/年",mgStatus:"已付首期，待簽署",note:"續約草案已送 Ray 確認（recA004）",expire:"2026-09-30"},
+    {ip:"Mofusand（貓福珊迪）",cls:"ok",label:"207 天後到期",licensor:"Mofusand / 有你共創",territory:"大陸+港台",royalty:"9.5%",mg:"¥29.7萬",mgStatus:"已付",note:"兩年合作老夥伴，JV實際執行；10月首款上市",expire:"2027-01-15"},
+    {ip:"Muziktiger（無業老虎）",cls:"warn",label:"238 天後到期",licensor:"佳盛藝術有限公司",territory:"大陸+港台",royalty:"8%",mg:"¥8萬",mgStatus:"已付",note:"7個月後到期，需評估是否擴大授權至泰國",expire:"2026-12-31"},
+    {ip:"Snoopy（史努比）",cls:"ok",label:"328 天後到期",licensor:"Peanuts Worldwide",territory:"全球",royalty:"10%",mg:"¥45萬",mgStatus:"已付",note:"全球最廣版圖，Q4前啟動續約談判",expire:"2027-03-31"},
+  ];
+  if(el) el.innerHTML = ipFallback.map((d,i)=>`
+    <div style="border-radius:7px;overflow:hidden;border:1px solid var(--border);">
+      <div onclick="toggleIpDetail('ip-detail-${i}')" style="background:var(--${d.cls}-dim);padding:9px 11px;font-size:11px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <span><span style="color:var(--${d.cls});font-weight:700">${d.cls==='warn'?'⚠ ':''}${d.ip}</span> <span style="color:var(--txt-mid)">${d.label}</span></span>
+        <span id="ip-arr-${i}" style="font-size:10px;color:var(--txt-lo);">▼</span>
+      </div>
+      <div id="ip-detail-${i}" style="display:none;background:var(--card2);padding:10px 12px;font-size:11px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
+          <div><span style="color:var(--txt-lo);">版權方</span><br><span style="color:var(--txt-hi);font-weight:600;">${d.licensor}</span></div>
+          <div><span style="color:var(--txt-lo);">授權地區</span><br><span style="color:var(--txt-hi);font-weight:600;">${d.territory}</span></div>
+          <div><span style="color:var(--txt-lo);">版稅率</span><br><span style="color:var(--txt-hi);font-weight:600;">${d.royalty}</span></div>
+          <div><span style="color:var(--txt-lo);">MG / 狀態</span><br><span style="color:var(--txt-hi);font-weight:600;">${d.mg} · ${d.mgStatus}</span></div>
+        </div>
+        <div style="margin-top:8px;padding:6px 8px;background:var(--card);border-radius:5px;color:var(--txt-mid);">${d.note}</div>
+      </div>
+    </div>`).join("");
   try{
     const items=await _fetchAll(_TBLS.contract);
     if(!items.length) return; // keep fallback
@@ -1477,9 +1569,12 @@ async function loadContractAlerts(){
     el.innerHTML=alerts.map(a=>{
       const cls=a.daysLeft<30?"danger":a.daysLeft<90?"warn":"ok";
       const label=a.daysLeft<0?`已過期 ${Math.abs(a.daysLeft)} 天`:a.daysLeft===0?"今日到期":`${a.daysLeft} 天後到期`;
-      return `<div class="ip-row" onclick="location.href='erp-anran.html'" style="cursor:pointer;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
-        <div class="ip-row-top"><span class="ip-name">${a.ip}</span><span class="ip-days ${cls}">${label}</span></div>
-        <div class="ip-desc">${a.note}</div>
+      return `<div style="border-radius:7px;overflow:hidden;border:1px solid var(--border);">
+        <div onclick="toggleIpDetail('ip-live-${a.ip.replace(/\s/g,'')}')" style="padding:9px 11px;font-size:11px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--${cls}-dim);" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          <span><span class="ip-name" style="color:var(--${cls})">${a.ip}</span></span>
+          <span style="display:flex;align-items:center;gap:8px;"><span class="ip-days ${cls}">${label}</span><span style="font-size:10px;color:var(--txt-lo);">▼</span></span>
+        </div>
+        <div id="ip-live-${a.ip.replace(/\s/g,'')}" style="display:none;background:var(--card2);padding:10px 12px;font-size:11px;color:var(--txt-mid);">${a.note||'—'}</div>
       </div>`;
     }).join("");
   }catch(e){ console.error("contract",e); /* keep fallback on error */ }
