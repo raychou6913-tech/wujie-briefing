@@ -352,29 +352,70 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <th class="ord-th">累計訂單</th>
         </tr></thead>
         <tbody>
-          <tr class="ord-tr">
-            <td class="ord-td" style="font-weight:700">廣州名創優品</td>
+          <tr class="ord-tr" id="otr-mc" style="cursor:pointer;" onclick="toggleOrderDetail('mc','odr-mc')">
+            <td class="ord-td" style="font-weight:700">廣州名創優品 <span id="oa-mc" style="font-size:9px;color:var(--txt-lo);">▼</span></td>
             <td class="ord-td" style="color:var(--txt-mid)">老董</td>
             <td class="ord-td">180 箱</td>
             <td class="ord-td" style="color:var(--ok);font-weight:700">¥ 42 萬</td>
             <td class="ord-td"><span class="chip chip-ok">全款已收</span></td>
             <td class="ord-td"><span class="ord-nth repeat">第 3 筆</span></td>
           </tr>
-          <tr class="ord-tr">
-            <td class="ord-td" style="font-weight:700">北京華糖</td>
+          <tr id="odr-mc" style="display:none;background:var(--card2);">
+            <td colspan="6" style="padding:10px 12px;font-size:11px;color:var(--txt-mid);">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 16px;line-height:1.8;">
+                <div>折扣：<strong style="color:var(--txt-hi);">46折</strong></div>
+                <div>零售建議價：<strong style="color:var(--txt-hi);">¥ 79.9 / 件</strong></div>
+                <div>批發單件價：<strong style="color:var(--txt-hi);">¥ 36.8 / 件</strong></div>
+                <div>每箱件數：<strong style="color:var(--txt-hi);">240 件 / 箱</strong></div>
+                <div>每箱批發金額：<strong style="color:var(--ok);">¥ 8,832 / 箱</strong></div>
+                <div>版稅（14%×批發）：<strong style="color:var(--txt-hi);">¥ 1,237 / 箱</strong></div>
+                <div>毛利率估算：<strong style="color:var(--ok);">≈ 32%</strong></div>
+                <div>付款條件：<strong style="color:var(--txt-hi);">全額預付</strong></div>
+              </div>
+            </td>
+          </tr>
+          <tr class="ord-tr" id="otr-ht" style="cursor:pointer;" onclick="toggleOrderDetail('ht','odr-ht')">
+            <td class="ord-td" style="font-weight:700">北京華糖 <span id="oa-ht" style="font-size:9px;color:var(--txt-lo);">▼</span></td>
             <td class="ord-td" style="color:var(--txt-mid)">老董</td>
             <td class="ord-td">300 箱</td>
             <td class="ord-td" style="color:var(--ok);font-weight:700">¥ 65 萬</td>
             <td class="ord-td"><span class="chip chip-ok">全款已收</span></td>
             <td class="ord-td"><span class="ord-nth repeat">第 5 筆</span></td>
           </tr>
-          <tr class="ord-tr">
-            <td class="ord-td" style="font-weight:700">首爾 SMTOWN COEX</td>
+          <tr id="odr-ht" style="display:none;background:var(--card2);">
+            <td colspan="6" style="padding:10px 12px;font-size:11px;color:var(--txt-mid);">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 16px;line-height:1.8;">
+                <div>折扣：<strong style="color:var(--txt-hi);">46折</strong></div>
+                <div>零售建議價：<strong style="color:var(--txt-hi);">¥ 79.9 / 件</strong></div>
+                <div>批發單件價：<strong style="color:var(--txt-hi);">¥ 36.8 / 件</strong></div>
+                <div>每箱件數：<strong style="color:var(--txt-hi);">240 件 / 箱</strong></div>
+                <div>每箱批發金額：<strong style="color:var(--ok);">¥ 8,832 / 箱</strong></div>
+                <div>版稅（14%×批發）：<strong style="color:var(--txt-hi);">¥ 1,237 / 箱</strong></div>
+                <div>毛利率估算：<strong style="color:var(--ok);">≈ 32%</strong></div>
+                <div>付款條件：<strong style="color:var(--txt-hi);">先30%訂金，出貨前付清</strong></div>
+              </div>
+            </td>
+          </tr>
+          <tr class="ord-tr" id="otr-sm" style="cursor:pointer;" onclick="toggleOrderDetail('sm','odr-sm')">
+            <td class="ord-td" style="font-weight:700">首爾 SMTOWN COEX <span id="oa-sm" style="font-size:9px;color:var(--txt-lo);">▼</span></td>
             <td class="ord-td" style="color:var(--txt-mid)">老董</td>
             <td class="ord-td">樣品中</td>
             <td class="ord-td" style="color:var(--txt-lo)">待報價</td>
             <td class="ord-td"><span class="chip chip-grey">樣品確認中</span></td>
             <td class="ord-td"><span class="ord-nth first">首次詢盤</span></td>
+          </tr>
+          <tr id="odr-sm" style="display:none;background:var(--card2);">
+            <td colspan="6" style="padding:10px 12px;font-size:11px;color:var(--txt-mid);">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 16px;line-height:1.8;">
+                <div>折扣：<strong style="color:var(--txt-lo);">報價中（參考 46折）</strong></div>
+                <div>零售建議價：<strong style="color:var(--txt-hi);">¥ 79.9（韓市場待確認）</strong></div>
+                <div>詢盤品項：<strong style="color:var(--txt-hi);">Snoopy 夏季盲盒</strong></div>
+                <div>預估數量：<strong style="color:var(--txt-hi);">100–200 箱（首次）</strong></div>
+                <div>付款條件：<strong style="color:var(--txt-lo);">待談</strong></div>
+                <div>負責業務：<strong style="color:var(--txt-hi);">老董</strong></div>
+                <div>進度：<strong style="color:var(--warn);">樣品確認中，等韓方回饋</strong></div>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -790,7 +831,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
     <div id="contract-list">
-      <div class="contract-row" id="ct-snoopy">
+      <!-- Snoopy -->
+      <div class="contract-row" id="ct-snoopy" style="cursor:pointer;" onclick="toggleContractDetail('cd-snoopy','ca-snoopy')">
         <div class="ct-top">
           <div class="ct-icon">🐾</div>
           <div class="ct-body">
@@ -800,11 +842,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
             <div class="ct-expiry">到期：2027-03</div>
+            <div id="ca-snoopy" style="font-size:10px;color:var(--txt-lo);margin-top:3px;">▼</div>
+          </div>
+        </div>
+        <div id="cd-snoopy" style="display:none;margin-top:8px;background:var(--card2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--txt-mid);" onclick="event.stopPropagation()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;line-height:1.8;">
+            <div>📅 授權期限：2024-04-01 ~ 2027-03-31</div>
+            <div>🌏 授權地區：全球</div>
+            <div>🏷 簽約品類：盲盒、公仔、配件、文具、生活品</div>
+            <div>💰 版稅率（零售）：14%</div>
+            <div>📦 版稅率（批發）：14% × 批發折扣</div>
+            <div>🎯 MG：USD 80,000 / 年 · 已付首期</div>
           </div>
         </div>
       </div>
 
-      <div class="contract-row" id="ct-muziktiger">
+      <!-- Muziktiger -->
+      <div class="contract-row" id="ct-muziktiger" style="cursor:pointer;" onclick="toggleContractDetail('cd-muzik','ca-muzik')">
         <div class="ct-top">
           <div class="ct-icon">🎵</div>
           <div class="ct-body">
@@ -814,11 +868,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
             <div class="ct-expiry">到期：2026-12</div>
+            <div id="ca-muzik" style="font-size:10px;color:var(--txt-lo);margin-top:3px;">▼</div>
           </div>
+        </div>
+        <div id="cd-muzik" style="display:none;margin-top:8px;background:var(--card2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--txt-mid);" onclick="event.stopPropagation()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;line-height:1.8;">
+            <div>📅 授權期限：2025-01-01 ~ 2026-12-31</div>
+            <div>🌏 授權地區：中國大陸</div>
+            <div>🏷 簽約品類：盲盒、公仔、周邊配件</div>
+            <div>💰 版稅率（零售）：12%</div>
+            <div>📦 版稅率（批發）：依批發折扣計算</div>
+            <div>🎯 MG：¥80,000 / 年 · 版權方：佳盛(JIASHENG)</div>
+          </div>
+          <div style="margin-top:6px;padding:5px 8px;background:var(--warn-dim);border-radius:5px;font-size:10px;color:var(--warn);">⚠ 2026-12 到期 · 建議 Q3 啟動續約洽談</div>
         </div>
       </div>
 
-      <div class="contract-row" id="ct-mofusand">
+      <!-- Mofusand -->
+      <div class="contract-row" id="ct-mofusand" style="cursor:pointer;" onclick="toggleContractDetail('cd-mofu','ca-mofu')">
         <div class="ct-top">
           <div class="ct-icon">🐱</div>
           <div class="ct-body">
@@ -828,11 +895,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
             <div class="ct-expiry">到期：2027-06</div>
+            <div id="ca-mofu" style="font-size:10px;color:var(--txt-lo);margin-top:3px;">▼</div>
+          </div>
+        </div>
+        <div id="cd-mofu" style="display:none;margin-top:8px;background:var(--card2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--txt-mid);" onclick="event.stopPropagation()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;line-height:1.8;">
+            <div>📅 授權期限：2025-07-01 ~ 2027-06-30</div>
+            <div>🌏 授權地區：中國大陸</div>
+            <div>🏷 簽約品類：盲盒、公仔、貼紙、配件、文具</div>
+            <div>💰 版稅率（零售）：14%</div>
+            <div>📦 版稅率（批發）：11.7%（以批發實收計）</div>
+            <div>🎯 MG：¥297,637 / 年 · 有你共創代簽</div>
           </div>
         </div>
       </div>
 
-      <div class="contract-row" id="ct-opanchu">
+      <!-- Opanchu -->
+      <div class="contract-row" id="ct-opanchu" style="cursor:pointer;" onclick="toggleContractDetail('cd-opanchu','ca-opanchu')">
         <div class="ct-top">
           <div class="ct-icon">🐰</div>
           <div class="ct-body">
@@ -842,12 +921,25 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="ct-right">
             <span class="chip chip-warn">快到期</span>
             <div class="ct-expiry" style="color:var(--warn)">到期：2026-09</div>
+            <div id="ca-opanchu" style="font-size:10px;color:var(--txt-lo);margin-top:3px;">▼</div>
           </div>
         </div>
         <div class="ct-warn-msg" id="opanchu-warn">⚠ 距到期 4 個月，需提前洽談續約</div>
+        <div id="cd-opanchu" style="display:none;margin-top:8px;background:var(--card2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--txt-mid);" onclick="event.stopPropagation()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;line-height:1.8;">
+            <div>📅 授權期限：2024-10-01 ~ 2026-09-30</div>
+            <div>🌏 授權地區：中國大陸 + 港澳</div>
+            <div>🏷 簽約品類：盲盒、公仔、周邊配件、馬克杯</div>
+            <div>💰 版稅率（零售）：12%</div>
+            <div>📦 版稅率（批發）：依批發折扣計算</div>
+            <div>🎯 MG：¥200,000 / 年 · 目標：爭取加入東南亞</div>
+          </div>
+          <div style="margin-top:6px;padding:5px 8px;background:var(--warn-dim);border-radius:5px;font-size:10px;color:var(--warn);">續約草案已送 Ray 確認（recA004）· 目標 3 年期，加入東南亞授權地區</div>
+        </div>
       </div>
 
-      <div class="contract-row" id="ct-onigiri" style="border-bottom:none;padding-bottom:0;">
+      <!-- 飯糰與梅子 -->
+      <div class="contract-row" id="ct-onigiri" style="border-bottom:none;padding-bottom:0;cursor:pointer;" onclick="toggleContractDetail('cd-onigiri','ca-onigiri')">
         <div class="ct-top">
           <div class="ct-icon">🍙</div>
           <div class="ct-body">
@@ -857,6 +949,17 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="ct-right">
             <span class="chip chip-ok">有效</span>
             <div class="ct-expiry">到期：確認中</div>
+            <div id="ca-onigiri" style="font-size:10px;color:var(--txt-lo);margin-top:3px;">▼</div>
+          </div>
+        </div>
+        <div id="cd-onigiri" style="display:none;margin-top:8px;background:var(--card2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--txt-mid);" onclick="event.stopPropagation()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;line-height:1.8;">
+            <div>📅 授權期限：2025-01-01 ~ 待確認</div>
+            <div>🌏 授權地區：中國大陸 + 港澳</div>
+            <div>🏷 簽約品類：盲盒、公仔、周邊配件</div>
+            <div>💰 版稅率（零售）：12%</div>
+            <div>📦 版稅率（批發）：依批發折扣計算</div>
+            <div>🎯 MG：¥200,000 · 有你共創代簽</div>
           </div>
         </div>
       </div>
@@ -899,6 +1002,22 @@ function toggleProd(id){
 }
 function toggleIntent(id){
   document.getElementById(id).classList.toggle('open');
+}
+function toggleContractDetail(detailId, arrowId){
+  const el=document.getElementById(detailId);
+  if(!el) return;
+  const isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'';
+  const arr=document.getElementById(arrowId);
+  if(arr) arr.textContent=isOpen?'▼':'▲';
+}
+function toggleOrderDetail(trId, detailRowId){
+  const row=document.getElementById(detailRowId);
+  if(!row) return;
+  const isOpen=row.style.display!=='none';
+  row.style.display=isOpen?'none':'';
+  const arr=document.getElementById('oa-'+trId);
+  if(arr) arr.textContent=isOpen?'▼':'▲';
 }
 function toggleKpiDetail(id) {
   const el = document.getElementById(id);

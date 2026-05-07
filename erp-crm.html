@@ -680,6 +680,14 @@ function intentChip(intent){
   return map[intent]||'chip-grey';
 }
 function ownerName(u){ return u==='laodong'?'老董':u==='debao'?'德寶':u||'—'; }
+function toggleCrmOdr(detailId, arrowId){
+  const el=document.getElementById(detailId);
+  if(!el) return;
+  const isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'';
+  const arr=document.getElementById(arrowId);
+  if(arr) arr.textContent=isOpen?'▼':'▲';
+}
 
 function toggleCard(header){
   const detail = header.nextElementSibling;
@@ -817,18 +825,22 @@ function renderMyProductOrders(){
   const ORDERS = {
     laodong: {
       snoopy: [
-        { client:'廣州名創優品', qty:'180 箱', amt:'¥ 42 萬', cs:'全款已收', nth:'第 3 筆', cs_cls:'chip-ok' },
-        { client:'北京華糖',     qty:'300 箱', amt:'¥ 65 萬', cs:'全款已收', nth:'第 5 筆', cs_cls:'chip-ok' },
-        { client:'首爾 SMTOWN', qty:'樣品中',  amt:'待報價',  cs:'樣品確認中', nth:'首次詢盤', cs_cls:'chip-grey' },
+        { id:'mc', client:'廣州名創優品', qty:'180 箱', amt:'¥ 42 萬', cs:'全款已收', nth:'第 3 筆', cs_cls:'chip-ok',
+          disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'全額預付' },
+        { id:'ht', client:'北京華糖',     qty:'300 箱', amt:'¥ 65 萬', cs:'全款已收', nth:'第 5 筆', cs_cls:'chip-ok',
+          disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'30%訂金，出貨前付清' },
+        { id:'sm', client:'首爾 SMTOWN', qty:'樣品中',  amt:'待報價',  cs:'樣品確認中', nth:'首次詢盤', cs_cls:'chip-grey',
+          disc:'報價中（參考46折）', srp:'¥ 79.9（韓市場待確認）', ws_unit:'待定', box_pcs:'240件/箱', box_amt:'待定', royalty:'待定', gm:'—', pay:'待談' },
       ],
       mofu: [
-        { client:'（台北誠品由珮玲負責）', qty:'—', amt:'—', cs:'—', nth:'—', cs_cls:'chip-grey' },
+        { id:'mofu-peilin', client:'（台北誠品由珮玲負責）', qty:'—', amt:'—', cs:'—', nth:'—', cs_cls:'chip-grey', disc:'—' },
       ],
     },
     debao: {
       snoopy: [],
       mofu: [
-        { client:'上海萌趣文化', qty:'80 箱', amt:'¥ 17.6 萬', cs:'訂金已收', nth:'第 1 筆', cs_cls:'chip-warn' },
+        { id:'db-mofu', client:'上海萌趣文化', qty:'80 箱', amt:'¥ 17.6 萬', cs:'訂金已收', nth:'第 1 筆', cs_cls:'chip-warn',
+          disc:'47折', srp:'¥ 79.9/件', ws_unit:'¥ 37.6/件', box_pcs:'240件/箱', box_amt:'¥ 9,016/箱', royalty:'¥ 1,262/箱', gm:'≈ 31%', pay:'30%訂金已收，待出貨付尾款' },
       ],
       opanchu: true,
     },
@@ -837,22 +849,42 @@ function renderMyProductOrders(){
   const d = ORDERS[myUser];
   if(!d) return;
 
-  function buildRows(rows){
+  function buildRows(rows, prod){
     if(!rows||!rows.length) return '<tr><td colspan="5" style="color:var(--txt-lo);text-align:center;padding:12px">無我的訂單</td></tr>';
-    return rows.map(r=>`<tr>
-      <td style="font-weight:700">${r.client}</td>
-      <td>${r.qty}</td>
-      <td style="font-weight:700">${r.amt}</td>
-      <td><span class="chip ${r.cs_cls}">${r.cs}</span></td>
-      <td><span class="ord-nth${r.nth==='首次詢盤'?' first':''}">${r.nth}</span></td>
-    </tr>`).join('');
+    return rows.map((r,i)=>{
+      const hasDetail = r.disc && r.disc !== '—';
+      const did = `crm-odr-${prod}-${i}`;
+      const aid = `crm-oa-${prod}-${i}`;
+      const mainRow = `<tr style="${hasDetail?'cursor:pointer;':''}" onclick="${hasDetail?`toggleCrmOdr('${did}','${aid}')`:''}" >
+        <td style="font-weight:700">${r.client}${hasDetail?` <span id="${aid}" style="font-size:9px;color:var(--txt-lo);">▼</span>`:''}</td>
+        <td>${r.qty}</td>
+        <td style="font-weight:700">${r.amt}</td>
+        <td><span class="chip ${r.cs_cls}">${r.cs}</span></td>
+        <td><span class="ord-nth${r.nth==='首次詢盤'?' first':''}">${r.nth}</span></td>
+      </tr>`;
+      const detailRow = hasDetail ? `<tr id="${did}" style="display:none;background:var(--card2);">
+        <td colspan="5" style="padding:10px 12px;font-size:11px;color:var(--txt-mid);">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 12px;line-height:1.8;">
+            <div>折扣：<strong style="color:var(--txt-hi);">${r.disc}</strong></div>
+            <div>零售建議價：<strong style="color:var(--txt-hi);">${r.srp}</strong></div>
+            <div>批發單件價：<strong style="color:var(--txt-hi);">${r.ws_unit}</strong></div>
+            <div>每箱件數：<strong style="color:var(--txt-hi);">${r.box_pcs}</strong></div>
+            <div>每箱批發金額：<strong style="color:var(--ok);">${r.box_amt}</strong></div>
+            <div>版稅/箱：<strong style="color:var(--txt-hi);">${r.royalty}</strong></div>
+            <div>毛利率估算：<strong style="color:var(--ok);">${r.gm}</strong></div>
+            <div>付款條件：<strong style="color:var(--txt-hi);">${r.pay}</strong></div>
+          </div>
+        </td>
+      </tr>` : '';
+      return mainRow + detailRow;
+    }).join('');
   }
 
   const snRows = document.getElementById('pb-snoopy-rows');
-  if(snRows) snRows.innerHTML = buildRows(d.snoopy);
+  if(snRows) snRows.innerHTML = buildRows(d.snoopy, 'sn');
 
   const mfRows = document.getElementById('pb-mofu-rows');
-  if(mfRows) mfRows.innerHTML = buildRows(d.mofu);
+  if(mfRows) mfRows.innerHTML = buildRows(d.mofu, 'mf');
 
   // Opanchu block: only show for debao
   const opBlock = document.getElementById('pb-opanchu');

@@ -93,6 +93,11 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .chip-flash{background:#06b6d418;color:var(--flash);}
 .chip-wholesale{background:#f9731618;color:var(--wholesale);}
 
+/* TAB BAR */
+.kpi-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--txt-lo);font-size:11px;font-weight:700;padding:9px 16px;cursor:pointer;letter-spacing:.02em;transition:color .15s,border-color .15s;margin-bottom:-1px;outline:none;}
+.kpi-tab:hover{color:var(--txt-mid);}
+.kpi-tab.active{color:var(--txt-hi);border-bottom-color:var(--accent);}
+
 /* FLASH STORE CARDS */
 .flash-item{padding:12px 16px;border-bottom:1px solid var(--border);}
 .flash-item:last-child{border-bottom:none;}
@@ -207,34 +212,71 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 <div class="main">
 
-  <!-- ① 全集團 KPI -->
-  <div class="sec-head"><span class="sec-title">全集團業績達成率 · SHAWN 核心指標</span></div>
+  <!-- ① Shawn 核心指標 -->
+  <div class="sec-head"><span class="sec-title">Shawn 核心指標 · 預算覆蓋 · 執行達成 · 超標潛力</span></div>
   <div class="kpi-row">
-    <div class="kpi-big" onclick="location.href='erp-war-room.html'">
-      <div class="kpi-big-label">年度收入達成率 <span style="font-size:9px;color:var(--txt-lo)">→ 戰情室</span></div>
-      <div class="kpi-big-val" id="g-rev" style="color:var(--warn)">792 萬</div>
-      <div class="kpi-big-sub" id="g-rev-sub">/ 2,400萬 全年目標</div>
-      <span class="kpi-big-trend trend-dn" id="g-rev-trend">落後 9%</span>
-      <div class="prog"><div id="g-rev-bar" class="prog-fill" style="width:33%;background:var(--warn)"></div></div>
-      <div class="kpi-big-footer"><span id="g-rev-ytd">YTD 33%</span><span id="g-rev-exp">預期進度 42%</span></div>
+
+    <!-- Card 1: 預算覆蓋率 -->
+    <div class="kpi-big" style="cursor:pointer;" onclick="toggleShawnKpi('sk-coverage')">
+      <div class="kpi-big-label">VAM 預算覆蓋率</div>
+      <div class="kpi-big-val" style="color:var(--warn)">78%</div>
+      <div class="kpi-big-sub">已建預算淨利 ¥624萬 / 目標 ¥800萬</div>
+      <span class="kpi-big-trend trend-dn">缺口 ¥176萬 未覆蓋</span>
+      <div class="prog"><div class="prog-fill" style="width:78%;background:var(--warn)"></div></div>
+      <div class="kpi-big-footer"><span>需再建預算項目補足缺口</span><span>▼ 展開</span></div>
+      <div id="sk-coverage" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--txt-mid);line-height:1.9;" onclick="event.stopPropagation()">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:2px 12px;">
+          <span>快閃店（Siam Paragon + T21）</span><span style="color:var(--accent)">¥ 320萬</span>
+          <span>批發全年預估淨利</span><span style="color:var(--accent)">¥ 215萬</span>
+          <span>電商（春雷 + 佳音）</span><span style="color:var(--accent)">¥ 89萬</span>
+          <span style="padding-top:4px;border-top:1px solid var(--border);font-weight:700;color:var(--txt-hi);">已覆蓋合計</span>
+          <span style="padding-top:4px;border-top:1px solid var(--border);font-weight:700;color:var(--warn);">¥ 624萬</span>
+          <span style="color:var(--danger);">未覆蓋缺口（需補建預算）</span><span style="color:var(--danger);">¥ 176萬</span>
+        </div>
+        <a href="erp-budget-planner.html" style="display:block;margin-top:8px;font-size:10px;color:var(--accent);text-decoration:none;">→ 前往預算規劃器補建項目</a>
+      </div>
     </div>
-    <div class="kpi-big" onclick="location.href='erp-war-room.html'">
-      <div class="kpi-big-label">本季業績（Q2）</div>
-      <div class="kpi-big-val" id="g-qtr" style="color:var(--accent)">892 萬</div>
-      <div class="kpi-big-sub" id="g-qtr-sub">Q2 目標 1,350 萬</div>
-      <span class="kpi-big-trend trend-warn" id="g-qtr-trend">Q2 66% 達成</span>
-      <div class="prog"><div id="g-qtr-bar" class="prog-fill" style="width:66%;background:var(--accent)"></div></div>
-      <div class="kpi-big-footer"><span>Q2（4–6月）</span><span id="g-qtr-foot">還剩 1 個月</span></div>
+
+    <!-- Card 2: 執行達成率 -->
+    <div class="kpi-big" style="cursor:pointer;" onclick="toggleShawnKpi('sk-achieve')">
+      <div class="kpi-big-label">項目執行達成率</div>
+      <div class="kpi-big-val" style="color:var(--accent)">82%</div>
+      <div class="kpi-big-sub">進行中 / 已結案項目 · 實際 vs 預算加權均值</div>
+      <span class="kpi-big-trend" style="background:#06b6d418;color:var(--flash);">尚在可接受範圍</span>
+      <div class="prog"><div class="prog-fill" style="width:82%;background:var(--accent)"></div></div>
+      <div class="kpi-big-footer"><span>Siam Discovery 94% · 批發 YTD 71%</span><span>▼ 展開</span></div>
+      <div id="sk-achieve" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--txt-mid);line-height:1.9;" onclick="event.stopPropagation()">
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:2px 10px;align-items:center;">
+          <span style="font-size:9px;color:var(--txt-lo);font-weight:700;">項目</span><span style="font-size:9px;color:var(--txt-lo);">達成率</span><span style="font-size:9px;color:var(--txt-lo);">狀態</span>
+          <span>Siam Discovery 快閃店</span><span style="color:var(--ok);font-weight:700;">94%</span><span style="font-size:9px;background:var(--ok-dim);color:var(--ok);padding:1px 5px;border-radius:4px;">已結案</span>
+          <span>批發 YTD（Snoopy+Mofusand）</span><span style="color:var(--warn);font-weight:700;">71%</span><span style="font-size:9px;background:var(--warn-dim);color:var(--warn);padding:1px 5px;border-radius:4px;">進行中</span>
+          <span>Siam Paragon（籌備中）</span><span style="color:var(--txt-lo);">—</span><span style="font-size:9px;background:var(--card2);color:var(--txt-lo);padding:1px 5px;border-radius:4px;">未開始</span>
+          <span>Terminal 21（場地評估）</span><span style="color:var(--txt-lo);">—</span><span style="font-size:9px;background:var(--card2);color:var(--txt-lo);padding:1px 5px;border-radius:4px;">未開始</span>
+        </div>
+      </div>
     </div>
-    <div class="kpi-big" onclick="location.href='erp-war-room.html'">
-      <div class="kpi-big-label">年度淨利達成率（VAM 對賭）<span style="font-size:9px;color:var(--txt-lo);margin-left:4px">→ 戰情室</span></div>
-      <div class="kpi-big-val" id="g-profit" style="color:var(--warn)">262 萬</div>
-      <div class="kpi-big-sub" id="g-profit-sub">/ 800萬 對賭目標</div>
-      <span class="kpi-big-trend trend-dn" id="g-profit-trend">↓ 落後 71萬</span>
-      <div class="prog"><div id="g-profit-bar" class="prog-fill" style="width:33%;background:var(--warn)"></div></div>
-      <div class="kpi-big-footer"><span id="g-profit-ytd">YTD 33%</span><span>VAM 2年目標 1,600萬</span></div>
-      <div style="margin-top:6px;font-size:9px;color:var(--txt-lo);border-top:1px solid var(--border);padding-top:5px;">📊 口徑：香港JV ＋ 深圳子公司淨利合併　快閃店淨利歸屬 JV，已計入</div>
+
+    <!-- Card 3: 超標潛力 -->
+    <div class="kpi-big" style="cursor:pointer;" onclick="toggleShawnKpi('sk-upside')">
+      <div class="kpi-big-label">超標潛力</div>
+      <div class="kpi-big-val" style="color:var(--ok)">+¥77萬</div>
+      <div class="kpi-big-sub">若所有計劃項目以 82% 達成率執行</div>
+      <span class="kpi-big-trend trend-up">超對賭目標 9.6%</span>
+      <div class="prog"><div class="prog-fill" style="width:100%;background:var(--ok)"></div></div>
+      <div class="kpi-big-footer"><span>前提：Siam Paragon + T21 按計劃開店</span><span>▼ 展開</span></div>
+      <div id="sk-upside" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--txt-mid);line-height:1.9;" onclick="event.stopPropagation()">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:2px 12px;">
+          <span>已覆蓋項目 × 82% 達成率</span><span style="color:var(--txt-hi);">¥ 512萬</span>
+          <span>Siam Paragon 預估淨利 × 82%</span><span style="color:var(--txt-hi);">¥ 187萬</span>
+          <span>Terminal 21 預估淨利 × 82%</span><span style="color:var(--txt-hi);">¥ 178萬</span>
+          <span style="padding-top:4px;border-top:1px solid var(--border);font-weight:700;color:var(--txt-hi);">樂觀全年預估淨利</span>
+          <span style="padding-top:4px;border-top:1px solid var(--border);font-weight:700;color:var(--ok);">¥ 877萬</span>
+          <span style="color:var(--ok);">超對賭 ¥800萬 目標</span><span style="color:var(--ok);font-weight:700;">+¥ 77萬</span>
+        </div>
+        <div style="margin-top:8px;padding:6px 8px;background:var(--warn-dim);border-radius:6px;font-size:10px;color:var(--warn);">⚠ Siam Paragon / T21 任一延期，超標空間即消失。確保按計劃開店是 Q3 第一優先。</div>
+      </div>
     </div>
+
   </div>
 
   <!-- ② 快速行動入口 -->
@@ -1082,6 +1124,16 @@ function togglePc(id){
 }
 
 // Wholesale tab
+function toggleShawnKpi(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'';
+  const card=el.closest('.kpi-big');
+  const foot=card?card.querySelector('.kpi-big-footer span:last-child'):null;
+  if(foot){foot.textContent=isOpen?'▼ 展開':'▲ 收起';}
+}
+
 function switchWTab(btn, panelId) {
   document.querySelectorAll('.biz-panel .kpi-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
