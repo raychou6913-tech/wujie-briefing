@@ -157,8 +157,11 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="payroll-rows" id="payroll-rows"></div>
   </div>
 
-  <!-- Form launchers -->
-  <div class="sec-hd"><span class="sec-title">標準表單</span></div>
+  <!-- Flow overview -->
+  <div class="sec-hd"><span class="sec-title">申請收件流程說明</span></div>
+  <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:11px;color:var(--txt-mid);line-height:1.6;">
+    以下申請由員工從各自工作台提交，系統自動轉入您的<strong style="color:var(--txt-hi);">待審核隊列</strong>。行政採購由楊子整合後發起。
+  </div>
   <div class="form-grid" id="form-grid"></div>
 
 </div>
@@ -282,10 +285,12 @@ function loadPayroll(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY)||'{"
 function savePayroll(s){ localStorage.setItem(PAYROLL_KEY,JSON.stringify(s)); }
 
 // ── Form Definitions ───────────────────────────────────────
+// role: 'receive' = 員工提交、楊子收件審核; 'initiate' = 楊子主動發起
 const FORMS = [
   {
     id:'f-expense', icon:'💸', name:'費用報銷申請',
     desc:'員工出差、採購、日常費用',
+    role:'receive', roleLabel:'員工提交 → 楊子初審',
     route:'楊子初審 → 安然複核 → 躍明付款',
     fields:[
       {type:'text',id:'申請人',label:'申請人'},
@@ -299,6 +304,7 @@ const FORMS = [
   {
     id:'f-leave', icon:'🌿', name:'請假申請',
     desc:'事假、病假、特休、年假',
+    role:'receive', roleLabel:'員工提交 → 楊子初審',
     route:'楊子初審 → 直屬主管 → 安然備案',
     fields:[
       {type:'text',id:'申請人',label:'申請人'},
@@ -311,20 +317,15 @@ const FORMS = [
   },
   {
     id:'f-recruit', icon:'👤', name:'招募需求申請',
-    desc:'新增人力、實習生、合約工',
+    desc:'主管提出人力需求後，楊子負責執行招募',
+    role:'receive', roleLabel:'主管申請 → 安然批准 → 楊子執行',
     route:'部門主管申請 → 安然批准 → 楊子執行招募',
-    fields:[
-      {type:'text',id:'職位',label:'需求職位'},
-      {type:'text',id:'部門',label:'所屬部門'},
-      {type:'select',id:'類型',label:'僱用類型',options:['正職','實習生','兼職','合約工']},
-      {type:'date',id:'到職日',label:'預計到職日'},
-      {type:'textarea',id:'要求',label:'技能要求'},
-      {type:'textarea',id:'原因',label:'增員原因'},
-    ],
+    fields:[],
   },
   {
     id:'f-procurement', icon:'📦', name:'行政採購申請',
     desc:'辦公室耗材、設備、雜費',
+    role:'initiate', roleLabel:'楊子整合發起',
     route:'楊子整合 → 安然批准 → 轉採購台',
     fields:[
       {type:'text',id:'申請人',label:'申請人'},
@@ -400,15 +401,24 @@ function render(){
   document.getElementById('payroll-status').textContent = allDone ? '✓ 已完成' : '進行中';
   document.getElementById('payroll-status').className = 'payroll-status ' + (allDone?'status-done':'status-progress');
 
-  // Forms
+  // Forms — receive cards are info-only; initiate cards are clickable launchers
   const formGrid = document.getElementById('form-grid');
-  formGrid.innerHTML = FORMS.map(f=>`
-    <div class="form-card" onclick="openForm('${f.id}')">
-      <div class="form-icon">${f.icon}</div>
+  formGrid.innerHTML = FORMS.map(f=>{
+    const isInitiate = f.role==='initiate';
+    const roleBadge = isInitiate
+      ? `<span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:var(--accent-dim);color:var(--accent);">楊子發起</span>`
+      : `<span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:var(--ok-dim);color:var(--ok);">收件審核</span>`;
+    const clickAttr = isInitiate ? `onclick="openForm('${f.id}')" style="cursor:pointer;"` : `style="cursor:default;opacity:.85;"`;
+    return `<div class="form-card" ${clickAttr}>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="form-icon">${f.icon}</div>${roleBadge}
+      </div>
       <div class="form-name">${f.name}</div>
       <div class="form-desc">${f.desc}</div>
-      <div class="form-route">送審路徑：<span>${f.route}</span></div>
-    </div>`).join('');
+      <div class="form-route">流程：<span>${f.route}</span></div>
+      ${isInitiate?'<div style="font-size:10px;color:var(--accent);margin-top:6px;font-weight:700;">點擊填寫 →</div>':'<div style="font-size:10px;color:var(--ok);margin-top:6px;">員工自行提交，出現在待審核隊列</div>'}
+    </div>`;
+  }).join('');
 }
 
 function openApproval(id){
@@ -456,7 +466,7 @@ function markPayrollDone(stepId){
 
 function openForm(id){
   const f = FORMS.find(x=>x.id===id);
-  if(!f) return;
+  if(!f||f.role==='receive') return;
   currentFormId = id;
   document.getElementById('nf-title').textContent = f.icon + ' ' + f.name;
   document.getElementById('nf-sub').textContent = '送審路徑：' + f.route;
