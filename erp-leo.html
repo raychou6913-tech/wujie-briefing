@@ -185,7 +185,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- 固定費用月度排程 -->
   <div class="sec-hd" style="margin-top:8px;">
     <span class="sec-title">本月固定支出排程</span>
-    <span style="font-size:10px;color:var(--txt-lo);">每月必付・是例行工作的來源</span>
+    <button class="sec-link" onclick="openFCModal()">管理項目 →</button>
   </div>
   <div class="fc-card">
     <div id="fc-rows"></div>
@@ -266,11 +266,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 </div>
 
+<!-- Fixed Cost Management Modal -->
+<div class="modal-bg" id="modal-fc">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-title">管理固定支出項目</div>
+    <div class="modal-sub">薪資與勞健保列自動計算，其餘項目可自由增刪改。</div>
+    <div id="fc-modal-rows" style="max-height:55vh;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeFCModal()">取消</button>
+      <button class="btn-full btn-primary" onclick="saveFCModal()">儲存 →</button>
+    </div>
+  </div>
+</div>
+
 <!-- Salary Edit Modal -->
 <div class="modal-bg" id="modal-salary">
   <div class="modal" style="max-width:520px;">
-    <div class="modal-title">編輯本月薪資明細</div>
-    <div class="modal-sub">底薪＋住房補貼＋獎金 → 投保級距自動計算</div>
+    <div class="modal-title">薪資人員設定</div>
+    <div class="modal-sub">底薪＋補貼＋獎金後，系統建議投保級距，Leo 可自行選擇實際級距。* = 已手動調整</div>
     <div id="salary-modal-rows"></div>
     <div class="modal-footer">
       <button class="btn-full btn-cancel" onclick="closeSalaryModal()">取消</button>
@@ -409,12 +422,21 @@ function lookupBracket(totalComp){
 function loadEmployees(){ return JSON.parse(localStorage.getItem(EMP_KEY)||JSON.stringify(EMP_DEFAULTS)); }
 function saveEmployees(arr){ localStorage.setItem(EMP_KEY, JSON.stringify(arr)); }
 
+function getEmpBracket(e){
+  const comp = e.base+(e.housing||0)+(e.bonus||0);
+  const suggested = lookupBracket(comp);
+  if(e.bracketLim) return NHI_BRACKETS.find(b=>b.lim===e.bracketLim)||suggested;
+  return suggested;
+}
+
 function renderEmployeeSalaryTable(){
   const emps = loadEmployees();
   let totBase=0, totHousing=0, totBonus=0, totComp=0, totLabor=0, totHealth=0, totPension=0;
   const rows = emps.map(e=>{
-    const comp = e.base + (e.housing||0) + (e.bonus||0);
-    const br = lookupBracket(comp);
+    const comp = e.base+(e.housing||0)+(e.bonus||0);
+    const br = getEmpBracket(e);
+    const sugBr = lookupBracket(comp);
+    const isOverride = e.bracketLim && e.bracketLim!==sugBr.lim;
     totBase+=e.base; totHousing+=(e.housing||0); totBonus+=(e.bonus||0); totComp+=comp;
     totLabor+=br.labor; totHealth+=br.health; totPension+=br.pension;
     const extras = [];
@@ -425,7 +447,7 @@ function renderEmployeeSalaryTable(){
       <td>${e.base.toLocaleString()}</td>
       <td style="color:var(--txt-mid);">${extras.length?extras.join('・'):'—'}</td>
       <td style="color:var(--txt-hi);font-weight:700;">${comp.toLocaleString()}</td>
-      <td style="color:var(--txt-lo);">NT$${br.lim.toLocaleString()}</td>
+      <td style="color:${isOverride?'var(--warn)':'var(--txt-lo)'};">NT$${br.lim.toLocaleString()}${isOverride?'*':''}</td>
       <td>${br.labor.toLocaleString()}</td>
       <td>${br.health.toLocaleString()}</td>
       <td>${br.pension.toLocaleString()}</td>
@@ -435,7 +457,7 @@ function renderEmployeeSalaryTable(){
   if(tbody) tbody.innerHTML = rows;
   const foot = document.getElementById('emp-salary-foot');
   if(foot) foot.innerHTML = `
-    <td>合計（6人）</td>
+    <td>合計（${emps.length}人）</td>
     <td>${totBase.toLocaleString()}</td>
     <td>${(totHousing+totBonus).toLocaleString()}</td>
     <td>${totComp.toLocaleString()}</td>
@@ -446,21 +468,65 @@ function renderEmployeeSalaryTable(){
   return {totComp, totLabor, totHealth, totPension};
 }
 
+const INP = 'padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;';
 let _salaryEdit = [];
+function _renderSalaryModalRows(){
+  const bracketOpts = NHI_BRACKETS.map(b=>`<option value="${b.lim}">NT$${b.lim.toLocaleString()}（勞${b.labor.toLocaleString()}/健${b.health.toLocaleString()}/退${b.pension.toLocaleString()}）</option>`).join('');
+  document.getElementById('salary-modal-rows').innerHTML = _salaryEdit.map((e,i)=>{
+    const comp = e.base+(e.housing||0)+(e.bonus||0);
+    const sugBr = lookupBracket(comp);
+    const selLim = e.bracketLim||sugBr.lim;
+    const selBr = NHI_BRACKETS.find(b=>b.lim===selLim)||sugBr;
+    return `<div id="emp-row-${i}" style="border-bottom:1px solid var(--border);padding:12px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <input value="${e.name}" oninput="_salaryEdit[${i}].name=this.value" placeholder="員工姓名" style="${INP}max-width:200px;">
+        <button onclick="removeEmp(${i})" style="background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">刪除</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">底薪 (TWD)</div>
+          <input type="number" value="${e.base}" id="emp-base-${i}" oninput="_salaryEdit[${i}].base=+this.value;_refreshEmpBracket(${i})" style="${INP}"></div>
+        <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">住房補貼</div>
+          <input type="number" value="${e.housing||0}" oninput="_salaryEdit[${i}].housing=+this.value;_refreshEmpBracket(${i})" style="${INP}"></div>
+        <div><div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">當月獎金</div>
+          <input type="number" value="${e.bonus||0}" oninput="_salaryEdit[${i}].bonus=+this.value;_refreshEmpBracket(${i})" style="${INP}"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div style="font-size:10px;color:var(--txt-lo);">月薪合計 <strong style="color:var(--txt-hi);" id="emp-comp-${i}">NT$${comp.toLocaleString()}</strong></div>
+        <div style="font-size:10px;color:var(--txt-lo);">建議級距 <strong style="color:var(--accent);">NT$${sugBr.lim.toLocaleString()}</strong></div>
+        <div style="flex:1;min-width:200px;">
+          <select id="emp-bracket-${i}" onchange="_salaryEdit[${i}].bracketLim=+this.value;_refreshEmpBracket(${i})" style="${INP}font-size:11px;">
+            ${NHI_BRACKETS.map(b=>`<option value="${b.lim}" ${b.lim===selLim?'selected':''}>NT$${b.lim.toLocaleString()}（勞${b.labor.toLocaleString()}/健${b.health.toLocaleString()}/退${b.pension.toLocaleString()}）</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div id="emp-nhi-preview-${i}" style="font-size:10px;color:var(--txt-lo);margin-top:4px;">公司負擔 → 勞保 NT$${selBr.labor.toLocaleString()} / 健保 NT$${selBr.health.toLocaleString()} / 退休金 NT$${selBr.pension.toLocaleString()}</div>
+    </div>`;
+  }).join('') + `<div style="padding:12px 0;text-align:center;">
+    <button onclick="addEmp()" style="background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">+ 新增員工</button>
+  </div>`;
+}
+function _refreshEmpBracket(i){
+  const e = _salaryEdit[i];
+  const comp = (e.base||0)+(e.housing||0)+(e.bonus||0);
+  const sugBr = lookupBracket(comp);
+  const selBr = e.bracketLim ? (NHI_BRACKETS.find(b=>b.lim===e.bracketLim)||sugBr) : sugBr;
+  const compEl = document.getElementById(`emp-comp-${i}`);
+  if(compEl) compEl.textContent = 'NT$'+comp.toLocaleString();
+  const preview = document.getElementById(`emp-nhi-preview-${i}`);
+  if(preview) preview.textContent = `公司負擔 → 勞保 NT$${selBr.labor.toLocaleString()} / 健保 NT$${selBr.health.toLocaleString()} / 退休金 NT$${selBr.pension.toLocaleString()}`;
+}
+function addEmp(){
+  _salaryEdit.push({id:'e'+Date.now(), name:'新員工', base:30300, housing:0, bonus:0, bracketLim:null});
+  _renderSalaryModalRows();
+}
+function removeEmp(i){
+  if(_salaryEdit.length<=1){showToast('至少保留一名員工');return;}
+  _salaryEdit.splice(i,1);
+  _renderSalaryModalRows();
+}
 function openSalaryModal(){
   _salaryEdit = JSON.parse(JSON.stringify(loadEmployees()));
-  document.getElementById('salary-modal-rows').innerHTML = _salaryEdit.map((e,i)=>`
-    <div style="border-bottom:1px solid var(--border);padding:10px 0;">
-      <div style="font-size:12px;font-weight:700;margin-bottom:8px;">${e.name}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-        <div class="field" style="margin:0;"><label>底薪 (TWD)</label>
-          <input type="number" value="${e.base}" onchange="_salaryEdit[${i}].base=+this.value" style="padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;"></div>
-        <div class="field" style="margin:0;"><label>住房補貼</label>
-          <input type="number" value="${e.housing||0}" onchange="_salaryEdit[${i}].housing=+this.value" style="padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;"></div>
-        <div class="field" style="margin:0;"><label>當月獎金</label>
-          <input type="number" value="${e.bonus||0}" onchange="_salaryEdit[${i}].bonus=+this.value" style="padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;"></div>
-      </div>
-    </div>`).join('');
+  _renderSalaryModalRows();
   document.getElementById('modal-salary').classList.add('show');
 }
 function closeSalaryModal(){ document.getElementById('modal-salary').classList.remove('show'); }
@@ -506,6 +572,45 @@ function renderFixedCosts(){
   if(el) el.innerHTML = rows;
   const tot = document.getElementById('fc-total');
   if(tot) tot.textContent = 'NT$' + grandTotal.toLocaleString();
+}
+
+let _fcEdit = [];
+function openFCModal(){
+  _fcEdit = JSON.parse(JSON.stringify(loadFC().filter(fc=>!fc.dynamic)));
+  _renderFCModalRows();
+  document.getElementById('modal-fc').classList.add('show');
+}
+function closeFCModal(){ document.getElementById('modal-fc').classList.remove('show'); }
+function _renderFCModalRows(){
+  const methodOpts = ['匯款（房東）','代扣自動扣款','公司信用卡','線上繳費','銀行轉帳','現金','其他'].map(m=>`<option>${m}</option>`).join('');
+  const statusOpts = ['paid','due','progress'];
+  const statusLabel = {paid:'✓ 已付',due:'待確認',progress:'進行中'};
+  document.getElementById('fc-modal-rows').innerHTML = _fcEdit.map((fc,i)=>`
+    <div style="display:flex;gap:6px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)10;">
+      <div style="flex:1;">
+        <input value="${fc.label}" oninput="_fcEdit[${i}].label=this.value" placeholder="費用科目" style="${INP}margin-bottom:6px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <div><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">金額 (TWD)</div>
+            <input type="number" value="${fc.amount||0}" oninput="_fcEdit[${i}].amount=+this.value" style="${INP}"></div>
+          <div><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">付款方式</div>
+            <select onchange="_fcEdit[${i}].method=this.value" style="${INP}font-size:11px;">${['匯款（房東）','代扣自動扣款','公司信用卡','線上繳費','銀行轉帳','現金','其他'].map(m=>`<option ${fc.method===m?'selected':''}>${m}</option>`).join('')}</select></div>
+          <div><div style="font-size:9px;color:var(--txt-lo);margin-bottom:2px;">本月狀態</div>
+            <select onchange="_fcEdit[${i}].status=this.value" style="${INP}font-size:11px;">${statusOpts.map(s=>`<option value="${s}" ${fc.status===s?'selected':''}>${statusLabel[s]}</option>`).join('')}</select></div>
+        </div>
+      </div>
+      <button onclick="_fcEdit.splice(${i},1);_renderFCModalRows()" style="background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);padding:5px 9px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0;margin-top:2px;">刪</button>
+    </div>`).join('') + `<div style="padding:10px 0;text-align:center;">
+    <button onclick="_fcEdit.push({id:'fc'+Date.now(),label:'',amount:0,method:'銀行轉帳',status:'due'});_renderFCModalRows()" style="background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);padding:7px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">+ 新增費用項目</button>
+  </div>`;
+}
+function saveFCModal(){
+  // Merge: keep dynamic rows (fc1, fc6), replace manual rows
+  const dynamics = FC_DEFAULTS.filter(x=>x.dynamic);
+  const merged = [...dynamics, ..._fcEdit];
+  saveFC(merged);
+  closeFCModal();
+  renderFixedCosts();
+  showToast('固定費用排程已更新 ✓');
 }
 
 // ── Intercompany Receivables ────────────────────────────────
