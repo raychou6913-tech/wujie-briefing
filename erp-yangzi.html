@@ -198,7 +198,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- 費用管銷總覽 -->
   <div class="sec-hd">
     <span class="sec-title">費用管銷總覽</span>
-    <span class="sec-link" onclick="openExpModal('opex')">+ 錄入費用</span>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="sec-link" style="color:var(--txt-mid);font-weight:600;" onclick="openOpexEditModal()">編輯本月實際 →</span>
+      <span class="sec-link" onclick="openExpModal('opex')">+ 錄入費用</span>
+    </div>
   </div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;">
     <div class="ent-tabs" style="padding:12px 12px 10px;" id="opex-ent-tabs">
@@ -208,6 +211,13 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
     <div class="opex-wrap"><table class="opex-table" id="opex-table"></table></div>
   </div>
+
+  <!-- 人事行政直接申請 -->
+  <div class="sec-hd">
+    <span class="sec-title" id="adhoc-title">人事行政直接申請</span>
+    <span class="sec-link" onclick="openExpModal('hr')">+ 發起申請</span>
+  </div>
+  <div id="adhoc-list"></div>
 
   <!-- 行政採購 -->
   <div class="sec-hd"><span class="sec-title">行政採購</span></div>
@@ -219,6 +229,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <button style="padding:9px 16px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:12px;white-space:nowrap;" onclick="openProcureModal()">填寫申請 →</button>
   </div>
 
+</div>
+
+<!-- OPEX Actual Edit Modal -->
+<div class="modal-bg" id="modal-opex-edit">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-title">編輯本月實際費用</div>
+    <div class="modal-sub" id="opex-edit-sub">修改各科目本月實際支出金額</div>
+    <div id="opex-edit-rows" style="max-height:55vh;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeOpexEditModal()">取消</button>
+      <button class="btn-full btn-approve" onclick="saveOpexEdit()">儲存 ✓</button>
+    </div>
+  </div>
 </div>
 
 <!-- Approval Modal -->
@@ -566,18 +589,27 @@ function renderOpexTable(){
   const d = OPEX_DATA[currentOpexEntity];
   if(!d) return;
   const sym = d.ccy==='TWD'?'NT$':d.ccy==='THB'?'฿':'¥';
+  const ovr = (loadOpexOverrides()||{})[currentOpexEntity]||{};
+  const curMoIdx = OPEX_ACTUAL_COUNT-1;
   // Show window: 3月-9月 by default (3 past + current + 4 future)
   const showMonths = OPEX_MONTHS.slice(2,9); // 3月~9月
   const colHeaders = showMonths.map((m,i)=>{
     const mi = OPEX_MONTHS.indexOf(m);
     const isActual = mi < OPEX_ACTUAL_COUNT;
     const isCur = mi === OPEX_ACTUAL_COUNT-1;
-    return `<th style="text-align:right;${isCur?'color:var(--txt-hi);':''}${!isActual?'opacity:.5;':''}">${m}${!isActual?'<br><span style="font-size:8px;color:var(--indigo);">預算</span>':''}</th>`;
+    return `<th style="text-align:right;${isCur?'color:var(--txt-hi);':''}${!isActual?'opacity:.5;':''}">${m}${!isActual?'<br><span style="font-size:8px;color:var(--indigo);">預算</span>':isCur?'<br><span style="font-size:8px;color:var(--ok);">已錄</span>':''}</th>`;
   }).join('');
+
+  // helper: get value with override support
+  const getVal=(r,mi)=>{
+    const isCur=mi===curMoIdx;
+    if(isCur && ovr[r.cat]!==undefined) return ovr[r.cat];
+    return r.vals[mi]||0;
+  };
 
   const totals = showMonths.map(m=>{
     const mi=OPEX_MONTHS.indexOf(m);
-    return d.rows.reduce((s,r)=>s+(r.vals[mi]||0),0);
+    return d.rows.reduce((s,r)=>s+getVal(r,mi),0);
   });
 
   const bodyRows = d.rows.map(r=>{
@@ -590,10 +622,11 @@ function renderOpexTable(){
 
     const cells = showMonths.map(m=>{
       const mi=OPEX_MONTHS.indexOf(m);
-      const v=r.vals[mi]||0;
+      const v=getVal(r,mi);
       const isActual=mi<OPEX_ACTUAL_COUNT;
       const isCur=mi===OPEX_ACTUAL_COUNT-1;
-      return `<td style="text-align:right;${isCur?'font-weight:700;':''}${!isActual?'opacity:.45;color:var(--indigo);':''}">${v>0?sym+v.toLocaleString():'—'}</td>`;
+      const hasOvr=isCur&&ovr[r.cat]!==undefined;
+      return `<td style="text-align:right;${isCur?'font-weight:700;':''}${!isActual?'opacity:.45;color:var(--indigo);':''}${hasOvr?'color:var(--ok);':''}">${v>0?sym+v.toLocaleString():'—'}</td>`;
     }).join('');
 
     const mainRow = `<tr style="cursor:pointer;" onclick="toggleOpexRow('${r.cat}')">
@@ -856,6 +889,9 @@ function showToast(msg){
 render();
 renderOpexTable();
 loadPaymentList();
+// renderAdhoc + openOpexEditModal are defined in the FAB script block below — call after parse
+window.addEventListener('DOMContentLoaded',()=>{if(typeof renderAdhoc==='function')renderAdhoc();},false);
+setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
 </script>
 
 <!-- ── EXPENSE FAB ── -->
@@ -909,7 +945,7 @@ loadPaymentList();
     <button class="exp-close" onclick="closeExpModal()">✕</button>
   </div>
 
-  <!-- 第一層：日常費用 vs 項目費用 -->
+  <!-- 第一層：日常費用 / 項目費用 / 人事行政 -->
   <div class="exp-main-row">
     <button class="exp-main-btn active-daily" id="expBtnDaily" onclick="setExpMainType('daily')">
       日常費用
@@ -918,6 +954,10 @@ loadPaymentList();
     <button class="exp-main-btn" id="expBtnProj" onclick="setExpMainType('proj')">
       項目費用
       <div class="exp-main-desc">供應商請款・快閃・生產</div>
+    </button>
+    <button class="exp-main-btn" id="expBtnHR" onclick="setExpMainType('hr')" style="border-color:#a78bfa40;">
+      人事行政
+      <div class="exp-main-desc">聚餐・招聘・培訓・雜費</div>
     </button>
   </div>
 
@@ -940,6 +980,34 @@ loadPaymentList();
       <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
     </div>
     <div class="exp-routing" id="expRouting">送審路徑：楊子初審 → 安然複核 → 躍明付款</div>
+  </div>
+
+  <!-- 人事行政 fields -->
+  <div id="expHRFields" style="display:none;">
+    <div class="exp-field">
+      <label>申請類型</label>
+      <select id="expHRCat" onchange="updateHRRouting()">
+        <option value="meal">員工聚餐 / 公司活動</option>
+        <option value="recruit">招聘費用（人力銀行 / 獵頭）</option>
+        <option value="train">員工培訓費</option>
+        <option value="welfare">員工福利品（節慶禮品等）</option>
+        <option value="admin">人事行政雜費</option>
+      </select>
+    </div>
+    <div class="exp-field">
+      <label>說明</label>
+      <textarea id="expHRDesc" rows="2" placeholder="例：5月份員工聚餐（全員12人）/人力銀行刊登職缺60天費用…"></textarea>
+    </div>
+    <div class="exp-field"><label>金額</label>
+      <div class="exp-amt-row">
+        <input id="expHRAmt" type="number" placeholder="0.00" min="0">
+        <select id="expHRCcy"><option>TWD</option><option>RMB</option><option>USD</option></select>
+      </div>
+    </div>
+    <div class="exp-field"><label>期望付款日</label><input id="expHRDate" type="date"></div>
+    <div style="padding:8px 10px;background:#a78bfa12;border:1px solid #a78bfa30;border-radius:8px;margin-bottom:12px;font-size:11px;color:#a78bfa;line-height:1.6;" id="expHRRoutingNote">
+      送審路徑：楊子 → <strong>Ray 確認</strong> → 躍明財務付款
+    </div>
   </div>
 
   <!-- 項目費用 fields -->
@@ -1022,25 +1090,122 @@ let expType='personal';
 
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
 
+// ── Adhoc HR Requests ──────────────────────────────────────
+const ADHOC_KEY='yangzi_adhoc_v1';
+const ADHOC_DEMO=[
+  {id:'adhoc1',type:'hr',cat:'員工聚餐 / 公司活動',desc:'4月份全員聚餐（12人 @ 台北）',amt:'9600',ccy:'TWD',date:'2026-04-25',status:'approved',submittedBy:'楊子'},
+  {id:'adhoc2',type:'hr',cat:'招聘費用（人力銀行 / 獵頭）',desc:'人力銀行刊登「設計師」職缺 60天',amt:'8800',ccy:'TWD',date:'2026-05-02',status:'pending',submittedBy:'楊子'},
+];
+function loadAdhoc(){ const s=localStorage.getItem(ADHOC_KEY); if(!s){localStorage.setItem(ADHOC_KEY,JSON.stringify(ADHOC_DEMO));return ADHOC_DEMO;} return JSON.parse(s); }
+function renderAdhoc(){
+  const items=loadAdhoc();
+  const pending=items.filter(x=>x.status==='pending').length;
+  const el=document.getElementById('adhoc-list');
+  if(!el) return;
+  document.getElementById('adhoc-title').textContent=`人事行政直接申請（${pending} 件待確認）`;
+  if(!items.length){el.innerHTML='<div style="padding:14px;text-align:center;color:var(--txt-lo);font-size:12px;">尚未送出申請</div>';return;}
+  const statusStyle={
+    pending:'background:#f59e0b18;border:1px solid #f59e0b40;color:#f59e0b;',
+    approved:'background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);',
+    rejected:'background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);',
+  };
+  const statusLabel={pending:'待確認',approved:'✓ 已核准',rejected:'✗ 已退回'};
+  el.innerHTML=items.map(r=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;background:${r.status==='approved'?'var(--ok)':r.status==='rejected'?'var(--danger)':'var(--warn)'}"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;">${r.cat}</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">${r.desc||'—'} · ${r.date}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:800;color:var(--warn);margin-bottom:4px;">${r.ccy} ${parseFloat(r.amt).toLocaleString()}</div>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;${statusStyle[r.status]||statusStyle.pending}">${statusLabel[r.status]||r.status}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── OPEX Actual Edit ────────────────────────────────────────
+const OPEX_OVR_KEY='yangzi_opex_overrides_v1';
+function loadOpexOverrides(){return JSON.parse(localStorage.getItem(OPEX_OVR_KEY)||'{}');}
+function saveOpexOverrides(o){localStorage.setItem(OPEX_OVR_KEY,JSON.stringify(o));}
+
+let _opexEditEnt='';
+function openOpexEditModal(){
+  _opexEditEnt=currentOpexEntity||'北京蕪解';
+  const d=OPEX_DATA[_opexEditEnt];
+  if(!d){showToast('找不到對應資料');return;}
+  const ovr=loadOpexOverrides();
+  const entOvr=(ovr[_opexEditEnt])||{};
+  const sym=d.ccy==='TWD'?'NT$':'¥';
+  const curMoIdx=OPEX_ACTUAL_COUNT-1;
+  const curMo=OPEX_MONTHS[curMoIdx];
+  document.getElementById('opex-edit-sub').textContent=`${_opexEditEnt} · ${curMo}月 實際支出（${d.ccy}）`;
+  const INP2='padding:7px 9px;font-size:13px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:110px;outline:none;text-align:right;';
+  document.getElementById('opex-edit-rows').innerHTML = d.rows.map(r=>{
+    const storedVal=(entOvr[r.cat]!==undefined)?entOvr[r.cat]:r.data[curMoIdx+1];
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)10;">
+      <div>
+        <div style="font-size:13px;font-weight:600;">${r.cat}</div>
+        <div style="font-size:10px;color:var(--txt-lo);">預算：${sym}${(r.data['budget']||r.budget||0).toLocaleString()}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:11px;color:var(--txt-mid);">${sym}</span>
+        <input type="number" data-cat="${r.cat}" value="${storedVal}" style="${INP2}">
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('modal-opex-edit').classList.add('show');
+}
+function closeOpexEditModal(){document.getElementById('modal-opex-edit').classList.remove('show');}
+function saveOpexEdit(){
+  const ovr=loadOpexOverrides();
+  if(!ovr[_opexEditEnt]) ovr[_opexEditEnt]={};
+  document.querySelectorAll('#opex-edit-rows input[data-cat]').forEach(inp=>{
+    ovr[_opexEditEnt][inp.dataset.cat]=parseFloat(inp.value)||0;
+  });
+  saveOpexOverrides(ovr);
+  closeOpexEditModal();
+  renderOpexTable();
+  showToast('本月實際費用已更新 ✓');
+}
+
 function openExpModal(hint){
   document.getElementById('expDate').valueAsDate=new Date();
   const u=getUser();
   const supBtn=document.getElementById('expTypeSupplier');
   if(supBtn) supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
-  setExpMainType(hint==='opex'?'proj':'daily');
+  setExpMainType(hint==='hr'?'hr':hint==='opex'?'proj':'daily');
   document.getElementById('expOverlay').classList.add('open');
 }
 function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
 
 function setExpMainType(t){
   expMainType=t;
-  const isProj=t==='proj';
-  document.getElementById('expDailyFields').style.display=isProj?'none':'';
+  const isProj=t==='proj', isHR=t==='hr';
+  document.getElementById('expDailyFields').style.display=(!isProj&&!isHR)?'':'none';
   document.getElementById('expProjFields').style.display=isProj?'':'none';
-  document.getElementById('expBtnDaily').className='exp-main-btn'+(isProj?'':' active-daily');
+  document.getElementById('expHRFields').style.display=isHR?'':'none';
+  document.getElementById('expBtnDaily').className='exp-main-btn'+(!isProj&&!isHR?' active-daily':'');
   document.getElementById('expBtnProj').className='exp-main-btn'+(isProj?' active-proj':'');
-  document.getElementById('expSheetTitle').textContent=isProj?'項目費用申請':'日常費用申請';
+  document.getElementById('expBtnHR').className='exp-main-btn'+(isHR?' active-proj':'');
+  if(isHR) document.getElementById('expBtnHR').style.cssText=isHR?'border-color:#a78bfa;background:#a78bfa12;color:#a78bfa;':'border-color:#a78bfa40;';
+  const titles={proj:'項目費用申請',hr:'人事行政申請',daily:'日常費用申請'};
+  document.getElementById('expSheetTitle').textContent=titles[t]||'費用申請';
   if(isProj) onProjEntityChange();
+  if(isHR){ document.getElementById('expHRDate').valueAsDate=new Date(); updateHRRouting(); }
+}
+function updateHRRouting(){
+  const cat=document.getElementById('expHRCat')?.value;
+  const note=document.getElementById('expHRRoutingNote');
+  if(!note) return;
+  const routingMap={
+    recruit:'招聘費通常較大・送審路徑：楊子 → <strong>Ray 確認</strong> → 躍明付款',
+    train:'送審路徑：楊子 → <strong>Ray 確認</strong> → 躍明付款',
+    meal:'送審路徑：楊子 → <strong>Ray 或 Shawn 確認</strong> → 躍明付款',
+    welfare:'送審路徑：楊子 → <strong>Ray 確認</strong> → 躍明付款',
+    admin:'送審路徑：楊子 → <strong>Ray 確認</strong> → 躍明付款',
+  };
+  note.innerHTML=routingMap[cat]||routingMap.admin;
 }
 
 function setExpType(t){
@@ -1096,6 +1261,29 @@ function submitExpense(){
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
 
+  if(expMainType==='hr'){
+    const catSel=document.getElementById('expHRCat');
+    const cat=catSel?catSel.options[catSel.selectedIndex].text:'人事費用';
+    const desc=document.getElementById('expHRDesc').value;
+    const amt=document.getElementById('expHRAmt').value;
+    const ccy=document.getElementById('expHRCcy').value;
+    const date=document.getElementById('expHRDate').value;
+    if(!amt){(window.showToast||alert)('請填寫金額');return;}
+    const rec={id:'adhoc'+Date.now(), type:'hr', cat, desc, amt, ccy, date, status:'pending', submittedBy:u, ts:Date.now()};
+    const adhocKey='yangzi_adhoc_v1';
+    const adhocs=JSON.parse(localStorage.getItem(adhocKey)||'[]');
+    adhocs.unshift(rec);
+    localStorage.setItem(adhocKey, JSON.stringify(adhocs));
+    if(typeof renderAdhoc==='function') renderAdhoc();
+    if(window._yzWriteApproval) window._yzWriteApproval({
+      '審批標題':`【人事行政】${cat} ${amt}${ccy}`,
+      '審批類型':'人事行政申請','申請人':u,'申請日期':Date.now(),
+      '金額':parseFloat(amt)||0,'幣別':ccy,'審批人':'Ray',
+      '審批狀態':'待審批','申請說明':desc||cat});
+    closeExpModal();
+    (window.showToast||alert)(`✅ 已送出：${cat} ${ccy}${parseFloat(amt).toLocaleString()} · 待 Ray 確認`);
+    return;
+  }
   if(expMainType==='proj'){
     const ent=document.getElementById('expProjEntity').value;
     const blId=document.getElementById('expProjBudgetLine').value;
@@ -1148,6 +1336,13 @@ window.submitExpense=submitExpense;
 window.onProjEntityChange=onProjEntityChange;
 window.showBudgetInline=showBudgetInline;
 window.updateBudgetRemaining=updateBudgetRemaining;
+window.updateHRRouting=updateHRRouting;
+window.renderAdhoc=renderAdhoc;
+window.openOpexEditModal=openOpexEditModal;
+window.closeOpexEditModal=closeOpexEditModal;
+window.saveOpexEdit=saveOpexEdit;
+// init adhoc list now that DOM is ready
+renderAdhoc();
 })();
 </script>
 
