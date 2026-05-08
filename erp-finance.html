@@ -824,13 +824,28 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ══ TAB: 項目 P&L ══ -->
   <div class="tab-panel" id="tab-project">
-    <div style="font-size:10px;color:var(--txt-lo);margin-bottom:12px;padding:8px 12px;background:var(--card2);border-radius:7px;border-left:3px solid var(--accent);">
-      🎯 每個項目獨立核算：收入 − 貨成 − 版稅 − 倉運 = <strong style="color:var(--accent)">項目毛利</strong>，點擊展開看各科目明細。
+    <!-- 視圖切換 -->
+    <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <button class="bf-chip active" id="projv-actual-btn" onclick="switchProjView('actual',this)">📊 項目實績</button>
+      <button class="bf-chip" id="projv-budget-btn" onclick="switchProjView('budget',this)">📋 預算規劃</button>
     </div>
-    <div class="export-row">
-      <button class="export-btn" onclick="_exportProjectCSV()">⬇ 匯出 CSV</button>
+
+    <!-- 視圖 A：項目實績 -->
+    <div id="proj-view-actual">
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:12px;padding:8px 12px;background:var(--card2);border-radius:7px;border-left:3px solid var(--accent);">
+        🎯 每個項目獨立核算：收入 − 貨成 − 版稅 − 倉運 = <strong style="color:var(--accent)">項目毛利</strong>，點擊展開看各科目明細。
+      </div>
+      <div class="export-row">
+        <button class="export-btn" onclick="_exportProjectCSV()">⬇ 匯出 CSV</button>
+      </div>
+      <div id="project-pl-list"></div>
     </div>
-    <div id="project-pl-list"></div>
+
+    <!-- 視圖 B：預算規劃 -->
+    <div id="proj-view-budget" style="display:none;">
+      <div id="project-budget-view"></div>
+    </div>
+
   </div><!-- /tab-project -->
 
   <!-- ══ TAB: 損益表 ══ -->
@@ -1908,6 +1923,87 @@ function renderProjectPL(){
       </div>
     </div>`;
   }).join('');
+}
+
+function switchProjView(view, btn){
+  document.getElementById('proj-view-actual').style.display=view==='actual'?'':'none';
+  document.getElementById('proj-view-budget').style.display=view==='budget'?'':'none';
+  document.querySelectorAll('#tab-project .bf-chip').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(view==='budget') renderProjectBudget();
+}
+
+const PROJ_BUDGET_TYPES=[
+  {type:'w',icon:'📦',label:'批發',color:'var(--ok)',
+   annual:{rev:2400,gp_pct:35}, h1:{rev:550,cogs:295}, h1_done:true,
+   h2_projects:[
+    {name:'吉依卡哇·批發 Q3',entity:'香港JV',rev:480,cogs:264,opex:38},
+    {name:'吉依卡哇·批發 Q4',entity:'香港JV',rev:420,cogs:231,opex:32},
+    {name:'Snoopy·批發 H2',entity:'香港JV / 北京蕪解',rev:300,cogs:165,opex:22},
+  ]},
+  {type:'f',icon:'🏪',label:'快閃',color:'var(--warn)',
+   annual:{rev:1000,gp_pct:32}, h1:{rev:533,cogs:263}, h1_done:true,
+   h2_projects:[
+    {name:'Muziktiger·曼谷快閃 Q3',entity:'UJ BKK',rev:280,cogs:140,opex:65},
+    {name:'新 IP·北京快閃 Q4',entity:'北京蕪解',rev:200,cogs:100,opex:50},
+  ]},
+  {type:'e',icon:'🛒',label:'電商',color:'var(--fin)',
+   annual:{rev:200,gp_pct:22}, h1:{rev:42,cogs:26}, h1_done:false,
+   h2_projects:[
+    {name:'大陸旗艦店 H2 持續',entity:'深圳子公司',rev:158,cogs:95,opex:20},
+  ]},
+];
+
+function renderProjectBudget(){
+  const el=document.getElementById('project-budget-view');
+  if(!el) return;
+  const cards=PROJ_BUDGET_TYPES.map(t=>{
+    const h1pct=t.annual.rev>0?Math.round(t.h1.rev/t.annual.rev*100):0;
+    const h2rev=t.h2_projects.reduce((s,p)=>s+p.rev,0);
+    const remaining=t.annual.rev-t.h1.rev;
+    const projRows=t.h2_projects.map(p=>{
+      const gp=p.rev-p.cogs;
+      const gpp=Math.round(gp/p.rev*100);
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--txt-hi);">${p.name}</div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">${p.entity}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;font-weight:800;color:${t.color};">¥${p.rev}萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);">毛利率目標 ${gpp}%</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:18px;">${t.icon}</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:${t.color};">${t.label}業務</div>
+            <div style="font-size:10px;color:var(--txt-lo);">年度目標 ¥${t.annual.rev}萬 · 毛利率 ${t.annual.gp_pct}%</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;color:var(--txt-lo);">H1已入帳</div>
+          <div style="font-size:16px;font-weight:800;color:var(--txt-hi);">¥${t.h1.rev}萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);">${h1pct}% of 年度</div>
+        </div>
+      </div>
+      <div style="background:var(--card2);border-radius:6px;height:6px;overflow:hidden;margin-bottom:10px;">
+        <div style="height:100%;width:${Math.min(h1pct,100)}%;background:${t.color};transition:width .4s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo);margin-bottom:10px;">
+        <span>H2 計劃收入：<strong style="color:var(--txt-hi);">¥${h2rev}萬</strong></span>
+        <span>年度剩餘預算空間：<strong style="color:${t.color};">¥${remaining}萬</strong></span>
+      </div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);margin-bottom:2px;letter-spacing:.04em;">H2 計畫項目</div>
+      ${projRows}
+    </div>`;
+  }).join('');
+  el.innerHTML=cards+`<div style="text-align:center;padding:16px;">
+    <a href="erp-budget-planner.html" style="display:inline-block;padding:10px 24px;background:var(--card2);border:1.5px solid var(--border);border-radius:20px;color:var(--accent);font-size:12px;font-weight:700;text-decoration:none;">前往完整預算規劃器 →</a>
+  </div>`;
 }
 
 function _exportProjectCSV(){
