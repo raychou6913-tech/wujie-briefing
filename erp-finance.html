@@ -171,6 +171,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .bf-label{font-size:10px;color:var(--txt-lo);font-weight:700;}
 .bf-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;transition:all .15s;}
 .bf-chip.active{background:var(--fin-dim);border-color:var(--fin);color:var(--fin);}
+.cash-ent-btn{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px;text-align:left;cursor:pointer;width:100%;transition:border-color .15s;}
+.cash-ent-btn.active{border-color:var(--ok);}
+.cash-ent-btn:hover:not(.active){border-color:var(--border-hi);}
 .ba-section{margin-bottom:16px;}
 .ba-sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card2);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;}
 .ba-sec-title{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
@@ -780,24 +783,27 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
-  <!-- 法人分欄摘要 -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-    <div style="background:var(--card);border:1px solid var(--ok);border-radius:10px;padding:12px;">
+  <!-- 法人分欄摘要（可點選篩選明細）-->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+    <button class="cash-ent-btn active" onclick="setCashEntity('all',this)">
       <div style="font-size:9px;font-weight:700;color:var(--ok);margin-bottom:6px;">香港JV ＋ 深圳（VAM考核）</div>
       <div style="font-size:18px;font-weight:800;color:var(--ok);">¥ 262 萬</div>
       <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">YTD 淨利</div>
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;">
+    </button>
+    <button class="cash-ent-btn" onclick="setCashEntity('bj',this)">
       <div style="font-size:9px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;">北京蕪解（服務商）</div>
       <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">¥ 38 萬</div>
       <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">YTD 服務費收入</div>
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;">
+    </button>
+    <button class="cash-ent-btn" onclick="setCashEntity('tw',this)">
       <div style="font-size:9px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;">台灣悍草 ＋ UJ BKK</div>
       <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">THB 1.2M</div>
       <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">快閃店代運營收入</div>
-    </div>
+    </button>
   </div>
+
+  <!-- 現金流彙總表（月份橫排）-->
+  <div id="cash-cf-table"></div>
 
   <!-- 篩選 + 匯出 -->
   <div class="export-row">
@@ -1412,7 +1418,7 @@ function switchTab(tab){
   if(tab==='pending') loadPendingList();
   if(tab==='project') renderProjectPL();
   if(tab==='pl'){ loadBudgetAchievement(); renderMgmtPL('ytd'); }
-  if(tab==='cash') renderCashTxList('all');
+  if(tab==='cash'){ renderCashTable(); renderCashTxList('all'); }
 }
 function prefillAndScrollToForm(company, month){
   const sel=document.getElementById('cf-company');
@@ -2094,18 +2100,54 @@ const CASH_TX={
 };
 
 let _cashFilter='all';
+let _cashEntity='all';
+
+function setCashEntity(ent,btn){
+  _cashEntity=ent;
+  document.querySelectorAll('.cash-ent-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCashTable();
+  renderCashTxList(_cashFilter);
+}
 function filterCash(f,btn){
   _cashFilter=f;
   document.querySelectorAll('.cf-filter .bf-chip').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   renderCashTxList(f);
 }
+
+function renderCashTable(){
+  const el=document.getElementById('cash-cf-table');
+  if(!el) return;
+  const data=CASH_2026;
+  const sc='background:var(--card2);position:sticky;left:0;z-index:1;padding:5px 10px;font-size:10px;color:var(--txt-mid);white-space:nowrap;border-right:1px solid var(--border);font-weight:600;';
+  const ths=data.map(m=>`<th style="padding:5px 8px;font-size:10px;font-weight:700;color:${m.future?'var(--txt-lo)':'var(--txt-mid)'};white-space:nowrap;${m.future?'font-style:italic':''}">${m.mo}${m.future?'<span style="color:var(--accent);font-size:8px;margin-left:1px;">預</span>':''}</th>`).join('');
+  const rowIn=data.map(m=>`<td style="padding:5px 8px;text-align:right;font-size:11px;color:var(--ok);font-weight:700;${m.future?'opacity:0.55':''}">+${m.in}</td>`).join('');
+  const rowOut=data.map(m=>`<td style="padding:5px 8px;text-align:right;font-size:11px;color:var(--danger);${m.future?'opacity:0.55':''}">−${m.out}</td>`).join('');
+  const rowNet=data.map(m=>`<td style="padding:5px 8px;text-align:right;font-size:11px;font-weight:800;color:${m.net>=0?'var(--ok)':'var(--danger)'};border-top:1px ${m.future?'dashed':'solid'} var(--border);${m.future?'opacity:0.55':''}">${m.net>=0?'+':''}${m.net}</td>`).join('');
+  el.innerHTML=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:4px;border-radius:10px;border:1px solid var(--border);">
+    <table style="width:max-content;min-width:100%;border-collapse:collapse;">
+      <thead style="background:var(--card2);">
+        <tr><th style="${sc}font-weight:700;color:var(--txt-lo);">科目</th>${ths}</tr>
+      </thead>
+      <tbody>
+        <tr><td style="${sc}">入帳（萬）</td>${rowIn}</tr>
+        <tr><td style="${sc}">出帳（萬）</td>${rowOut}</tr>
+        <tr><td style="${sc}font-weight:800;">淨現金（萬）</td>${rowNet}</tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:9px;color:var(--txt-lo);margin-bottom:10px;padding:0 2px;"><span style="color:var(--accent);font-style:italic;margin-right:2px;">預</span>= 預測值 · 滑動查看全年 · 實際入帳以下方明細為準</div>`;
+}
+
 function renderCashTxList(filter){
   const el=document.getElementById('cash-tx-list');
   if(!el) return;
   const months=Object.keys(CASH_TX);
-  el.innerHTML=months.map(mo=>{
-    const allTx=CASH_TX[mo];
+  const result=months.map(mo=>{
+    let allTx=CASH_TX[mo];
+    if(_cashEntity==='bj') allTx=allTx.filter(t=>t.sub.includes('北京蕪解'));
+    else if(_cashEntity==='tw') allTx=allTx.filter(t=>t.sub.includes('台灣')||t.sub.includes('BKK'));
     const tx=filter==='all'?allTx:filter==='rev'?allTx.filter(t=>t.dir==='+'):filter==='exp'?allTx.filter(t=>t.dir==='−'):allTx.filter(t=>t.dir==='←→');
     if(!tx.length) return '';
     const totIn=tx.filter(t=>t.dir==='+').reduce((s,t)=>s+t.amt,0);
@@ -2135,6 +2177,7 @@ function renderCashTxList(filter){
       </div>
       <div class="tx-list" id="${id}">${rows}</div>`;
   }).join('');
+  el.innerHTML=result||`<div style="text-align:center;padding:32px 16px;color:var(--txt-lo);font-size:12px;border:1px dashed var(--border);border-radius:10px;">此主體暫無交易記錄<br><span style="font-size:10px;opacity:0.7;margin-top:4px;display:block;">API 接入後將顯示真實數據</span></div>`;
 }
 function toggleTxGroup(id,hdr){
   const list=document.getElementById(id);
@@ -2249,6 +2292,7 @@ function setCashRange(range, btn){
 setCashRange('month', null);
 // init first visible tab
 loadPendingList();
+renderCashTable();
 renderCashTxList('all');
 </script>
 </body>
