@@ -246,8 +246,12 @@ function logout(){ localStorage.removeItem('erp_sess'); location.href='login.htm
 
 document.getElementById('tb-user').textContent = SESS.name + ' · ' + SESS.role;
 
-// ── IP版權截止警報 ──────────────────────────────────────
-const IP_ALERTS = [
+// ── IP版權截止警報（有飛書 demo 資料的 IP 才列入；Miffy 無資料已移除）──
+const _PL_PROXY='https://feishu-proxy.raychou6913.workers.dev';
+const _PL_AT='Sg7ObNELHaAdZzshGIFjWPVhpce';
+const _PL_CONTRACT_TBL='tblWn4PwOVRgt7c1';
+
+let IP_ALERTS = [
   {
     ip:'Muziktiger', color:'#ef4444',
     event:'版權送審回覆截止',
@@ -256,24 +260,26 @@ const IP_ALERTS = [
     action:'追蹤中', actionColor:'#ef4444',
   },
   {
-    ip:'Miffy (Mercis)', color:'#0284c7',
-    event:'版權費確認截止',
-    meta:'本季版權費金額需與安然核對後送 Mercis 確認',
-    daysLeft:12, urgency:'warn',
-    action:'待確認', actionColor:'#f59e0b',
+    ip:'Mofusand（貓福珊迪）', color:'#9333ea',
+    event:'2D 送審回覆催辦',
+    meta:'10月款 2D 稿已提交，5/12 催辦截止，請跟進版權方回覆',
+    daysLeft:4, urgency:'warn',
+    action:'催辦中', actionColor:'#f59e0b',
   },
   {
-    ip:'貓福珊迪 (Sanrio)', color:'#9333ea',
-    event:'Q3 送審包截止',
-    meta:'夏日系列 + 文創組合，送審包需在 5/30 前遞交',
-    daysLeft:23, urgency:'ok',
-    action:'準備中', actionColor:'#22c55e',
+    ip:'Opanchu（褲褲兔）', color:'#f59e0b',
+    event:'合約到期預警',
+    meta:'授權合約 2026-09-30 到期，建議 7 月前啟動續約洽談',
+    daysLeft:145, urgency:'ok',
+    action:'續約籌備', actionColor:'#22c55e',
   },
 ];
 
-function renderIpAlerts(){
+function renderIpAlerts(alerts){
+  const arr = alerts || IP_ALERTS;
   const el = document.getElementById('ip-alert-list');
-  el.innerHTML = IP_ALERTS.map(a=>{
+  if(!el) return;
+  el.innerHTML = arr.map(a=>{
     const dayLabel = a.daysLeft<0
       ? `<span style="color:var(--danger);font-weight:800;">逾期 ${Math.abs(a.daysLeft)} 天</span>`
       : `<span style="color:${a.daysLeft<=14?'var(--warn)':'var(--txt-mid)'};">剩 ${a.daysLeft} 天</span>`;
@@ -289,6 +295,40 @@ function renderIpAlerts(){
       </div>
     </div>`;
   }).join('');
+}
+
+async function loadContractAlerts(){
+  try{
+    const tr=await fetch(_PL_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const {tenant_access_token:tk}=await tr.json();
+    const res=await fetch(_PL_PROXY+'/open-apis/bitable/v1/apps/'+_PL_AT+'/tables/'+_PL_CONTRACT_TBL+'/records?page_size=100',
+      {headers:{'Authorization':'Bearer '+tk}});
+    const {data}=await res.json();
+    const items=(data&&data.items)||[];
+    if(!items.length) return;
+    const now=Date.now();
+    const fn=(f,keys)=>{for(const k of keys){const v=f[k];if(v!=null){return typeof v==='object'?(v.text||v.value||''):String(v);}}return '';};
+    const apiAlerts=items.map(item=>{
+      const f=item.fields;
+      const ipName=fn(f,['IP名稱','授權IP','IP','合約名稱','標題']);
+      const expiryRaw=fn(f,['合約截止日','到期日','合約到期日','截止日期','授權到期']);
+      if(!ipName||!expiryRaw) return null;
+      const exStr=isNaN(Number(expiryRaw))
+        ?String(expiryRaw).slice(0,10)
+        :new Date(Number(expiryRaw)).toISOString().slice(0,10);
+      const daysLeft=Math.round((new Date(exStr).getTime()-now)/86400000);
+      if(daysLeft>180) return null;
+      const color=daysLeft<60?'#ef4444':'#f59e0b';
+      return {ip:ipName,color,event:'合約到期預警',meta:`授權合約 ${exStr} 到期`,
+        daysLeft,urgency:daysLeft<60?'urgent':'warn',
+        action:daysLeft<60?'立即洽談續約':'籌備續約',actionColor:color};
+    }).filter(Boolean);
+    if(apiAlerts.length){
+      const nonExpiry=IP_ALERTS.filter(a=>a.event!=='合約到期預警');
+      const merged=[...nonExpiry,...apiAlerts].sort((a,b)=>a.daysLeft-b.daysLeft);
+      renderIpAlerts(merged);
+    }
+  }catch(e){/* silent — stay on fallback */}
 }
 
 // ── Task Data ──────────────────────────────────────────────
@@ -548,6 +588,7 @@ function showToast(msg){
 }
 
 render();
+loadContractAlerts();
 </script>
 
 <!-- ── EXPENSE FAB ── -->
