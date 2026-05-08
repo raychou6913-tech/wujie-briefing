@@ -876,7 +876,52 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <span style="font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.04em;">管理損益表（非 GAAP · 管理用途）</span>
         <button class="export-btn" onclick="_exportPLCSV()" style="font-size:10px;padding:3px 10px;">⬇ CSV</button>
       </div>
+      <!-- 主體切換 -->
+      <div id="pl-entity-tabs" style="display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:nowrap;">
+        <button class="pl-ent-btn active" onclick="setPLEntity('合併',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:var(--fin-dim);color:var(--fin);cursor:pointer;white-space:nowrap;">合併（全集團）</button>
+        <button class="pl-ent-btn" onclick="setPLEntity('香港JV',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">香港JV</button>
+        <button class="pl-ent-btn" onclick="setPLEntity('深圳子公司',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">深圳子公司</button>
+        <button class="pl-ent-btn" onclick="setPLEntity('北京蕪解',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">北京蕪解</button>
+        <button class="pl-ent-btn" onclick="setPLEntity('台灣悍草',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">台灣悍草</button>
+        <button class="pl-ent-btn" onclick="setPLEntity('UJ BKK',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">UJ BKK</button>
+      </div>
+      <div id="pl-entity-note" style="display:none;padding:6px 14px;font-size:10px;color:var(--txt-lo);background:#ffffff04;border-bottom:1px solid var(--border);line-height:1.5;"></div>
       <div id="mgmt-pl-table"></div>
+    </div>
+
+    <!-- 庫存資產快覽 -->
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);">
+        <div>
+          <span style="font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.04em;">庫存資產快覽</span>
+          <span style="margin-left:8px;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:#f59e0b20;color:#f59e0b;letter-spacing:.04em;">Balance Sheet 項目</span>
+        </div>
+        <a href="erp-gaowei.html" style="font-size:10px;color:var(--fin);text-decoration:none;">→ 高維庫存台</a>
+      </div>
+      <div style="padding:10px 12px 4px;font-size:10px;color:var(--txt-lo);line-height:1.6;background:#f59e0b08;border-bottom:1px solid var(--border)20;">
+        ⚠️ 庫存為資產負債表項目，<strong style="color:var(--txt-mid);">未出售前不計入損益表</strong>。貨物銷出後，對應成本轉入 COGS，才影響毛利。以下數字為參考，不含在上方損益表中。
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0;border-bottom:1px solid var(--border);">
+        <div style="padding:14px 16px;border-right:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">批發庫存（含在途）</div>
+          <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">¥68.4 <span style="font-size:12px;font-weight:400;color:var(--txt-mid);">萬</span></div>
+          <div style="margin-top:4px;font-size:10px;color:var(--txt-lo);">成本計價・現貨+在途合計</div>
+          <div style="margin-top:8px;font-size:10px;color:var(--ok);">潛在毛利 ¥45.6 萬（毛利率約 40%）</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">快閃店備貨（未售出）</div>
+          <div style="font-size:18px;font-weight:800;color:var(--txt-hi);">¥38.2 <span style="font-size:12px;font-weight:400;color:var(--txt-mid);">萬</span></div>
+          <div style="margin-top:4px;font-size:10px;color:var(--txt-lo);">成本計價・北京倉+泰國倉</div>
+          <div style="margin-top:8px;font-size:10px;color:var(--ok);">潛在毛利 ¥37.8 萬（毛利率約 50%）</div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="font-size:11px;font-weight:700;color:var(--txt-mid);">庫存資產合計</span>
+          <span style="margin-left:10px;font-size:14px;font-weight:800;color:#f59e0b;">¥106.6 萬</span>
+        </div>
+        <div style="font-size:10px;color:var(--txt-lo);">潛在收入 ¥152 萬・資料來源：高維庫存台</div>
+      </div>
     </div>
 
     <!-- 分隔線 -->
@@ -2039,7 +2084,107 @@ const PL_2026=[
   {mo:'12月',revW:200,revF:45, revIP:0, revEC:25, cogs:185,opex:36,tax:0, future:true},
 ];
 
+// Per-entity P&L data (standalone, intercompany NOT eliminated)
+// 北京/台灣 revW = service fee income from JV; 合併 view eliminates these
+const PL_ENTITIES={
+  '香港JV':[
+    {mo:'1月', revW:236,revF:0,  revIP:0, revEC:0,  cogs:160,opex:8, tax:3, future:false},
+    {mo:'2月', revW:138,revF:0,  revIP:12,revEC:0,  cogs:106,opex:8, tax:0, future:false},
+    {mo:'3月', revW:149,revF:0,  revIP:0, revEC:0,  cogs:125,opex:9, tax:2, future:false},
+    {mo:'4月', revW:160,revF:0,  revIP:0, revEC:0,  cogs:185,opex:10,tax:4, future:false},
+    {mo:'5月', revW:228,revF:0,  revIP:0, revEC:0,  cogs:163,opex:9, tax:3, future:false},
+    {mo:'6月', revW:168,revF:0,  revIP:0, revEC:0,  cogs:152,opex:9, tax:0, future:true},
+    {mo:'7月', revW:184,revF:0,  revIP:0, revEC:0,  cogs:162,opex:9, tax:0, future:true},
+    {mo:'8月', revW:148,revF:0,  revIP:0, revEC:0,  cogs:136,opex:8, tax:0, future:true},
+    {mo:'9月', revW:200,revF:0,  revIP:0, revEC:0,  cogs:192,opex:10,tax:0, future:true},
+    {mo:'10月',revW:180,revF:0,  revIP:0, revEC:0,  cogs:166,opex:9, tax:0, future:true},
+    {mo:'11月',revW:204,revF:0,  revIP:108,revEC:0, cogs:178,opex:9, tax:0, future:true},
+    {mo:'12月',revW:160,revF:0,  revIP:0, revEC:0,  cogs:144,opex:8, tax:0, future:true},
+  ],
+  '深圳子公司':[
+    {mo:'1月', revW:59, revF:0,  revIP:0, revEC:0,  cogs:42, opex:9, tax:1, future:false},
+    {mo:'2月', revW:35, revF:0,  revIP:0, revEC:0,  cogs:28, opex:9, tax:0, future:false},
+    {mo:'3月', revW:37, revF:0,  revIP:0, revEC:12, cogs:36, opex:10,tax:1, future:false},
+    {mo:'4月', revW:40, revF:0,  revIP:0, revEC:25, cogs:56, opex:11,tax:2, future:false},
+    {mo:'5月', revW:57, revF:0,  revIP:0, revEC:25, cogs:42, opex:10,tax:2, future:false},
+    {mo:'6月', revW:42, revF:0,  revIP:0, revEC:20, cogs:40, opex:10,tax:0, future:true},
+    {mo:'7月', revW:46, revF:0,  revIP:0, revEC:25, cogs:42, opex:10,tax:0, future:true},
+    {mo:'8月', revW:37, revF:0,  revIP:0, revEC:20, cogs:36, opex:9, tax:0, future:true},
+    {mo:'9月', revW:50, revF:0,  revIP:0, revEC:30, cogs:50, opex:11,tax:0, future:true},
+    {mo:'10月',revW:45, revF:0,  revIP:0, revEC:25, cogs:42, opex:10,tax:0, future:true},
+    {mo:'11月',revW:51, revF:0,  revIP:0, revEC:25, cogs:46, opex:10,tax:0, future:true},
+    {mo:'12月',revW:40, revF:0,  revIP:0, revEC:25, cogs:38, opex:9, tax:0, future:true},
+  ],
+  '北京蕪解':[
+    {mo:'1月', revW:20, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:16,tax:0, future:false},
+    {mo:'2月', revW:20, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:16,tax:0, future:false},
+    {mo:'3月', revW:21, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:16,tax:0, future:false},
+    {mo:'4月', revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:18,tax:0, future:false},
+    {mo:'5月', revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:18,tax:0, future:false},
+    {mo:'6月', revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:18,tax:0, future:true},
+    {mo:'7月', revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:18,tax:0, future:true},
+    {mo:'8月', revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:16,tax:0, future:true},
+    {mo:'9月', revW:23, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:20,tax:0, future:true},
+    {mo:'10月',revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:18,tax:0, future:true},
+    {mo:'11月',revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:18,tax:0, future:true},
+    {mo:'12月',revW:22, revF:0,  revIP:0, revEC:0,  cogs:0,  opex:16,tax:0, future:true},
+  ],
+  '台灣悍草':[
+    {mo:'1月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'2月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'3月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'4月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'5月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'6月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+    {mo:'7月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+    {mo:'8月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+    {mo:'9月', revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+    {mo:'10月',revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+    {mo:'11月',revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+    {mo:'12月',revW:7,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:true},
+  ],
+  'UJ BKK':[
+    {mo:'1月', revW:0,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'2月', revW:0,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'3月', revW:0,  revF:50, revIP:0, revEC:0,  cogs:40, opex:8, tax:0, future:false},
+    {mo:'4月', revW:0,  revF:160,revIP:0, revEC:0,  cogs:128,opex:10,tax:0, future:false},
+    {mo:'5月', revW:0,  revF:0,  revIP:0, revEC:0,  cogs:0,  opex:5, tax:0, future:false},
+    {mo:'6月', revW:0,  revF:50, revIP:0, revEC:0,  cogs:40, opex:8, tax:0, future:true},
+    {mo:'7月', revW:0,  revF:50, revIP:0, revEC:0,  cogs:40, opex:8, tax:0, future:true},
+    {mo:'8月', revW:0,  revF:45, revIP:0, revEC:0,  cogs:36, opex:7, tax:0, future:true},
+    {mo:'9月', revW:0,  revF:100,revIP:0, revEC:0,  cogs:82, opex:10,tax:0, future:true},
+    {mo:'10月',revW:0,  revF:60, revIP:0, revEC:0,  cogs:48, opex:8, tax:0, future:true},
+    {mo:'11月',revW:0,  revF:65, revIP:0, revEC:0,  cogs:52, opex:8, tax:0, future:true},
+    {mo:'12月',revW:0,  revF:45, revIP:0, revEC:0,  cogs:36, opex:7, tax:0, future:true},
+  ],
+};
+
+const PL_ENTITY_NOTES={
+  '合併':'合併口徑已消除集團內部公司間交易（服務費、管理費）。',
+  '香港JV':'主要收入：批發出口、IP授權費。COGS含版稅及採購成本。',
+  '深圳子公司':'主要收入：大陸電商平台及部分境內批發。',
+  '北京蕪解':'收入為向香港JV收取的服務費（含採購執行、運營支持）。合併口徑下已消除。',
+  '台灣悍草':'收入為向香港JV收取的設計及管理服務費。合併口徑下已消除。',
+  'UJ BKK':'收入來自曼谷快閃店零售業績。固定成本含場地租金、Shawn團隊薪資。',
+};
+
 let _plRange='ytd';
+let _plEntity='合併';
+
+function setPLEntity(ent,btn){
+  _plEntity=ent;
+  document.querySelectorAll('#pl-entity-tabs .pl-ent-btn').forEach(b=>{
+    b.style.background='transparent';b.style.color='var(--txt-mid)';b.style.borderColor='var(--border)';
+  });
+  if(btn){btn.style.background='var(--fin-dim)';btn.style.color='var(--fin)';btn.style.borderColor='var(--fin)';}
+  const noteEl=document.getElementById('pl-entity-note');
+  if(noteEl){
+    noteEl.style.display='block';
+    noteEl.textContent=PL_ENTITY_NOTES[ent]||'';
+  }
+  renderMgmtPL(_plRange);
+}
+
 function setPLRange(range,btn){
   _plRange=range;
   document.querySelectorAll('#pl-range-bar .range-btn').forEach(b=>b.classList.remove('active'));
@@ -2048,10 +2193,11 @@ function setPLRange(range,btn){
 }
 
 function _plMonths(range){
-  if(range==='ytd') return PL_2026.filter(m=>!m.future);
-  if(range==='month') return [PL_2026[4]];
-  if(range==='q2') return PL_2026.slice(3,6);
-  return PL_2026;
+  const src=(_plEntity&&_plEntity!=='合併'&&PL_ENTITIES[_plEntity])?PL_ENTITIES[_plEntity]:PL_2026;
+  if(range==='ytd') return src.filter(m=>!m.future);
+  if(range==='month') return [src[4]];
+  if(range==='q2') return src.slice(3,6);
+  return src;
 }
 
 function renderMgmtPL(range){
@@ -2078,6 +2224,8 @@ function renderMgmtPL(range){
     <div class="report-kpi"><div class="rk-label">淨利（管理口徑）</div><div class="rk-val" style="color:${net>=0?'var(--ok)':'var(--danger)'}">${net>=0?'¥'+net+' 萬':'−¥'+Math.abs(net)+' 萬'}</div><div class="rk-trend ${net>=0?'ok':'danger'}">淨利率 ${netPct}%</div></div>`;
 
   // P&L table
+  const isServiceEnt=(_plEntity==='北京蕪解'||_plEntity==='台灣悍草');
+  const revWLabel=isServiceEnt?'服務費收入（向JV收取）':'批發業務收入';
   const hasFuture=months.some(m=>m.future);
   const moLabels=months.map(m=>`<th>${m.mo}${m.future?'<br><span style="font-size:8px;color:var(--txt-lo)">(預)</span>':''}</th>`).join('');
   const mkRow=(label,vals,cls,indent)=>{
@@ -2118,7 +2266,7 @@ function renderMgmtPL(range){
     </tr></thead>
     <tbody>
     ${mkHdrRow('▲ 收入')}
-    ${mkValRow('批發業務收入',revWv,()=>'var(--ok)',true,false)}
+    ${mkValRow(revWLabel,revWv,()=>'var(--ok)',true,false)}
     ${mkValRow('快閃店收入',revFv,()=>'var(--ok)',true,false)}
     ${mkValRow('IP授權費收入',revIPv,()=>'var(--ok)',true,false)}
     ${mkValRow('電商收入（大陸）',revECv,()=>'var(--ok)',true,false)}
