@@ -1391,27 +1391,12 @@ function _bizFullTable(yearGroups){
 }
 
 function setBizRange(range,btn){
+  // biz-content tab removed; function kept for backward compat
   document.querySelectorAll('#biz-range-bar .range-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  const el=document.getElementById('biz-content');
-  if(range==='month'){
-    const m=BIZ_2026[4];
-    el.innerHTML=_bizKpis([m]);
-  } else if(range==='quarter'){
-    const q=BIZ_2026.slice(3,6);
-    el.innerHTML=_bizKpis(q)+_bizMiniTable(q);
-  } else if(range==='year'){
-    el.innerHTML=_bizKpis(BIZ_2026)+_bizFullTable([{year:'2026',months:BIZ_2026,isCurrent:true}]);
-  } else {
-    el.innerHTML=_bizFullTable([
-      {year:'2025',months:BIZ_2025,isCurrent:false},
-      {year:'2026',months:BIZ_2026,isCurrent:true}
-    ]);
-  }
 }
 
-// 初始化業務報表
-setBizRange('month', null);
+// biz-content tab removed; no init needed
 
 // ── 現金流月份資料（單位：萬元 RMB，現金口徑）──
 // 入帳=客戶實際到帳；出帳=供應商付款+OPEX+版稅
