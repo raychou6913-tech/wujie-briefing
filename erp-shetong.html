@@ -536,6 +536,7 @@ render();
   <div id="expPersonalFields">
     <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
     <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+    <div class="exp-field"><label>對應預算科目 <span style="color:#818cf8;font-size:9px;font-weight:700;">▸ 財務入帳用</span></label><select id="expBudgetSubject" style="background:#1e2130;border:1px solid #363b58;color:#e8eaf8;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;"><option value="">— 選擇科目（必填）—</option><option value="設計外包費">設計外包費</option><option value="行銷推廣費">行銷推廣費</option><option value="差旅費">差旅費</option><option value="辦公管銷">辦公管銷</option><option value="其他">其他（不在預算範圍）</option></select></div>
     <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
     <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
   </div>
@@ -617,8 +618,10 @@ function submitExpense(){
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
+    const subj=document.getElementById('expBudgetSubject').value;
     if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
-    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+    if(!subj){(window.showToast||window._toast||alert)('請選擇預算科目（財務入帳用）');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,subject:subj,next:r.next,cc:r.cc,ts:Date.now()};
   }else if(expType==='leave'){
     const leaveType=document.getElementById('expLeaveType').value;
     const start=document.getElementById('expLeaveStart').value;
@@ -654,7 +657,7 @@ function submitExpense(){
   _writeApproval({'標題':title,'審批標題':title,'審批類型':rec.type==='請假申請'?'其他':'費用申請',
     '申請人':applicant,'申請日期':Date.now(),'金額':amt,'幣別':ccy,
     '審批人':approver,'審批狀態':'待審批','Email已發送':'否',
-    '申請說明':rec.desc||rec.reason||`${rec.type} 申請`});
+    '申請說明':rec.desc||rec.reason||`${rec.type} 申請`,'預算科目':rec.subject||''});
 
   closeExpModal();
   (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
