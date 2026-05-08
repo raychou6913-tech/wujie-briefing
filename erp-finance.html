@@ -1500,7 +1500,7 @@ function openSubjectModal(idx,title,person,ccy,amount){
   document.getElementById('subject-modal-sub').textContent=`${person} 申請的費用，請確認入帳科目後更新預算達成表。`;
   document.getElementById('subject-expense-summary').innerHTML=
     `<strong>${title}</strong><br><span style="color:var(--ok);font-size:13px;font-weight:800;">${ccy} ${amount.toLocaleString()}</span><span style="font-size:10px;color:var(--txt-lo);margin-left:8px;">申請人：${person}</span>`;
-  document.getElementById('subject-amount-confirm').value=(amount/10000).toFixed(4);
+  document.getElementById('subject-amount-confirm').value=parseFloat((amount/10000).toFixed(4));
   document.getElementById('subject-select').value='';
   document.getElementById('subject-other-wrap').style.display='none';
   document.getElementById('subject-select').onchange=function(){
@@ -1895,7 +1895,7 @@ function renderProjectPL(){
       <div class="proj-detail">
         <div class="proj-summary">
           <div class="proj-sum-cell"><div class="psc-label">實際收入</div><div class="psc-val" style="color:var(--ok)">¥${p.rev.a}萬</div></div>
-          <div class="proj-sum-cell"><div class="psc-label">毛利（含OpEx前）</div><div class="psc-val" style="color:var(--fin)">¥${gp}萬 · ${gpPct}%</div></div>
+          <div class="proj-sum-cell"><div class="psc-label">毛利（扣COGS）</div><div class="psc-val" style="color:var(--fin)">¥${gp}萬 · ${gpPct}%</div></div>
           <div class="proj-sum-cell"><div class="psc-label">淨利（扣OpEx）</div><div class="psc-val" style="color:${net>=0?'var(--ok)':'var(--danger)'}">¥${net}萬</div></div>
         </div>
         ${itemRows}

@@ -1346,6 +1346,16 @@ Promise.allSettled([loadBudget(), loadApprovals(), loadSales()]);
     <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：Siam Paragon、曼谷物流商"></div>
     <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-BKK-2026-018"></div>
     <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>THB</option><option>RMB</option><option>TWD</option><option>HKD</option><option>USD</option></select></div></div>
+    <div class="exp-field">
+      <label>對應預算科目 <span style="color:#818cf8;font-size:9px;font-weight:700;">▸ 財務入帳用</span></label>
+      <select id="expSupBudgetSubject" style="background:#181a22;border:1px solid #222535;color:#e8eaf8;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;">
+        <option value="快閃店場地費">快閃店場地費</option>
+        <option value="採購貨款">採購貨款（備貨/代購）</option>
+        <option value="倉儲物流費">倉儲物流費</option>
+        <option value="行銷推廣費">行銷推廣費</option>
+        <option value="其他">其他（不在預算範圍）</option>
+      </select>
+    </div>
     <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
   </div>
   <div class="exp-routing" id="expRouting">送審路徑：<strong>Ray 直接批核</strong></div>
@@ -1401,10 +1411,11 @@ function submitExpense(){
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
+    const supSubj=document.getElementById('expSupBudgetSubject').value||'快閃店場地費';
     if(!supplier||!amt){(window._shToast||alert)('請填寫供應商名稱與金額');return;}
-    rec={type:'供應商付款申請',supplier,po,amt,ccy,desc,subject:'快閃店場地費'};
+    rec={type:'供應商付款申請',supplier,po,amt,ccy,desc,subject:supSubj};
     const _cy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[ccy]||'THB';
-    _shWriteApproval({'標題':`【付款】${name} ${supplier} ${amt}${ccy}`,'審批標題':`【付款】${name} ${supplier} ${amt}${ccy}`,'審批類型':'費用申請','申請人':name,'申請日期':Date.now(),'金額':parseFloat(amt)||0,'幣別':_cy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':desc||'供應商付款申請','預算科目':'快閃店場地費'});
+    _shWriteApproval({'標題':`【付款】${name} ${supplier} ${amt}${ccy}`,'審批標題':`【付款】${name} ${supplier} ${amt}${ccy}`,'審批類型':'費用申請','申請人':name,'申請日期':Date.now(),'金額':parseFloat(amt)||0,'幣別':_cy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':desc||'供應商付款申請','預算科目':supSubj});
   }
   closeExpModal();
   const msg=`✅ ${rec.type}已送出 · 待 Ray 批核`;
