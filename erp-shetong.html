@@ -239,7 +239,7 @@ const TASKS = [
     title:'夏日系列 — 第 2 輪修改稿',
     stage:'第2輪設計', stageN:2,
     urgency:'overdue',
-    deadline:'2026-05-01',  // yesterday
+    deadline:'2026-05-06',
     brief:{
       desc:'夏日主題文具組（筆記本 × 2 + 便利貼 × 3 + 鉛筆組 × 6）。主色系：珊瑚橘 × 薄荷綠。風格參考：日系雜貨感，不要卡通感過重。授權尺寸需符合 Sanrio 規範。',
       tags:['文具','夏日','珊瑚橘','薄荷綠','日系'],
@@ -257,9 +257,9 @@ const TASKS = [
     title:'聖誕限定公仔 — 概念稿（全新）',
     stage:'第1輪設計', stageN:1,
     urgency:'today',
-    deadline:'2026-05-03',
+    deadline:'2026-05-08',
     brief:{
-      desc:'Snoopy 聖誕節限定公仔，尺寸 20cm。主題：聖誕老人服裝 + 麋鹿耳朵版本各一。配色嚴格按授權色票。此次是 Peanuts 2026 聖誕系列首款，對方希望 5/5 前看到概念稿。',
+      desc:'Snoopy 聖誕節限定公仔，尺寸 20cm。主題：聖誕老人服裝 + 麋鹿耳朵版本各一。配色嚴格按授權色票。此次是 Peanuts 2026 聖誕系列首款，對方希望 5/10 前看到概念稿。',
       tags:['公仔','聖誕','限定','Peanuts授權'],
       refs:['🖼','🖼'],
     },
@@ -290,9 +290,19 @@ let doneSet = new Set(JSON.parse(localStorage.getItem(DONE_KEY)||'[]'));
 let currentUploadId = null;
 
 // ── Render ─────────────────────────────────────────────────
+function computeUrgency(t){
+  if(t.urgency==='waiting') return 'waiting';
+  if(!t.deadline) return t.urgency;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const due=new Date(t.deadline);
+  if(due<today) return 'overdue';
+  if(due.getTime()===today.getTime()) return 'today';
+  return t.urgency==='overdue'?'ok':t.urgency;
+}
 function render(){
   const today = new Date().toISOString().slice(0,10);
-  const active = TASKS.filter(t=>!doneSet.has(t.id));
+  const activeTasks = TASKS.filter(t=>!doneSet.has(t.id)).map(t=>({...t,urgency:computeUrgency(t)}));
+  const active = activeTasks;
   const done = TASKS.filter(t=>doneSet.has(t.id));
 
   // Greeting

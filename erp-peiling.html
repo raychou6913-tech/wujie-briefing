@@ -354,10 +354,19 @@ let doneSet = new Set(JSON.parse(localStorage.getItem(DONE_KEY)||'[]'));
 let currentUploadId = null;
 
 // ── Render ─────────────────────────────────────────────────
+function _computeUrgency(t){
+  if(t.urgency==='waiting') return 'waiting';
+  if(!t.deadline) return t.urgency;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const due=new Date(t.deadline);
+  if(due<today) return 'overdue';
+  if(due.getTime()===today.getTime()) return 'today';
+  return (t.urgency==='overdue'||t.urgency==='today')?'ok':t.urgency;
+}
 function render(){
   renderIpAlerts();
 
-  const active = TASKS.filter(t=>!doneSet.has(t.id));
+  const active = TASKS.filter(t=>!doneSet.has(t.id)).map(t=>({...t,urgency:_computeUrgency(t)}));
   const done = TASKS.filter(t=>doneSet.has(t.id));
 
   const overdue = active.filter(t=>t.urgency==='overdue').length;
