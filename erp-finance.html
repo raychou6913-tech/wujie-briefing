@@ -229,6 +229,68 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .ft-profit{color:var(--fin);font-weight:700;}
 .ft-pct{font-size:9px;}
 
+/* PROJECT P&L CARDS */
+.proj-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .15s;}
+.proj-card:hover{border-color:var(--border-hi);}
+.proj-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;}
+.proj-icon{font-size:18px;flex-shrink:0;}
+.proj-body{flex:1;min-width:0;}
+.proj-name{font-size:13px;font-weight:800;margin-bottom:2px;}
+.proj-meta{font-size:10px;color:var(--txt-mid);}
+.proj-kpi{text-align:right;flex-shrink:0;}
+.proj-gp{font-size:14px;font-weight:800;}
+.proj-detail{display:none;border-top:1px solid var(--border);background:var(--card2);padding:14px;}
+.proj-detail.open{display:block;}
+.proj-biz-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;display:inline-block;margin-left:6px;}
+.pbiz-w{background:#f9731618;color:#f97316;}
+.pbiz-f{background:#06b6d418;color:#06b6d4;}
+.pbiz-ip{background:#a855f718;color:#a855f7;}
+.pbiz-e{background:#10b98118;color:#10b981;}
+.proj-vs-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.proj-vs-row:last-child{border-bottom:none;}
+.proj-vs-label{color:var(--txt-mid);}
+.proj-vs-nums{display:flex;gap:16px;align-items:center;}
+.proj-vs-act{font-weight:800;}
+.proj-vs-bgt{font-size:9px;color:var(--txt-lo);}
+.proj-vs-bar{width:60px;flex-shrink:0;}
+.proj-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.proj-sum-cell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 10px;text-align:center;}
+.psc-label{font-size:9px;color:var(--txt-lo);margin-bottom:3px;}
+.psc-val{font-size:13px;font-weight:800;}
+
+/* CASHFLOW TX VIEW */
+.cf-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
+.tx-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:4px;transition:border-color .15s;}
+.tx-group-hdr:hover{border-color:var(--border-hi);}
+.tx-group-hdr.expanded{border-radius:10px 10px 0 0;margin-bottom:0;border-bottom:none;}
+.tx-mo-label{font-size:12px;font-weight:800;}
+.tx-mo-nums{display:flex;gap:14px;font-size:11px;}
+.tx-list{display:none;border:1.5px solid var(--border);border-top:none;border-radius:0 0 10px 10px;margin-bottom:4px;overflow:hidden;}
+.tx-list.open{display:block;}
+.tx-row{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;}
+.tx-row:last-child{border-bottom:none;}
+.tx-row:hover{background:var(--card2);}
+.tx-dir{font-size:12px;flex-shrink:0;width:14px;}
+.tx-body{flex:1;min-width:0;}
+.tx-title{font-weight:700;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-sub{font-size:9px;color:var(--txt-lo);}
+.tx-amt{font-size:12px;font-weight:800;white-space:nowrap;}
+.tx-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--card2);color:var(--txt-mid);flex-shrink:0;white-space:nowrap;}
+.export-row{display:flex;justify-content:flex-end;margin-bottom:10px;gap:8px;}
+.export-btn{font-size:11px;font-weight:700;padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;}
+.export-btn:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+
+/* MGMT P&L */
+.mpl-section{margin-bottom:6px;}
+.mpl-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border);}
+.mpl-row:last-child{border-bottom:none;}
+.mpl-row.subtotal{background:var(--card2);font-weight:800;border-top:2px solid var(--border-hi);}
+.mpl-row.indent{padding-left:22px;font-size:11px;color:var(--txt-mid);}
+.mpl-row.section-hdr{background:#ffffff06;font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;}
+.mpl-label{flex:1;}
+.mpl-vals{display:flex;gap:20px;text-align:right;}
+.mpl-col{min-width:52px;font-weight:700;}
+
 /* P&L REPORT */
 .report-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
 .report-kpi{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;}
@@ -327,18 +389,20 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('entry')">📝 記帳</button>
-    <button class="tab-btn" onclick="switchTab('pending')">📋 待入帳</button>
+    <button class="tab-btn active" onclick="switchTab('pending')">📋 待入帳</button>
     <button class="tab-btn" onclick="switchTab('cash')">📊 現金流</button>
-    <button class="tab-btn" onclick="switchTab('budget')">🎯 預算達成</button>
+    <button class="tab-btn" onclick="switchTab('project')">🎯 項目P&L</button>
+    <button class="tab-btn" onclick="switchTab('pl')">📈 損益表</button>
+    <button class="tab-btn" onclick="switchTab('tools')">⚙ 工具</button>
   </div>
 
-  <!-- ══ TAB: 記帳工作台 ══ -->
-  <div class="tab-panel active" id="tab-entry">
+  <!-- ══ TAB: 工具（異常補錄 + 今日待辦）══ -->
+  <div class="tab-panel" id="tab-tools">
 
-    <!-- 現金流月結記帳表單 -->
-    <div style="background:var(--card);border:1.5px solid var(--fin);border-radius:12px;padding:16px;margin-bottom:16px;">
-      <div style="font-size:11px;font-weight:700;color:var(--fin);margin-bottom:12px;letter-spacing:.04em;">📝 月度現金流記帳</div>
+    <!-- 異常補錄 -->
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--txt-mid);margin-bottom:4px;letter-spacing:.04em;">📝 異常補錄</div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:12px;line-height:1.6;">正常收支已透過各廳審批流程自動記錄。此欄位僅用於補錄銀行到帳確認、匯差損益等無法透過審批流程處理的邊緣情況。</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         <div>
           <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">公司主體</label>
@@ -355,25 +419,26 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <input id="cf-month" type="month" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;" value="2026-05">
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         <div>
-          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">期末現金餘額（萬）</label>
-          <input id="cf-balance" type="number" placeholder="例：128.5" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">補錄類型</label>
+          <select id="cf-type" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+            <option value="银行到帐确认">銀行到帳確認</option>
+            <option value="汇差损益">匯差損益</option>
+            <option value="期末余额更正">期末餘額更正</option>
+            <option value="其他补录">其他補錄</option>
+          </select>
         </div>
         <div>
-          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">主要收入（萬）</label>
-          <input id="cf-income" type="number" placeholder="例：85" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
-        </div>
-        <div>
-          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">主要支出（萬）</label>
-          <input id="cf-expense" type="number" placeholder="例：42" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
+          <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">金額（萬元）</label>
+          <input id="cf-balance" type="number" placeholder="例：9.3156" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;">
         </div>
       </div>
       <div style="margin-bottom:10px;">
-        <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">收支說明 / 備注</label>
-        <textarea id="cf-note" rows="2" placeholder="例：主要收入來自批發貨款 TWD 420,000；主要支出為採購付款及薪資" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;resize:none;line-height:1.5;"></textarea>
+        <label style="font-size:10px;color:var(--txt-lo);display:block;margin-bottom:4px;">說明</label>
+        <textarea id="cf-note" rows="2" placeholder="例：台灣悍草 Q1 貨款 TWD 420,000 確認到帳，折算 RMB 93,156" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--txt-hi);border-radius:7px;padding:8px 10px;font-size:12px;resize:none;line-height:1.5;"></textarea>
       </div>
-      <button onclick="submitCashflowEntry()" style="width:100%;background:var(--fin);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;" id="cf-submit-btn">寫入飛書 →</button>
+      <button onclick="submitCashflowEntry()" style="width:100%;background:var(--fin);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;" id="cf-submit-btn">補錄至飛書 →</button>
     </div>
 
     <!-- 今日財務待辦 -->
@@ -449,10 +514,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
     </div>
 
-  </div><!-- /tab-entry -->
+  </div><!-- /tab-tools -->
 
   <!-- ══ TAB: 待入帳清單 ══ -->
-  <div class="tab-panel" id="tab-pending">
+  <div class="tab-panel active" id="tab-pending">
     <div style="margin-bottom:12px;">
       <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;padding:8px 10px;background:var(--card2);border-radius:7px;border-left:3px solid var(--fin);">
         📋 以下是已經過 Ray 批准、等待躍明入帳或付款的費用申請。確認付款後點「標記已入帳」。
@@ -461,6 +526,241 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div id="pending-list">
       <div style="text-align:center;padding:30px;color:var(--txt-lo);font-size:12px;">載入中…</div>
     </div>
+
+    <!-- 跨境匯款追蹤 -->
+    <div class="sec-hdr" style="margin-top:20px">
+      <div class="sec-title">跨境匯款追蹤</div>
+      <span class="sec-link" onclick="openNewRemitModal()">+ 新增</span>
+    </div>
+
+    <div class="remit-card arriving">
+      <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="remit-entities">
+          <span class="entity-badge e-tw">台灣悍草</span>
+          <span class="arrow">→</span>
+          <span class="entity-badge e-bj">北京蕪解</span>
+        </div>
+        <div class="remit-body">
+          <div class="remit-amount">TWD 420,000 <span style="font-size:10px;color:var(--txt-lo)">≈ RMB 93,156</span></div>
+          <div class="remit-meta">Q1 貨款 · TWN-BJ-2025-003</div>
+        </div>
+        <div class="remit-right">
+          <div class="remit-status rs-arriving">今天到帳</div>
+          <div class="remit-eta">ETA 2026-05-02</div>
+        </div>
+      </div>
+      <div class="remit-detail">
+        <div class="rate-box">
+          <div class="rate-row"><span class="rate-label">鎖定日期</span><span class="rate-val">2026-04-28 <span class="rate-locked">🔒</span></span></div>
+          <div class="rate-row"><span class="rate-label">鎖定匯率</span><span class="rate-val">1 TWD = 0.2218 RMB（台銀牌告）</span></div>
+          <div class="rate-row"><span class="rate-label">匯差處理</span><span class="rate-val">由台灣方吸收</span></div>
+        </div>
+        <div class="tc-actions">
+          <button class="ta-btn ta-ok" onclick="showToast('✅ 到帳確認已記錄')">✓ 確認到帳</button>
+          <button class="ta-btn ta-fin" onclick="showToast('✅ 匯差記錄已建立')">記錄匯差</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="remit-card pending">
+      <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="remit-entities">
+          <span class="entity-badge e-bj">北京蕪解</span>
+          <span class="arrow">→</span>
+          <span class="entity-badge e-bkk">泰國 UJ BKK</span>
+        </div>
+        <div class="remit-body">
+          <div class="remit-amount">RMB 280,000 <span style="font-size:10px;color:var(--txt-lo)">≈ THB 1,386,000</span></div>
+          <div class="remit-meta">Q2 備貨預付款 · 銀行處理中</div>
+        </div>
+        <div class="remit-right">
+          <div class="remit-status rs-pending">銀行處理中</div>
+          <div class="remit-eta">ETA 5/5～5/7</div>
+        </div>
+      </div>
+      <div class="remit-detail">
+        <div class="rate-box">
+          <div class="rate-row"><span class="rate-label">鎖定日期</span><span class="rate-val">2026-04-30 <span class="rate-locked">🔒</span></span></div>
+          <div class="rate-row"><span class="rate-label">鎖定匯率</span><span class="rate-val">1 RMB = 4.95 THB（實際成交）</span></div>
+        </div>
+        <div class="tc-actions">
+          <button class="ta-btn ta-fin" onclick="showToast('→ 已聯繫銀行，查詢中...')">查詢銀行進度</button>
+          <button class="ta-btn ta-grey">通知 Shawn</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="remit-card needs-contract">
+      <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="remit-entities">
+          <span class="entity-badge e-hk">香港 JV</span>
+          <span class="arrow">→</span>
+          <span class="entity-badge e-bj">北京蕪解</span>
+        </div>
+        <div class="remit-body">
+          <div class="remit-amount">HKD 150,000 <span style="font-size:10px;color:var(--txt-lo)">≈ RMB 138,000</span></div>
+          <div class="remit-meta">JV 首筆資本注入 · 待合約支撐</div>
+        </div>
+        <div class="remit-right">
+          <div class="remit-status rs-contract">⚠ 缺合約</div>
+          <div class="remit-eta">外管局可能攔截</div>
+        </div>
+      </div>
+      <div class="remit-detail">
+        <div style="background:var(--danger-dim);border:1px solid #ef444430;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--danger);line-height:1.6;">
+          ⚠ 此筆匯款目前沒有對應的貿易/服務合約，外管局有機率攔截退款，請先補簽合約。
+        </div>
+        <div class="tc-actions">
+          <button class="ta-btn ta-warn" onclick="showToast('→ 已通知安然：HK→BJ 服務合約需補簽')">→ 通知安然補合約</button>
+          <button class="ta-btn ta-grey">暫緩匯款</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 代墊款追蹤 -->
+    <div class="sec-hdr" style="margin-top:16px">
+      <div class="sec-title">代墊款追蹤</div>
+      <span class="sec-link" onclick="openAdvanceModal()">+ 新增代墊</span>
+    </div>
+
+    <div class="advance-card" id="adv-1">
+      <div class="advance-row">
+        <div class="adv-entities">
+          <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
+          <span style="font-size:10px;color:var(--txt-lo);margin:0 4px">代墊</span>
+          <span class="entity-badge e-bkk" style="font-size:9px">泰國 UJ BKK</span>
+        </div>
+        <div class="adv-body" style="margin-left:10px">
+          <div class="adv-amount">TWD 100,000 <span style="font-size:9px;color:var(--txt-lo)">≈ THB 109,000</span></div>
+          <div class="adv-meta">曼谷展場費代墊 · 鎖定 4/15 台銀匯率 1 TWD=1.09 THB <span style="color:var(--ok)">🔒</span></div>
+        </div>
+        <div class="adv-right">
+          <div class="adv-due soon">5/15 還款</div>
+          <div class="adv-locked" style="margin-top:2px">匯率已鎖定</div>
+          <button class="adv-settle-btn" onclick="openSettleModal('adv-1','台灣悍草','泰國 UJ BKK','TWD','THB',100000,1.09,'曼谷展場費代墊')">核銷</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="advance-card" id="adv-2">
+      <div class="advance-row">
+        <div class="adv-entities">
+          <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+          <span style="font-size:10px;color:var(--txt-lo);margin:0 4px">代墊</span>
+          <span class="entity-badge e-sz" style="font-size:9px">深圳子公司</span>
+        </div>
+        <div class="adv-body" style="margin-left:10px">
+          <div class="adv-amount">RMB 45,000</div>
+          <div class="adv-meta">深圳辦公室押金代墊 · 同幣別無匯差</div>
+        </div>
+        <div class="adv-right">
+          <div class="adv-due overdue">逾期 5 天</div>
+          <button class="adv-settle-btn" onclick="openSettleModal('adv-2','北京蕪解','深圳子公司','RMB','RMB',45000,1,'深圳辦公室押金代墊')">核銷</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 跨實體資產負債一覽 -->
+    <div class="sec-hdr" style="margin-top:20px">
+      <div class="sec-title">跨實體應收應付</div>
+      <span class="sec-link" id="balance-toggle" onclick="toggleBalanceDetail()">展開明細</span>
+    </div>
+
+    <div class="balance-summary">
+      <div class="bs-row">
+        <div class="bs-entities">
+          <span class="entity-badge e-bkk" style="font-size:9px">泰國 UJ BKK</span>
+          <span class="bs-dir owed">欠</span>
+          <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
+        </div>
+        <div style="flex:1;padding:0 8px">
+          <div class="bs-amt">TWD 100,000</div>
+          <div class="bs-note">曼谷展場費代墊 · 到期 5/15</div>
+        </div>
+        <button class="bs-settle-btn" onclick="openSettleModal('adv-1','台灣悍草','泰國 UJ BKK','TWD','THB',100000,1.09,'曼谷展場費代墊')">核銷</button>
+      </div>
+      <div class="bs-row">
+        <div class="bs-entities">
+          <span class="entity-badge e-sz" style="font-size:9px">深圳子公司</span>
+          <span class="bs-dir owed">欠</span>
+          <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+        </div>
+        <div style="flex:1;padding:0 8px">
+          <div class="bs-amt">RMB 45,000</div>
+          <div class="bs-note">辦公室押金代墊 · <span style="color:var(--danger)">逾期 5 天</span></div>
+        </div>
+        <button class="bs-settle-btn" onclick="openSettleModal('adv-2','北京蕪解','深圳子公司','RMB','RMB',45000,1,'深圳辦公室押金代墊')">核銷</button>
+      </div>
+      <div class="bs-row">
+        <div class="bs-entities">
+          <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+          <span class="bs-dir owed">欠</span>
+          <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
+        </div>
+        <div style="flex:1;padding:0 8px">
+          <div class="bs-amt">TWD 420,000</div>
+          <div class="bs-note">Q1 貨款 · <span style="color:var(--ok)">今天到帳確認中</span></div>
+        </div>
+        <button class="bs-settle-btn" onclick="showToast('此筆請在上方匯款追蹤確認到帳')">查看</button>
+      </div>
+      <div class="bs-row">
+        <div class="bs-entities">
+          <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
+          <span class="bs-dir recv">待收</span>
+          <span class="entity-badge e-hk" style="font-size:9px">香港 JV</span>
+        </div>
+        <div style="flex:1;padding:0 8px">
+          <div class="bs-amt">HKD 150,000</div>
+          <div class="bs-note">JV 首筆資本注入 · <span style="color:var(--danger)">待合約補簽</span></div>
+        </div>
+        <button class="bs-settle-btn" onclick="showToast('⚠ 缺合約，已提示安然補簽')">補合約</button>
+      </div>
+    </div>
+
+    <div id="balance-detail" style="display:none">
+      <div class="balance-grid">
+        <div class="balance-entity-card">
+          <div class="bec-header">
+            <span class="entity-badge e-bj" style="font-size:10px">北京蕪解</span>
+            <span class="bec-net negative">淨欠出 RMB 68,000</span>
+          </div>
+          <div class="bec-rows">
+            <div class="bec-row"><span class="bec-peer">應付 台灣悍草</span><span class="bec-amt owed">−RMB 93,156</span></div>
+            <div class="bec-row"><span class="bec-peer">應收 深圳子公司</span><span class="bec-amt recv">+RMB 45,000</span></div>
+          </div>
+        </div>
+        <div class="balance-entity-card">
+          <div class="bec-header">
+            <span class="entity-badge e-tw" style="font-size:10px">台灣悍草</span>
+            <span class="bec-net positive">淨應收 TWD 520,000</span>
+          </div>
+          <div class="bec-rows">
+            <div class="bec-row"><span class="bec-peer">應收 北京蕪解</span><span class="bec-amt recv">+TWD 420,000</span></div>
+            <div class="bec-row"><span class="bec-peer">應收 泰國BKK</span><span class="bec-amt recv">+TWD 100,000</span></div>
+          </div>
+        </div>
+        <div class="balance-entity-card">
+          <div class="bec-header">
+            <span class="entity-badge e-bkk" style="font-size:10px">泰國 UJ BKK</span>
+            <span class="bec-net negative">淨欠出 TWD 100,000</span>
+          </div>
+          <div class="bec-rows">
+            <div class="bec-row"><span class="bec-peer">欠 台灣悍草</span><span class="bec-amt owed">−TWD 100,000</span></div>
+          </div>
+        </div>
+        <div class="balance-entity-card">
+          <div class="bec-header">
+            <span class="entity-badge e-hk" style="font-size:10px">香港 JV</span>
+            <span class="bec-net negative">淨欠出 HKD 150,000</span>
+          </div>
+          <div class="bec-rows">
+            <div class="bec-row"><span class="bec-peer">欠 北京蕪解</span><span class="bec-amt owed">−HKD 150,000</span></div>
+            <div class="bec-row" style="color:var(--danger);font-size:10px">⚠ 待合約補簽</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /tab-pending -->
 
   <!-- ══ TAB: 現金流 ══ -->
@@ -499,301 +799,69 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
   </div>
 
-  <!-- 時間範圍 -->
-  <div class="range-bar" id="cash-range-bar">
-    <button class="range-btn active" onclick="setCashRange('month',this)">本月</button>
-    <button class="range-btn" onclick="setCashRange('quarter',this)">本季</button>
-    <button class="range-btn" onclick="setCashRange('year',this)">全年</button>
-    <button class="range-btn" onclick="setCashRange('2year',this)">近兩年</button>
+  <!-- 篩選 + 匯出 -->
+  <div class="export-row">
+    <button class="export-btn" onclick="_exportCashCSV()">⬇ 匯出 CSV</button>
+  </div>
+  <div class="cf-filter">
+    <span style="font-size:10px;color:var(--txt-lo);font-weight:700;">篩選：</span>
+    <button class="bf-chip active" onclick="filterCash('all',this)">全部</button>
+    <button class="bf-chip" onclick="filterCash('rev',this)">收入</button>
+    <button class="bf-chip" onclick="filterCash('exp',this)">支出</button>
+    <button class="bf-chip" onclick="filterCash('inter',this)">跨境</button>
   </div>
 
-  <!-- 動態彙總（全年/近兩年顯示） -->
-  <div id="cash-summary"></div>
-
-  <!-- 跨境匯款追蹤 header — skipping old task cards which are now in tab-entry -->
-
-  <!-- 跨境匯款時間軸 -->
-  <div class="sec-hdr" style="margin-top:8px">
-    <div class="sec-title">跨境匯款追蹤</div>
-    <span class="sec-link" onclick="openNewRemitModal()">+ 新增</span>
-  </div>
-
-  <!-- 匯款 1 -->
-  <div class="remit-card arriving">
-    <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
-      <div class="remit-entities">
-        <span class="entity-badge e-tw">台灣悍草</span>
-        <span class="arrow">→</span>
-        <span class="entity-badge e-bj">北京蕪解</span>
-      </div>
-      <div class="remit-body">
-        <div class="remit-amount">TWD 420,000 <span style="font-size:10px;color:var(--txt-lo)">≈ RMB 93,156</span></div>
-        <div class="remit-meta">Q1 貨款 · TWN-BJ-2025-003</div>
-      </div>
-      <div class="remit-right">
-        <div class="remit-status rs-arriving">今天到帳</div>
-        <div class="remit-eta">ETA 2026-05-02</div>
-      </div>
-    </div>
-    <div class="remit-detail">
-      <div class="rate-box">
-        <div class="rate-row"><span class="rate-label">鎖定日期</span><span class="rate-val">2026-04-28 <span class="rate-locked">🔒</span></span></div>
-        <div class="rate-row"><span class="rate-label">鎖定匯率</span><span class="rate-val">1 TWD = 0.2218 RMB（台銀牌告）</span></div>
-        <div class="rate-row"><span class="rate-label">匯差處理</span><span class="rate-val">由台灣方吸收</span></div>
-      </div>
-      <a class="contract-link" href="erp-anran.html" onclick="showToast('→ 跳轉安然廳查看合約詳情')">
-        <div class="cl-icon">📄</div>
-        <div class="cl-body">
-          <div class="cl-title">TWN-BJ-2025-003 · 台灣悍草採購框架合約</div>
-          <div class="cl-sub">有效期至 2026-12-31 · 安然管理</div>
-        </div>
-        <span class="cl-status chip chip-ok">有效 →</span>
-      </a>
-      <div class="tc-actions">
-        <button class="ta-btn ta-ok" onclick="showToast('✅ 到帳確認已記錄')">✓ 確認到帳</button>
-        <button class="ta-btn ta-fin" onclick="showToast('✅ 匯差記錄已建立')">記錄匯差</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 匯款 2 -->
-  <div class="remit-card pending">
-    <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
-      <div class="remit-entities">
-        <span class="entity-badge e-bj">北京蕪解</span>
-        <span class="arrow">→</span>
-        <span class="entity-badge e-bkk">泰國 UJ BKK</span>
-      </div>
-      <div class="remit-body">
-        <div class="remit-amount">RMB 280,000 <span style="font-size:10px;color:var(--txt-lo)">≈ THB 1,386,000</span></div>
-        <div class="remit-meta">Q2 備貨預付款 · 銀行處理中</div>
-      </div>
-      <div class="remit-right">
-        <div class="remit-status rs-pending">銀行處理中</div>
-        <div class="remit-eta">ETA 5/5～5/7</div>
-      </div>
-    </div>
-    <div class="remit-detail">
-      <div class="rate-box">
-        <div class="rate-row"><span class="rate-label">鎖定日期</span><span class="rate-val">2026-04-30 <span class="rate-locked">🔒</span></span></div>
-        <div class="rate-row"><span class="rate-label">鎖定匯率</span><span class="rate-val">1 RMB = 4.95 THB（實際成交）</span></div>
-        <div class="rate-row"><span class="rate-label">匯差處理</span><span class="rate-val">各自吸收 50%</span></div>
-      </div>
-      <a class="contract-link" href="erp-anran.html" onclick="showToast('→ 跳轉安然廳查看合約詳情')">
-        <div class="cl-icon">📄</div>
-        <div class="cl-body">
-          <div class="cl-title">BJ-BKK-2026-001 · 北京→泰國備貨調撥合約</div>
-          <div class="cl-sub">有效期至 2026-09-30 · 安然管理</div>
-        </div>
-        <span class="cl-status chip chip-ok">有效 →</span>
-      </a>
-      <div class="tc-actions">
-        <button class="ta-btn ta-fin" onclick="showToast('→ 已聯繫銀行，查詢中...')">查詢銀行進度</button>
-        <button class="ta-btn ta-grey">通知 Shawn</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 匯款 3 — 缺合約 -->
-  <div class="remit-card needs-contract">
-    <div class="remit-header" onclick="this.nextElementSibling.classList.toggle('open')">
-      <div class="remit-entities">
-        <span class="entity-badge e-hk">香港 JV</span>
-        <span class="arrow">→</span>
-        <span class="entity-badge e-bj">北京蕪解</span>
-      </div>
-      <div class="remit-body">
-        <div class="remit-amount">HKD 150,000 <span style="font-size:10px;color:var(--txt-lo)">≈ RMB 138,000</span></div>
-        <div class="remit-meta">JV 首筆資本注入 · 待合約支撐</div>
-      </div>
-      <div class="remit-right">
-        <div class="remit-status rs-contract">⚠ 缺合約</div>
-        <div class="remit-eta">外管局可能攔截</div>
-      </div>
-    </div>
-    <div class="remit-detail">
-      <div style="background:var(--danger-dim);border:1px solid #ef444430;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--danger);line-height:1.6;">
-        ⚠ 此筆匯款目前沒有對應的貿易/服務合約。跨境人民幣匯款無合同支撐，大陸外管局有機率攔截退款，請在匯款前聯繫安然補簽合約。
-      </div>
-      <div class="rate-box">
-        <div class="rate-row"><span class="rate-label">預計鎖定匯率</span><span class="rate-val">待建立 <span class="rate-warn">⚠ 尚未鎖定</span></span></div>
-        <div class="rate-row"><span class="rate-label">結算幣別</span><span class="rate-val">RMB（建議）</span></div>
-      </div>
-      <div class="tc-actions">
-        <button class="ta-btn ta-warn" onclick="showToast('→ 已通知安然：HK→BJ 服務合約需補簽')">→ 通知安然補合約</button>
-        <button class="ta-btn ta-grey">暫緩匯款</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 代墊款追蹤 -->
-  <div class="sec-hdr" style="margin-top:8px">
-    <div class="sec-title">代墊款追蹤</div>
-    <span class="sec-link" onclick="openAdvanceModal()">+ 新增代墊</span>
-  </div>
-
-  <div class="advance-card" id="adv-1">
-    <div class="advance-row">
-      <div class="adv-entities">
-        <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
-        <span style="font-size:10px;color:var(--txt-lo);margin:0 4px">代墊</span>
-        <span class="entity-badge e-bkk" style="font-size:9px">泰國 UJ BKK</span>
-      </div>
-      <div class="adv-body" style="margin-left:10px">
-        <div class="adv-amount">TWD 100,000 <span style="font-size:9px;color:var(--txt-lo)">≈ THB 109,000</span></div>
-        <div class="adv-meta">曼谷展場費代墊 · 鎖定 4/15 台銀匯率 1 TWD=1.09 THB <span style="color:var(--ok)">🔒</span></div>
-      </div>
-      <div class="adv-right">
-        <div class="adv-due soon">5/15 還款</div>
-        <div class="adv-locked" style="margin-top:2px">匯率已鎖定</div>
-        <button class="adv-settle-btn" onclick="openSettleModal('adv-1','台灣悍草','泰國 UJ BKK','TWD','THB',100000,1.09,'曼谷展場費代墊')">核銷</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="advance-card" id="adv-2">
-    <div class="advance-row">
-      <div class="adv-entities">
-        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
-        <span style="font-size:10px;color:var(--txt-lo);margin:0 4px">代墊</span>
-        <span class="entity-badge e-sz" style="font-size:9px">深圳子公司</span>
-      </div>
-      <div class="adv-body" style="margin-left:10px">
-        <div class="adv-amount">RMB 45,000</div>
-        <div class="adv-meta">深圳辦公室押金代墊 · 同幣別無匯差</div>
-      </div>
-      <div class="adv-right">
-        <div class="adv-due overdue">逾期 5 天</div>
-        <button class="adv-settle-btn" onclick="openSettleModal('adv-2','北京蕪解','深圳子公司','RMB','RMB',45000,1,'深圳辦公室押金代墊')">核銷</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 跨實體資產負債一覽 -->
-  <div class="sec-hdr" style="margin-top:20px">
-    <div class="sec-title">跨實體資產負債一覽</div>
-    <span class="sec-link" id="balance-toggle" onclick="toggleBalanceDetail()">展開明細</span>
-  </div>
-
-  <div class="balance-summary">
-    <div class="bs-row">
-      <div class="bs-entities">
-        <span class="entity-badge e-bkk" style="font-size:9px">泰國 UJ BKK</span>
-        <span class="bs-dir owed">欠</span>
-        <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
-      </div>
-      <div style="flex:1;padding:0 8px">
-        <div class="bs-amt">TWD 100,000</div>
-        <div class="bs-note">曼谷展場費代墊 · 到期 5/15</div>
-      </div>
-      <button class="bs-settle-btn" onclick="openSettleModal('adv-1','台灣悍草','泰國 UJ BKK','TWD','THB',100000,1.09,'曼谷展場費代墊')">核銷</button>
-    </div>
-    <div class="bs-row">
-      <div class="bs-entities">
-        <span class="entity-badge e-sz" style="font-size:9px">深圳子公司</span>
-        <span class="bs-dir owed">欠</span>
-        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
-      </div>
-      <div style="flex:1;padding:0 8px">
-        <div class="bs-amt">RMB 45,000</div>
-        <div class="bs-note">辦公室押金代墊 · <span style="color:var(--danger)">逾期 5 天</span></div>
-      </div>
-      <button class="bs-settle-btn" onclick="openSettleModal('adv-2','北京蕪解','深圳子公司','RMB','RMB',45000,1,'深圳辦公室押金代墊')">核銷</button>
-    </div>
-    <div class="bs-row">
-      <div class="bs-entities">
-        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
-        <span class="bs-dir owed">欠</span>
-        <span class="entity-badge e-tw" style="font-size:9px">台灣悍草</span>
-      </div>
-      <div style="flex:1;padding:0 8px">
-        <div class="bs-amt">TWD 420,000</div>
-        <div class="bs-note">Q1 貨款 · <span style="color:var(--ok)">今天到帳確認中</span></div>
-      </div>
-      <button class="bs-settle-btn" onclick="showToast('此筆請在下方跨境匯款追蹤確認到帳')">查看</button>
-    </div>
-    <div class="bs-row">
-      <div class="bs-entities">
-        <span class="entity-badge e-bj" style="font-size:9px">北京蕪解</span>
-        <span class="bs-dir recv">待收</span>
-        <span class="entity-badge e-hk" style="font-size:9px">香港 JV</span>
-      </div>
-      <div style="flex:1;padding:0 8px">
-        <div class="bs-amt">HKD 150,000</div>
-        <div class="bs-note">JV 首筆資本注入 · <span style="color:var(--danger)">待合約補簽</span></div>
-      </div>
-      <button class="bs-settle-btn" onclick="showToast('⚠ 缺合約，已提示安然補簽')">補合約</button>
-    </div>
-  </div>
-
-  <!-- 各實體淨部位（預設收起） -->
-  <div id="balance-detail" style="display:none">
-    <div class="balance-grid">
-      <div class="balance-entity-card">
-        <div class="bec-header">
-          <span class="entity-badge e-bj" style="font-size:10px">北京蕪解</span>
-          <span class="bec-net negative">淨欠出 RMB 68,000</span>
-        </div>
-        <div class="bec-rows">
-          <div class="bec-row"><span class="bec-peer">應付 台灣悍草</span><span class="bec-amt owed">−RMB 93,156</span></div>
-          <div class="bec-row"><span class="bec-peer">應收 深圳子公司</span><span class="bec-amt recv">+RMB 45,000</span></div>
-          <div class="bec-row"><span class="bec-peer">應付 泰國BKK（在途）</span><span class="bec-amt owed">−RMB 19,844</span></div>
-        </div>
-      </div>
-      <div class="balance-entity-card">
-        <div class="bec-header">
-          <span class="entity-badge e-tw" style="font-size:10px">台灣悍草</span>
-          <span class="bec-net positive">淨應收 TWD 520,000</span>
-        </div>
-        <div class="bec-rows">
-          <div class="bec-row"><span class="bec-peer">應收 北京蕪解</span><span class="bec-amt recv">+TWD 420,000</span></div>
-          <div class="bec-row"><span class="bec-peer">應收 泰國BKK</span><span class="bec-amt recv">+TWD 100,000</span></div>
-        </div>
-      </div>
-      <div class="balance-entity-card">
-        <div class="bec-header">
-          <span class="entity-badge e-bkk" style="font-size:10px">泰國 UJ BKK</span>
-          <span class="bec-net negative">淨欠出 TWD 100,000</span>
-        </div>
-        <div class="bec-rows">
-          <div class="bec-row"><span class="bec-peer">欠 台灣悍草</span><span class="bec-amt owed">−TWD 100,000</span></div>
-          <div class="bec-row"><span class="bec-peer">應收 北京蕪解（在途）</span><span class="bec-amt recv">+RMB 280,000</span></div>
-        </div>
-      </div>
-      <div class="balance-entity-card">
-        <div class="bec-header">
-          <span class="entity-badge e-hk" style="font-size:10px">香港 JV</span>
-          <span class="bec-net negative">淨欠出 HKD 150,000</span>
-        </div>
-        <div class="bec-rows">
-          <div class="bec-row"><span class="bec-peer">欠 北京蕪解</span><span class="bec-amt owed">−HKD 150,000</span></div>
-          <div class="bec-row" style="color:var(--danger);font-size:10px">⚠ 待合約補簽</div>
-        </div>
-      </div>
-    </div>
-    <div class="balance-entity-card" style="margin-bottom:8px">
-      <div class="bec-header">
-        <span class="entity-badge e-sz" style="font-size:10px">深圳子公司</span>
-        <span class="bec-net negative">淨欠出 RMB 45,000</span>
-      </div>
-      <div class="bec-rows" style="border-top:none;padding-top:0">
-        <div class="bec-row"><span class="bec-peer">欠 北京蕪解</span><span class="bec-amt owed">−RMB 45,000 <span style="color:var(--danger);font-size:9px">逾期</span></span></div>
-      </div>
-    </div>
-  </div>
+  <!-- 月度展開式交易列表 -->
+  <div id="cash-tx-list"></div>
 
   </div><!-- /tab-cash -->
 
-  <!-- ══ TAB: 預算達成 ══ -->
-  <div class="tab-panel" id="tab-budget">
+  <!-- ══ TAB: 項目 P&L ══ -->
+  <div class="tab-panel" id="tab-project">
+    <div style="font-size:10px;color:var(--txt-lo);margin-bottom:12px;padding:8px 12px;background:var(--card2);border-radius:7px;border-left:3px solid var(--accent);">
+      🎯 每個項目獨立核算：收入 − 貨成 − 版稅 − 倉運 = <strong style="color:var(--accent)">項目毛利</strong>，點擊展開看各科目明細。
+    </div>
+    <div class="export-row">
+      <button class="export-btn" onclick="_exportProjectCSV()">⬇ 匯出 CSV</button>
+    </div>
+    <div id="project-pl-list"></div>
+  </div><!-- /tab-project -->
 
-    <!-- 說明條 -->
-    <div style="background:var(--fin-dim);border:1px solid #0284c740;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--txt-mid);line-height:1.6;">
-      📊 <strong style="color:var(--fin);">預算達成追蹤</strong> · 對照各科目年度預算 vs YTD 實際，確認後推送 Ray / Shawn / 安然 管理層確認。<br>
-      <span style="color:var(--txt-lo);">實際金額來自各廳已批准費用（審批記錄表）+ 躍明確認入帳後更新至飛書預算管理表。</span>
+  <!-- ══ TAB: 損益表 ══ -->
+  <div class="tab-panel" id="tab-pl">
+
+    <!-- 期間選擇 -->
+    <div class="range-bar" id="pl-range-bar" style="margin-bottom:14px;">
+      <button class="range-btn active" onclick="setPLRange('ytd',this)">YTD（1–5月）</button>
+      <button class="range-btn" onclick="setPLRange('month',this)">本月</button>
+      <button class="range-btn" onclick="setPLRange('q2',this)">Q2 預測</button>
+      <button class="range-btn" onclick="setPLRange('year',this)">全年預測</button>
     </div>
 
-    <!-- 主體過濾 -->
+    <!-- P&L KPI 三格 -->
+    <div id="pl-kpi-row" class="report-kpi-row" style="margin-bottom:14px;"></div>
+
+    <!-- 管理損益表 -->
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);">
+        <span style="font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.04em;">管理損益表（非 GAAP · 管理用途）</span>
+        <button class="export-btn" onclick="_exportPLCSV()" style="font-size:10px;padding:3px 10px;">⬇ CSV</button>
+      </div>
+      <div id="mgmt-pl-table"></div>
+    </div>
+
+    <!-- 分隔線 -->
+    <div style="display:flex;align-items:center;gap:10px;margin:20px 0 14px;">
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+      <span style="font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;">預算達成追蹤</span>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+    </div>
+
+    <div style="background:var(--fin-dim);border:1px solid #0284c740;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--txt-mid);line-height:1.6;">
+      📊 <strong style="color:var(--fin);">科目預算達成</strong> · 各科目年度預算 vs YTD 實際。確認後推送管理層。<br>
+      <span style="color:var(--txt-lo);">實際來自各廳審批記錄，待入帳確認後更新。</span>
+    </div>
+
     <div class="budget-filter">
       <span class="bf-label">主體：</span>
       <button class="bf-chip active" onclick="filterBudget('全部',this)">全部</button>
@@ -803,22 +871,18 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <button class="bf-chip" onclick="filterBudget('UJ BKK',this)">UJ BKK</button>
     </div>
 
-    <!-- KPI 列 -->
     <div id="budget-kpi-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
-
-    <!-- 科目明細表 -->
     <div id="budget-table-wrap"></div>
 
-    <!-- 送管理層按鈕 -->
     <div style="margin-top:8px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;">
       <div style="font-size:11px;color:var(--txt-mid);margin-bottom:10px;line-height:1.6;">
-        <strong style="color:var(--txt-hi);">確認送出</strong>後，管理層（Ray / Shawn / 安然）將在戰情室收到本期達成報告，逐一確認後記錄在案。
+        <strong style="color:var(--txt-hi);">確認送出</strong>後，管理層（Ray / Shawn / 安然）將在戰情室收到本期達成報告。
         <span id="last-sent-time" style="display:block;font-size:10px;color:var(--txt-lo);margin-top:4px;"></span>
       </div>
       <button class="send-report-btn" id="send-report-btn" onclick="sendBudgetReport()">📤 推送本月達成報告給管理層</button>
     </div>
 
-  </div><!-- /tab-budget -->
+  </div><!-- /tab-pl -->
 
   <!-- ══ TAB: 人員分攤 ══ -->
   <div class="tab-panel" id="tab-staff">
@@ -1341,12 +1405,14 @@ function confirmSettle(){
 }
 
 function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['entry','pending','cash','budget'][i]===tab));
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['pending','cash','project','pl','tools'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('tab-'+tab);
   if(el) el.classList.add('active');
   if(tab==='pending') loadPendingList();
-  if(tab==='budget') loadBudgetAchievement();
+  if(tab==='project') renderProjectPL();
+  if(tab==='pl'){ loadBudgetAchievement(); renderMgmtPL('ytd'); }
+  if(tab==='cash') renderCashTxList('all');
 }
 function prefillAndScrollToForm(company, month){
   const sel=document.getElementById('cf-company');
@@ -1735,13 +1801,367 @@ async function sendBudgetReport(){
   }
 }
 
+// ── 項目 P&L 資料 ──
+const PROJECTS=[
+  {id:'kitikata-q2',name:'吉依卡哇·批發 Q2 2026',type:'w',entity:'香港JV / 北京蕪解',status:'active',
+   rev:{b:420,a:385},cogs:{b:232,a:203},opex:{b:32,a:26},
+   items:[
+    {科目:'批發業務收入',dir:'rev',b:420,a:385},
+    {科目:'採購貨款',dir:'exp',b:189,a:165},{科目:'IP版稅（吉依卡哇）',dir:'exp',b:27,a:25},
+    {科目:'倉儲物流費',dir:'exp',b:16,a:13},{科目:'行銷推廣費',dir:'exp',b:14,a:9},
+    {科目:'差旅費',dir:'exp',b:6,a:6},{科目:'辦公管銷',dir:'exp',b:6,a:5}
+  ]},
+  {id:'volleyball-bj',name:'排球少年·北京快閃 2026',type:'f',entity:'北京蕪解 / 深圳子公司',status:'done',
+   rev:{b:280,a:346},cogs:{b:140,a:166},opex:{b:60,a:52},
+   items:[
+    {科目:'快閃店收入',dir:'rev',b:280,a:346},
+    {科目:'採購貨款',dir:'exp',b:102,a:126},{科目:'IP版稅（排球少年）',dir:'exp',b:22,a:28},
+    {科目:'倉儲物流費',dir:'exp',b:16,a:12},{科目:'快閃店場地費',dir:'exp',b:42,a:38},
+    {科目:'行銷推廣費',dir:'exp',b:15,a:12},{科目:'差旅費',dir:'exp',b:3,a:2}
+  ]},
+  {id:'jjk-bkk',name:'JJK·曼谷快閃 Q1 2026',type:'f',entity:'UJ BKK',status:'done',
+   rev:{b:175,a:187},cogs:{b:88,a:97},opex:{b:36,a:30},
+   items:[
+    {科目:'快閃店收入（折算 RMB）',dir:'rev',b:175,a:187},
+    {科目:'採購貨款',dir:'exp',b:64,a:72},{科目:'IP版稅（JJK）',dir:'exp',b:14,a:15},
+    {科目:'倉儲物流費',dir:'exp',b:10,a:10},{科目:'快閃店場地費',dir:'exp',b:26,a:25},
+    {科目:'行銷推廣費',dir:'exp',b:8,a:5},{科目:'差旅費',dir:'exp',b:2,a:0}
+  ]},
+  {id:'snoopy-q1',name:'Snoopy·批發 Q1 2026',type:'w',entity:'香港JV / 北京蕪解',status:'done',
+   rev:{b:180,a:165},cogs:{b:99,a:92},opex:{b:18,a:15},
+   items:[
+    {科目:'批發業務收入',dir:'rev',b:180,a:165},
+    {科目:'採購貨款',dir:'exp',b:82,a:77},{科目:'IP版稅（Snoopy）',dir:'exp',b:10,a:9},
+    {科目:'倉儲物流費',dir:'exp',b:7,a:6},{科目:'行銷推廣費',dir:'exp',b:8,a:5},
+    {科目:'差旅費',dir:'exp',b:4,a:4},{科目:'辦公管銷',dir:'exp',b:6,a:6}
+  ]},
+  {id:'ecom-cn',name:'電商·大陸旗艦店 2026',type:'e',entity:'深圳子公司',status:'active',
+   rev:{b:180,a:42},cogs:{b:108,a:26},opex:{b:30,a:12},
+   items:[
+    {科目:'電商收入（大陸）',dir:'rev',b:180,a:42},
+    {科目:'採購貨款',dir:'exp',b:90,a:22},{科目:'IP版稅',dir:'exp',b:9,a:2},
+    {科目:'倉儲物流費',dir:'exp',b:9,a:2},{科目:'行銷推廣費',dir:'exp',b:18,a:8},
+    {科目:'設計外包費',dir:'exp',b:6,a:4},{科目:'辦公管銷',dir:'exp',b:6,a:0}
+  ]},
+];
+
+const PROJ_TYPE_MAP={w:{icon:'📦',tag:'pbiz-w',label:'批發'},f:{icon:'🏪',tag:'pbiz-f',label:'快閃'},
+  e:{icon:'🛒',tag:'pbiz-e',label:'電商'},ip:{icon:'©️',tag:'pbiz-ip',label:'授權'}};
+
+function renderProjectPL(){
+  const el=document.getElementById('project-pl-list');
+  if(!el) return;
+  el.innerHTML=PROJECTS.map(p=>{
+    const t=PROJ_TYPE_MAP[p.type]||PROJ_TYPE_MAP.w;
+    const gp=p.rev.a-p.cogs.a;
+    const gpB=p.rev.b-p.cogs.b;
+    const net=gp-p.opex.a;
+    const gpPct=p.rev.a>0?Math.round(gp/p.rev.a*100):0;
+    const achPct=gpB>0?Math.round(gp/gpB*100):0;
+    const statusCls=achPct>=95?'chip-ok':achPct>=75?'chip-warn':'chip-danger';
+    const statusLbl=p.status==='done'?'已結算':p.status==='active'?'進行中':'計劃中';
+    const itemRows=p.items.map(it=>{
+      const isRev=it.dir==='rev';
+      const diff=it.a-it.b;
+      const diffStr=(diff>=0?'+':'')+diff+'萬';
+      const diffColor=isRev?(diff>=0?'var(--ok)':'var(--danger)'):(diff<=0?'var(--ok)':'var(--danger)');
+      const pct=it.b>0?Math.round(it.a/it.b*100):0;
+      const barW=Math.min(pct,150);
+      const barColor=isRev?(pct>=90?'var(--ok)':pct>=70?'var(--warn)':'var(--danger)'):(pct<=100?'var(--ok)':pct<=120?'var(--warn)':'var(--danger)');
+      return `<div class="proj-vs-row">
+        <span class="proj-vs-label">${it.科目}</span>
+        <div class="proj-vs-nums">
+          <span class="proj-vs-bgt">預算 ¥${it.b}萬</span>
+          <span class="proj-vs-act" style="color:${isRev?'var(--ok)':'var(--danger)'}">¥${it.a}萬</span>
+          <span style="font-size:9px;font-weight:700;color:${diffColor}">${diffStr}</span>
+        </div>
+        <div class="proj-vs-bar">
+          <div class="ba-track"><div class="ba-fill" style="width:${barW}%;background:${barColor}"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="proj-card">
+      <div class="proj-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="proj-icon">${t.icon}</div>
+        <div class="proj-body">
+          <div class="proj-name">${p.name}<span class="proj-biz-tag ${t.tag}">${t.label}</span></div>
+          <div class="proj-meta">${p.entity} · <span class="chip ${statusCls}" style="font-size:9px;padding:1px 6px;">${statusLbl}</span></div>
+        </div>
+        <div class="proj-kpi">
+          <div class="proj-gp" style="color:${gp>=0?'var(--ok)':'var(--danger)'}">¥${gp}萬</div>
+          <div style="font-size:9px;color:var(--txt-lo);margin-top:1px">毛利 · ${gpPct}%</div>
+        </div>
+      </div>
+      <div class="proj-detail">
+        <div class="proj-summary">
+          <div class="proj-sum-cell"><div class="psc-label">實際收入</div><div class="psc-val" style="color:var(--ok)">¥${p.rev.a}萬</div></div>
+          <div class="proj-sum-cell"><div class="psc-label">毛利（含OpEx前）</div><div class="psc-val" style="color:var(--fin)">¥${gp}萬 · ${gpPct}%</div></div>
+          <div class="proj-sum-cell"><div class="psc-label">淨利（扣OpEx）</div><div class="psc-val" style="color:${net>=0?'var(--ok)':'var(--danger)'}">¥${net}萬</div></div>
+        </div>
+        ${itemRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _exportProjectCSV(){
+  const rows=[['項目','類型','實際收入(萬)','預算收入(萬)','毛利(萬)','毛利率','淨利(萬)']];
+  PROJECTS.forEach(p=>{
+    const gp=p.rev.a-p.cogs.a; const net=gp-p.opex.a;
+    rows.push([p.name,p.type,p.rev.a,p.rev.b,gp,Math.round(gp/p.rev.a*100)+'%',net]);
+  });
+  _exportCSV(rows,'project_pl_2026.csv');
+}
+
+// ── 管理損益表資料（單位：萬元 RMB，管理口徑）──
+const PL_2026=[
+  {mo:'1月', revW:295,revF:0,  revIP:0, revEC:0,  cogs:205,opex:30,tax:4, future:false},
+  {mo:'2月', revW:173,revF:0,  revIP:12,revEC:0,  cogs:138,opex:32,tax:0, future:false},
+  {mo:'3月', revW:186,revF:50, revIP:0, revEC:12, cogs:168,opex:34,tax:3, future:false},
+  {mo:'4月', revW:200,revF:160,revIP:0, revEC:25, cogs:250,opex:38,tax:6, future:false},
+  {mo:'5月', revW:285,revF:0,  revIP:0, revEC:25, cogs:210,opex:36,tax:5, future:false},
+  {mo:'6月', revW:210,revF:50, revIP:0, revEC:20, cogs:195,opex:36,tax:0, future:true},
+  {mo:'7月', revW:230,revF:50, revIP:0, revEC:25, cogs:205,opex:36,tax:0, future:true},
+  {mo:'8月', revW:185,revF:45, revIP:0, revEC:20, cogs:175,opex:34,tax:0, future:true},
+  {mo:'9月', revW:250,revF:100,revIP:0, revEC:30, cogs:245,opex:40,tax:0, future:true},
+  {mo:'10月',revW:225,revF:60, revIP:0, revEC:25, cogs:210,opex:38,tax:0, future:true},
+  {mo:'11月',revW:255,revF:65, revIP:108,revEC:25,cogs:228,opex:38,tax:0, future:true},
+  {mo:'12月',revW:200,revF:45, revIP:0, revEC:25, cogs:185,opex:36,tax:0, future:true},
+];
+
+let _plRange='ytd';
+function setPLRange(range,btn){
+  _plRange=range;
+  document.querySelectorAll('#pl-range-bar .range-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderMgmtPL(range);
+}
+
+function _plMonths(range){
+  if(range==='ytd') return PL_2026.filter(m=>!m.future);
+  if(range==='month') return [PL_2026[4]];
+  if(range==='q2') return PL_2026.slice(3,6);
+  return PL_2026;
+}
+
+function renderMgmtPL(range){
+  const months=_plMonths(range);
+  const totRevW=months.reduce((s,m)=>s+m.revW,0);
+  const totRevF=months.reduce((s,m)=>s+m.revF,0);
+  const totRevIP=months.reduce((s,m)=>s+m.revIP,0);
+  const totRevEC=months.reduce((s,m)=>s+m.revEC,0);
+  const totRev=totRevW+totRevF+totRevIP+totRevEC;
+  const totCogs=months.reduce((s,m)=>s+m.cogs,0);
+  const gp=totRev-totCogs;
+  const gpPct=totRev>0?Math.round(gp/totRev*100):0;
+  const totOpex=months.reduce((s,m)=>s+m.opex,0);
+  const ebit=gp-totOpex;
+  const totTax=months.reduce((s,m)=>s+m.tax,0);
+  const net=ebit-totTax;
+  const netPct=totRev>0?Math.round(net/totRev*100):0;
+
+  // KPI row
+  const kpiEl=document.getElementById('pl-kpi-row');
+  if(kpiEl) kpiEl.innerHTML=`
+    <div class="report-kpi"><div class="rk-label">總收入</div><div class="rk-val ft-rev">¥${totRev} 萬</div><div class="rk-sub">${months.length}個月累計</div></div>
+    <div class="report-kpi"><div class="rk-label">毛利</div><div class="rk-val ft-profit">¥${gp} 萬</div><div class="rk-trend ok">毛利率 ${gpPct}%</div></div>
+    <div class="report-kpi"><div class="rk-label">淨利（管理口徑）</div><div class="rk-val" style="color:${net>=0?'var(--ok)':'var(--danger)'}">${net>=0?'¥'+net+' 萬':'−¥'+Math.abs(net)+' 萬'}</div><div class="rk-trend ${net>=0?'ok':'danger'}">淨利率 ${netPct}%</div></div>`;
+
+  // P&L table
+  const hasFuture=months.some(m=>m.future);
+  const moLabels=months.map(m=>`<th>${m.mo}${m.future?'<br><span style="font-size:8px;color:var(--txt-lo)">(預)</span>':''}</th>`).join('');
+  const mkRow=(label,vals,cls,indent)=>{
+    const cells=vals.map((v,i)=>`<td class="${cls}" style="${months[i]?.future?'color:var(--txt-mid)':''}">${v>=0?'¥'+v:'−¥'+Math.abs(v)}</td>`).join('');
+    return `<tr class="${indent?'':''}"><td class="mpl-label" style="${indent?'padding-left:22px;font-size:11px;color:var(--txt-mid)':'font-weight:700'}">${label}</td>${cells}</tr>`;
+  };
+  const revWv=months.map(m=>m.revW);
+  const revFv=months.map(m=>m.revF);
+  const revIPv=months.map(m=>m.revIP);
+  const revECv=months.map(m=>m.revEC);
+  const totRevv=months.map(m=>m.revW+m.revF+m.revIP+m.revEC);
+  const cogsv=months.map(m=>m.cogs);
+  const gpv=months.map(m=>m.revW+m.revF+m.revIP+m.revEC-m.cogs);
+  const gpPctv=months.map(m=>{const r=m.revW+m.revF+m.revIP+m.revEC;const g=r-m.cogs;return r>0?Math.round(g/r*100):0;});
+  const opexv=months.map(m=>m.opex);
+  const ebitv=months.map(m=>m.revW+m.revF+m.revIP+m.revEC-m.cogs-m.opex);
+  const taxv=months.map(m=>m.tax);
+  const netv=months.map(m=>m.revW+m.revF+m.revIP+m.revEC-m.cogs-m.opex-m.tax);
+
+  const mkValRow=(label,vals,colorFn,indent,bold)=>{
+    const cells=vals.map((v,i)=>{
+      const col=colorFn?colorFn(v,i):'var(--txt-hi)';
+      const dim=months[i]?.future?'opacity:.65;':'';
+      return `<td style="text-align:right;font-size:11px;font-weight:${bold?'800':'600'};color:${col};${dim}padding:7px 10px;">${typeof v==='string'?v:(v>=0?'¥'+v:'−¥'+Math.abs(v))+'萬'}</td>`;
+    }).join('');
+    return `<tr style="border-bottom:1px solid var(--border);${bold?'background:var(--card2);':''}">
+      <td style="padding:7px 10px;font-size:11px;font-weight:${bold?'800':'400'};color:${bold?'var(--txt-hi)':'var(--txt-mid)'};${indent?'padding-left:22px;':''}">${label}</td>${cells}</tr>`;
+  };
+  const mkHdrRow=(label)=>`<tr style="background:#ffffff05;border-bottom:1px solid var(--border);">
+    <td colspan="${months.length+1}" style="padding:6px 10px;font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.04em;text-transform:uppercase;">${label}</td></tr>`;
+
+  const tableEl=document.getElementById('mgmt-pl-table');
+  if(!tableEl) return;
+  tableEl.innerHTML=`<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;min-width:${months.length*80+140}px;font-size:12px;">
+    <thead><tr style="background:var(--card2);border-bottom:1px solid var(--border);">
+      <th style="text-align:left;padding:8px 10px;font-size:10px;font-weight:700;color:var(--txt-lo);min-width:130px;">科目</th>
+      ${months.map(m=>`<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:var(--txt-lo);min-width:72px;">${m.mo}${m.future?'<span style="font-size:8px;color:var(--txt-lo);display:block">(預)</span>':''}</th>`).join('')}
+    </tr></thead>
+    <tbody>
+    ${mkHdrRow('▲ 收入')}
+    ${mkValRow('批發業務收入',revWv,()=>'var(--ok)',true,false)}
+    ${mkValRow('快閃店收入',revFv,()=>'var(--ok)',true,false)}
+    ${mkValRow('IP授權費收入',revIPv,()=>'var(--ok)',true,false)}
+    ${mkValRow('電商收入（大陸）',revECv,()=>'var(--ok)',true,false)}
+    ${mkValRow('總收入',totRevv,()=>'var(--ok)',false,true)}
+    ${mkHdrRow('▼ 貨成本（COGS）')}
+    ${mkValRow('採購+版稅+倉運',cogsv,()=>'var(--danger)',true,false)}
+    ${mkValRow('毛利',gpv,(v)=>v>=0?'var(--ok)':'var(--danger)',false,true)}
+    ${mkValRow('毛利率',gpPctv.map(p=>p+'%'),(v)=>'var(--fin)',false,false)}
+    ${mkHdrRow('▼ 營業費用（OpEx）')}
+    ${mkValRow('薪資+行銷+設計+差旅+辦公',opexv,()=>'var(--danger)',true,false)}
+    ${mkValRow('EBIT（息稅前利潤）',ebitv,(v)=>v>=0?'var(--ok)':'var(--danger)',false,true)}
+    ${mkValRow('稅務（估算）',taxv,()=>'var(--danger)',true,false)}
+    ${mkValRow('淨利（管理口徑）',netv,(v)=>v>=0?'var(--ok)':'var(--danger)',false,true)}
+    </tbody></table></div>`;
+}
+
+function _exportPLCSV(){
+  const months=_plMonths(_plRange);
+  const header=['科目',...months.map(m=>m.mo)];
+  const rows=[header];
+  const addRow=(label,vals)=>rows.push([label,...vals]);
+  addRow('批發業務收入',months.map(m=>m.revW));
+  addRow('快閃店收入',months.map(m=>m.revF));
+  addRow('IP授權費',months.map(m=>m.revIP));
+  addRow('電商收入',months.map(m=>m.revEC));
+  addRow('總收入',months.map(m=>m.revW+m.revF+m.revIP+m.revEC));
+  addRow('COGS',months.map(m=>m.cogs));
+  addRow('毛利',months.map(m=>m.revW+m.revF+m.revIP+m.revEC-m.cogs));
+  addRow('OpEx',months.map(m=>m.opex));
+  addRow('EBIT',months.map(m=>m.revW+m.revF+m.revIP+m.revEC-m.cogs-m.opex));
+  addRow('稅務',months.map(m=>m.tax));
+  addRow('淨利',months.map(m=>m.revW+m.revF+m.revIP+m.revEC-m.cogs-m.opex-m.tax));
+  _exportCSV(rows,'mgmt_pl_2026.csv');
+}
+
+// ── 現金流交易資料（月度展開）──
+const CASH_TX={
+  '1月':[
+    {dir:'+',title:'吉依卡哇·批發 Q4 2025 尾款',sub:'香港JV',amt:165,tag:'批發業務收入',proj:'kitikata-q4'},
+    {dir:'+',title:'Snoopy·批發 Q4 首付',sub:'北京蕪解',amt:80,tag:'批發業務收入',proj:'snoopy-q1'},
+    {dir:'+',title:'JJK 曼谷快閃 首日銷售',sub:'UJ BKK',amt:50,tag:'快閃店收入',proj:'jjk-bkk'},
+    {dir:'−',title:'採購付款·吉依卡哇 Q2 首付 30%',sub:'北京蕪解→工廠',amt:126,tag:'採購貨款',proj:'kitikata-q2'},
+    {dir:'−',title:'薪資 + 服務費（全集團1月）',sub:'全集團',amt:38,tag:'薪資人力',proj:'—'},
+    {dir:'←→',title:'台灣悍草 → 北京蕪解 貨款（在途）',sub:'跨境匯款',amt:93,tag:'跨境',proj:'—'},
+  ],
+  '2月':[
+    {dir:'+',title:'Snoopy·批發 Q4 尾款',sub:'香港JV',amt:85,tag:'批發業務收入',proj:'snoopy-q1'},
+    {dir:'+',title:'JJK 曼谷快閃 週末結算',sub:'UJ BKK',amt:98,tag:'快閃店收入',proj:'jjk-bkk'},
+    {dir:'+',title:'吉依卡哇 IP授權費',sub:'深圳子公司',amt:12,tag:'IP授權費收入',proj:'—'},
+    {dir:'−',title:'採購付款·JJK 貨品 Q1 首付',sub:'北京蕪解→工廠',amt:72,tag:'採購貨款',proj:'jjk-bkk'},
+    {dir:'−',title:'JJK 曼谷快閃場地費',sub:'UJ BKK',amt:25,tag:'快閃店場地費',proj:'jjk-bkk'},
+    {dir:'−',title:'薪資 + 服務費（2月）',sub:'全集團',amt:36,tag:'薪資人力',proj:'—'},
+    {dir:'−',title:'IP版稅·吉依卡哇（半年結算）',sub:'北京蕪解',amt:25,tag:'IP版稅',proj:'—'},
+  ],
+  '3月':[
+    {dir:'+',title:'吉依卡哇·批發 Q1 貨款',sub:'香港JV',amt:186,tag:'批發業務收入',proj:'kitikata-q2'},
+    {dir:'+',title:'電商·抖音旗艦店 首月',sub:'深圳子公司',amt:12,tag:'電商收入',proj:'ecom-cn'},
+    {dir:'+',title:'排球少年·北京快閃 首日',sub:'北京蕪解',amt:50,tag:'快閃店收入',proj:'volleyball-bj'},
+    {dir:'−',title:'採購付款·排球少年周邊 首付',sub:'北京蕪解→工廠',amt:102,tag:'採購貨款',proj:'volleyball-bj'},
+    {dir:'−',title:'排球少年·北京快閃場地押金',sub:'北京蕪解',amt:22,tag:'快閃店場地費',proj:'volleyball-bj'},
+    {dir:'−',title:'薪資 + 服務費（3月）',sub:'全集團',amt:34,tag:'薪資人力',proj:'—'},
+    {dir:'←→',title:'北京蕪解 → UJ BKK 備貨款',sub:'跨境匯款',amt:28,tag:'跨境',proj:'—'},
+  ],
+  '4月':[
+    {dir:'+',title:'吉依卡哇·批發 Q2 首批',sub:'香港JV',amt:200,tag:'批發業務收入',proj:'kitikata-q2'},
+    {dir:'+',title:'排球少年·北京快閃 週末高峰',sub:'北京蕪解',amt:160,tag:'快閃店收入',proj:'volleyball-bj'},
+    {dir:'+',title:'電商·抖音+淘寶 4月',sub:'深圳子公司',amt:25,tag:'電商收入',proj:'ecom-cn'},
+    {dir:'−',title:'採購付款·吉依卡哇 Q2 中付 40%',sub:'北京蕪解→工廠',amt:168,tag:'採購貨款',proj:'kitikata-q2'},
+    {dir:'−',title:'排球少年·版稅半年結算',sub:'北京蕪解',amt:28,tag:'IP版稅',proj:'volleyball-bj'},
+    {dir:'−',title:'薪資 + 服務費（4月）',sub:'全集團',amt:38,tag:'薪資人力',proj:'—'},
+    {dir:'−',title:'行銷推廣·廣州展位訂金',sub:'深圳子公司',amt:8,tag:'行銷推廣費',proj:'—'},
+    {dir:'←→',title:'台灣悍草 → 北京 Q1 貨款（到帳）',sub:'跨境匯款',amt:93,tag:'跨境',proj:'—'},
+  ],
+  '5月':[
+    {dir:'+',title:'吉依卡哇·批發 Q2 追加',sub:'香港JV',amt:185,tag:'批發業務收入',proj:'kitikata-q2'},
+    {dir:'+',title:'Snoopy·批發 Q1 結算尾款',sub:'香港JV',amt:80,tag:'批發業務收入',proj:'snoopy-q1'},
+    {dir:'+',title:'電商·5月',sub:'深圳子公司',amt:25,tag:'電商收入',proj:'ecom-cn'},
+    {dir:'−',title:'採購付款·吉依卡哇 Q2 尾款 30%',sub:'北京蕪解→工廠',amt:126,tag:'採購貨款',proj:'kitikata-q2'},
+    {dir:'−',title:'薪資 + 服務費（5月）',sub:'全集團',amt:36,tag:'薪資人力',proj:'—'},
+    {dir:'−',title:'IP版稅·Snoopy（半年結算）',sub:'北京蕪解',amt:9,tag:'IP版稅',proj:'snoopy-q1'},
+    {dir:'←→',title:'北京蕪解 → UJ BKK Q2 備貨款（在途）',sub:'跨境匯款',amt:28,tag:'跨境',proj:'—'},
+  ],
+};
+
+let _cashFilter='all';
+function filterCash(f,btn){
+  _cashFilter=f;
+  document.querySelectorAll('.cf-filter .bf-chip').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCashTxList(f);
+}
+function renderCashTxList(filter){
+  const el=document.getElementById('cash-tx-list');
+  if(!el) return;
+  const months=Object.keys(CASH_TX);
+  el.innerHTML=months.map(mo=>{
+    const allTx=CASH_TX[mo];
+    const tx=filter==='all'?allTx:filter==='rev'?allTx.filter(t=>t.dir==='+'):filter==='exp'?allTx.filter(t=>t.dir==='−'):allTx.filter(t=>t.dir==='←→');
+    if(!tx.length) return '';
+    const totIn=tx.filter(t=>t.dir==='+').reduce((s,t)=>s+t.amt,0);
+    const totOut=tx.filter(t=>t.dir==='−').reduce((s,t)=>s+t.amt,0);
+    const net=totIn-totOut;
+    const netColor=net>=0?'var(--ok)':'var(--danger)';
+    const rows=tx.map(t=>{
+      const dirColor=t.dir==='+'?'var(--ok)':t.dir==='−'?'var(--danger)':'var(--txt-lo)';
+      return `<div class="tx-row">
+        <span class="tx-dir" style="color:${dirColor}">${t.dir}</span>
+        <div class="tx-body">
+          <div class="tx-title">${t.title}</div>
+          <div class="tx-sub">${t.sub}</div>
+        </div>
+        <span class="tx-tag">${t.tag}</span>
+        <span class="tx-amt" style="color:${dirColor}">¥${t.amt}萬</span>
+      </div>`;
+    }).join('');
+    const id='txg-'+mo.replace(/月/,'');
+    return `<div class="tx-group-hdr" onclick="toggleTxGroup('${id}',this)">
+        <span class="tx-mo-label">${mo}</span>
+        <div class="tx-mo-nums">
+          <span style="color:var(--ok)">+¥${totIn}萬</span>
+          <span style="color:var(--danger)">−¥${totOut}萬</span>
+          <span style="color:${netColor};font-weight:800">${net>=0?'+':''}¥${net}萬</span>
+        </div>
+      </div>
+      <div class="tx-list" id="${id}">${rows}</div>`;
+  }).join('');
+}
+function toggleTxGroup(id,hdr){
+  const list=document.getElementById(id);
+  if(!list) return;
+  const open=list.classList.toggle('open');
+  hdr.classList.toggle('expanded',open);
+}
+function _exportCashCSV(){
+  const rows=[['月份','方向','項目','主體','金額(萬)','科目']];
+  Object.entries(CASH_TX).forEach(([mo,txs])=>txs.forEach(t=>rows.push([mo,t.dir,t.title,t.sub,t.amt,t.tag])));
+  _exportCSV(rows,'cashflow_tx_2026.csv');
+}
+
+// ── CSV 匯出工具 ──
+function _exportCSV(rows,filename){
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ 已下載 '+filename);
+}
+
 function setBizRange(range,btn){
-  // biz-content tab removed; function kept for backward compat
   document.querySelectorAll('#biz-range-bar .range-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
 }
-
-// biz-content tab removed; no init needed
 
 // ── 現金流月份資料（單位：萬元 RMB，現金口徑）──
 // 入帳=客戶實際到帳；出帳=供應商付款+OPEX+版稅
@@ -1811,26 +2231,25 @@ function setCashRange(range, btn){
   document.querySelectorAll('#cash-range-bar .range-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   const summary = document.getElementById('cash-summary');
-  const opsSection = document.getElementById('cash-ops-section');
+  if(!summary) return;
   if(range==='month'){
     summary.innerHTML = _cashKpis([CASH_2026[4]]);
-    opsSection.style.display='';
   } else if(range==='quarter'){
     summary.innerHTML = _cashKpis(CASH_2026.slice(3,6)) + _cashFullTable([{year:'Q2',months:CASH_2026.slice(3,6),isCurrent:true}]);
-    opsSection.style.display='none';
   } else if(range==='year'){
     summary.innerHTML = _cashKpis(CASH_2026) + _cashFullTable([{year:'2026',months:CASH_2026,isCurrent:true}]);
-    opsSection.style.display='none';
   } else {
     summary.innerHTML = _cashFullTable([
       {year:'2025',months:CASH_2025,isCurrent:false},
       {year:'2026',months:CASH_2026,isCurrent:true}
     ]);
-    opsSection.style.display='none';
   }
 }
 
 setCashRange('month', null);
+// init first visible tab
+loadPendingList();
+renderCashTxList('all');
 </script>
 </body>
 </html>
