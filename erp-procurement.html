@@ -329,9 +329,6 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- PROCUREMENT LIST -->
   <div class="sec-head"><span class="sec-title">採購單列表</span><span style="font-size:10px;color:var(--txt-lo)">點擊展開三家比價</span></div>
 
-  <!-- FEISHU LIVE POs (injected dynamically if Feishu has data) -->
-  <div id="feishu-po-list"></div>
-
   <!-- PO FILTER TABS -->
   <div class="po-filter-bar">
     <button class="po-filter-tab active" onclick="filterPO('all',this)">全部 <span style="color:var(--txt-lo)">5</span></button>
@@ -581,66 +578,6 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="compare-footer">
         <div class="compare-note">5/01 廠端備妥確認 · 張作興核對</div>
       </div>
-    </div>
-  </div>
-
-  <!-- SUPPLIER COMPARISON TABLE -->
-  <div class="sec-head"><span class="sec-title">供應商比價詳細表 · Snoopy 夏季大貨</span></div>
-  <div class="supplier-section">
-    <div class="supplier-section-header">
-      <div>
-        <div class="supplier-section-title">Snoopy 夏季大貨 · 三家比價明細</div>
-        <div class="supplier-section-sub">賴哥確認：永盛報價最低、品質最穩、熟悉 Snoopy 授權標準</div>
-      </div>
-      <span class="chip chip-warn">待送 Shawn</span>
-    </div>
-    <div class="supplier-table-wrap">
-      <table class="supplier-table">
-        <thead>
-          <tr>
-            <th>評比項目</th>
-            <th>東莞永盛玩具</th>
-            <th>廣州德盛工藝</th>
-            <th>深圳宏達玩具</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="best-row">
-            <td style="color:var(--txt-mid);font-size:10px;">報價</td>
-            <td class="col-price-best">¥ 148,000 <span class="recommend-badge">✓ 推薦</span></td>
-            <td class="col-price">¥ 162,000</td>
-            <td class="col-price">¥ 155,000</td>
-          </tr>
-          <tr class="best-row">
-            <td style="color:var(--txt-mid);font-size:10px;">交期</td>
-            <td class="col-supplier">45 天</td>
-            <td>60 天</td>
-            <td>50 天</td>
-          </tr>
-          <tr class="best-row">
-            <td style="color:var(--txt-mid);font-size:10px;">付款條件</td>
-            <td class="col-supplier">30/40/30</td>
-            <td>50/50</td>
-            <td>40/60</td>
-          </tr>
-          <tr class="best-row">
-            <td style="color:var(--txt-mid);font-size:10px;">品質評分</td>
-            <td><span class="star-rating">★★★★★</span></td>
-            <td><span class="star-rating">★★★★</span><span style="color:var(--txt-lo)">☆</span></td>
-            <td><span class="star-rating">★★★★</span><span style="color:var(--txt-lo)">☆</span></td>
-          </tr>
-          <tr class="best-row">
-            <td style="color:var(--txt-mid);font-size:10px;">備注</td>
-            <td style="color:var(--ok);font-size:11px;">熟悉 Snoopy 授權標準</td>
-            <td>—</td>
-            <td><span class="warn-badge">⚠ 曾遲交</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="send-shawn-wrap">
-      <div class="send-shawn-note">賴哥推薦東莞永盛玩具 · 30/40/30 條件 · 最低報價 ¥148,000</div>
-      <button class="btn-send" id="btn-send-main" onclick="sendToShawnMain()">✓ 送 Shawn 審核</button>
     </div>
   </div>
 
@@ -1288,46 +1225,7 @@ function renderQuotesList(){
   });
 }
 
-/* ── INIT ── */
-/* ── FEISHU: PO LIST ── */
-async function loadPOsFromFeishu(){
-  try{
-    const rows = await query(_T.procurement);
-    if(!rows.length) return;
-    const STATUS_COLOR = {
-      '詢比價中':'var(--warn)', '確認中':'var(--warn)',
-      '已下單':'var(--accent)', '生產中':'var(--accent)',
-      '已完成':'var(--ok)', '已出貨':'var(--ok)',
-      '取消':'var(--txt-lo)', '逾期':'var(--danger)',
-    };
-    const container = document.getElementById('feishu-po-list');
-    if(!container) return;
-    container.innerHTML = `
-      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;padding:0 2px;">飛書採購記錄（${rows.length} 筆）</div>
-      ${rows.map((r,i)=>{
-        const f = r.fields;
-        const item = fv(f,'採購品項')||fv(f,'品項')||'—';
-        const supplier = fv(f,'供應商A')||fv(f,'供應商')||'—';
-        const amt = parseFloat(fv(f,'議定價格'))||parseFloat(fv(f,'金額'))||0;
-        const status = fv(f,'採購狀態')||fv(f,'審批狀態')||'待處理';
-        const owner = fv(f,'負責人')||'賴哥';
-        const clr = STATUS_COLOR[status]||'var(--txt-mid)';
-        return `<div class="po-card" style="margin-bottom:6px;">
-          <div class="po-header" style="cursor:default;">
-            <div class="po-body" style="flex:1;">
-              <div class="po-name">${item} <span class="chip" style="background:${clr}18;color:${clr};border:1px solid ${clr}30;font-size:9px;padding:1px 6px;border-radius:4px;">${status}</span></div>
-              <div class="po-meta">供應商：${supplier} · 負責：${owner}</div>
-            </div>
-            <div class="po-right"><div class="po-amt" style="color:${clr}">${amt?'¥ '+(amt/10000).toFixed(1)+'萬':'—'}</div></div>
-          </div>
-        </div>`;
-      }).join('')}
-    `;
-  }catch(e){}
-}
-
 loadKPIsFromFeishu();
-loadPOsFromFeishu();
 renderQuotesList();
 </script>
 
