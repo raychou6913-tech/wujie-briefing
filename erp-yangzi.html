@@ -121,6 +121,34 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 /* Toast */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ok);color:#000;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
+
+/* Entity tabs */
+.ent-tabs{display:flex;gap:4px;flex-wrap:wrap;}
+.ent-tab{padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--card);color:var(--txt-mid);cursor:pointer;transition:all .15s;}
+.ent-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.ent-tab:hover:not(.active){border-color:var(--border-hi);color:var(--txt-hi);}
+
+/* OPEX table */
+.opex-wrap{overflow-x:auto;padding:0 2px;}
+.opex-table{width:100%;border-collapse:collapse;min-width:400px;}
+.opex-table th{font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;padding:8px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.04em;}
+.opex-table th:first-child{text-align:left;}
+.opex-table td{font-size:12px;padding:9px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;}
+.opex-table td:first-child{text-align:left;color:var(--txt-mid);font-size:11px;font-weight:600;}
+.opex-table tr.total-row td{border-top:1px solid var(--border-hi);border-bottom:none;font-weight:800;color:var(--txt-hi);padding-top:11px;}
+.opex-table tr.total-row td:first-child{color:var(--txt-hi);}
+.num-over{color:var(--danger)!important;}
+.num-warn{color:var(--warn)!important;}
+.num-ok{color:var(--ok)!important;}
+
+/* Budget inline */
+.budget-inline{background:var(--card2);border:1px solid var(--border-hi);border-radius:9px;padding:10px 13px;margin-top:8px;}
+.bi-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.bi-label{font-size:10px;color:var(--txt-lo);}
+.bi-val{font-size:12px;font-weight:700;}
+.bi-divider{height:1px;background:var(--border);margin:6px 0;}
+.bi-row.total .bi-label{color:var(--txt-mid);font-weight:700;}
+.bi-row.total .bi-val{font-size:13px;}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -167,12 +195,29 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="payroll-rows" id="payroll-rows"></div>
   </div>
 
-  <!-- Flow overview -->
-  <div class="sec-hd"><span class="sec-title">申請收件流程說明</span></div>
-  <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:11px;color:var(--txt-mid);line-height:1.6;">
-    以下申請由員工從各自工作台提交，系統自動轉入您的<strong style="color:var(--txt-hi);">待審核隊列</strong>。行政採購由楊子整合後發起。
+  <!-- 費用管銷總覽 -->
+  <div class="sec-hd">
+    <span class="sec-title">費用管銷總覽</span>
+    <span class="sec-link" onclick="openExpModal('opex')">+ 錄入費用</span>
   </div>
-  <div class="form-grid" id="form-grid"></div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;">
+    <div class="ent-tabs" style="padding:12px 12px 10px;" id="opex-ent-tabs">
+      <button class="ent-tab active" onclick="setOpexEnt('北京蕪解',this)">北京蕪解</button>
+      <button class="ent-tab" onclick="setOpexEnt('台灣悍草',this)">台灣悍草</button>
+      <button class="ent-tab" onclick="setOpexEnt('UJ BKK',this)">UJ BKK</button>
+    </div>
+    <div class="opex-wrap"><table class="opex-table" id="opex-table"></table></div>
+  </div>
+
+  <!-- 行政採購 -->
+  <div class="sec-hd"><span class="sec-title">行政採購</span></div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:3px;">辦公室耗材 / 設備 / 雜費採購</div>
+      <div style="font-size:11px;color:var(--txt-mid);">楊子整合需求 → 安然批准 → 轉採購台執行</div>
+    </div>
+    <button style="padding:9px 16px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:12px;white-space:nowrap;" onclick="openProcureModal()">填寫申請 →</button>
+  </div>
 
 </div>
 
@@ -201,15 +246,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   </div>
 </div>
 
-<!-- New Form Modal -->
-<div class="modal-bg" id="modal-form">
+<!-- Procurement Modal -->
+<div class="modal-bg" id="modal-procure">
   <div class="modal">
-    <div class="modal-title" id="nf-title">填寫申請</div>
-    <div class="modal-sub" id="nf-sub"></div>
-    <div id="nf-fields"></div>
+    <div class="modal-title">📦 行政採購申請</div>
+    <div class="modal-sub">楊子整合 → 安然批准 → 轉採購台執行</div>
+    <div class="field"><label>採購品項與數量</label><textarea id="pc-items" placeholder="例：A4影印紙 5箱、墨水匣 2組" style="resize:vertical;min-height:70px;"></textarea></div>
+    <div class="field"><label>預估預算</label><input id="pc-budget" placeholder="例：¥1,200"></div>
+    <div class="field"><label>緊急程度</label>
+      <select id="pc-urgency">
+        <option>正常（1週內）</option>
+        <option>緊急（3天內）</option>
+        <option>非常緊急（今天）</option>
+      </select>
+    </div>
+    <div class="field"><label>採購原因（選填）</label><textarea id="pc-reason" style="resize:vertical;min-height:50px;" placeholder="說明採購必要性…"></textarea></div>
     <div class="modal-footer">
-      <button class="btn-full btn-cancel" onclick="closeForm()">取消</button>
-      <button class="btn-full btn-full" style="background:var(--accent);color:#fff;" onclick="submitForm()">送出申請</button>
+      <button class="btn-full btn-cancel" onclick="closeProcureModal()">取消</button>
+      <button class="btn-full" style="background:var(--accent);color:#fff;" onclick="submitProcure()">送出 →</button>
     </div>
   </div>
 </div>
@@ -341,57 +395,100 @@ const PAYROLL_STEPS = [
 function loadPayroll(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY)||'{"done":["p1"]}'); }
 function savePayroll(s){ localStorage.setItem(PAYROLL_KEY,JSON.stringify(s)); }
 
-// ── Form Definitions ───────────────────────────────────────
-// role: 'receive' = 員工提交、楊子收件審核; 'initiate' = 楊子主動發起
-const FORMS = [
-  {
-    id:'f-expense', icon:'💸', name:'費用報銷申請',
-    desc:'員工出差、採購、日常費用',
-    role:'receive', roleLabel:'員工提交 → 楊子初審',
-    route:'楊子初審 → 安然複核 → 躍明付款',
-    fields:[
-      {type:'text',id:'申請人',label:'申請人'},
-      {type:'text',id:'事由',label:'申請事由'},
-      {type:'date',id:'日期',label:'費用發生日期'},
-      {type:'text',id:'金額',label:'金額'},
-      {type:'select',id:'貨幣',label:'貨幣',options:['TWD','CNY','THB','USD','HKD']},
-      {type:'textarea',id:'明細',label:'費用明細'},
-    ],
+// ── OPEX Data ──────────────────────────────────────────────
+const OPEX_DATA = {
+  '北京蕪解': {
+    ccy:'CNY', months:['3月','4月','5月'],
+    rows:[
+      {cat:'薪資人事',  vals:[85000,85000,85000], budget:90000},
+      {cat:'辦公費用',  vals:[8200, 7600, 6800],  budget:10000},
+      {cat:'倉儲物流',  vals:[12400,15200,8500],  budget:15000},
+      {cat:'差旅費',    vals:[3200, 4800, 1200],  budget:5000},
+      {cat:'業務行銷',  vals:[6800, 9200, 2400],  budget:8000},
+      {cat:'其他',      vals:[1800, 2400, 800],   budget:3000},
+    ]
   },
-  {
-    id:'f-leave', icon:'🌿', name:'請假申請',
-    desc:'事假、病假、特休、年假',
-    role:'receive', roleLabel:'員工提交 → 楊子初審',
-    route:'楊子初審 → 直屬主管 → 安然備案',
-    fields:[
-      {type:'text',id:'申請人',label:'申請人'},
-      {type:'select',id:'假別',label:'假別',options:['事假','病假','特休','年假','其他']},
-      {type:'date',id:'開始',label:'開始日期'},
-      {type:'date',id:'結束',label:'結束日期'},
-      {type:'text',id:'代理人',label:'代理人'},
-      {type:'textarea',id:'原因',label:'請假原因（選填）'},
-    ],
+  '台灣悍草': {
+    ccy:'TWD', months:['3月','4月','5月'],
+    rows:[
+      {cat:'薪資人事',  vals:[248000,248000,248000], budget:260000},
+      {cat:'辦公費用',  vals:[18500, 17200, 15800],  budget:20000},
+      {cat:'設計費用',  vals:[42000, 38000, 24000],  budget:40000},
+      {cat:'差旅費',    vals:[8400,  12600, 3200],   budget:10000},
+      {cat:'其他',      vals:[4200,  5600,  1800],   budget:6000},
+    ]
   },
-  {
-    id:'f-recruit', icon:'👤', name:'招募需求申請',
-    desc:'主管提出人力需求後，楊子負責執行招募',
-    role:'receive', roleLabel:'主管申請 → 安然批准 → 楊子執行',
-    route:'部門主管申請 → 安然批准 → 楊子執行招募',
-    fields:[],
+  'UJ BKK': {
+    ccy:'THB', months:['3月','4月','5月'],
+    rows:[
+      {cat:'薪資人事',  vals:[62000, 62000, 62000],  budget:65000},
+      {cat:'快閃場地費',vals:[0,     186000,0],       budget:200000},
+      {cat:'快閃行銷',  vals:[18000, 48000, 8000],   budget:50000},
+      {cat:'差旅費',    vals:[12400, 18600, 6200],   budget:15000},
+      {cat:'其他',      vals:[3200,  4800,  1400],   budget:5000},
+    ]
   },
-  {
-    id:'f-procurement', icon:'📦', name:'行政採購申請',
-    desc:'辦公室耗材、設備、雜費',
-    role:'initiate', roleLabel:'楊子整合發起',
-    route:'楊子整合 → 安然批准 → 轉採購台',
-    fields:[
-      {type:'text',id:'申請人',label:'申請人'},
-      {type:'textarea',id:'品項',label:'採購品項與數量'},
-      {type:'text',id:'預算',label:'預估預算'},
-      {type:'select',id:'緊急',label:'緊急程度',options:['正常（1週內）','緊急（3天內）','非常緊急（今天）']},
-      {type:'textarea',id:'原因',label:'採購原因'},
-    ],
-  },
+};
+
+let currentOpexEntity = '北京蕪解';
+
+function setOpexEnt(ent, btn){
+  currentOpexEntity = ent;
+  document.querySelectorAll('.ent-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOpexTable();
+}
+
+function renderOpexTable(){
+  const d = OPEX_DATA[currentOpexEntity];
+  if(!d){ return; }
+  const months = d.months;
+  const curMonLabel = months[months.length-1];
+  const thead = `<thead><tr>
+    <th>科目</th>
+    ${months.map((m,i)=>`<th>${m}</th>`).join('')}
+    <th>月預算</th>
+    <th>本月差異</th>
+  </tr></thead>`;
+  const totals = months.map((_,mi)=>d.rows.reduce((s,r)=>s+(r.vals[mi]||0),0));
+  const totalBudget = d.rows.reduce((s,r)=>s+r.budget,0);
+  const curTotal = totals[totals.length-1];
+  const curBudget = totalBudget;
+  const tbody = d.rows.map(r=>{
+    const curVal = r.vals[r.vals.length-1];
+    const diff = curVal - r.budget;
+    const diffClass = diff > r.budget*0.1 ? 'num-over' : diff > 0 ? 'num-warn' : 'num-ok';
+    const diffTxt = diff===0 ? '—' : (diff>0?'+':'')+diff.toLocaleString();
+    return `<tr>
+      <td>${r.cat}</td>
+      ${r.vals.map((v,i)=>`<td style="color:${i===r.vals.length-1?'var(--txt-hi)':'var(--txt-lo)'}">${v>0?v.toLocaleString():'—'}</td>`).join('')}
+      <td style="color:var(--txt-mid);">${r.budget.toLocaleString()}</td>
+      <td class="${diffClass}">${diffTxt}</td>
+    </tr>`;
+  }).join('');
+  const totalDiff = curTotal - curBudget;
+  const totalDiffClass = totalDiff > 0 ? 'num-over' : 'num-ok';
+  const tfoot = `<tr class="total-row">
+    <td>合計</td>
+    ${totals.map((v,i)=>`<td>${v.toLocaleString()}</td>`).join('')}
+    <td>${curBudget.toLocaleString()}</td>
+    <td class="${totalDiffClass}">${(totalDiff>0?'+':'')+totalDiff.toLocaleString()}</td>
+  </tr>`;
+  document.getElementById('opex-table').innerHTML = `${thead}<tbody>${tbody}${tfoot}</tbody>`;
+}
+
+// ── Budget Lines (項目費用科目) ──────────────────────────────
+const BUDGET_LINES = [
+  {id:'bl1', entity:'北京蕪解', cat:'倉儲物流費',     ccy:'CNY', budget:15000, used:8500},
+  {id:'bl2', entity:'北京蕪解', cat:'業務行銷費',     ccy:'CNY', budget:8000,  used:2400},
+  {id:'bl3', entity:'北京蕪解', cat:'差旅費',         ccy:'CNY', budget:5000,  used:1200},
+  {id:'bl4', entity:'北京蕪解', cat:'採購生產費',     ccy:'CNY', budget:500000,used:142000},
+  {id:'bl5', entity:'台灣悍草', cat:'設計打樣費',     ccy:'TWD', budget:40000, used:18400},
+  {id:'bl6', entity:'台灣悍草', cat:'差旅費',         ccy:'TWD', budget:10000, used:3200},
+  {id:'bl7', entity:'台灣悍草', cat:'行銷推廣費',     ccy:'TWD', budget:15000, used:6800},
+  {id:'bl8', entity:'UJ BKK',  cat:'快閃店場地費',   ccy:'THB', budget:200000,used:186000},
+  {id:'bl9', entity:'UJ BKK',  cat:'快閃店行銷費',   ccy:'THB', budget:50000, used:48000},
+  {id:'bl10',entity:'UJ BKK',  cat:'差旅費',         ccy:'THB', budget:15000, used:6200},
 ];
 
 // ── Render ─────────────────────────────────────────────────
@@ -458,24 +555,10 @@ function render(){
   document.getElementById('payroll-status').textContent = allDone ? '✓ 已完成' : '進行中';
   document.getElementById('payroll-status').className = 'payroll-status ' + (allDone?'status-done':'status-progress');
 
-  // Forms — receive cards are info-only; initiate cards are clickable launchers
-  const formGrid = document.getElementById('form-grid');
-  formGrid.innerHTML = FORMS.map(f=>{
-    const isInitiate = f.role==='initiate';
-    const roleBadge = isInitiate
-      ? `<span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:var(--accent-dim);color:var(--accent);">楊子發起</span>`
-      : `<span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:var(--ok-dim);color:var(--ok);">收件審核</span>`;
-    const clickAttr = isInitiate ? `onclick="openForm('${f.id}')" style="cursor:pointer;"` : `style="cursor:default;opacity:.85;"`;
-    return `<div class="form-card" ${clickAttr}>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-        <div class="form-icon">${f.icon}</div>${roleBadge}
-      </div>
-      <div class="form-name">${f.name}</div>
-      <div class="form-desc">${f.desc}</div>
-      <div class="form-route">流程：<span>${f.route}</span></div>
-      ${isInitiate?'<div style="font-size:10px;color:var(--accent);margin-top:6px;font-weight:700;">點擊填寫 →</div>':'<div style="font-size:10px;color:var(--ok);margin-top:6px;">員工自行提交，出現在待審核隊列</div>'}
-    </div>`;
-  }).join('');
+}
+
+function renderOpexOnce(){
+  if(!document.getElementById('opex-table').innerHTML) renderOpexTable();
 }
 
 function openApproval(id){
@@ -521,51 +604,26 @@ function markPayrollDone(stepId){
   showToast('已完成此步驟 ✓');
 }
 
-function openForm(id){
-  const f = FORMS.find(x=>x.id===id);
-  if(!f||f.role==='receive') return;
-  currentFormId = id;
-  document.getElementById('nf-title').textContent = f.icon + ' ' + f.name;
-  document.getElementById('nf-sub').textContent = '送審路徑：' + f.route;
-  document.getElementById('nf-fields').innerHTML = f.fields.map(field=>{
-    let input='';
-    if(field.type==='text') input=`<input id="nf-${field.id}" placeholder="">`;
-    else if(field.type==='date') input=`<input type="date" id="nf-${field.id}">`;
-    else if(field.type==='textarea') input=`<textarea id="nf-${field.id}" style="resize:vertical;min-height:60px;"></textarea>`;
-    else if(field.type==='select') input=`<select id="nf-${field.id}">${(field.options||[]).map(o=>`<option>${o}</option>`).join('')}</select>`;
-    return `<div class="field"><label>${field.label}</label>${input}</div>`;
-  }).join('');
-  document.getElementById('modal-form').classList.add('show');
+function openProcureModal(){
+  ['pc-items','pc-budget','pc-reason'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('modal-procure').classList.add('show');
 }
-
-function submitForm(){
-  const f = FORMS.find(x=>x.id===currentFormId);
-  if(f){
-    const data = {};
-    f.fields.forEach(field=>{
-      const el = document.getElementById(`nf-${field.id}`);
-      if(el) data[field.label] = el.value;
-    });
-    const rec = { ts: Date.now(), formId: currentFormId, formName: f.name,
-      route: f.route, data, by: SESS?.name||'楊子' };
-    const key = 'yangzi_form_queue_v1';
-    const q = JSON.parse(localStorage.getItem(key)||'[]');
-    q.unshift(rec);
-    localStorage.setItem(key, JSON.stringify(q));
-    // Fire-and-forget → Feishu 審批記錄
-    const desc=Object.entries(data).map(([k,v])=>`${k}：${v}`).join(' · ');
-    const amt=parseFloat(Object.values(data).find(v=>!isNaN(parseFloat(v)))||0)||0;
-    _yzWriteApproval({'標題':`【採購】楊子 ${f.name}`,
-      '審批標題':`【採購申請】楊子 ${f.name}`,
-      '審批類型':'採購審批','申請人':'楊子','申請日期':Date.now(),
-      '金額':amt,'幣別':'CNY','審批人':'Ray',
-      '審批狀態':'待審批','Email已發送':'否','申請說明':desc||f.name});
-  }
-  closeForm();
-  showToast('申請已送出，審核中...');
+function closeProcureModal(){ document.getElementById('modal-procure').classList.remove('show'); }
+function submitProcure(){
+  const items=document.getElementById('pc-items').value.trim();
+  const budget=document.getElementById('pc-budget').value.trim();
+  if(!items){ showToast('請填寫採購品項'); return; }
+  const reason=document.getElementById('pc-reason').value;
+  const urgency=document.getElementById('pc-urgency').value;
+  _yzWriteApproval({'標題':`【行政採購】楊子 ${items.slice(0,20)}`,
+    '審批標題':`【行政採購申請】${items.slice(0,30)}`,
+    '審批類型':'採購審批','申請人':'楊子','申請日期':Date.now(),
+    '金額':parseFloat(budget.replace(/[^0-9.]/g,''))||0,'幣別':'CNY',
+    '審批人':'安然','審批狀態':'待審批','Email已發送':'否',
+    '申請說明':`${items} / 緊急程度：${urgency} / ${reason}`});
+  closeProcureModal();
+  showToast('採購申請已送出，待安然批准 ✓');
 }
-
-function closeForm(){ document.getElementById('modal-form').classList.remove('show'); }
 
 function showToast(msg){
   const el=document.getElementById('toast');
@@ -574,6 +632,7 @@ function showToast(msg){
 }
 
 render();
+renderOpexTable();
 loadPaymentList();
 </script>
 
@@ -583,10 +642,17 @@ loadPaymentList();
 .exp-fab:active{transform:scale(.92);}
 .exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
 .exp-overlay.open{display:flex;}
-.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
-.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.exp-sheet{background:#111318;border:1px solid #222535;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:90vh;overflow-y:auto;}
+.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .exp-title{font-size:15px;font-weight:700;color:#e8eaf8;}
 .exp-close{background:none;border:none;color:#7880a8;font-size:18px;cursor:pointer;}
+/* Main type: 日常費用 vs 項目費用 */
+.exp-main-row{display:flex;gap:8px;margin-bottom:16px;}
+.exp-main-btn{flex:1;padding:11px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid #222535;background:#181a22;color:#7880a8;transition:.15s;text-align:center;}
+.exp-main-btn.active-daily{border-color:#10b981;background:#10b98112;color:#10b981;}
+.exp-main-btn.active-proj{border-color:#818cf8;background:#818cf812;color:#818cf8;}
+.exp-main-desc{font-size:10px;font-weight:400;margin-top:3px;opacity:.7;}
+/* Sub type (日常費用 tabs) */
 .exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
 .exp-type-btn{flex:1;padding:8px;border:1px solid #222535;border-radius:8px;background:#181a22;color:#7880a8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
 .exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
@@ -597,6 +663,17 @@ loadPaymentList();
 .exp-amt-row{display:flex;gap:6px;}
 .exp-amt-row input{flex:1;}
 .exp-amt-row select{width:90px;}
+/* Budget inline display */
+.exp-budget-box{background:#1e2130;border:1px solid #363b58;border-radius:9px;padding:11px 13px;margin-top:8px;}
+.exp-budget-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11px;}
+.exp-budget-row .lbl{color:#7880a8;}
+.exp-budget-row .val{font-weight:700;}
+.exp-budget-divider{height:1px;background:#222535;margin:7px 0;}
+.exp-budget-row.total .lbl{color:#e8eaf8;font-weight:700;}
+.exp-budget-row.total .val{font-size:13px;}
+.exp-over{color:#ef4444!important;}
+.exp-warn{color:#f59e0b!important;}
+.exp-ok{color:#22c55e!important;}
 .exp-routing{font-size:11px;color:#7880a8;padding:8px 10px;background:#181a22;border-radius:8px;margin-bottom:12px;border:1px solid #222535;}
 .exp-routing strong{color:#10b981;}
 .exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
@@ -605,25 +682,78 @@ loadPaymentList();
 <button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
 <div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
 <div class="exp-sheet">
-  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
-  <div class="exp-type-row" id="expTypeRow">
-    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
-    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+  <div class="exp-header">
+    <span class="exp-title" id="expSheetTitle">費用申請</span>
+    <button class="exp-close" onclick="closeExpModal()">✕</button>
   </div>
-  <div id="expPersonalFields">
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
-    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
-    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+
+  <!-- 第一層：日常費用 vs 項目費用 -->
+  <div class="exp-main-row">
+    <button class="exp-main-btn active-daily" id="expBtnDaily" onclick="setExpMainType('daily')">
+      日常費用
+      <div class="exp-main-desc">差旅・車資・餐費・辦公</div>
+    </button>
+    <button class="exp-main-btn" id="expBtnProj" onclick="setExpMainType('proj')">
+      項目費用
+      <div class="exp-main-desc">供應商請款・快閃・生產</div>
+    </button>
   </div>
-  <div id="expSupplierFields" style="display:none">
-    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
-    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+
+  <!-- 日常費用 fields -->
+  <div id="expDailyFields">
+    <div class="exp-type-row">
+      <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
+      <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款</button>
+    </div>
+    <div id="expPersonalFields">
+      <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+      <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
+      <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
+      <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
+    </div>
+    <div id="expSupplierFields" style="display:none;">
+      <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
+      <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
+      <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+      <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+    </div>
+    <div class="exp-routing" id="expRouting">送審路徑：楊子初審 → 安然複核 → 躍明付款</div>
   </div>
-  <div class="exp-routing" id="expRouting">載入中...</div>
-  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
+
+  <!-- 項目費用 fields -->
+  <div id="expProjFields" style="display:none;">
+    <div class="exp-field">
+      <label>主體</label>
+      <select id="expProjEntity" onchange="onProjEntityChange()">
+        <option value="北京蕪解">北京蕪解</option>
+        <option value="台灣悍草">台灣悍草</option>
+        <option value="UJ BKK">UJ BKK（泰國）</option>
+        <option value="香港JV">香港 JV</option>
+      </select>
+    </div>
+    <div class="exp-field">
+      <label>預算科目</label>
+      <select id="expProjBudgetLine" onchange="showBudgetInline()">
+        <option value="">— 選擇科目 —</option>
+      </select>
+      <!-- 預算對照 -->
+      <div id="expBudgetBox" class="exp-budget-box" style="display:none;">
+        <div class="exp-budget-row"><span class="lbl">本期預算</span><span class="val" id="bi-budget">—</span></div>
+        <div class="exp-budget-row"><span class="lbl">本期已用</span><span class="val" id="bi-used">—</span></div>
+        <div class="exp-budget-divider"></div>
+        <div class="exp-budget-row"><span class="lbl">本次申請</span><span class="val" id="bi-this" style="color:#818cf8;">—</span></div>
+        <div class="exp-budget-divider"></div>
+        <div class="exp-budget-row total"><span class="lbl">核准後剩餘</span><span class="val" id="bi-remaining">—</span></div>
+      </div>
+    </div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expProjAmt" type="number" placeholder="0.00" min="0" step="0.01" oninput="updateBudgetRemaining()"><select id="expProjCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>說明 / 費用事由</label><textarea id="expProjDesc" rows="2" placeholder="費用說明、合約條款或 PO 編號..."></textarea></div>
+    <div style="font-size:10px;color:#818cf8;padding:8px 10px;background:#818cf808;border:1px solid #818cf820;border-radius:8px;margin-bottom:12px;">
+      送審路徑：<strong>部門主管確認</strong> → <strong>Ray 核准</strong> → <strong>躍明付款</strong>
+    </div>
+  </div>
+
+  <button class="exp-submit" id="expSubmitBtn" onclick="submitExpense()">送出申請</button>
 </div>
 </div>
 <script>
@@ -637,31 +767,60 @@ const EXP_ROUTES={
   gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
   chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
   jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
   muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
-  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
+  laige:{next:'yangzi',nextLabel:'楊子',cc:'安然'},
+  yuming:{next:'yangzi',nextLabel:'楊子',cc:'安然'},
   yangzi:{next:'anran',nextLabel:'安然',cc:null},
-  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
+  anran:{next:'yangzi',nextLabel:'楊子',cc:'Ray'},
+  shawn:{next:'yangzi',nextLabel:'楊子',cc:'Ray'},
   leo:{next:'ray',nextLabel:'Ray',cc:null},
-  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
+  ray:{next:'yangzi',nextLabel:'楊子',cc:null},
+};
+// 項目費用：按主體決定主管
+const PROJ_APPROVERS={
+  '北京蕪解':'安然','台灣悍草':'Bevis','UJ BKK':'Shawn','香港JV':'Ray'
 };
 const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
+// 預算科目資料（同 BUDGET_LINES，這裡局部 copy 讓 FAB IIFE 可存取）
+const BL=[
+  {id:'bl1',entity:'北京蕪解',cat:'倉儲物流費',    ccy:'CNY',budget:15000, used:8500},
+  {id:'bl2',entity:'北京蕪解',cat:'業務行銷費',    ccy:'CNY',budget:8000,  used:2400},
+  {id:'bl3',entity:'北京蕪解',cat:'差旅費',        ccy:'CNY',budget:5000,  used:1200},
+  {id:'bl4',entity:'北京蕪解',cat:'採購生產費',    ccy:'CNY',budget:500000,used:142000},
+  {id:'bl5',entity:'台灣悍草',cat:'設計打樣費',    ccy:'TWD',budget:40000, used:18400},
+  {id:'bl6',entity:'台灣悍草',cat:'差旅費',        ccy:'TWD',budget:10000, used:3200},
+  {id:'bl7',entity:'台灣悍草',cat:'行銷推廣費',    ccy:'TWD',budget:15000, used:6800},
+  {id:'bl8',entity:'UJ BKK', cat:'快閃店場地費',  ccy:'THB',budget:200000,used:186000},
+  {id:'bl9',entity:'UJ BKK', cat:'快閃店行銷費',  ccy:'THB',budget:50000, used:48000},
+  {id:'bl10',entity:'UJ BKK',cat:'差旅費',        ccy:'THB',budget:15000, used:6200},
+];
+
+let expMainType='daily';
 let expType='personal';
+
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
-function openExpModal(){
-  const u=getUser();const r=EXP_ROUTES[u];
-  const hint=document.getElementById('expRouting');
-  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
-  else{hint.innerHTML='送審路徑：楊子';}
-  const supBtn=document.getElementById('expTypeSupplier');
-  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+
+function openExpModal(hint){
   document.getElementById('expDate').valueAsDate=new Date();
-  setExpType('personal');
+  const u=getUser();
+  const supBtn=document.getElementById('expTypeSupplier');
+  if(supBtn) supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
+  setExpMainType(hint==='opex'?'proj':'daily');
   document.getElementById('expOverlay').classList.add('open');
 }
 function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
+
+function setExpMainType(t){
+  expMainType=t;
+  const isProj=t==='proj';
+  document.getElementById('expDailyFields').style.display=isProj?'none':'';
+  document.getElementById('expProjFields').style.display=isProj?'':'none';
+  document.getElementById('expBtnDaily').className='exp-main-btn'+(isProj?'':' active-daily');
+  document.getElementById('expBtnProj').className='exp-main-btn'+(isProj?' active-proj':'');
+  document.getElementById('expSheetTitle').textContent=isProj?'項目費用申請':'日常費用申請';
+  if(isProj) onProjEntityChange();
+}
+
 function setExpType(t){
   expType=t;
   document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
@@ -669,33 +828,104 @@ function setExpType(t){
   document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
   document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
 }
-function submitExpense(){
-  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
-  let rec;
-  if(expType==='personal'){
-    const amt=document.getElementById('expAmt').value;
-    const ccy=document.getElementById('expCcy').value;
-    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
-    const date=document.getElementById('expDate').value;
-    const desc=document.getElementById('expDesc').value;
-    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
-    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
-  }else{
-    const name=document.getElementById('expSupName').value;
-    const po=document.getElementById('expSupPO').value;
-    const amt=document.getElementById('expSupAmt').value;
-    const ccy=document.getElementById('expSupCcy').value;
-    const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
-    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+
+function onProjEntityChange(){
+  const ent=document.getElementById('expProjEntity').value;
+  const sel=document.getElementById('expProjBudgetLine');
+  const lines=BL.filter(b=>b.entity===ent);
+  sel.innerHTML='<option value="">— 選擇預算科目 —</option>'+
+    lines.map(b=>`<option value="${b.id}">${b.cat}（${b.ccy} ${b.budget.toLocaleString()}）</option>`).join('');
+  document.getElementById('expBudgetBox').style.display='none';
+  const ccyMap={'北京蕪解':'RMB','台灣悍草':'TWD','UJ BKK':'THB','香港JV':'HKD'};
+  const ccySel=document.getElementById('expProjCcy');
+  if(ccySel){
+    [...ccySel.options].forEach(o=>o.selected=o.value===(ccyMap[ent]||'RMB'));
   }
+}
+
+function showBudgetInline(){
+  const id=document.getElementById('expProjBudgetLine').value;
+  const box=document.getElementById('expBudgetBox');
+  if(!id){box.style.display='none';return;}
+  const bl=BL.find(b=>b.id===id);
+  if(!bl){box.style.display='none';return;}
+  document.getElementById('bi-budget').textContent=`${bl.ccy} ${bl.budget.toLocaleString()}`;
+  document.getElementById('bi-used').textContent=`${bl.ccy} ${bl.used.toLocaleString()}`;
+  box.style.display='';
+  updateBudgetRemaining();
+}
+
+function updateBudgetRemaining(){
+  const id=document.getElementById('expProjBudgetLine').value;
+  if(!id) return;
+  const bl=BL.find(b=>b.id===id);
+  if(!bl) return;
+  const thisAmt=parseFloat(document.getElementById('expProjAmt').value)||0;
+  document.getElementById('bi-this').textContent=thisAmt>0?`${bl.ccy} ${thisAmt.toLocaleString()}`:'—';
+  const remaining=bl.budget-bl.used-thisAmt;
+  const el=document.getElementById('bi-remaining');
+  el.textContent=`${bl.ccy} ${remaining.toLocaleString()}`;
+  el.className='val '+(remaining<0?'exp-over':remaining<bl.budget*0.1?'exp-warn':'exp-ok');
+}
+
+function submitExpense(){
+  const u=getUser();
+  const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
-  q.push(rec);localStorage.setItem(key,JSON.stringify(q));
-  closeExpModal();
-  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
+
+  if(expMainType==='proj'){
+    const ent=document.getElementById('expProjEntity').value;
+    const blId=document.getElementById('expProjBudgetLine').value;
+    const bl=BL.find(b=>b.id===blId);
+    const amt=document.getElementById('expProjAmt').value;
+    const desc=document.getElementById('expProjDesc').value;
+    if(!blId||!amt){(window.showToast||alert)('請選擇預算科目並填寫金額');return;}
+    const approver=PROJ_APPROVERS[ent]||'Ray';
+    const rec={type:'項目費用',user:u,entity:ent,cat:bl?.cat,budgetLine:blId,
+      amt,ccy:bl?.ccy,desc,next:'ray',ts:Date.now()};
+    q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+    // Write to Feishu
+    if(window._yzWriteApproval) window._yzWriteApproval({
+      '標題':`【項目費用】${u} ${bl?.cat} ${amt}${bl?.ccy}`,
+      '審批標題':`【項目費用】${ent} ${bl?.cat}`,
+      '審批類型':'費用申請','申請人':u,'申請日期':Date.now(),
+      '金額':parseFloat(amt)||0,'幣別':bl?.ccy||'CNY',
+      '審批人':approver,'審批狀態':'待審批','Email已發送':'否',
+      '申請說明':`${desc} / 主體：${ent} / 科目：${bl?.cat} / 預算：${bl?.budget} 已用：${bl?.used}`});
+    closeExpModal();
+    (window.showToast||alert)(`✅ 項目費用已送出 · 待 ${approver} → Ray 確認`);
+  } else {
+    if(expType==='personal'){
+      const amt=document.getElementById('expAmt').value;
+      const ccy=document.getElementById('expCcy').value;
+      const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
+      const date=document.getElementById('expDate').value;
+      const desc=document.getElementById('expDesc').value;
+      if(!amt||!date){(window.showToast||alert)('請填寫金額與日期');return;}
+      const rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:r.next,cc:r.cc,ts:Date.now()};
+      q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+    } else {
+      const name=document.getElementById('expSupName').value;
+      const po=document.getElementById('expSupPO').value;
+      const amt=document.getElementById('expSupAmt').value;
+      const ccy=document.getElementById('expSupCcy').value;
+      const desc=document.getElementById('expSupDesc').value;
+      if(!name||!amt){(window.showToast||alert)('請填寫供應商名稱與金額');return;}
+      const rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,next:r.next,cc:r.cc,ts:Date.now()};
+      q.push(rec);localStorage.setItem(key,JSON.stringify(q));
+    }
+    closeExpModal();
+    (window.showToast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
+  }
 }
-window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
+
+window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;
+window.setExpType=setExpType;window.setExpMainType=setExpMainType;
+window.submitExpense=submitExpense;
+window.onProjEntityChange=onProjEntityChange;
+window.showBudgetInline=showBudgetInline;
+window.updateBudgetRemaining=updateBudgetRemaining;
 })();
 </script>
 
