@@ -820,6 +820,14 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <!-- 月度展開式交易列表 -->
   <div id="cash-tx-list"></div>
 
+  <!-- Leo 更新的台灣帳戶餘額 -->
+  <div style="margin-top:16px;">
+    <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">台灣帳戶餘額（Leo 更新）</div>
+    <div id="fin-bank-section">
+      <div style="padding:12px;text-align:center;color:var(--txt-lo);font-size:12px;">讀取中…</div>
+    </div>
+  </div>
+
   </div><!-- /tab-cash -->
 
   <!-- ══ TAB: 項目 P&L ══ -->
@@ -1433,7 +1441,7 @@ function switchTab(tab){
   if(tab==='pending') loadPendingList();
   if(tab==='project') renderProjectPL();
   if(tab==='pl'){ loadBudgetAchievement(); renderMgmtPL('ytd'); }
-  if(tab==='cash'){ renderCashTable(); renderCashTxList('all'); }
+  if(tab==='cash'){ renderCashTable(); renderCashTxList('all'); renderLeoBankSection(); }
 }
 function prefillAndScrollToForm(company, month){
   const sel=document.getElementById('cf-company');
@@ -2390,6 +2398,30 @@ setCashRange('month', null);
 loadPendingList();
 renderCashTable();
 renderCashTxList('all');
+
+// ── Leo 銀行帳戶（從 leo_bank_v1 讀取）──────────────────────
+function renderLeoBankSection(){
+  const el = document.getElementById('fin-bank-section');
+  if(!el) return;
+  const DEFAULTS = [
+    {id:'tw-main',name:'台灣悍草・主帳戶（玉山銀行）',ccy:'TWD',balance:1284600,updated:'2026-05-07'},
+    {id:'tw-backup',name:'台灣悍草・備用帳戶（國泰世華）',ccy:'TWD',balance:320000,updated:'2026-05-01'},
+  ];
+  const banks = JSON.parse(localStorage.getItem('leo_bank_v1')||JSON.stringify(DEFAULTS));
+  const total = banks.reduce((s,b)=>s+b.balance,0);
+  el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">` +
+    banks.map(b=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;">
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:5px;">${b.name}</div>
+      <div style="font-size:18px;font-weight:800;">NT$${b.balance.toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;">Leo 更新：${b.updated}</div>
+    </div>`).join('') +
+    `<div style="background:var(--card);border:1px solid var(--border-hi);border-radius:12px;padding:13px 14px;">
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:5px;">台灣悍草合計</div>
+      <div style="font-size:18px;font-weight:800;color:var(--ok);">NT$${total.toLocaleString()}</div>
+    </div></div>`;
+}
+
+renderLeoBankSection();
 </script>
 </body>
 </html>

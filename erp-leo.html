@@ -10,11 +10,10 @@
   --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
   --border:#222535;--border-hi:#363b58;
   --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
-  --accent:#475569;--accent-dim:#47556920;
+  --accent:#0284c7;--accent-dim:#0284c718;
   --ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
-  --blue:#0284c7;
 }
 body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
@@ -26,32 +25,81 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .main{padding:16px;max-width:720px;margin:0 auto;}
 
 /* Greeting */
-.greet{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border-hi);border-radius:16px;padding:20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.greet-left{}
+.greet{background:linear-gradient(135deg,var(--card2),var(--card));border:1px solid var(--border-hi);border-radius:16px;padding:20px;margin-bottom:16px;}
 .greet-hi{font-size:18px;font-weight:800;margin-bottom:4px;}
 .greet-sub{font-size:12px;color:var(--txt-mid);}
 .greet-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
 .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
 .badge-warn{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
 .badge-ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
-.badge-blue{background:#0284c720;border:1px solid #0284c7;color:var(--blue);}
+.badge-blue{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);}
 
 /* Section */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:24px;}
-.sec-hd:first-of-type{margin-top:0;}
 .sec-title{font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;}
-.sec-action{font-size:11px;color:var(--blue);cursor:pointer;border:none;background:none;}
-.sec-action:hover{opacity:.8;}
+.sec-link{font-size:11px;color:var(--accent);cursor:pointer;font-weight:700;border:none;background:none;}
 
-/* Monthly checklist */
-.checklist{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
-.check-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;}
+/* Payment items */
+.pay-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.pay-bar{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.pay-body{flex:1;min-width:0;}
+.pay-title{font-size:13px;font-weight:700;}
+.pay-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.pay-note{font-size:10px;color:var(--txt-lo);margin-top:2px;}
+.pay-right{text-align:right;flex-shrink:0;}
+.pay-amt{font-size:14px;font-weight:800;color:var(--warn);margin-bottom:6px;}
+.pay-btn{font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;cursor:pointer;border:1px solid;}
+
+/* Payroll steps */
+.payroll-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:4px;}
+.payroll-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.payroll-month{font-size:14px;font-weight:800;}
+.payroll-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.status-progress{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
+.status-done{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
+.payroll-rows{display:flex;flex-direction:column;gap:8px;}
+.payroll-row{display:flex;align-items:center;gap:10px;}
+.pr-step{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.step-done{background:var(--ok);color:#000;}
+.step-active{background:var(--accent);color:#fff;}
+.step-todo{background:var(--card2);border:1px solid var(--border);color:var(--txt-lo);}
+.pr-label{font-size:12px;flex:1;}
+.pr-label.active{font-weight:700;color:var(--txt-hi);}
+.pr-label.done{color:var(--txt-lo);text-decoration:line-through;}
+.pr-action{font-size:11px;color:var(--accent);cursor:pointer;border:none;background:none;}
+
+/* NHI (勞健保) */
+.nhi-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;}
+.nhi-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+.nhi-month{font-size:13px;font-weight:800;}
+.nhi-due{font-size:11px;color:var(--warn);font-weight:700;}
+.nhi-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);}
+.nhi-row:last-child{border-bottom:none;}
+.nhi-label{font-size:12px;flex:1;color:var(--txt-mid);}
+.nhi-amt{font-size:13px;font-weight:800;min-width:80px;text-align:right;}
+.nhi-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.nhi-check.paid{background:var(--ok);border-color:var(--ok);color:#000;}
+.nhi-check:not(.paid):hover{border-color:var(--ok);}
+.nhi-total-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card2);border-top:1px solid var(--border-hi);}
+.nhi-total-label{font-size:11px;font-weight:700;color:var(--txt-mid);}
+.nhi-total-amt{font-size:14px;font-weight:800;}
+
+/* Bank accounts */
+.bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;}
+@media(max-width:480px){.bank-grid{grid-template-columns:1fr;}}
+.bank-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+.bank-name{font-size:11px;font-weight:700;color:var(--txt-mid);margin-bottom:6px;}
+.bank-bal{font-size:20px;font-weight:800;margin-bottom:4px;}
+.bank-meta{font-size:10px;color:var(--txt-lo);}
+.bank-upd{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--accent-dim);color:var(--accent);border:1px solid #0284c740;cursor:pointer;margin-top:8px;}
+.bank-upd:hover{opacity:.8;}
+
+/* Checklist */
+.check-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
 .check-item:hover{border-color:var(--border-hi);}
-.check-item.done{opacity:.55;}
-.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
-.check-box:hover{border-color:var(--ok);}
-.check-box.checked{background:var(--ok);border-color:var(--ok);}
-.check-box.checked::after{content:'✓';font-size:12px;font-weight:800;color:#000;}
+.check-item.done{opacity:.5;}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.check-box.checked{background:var(--ok);border-color:var(--ok);color:#000;}
 .check-info{flex:1;}
 .check-name{font-size:13px;font-weight:700;}
 .check-meta{font-size:11px;color:var(--txt-mid);margin-top:2px;}
@@ -60,62 +108,20 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .due-warn{background:var(--warn-dim);color:var(--warn);}
 .due-ok{background:var(--ok-dim);color:var(--ok);}
 
-/* Quick records */
-.record-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:4px;}
-@media(max-width:420px){.record-grid{grid-template-columns:1fr;}}
-.record-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s;}
-.record-card:hover{border-color:var(--border-hi);}
-.rc-icon{font-size:22px;margin-bottom:6px;}
-.rc-name{font-size:13px;font-weight:700;margin-bottom:4px;}
-.rc-desc{font-size:11px;color:var(--txt-mid);line-height:1.5;}
-.rc-sync{font-size:10px;color:var(--txt-lo);margin-top:6px;}
-.rc-sync span{color:var(--blue);}
-
-/* Recent entries */
-.entry-list{display:flex;flex-direction:column;gap:6px;margin-bottom:4px;}
-.entry-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
-.entry-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.dot-income{background:var(--ok);}
-.dot-expense{background:var(--danger);}
-.dot-transfer{background:var(--blue);}
-.entry-info{flex:1;}
-.entry-name{font-size:12px;font-weight:700;}
-.entry-meta{font-size:10px;color:var(--txt-lo);}
-.entry-amount{font-size:13px;font-weight:800;flex-shrink:0;}
-.entry-amount.income{color:var(--ok);}
-.entry-amount.expense{color:var(--danger);}
-.entry-amount.transfer{color:var(--blue);}
-
-/* Sync status */
-.sync-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:4px;}
-.sync-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.sync-title{font-size:13px;font-weight:700;}
-.sync-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
-.sync-ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
-.sync-warn{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
-.sync-rows{display:flex;flex-direction:column;gap:8px;}
-.sync-row{display:flex;justify-content:space-between;align-items:center;}
-.sync-label{font-size:12px;color:var(--txt-mid);}
-.sync-val{font-size:12px;font-weight:700;}
-.sync-val.ok{color:var(--ok);}
-.sync-val.pending{color:var(--warn);}
-
 /* Modal */
 .modal-bg{position:fixed;inset:0;background:#00000080;z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
 .modal-bg.show{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;padding:22px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
+.modal{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;padding:22px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
 .modal-title{font-size:15px;font-weight:800;margin-bottom:4px;}
 .modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:5px;}
-.field input,.field select,.field textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);}
+.field input,.field select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.field input:focus{border-color:var(--accent);}
 .field select option{background:var(--card2);}
-.field textarea{resize:vertical;min-height:70px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.modal-footer{display:flex;gap:8px;margin-top:4px;}
+.modal-footer{display:flex;gap:8px;}
 .btn-full{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
-.btn-submit{background:var(--blue);color:#fff;}
+.btn-primary{background:var(--accent);color:#fff;}
 .btn-cancel{background:var(--card2);color:var(--txt-mid);border:1px solid var(--border);}
 
 /* Toast */
@@ -137,114 +143,73 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- Greeting -->
   <div class="greet">
-    <div class="greet-left">
-      <div class="greet-hi" id="greet-hi">Leo，本月帳務整理</div>
-      <div class="greet-sub">台灣出納 · 與躍明同步</div>
-      <div class="greet-badges" id="greet-badges"></div>
+    <div class="greet-hi" id="greet-hi">Leo，今天有付款任務</div>
+    <div class="greet-sub">台灣悍草出納 · 付款需躍明確認後執行</div>
+    <div class="greet-badges" id="greet-badges"></div>
+  </div>
+
+  <!-- 待付款通知 -->
+  <div class="sec-hd">
+    <span class="sec-title" id="pay-title">待付款通知</span>
+    <button class="sec-link" onclick="renderPayments()">刷新</button>
+  </div>
+  <div id="pay-list"></div>
+
+  <!-- 薪資發放流程 -->
+  <div class="sec-hd"><span class="sec-title">薪資發放流程</span></div>
+  <div class="payroll-card">
+    <div class="payroll-head">
+      <span class="payroll-month">2026 年 5 月薪資</span>
+      <span class="payroll-status status-progress" id="payroll-status">進行中</span>
+    </div>
+    <div class="payroll-rows" id="payroll-rows"></div>
+  </div>
+
+  <!-- 勞健保月結 -->
+  <div class="sec-hd"><span class="sec-title">勞健保繳費（5月）</span></div>
+  <div class="nhi-card" id="nhi-card">
+    <div class="nhi-hd">
+      <span class="nhi-month">2026 年 5 月 勞保 + 健保</span>
+      <span class="nhi-due" id="nhi-due-badge">繳費期限 5/10</span>
+    </div>
+    <div id="nhi-rows"></div>
+    <div class="nhi-total-row">
+      <span class="nhi-total-label">本月合計（公司負擔）</span>
+      <span class="nhi-total-amt" id="nhi-total"></span>
     </div>
   </div>
 
-  <!-- Monthly checklist -->
+  <!-- 銀行帳戶管理 -->
+  <div class="sec-hd">
+    <span class="sec-title">銀行帳戶管理</span>
+    <span style="font-size:10px;color:var(--txt-lo);">更新後同步躍明財務台</span>
+  </div>
+  <div class="bank-grid" id="bank-grid"></div>
+
+  <!-- 本月例行工作 -->
   <div class="sec-hd">
     <span class="sec-title" id="checklist-title">本月例行工作</span>
   </div>
-  <div class="checklist" id="checklist"></div>
-
-  <!-- Quick record -->
-  <div class="sec-hd">
-    <span class="sec-title">快速記帳</span>
-  </div>
-  <div class="record-grid">
-    <div class="record-card" onclick="openRecord('income')">
-      <div class="rc-icon">💰</div>
-      <div class="rc-name">記錄收入</div>
-      <div class="rc-desc">客戶付款、預收款、其他收入</div>
-      <div class="rc-sync">同步至：<span>躍明財務工作台</span></div>
-    </div>
-    <div class="record-card" onclick="openRecord('expense')">
-      <div class="rc-icon">💸</div>
-      <div class="rc-name">記錄支出</div>
-      <div class="rc-desc">房租水電、薪資、日常費用</div>
-      <div class="rc-sync">同步至：<span>躍明財務工作台</span></div>
-    </div>
-    <div class="record-card" onclick="openRecord('transfer')">
-      <div class="rc-icon">🔄</div>
-      <div class="rc-name">跨帳戶轉帳</div>
-      <div class="rc-desc">台灣各帳戶之間轉帳紀錄</div>
-      <div class="rc-sync">同步至：<span>躍明財務工作台</span></div>
-    </div>
-    <div class="record-card" onclick="openRecord('advance')">
-      <div class="rc-icon">📋</div>
-      <div class="rc-name">代墊款記錄</div>
-      <div class="rc-desc">員工代墊 / 公司代墊明細</div>
-      <div class="rc-sync">需：<span>安然確認後回補</span></div>
-    </div>
-  </div>
-
-  <!-- Sync status -->
-  <div class="sec-hd"><span class="sec-title">與躍明同步狀態</span></div>
-  <div class="sync-card">
-    <div class="sync-header">
-      <span class="sync-title">2026 年 5 月對帳</span>
-      <span class="sync-badge sync-warn" id="sync-badge">待確認</span>
-    </div>
-    <div class="sync-rows">
-      <div class="sync-row">
-        <span class="sync-label">台灣費用明細</span>
-        <span class="sync-val pending" id="sy-expense">整理中</span>
-      </div>
-      <div class="sync-row">
-        <span class="sync-label">Q1 費用彙總</span>
-        <span class="sync-val ok">✓ 已提交</span>
-      </div>
-      <div class="sync-row">
-        <span class="sync-label">4 月固定支出</span>
-        <span class="sync-val ok">✓ 已確認</span>
-      </div>
-      <div class="sync-row">
-        <span class="sync-label">5 月固定支出</span>
-        <span class="sync-val pending" id="sy-may">執行中</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent entries -->
-  <div class="sec-hd">
-    <span class="sec-title">近期記錄</span>
-    <button class="sec-action" onclick="showToast('完整記錄在正式版查詢')">查看全部</button>
-  </div>
-  <div class="entry-list" id="entry-list"></div>
+  <div id="checklist"></div>
 
 </div>
 
-<!-- Record Modal -->
-<div class="modal-bg" id="modal-record">
+<!-- Bank Balance Update Modal -->
+<div class="modal-bg" id="modal-bank">
   <div class="modal">
-    <div class="modal-title" id="rec-title">記錄收入</div>
-    <div class="modal-sub" id="rec-sub">記錄後自動同步給躍明</div>
-    <div class="field-row">
-      <div class="field"><label>日期</label><input type="date" id="rec-date"></div>
-      <div class="field"><label>金額</label><input id="rec-amount" placeholder="例：50,000"></div>
+    <div class="modal-title" id="bank-modal-title">更新帳戶餘額</div>
+    <div class="modal-sub" id="bank-modal-sub">請輸入最新對帳餘額</div>
+    <div class="field">
+      <label>帳戶餘額（TWD）</label>
+      <input type="number" id="bank-bal-input" placeholder="例：1,280,000">
     </div>
-    <div class="field"><label>幣別</label>
-      <select id="rec-currency">
-        <option>TWD</option><option>CNY</option><option>HKD</option><option>USD</option><option>THB</option>
-      </select>
-    </div>
-    <div class="field"><label>摘要</label><input id="rec-desc" placeholder="說明這筆款項的來源/用途"></div>
-    <div class="field"><label>帳戶</label>
-      <select id="rec-account">
-        <option>台灣主帳戶（悍草）</option>
-        <option>台灣備用帳戶</option>
-        <option>現金</option>
-      </select>
-    </div>
-    <div class="field"><label>備註 / 附件說明</label>
-      <textarea id="rec-note" placeholder="如有票據，說明票據號碼或上傳方式..."></textarea>
+    <div class="field">
+      <label>更新備註（選填）</label>
+      <input id="bank-note-input" placeholder="例：5/8 網銀對帳">
     </div>
     <div class="modal-footer">
-      <button class="btn-full btn-cancel" onclick="closeRecord()">取消</button>
-      <button class="btn-full btn-submit" onclick="saveRecord()">儲存並通知躍明</button>
+      <button class="btn-full btn-cancel" onclick="closeBankModal()">取消</button>
+      <button class="btn-full btn-primary" onclick="saveBankBalance()">儲存並同步 →</button>
     </div>
   </div>
 </div>
@@ -257,130 +222,248 @@ if(!SESS||Date.now()-SESS.ts>7*86400000){ localStorage.removeItem('erp_sess'); l
 function logout(){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
 document.getElementById('tb-user').textContent = SESS.name + ' · ' + SESS.role;
 
-// ── Checklist ──────────────────────────────────────────────
-const CHECKLIST_KEY = 'leo_checklist_v1';
-const MONTHLY_TASKS = [
-  {id:'c1',name:'5月固定支出執行',meta:'房租 + 水電 + 薪資，需同步躍明',due:'warn'},
-  {id:'c2',name:'台灣 Q1 費用明細整理',meta:'配合躍明月結報表',due:'warn'},
-  {id:'c3',name:'客戶預收款核對',meta:'確認是否有未入帳款項',due:'ok'},
-  {id:'c4',name:'代墊款回補確認',meta:'安然複核後等躍明匯回',due:'ok'},
-  {id:'c5',name:'月底帳目提交躍明',meta:'截止 5/31，每月例行',due:'ok'},
+// ── Bank Accounts ──────────────────────────────────────────
+const BANK_KEY = 'leo_bank_v1';
+const BANK_DEFAULTS = [
+  {id:'tw-main', name:'台灣悍草・主帳戶（玉山銀行）', ccy:'TWD', balance:1284600, updated:'2026-05-07'},
+  {id:'tw-backup', name:'台灣悍草・備用帳戶（國泰世華）', ccy:'TWD', balance:320000, updated:'2026-05-01'},
 ];
+function loadBankAccounts(){
+  return JSON.parse(localStorage.getItem(BANK_KEY)||JSON.stringify(BANK_DEFAULTS));
+}
+function saveBankAccounts(arr){ localStorage.setItem(BANK_KEY, JSON.stringify(arr)); }
 
-function loadChecklist(){ return JSON.parse(localStorage.getItem(CHECKLIST_KEY)||'{"done":[]}'); }
-function saveChecklist(s){ localStorage.setItem(CHECKLIST_KEY,JSON.stringify(s)); }
+let currentBankId = null;
+function openBankModal(id){
+  const banks = loadBankAccounts();
+  const b = banks.find(x=>x.id===id);
+  if(!b) return;
+  currentBankId = id;
+  document.getElementById('bank-modal-title').textContent = '更新：' + b.name.split('（')[0].trim();
+  document.getElementById('bank-modal-sub').textContent = `現有餘額 NT$${b.balance.toLocaleString()} · ${b.updated}`;
+  document.getElementById('bank-bal-input').value = b.balance;
+  document.getElementById('bank-note-input').value = '';
+  document.getElementById('modal-bank').classList.add('show');
+}
+function closeBankModal(){ document.getElementById('modal-bank').classList.remove('show'); }
+function saveBankBalance(){
+  const val = parseFloat(document.getElementById('bank-bal-input').value);
+  if(!val && val!==0){ showToast('請填寫帳戶餘額'); return; }
+  const banks = loadBankAccounts();
+  const idx = banks.findIndex(x=>x.id===currentBankId);
+  if(idx>-1){
+    banks[idx].balance = val;
+    banks[idx].updated = new Date().toISOString().slice(0,10);
+    banks[idx].note = document.getElementById('bank-note-input').value;
+  }
+  saveBankAccounts(banks);
+  closeBankModal();
+  renderBankGrid();
+  showToast('帳戶餘額已更新，已同步至躍明財務台 ✓');
+}
 
-// ── Entries ────────────────────────────────────────────────
-const ENTRIES_KEY = 'leo_entries_v1';
-function loadEntries(){
-  const stored = localStorage.getItem(ENTRIES_KEY);
+function renderBankGrid(){
+  const banks = loadBankAccounts();
+  const total = banks.reduce((s,b)=>s+b.balance,0);
+  document.getElementById('bank-grid').innerHTML = banks.map(b=>`
+    <div class="bank-card">
+      <div class="bank-name">${b.name}</div>
+      <div class="bank-bal">NT$${b.balance.toLocaleString()}</div>
+      <div class="bank-meta">最後更新：${b.updated}</div>
+      <button class="bank-upd" onclick="openBankModal('${b.id}')">更新餘額</button>
+    </div>`).join('') +
+    `<div class="bank-card" style="border-color:var(--border-hi);">
+      <div class="bank-name">台灣悍草合計</div>
+      <div class="bank-bal" style="color:var(--ok);">NT$${total.toLocaleString()}</div>
+      <div class="bank-meta">${banks.length} 個帳戶</div>
+    </div>`;
+}
+
+// ── NHI (勞健保) ───────────────────────────────────────────
+const NHI_KEY = 'leo_nhi_v1';
+const NHI_ITEMS = [
+  {id:'n1', label:'勞保費（公司負擔）', note:'6名員工・依月投保薪資', amount:18420},
+  {id:'n2', label:'健保費（公司負擔）', note:'6名員工・含眷屬', amount:13680},
+  {id:'n3', label:'勞工退休金（公司提繳）', note:'6% 每月提繳', amount:19800},
+];
+function loadNHI(){ return JSON.parse(localStorage.getItem(NHI_KEY)||'{"paid":[]}'); }
+function saveNHI(s){ localStorage.setItem(NHI_KEY, JSON.stringify(s)); }
+function toggleNHI(id){
+  const nhi = loadNHI();
+  const idx = nhi.paid.indexOf(id);
+  if(idx>-1) nhi.paid.splice(idx,1);
+  else nhi.paid.push(id);
+  saveNHI(nhi);
+  renderNHI();
+  showToast(idx>-1 ? '已取消' : '✓ 已標記繳費');
+}
+function renderNHI(){
+  const nhi = loadNHI();
+  const total = NHI_ITEMS.reduce((s,x)=>s+x.amount,0);
+  const paidAll = NHI_ITEMS.every(x=>nhi.paid.includes(x.id));
+  document.getElementById('nhi-due-badge').textContent = paidAll ? '✓ 本月已繳' : '繳費期限 5/10';
+  document.getElementById('nhi-due-badge').style.color = paidAll ? 'var(--ok)' : 'var(--warn)';
+  document.getElementById('nhi-rows').innerHTML = NHI_ITEMS.map(x=>{
+    const paid = nhi.paid.includes(x.id);
+    return `<div class="nhi-row">
+      <div>
+        <div class="nhi-label" style="color:var(--txt-hi);font-size:12px;font-weight:600;">${x.label}</div>
+        <div style="font-size:10px;color:var(--txt-lo);">${x.note}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="nhi-amt" style="${paid?'color:var(--ok);text-decoration:line-through;':''}"">NT$${x.amount.toLocaleString()}</div>
+      </div>
+      <div class="nhi-check ${paid?'paid':''}" onclick="toggleNHI('${x.id}')">${paid?'✓':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('nhi-total').textContent = `NT$${total.toLocaleString()}`;
+}
+
+// ── Payroll ────────────────────────────────────────────────
+const PAYROLL_KEY = 'leo_payroll_v1';
+const PAYROLL_STEPS = [
+  {id:'p1', label:'確認各員工出勤記錄'},
+  {id:'p2', label:'計算薪資（含勞健保扣除）'},
+  {id:'p3', label:'送躍明核帳確認'},
+  {id:'p4', label:'執行銀行薪資轉帳'},
+  {id:'p5', label:'確認入帳並通知員工'},
+];
+function loadPayroll(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY)||'{"done":["p1"]}'); }
+function savePayroll(s){ localStorage.setItem(PAYROLL_KEY, JSON.stringify(s)); }
+function markPayrollDone(id){
+  const p = loadPayroll();
+  if(!p.done.includes(id)) p.done.push(id);
+  savePayroll(p);
+  renderPayroll();
+  showToast('已完成此步驟 ✓');
+}
+function renderPayroll(){
+  const p = loadPayroll();
+  const rows = PAYROLL_STEPS.map((step,i)=>{
+    const done = p.done.includes(step.id);
+    const activeIdx = PAYROLL_STEPS.findIndex(s=>!p.done.includes(s.id));
+    const isActive = i===activeIdx;
+    const sc = done?'step-done':isActive?'step-active':'step-todo';
+    const lc = done?'done':isActive?'active':'';
+    const action = !done&&isActive ? `<button class="pr-action" onclick="markPayrollDone('${step.id}')">完成 →</button>` : '';
+    return `<div class="payroll-row">
+      <div class="pr-step ${sc}">${done?'✓':i+1}</div>
+      <div class="pr-label ${lc}">${step.label}</div>
+      ${action}
+    </div>`;
+  }).join('');
+  document.getElementById('payroll-rows').innerHTML = rows;
+  const allDone = PAYROLL_STEPS.every(s=>p.done.includes(s.id));
+  document.getElementById('payroll-status').textContent = allDone?'✓ 已完成':'進行中';
+  document.getElementById('payroll-status').className = 'payroll-status ' + (allDone?'status-done':'status-progress');
+}
+
+// ── Payments ───────────────────────────────────────────────
+const PAY_KEY = 'leo_payments_v1';
+function loadPayments(){
+  const stored = localStorage.getItem(PAY_KEY);
   if(stored) return JSON.parse(stored);
   const seed = [
-    {id:'e1',type:'expense',name:'5月房租（台北辦公室）',meta:'2026-05-01 · 台灣主帳戶',amount:'-NT$45,000'},
-    {id:'e2',type:'income', name:'客戶預付款 — 貓福珊迪批貨',meta:'2026-04-30 · 台灣主帳戶',amount:'+NT$120,000'},
-    {id:'e3',type:'transfer',name:'主帳戶→備用帳戶轉帳',meta:'2026-04-28 · 備用金',amount:'NT$30,000'},
-    {id:'e4',type:'expense',name:'4月水電瓦斯費',meta:'2026-04-25 · 台灣主帳戶',amount:'-NT$3,280'},
+    {id:'pay1', title:'5月薪資（台灣悍草全員）', person:'躍明確認', date:'2026-05-08', ccy:'TWD', amount:307000, note:'Bevis/珮玲/詩彤/楊子/躍明/Leo · 已核帳', status:'pending'},
+    {id:'pay2', title:'Bevis 出差費用報銷', person:'Bevis 申請', date:'2026-05-06', ccy:'TWD', amount:12600, note:'台北→台中客戶簡報出差費', status:'pending'},
+    {id:'pay3', title:'台北辦公室 5月租金', person:'躍明確認', date:'2026-05-01', ccy:'TWD', amount:45000, note:'房東：大安路XXX號', status:'paid'},
   ];
-  localStorage.setItem(ENTRIES_KEY,JSON.stringify(seed));
+  localStorage.setItem(PAY_KEY, JSON.stringify(seed));
   return seed;
 }
-function saveEntries(arr){ localStorage.setItem(ENTRIES_KEY,JSON.stringify(arr)); }
+function savePayments(arr){ localStorage.setItem(PAY_KEY, JSON.stringify(arr)); }
+function markPaid(id){
+  const pays = loadPayments();
+  const idx = pays.findIndex(x=>x.id===id);
+  if(idx>-1) pays[idx].status='paid';
+  savePayments(pays);
+  renderPayments();
+  renderBankGrid();
+  showToast('✅ 已標記付款完成');
+}
+function renderPayments(){
+  const pays = loadPayments().filter(x=>x.status==='pending');
+  const el = document.getElementById('pay-list');
+  document.getElementById('pay-title').textContent = `待付款通知（${pays.length}）`;
+  if(!pays.length){
+    el.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待付款項目</div>';
+    return;
+  }
+  el.innerHTML = pays.map(p=>`
+    <div class="pay-item">
+      <div class="pay-bar" style="background:var(--warn);"></div>
+      <div class="pay-body">
+        <div class="pay-title">${p.title}</div>
+        <div class="pay-meta">${p.person} · ${p.date}</div>
+        <div class="pay-note">${p.note}</div>
+      </div>
+      <div class="pay-right">
+        <div class="pay-amt">${p.ccy} ${p.amount.toLocaleString()}</div>
+        <button class="pay-btn" style="background:var(--ok-dim);color:var(--ok);border-color:#22c55e40;" onclick="markPaid('${p.id}')">付款 →</button>
+      </div>
+    </div>`).join('');
+}
 
-let currentRecordType = 'income';
-
-function render(){
-  const cl = loadChecklist();
-  const done = cl.done||[];
+// ── Checklist ──────────────────────────────────────────────
+const CHECK_KEY = 'leo_check_v1';
+const MONTHLY_TASKS = [
+  {id:'c1', name:'勞健保繳費（期限 5/10）', meta:'健保局 + 勞保局線上繳費', due:'urgent'},
+  {id:'c2', name:'薪資轉帳執行', meta:'躍明核帳後 → 銀行系統批次轉帳', due:'warn'},
+  {id:'c3', name:'5月固定支出確認', meta:'房租 / 水電 / 網路', due:'warn'},
+  {id:'c4', name:'更新主帳戶對帳餘額', meta:'網銀對帳後更新至 ERP', due:'ok'},
+  {id:'c5', name:'月底帳目提交躍明', meta:'截止 5/31', due:'ok'},
+];
+function loadCheck(){ return JSON.parse(localStorage.getItem(CHECK_KEY)||'{"done":[]}'); }
+function saveCheck(s){ localStorage.setItem(CHECK_KEY, JSON.stringify(s)); }
+function toggleCheck(id){
+  const cl = loadCheck();
+  const idx = cl.done.indexOf(id);
+  if(idx>-1) cl.done.splice(idx,1);
+  else cl.done.push(id);
+  saveCheck(cl);
+  renderCheck();
+  showToast(idx>-1?'已取消':'✓ 已完成');
+}
+function renderCheck(){
+  const cl = loadCheck();
+  const done = cl.done;
   const total = MONTHLY_TASKS.length;
   const doneCount = done.length;
-
-  // Greeting badges
-  const remaining = total - doneCount;
-  document.getElementById('greet-hi').textContent = remaining===0
-    ? 'Leo，本月例行工作都完成了 ✓'
-    : `Leo，本月還有 ${remaining} 件例行工作`;
-  const badges = document.getElementById('greet-badges');
-  badges.innerHTML='';
-  if(doneCount>0) badges.innerHTML+=`<span class="badge badge-ok">✓ 已完成 ${doneCount}</span>`;
-  if(remaining>0) badges.innerHTML+=`<span class="badge badge-warn">${remaining} 件待完成</span>`;
-
-  // Checklist
-  document.getElementById('checklist-title').textContent=`本月例行工作（${doneCount}/${total}）`;
+  document.getElementById('checklist-title').textContent = `本月例行工作（${doneCount}/${total}）`;
   document.getElementById('checklist').innerHTML = MONTHLY_TASKS.map(t=>{
     const isDone = done.includes(t.id);
+    const dueCls = {urgent:'due-urgent',warn:'due-warn',ok:'due-ok'}[t.due]||'due-ok';
+    const dueLabel = {urgent:'本月優先',warn:'本月內',ok:'月底前'}[t.due]||'';
     return `<div class="check-item ${isDone?'done':''}" onclick="toggleCheck('${t.id}')">
-      <div class="check-box ${isDone?'checked':''}"></div>
+      <div class="check-box ${isDone?'checked':''}">${isDone?'✓':''}</div>
       <div class="check-info">
         <div class="check-name">${t.name}</div>
         <div class="check-meta">${t.meta}</div>
       </div>
-      ${!isDone?`<span class="check-due due-${t.due}">${t.due==='warn'?'本月優先':'本月內'}</span>`:''}
+      ${!isDone?`<span class="check-due ${dueCls}">${dueLabel}</span>`:''}
     </div>`;
   }).join('');
-
-  // Entries
-  const entries = loadEntries().slice(0,6);
-  document.getElementById('entry-list').innerHTML = entries.map(e=>`
-    <div class="entry-row">
-      <div class="entry-dot dot-${e.type}"></div>
-      <div class="entry-info">
-        <div class="entry-name">${e.name}</div>
-        <div class="entry-meta">${e.meta}</div>
-      </div>
-      <div class="entry-amount ${e.type}">${e.amount}</div>
-    </div>`).join('');
 }
 
-function toggleCheck(id){
-  const cl = loadChecklist();
-  const idx = cl.done.indexOf(id);
-  if(idx>-1) cl.done.splice(idx,1);
-  else cl.done.push(id);
-  saveChecklist(cl);
-  render();
-  showToast(idx>-1 ? '已取消完成' : '已完成 ✓');
+// ── Greeting ───────────────────────────────────────────────
+function renderGreeting(){
+  const pays = loadPayments().filter(x=>x.status==='pending').length;
+  const nhi = loadNHI();
+  const nhiPending = NHI_ITEMS.filter(x=>!nhi.paid.includes(x.id)).length;
+  const cl = loadCheck();
+  const checkPending = MONTHLY_TASKS.filter(x=>!cl.done.includes(x.id)).length;
+
+  const total = pays + (nhiPending>0?1:0) + checkPending;
+  document.getElementById('greet-hi').textContent = total===0
+    ? 'Leo，本月例行工作都完成了 ✓'
+    : `Leo，今天有 ${total} 件待處理`;
+
+  const badges = document.getElementById('greet-badges');
+  badges.innerHTML = '';
+  if(pays>0) badges.innerHTML+=`<span class="badge badge-warn">💸 ${pays} 筆待付款</span>`;
+  if(nhiPending>0) badges.innerHTML+=`<span class="badge badge-warn">🏥 勞健保未繳</span>`;
+  if(pays===0&&nhiPending===0) badges.innerHTML+=`<span class="badge badge-ok">✓ 付款無待辦</span>`;
 }
-
-const REC_CONFIG = {
-  income:  {title:'記錄收入',  sub:'收入記錄後同步給躍明'},
-  expense: {title:'記錄支出',  sub:'支出記錄後同步給躍明'},
-  transfer:{title:'跨帳戶轉帳',sub:'台灣帳戶間轉帳紀錄'},
-  advance: {title:'代墊款記錄',sub:'需安然確認後由躍明匯回'},
-};
-
-function openRecord(type){
-  currentRecordType = type;
-  const cfg = REC_CONFIG[type];
-  document.getElementById('rec-title').textContent = cfg.title;
-  document.getElementById('rec-sub').textContent = cfg.sub;
-  document.getElementById('rec-date').value = new Date().toISOString().slice(0,10);
-  document.getElementById('rec-amount').value='';
-  document.getElementById('rec-desc').value='';
-  document.getElementById('rec-note').value='';
-  document.getElementById('modal-record').classList.add('show');
-}
-
-function saveRecord(){
-  const desc = document.getElementById('rec-desc').value.trim()||'未填摘要';
-  const amount = document.getElementById('rec-amount').value.trim()||'—';
-  const currency = document.getElementById('rec-currency').value;
-  const date = document.getElementById('rec-date').value;
-  const entries = loadEntries();
-  const prefix = currentRecordType==='income'?'+':currentRecordType==='expense'?'-':'';
-  entries.unshift({
-    id:'e'+Date.now(),
-    type:currentRecordType,
-    name:desc,
-    meta:`${date} · ${document.getElementById('rec-account').value}`,
-    amount:`${prefix}${currency} ${amount}`,
-  });
-  saveEntries(entries);
-  closeRecord();
-  render();
-  showToast('已記錄並通知躍明 ✓');
-}
-
-function closeRecord(){ document.getElementById('modal-record').classList.remove('show'); }
 
 function showToast(msg){
   const el=document.getElementById('toast');
@@ -388,7 +471,13 @@ function showToast(msg){
   setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-render();
+// Init
+renderPayments();
+renderPayroll();
+renderNHI();
+renderBankGrid();
+renderCheck();
+renderGreeting();
 </script>
 
 <!-- ── EXPENSE FAB ── -->
@@ -425,58 +514,29 @@ render();
     <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
   </div>
   <div id="expPersonalFields">
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>類別</label><select id="expCat"><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="material">材料 / 文具</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
-    <div class="exp-field"><label>對應預算科目 <span style="color:#818cf8;font-size:9px;font-weight:700;">▸ 財務入帳用</span></label><select id="expBudgetSubject" style="background:#1e2130;border:1px solid #363b58;color:#e8eaf8;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;"><option value="">— 選擇科目（必填）—</option><option value="行銷推廣費">行銷推廣費</option><option value="差旅費">差旅費</option><option value="辦公管銷">辦公管銷</option><option value="其他">其他（不在預算範圍）</option></select></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>TWD</option><option>RMB</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>類別</label><select id="expCat"><option>交通 / 車資</option><option>餐飲</option><option>住宿</option><option>業務招待</option><option>材料 / 文具</option><option>出差費用</option><option>其他</option></select></div>
     <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
     <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
   </div>
   <div id="expSupplierFields" style="display:none">
-    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：東莞廠、德榮包裝"></div>
-    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-2026-318"></div>
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
+    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：水電公司、房東"></div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>TWD</option><option>RMB</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、科目..."></textarea></div>
   </div>
-  <div class="exp-routing" id="expRouting">載入中...</div>
+  <div class="exp-routing" id="expRouting">送審路徑：Leo → Ray 確認 → 躍明財務確認 → 執行付款</div>
   <button class="exp-submit" onclick="submitExpense()">送出申請</button>
 </div>
 </div>
 <script>
 (function(){
-const EXP_ROUTES={
-  shetong:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
-  peilin:{next:'bevis',nextLabel:'Bevis',cc:'安然'},
-  bevis:{next:'ray',nextLabel:'Ray',cc:'安然'},
-  laodong:{next:'anran',nextLabel:'安然',cc:null},
-  debao:{next:'anran',nextLabel:'安然',cc:null},
-  gaowei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  chunlei:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  jiaying:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  xiaochuan:{next:'shawn',nextLabel:'Shawn',cc:'安然'},
-  muzi:{next:'laige',nextLabel:'賴哥',cc:'安然'},
-  laige:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yuming:{next:'yangzi',nextLabel:'楊子（直接）',cc:'安然'},
-  yangzi:{next:'anran',nextLabel:'安然',cc:null},
-  anran:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  shawn:{next:'yangzi',nextLabel:'楊子（直接）',cc:'Ray'},
-  leo:{next:'ray',nextLabel:'Ray',cc:null},
-  ray:{next:'yangzi',nextLabel:'楊子（直接）',cc:null},
-};
-const SUPPLIER_ALLOWED=['laige','muzi','anran','ray'];
 const _LR='https://feishu-proxy.raychou6913.workers.dev';
 const _LAT='Sg7ObNELHaAdZzshGIFjWPVhpce';
 const _LTBL='tbl4OBNvsNkqS4mQ';
-const _LAPPROVER={ray:'Ray',shawn:'Shawn',anran:'安然',yangzi:'楊子',laige:'賴哥'};
-async function _lWriteApproval(fields){try{const tr=await fetch(_LR+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const {tenant_access_token:tk}=await tr.json();await fetch(_LR+'/open-apis/bitable/v1/apps/'+_LAT+'/tables/'+_LTBL+'/records',{method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({fields})});}catch(e){console.warn('Feishu write skipped',e);}}
+async function _write(fields){try{const tr=await fetch(_LR+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const {tenant_access_token:tk}=await tr.json();await fetch(_LR+'/open-apis/bitable/v1/apps/'+_LAT+'/tables/'+_LTBL+'/records',{method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({fields})});}catch(e){console.warn('Feishu skip',e);}}
 let expType='personal';
 function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
 function openExpModal(){
-  const u=getUser();const r=EXP_ROUTES[u];
-  const hint=document.getElementById('expRouting');
-  if(r){let s=`送審路徑：<strong>${r.nextLabel}</strong>`;if(r.cc)s+=` → 楊子付款，抄送 <strong>${r.cc}</strong>`;else if(r.next==='yangzi')s+=' 付款';hint.innerHTML=s;}
-  else{hint.innerHTML='送審路徑：楊子';}
-  const supBtn=document.getElementById('expTypeSupplier');
-  if(supBtn)supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
   document.getElementById('expDate').valueAsDate=new Date();
   setExpType('personal');
   document.getElementById('expOverlay').classList.add('open');
@@ -490,35 +550,32 @@ function setExpType(t){
   document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
 }
 function submitExpense(){
-  const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
-  let rec;
+  const u=getUser();
+  const key='erp_expense_queue';
+  const q=JSON.parse(localStorage.getItem(key)||'[]');
+  let rec,toastMsg;
   if(expType==='personal'){
     const amt=document.getElementById('expAmt').value;
     const ccy=document.getElementById('expCcy').value;
     const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
     const date=document.getElementById('expDate').value;
     const desc=document.getElementById('expDesc').value;
-    const subj=document.getElementById('expBudgetSubject').value;
-    if(!amt||!date){(window.showToast||window._toast||alert)('請填寫金額與日期');return;}
-    if(!subj){(window.showToast||window._toast||alert)('請選擇預算科目（財務入帳用）');return;}
-    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,subject:subj,next:r.next,cc:r.cc,ts:Date.now()};
+    if(!amt||!date){(window.showToast||alert)('請填寫金額與日期');return;}
+    rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:'ray',ts:Date.now()};
+    toastMsg='✅ 報銷申請已送出 · 待 Ray 確認';
   }else{
     const name=document.getElementById('expSupName').value;
-    const po=document.getElementById('expSupPO').value;
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
     const desc=document.getElementById('expSupDesc').value;
-    if(!name||!amt){(window.showToast||window._toast||alert)('請填寫供應商名稱與金額');return;}
-    rec={type:'供應商付款申請',user:u,supplier:name,po,amt,ccy,desc,subject:'其他',next:r.next,cc:r.cc,ts:Date.now()};
+    if(!name||!amt){(window.showToast||alert)('請填寫供應商名稱與金額');return;}
+    rec={type:'供應商付款申請',user:u,supplier:name,amt,ccy,desc,next:'ray',ts:Date.now()};
+    toastMsg='✅ 付款申請已送出 · 待 Ray → 躍明確認';
   }
-  const key='erp_expense_queue';
-  const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
-  const _lcy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[rec.ccy]||'CNY';
-  const _lapp=_LAPPROVER[rec.next]||'楊子';
-  _lWriteApproval({'標題':`【${rec.type}】${rec.user} ${rec.amt}${rec.ccy}`,'審批標題':`【${rec.type}】${rec.user} ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':rec.user,'申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':_lcy,'審批人':_lapp,'審批狀態':'待審批','Email已發送':'否','申請說明':rec.desc||rec.cat||'','預算科目':rec.subject||''});
+  _write({'審批標題':`【Leo】${rec.type} ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':u,'申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':rec.ccy,'審批人':'Ray','審批狀態':'待審批','申請說明':rec.desc||''});
   closeExpModal();
-  (window.showToast||window._toast||alert)(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
+  (window.showToast||alert)(toastMsg);
 }
 window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
 })();

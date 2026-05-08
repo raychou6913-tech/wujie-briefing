@@ -669,8 +669,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           台灣悍草
         </div>
         <div>
-          <div class="cash-amt" style="color:var(--txt-mid)">—</div>
-          <div class="cash-trend">待 Leo 填入</div>
+          <div class="cash-amt" id="wr-tw-cash" style="color:var(--ok)">—</div>
+          <div class="cash-trend" id="wr-tw-cash-date">Leo 更新中</div>
         </div>
       </div>
       <div class="cash-row">
@@ -798,6 +798,41 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
         <div class="ip-row"><div class="ip-row-top"><span class="ip-name">載入中…</span></div></div>
       </div>
       <a href="erp-anran.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看完整合約管理 → 安然廳</a>
+    </div>
+
+    <!-- D: 庫存總貨值 -->
+    <div class="abc-card">
+      <div class="abc-header">
+        <span class="abc-title">🏬 庫存總貨值</span>
+        <span class="abc-tag ok">即時（高維更新）</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:11px;font-weight:700;">批發庫存（工廠寄存）</div>
+            <div style="font-size:10px;color:var(--txt-lo);">3 款產品 · 在途 + 已到</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:13px;font-weight:800;color:var(--warn);">¥ 68.4 萬</div>
+            <div style="font-size:9px;color:var(--txt-lo);">成本貨值</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:11px;font-weight:700;">快閃庫存（BKK 倉）</div>
+            <div style="font-size:10px;color:var(--txt-lo);">2 個活動備貨</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:13px;font-weight:800;color:var(--accent);">¥ 38.2 萬</div>
+            <div style="font-size:9px;color:var(--txt-lo);">成本貨值</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;">
+          <div style="font-size:11px;font-weight:700;color:var(--txt-hi);">潛在收入（售完估算）</div>
+          <div style="font-size:14px;font-weight:800;color:var(--ok);">¥ 152 萬</div>
+        </div>
+      </div>
+      <a href="erp-gaowei.html" style="display:block;margin-top:10px;font-size:10px;color:var(--accent);text-decoration:none;padding-top:8px;border-top:1px solid var(--border);">查看庫存明細 → 高維物流台</a>
     </div>
   </div>
 
@@ -2181,6 +2216,21 @@ loadOrderStats();
 loadContractAlerts();
 loadVamProgress().then(() => loadPipelineCoverage());
 loadSellThruWarRoom();
+
+// ── Leo 台灣帳戶餘額 ──
+(function(){
+  const DEFAULTS=[
+    {balance:1284600,updated:'2026-05-07'},
+    {balance:320000,updated:'2026-05-01'},
+  ];
+  const banks=JSON.parse(localStorage.getItem('leo_bank_v1')||JSON.stringify(DEFAULTS));
+  const total=banks.reduce((s,b)=>s+b.balance,0);
+  const el=document.getElementById('wr-tw-cash');
+  const dt=document.getElementById('wr-tw-cash-date');
+  if(el) el.textContent='NT$'+total.toLocaleString();
+  const latest=banks.reduce((a,b)=>a.updated>b.updated?a:b);
+  if(dt) dt.textContent='Leo '+latest.updated+' 更新';
+})();
 </script>
 </body>
 </html>
