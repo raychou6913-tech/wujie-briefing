@@ -268,6 +268,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   </div>
 </div>
 
+<!-- Payroll Input Modal -->
+<div class="modal-bg" id="modal-payroll">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-title">📋 5月薪資錄入</div>
+    <div class="modal-sub">填寫各員工本月薪資，儲存後同步至費用管銷總覽</div>
+    <div class="ent-tabs" id="payroll-ent-tabs" style="margin-bottom:14px;">
+      <button class="ent-tab active" onclick="setPayrollEnt('北京蕪解',this)">北京蕪解 (CNY)</button>
+      <button class="ent-tab" onclick="setPayrollEnt('台灣悍草',this)">台灣悍草 (TWD)</button>
+    </div>
+    <div id="payroll-input-rows" style="margin-bottom:16px;"></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closePayrollModal()">取消</button>
+      <button class="btn-full btn-approve" onclick="savePayrollModal()">儲存 ✓</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -295,12 +312,25 @@ async function loadPaymentList(){
   const el=document.getElementById('payment-list');
   if(!el) return;
   const DEMO=[
-    {title:'安然廳 · 北京倉儲費',person:'安然',date:'2026-05-01',approver:'Ray',ccy:'CNY',amount:8500,note:'4月北京倉儲+物流費'},
-    {title:'採購台 · 打樣費',person:'賴哥',date:'2026-04-28',approver:'Ray',ccy:'CNY',amount:12000,note:'吉依卡哇盲袋打樣費用'},
-    {title:'高維 · 物流費',person:'高維',date:'2026-04-26',approver:'安然',ccy:'CNY',amount:3200,note:'在途批次物流費'},
+    {title:'安然廳 · 北京倉儲費',person:'安然',date:'2026-05-01',approver:'Ray',ccy:'CNY',amount:8500,note:'4月北京倉儲+物流費',expType:'項目費用',finConfirmed:true},
+    {title:'採購台 · 打樣費（吉依卡哇）',person:'賴哥',date:'2026-04-28',approver:'Ray',ccy:'CNY',amount:12000,note:'吉依卡哇盲袋打樣費用',expType:'項目費用',finConfirmed:false},
+    {title:'高維 · 物流費',person:'高維',date:'2026-04-26',approver:'安然',ccy:'CNY',amount:3200,note:'在途批次物流費',expType:'個人報銷',finConfirmed:true},
   ];
   const renderItems=recs=>recs.length
-    ? recs.map(r=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+    ? recs.map(r=>{
+      const expType=r.expType||r['審批類型']||'';
+      const needsFinance=expType.includes('項目')||expType.includes('供應商');
+      const finConfirmed=r.finConfirmed??!needsFinance;
+      const canPay=!needsFinance||finConfirmed;
+      const finBadge=needsFinance
+        ?finConfirmed
+          ?`<div style="margin-bottom:4px;"><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:#22c55e18;color:#22c55e;border:1px solid #22c55e40;font-weight:700;">躍明已確認 ✓</span></div>`
+          :`<div style="margin-bottom:4px;"><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b40;font-weight:700;">待躍明確認</span></div>`
+        :'';
+      const payBtn=canPay
+        ?`<button style="font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;" onclick="this.textContent='✓ 已付款';this.disabled=true;showToast('✅ 已標記付款')">付款 →</button>`
+        :`<button style="font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--card2);color:var(--txt-lo);border:1px solid var(--border);cursor:not-allowed;" disabled>待確認</button>`;
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
         <div style="width:4px;align-self:stretch;border-radius:2px;background:var(--warn);flex-shrink:0;"></div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:700;">${r.title||r['審批標題']||'—'}</div>
@@ -308,10 +338,12 @@ async function loadPaymentList(){
           <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">${r.note||r['申請說明']||''}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
-          <div style="font-size:14px;font-weight:800;color:var(--warn);">${r.ccy||r['幣別']||''} ${(r.amount||r['金額']||0).toLocaleString()}</div>
-          <button style="margin-top:6px;font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;" onclick="this.textContent='✓ 已付款';this.disabled=true;this.closest('[style]').style.opacity='.5';showToast('✅ 已標記付款')">付款 →</button>
+          ${finBadge}
+          <div style="font-size:14px;font-weight:800;color:var(--warn);margin-bottom:6px;">${r.ccy||r['幣別']||''} ${(r.amount||r['金額']||0).toLocaleString()}</div>
+          ${payBtn}
         </div>
-      </div>`).join('')
+      </div>`;
+    }).join('')
     : '<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待付款申請</div>';
   try{
     const tr=await fetch(_YZ_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
@@ -395,86 +427,213 @@ const PAYROLL_STEPS = [
 function loadPayroll(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY)||'{"done":["p1"]}'); }
 function savePayroll(s){ localStorage.setItem(PAYROLL_KEY,JSON.stringify(s)); }
 
-// ── OPEX Data ──────────────────────────────────────────────
+// ── OPEX Data (12月 全年，前5月實際，後7月預算) ────────────
+const OPEX_MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const OPEX_ACTUAL_COUNT = 5; // 1-5月已發生
+
 const OPEX_DATA = {
   '北京蕪解': {
-    ccy:'CNY', months:['3月','4月','5月'],
+    ccy:'CNY',
     rows:[
-      {cat:'薪資人事',  vals:[85000,85000,85000], budget:90000},
-      {cat:'辦公費用',  vals:[8200, 7600, 6800],  budget:10000},
-      {cat:'倉儲物流',  vals:[12400,15200,8500],  budget:15000},
-      {cat:'差旅費',    vals:[3200, 4800, 1200],  budget:5000},
-      {cat:'業務行銷',  vals:[6800, 9200, 2400],  budget:8000},
-      {cat:'其他',      vals:[1800, 2400, 800],   budget:3000},
+      {cat:'薪資人事', vals:[85000,85000,85000,85000,85000,90000,90000,90000,90000,90000,90000,90000],
+       items:[
+         {name:'安然',  role:'北京負責人', amount:25000},
+         {name:'賴哥',  role:'採購主管',   amount:18000},
+         {name:'木子',  role:'採購執行',   amount:12000},
+         {name:'老董',  role:'業務',       amount:15000},
+         {name:'德寶',  role:'業務',       amount:10000},
+         {name:'高維',  role:'物流',       amount:8000},
+         {name:'春雷',  role:'電商',       amount:9000},
+         {name:'佳音',  role:'電商',       amount:8000},
+       ]},
+      {cat:'辦公費用', vals:[8200,7800,8200,7600,6800,8000,8000,8000,8000,8000,8000,8000],
+       items:[
+         {name:'北京辦公室租金', role:'固定',  amount:5500},
+         {name:'水電網路',       role:'固定',  amount:800},
+         {name:'辦公耗材',       role:'浮動',  amount:500},
+       ]},
+      {cat:'倉儲物流', vals:[12400,11800,12400,15200,8500,12000,12000,12000,12000,12000,12000,12000],
+       items:[
+         {name:'北京倉租金',   role:'固定', amount:6000},
+         {name:'搬運/裝卸費', role:'浮動', amount:2000},
+         {name:'其他物流雜費', role:'浮動', amount:500},
+       ]},
+      {cat:'差旅費',   vals:[3200,2800,3200,4800,1200,4000,4000,4000,4000,4000,4000,4000],
+       items:[
+         {name:'業務出差（老董/德寶）', role:'浮動', amount:2000},
+         {name:'採購廠商拜訪',          role:'浮動', amount:1000},
+       ]},
+      {cat:'業務行銷', vals:[6800,5200,6800,9200,2400,6000,6000,6000,6000,6000,6000,6000],
+       items:[
+         {name:'展覽/活動費用', role:'浮動', amount:3000},
+         {name:'業務招待',      role:'浮動', amount:1500},
+         {name:'市場推廣',      role:'浮動', amount:1500},
+       ]},
+      {cat:'其他',     vals:[1800,2200,1800,2400,800,2000,2000,2000,2000,2000,2000,2000],
+       items:[
+         {name:'雜費', role:'浮動', amount:800},
+       ]},
     ]
   },
   '台灣悍草': {
-    ccy:'TWD', months:['3月','4月','5月'],
+    ccy:'TWD',
     rows:[
-      {cat:'薪資人事',  vals:[248000,248000,248000], budget:260000},
-      {cat:'辦公費用',  vals:[18500, 17200, 15800],  budget:20000},
-      {cat:'設計費用',  vals:[42000, 38000, 24000],  budget:40000},
-      {cat:'差旅費',    vals:[8400,  12600, 3200],   budget:10000},
-      {cat:'其他',      vals:[4200,  5600,  1800],   budget:6000},
+      {cat:'薪資人事', vals:[248000,248000,248000,248000,248000,260000,260000,260000,260000,260000,260000,260000],
+       items:[
+         {name:'Bevis',  role:'設計主管', amount:72000},
+         {name:'珮玲',   role:'設計師',   amount:52000},
+         {name:'詩彤',   role:'設計師',   amount:48000},
+         {name:'楊子',   role:'行政HR',   amount:42000},
+         {name:'躍明',   role:'財務',     amount:55000},
+         {name:'Leo',    role:'出納',     amount:38000},
+       ]},
+      {cat:'辦公費用', vals:[18500,17200,18500,17200,15800,18000,18000,18000,18000,18000,18000,18000],
+       items:[
+         {name:'台北辦公室租金', role:'固定', amount:12000},
+         {name:'水電網路',       role:'固定', amount:2500},
+         {name:'辦公耗材',       role:'浮動', amount:1000},
+       ]},
+      {cat:'設計費用', vals:[42000,38000,42000,38000,24000,36000,36000,36000,36000,36000,36000,36000],
+       items:[
+         {name:'軟體授權（Adobe/Figma）', role:'固定', amount:8000},
+         {name:'外包設計費',              role:'浮動', amount:15000},
+         {name:'打樣/樣品費',             role:'浮動', amount:10000},
+       ]},
+      {cat:'差旅費',   vals:[8400,6800,8400,12600,3200,8000,8000,8000,8000,8000,8000,8000],
+       items:[
+         {name:'設計/採購出差', role:'浮動', amount:5000},
+         {name:'展覽參訪',      role:'浮動', amount:2000},
+       ]},
+      {cat:'其他',     vals:[4200,3800,4200,5600,1800,4000,4000,4000,4000,4000,4000,4000],
+       items:[
+         {name:'雜費', role:'浮動', amount:1800},
+       ]},
     ]
   },
   'UJ BKK': {
-    ccy:'THB', months:['3月','4月','5月'],
+    ccy:'THB',
     rows:[
-      {cat:'薪資人事',  vals:[62000, 62000, 62000],  budget:65000},
-      {cat:'快閃場地費',vals:[0,     186000,0],       budget:200000},
-      {cat:'快閃行銷',  vals:[18000, 48000, 8000],   budget:50000},
-      {cat:'差旅費',    vals:[12400, 18600, 6200],   budget:15000},
-      {cat:'其他',      vals:[3200,  4800,  1400],   budget:5000},
+      {cat:'薪資人事', vals:[62000,62000,62000,62000,62000,65000,65000,65000,65000,65000,65000,65000],
+       items:[
+         {name:'Shawn', role:'COO / UJ BKK 負責人', amount:45000},
+         {name:'BKK 本地員工 ×2', role:'運營', amount:17000},
+       ]},
+      {cat:'快閃場地費', vals:[0,0,0,186000,0,0,200000,0,0,0,0,0],
+       items:[
+         {name:'Central World 場地費', role:'一次性', amount:186000},
+       ]},
+      {cat:'快閃行銷',  vals:[18000,16000,18000,48000,8000,20000,40000,20000,20000,20000,20000,20000],
+       items:[
+         {name:'社群廣告費', role:'浮動', amount:8000},
+         {name:'現場布置/道具', role:'浮動', amount:10000},
+       ]},
+      {cat:'差旅費',    vals:[12400,10800,12400,18600,6200,12000,12000,12000,12000,12000,12000,12000],
+       items:[
+         {name:'台灣→BKK 出差', role:'浮動', amount:6000},
+         {name:'市內交通', role:'浮動', amount:2000},
+       ]},
+      {cat:'其他',      vals:[3200,2800,3200,4800,1400,3000,3000,3000,3000,3000,3000,3000],
+       items:[
+         {name:'雜費', role:'浮動', amount:1400},
+       ]},
     ]
   },
 };
 
+// 薪資發放 demo（可被填報覆蓋）
+const PAYROLL_KEY_DETAIL = 'yangzi_payroll_detail_v1';
+function loadPayrollDetail(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY_DETAIL)||'null'); }
+function savePayrollDetail(d){ localStorage.setItem(PAYROLL_KEY_DETAIL, JSON.stringify(d)); }
+
 let currentOpexEntity = '北京蕪解';
+const opexOpenRows = new Set();
 
 function setOpexEnt(ent, btn){
   currentOpexEntity = ent;
+  opexOpenRows.clear();
   document.querySelectorAll('.ent-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderOpexTable();
 }
 
+function toggleOpexRow(cat){
+  if(opexOpenRows.has(cat)) opexOpenRows.delete(cat);
+  else opexOpenRows.add(cat);
+  renderOpexTable();
+}
+
 function renderOpexTable(){
   const d = OPEX_DATA[currentOpexEntity];
-  if(!d){ return; }
-  const months = d.months;
-  const curMonLabel = months[months.length-1];
-  const thead = `<thead><tr>
-    <th>科目</th>
-    ${months.map((m,i)=>`<th>${m}</th>`).join('')}
-    <th>月預算</th>
-    <th>本月差異</th>
-  </tr></thead>`;
-  const totals = months.map((_,mi)=>d.rows.reduce((s,r)=>s+(r.vals[mi]||0),0));
-  const totalBudget = d.rows.reduce((s,r)=>s+r.budget,0);
-  const curTotal = totals[totals.length-1];
-  const curBudget = totalBudget;
-  const tbody = d.rows.map(r=>{
-    const curVal = r.vals[r.vals.length-1];
-    const diff = curVal - r.budget;
-    const diffClass = diff > r.budget*0.1 ? 'num-over' : diff > 0 ? 'num-warn' : 'num-ok';
-    const diffTxt = diff===0 ? '—' : (diff>0?'+':'')+diff.toLocaleString();
-    return `<tr>
-      <td>${r.cat}</td>
-      ${r.vals.map((v,i)=>`<td style="color:${i===r.vals.length-1?'var(--txt-hi)':'var(--txt-lo)'}">${v>0?v.toLocaleString():'—'}</td>`).join('')}
-      <td style="color:var(--txt-mid);">${r.budget.toLocaleString()}</td>
-      <td class="${diffClass}">${diffTxt}</td>
-    </tr>`;
+  if(!d) return;
+  const sym = d.ccy==='TWD'?'NT$':d.ccy==='THB'?'฿':'¥';
+  // Show window: 3月-9月 by default (3 past + current + 4 future)
+  const showMonths = OPEX_MONTHS.slice(2,9); // 3月~9月
+  const colHeaders = showMonths.map((m,i)=>{
+    const mi = OPEX_MONTHS.indexOf(m);
+    const isActual = mi < OPEX_ACTUAL_COUNT;
+    const isCur = mi === OPEX_ACTUAL_COUNT-1;
+    return `<th style="text-align:right;${isCur?'color:var(--txt-hi);':''}${!isActual?'opacity:.5;':''}">${m}${!isActual?'<br><span style="font-size:8px;color:var(--indigo);">預算</span>':''}</th>`;
   }).join('');
-  const totalDiff = curTotal - curBudget;
-  const totalDiffClass = totalDiff > 0 ? 'num-over' : 'num-ok';
-  const tfoot = `<tr class="total-row">
+
+  const totals = showMonths.map(m=>{
+    const mi=OPEX_MONTHS.indexOf(m);
+    return d.rows.reduce((s,r)=>s+(r.vals[mi]||0),0);
+  });
+
+  const bodyRows = d.rows.map(r=>{
+    const isOpen = opexOpenRows.has(r.cat);
+    const curMi = OPEX_ACTUAL_COUNT-1;
+    const curVal = r.vals[curMi]||0;
+    const budgetVal = r.vals[curMi+1]||curVal;
+    const diff = curVal - budgetVal;
+    const diffCls = diff>budgetVal*0.1?'num-over':diff>0?'num-warn':'num-ok';
+
+    const cells = showMonths.map(m=>{
+      const mi=OPEX_MONTHS.indexOf(m);
+      const v=r.vals[mi]||0;
+      const isActual=mi<OPEX_ACTUAL_COUNT;
+      const isCur=mi===OPEX_ACTUAL_COUNT-1;
+      return `<td style="text-align:right;${isCur?'font-weight:700;':''}${!isActual?'opacity:.45;color:var(--indigo);':''}">${v>0?sym+v.toLocaleString():'—'}</td>`;
+    }).join('');
+
+    const mainRow = `<tr style="cursor:pointer;" onclick="toggleOpexRow('${r.cat}')">
+      <td style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:10px;color:var(--txt-lo);transition:transform .15s;display:inline-block;transform:rotate(${isOpen?'90deg':'0deg'})"">▶</span>
+        <span style="font-size:11px;font-weight:600;">${r.cat}</span>
+      </td>
+      ${cells}
+    </tr>`;
+
+    if(!isOpen) return mainRow;
+
+    // Item sub-rows
+    const payrollDetail = loadPayrollDetail();
+    const itemRows = r.items.map(it=>{
+      const amt = (payrollDetail && payrollDetail[r.cat] && payrollDetail[r.cat][currentOpexEntity] && payrollDetail[r.cat][currentOpexEntity][it.name])
+        ? payrollDetail[r.cat][currentOpexEntity][it.name] : it.amount;
+      return `<tr style="background:var(--card2);">
+        <td style="padding-left:28px;font-size:11px;color:var(--txt-mid);">${it.name} <span style="font-size:9px;color:var(--txt-lo);">${it.role}</span></td>
+        <td colspan="${showMonths.length-1}" style="font-size:11px;color:var(--txt-lo);">每月固定 / 浮動</td>
+        <td style="text-align:right;font-size:11px;font-weight:600;">${sym}${amt.toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+
+    return mainRow + itemRows;
+  }).join('');
+
+  const totRow = `<tr class="total-row">
     <td>合計</td>
-    ${totals.map((v,i)=>`<td>${v.toLocaleString()}</td>`).join('')}
-    <td>${curBudget.toLocaleString()}</td>
-    <td class="${totalDiffClass}">${(totalDiff>0?'+':'')+totalDiff.toLocaleString()}</td>
+    ${totals.map((v,i)=>{
+      const mi=OPEX_MONTHS.indexOf(showMonths[i]);
+      const isActual=mi<OPEX_ACTUAL_COUNT;
+      const isCur=mi===OPEX_ACTUAL_COUNT-1;
+      return `<td style="text-align:right;${!isActual?'opacity:.5;color:var(--indigo);':''}">${sym}${v.toLocaleString()}</td>`;
+    }).join('')}
   </tr>`;
-  document.getElementById('opex-table').innerHTML = `${thead}<tbody>${tbody}${tfoot}</tbody>`;
+
+  document.getElementById('opex-table').innerHTML =
+    `<thead><tr><th>科目（點開展開明細）</th>${colHeaders}</tr></thead>
+     <tbody>${bodyRows}${totRow}</tbody>`;
 }
 
 // ── Budget Lines (項目費用科目) ──────────────────────────────
@@ -490,6 +649,65 @@ const BUDGET_LINES = [
   {id:'bl9', entity:'UJ BKK',  cat:'快閃店行銷費',   ccy:'THB', budget:50000, used:48000},
   {id:'bl10',entity:'UJ BKK',  cat:'差旅費',         ccy:'THB', budget:15000, used:6200},
 ];
+
+// ── Payroll Input Modal ────────────────────────────────────
+let currentPayrollModalEnt = '北京蕪解';
+
+function openPayrollModal(){
+  currentPayrollModalEnt = '北京蕪解';
+  document.querySelectorAll('#payroll-ent-tabs .ent-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  renderPayrollInputRows();
+  document.getElementById('modal-payroll').classList.add('show');
+}
+function closePayrollModal(){ document.getElementById('modal-payroll').classList.remove('show'); }
+
+function setPayrollEnt(ent,btn){
+  currentPayrollModalEnt=ent;
+  document.querySelectorAll('#payroll-ent-tabs .ent-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPayrollInputRows();
+}
+
+function renderPayrollInputRows(){
+  const d=OPEX_DATA[currentPayrollModalEnt];
+  if(!d) return;
+  const sym=d.ccy==='TWD'?'NT$':'¥';
+  const payrollRow=d.rows.find(r=>r.cat==='薪資人事');
+  if(!payrollRow) return;
+  const detail=loadPayrollDetail()||{};
+  const catDetail=(detail['薪資人事']&&detail['薪資人事'][currentPayrollModalEnt])||{};
+  document.getElementById('payroll-input-rows').innerHTML=payrollRow.items.map(it=>{
+    const val=catDetail[it.name]??it.amount;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;">${it.name}</div>
+        <div style="font-size:10px;color:var(--txt-lo);">${it.role}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:12px;color:var(--txt-mid);">${sym}</span>
+        <input type="number" data-name="${it.name}" value="${val}"
+          style="width:96px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;color:var(--txt-hi);outline:none;text-align:right;">
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function savePayrollModal(){
+  const detail=loadPayrollDetail()||{'薪資人事':{}};
+  if(!detail['薪資人事']) detail['薪資人事']={};
+  if(!detail['薪資人事'][currentPayrollModalEnt]) detail['薪資人事'][currentPayrollModalEnt]={};
+  document.querySelectorAll('#payroll-input-rows input[data-name]').forEach(inp=>{
+    detail['薪資人事'][currentPayrollModalEnt][inp.dataset.name]=parseFloat(inp.value)||0;
+  });
+  savePayrollDetail(detail);
+  // auto-advance payroll step p2
+  const payroll=loadPayroll();
+  if(!payroll.done.includes('p2')){ payroll.done.push('p2'); savePayroll(payroll); }
+  closePayrollModal();
+  render();
+  renderOpexTable();
+  showToast('薪資已儲存 ✓');
+}
 
 // ── Render ─────────────────────────────────────────────────
 let currentApprovalId = null;
@@ -544,7 +762,11 @@ function render(){
     const isActive = i===activeIdx;
     const stepClass = done?'step-done':isActive?'step-active':'step-todo';
     const labelClass = done?'done':isActive?'active':'';
-    const action = !done&&isActive ? `<button class="pr-action" onclick="markPayrollDone('${step.id}')">完成 →</button>` : '';
+    const action = !done&&isActive
+      ? step.id==='p2'
+        ? `<button class="pr-action" onclick="openPayrollModal()">錄入薪資 →</button>`
+        : `<button class="pr-action" onclick="markPayrollDone('${step.id}')">完成 →</button>`
+      : '';
     return `<div class="payroll-row">
       <div class="pr-step ${stepClass}">${done?'✓':i+1}</div>
       <div class="pr-label ${labelClass}">${step.label}</div>
