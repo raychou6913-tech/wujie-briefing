@@ -878,7 +878,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
       <!-- 主體切換 -->
       <div id="pl-entity-tabs" style="display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:nowrap;">
-        <button class="pl-ent-btn active" onclick="setPLEntity('合併',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:var(--fin-dim);color:var(--fin);cursor:pointer;white-space:nowrap;">合併（全集團）</button>
+        <button class="pl-ent-btn active" onclick="setPLEntity('VAM',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--border);background:var(--fin-dim);color:var(--fin);cursor:pointer;white-space:nowrap;">港JV＋深圳（VAM）</button>
         <button class="pl-ent-btn" onclick="setPLEntity('香港JV',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">香港JV</button>
         <button class="pl-ent-btn" onclick="setPLEntity('深圳子公司',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">深圳子公司</button>
         <button class="pl-ent-btn" onclick="setPLEntity('北京蕪解',this)" style="flex-shrink:0;padding:4px 10px;font-size:10px;font-weight:600;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;white-space:nowrap;">北京蕪解</button>
@@ -2160,16 +2160,16 @@ const PL_ENTITIES={
 };
 
 const PL_ENTITY_NOTES={
-  '合併':'合併口徑已消除集團內部公司間交易（服務費、管理費）。',
-  '香港JV':'主要收入：批發出口、IP授權費。COGS含版稅及採購成本。',
+  'VAM':'VAM 考核口徑：港JV ＋ 深圳子公司合計，已消除兩主體間往來。北京/台灣/BKK服務費在各自主體查看。',
+  '香港JV':'主要收入：批發出口、IP授權費。COGS含版稅及採購成本（不含向子公司支付的服務費）。',
   '深圳子公司':'主要收入：大陸電商平台及部分境內批發。',
-  '北京蕪解':'收入為向香港JV收取的服務費（含採購執行、運營支持）。合併口徑下已消除。',
-  '台灣悍草':'收入為向香港JV收取的設計及管理服務費。合併口徑下已消除。',
+  '北京蕪解':'收入為向香港JV收取的服務費（含採購執行、運營支持）。VAM口徑下已消除。',
+  '台灣悍草':'收入為向香港JV收取的設計及管理服務費。VAM口徑下已消除。',
   'UJ BKK':'收入來自曼谷快閃店零售業績。固定成本含場地租金、Shawn團隊薪資。',
 };
 
 let _plRange='ytd';
-let _plEntity='合併';
+let _plEntity='VAM';
 
 function setPLEntity(ent,btn){
   _plEntity=ent;
@@ -2193,7 +2193,18 @@ function setPLRange(range,btn){
 }
 
 function _plMonths(range){
-  const src=(_plEntity&&_plEntity!=='合併'&&PL_ENTITIES[_plEntity])?PL_ENTITIES[_plEntity]:PL_2026;
+  let src;
+  if(_plEntity==='VAM'){
+    const jv=PL_ENTITIES['香港JV'], sz=PL_ENTITIES['深圳子公司'];
+    src=jv.map((m,i)=>({
+      mo:m.mo, future:m.future,
+      revW:m.revW+sz[i].revW, revF:m.revF+sz[i].revF,
+      revIP:m.revIP+sz[i].revIP, revEC:m.revEC+sz[i].revEC,
+      cogs:m.cogs+sz[i].cogs, opex:m.opex+sz[i].opex, tax:m.tax+sz[i].tax,
+    }));
+  } else {
+    src=(PL_ENTITIES[_plEntity])||PL_2026;
+  }
   if(range==='ytd') return src.filter(m=>!m.future);
   if(range==='month') return [src[4]];
   if(range==='q2') return src.slice(3,6);
@@ -2225,7 +2236,7 @@ function renderMgmtPL(range){
 
   // P&L table
   const isServiceEnt=(_plEntity==='北京蕪解'||_plEntity==='台灣悍草');
-  const revWLabel=isServiceEnt?'服務費收入（向JV收取）':'批發業務收入';
+  const revWLabel=isServiceEnt?'服務費收入（向JV收取）':(_plEntity==='VAM'?'批發業務收入（港JV＋深圳）':'批發業務收入');
   const hasFuture=months.some(m=>m.future);
   const moLabels=months.map(m=>`<th>${m.mo}${m.future?'<br><span style="font-size:8px;color:var(--txt-lo)">(預)</span>':''}</th>`).join('');
   const mkRow=(label,vals,cls,indent)=>{
