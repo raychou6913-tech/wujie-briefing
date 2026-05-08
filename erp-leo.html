@@ -127,6 +127,40 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 /* Toast */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ok);color:#000;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;}
 .toast.show{opacity:1;}
+
+/* Fixed cost schedule */
+.fc-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;}
+.fc-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)20;}
+.fc-row:last-child{border-bottom:none;}
+.fc-label{flex:1;font-size:12px;color:var(--txt-mid);}
+.fc-amt{font-size:13px;font-weight:800;min-width:100px;text-align:right;}
+.fc-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;min-width:56px;text-align:center;margin-left:8px;}
+.fc-paid{background:var(--ok-dim);color:var(--ok);}
+.fc-due{background:var(--warn-dim);color:var(--warn);}
+.fc-progress{background:var(--accent-dim);color:var(--accent);}
+.fc-total-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card2);border-top:1px solid var(--border-hi);}
+
+/* Employee salary detail */
+.emp-table{width:100%;border-collapse:collapse;}
+.emp-table th{padding:7px 10px;font-size:10px;font-weight:700;color:var(--txt-lo);text-align:right;border-bottom:1px solid var(--border);}
+.emp-table th:first-child{text-align:left;}
+.emp-table td{padding:8px 10px;font-size:11px;border-bottom:1px solid var(--border)10;text-align:right;}
+.emp-table td:first-child{text-align:left;font-weight:700;color:var(--txt-hi);}
+.emp-table tr:hover td{background:#ffffff04;}
+.emp-table tfoot td{font-weight:800;font-size:12px;color:var(--accent);background:var(--card2);border-top:1px solid var(--border-hi);}
+.emp-table tfoot td:first-child{color:var(--txt-mid);}
+
+/* Intercompany receivables */
+.icr-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.icr-bar{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;background:#f59e0b;}
+.icr-body{flex:1;min-width:0;}
+.icr-title{font-size:12px;font-weight:700;}
+.icr-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.icr-right{text-align:right;flex-shrink:0;}
+.icr-amt{font-size:13px;font-weight:800;color:#f59e0b;margin-bottom:5px;}
+.icr-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;}
+.icr-pending{background:#f59e0b18;border:1px solid #f59e0b40;color:#f59e0b;}
+.icr-received{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -148,6 +182,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="greet-badges" id="greet-badges"></div>
   </div>
 
+  <!-- 固定費用月度排程 -->
+  <div class="sec-hd" style="margin-top:8px;">
+    <span class="sec-title">本月固定支出排程</span>
+    <span style="font-size:10px;color:var(--txt-lo);">每月必付・是例行工作的來源</span>
+  </div>
+  <div class="fc-card">
+    <div id="fc-rows"></div>
+    <div class="fc-total-row">
+      <span style="font-size:11px;font-weight:700;color:var(--txt-mid);">本月固定支出合計</span>
+      <span style="font-size:15px;font-weight:800;color:var(--warn);" id="fc-total"></span>
+    </div>
+  </div>
+
   <!-- 待付款通知 -->
   <div class="sec-hd">
     <span class="sec-title" id="pay-title">待付款通知</span>
@@ -163,6 +210,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <span class="payroll-status status-progress" id="payroll-status">進行中</span>
     </div>
     <div class="payroll-rows" id="payroll-rows"></div>
+  </div>
+
+  <!-- 薪資人員明細 -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);">
+      <span style="font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;">薪資人員明細</span>
+      <button style="font-size:10px;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:700;" onclick="openSalaryModal()">編輯本月薪資 →</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="emp-table" id="emp-salary-table">
+        <thead><tr>
+          <th>員工</th><th>底薪</th><th>住房補貼/獎金</th><th>月薪合計</th><th>投保級距</th><th>勞保(公司)</th><th>健保(公司)</th><th>退休金</th>
+        </tr></thead>
+        <tbody id="emp-salary-tbody"></tbody>
+        <tfoot><tr id="emp-salary-foot"></tr></tfoot>
+      </table>
+    </div>
+    <div style="padding:8px 14px;font-size:10px;color:var(--txt-lo);">公司負擔部分。員工個人扣除額另計（勞保員工負擔 2.11%，健保員工負擔 1.17%）。</div>
   </div>
 
   <!-- 勞健保月結 -->
@@ -186,12 +251,32 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   </div>
   <div class="bank-grid" id="bank-grid"></div>
 
+  <!-- 跨主體應收款 -->
+  <div class="sec-hd">
+    <span class="sec-title">主體間應收款</span>
+    <span style="font-size:10px;color:var(--txt-lo);">悍草代付 → 向他主體請款</span>
+  </div>
+  <div id="icr-list"></div>
+
   <!-- 本月例行工作 -->
   <div class="sec-hd">
     <span class="sec-title" id="checklist-title">本月例行工作</span>
   </div>
   <div id="checklist"></div>
 
+</div>
+
+<!-- Salary Edit Modal -->
+<div class="modal-bg" id="modal-salary">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title">編輯本月薪資明細</div>
+    <div class="modal-sub">底薪＋住房補貼＋獎金 → 投保級距自動計算</div>
+    <div id="salary-modal-rows"></div>
+    <div class="modal-footer">
+      <button class="btn-full btn-cancel" onclick="closeSalaryModal()">取消</button>
+      <button class="btn-full btn-primary" onclick="saveSalaryModal()">儲存 →</button>
+    </div>
+  </div>
 </div>
 
 <!-- Bank Balance Update Modal -->
@@ -279,6 +364,191 @@ function renderBankGrid(){
     </div>`;
 }
 
+// ── Employees + 投保級距 ────────────────────────────────────
+const EMP_KEY = 'leo_employees_v1';
+const EMP_DEFAULTS = [
+  {id:'e1', name:'Ray（周宇翔）',   base:80000, housing:0,    bonus:0},
+  {id:'e2', name:'Bevis（林柏毅）', base:45000, housing:3000, bonus:0},
+  {id:'e3', name:'珮玲',           base:38000, housing:0,    bonus:0},
+  {id:'e4', name:'詩彤',           base:38000, housing:0,    bonus:0},
+  {id:'e5', name:'躍明（楊子）',   base:48000, housing:0,    bonus:0},
+  {id:'e6', name:'Leo（陳昱廷）',  base:42000, housing:0,    bonus:0},
+];
+// 投保級距 → 公司負擔（勞保 8.09%｜健保含補充保費 4.69%｜退休金 6%）
+const NHI_BRACKETS = [
+  {lim:26400,  labor:2137,  health:1237,  pension:1584},
+  {lim:27600,  labor:2234,  health:1294,  pension:1656},
+  {lim:28800,  labor:2331,  health:1350,  pension:1728},
+  {lim:30300,  labor:2453,  health:1421,  pension:1818},
+  {lim:31800,  labor:2575,  health:1491,  pension:1908},
+  {lim:33300,  labor:2697,  health:1561,  pension:1998},
+  {lim:34800,  labor:2818,  health:1632,  pension:2088},
+  {lim:36300,  labor:2940,  health:1702,  pension:2178},
+  {lim:38200,  labor:3092,  health:1791,  pension:2292},
+  {lim:40100,  labor:3248,  health:1881,  pension:2406},
+  {lim:42000,  labor:3402,  health:1970,  pension:2520},
+  {lim:43900,  labor:3554,  health:2059,  pension:2634},
+  {lim:45800,  labor:3706,  health:2148,  pension:2748},
+  {lim:48200,  labor:3902,  health:2260,  pension:2892},
+  {lim:50600,  labor:4097,  health:2372,  pension:3036},
+  {lim:53000,  labor:4292,  health:2485,  pension:3180},
+  {lim:55400,  labor:4487,  health:2598,  pension:3324},
+  {lim:57800,  labor:4681,  health:2711,  pension:3468},
+  {lim:60800,  labor:4923,  health:2852,  pension:3648},
+  {lim:63800,  labor:5166,  health:2993,  pension:3828},
+  {lim:66800,  labor:5409,  health:3133,  pension:4008},
+  {lim:72800,  labor:5895,  health:3414,  pension:4368},
+  {lim:76500,  labor:6193,  health:3587,  pension:4590},
+  {lim:80200,  labor:6493,  health:3762,  pension:4812},
+  {lim:87600,  labor:7093,  health:4108,  pension:5256},
+  {lim:99999,  labor:8000,  health:4690,  pension:6000},
+];
+function lookupBracket(totalComp){
+  return NHI_BRACKETS.find(b=>b.lim>=totalComp)||NHI_BRACKETS[NHI_BRACKETS.length-1];
+}
+function loadEmployees(){ return JSON.parse(localStorage.getItem(EMP_KEY)||JSON.stringify(EMP_DEFAULTS)); }
+function saveEmployees(arr){ localStorage.setItem(EMP_KEY, JSON.stringify(arr)); }
+
+function renderEmployeeSalaryTable(){
+  const emps = loadEmployees();
+  let totBase=0, totHousing=0, totBonus=0, totComp=0, totLabor=0, totHealth=0, totPension=0;
+  const rows = emps.map(e=>{
+    const comp = e.base + (e.housing||0) + (e.bonus||0);
+    const br = lookupBracket(comp);
+    totBase+=e.base; totHousing+=(e.housing||0); totBonus+=(e.bonus||0); totComp+=comp;
+    totLabor+=br.labor; totHealth+=br.health; totPension+=br.pension;
+    const extras = [];
+    if(e.housing) extras.push(`住房 ${e.housing.toLocaleString()}`);
+    if(e.bonus) extras.push(`獎金 ${e.bonus.toLocaleString()}`);
+    return `<tr>
+      <td>${e.name}</td>
+      <td>${e.base.toLocaleString()}</td>
+      <td style="color:var(--txt-mid);">${extras.length?extras.join('・'):'—'}</td>
+      <td style="color:var(--txt-hi);font-weight:700;">${comp.toLocaleString()}</td>
+      <td style="color:var(--txt-lo);">NT$${br.lim.toLocaleString()}</td>
+      <td>${br.labor.toLocaleString()}</td>
+      <td>${br.health.toLocaleString()}</td>
+      <td>${br.pension.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+  const tbody = document.getElementById('emp-salary-tbody');
+  if(tbody) tbody.innerHTML = rows;
+  const foot = document.getElementById('emp-salary-foot');
+  if(foot) foot.innerHTML = `
+    <td>合計（6人）</td>
+    <td>${totBase.toLocaleString()}</td>
+    <td>${(totHousing+totBonus).toLocaleString()}</td>
+    <td>${totComp.toLocaleString()}</td>
+    <td>—</td>
+    <td style="color:var(--danger);">${totLabor.toLocaleString()}</td>
+    <td style="color:var(--danger);">${totHealth.toLocaleString()}</td>
+    <td style="color:var(--danger);">${totPension.toLocaleString()}</td>`;
+  return {totComp, totLabor, totHealth, totPension};
+}
+
+let _salaryEdit = [];
+function openSalaryModal(){
+  _salaryEdit = JSON.parse(JSON.stringify(loadEmployees()));
+  document.getElementById('salary-modal-rows').innerHTML = _salaryEdit.map((e,i)=>`
+    <div style="border-bottom:1px solid var(--border);padding:10px 0;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px;">${e.name}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div class="field" style="margin:0;"><label>底薪 (TWD)</label>
+          <input type="number" value="${e.base}" onchange="_salaryEdit[${i}].base=+this.value" style="padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;"></div>
+        <div class="field" style="margin:0;"><label>住房補貼</label>
+          <input type="number" value="${e.housing||0}" onchange="_salaryEdit[${i}].housing=+this.value" style="padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;"></div>
+        <div class="field" style="margin:0;"><label>當月獎金</label>
+          <input type="number" value="${e.bonus||0}" onchange="_salaryEdit[${i}].bonus=+this.value" style="padding:7px 9px;font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);width:100%;outline:none;"></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('modal-salary').classList.add('show');
+}
+function closeSalaryModal(){ document.getElementById('modal-salary').classList.remove('show'); }
+function saveSalaryModal(){
+  saveEmployees(_salaryEdit);
+  closeSalaryModal();
+  renderEmployeeSalaryTable();
+  renderNHI();
+  renderFixedCosts();
+  showToast('薪資明細已儲存，勞健保自動更新 ✓');
+}
+
+// ── Fixed Costs ────────────────────────────────────────────
+const FC_KEY = 'leo_fc_v1';
+const FC_DEFAULTS = [
+  {id:'fc1', label:'薪資支出（全員，含公司負擔勞健保）', amount:null, dynamic:true, method:'銀行轉帳', status:'progress'},
+  {id:'fc2', label:'台北辦公室租金', amount:45000, method:'匯款（房東）', status:'paid'},
+  {id:'fc3', label:'辦公室水電費', amount:8000, method:'代扣自動扣款', status:'due'},
+  {id:'fc4', label:'網路 / 電話費', amount:3500, method:'代扣自動扣款', status:'due'},
+  {id:'fc5', label:'軟體訂閱（Adobe / 設計工具）', amount:6000, method:'公司信用卡', status:'paid'},
+  {id:'fc6', label:'勞健保繳費（勞保局 + 健保署）', amount:null, dynamic:true, method:'線上繳費', status:'progress'},
+];
+function loadFC(){ return JSON.parse(localStorage.getItem(FC_KEY)||JSON.stringify(FC_DEFAULTS)); }
+function saveFC(arr){ localStorage.setItem(FC_KEY, JSON.stringify(arr)); }
+function renderFixedCosts(){
+  const fcs = loadFC();
+  const {totComp, totLabor, totHealth, totPension} = renderEmployeeSalaryTable();
+  const nhiTotal = totLabor + totHealth + totPension;
+  const payrollTotal = totComp + nhiTotal;
+  let grandTotal = 0;
+  const rows = fcs.map(fc=>{
+    const amt = fc.id==='fc1' ? payrollTotal : fc.id==='fc6' ? nhiTotal : (fc.amount||0);
+    grandTotal += amt;
+    const statusMap = {paid:'<span class="fc-badge fc-paid">✓ 已付</span>',due:'<span class="fc-badge fc-due">待確認</span>',progress:'<span class="fc-badge fc-progress">進行中</span>'};
+    return `<div class="fc-row">
+      <div class="fc-label">${fc.label}</div>
+      <div class="fc-amt" style="color:${fc.status==='paid'?'var(--txt-lo)':'var(--warn)'};">${fc.status==='paid'?'<span style="text-decoration:line-through;">NT$'+amt.toLocaleString()+'</span>':'NT$'+amt.toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--txt-lo);min-width:90px;text-align:right;">${fc.method}</div>
+      ${statusMap[fc.status]||''}
+    </div>`;
+  }).join('');
+  const el = document.getElementById('fc-rows');
+  if(el) el.innerHTML = rows;
+  const tot = document.getElementById('fc-total');
+  if(tot) tot.textContent = 'NT$' + grandTotal.toLocaleString();
+}
+
+// ── Intercompany Receivables ────────────────────────────────
+const ICR_KEY = 'leo_icr_v1';
+const ICR_DEMO = [
+  {id:'icr1', title:'珮玲・Snoopy 2025夏季主視覺插畫外包', entity:'香港JV', ccy:'TWD', amount:28000, desc:'委外設計師 / JJK系列主視覺', date:'2026-05-05', status:'pending'},
+  {id:'icr2', title:'詩彤・Opanchu 周邊插畫包（共4款）', entity:'深圳子公司', ccy:'TWD', amount:15000, desc:'電商詳情頁插圖外包', date:'2026-05-03', status:'pending'},
+];
+function loadICR(){ return JSON.parse(localStorage.getItem(ICR_KEY)||JSON.stringify(ICR_DEMO)); }
+function saveICR(arr){ localStorage.setItem(ICR_KEY, JSON.stringify(arr)); }
+function markICRReceived(id){
+  const icrs = loadICR();
+  const idx = icrs.findIndex(x=>x.id===id);
+  if(idx>-1) icrs[idx].status='received';
+  saveICR(icrs);
+  renderICR();
+  showToast('✓ 已標記收款完成');
+}
+function renderICR(){
+  const icrs = loadICR();
+  const el = document.getElementById('icr-list');
+  if(!el) return;
+  if(!icrs.length){
+    el.innerHTML='<div style="padding:14px;text-align:center;color:var(--txt-lo);font-size:12px;">目前無跨主體應收款</div>';
+    return;
+  }
+  el.innerHTML = icrs.map(r=>`
+    <div class="icr-item">
+      <div class="icr-bar" style="background:${r.status==='received'?'var(--ok)':'#f59e0b'};"></div>
+      <div class="icr-body">
+        <div class="icr-title">${r.title}</div>
+        <div class="icr-meta">請款主體：${r.entity} · ${r.date} · ${r.desc}</div>
+      </div>
+      <div class="icr-right">
+        <div class="icr-amt" style="color:${r.status==='received'?'var(--ok)':'#f59e0b'};">${r.ccy} ${r.amount.toLocaleString()}</div>
+        ${r.status==='pending'
+          ? `<span class="icr-badge icr-pending">待收款</span><br><button style="font-size:10px;color:var(--ok);background:none;border:none;cursor:pointer;margin-top:4px;font-weight:700;" onclick="markICRReceived('${r.id}')">標記已收 →</button>`
+          : `<span class="icr-badge icr-received">✓ 已收款</span>`
+        }
+      </div>
+    </div>`).join('');
+}
+
 // ── NHI (勞健保) ───────────────────────────────────────────
 const NHI_KEY = 'leo_nhi_v1';
 const NHI_ITEMS = [
@@ -299,11 +569,22 @@ function toggleNHI(id){
 }
 function renderNHI(){
   const nhi = loadNHI();
-  const total = NHI_ITEMS.reduce((s,x)=>s+x.amount,0);
-  const paidAll = NHI_ITEMS.every(x=>nhi.paid.includes(x.id));
+  const emps = loadEmployees();
+  let totLabor=0, totHealth=0, totPension=0;
+  emps.forEach(e=>{
+    const br = lookupBracket(e.base+(e.housing||0)+(e.bonus||0));
+    totLabor+=br.labor; totHealth+=br.health; totPension+=br.pension;
+  });
+  const nhiItems = [
+    {id:'n1', label:'勞保費（公司負擔）', note:`${emps.length}名員工・依月投保薪資自動計算`, amount:totLabor},
+    {id:'n2', label:'健保費（公司負擔）', note:`${emps.length}名員工・含眷屬`, amount:totHealth},
+    {id:'n3', label:'勞工退休金（公司提繳）', note:'6% 月投保薪資・自動計算', amount:totPension},
+  ];
+  const total = totLabor + totHealth + totPension;
+  const paidAll = nhiItems.every(x=>nhi.paid.includes(x.id));
   document.getElementById('nhi-due-badge').textContent = paidAll ? '✓ 本月已繳' : '繳費期限 5/10';
   document.getElementById('nhi-due-badge').style.color = paidAll ? 'var(--ok)' : 'var(--warn)';
-  document.getElementById('nhi-rows').innerHTML = NHI_ITEMS.map(x=>{
+  document.getElementById('nhi-rows').innerHTML = nhiItems.map(x=>{
     const paid = nhi.paid.includes(x.id);
     return `<div class="nhi-row">
       <div>
@@ -311,7 +592,7 @@ function renderNHI(){
         <div style="font-size:10px;color:var(--txt-lo);">${x.note}</div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
-        <div class="nhi-amt" style="${paid?'color:var(--ok);text-decoration:line-through;':''}"">NT$${x.amount.toLocaleString()}</div>
+        <div class="nhi-amt" style="${paid?'color:var(--ok);text-decoration:line-through;':''}">NT$${x.amount.toLocaleString()}</div>
       </div>
       <div class="nhi-check ${paid?'paid':''}" onclick="toggleNHI('${x.id}')">${paid?'✓':''}</div>
     </div>`;
@@ -449,11 +730,12 @@ function renderCheck(){
 function renderGreeting(){
   const pays = loadPayments().filter(x=>x.status==='pending').length;
   const nhi = loadNHI();
-  const nhiPending = NHI_ITEMS.filter(x=>!nhi.paid.includes(x.id)).length;
+  const nhiPending = 3 - nhi.paid.length;
   const cl = loadCheck();
   const checkPending = MONTHLY_TASKS.filter(x=>!cl.done.includes(x.id)).length;
+  const icrPending = loadICR().filter(x=>x.status==='pending').length;
 
-  const total = pays + (nhiPending>0?1:0) + checkPending;
+  const total = pays + (nhiPending>0?1:0) + checkPending + (icrPending>0?1:0);
   document.getElementById('greet-hi').textContent = total===0
     ? 'Leo，本月例行工作都完成了 ✓'
     : `Leo，今天有 ${total} 件待處理`;
@@ -462,7 +744,8 @@ function renderGreeting(){
   badges.innerHTML = '';
   if(pays>0) badges.innerHTML+=`<span class="badge badge-warn">💸 ${pays} 筆待付款</span>`;
   if(nhiPending>0) badges.innerHTML+=`<span class="badge badge-warn">🏥 勞健保未繳</span>`;
-  if(pays===0&&nhiPending===0) badges.innerHTML+=`<span class="badge badge-ok">✓ 付款無待辦</span>`;
+  if(icrPending>0) badges.innerHTML+=`<span class="badge badge-warn">🔁 ${icrPending} 筆跨主體待收款</span>`;
+  if(pays===0&&nhiPending===0&&icrPending===0) badges.innerHTML+=`<span class="badge badge-ok">✓ 付款無待辦</span>`;
 }
 
 function showToast(msg){
@@ -472,10 +755,12 @@ function showToast(msg){
 }
 
 // Init
+renderFixedCosts();
 renderPayments();
 renderPayroll();
 renderNHI();
 renderBankGrid();
+renderICR();
 renderCheck();
 renderGreeting();
 </script>
@@ -511,7 +796,8 @@ renderGreeting();
   <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
   <div class="exp-type-row" id="expTypeRow">
     <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
-    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
+    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款</button>
+    <button class="exp-type-btn" id="expTypeOutsource" onclick="setExpType('outsource')">設計外包費</button>
   </div>
   <div id="expPersonalFields">
     <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>TWD</option><option>RMB</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
@@ -523,6 +809,17 @@ renderGreeting();
     <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：水電公司、房東"></div>
     <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>TWD</option><option>RMB</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
     <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、科目..."></textarea></div>
+  </div>
+  <div id="expOutsourceFields" style="display:none">
+    <div style="padding:8px 10px;background:#f59e0b10;border:1px solid #f59e0b30;border-radius:8px;margin-bottom:12px;font-size:11px;color:#f59e0b;line-height:1.6;">
+      🔁 悍草<strong>不代墊</strong>設計費。付款後，本系統自動建立「悍草→請款主體」的應收款紀錄，供後續跨主體結算。
+    </div>
+    <div class="exp-field"><label>外包商名稱</label><input id="expOsName" placeholder="例：自由接案設計師 / 插畫工作室"></div>
+    <div class="exp-field"><label>費用歸屬主體（向誰請款）</label>
+      <select id="expOsEntity"><option value="香港JV">香港JV（IP授權/批發項目）</option><option value="深圳子公司">深圳子公司（電商/大陸項目）</option></select>
+    </div>
+    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expOsAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expOsCcy"><option>TWD</option><option>RMB</option><option>HKD</option><option>USD</option></select></div></div>
+    <div class="exp-field"><label>項目說明</label><textarea id="expOsDesc" rows="2" placeholder="例：Snoopy 2025夏季主視覺插畫外包"></textarea></div>
   </div>
   <div class="exp-routing" id="expRouting">送審路徑：Leo → Ray 確認 → 躍明財務確認 → 執行付款</div>
   <button class="exp-submit" onclick="submitExpense()">送出申請</button>
@@ -546,8 +843,16 @@ function setExpType(t){
   expType=t;
   document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
   document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
+  document.getElementById('expOutsourceFields').style.display=t==='outsource'?'':'none';
   document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
   document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
+  document.getElementById('expTypeOutsource').classList.toggle('active',t==='outsource');
+  const routing={
+    personal:'送審路徑：Leo → Ray 確認 → 躍明財務確認 → 執行付款',
+    supplier:'送審路徑：Leo → Ray 確認 → 躍明財務確認 → 執行付款',
+    outsource:'送審路徑：Leo → Shawn / Ray 確認 → 躍明確認 → 執行付款 ＋ 建立悍草→主體應收款'
+  };
+  document.getElementById('expRouting').textContent=routing[t]||routing.personal;
 }
 function submitExpense(){
   const u=getUser();
@@ -563,7 +868,7 @@ function submitExpense(){
     if(!amt||!date){(window.showToast||alert)('請填寫金額與日期');return;}
     rec={type:'個人報銷',user:u,amt,ccy,cat,date,desc,next:'ray',ts:Date.now()};
     toastMsg='✅ 報銷申請已送出 · 待 Ray 確認';
-  }else{
+  } else if(expType==='supplier'){
     const name=document.getElementById('expSupName').value;
     const amt=document.getElementById('expSupAmt').value;
     const ccy=document.getElementById('expSupCcy').value;
@@ -571,9 +876,25 @@ function submitExpense(){
     if(!name||!amt){(window.showToast||alert)('請填寫供應商名稱與金額');return;}
     rec={type:'供應商付款申請',user:u,supplier:name,amt,ccy,desc,next:'ray',ts:Date.now()};
     toastMsg='✅ 付款申請已送出 · 待 Ray → 躍明確認';
+  } else {
+    const name=document.getElementById('expOsName').value;
+    const entity=document.getElementById('expOsEntity').value;
+    const amt=document.getElementById('expOsAmt').value;
+    const ccy=document.getElementById('expOsCcy').value;
+    const desc=document.getElementById('expOsDesc').value;
+    if(!name||!amt){(window.showToast||alert)('請填寫外包商名稱與金額');return;}
+    rec={type:'設計外包費',user:u,supplier:name,entity,amt,ccy,desc,next:'shawn',ts:Date.now()};
+    // Create intercompany receivable entry
+    const icrs=JSON.parse(localStorage.getItem('leo_icr_v1')||'[]');
+    const icrId='icr'+Date.now();
+    icrs.push({id:icrId,title:`${name}・${desc||'設計外包'}`,entity,ccy,amount:parseFloat(amt),desc,date:new Date().toISOString().slice(0,10),status:'pending'});
+    localStorage.setItem('leo_icr_v1',JSON.stringify(icrs));
+    if(typeof renderICR==='function') renderICR();
+    if(typeof renderGreeting==='function') renderGreeting();
+    toastMsg='✅ 外包費申請已送出 · 已建立悍草→'+entity+'應收款記錄';
   }
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
-  _write({'審批標題':`【Leo】${rec.type} ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':u,'申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':rec.ccy,'審批人':'Ray','審批狀態':'待審批','申請說明':rec.desc||''});
+  _write({'審批標題':`【Leo】${rec.type} ${rec.amt||rec.amount||''}${rec.ccy}`,'審批類型':'費用申請','申請人':u,'申請日期':Date.now(),'金額':parseFloat(rec.amt||rec.amount)||0,'幣別':rec.ccy||'TWD','審批人':rec.next==='shawn'?'Shawn':'Ray','審批狀態':'待審批','申請說明':rec.desc||''});
   closeExpModal();
   (window.showToast||alert)(toastMsg);
 }
