@@ -203,6 +203,36 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .inv-table .num.warn{color:var(--warn);}
 .inv-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;white-space:nowrap;}
 .inv-note{font-size:11px;color:var(--txt-mid);padding:12px;text-align:center;}
+
+/* Store accordion (快閃) */
+.store-row{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;}
+.store-row:hover{background:var(--card2);}
+.store-row:last-child{border-bottom:none;}
+.store-chev{color:var(--txt-lo);font-size:11px;transition:transform .2s;flex-shrink:0;}
+.store-row.open .store-chev{transform:rotate(180deg);}
+.store-info{flex:1;min-width:0;}
+.store-name{font-size:13px;font-weight:800;margin-bottom:2px;}
+.store-meta{font-size:10px;color:var(--txt-mid);}
+.store-vals{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;text-align:right;}
+.store-cost{font-size:12px;font-weight:700;color:var(--warn);}
+.store-rev{font-size:11px;color:var(--ok);}
+.store-status{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;flex-shrink:0;}
+.status-active{background:#22c55e15;color:var(--ok);}
+.status-prep{background:#818cf815;color:#818cf8;}
+.status-ended{background:#3d426820;color:var(--txt-lo);}
+/* SKU sub-table */
+.sku-panel{display:none;border-bottom:1px solid var(--border);background:var(--card2);}
+.store-row.open+.sku-panel{display:block;}
+.sku-table{width:100%;border-collapse:collapse;}
+.sku-table th{font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;padding:7px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.04em;}
+.sku-table th:first-child,.sku-table th:nth-child(2){text-align:left;}
+.sku-table td{font-size:11px;padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;}
+.sku-table td:first-child{text-align:left;}
+.sku-table td:nth-child(2){font-size:12px;font-weight:700;text-align:left;}
+.sku-table tr:last-child td{border-bottom:none;}
+.sku-table .cost-val{color:var(--warn);font-weight:700;}
+.sku-table .rev-val{color:var(--ok);font-weight:700;}
+.sku-table .tot-row td{font-weight:800;border-top:1px solid var(--border-hi);color:var(--txt-hi);}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -242,32 +272,23 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ── 庫存現況 tab ── -->
   <div id="page-inventory" style="display:none;">
+
+    <!-- 庫存總貨值卡 -->
+    <div id="inv-value-card" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;">
+      <div style="font-size:10px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">庫存總貨值</div>
+      <div id="inv-value-body" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end;"></div>
+    </div>
+
     <div class="inv-toggle">
       <button class="inv-toggle-btn active" id="inv-btn-wholesale" onclick="setInvType('wholesale',this)">批發產品</button>
       <button class="inv-toggle-btn" id="inv-btn-popup" onclick="setInvType('popup',this)">快閃店產品</button>
     </div>
-    <div class="inv-loc-grid">
-      <div class="inv-loc-card">
-        <div class="inv-loc-title">🏭 工廠寄存（主力）</div>
-        <div class="inv-loc-num" id="inv-factory-total">—</div>
-        <div class="inv-loc-sub" id="inv-factory-sub">生產完成，等客戶下單直發</div>
-      </div>
-      <div class="inv-loc-card">
-        <div class="inv-loc-title">🏢 北京倉</div>
-        <div class="inv-loc-num" id="inv-bj-total">—</div>
-        <div class="inv-loc-sub" id="inv-bj-sub">滯銷 / 快閃剩餘 / 暫存</div>
-      </div>
-      <div class="inv-loc-card">
-        <div class="inv-loc-title">🌏 泰國倉（曼谷）</div>
-        <div class="inv-loc-num" id="inv-bkk-total">—</div>
-        <div class="inv-loc-sub" id="inv-bkk-sub">曼谷快閃相關庫存</div>
-      </div>
-    </div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-      <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
         <span style="font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.06em;" id="inv-table-title">產品庫存明細</span>
+        <span style="font-size:10px;color:var(--txt-lo);" id="inv-table-sub"></span>
       </div>
-      <div id="inv-table-wrap" style="overflow-x:auto;"></div>
+      <div id="inv-table-wrap"></div>
     </div>
   </div>
 
@@ -1116,20 +1137,43 @@ function showToast(msg){
 }
 
 // ── Inventory ──────────────────────────────────────────────
-const INV_DATA = {
-  wholesale: [
-    {sku:'SNP-SUM-001', name:'Snoopy 夏日背包掛件',     ip:'Snoopy',    ip_color:'#0284c7', factory:480, bj:0,   bkk:0,   unit:'件', po:'PO-318'},
-    {sku:'MFS-SPR-002', name:'貓福珊迪 春季盲盒',       ip:'Mofusand',  ip_color:'#9333ea', factory:720, bj:120, bkk:0,   unit:'件', po:'PO-320'},
-    {sku:'MFS-SUM-001', name:'貓福珊迪 夏日貼紙包',     ip:'Mofusand',  ip_color:'#9333ea', factory:960, bj:0,   bkk:0,   unit:'件', po:'PO-322'},
-    {sku:'MZK-NEW-001', name:'Muziktiger 壓克力立牌',   ip:'Muziktiger',ip_color:'#ec4899', factory:240, bj:0,   bkk:0,   unit:'件', po:'PO-323'},
-    {sku:'OPN-SUM-001', name:'Opanchu 夏日壓克力掛件',  ip:'Opanchu',   ip_color:'#f59e0b', factory:360, bj:60,  bkk:0,   unit:'件', po:'PO-321'},
-  ],
-  popup: [
-    {sku:'SNP-BKK-001', name:'Snoopy BKK 快閃限定款',   ip:'Snoopy',    ip_color:'#0284c7', factory:200, bj:0,   bkk:350, unit:'件', po:'PO-319'},
-    {sku:'OPN-BKK-001', name:'Opanchu BKK 快閃彩虹款',  ip:'Opanchu',   ip_color:'#f59e0b', factory:0,   bj:0,   bkk:180, unit:'件', po:'PO-321'},
-    {sku:'MFS-BKK-001', name:'貓福珊迪 BKK 快閃盲盒',   ip:'Mofusand',  ip_color:'#9333ea', factory:480, bj:40,  bkk:0,   unit:'件', po:'PO-320'},
-  ]
-};
+// 批發產品：cost/price in CNY
+const INV_WHOLESALE = [
+  {sku:'SNP-SUM-001', name:'Snoopy 夏日背包掛件',    ip:'Snoopy',    ip_color:'#0284c7', factory:480, bj:0,   bkk:0,  ccy:'CNY', cost:12.5, price:45,  po:'PO-318'},
+  {sku:'MFS-SPR-002', name:'貓福珊迪 春季盲盒',      ip:'Mofusand',  ip_color:'#9333ea', factory:720, bj:120, bkk:0,  ccy:'CNY', cost:8.8,  price:35,  po:'PO-320'},
+  {sku:'MFS-SUM-001', name:'貓福珊迪 夏日貼紙包',    ip:'Mofusand',  ip_color:'#9333ea', factory:960, bj:0,   bkk:0,  ccy:'CNY', cost:5.2,  price:22,  po:'PO-322'},
+  {sku:'MZK-NEW-001', name:'Muziktiger 壓克力立牌',  ip:'Muziktiger',ip_color:'#ec4899', factory:240, bj:0,   bkk:0,  ccy:'CNY', cost:14.0, price:55,  po:'PO-323'},
+  {sku:'OPN-SUM-001', name:'Opanchu 夏日壓克力掛件', ip:'Opanchu',   ip_color:'#f59e0b', factory:360, bj:60,  bkk:0,  ccy:'CNY', cost:11.5, price:42,  po:'PO-321'},
+];
+
+// 快閃店：按場次分組
+const POPUP_STORES = [
+  {
+    id:'bkk-2604', name:'BKK 曼谷快閃 #3', location:'泰國曼谷 Central World',
+    dates:'2026-04-20 ～ 2026-05-10', status:'active',
+    skus:[
+      {sku:'SNP-BKK-001', name:'Snoopy 限定掛件',     ip:'Snoopy',    ip_color:'#0284c7', factory:200, bj:0, bkk:350, ccy:'THB', cost:85,  price:299},
+      {sku:'SNP-BKK-002', name:'Snoopy 抱枕限定款',   ip:'Snoopy',    ip_color:'#0284c7', factory:0,   bj:0, bkk:120, ccy:'THB', cost:220, price:699},
+      {sku:'OPN-BKK-001', name:'Opanchu 彩虹彩繪款',  ip:'Opanchu',   ip_color:'#f59e0b', factory:0,   bj:0, bkk:180, ccy:'THB', cost:120, price:399},
+      {sku:'OPN-BKK-002', name:'Opanchu 手機殼',      ip:'Opanchu',   ip_color:'#f59e0b', factory:80,  bj:0, bkk:95,  ccy:'THB', cost:95,  price:349},
+      {sku:'MFS-BKK-001', name:'貓福珊迪 BKK 盲盒',   ip:'Mofusand',  ip_color:'#9333ea', factory:0,   bj:0, bkk:220, ccy:'THB', cost:95,  price:329},
+      {sku:'MFS-BKK-002', name:'貓福珊迪 亞克力立牌', ip:'Mofusand',  ip_color:'#9333ea', factory:160, bj:40,bkk:0,   ccy:'THB', cost:72,  price:259},
+      {sku:'MZK-BKK-001', name:'Muziktiger BKK 貼紙', ip:'Muziktiger',ip_color:'#ec4899', factory:0,   bj:0, bkk:400, ccy:'THB', cost:38,  price:149},
+      {sku:'MZK-BKK-002', name:'Muziktiger 鑰匙圈',   ip:'Muziktiger',ip_color:'#ec4899', factory:120, bj:0, bkk:280, ccy:'THB', cost:55,  price:199},
+    ]
+  },
+  {
+    id:'bj-2606', name:'北京三里屯快閃 #1', location:'北京朝陽區三里屯太古里',
+    dates:'2026-06-15 ～ 2026-07-15', status:'prep',
+    skus:[
+      {sku:'MFS-BJ-001', name:'貓福珊迪 夏日限定盲盒', ip:'Mofusand', ip_color:'#9333ea', factory:480, bj:40, bkk:0, ccy:'CNY', cost:9.2,  price:39},
+      {sku:'MFS-BJ-002', name:'貓福珊迪 壓克力套組',   ip:'Mofusand', ip_color:'#9333ea', factory:360, bj:0,  bkk:0, ccy:'CNY', cost:14.5, price:58},
+      {sku:'SNP-BJ-001', name:'Snoopy 京限款掛件',     ip:'Snoopy',   ip_color:'#0284c7', factory:240, bj:0,  bkk:0, ccy:'CNY', cost:13.0, price:49},
+      {sku:'OPN-BJ-001', name:'Opanchu 北京限定公仔',  ip:'Opanchu',  ip_color:'#f59e0b', factory:180, bj:0,  bkk:0, ccy:'CNY', cost:18.5, price:69},
+      {sku:'MZK-BJ-001', name:'Muziktiger 手機殼',     ip:'Muziktiger',ip_color:'#ec4899', factory:200, bj:0, bkk:0, ccy:'CNY', cost:22.0, price:88},
+    ]
+  },
+];
 
 function setInvType(type, btn){
   currentInvType = type;
@@ -1138,47 +1182,174 @@ function setInvType(type, btn){
   renderInventory();
 }
 
+function toggleStore(id){
+  const row = document.getElementById('store-row-'+id);
+  const panel = document.getElementById('sku-panel-'+id);
+  if(!row||!panel) return;
+  row.classList.toggle('open');
+}
+
 function renderInventory(){
-  const data = INV_DATA[currentInvType];
-  const factoryTotal = data.reduce((s,r)=>s+r.factory,0);
-  const bjTotal      = data.reduce((s,r)=>s+r.bj,0);
-  const bkkTotal     = data.reduce((s,r)=>s+r.bkk,0);
-  document.getElementById('inv-factory-total').textContent = factoryTotal.toLocaleString();
-  document.getElementById('inv-bj-total').textContent      = bjTotal.toLocaleString();
-  document.getElementById('inv-bkk-total').textContent     = bkkTotal.toLocaleString();
-  const label = currentInvType==='wholesale' ? '批發產品明細' : '快閃店產品明細';
-  document.getElementById('inv-table-title').textContent = label;
+  const isPopup = currentInvType==='popup';
 
-  const rows = data.map(r=>{
-    const total = r.factory + r.bj + r.bkk;
-    const badge = `<span class="inv-tag" style="background:${r.ip_color}20;color:${r.ip_color}">${r.ip}</span>`;
-    return `<tr>
-      <td>${badge}</td>
-      <td style="font-weight:700;">${r.name}</td>
-      <td style="font-size:10px;color:var(--txt-lo);">${r.sku}</td>
-      <td class="num ok">${r.factory.toLocaleString()}</td>
-      <td class="num ${r.bj>0?'':''}">  ${r.bj>0?r.bj.toLocaleString():'—'}</td>
-      <td class="num ${r.bkk>0?'':''}">${r.bkk>0?r.bkk.toLocaleString():'—'}</td>
-      <td class="num" style="color:var(--txt-hi);">${total.toLocaleString()}</td>
-      <td style="font-size:10px;color:var(--txt-lo);">${r.po}</td>
+  // ── 總貨值計算 ──
+  let valGroups = {}; // ccy → {cost, rev}
+  const allSkus = isPopup
+    ? POPUP_STORES.flatMap(s=>s.skus)
+    : INV_WHOLESALE;
+  allSkus.forEach(r=>{
+    const qty = r.factory + r.bj + r.bkk;
+    const c = r.ccy||'CNY';
+    if(!valGroups[c]) valGroups[c]={cost:0,rev:0};
+    valGroups[c].cost += qty * (r.cost||0);
+    valGroups[c].rev  += qty * (r.price||0);
+  });
+  const valueBodyHtml = Object.entries(valGroups).map(([ccy,v])=>`
+    <div style="flex:1;min-width:140px;">
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:3px;">${ccy} · ${isPopup?'快閃':'批發'}</div>
+      <div style="font-size:22px;font-weight:800;color:var(--warn);">${ccy==='CNY'?'¥':''}${ccy==='THB'?'฿':''}${Math.round(v.cost).toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">成本貨值</div>
+      <div style="font-size:14px;font-weight:700;color:var(--ok);margin-top:6px;">${ccy==='CNY'?'¥':''}${ccy==='THB'?'฿':''}${Math.round(v.rev).toLocaleString()}</div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">潛在收入（全賣完）</div>
+      <div style="font-size:10px;color:var(--indigo);margin-top:4px;">毛利空間 ${ccy==='CNY'?'¥':''}${ccy==='THB'?'฿':''}${Math.round(v.rev-v.cost).toLocaleString()}</div>
+    </div>
+  `).join('<div style="width:1px;background:var(--border);align-self:stretch;margin:0 4px;"></div>');
+  document.getElementById('inv-value-body').innerHTML = valueBodyHtml;
+
+  if(isPopup){
+    // ── 快閃店：按場次 accordion ──
+    document.getElementById('inv-table-title').textContent = '快閃店庫存 · 按場次';
+    const totalSkus = POPUP_STORES.reduce((s,st)=>s+st.skus.length,0);
+    document.getElementById('inv-table-sub').textContent = `${POPUP_STORES.length} 個場次 · ${totalSkus} 個 SKU`;
+
+    const STATUS_MAP={active:{cls:'status-active',txt:'進行中'},prep:{cls:'status-prep',txt:'籌備中'},ended:{cls:'status-ended',txt:'已結束'}};
+
+    const html = POPUP_STORES.map(store=>{
+      const st = STATUS_MAP[store.status]||STATUS_MAP.prep;
+      // Store totals
+      const storeVals={};
+      store.skus.forEach(r=>{
+        const qty=r.factory+r.bj+r.bkk;
+        const c=r.ccy||'CNY';
+        if(!storeVals[c])storeVals[c]={qty:0,cost:0,rev:0};
+        storeVals[c].qty+=qty;
+        storeVals[c].cost+=qty*(r.cost||0);
+        storeVals[c].rev+=qty*(r.price||0);
+      });
+      const ccy=store.skus[0]?.ccy||'CNY';
+      const sym=ccy==='THB'?'฿':'¥';
+      const sv=storeVals[ccy]||{qty:0,cost:0,rev:0};
+
+      // SKU sub-table rows
+      const skuRows = store.skus.map(r=>{
+        const qty=r.factory+r.bj+r.bkk;
+        const costVal=qty*(r.cost||0);
+        const revVal=qty*(r.price||0);
+        const badge=`<span class="inv-tag" style="background:${r.ip_color}20;color:${r.ip_color}">${r.ip}</span>`;
+        return `<tr>
+          <td>${badge}</td>
+          <td>${r.name}<div style="font-size:9px;color:var(--txt-lo);margin-top:1px;">${r.sku}</div></td>
+          <td>${r.factory>0?r.factory.toLocaleString():'—'}</td>
+          <td>${r.bj>0?r.bj.toLocaleString():'—'}</td>
+          <td>${r.bkk>0?r.bkk.toLocaleString():'—'}</td>
+          <td style="font-weight:700;">${qty.toLocaleString()}</td>
+          <td>${sym}${r.cost}</td>
+          <td class="cost-val">${sym}${Math.round(costVal).toLocaleString()}</td>
+          <td>${sym}${r.price}</td>
+          <td class="rev-val">${sym}${Math.round(revVal).toLocaleString()}</td>
+        </tr>`;
+      }).join('');
+      const skuTotCost=Object.values(storeVals).reduce((s,v)=>s+v.cost,0);
+      const skuTotRev=Object.values(storeVals).reduce((s,v)=>s+v.rev,0);
+      const totRow=`<tr class="tot-row">
+        <td colspan="5" style="text-align:left;font-size:11px;">合計（${store.skus.length} SKU）</td>
+        <td>${sv.qty.toLocaleString()}</td>
+        <td>—</td>
+        <td class="cost-val">${sym}${Math.round(skuTotCost).toLocaleString()}</td>
+        <td>—</td>
+        <td class="rev-val">${sym}${Math.round(skuTotRev).toLocaleString()}</td>
+      </tr>`;
+
+      return `
+        <div class="store-row" id="store-row-${store.id}" onclick="toggleStore('${store.id}')">
+          <span class="store-chev">▼</span>
+          <div class="store-info">
+            <div class="store-name">${store.name}</div>
+            <div class="store-meta">${store.location} · ${store.dates} · ${store.skus.length} SKU</div>
+          </div>
+          <span class="store-status ${st.cls}">${st.txt}</span>
+          <div class="store-vals">
+            <div class="store-cost">成本 ${sym}${Math.round(sv.cost).toLocaleString()}</div>
+            <div class="store-rev">潛收 ${sym}${Math.round(sv.rev).toLocaleString()}</div>
+          </div>
+        </div>
+        <div class="sku-panel" id="sku-panel-${store.id}">
+          <div style="overflow-x:auto;">
+          <table class="sku-table">
+            <thead><tr>
+              <th style="text-align:left;">IP</th>
+              <th style="text-align:left;">產品名稱 / SKU</th>
+              <th>工廠</th><th>北京</th><th>泰國</th>
+              <th>合計</th>
+              <th>成本價</th><th>成本貨值</th>
+              <th>售價</th><th>潛在收入</th>
+            </tr></thead>
+            <tbody>${skuRows}${totRow}</tbody>
+          </table>
+          </div>
+        </div>`;
+    }).join('');
+    document.getElementById('inv-table-wrap').innerHTML = html +
+      `<div style="padding:10px 14px;font-size:10px;color:var(--txt-lo);">⓵ 點擊場次列可展開所有 SKU 明細。API 接入後顯示飛書真實庫存與成本。</div>`;
+
+  } else {
+    // ── 批發：flat table with cost + price ──
+    document.getElementById('inv-table-title').textContent = '批發產品庫存明細';
+    document.getElementById('inv-table-sub').textContent = `${INV_WHOLESALE.length} 個 SKU`;
+    const rows = INV_WHOLESALE.map(r=>{
+      const qty=r.factory+r.bj+r.bkk;
+      const costVal=qty*r.cost;
+      const revVal=qty*r.price;
+      const badge=`<span class="inv-tag" style="background:${r.ip_color}20;color:${r.ip_color}">${r.ip}</span>`;
+      return `<tr>
+        <td>${badge}</td>
+        <td style="font-weight:700;">${r.name}<div style="font-size:9px;color:var(--txt-lo);margin-top:1px;">${r.sku}</div></td>
+        <td class="num ok">${r.factory>0?r.factory.toLocaleString():'—'}</td>
+        <td class="num">${r.bj>0?r.bj.toLocaleString():'—'}</td>
+        <td class="num">${r.bkk>0?r.bkk.toLocaleString():'—'}</td>
+        <td class="num" style="color:var(--txt-hi);">${qty.toLocaleString()}</td>
+        <td class="num">¥${r.cost}</td>
+        <td class="num" style="color:var(--warn);font-weight:700;">¥${Math.round(costVal).toLocaleString()}</td>
+        <td class="num">¥${r.price}</td>
+        <td class="num" style="color:var(--ok);font-weight:700;">¥${Math.round(revVal).toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+    const totQty=INV_WHOLESALE.reduce((s,r)=>s+(r.factory+r.bj+r.bkk),0);
+    const totCost=INV_WHOLESALE.reduce((s,r)=>s+(r.factory+r.bj+r.bkk)*r.cost,0);
+    const totRev=INV_WHOLESALE.reduce((s,r)=>s+(r.factory+r.bj+r.bkk)*r.price,0);
+    const totRow=`<tr style="font-weight:800;border-top:1px solid var(--border-hi);">
+      <td colspan="2" style="color:var(--txt-hi);">合計</td>
+      <td colspan="3"></td>
+      <td class="num" style="color:var(--txt-hi);">${totQty.toLocaleString()}</td>
+      <td></td>
+      <td class="num" style="color:var(--warn);">¥${Math.round(totCost).toLocaleString()}</td>
+      <td></td>
+      <td class="num" style="color:var(--ok);">¥${Math.round(totRev).toLocaleString()}</td>
     </tr>`;
-  }).join('');
-
-  document.getElementById('inv-table-wrap').innerHTML = `
-    <table class="inv-table">
-      <thead><tr>
-        <th>IP</th><th>產品名稱</th><th>SKU</th>
-        <th style="text-align:right;">工廠寄存</th>
-        <th style="text-align:right;">北京倉</th>
-        <th style="text-align:right;">泰國倉</th>
-        <th style="text-align:right;">合計</th>
-        <th>關聯PO</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div style="padding:10px 14px;font-size:10px;color:var(--txt-lo);">
-      ⓘ 工廠寄存為批發主力庫存（生產完留廠，客戶下單直發）。北京/泰國倉存放快閃剩餘與長期滯銷品。API 接入後顯示飛書真實數量。
-    </div>`;
+    document.getElementById('inv-table-wrap').innerHTML = `<div style="overflow-x:auto;">
+      <table class="inv-table">
+        <thead><tr>
+          <th>IP</th><th>產品名稱</th>
+          <th style="text-align:right;">工廠</th><th style="text-align:right;">北京</th><th style="text-align:right;">泰國</th>
+          <th style="text-align:right;">合計</th>
+          <th style="text-align:right;">成本價</th><th style="text-align:right;">成本貨值</th>
+          <th style="text-align:right;">售價</th><th style="text-align:right;">潛在收入</th>
+        </tr></thead>
+        <tbody>${rows}${totRow}</tbody>
+      </table>
+      </div>
+      <div style="padding:10px 14px;font-size:10px;color:var(--txt-lo);">⓵ 工廠寄存為主力庫存（客戶下單直發）。成本 / 售價為 demo 數據，API 接入後替換飛書真實成本。</div>`;
+  }
 }
 
 render();
