@@ -521,9 +521,26 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
   <!-- ══ TAB: 待入帳清單 ══ -->
   <div class="tab-panel active" id="tab-pending">
+
+    <!-- 出納已付款・待躍明財務入帳 -->
+    <div class="sec-hdr" style="margin-bottom:8px;">
+      <div class="sec-title" id="ym-queue-title">出納已付款・待入帳確認</div>
+      <span class="sec-link" onclick="renderYumingQueue()">刷新</span>
+    </div>
+    <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;padding:8px 10px;background:#22c55e10;border-radius:7px;border-left:3px solid var(--ok);">
+      💰 Leo（台灣出納）／楊子（中國出納）已確認銀行清算的款項。請勾選確認入帳，正式進入損益表。
+    </div>
+    <div id="ym-queue-list" style="margin-bottom:18px;">
+      <div style="text-align:center;padding:20px;color:var(--txt-lo);font-size:12px;">載入中…</div>
+    </div>
+
+    <!-- 已批准・待付款（Ray 批准後等待出納執行）-->
+    <div class="sec-hdr" style="margin-bottom:8px;">
+      <div class="sec-title">已批准・等出納付款</div>
+    </div>
     <div style="margin-bottom:12px;">
       <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;padding:8px 10px;background:var(--card2);border-radius:7px;border-left:3px solid var(--fin);">
-        📋 以下是已經過 Ray 批准、等待躍明入帳或付款的費用申請。確認付款後點「標記已入帳」。
+        📋 Ray 已批准，正等待 Leo/楊子 從銀行端送出付款指令。此處僅供查閱；入帳由上方「出納已付款」區塊處理。
       </div>
     </div>
     <div id="pending-list">
@@ -1483,7 +1500,7 @@ function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('tab-'+tab);
   if(el) el.classList.add('active');
-  if(tab==='pending') loadPendingList();
+  if(tab==='pending'){ renderYumingQueue(); loadPendingList(); }
   if(tab==='project') renderProjectPL();
   if(tab==='pl'){ loadBudgetAchievement(); renderMgmtPL('ytd'); }
   if(tab==='cash'){ renderCashTable(); renderCashTxList('all'); renderLeoBankSection(); }
@@ -1523,6 +1540,54 @@ async function submitCashflowEntry(){
     showToast('⚠ 暫時無法連線，請稍後再試');
   }
 }
+// ── 躍明入帳佇列（讀取自 Leo / 楊子 的 yuming_pending_v1） ─────────────────────
+const YM_QUEUE_KEY='yuming_pending_v1';
+function loadYumingQueue(){
+  return JSON.parse(localStorage.getItem(YM_QUEUE_KEY)||'[]');
+}
+function saveYumingQueue(arr){
+  localStorage.setItem(YM_QUEUE_KEY, JSON.stringify(arr));
+}
+function recognizeEntry(id){
+  const arr=loadYumingQueue();
+  const i=arr.findIndex(x=>x.id===id);
+  if(i<0) return;
+  arr[i].status='recognized';
+  arr[i].recognizedAt=new Date().toISOString().slice(0,10);
+  saveYumingQueue(arr);
+  renderYumingQueue();
+  showToast('✓ 已入帳・本月實際數已更新');
+}
+function renderYumingQueue(){
+  const el=document.getElementById('ym-queue-list');
+  if(!el) return;
+  const arr=loadYumingQueue().filter(x=>x.status==='pending_finance');
+  document.getElementById('ym-queue-title').textContent='出納已付款・待入帳確認'+(arr.length?`（${arr.length}）`:'');
+  if(!arr.length){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--txt-lo);font-size:12px;">目前沒有待入帳款項</div>';
+    return;
+  }
+  el.innerHTML=arr.map(r=>{
+    const ccy=r.ccy||'';
+    const amt=(r.amount||0).toLocaleString();
+    return `<div style="background:var(--card);border:1.5px solid #22c55e40;border-radius:10px;padding:14px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:10px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;">${r.title||'—'}</div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">出納：${r.executor||'—'} · 付款：${r.executedAt||'—'} · 已確認入帳：${r.confirmedAt||'—'}</div>
+          ${r.note?`<div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">${r.note}</div>`:''}
+        </div>
+        <span style="font-size:13px;font-weight:800;color:var(--ok);white-space:nowrap;">${ccy} ${amt}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <button style="font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;background:#22c55e18;color:#22c55e;border:1px solid #22c55e60;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="recognizeEntry('${r.id}')">
+          <span style="display:inline-block;width:13px;height:13px;border:1.5px solid #22c55e;border-radius:3px;"></span>確認入帳
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadPendingList(){
   const el=document.getElementById('pending-list');
   if(!el) return;
@@ -2554,6 +2619,7 @@ function setCashRange(range, btn){
 
 setCashRange('month', null);
 // init first visible tab
+renderYumingQueue();
 loadPendingList();
 renderCashTable();
 renderCashTxList('all');

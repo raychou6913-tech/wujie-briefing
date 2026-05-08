@@ -331,52 +331,100 @@ async function _yzWriteApproval(fields){
   }catch(e){console.warn('Feishu write skipped',e);}
 }
 
-async function loadPaymentList(){
+// ── 三態付款狀態機 ─────────────────────────────────────────
+// pending（待付款）→ initiating（已通知付款，待確認入帳）→ confirmed（已入帳，寫入躍明佇列）
+const PAY_KEY='yangzi_pay_v1';
+const YUMING_KEY='yuming_pending_v1';
+function loadPays(){
+  const stored=localStorage.getItem(PAY_KEY);
+  if(stored) return JSON.parse(stored);
+  const seed=[
+    {id:'p1',title:'安然廳 · 北京倉儲費',person:'安然',date:'2026-05-01',approver:'Ray',ccy:'CNY',amount:8500,note:'4月北京倉儲+物流費',expType:'項目費用',finConfirmed:true,status:'pending'},
+    {id:'p2',title:'採購台 · 打樣費（吉依卡哇）',person:'賴哥',date:'2026-04-28',approver:'Ray',ccy:'CNY',amount:12000,note:'吉依卡哇盲袋打樣費用',expType:'項目費用',finConfirmed:false,status:'pending'},
+    {id:'p3',title:'高維 · 物流費',person:'高維',date:'2026-04-26',approver:'安然',ccy:'CNY',amount:3200,note:'在途批次物流費',expType:'個人報銷',finConfirmed:true,status:'pending'},
+  ];
+  localStorage.setItem(PAY_KEY,JSON.stringify(seed));
+  return seed;
+}
+function savePays(arr){ localStorage.setItem(PAY_KEY,JSON.stringify(arr)); }
+
+function notifyPay(id){
+  const arr=loadPays();
+  const i=arr.findIndex(x=>x.id===id);
+  if(i<0) return;
+  arr[i].status='initiating';
+  arr[i].notifiedAt=new Date().toISOString().slice(0,10);
+  savePays(arr);
+  loadPaymentList();
+  showToast('已送出付款指令 🔄 銀行清算後請勾選入帳');
+}
+function confirmPaymentDone(id){
+  const arr=loadPays();
+  const i=arr.findIndex(x=>x.id===id);
+  if(i<0) return;
+  arr[i].status='confirmed';
+  arr[i].confirmedAt=new Date().toISOString().slice(0,10);
+  savePays(arr);
+  // 寫入躍明佇列
+  const queue=JSON.parse(localStorage.getItem(YUMING_KEY)||'[]');
+  queue.push({
+    id:'yz-'+id, title:arr[i].title, amount:arr[i].amount, ccy:arr[i].ccy,
+    executor:'楊子', executedAt:arr[i].notifiedAt, confirmedAt:arr[i].confirmedAt,
+    note:arr[i].note, status:'pending_finance'
+  });
+  localStorage.setItem(YUMING_KEY,JSON.stringify(queue));
+  loadPaymentList();
+  showToast('✓ 已確認入帳，已通知躍明財務入帳確認');
+}
+
+function loadPaymentList(){
   const el=document.getElementById('payment-list');
   if(!el) return;
-  const DEMO=[
-    {title:'安然廳 · 北京倉儲費',person:'安然',date:'2026-05-01',approver:'Ray',ccy:'CNY',amount:8500,note:'4月北京倉儲+物流費',expType:'項目費用',finConfirmed:true},
-    {title:'採購台 · 打樣費（吉依卡哇）',person:'賴哥',date:'2026-04-28',approver:'Ray',ccy:'CNY',amount:12000,note:'吉依卡哇盲袋打樣費用',expType:'項目費用',finConfirmed:false},
-    {title:'高維 · 物流費',person:'高維',date:'2026-04-26',approver:'安然',ccy:'CNY',amount:3200,note:'在途批次物流費',expType:'個人報銷',finConfirmed:true},
-  ];
-  const renderItems=recs=>recs.length
-    ? recs.map(r=>{
-      const expType=r.expType||r['審批類型']||'';
-      const needsFinance=expType.includes('項目')||expType.includes('供應商');
-      const finConfirmed=r.finConfirmed??!needsFinance;
-      const canPay=!needsFinance||finConfirmed;
-      const finBadge=needsFinance
-        ?finConfirmed
-          ?`<div style="margin-bottom:4px;"><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:#22c55e18;color:#22c55e;border:1px solid #22c55e40;font-weight:700;">躍明已確認 ✓</span></div>`
-          :`<div style="margin-bottom:4px;"><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b40;font-weight:700;">待躍明確認</span></div>`
-        :'';
-      const payBtn=canPay
-        ?`<button style="font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--ok-dim);color:var(--ok);border:1px solid #22c55e40;cursor:pointer;" onclick="this.textContent='✓ 已付款';this.disabled=true;showToast('✅ 已標記付款')">付款 →</button>`
-        :`<button style="font-size:10px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--card2);color:var(--txt-lo);border:1px solid var(--border);cursor:not-allowed;" disabled>待確認</button>`;
-      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-        <div style="width:4px;align-self:stretch;border-radius:2px;background:var(--warn);flex-shrink:0;"></div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:700;">${r.title||r['審批標題']||'—'}</div>
-          <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">${r.person||r['申請人']||'—'} · 審批人：${r.approver||r['審批人']||'—'} · ${r.date||r['申請日期']||''}</div>
-          <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">${r.note||r['申請說明']||''}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;">
-          ${finBadge}
-          <div style="font-size:14px;font-weight:800;color:var(--warn);margin-bottom:6px;">${r.ccy||r['幣別']||''} ${(r.amount||r['金額']||0).toLocaleString()}</div>
-          ${payBtn}
-        </div>
+  const arr=loadPays().filter(x=>x.status==='pending'||x.status==='initiating');
+  const pendingCount=arr.filter(x=>x.status==='pending').length;
+  const initCount=arr.filter(x=>x.status==='initiating').length;
+  document.getElementById('payment-title').textContent='已批准・待付款'+
+    (arr.length?`（${pendingCount} 待付${initCount?' · '+initCount+' 付款中':''}）`:'');
+  if(!arr.length){ el.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待付款申請</div>'; return; }
+  el.innerHTML=arr.map(r=>{
+    const isInit=r.status==='initiating';
+    const expType=r.expType||'';
+    const needsFinance=expType.includes('項目')||expType.includes('供應商');
+    const finConfirmed=r.finConfirmed??!needsFinance;
+    const canPay=!needsFinance||finConfirmed;
+    const finBadge=needsFinance
+      ?finConfirmed
+        ?`<div style="margin-bottom:4px;"><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:#22c55e18;color:#22c55e;border:1px solid #22c55e40;font-weight:700;">躍明已確認 ✓</span></div>`
+        :`<div style="margin-bottom:4px;"><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b40;font-weight:700;">待躍明確認</span></div>`
+      :'';
+    const barColor=isInit?'var(--accent)':'var(--warn)';
+    let actionEl='';
+    if(isInit){
+      actionEl=`<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <span style="font-size:9px;font-weight:700;color:var(--accent);">🔄 付款中（${r.notifiedAt}）</span>
+        <button style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:6px;background:#22c55e18;color:#22c55e;border:1px solid #22c55e60;cursor:pointer;display:flex;align-items:center;gap:5px;" onclick="confirmPaymentDone('${r.id}')">
+          <span style="display:inline-block;width:13px;height:13px;border:1.5px solid #22c55e;border-radius:3px;"></span>確認入帳
+        </button>
       </div>`;
-    }).join('')
-    : '<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待付款申請</div>';
-  try{
-    const tr=await fetch(_YZ_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-    const {tenant_access_token:tk}=await tr.json();
-    const res=await fetch(_YZ_PROXY+'/bitable/records?appToken='+_YZ_AT+'&tableId='+_YZ_TBL,{headers:{'Authorization':'Bearer '+tk}});
-    const {data}=await res.json();
-    const recs=(data?.items||[]).filter(r=>['已批准','已通過'].includes(r.fields?.['審批狀態'])).map(r=>r.fields);
-    el.innerHTML=renderItems(recs);
-    document.getElementById('payment-title').textContent='已批准・待付款'+(recs.length?`（${recs.length}）`:'');
-  }catch(e){ el.innerHTML=renderItems(DEMO); document.getElementById('payment-title').textContent=`已批准・待付款（${DEMO.length}）`; }
+    }else if(canPay){
+      actionEl=`<button style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:6px;background:var(--warn);color:#fff;border:none;cursor:pointer;" onclick="notifyPay('${r.id}')">付款指令 →</button>`;
+    }else{
+      actionEl=`<button style="font-size:10px;font-weight:700;padding:5px 12px;border-radius:6px;background:var(--card2);color:var(--txt-lo);border:1px solid var(--border);cursor:not-allowed;" disabled>待確認</button>`;
+    }
+    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div style="width:4px;align-self:stretch;border-radius:2px;background:${barColor};flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;">${r.title}</div>
+        <div style="font-size:10px;color:var(--txt-mid);margin-top:2px;">${r.person} · 審批人：${r.approver} · ${r.date}</div>
+        <div style="font-size:10px;color:var(--txt-lo);margin-top:2px;">${r.note||''}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;min-width:100px;">
+        ${finBadge}
+        <div style="font-size:14px;font-weight:800;color:var(--warn);margin-bottom:6px;">${r.ccy} ${r.amount.toLocaleString()}</div>
+        ${actionEl}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── Inbox Data ─────────────────────────────────────────────

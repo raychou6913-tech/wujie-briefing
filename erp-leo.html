@@ -745,56 +745,95 @@ function renderPayroll(){
 }
 
 // ── Payments ───────────────────────────────────────────────
+// 三態：pending（待付款）→ initiating（付款中，已送出指令）→ confirmed（已確認入帳）
 const PAY_KEY = 'leo_payments_v1';
+const YUMING_KEY = 'yuming_pending_v1';
 function loadPayments(){
   const stored = localStorage.getItem(PAY_KEY);
   if(stored) return JSON.parse(stored);
   const seed = [
     {id:'pay1', title:'5月薪資（台灣悍草全員）', person:'躍明確認', date:'2026-05-08', ccy:'TWD', amount:307000, note:'Bevis/珮玲/詩彤/楊子/躍明/Leo · 已核帳', status:'pending'},
     {id:'pay2', title:'Bevis 出差費用報銷', person:'Bevis 申請', date:'2026-05-06', ccy:'TWD', amount:12600, note:'台北→台中客戶簡報出差費', status:'pending'},
-    {id:'pay3', title:'台北辦公室 5月租金', person:'躍明確認', date:'2026-05-01', ccy:'TWD', amount:45000, note:'房東：大安路XXX號', status:'paid'},
+    {id:'pay3', title:'台北辦公室 5月租金', person:'躍明確認', date:'2026-05-01', ccy:'TWD', amount:45000, note:'房東：大安路XXX號', status:'confirmed'},
   ];
   localStorage.setItem(PAY_KEY, JSON.stringify(seed));
   return seed;
 }
 function savePayments(arr){ localStorage.setItem(PAY_KEY, JSON.stringify(arr)); }
-function markPaid(id){
+
+// 步驟一：Leo 已在銀行端送出轉帳指令
+function initiatePay(id){
   const pays = loadPayments();
   const idx = pays.findIndex(x=>x.id===id);
-  if(idx>-1) pays[idx].status='paid';
+  if(idx>-1){ pays[idx].status='initiating'; pays[idx].initiatedAt=new Date().toISOString().slice(0,10); }
   savePayments(pays);
   renderPayments();
-  renderBankGrid();
-  showToast('✅ 已標記付款完成');
+  showToast('已送出付款指令 🔄 請至銀行網銀確認清算後勾選入帳');
 }
+
+// 步驟二：Leo 已查網銀，確認款項清算完成
+function confirmClear(id){
+  const pays = loadPayments();
+  const idx = pays.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  pays[idx].status='confirmed';
+  pays[idx].confirmedAt=new Date().toISOString().slice(0,10);
+  savePayments(pays);
+  // 寫入躍明的待入帳確認佇列
+  const p=pays[idx];
+  const queue=JSON.parse(localStorage.getItem(YUMING_KEY)||'[]');
+  if(!queue.find(q=>q.id===p.id)){
+    queue.push({id:p.id, title:p.title, amount:p.amount, ccy:p.ccy,
+      executor:'Leo', executedAt:p.initiatedAt||p.date, confirmedAt:p.confirmedAt,
+      note:p.note, status:'pending_finance'});
+    localStorage.setItem(YUMING_KEY, JSON.stringify(queue));
+  }
+  renderPayments();
+  renderBankGrid();
+  showToast('✓ 已確認入帳，已通知躍明財務入帳確認');
+}
+
 function renderPayments(){
-  const pays = loadPayments().filter(x=>x.status==='pending');
+  // 顯示 pending（待付款）和 initiating（付款中）
+  const pays = loadPayments().filter(x=>x.status==='pending'||x.status==='initiating');
   const el = document.getElementById('pay-list');
-  document.getElementById('pay-title').textContent = `待付款通知（${pays.length}）`;
+  const pendingCount = pays.filter(x=>x.status==='pending').length;
+  document.getElementById('pay-title').textContent = `待付款通知（${pendingCount} 待付 ${pays.filter(x=>x.status==='initiating').length>0?'· '+pays.filter(x=>x.status==='initiating').length+' 付款中':''}）`;
   if(!pays.length){
-    el.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待付款項目</div>';
+    el.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:12px;">目前沒有待處理付款</div>';
     return;
   }
-  el.innerHTML = pays.map(p=>`
-    <div class="pay-item">
-      <div class="pay-bar" style="background:var(--warn);"></div>
+  el.innerHTML = pays.map(p=>{
+    const isInit = p.status==='initiating';
+    const barColor = isInit ? 'var(--accent)' : 'var(--warn)';
+    const actionArea = isInit
+      ? `<div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:6px;">🔄 付款指令已送出</div>
+         <div style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="confirmClear('${p.id}')">
+           <div style="width:18px;height:18px;border-radius:5px;border:2px solid var(--ok);flex-shrink:0;display:flex;align-items:center;justify-content:center;"></div>
+           <span style="font-size:11px;color:var(--ok);font-weight:700;">確認入帳 ✓</span>
+         </div>
+         <div style="font-size:9px;color:var(--txt-lo);margin-top:3px;">查銀行網銀確認清算後勾選</div>`
+      : `<button class="pay-btn" style="background:#f59e0b18;color:var(--warn);border-color:#f59e0b40;" onclick="initiatePay('${p.id}')">付款指令 →</button>
+         <div style="font-size:9px;color:var(--txt-lo);margin-top:3px;text-align:right;">銀行轉帳後點此</div>`;
+    return `<div class="pay-item" style="border-color:${isInit?'var(--accent)30':'var(--border)'};">
+      <div class="pay-bar" style="background:${barColor};"></div>
       <div class="pay-body">
         <div class="pay-title">${p.title}</div>
         <div class="pay-meta">${p.person} · ${p.date}</div>
         <div class="pay-note">${p.note}</div>
       </div>
       <div class="pay-right">
-        <div class="pay-amt">${p.ccy} ${p.amount.toLocaleString()}</div>
-        <button class="pay-btn" style="background:var(--ok-dim);color:var(--ok);border-color:#22c55e40;" onclick="markPaid('${p.id}')">付款 →</button>
+        <div class="pay-amt" style="color:${isInit?'var(--accent)':'var(--warn)'};">${p.ccy} ${p.amount.toLocaleString()}</div>
+        ${actionArea}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── Checklist ──────────────────────────────────────────────
 const CHECK_KEY = 'leo_check_v1';
 const MONTHLY_TASKS = [
   {id:'c1', name:'勞健保繳費（期限 5/10）', meta:'健保局 + 勞保局線上繳費', due:'urgent'},
-  {id:'c2', name:'薪資轉帳執行', meta:'躍明核帳後 → 銀行系統批次轉帳', due:'warn'},
   {id:'c3', name:'5月固定支出確認', meta:'房租 / 水電 / 網路', due:'warn'},
   {id:'c4', name:'更新主帳戶對帳餘額', meta:'網銀對帳後更新至 ERP', due:'ok'},
   {id:'c5', name:'月底帳目提交躍明', meta:'截止 5/31', due:'ok'},
@@ -833,7 +872,7 @@ function renderCheck(){
 
 // ── Greeting ───────────────────────────────────────────────
 function renderGreeting(){
-  const pays = loadPayments().filter(x=>x.status==='pending').length;
+  const pays = loadPayments().filter(x=>x.status==='pending'||x.status==='initiating').length;
   const nhi = loadNHI();
   const nhiPending = 3 - nhi.paid.length;
   const cl = loadCheck();
