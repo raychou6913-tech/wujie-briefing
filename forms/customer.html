@@ -81,7 +81,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <option>KA大客戶</option><option>流通渠道商</option><option>電商平台</option>
             <option>零售門店</option><option>展覽/快閃</option><option>海外經銷商</option><option>其他</option>
           </select></div>
-        <div class="f"><label>所在地區</label>
+        <div class="f"><label>團隊辦公地區</label>
           <select id="f-region">
             <option>台灣</option><option>北京</option><option>上海</option><option>廣州/深圳</option>
             <option>其他大陸</option><option>香港</option><option>泰國</option><option>東南亞</option>
@@ -227,7 +227,7 @@ async function _getProjects(typeFilter){
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
     const iv=f["IP品牌"];
     const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
-    const lv=f["所在地"];
+    const lv=f["團隊辦公地"];
     const loc=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
     return {name,type,ip,loc};
   }).filter(Boolean);
@@ -326,7 +326,7 @@ async function _getContracts(ipFilter){
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["對方公司"])||_t(f["版權方"]),
         status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
-        amount:_n(f["保底金額"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
+        amount:_n(f["MG_總保底"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
         royalRetail:_n(f["授權金_零售%"]), royalWholesale:_n(f["授權金_批發%"]),
         wholesaleRatio:_n(f["批發折數"]),
         startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
@@ -524,7 +524,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     const fields={...({
       "客戶名稱":    document.getElementById("f-name").value,
       "客戶類型":    document.getElementById("f-type").value,
-      "所在地區":    document.getElementById("f-region").value,
+      "團隊辦公地區":    document.getElementById("f-region").value,
       "聯絡人":      document.getElementById("f-contact").value,
       "聯絡方式":    document.getElementById("f-contact-info").value,
       "帳期":        document.getElementById("f-term").value,

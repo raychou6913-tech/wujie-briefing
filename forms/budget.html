@@ -112,7 +112,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
     <div class="f"><label>季度</label>
       <select id="g-quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>全年</option></select>
     </div>
-    <div class="f"><label>所在地</label>
+    <div class="f"><label>團隊辦公地</label>
       <select id="g-loc"><option>台北</option><option>北京</option><option>曼谷</option><option>全公司</option></select>
     </div>
   </div>
@@ -247,7 +247,7 @@ async function _getProjects(typeFilter){
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
     const iv=f["IP品牌"];
     const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
-    const lv=f["所在地"];
+    const lv=f["團隊辦公地"];
     const loc=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
     return {name,type,ip,loc};
   }).filter(Boolean);
@@ -346,7 +346,7 @@ async function _getContracts(ipFilter){
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["對方公司"])||_t(f["版權方"]),
         status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
-        amount:_n(f["保底金額"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
+        amount:_n(f["MG_總保底"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
         royalRetail:_n(f["授權金_零售%"]), royalWholesale:_n(f["授權金_批發%"]),
         wholesaleRatio:_n(f["批發折數"]),
         startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
@@ -541,7 +541,7 @@ const _isPopup=new URLSearchParams(location.search).get('ctx')==='popup';
 window._ctxTypeFilter=_isPopup?'快閃店':null;
 if(_isPopup)document.getElementById('popup-mode-banner').style.display='block';
 
-const CATS_NORMAL=['生產製造','開發費用','版權費用','採購','行銷','物流','倉儲','運營','人事','差旅','展場','其他支出','預計收入'];
+const CATS_NORMAL=['生產製造','開發費用','版權費用','採購','行銷','物流','倉儲','運營','人事','差旅','展場','其他支出','批發收入','零售收入'];
 const CATS_POPUP=['場地費','贊助收入','寄售分潤','展場布置','人員差旅','行銷推廣','物流倉儲','其他'];
 const CATS=_isPopup?CATS_POPUP:CATS_NORMAL;
 const BN={
@@ -558,7 +558,8 @@ const BN={
   '展場':['展位費','展場佈置費','道具費','設備租借費','施工費'],
   '設計':['設計費','版費','修改費','外包設計費'],
   '其他支出':['雜費','應急備用金','未分類支出'],
-  '預計收入':['批發銷售收入','零售銷售收入','代理佣金','授權金收入'],
+  '批發收入':['批發銷售收入','代理佣金','授權金收入'],
+  '零售收入':['零售銷售收入','直營店收入','寄售結算收入'],
   '場地費':['場地租金','保證金','場地服務費','水電管理費','場地清潔費'],
   '贊助收入':['品牌贊助金','展位贊助費','冠名贊助收入','媒體置換'],
   '寄售分潤':['品牌方寄售分潤','代售商品分潤','寄售結算款'],
@@ -758,7 +759,7 @@ async function submitAll(){
   const _crows=[
     ["關聯項目", proj],
     ["年度 / 季度", _yr+" "+_qtr],
-    ["所在地", _loc],
+    ["團隊辦公地", _loc],
     ["明細筆數", rows.length+" 筆"],
     ["支出合計（估）", _totalExp.toLocaleString()],
     ["收入合計（估）", _totalInc.toLocaleString()],
@@ -789,7 +790,7 @@ async function submitAll(){
         "預算名稱":   name,
         "類別":       document.getElementById('cat-'+id).value,
         "預算性質":   document.getElementById('nat-'+id).value,
-        "所在地":     loc,
+        "團隊辦公地":     loc,
         "幣別":       document.getElementById('cur-'+id).value,
         "年度":       yr,
         "季度":       qtr,
@@ -835,7 +836,7 @@ _loadProjectSelect('proj-sel',window._ctxTypeFilter||null);
 document.getElementById('g-year').value=new Date().getFullYear();
 (function(){const m=new Date().getMonth();const q=m<3?"Q1":m<6?"Q2":m<9?"Q3":"Q4";document.getElementById('g-quarter').value=q;})();
 // start with 3 default rows
-addRow('生產製造');addRow('版權費用');addRow('預計收入');
+addRow('生產製造');addRow('版權費用');addRow('批發收入');
 window.addEventListener('DOMContentLoaded',function(){
   const s=JSON.parse(localStorage.getItem("wujie_session")||"null");
   if(!s||Date.now()>s.expires){localStorage.removeItem("wujie_session");location.replace("../login.html");}

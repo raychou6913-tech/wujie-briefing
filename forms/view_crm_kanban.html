@@ -227,7 +227,7 @@ function render(){
   const kw=(document.getElementById("f-search").value||"").toLowerCase().trim();
   let recs=allCustomers.filter(i=>{
     const f=i.fields||{};
-    if(regionF&&fv(f,"所在地區")!==regionF)return false;
+    if(regionF&&fv(f,"團隊辦公地區")!==regionF)return false;
     if(handlerF&&fv(f,"主要對接業務")!==handlerF)return false;
     if(typeF&&fv(f,"客戶類型")!==typeF)return false;
     if(kw&&!fv(f,"客戶名稱").toLowerCase().includes(kw))return false;
@@ -253,7 +253,7 @@ function render(){
     cards.forEach(r=>{
       const f=r.fields||{};
       const name=fv(f,"客戶名稱")||"—";
-      const region=fv(f,"所在地區")||"";
+      const region=fv(f,"團隊辦公地區")||"";
       const handler=fv(f,"主要對接業務")||"";
       const amt=parseFloat(fv(f,"預估金額"))||0;
       const cur=fv(f,"預估幣別")||"";
@@ -289,7 +289,7 @@ function openModal(recId, name){
     document.getElementById("m-stage").value=stage;
     document.getElementById("m-info").innerHTML=`
       <div class="info-item"><label>客戶類型</label><span>${esc(fv(f,"客戶類型"))||"—"}</span></div>
-      <div class="info-item"><label>所在地區</label><span>${esc(fv(f,"所在地區"))||"—"}</span></div>
+      <div class="info-item"><label>團隊辦公地區</label><span>${esc(fv(f,"團隊辦公地區"))||"—"}</span></div>
       <div class="info-item"><label>聯絡人</label><span>${esc(fv(f,"聯絡人"))||"—"}</span></div>
       <div class="info-item"><label>聯絡方式</label><span>${esc(fv(f,"聯絡方式"))||"—"}</span></div>
       <div class="info-item"><label>主要業務</label><span>${esc(fv(f,"主要對接業務"))||"—"}</span></div>

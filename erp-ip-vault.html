@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · IP 版權庫</title>
+<style>
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --vault:#06b6d4;--vault-dim:#06b6d418;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--vault);box-shadow:0 0 6px var(--vault);}
+.brand-name{font-size:14px;font-weight:700;}
+.brand-sub{font-size:10px;color:var(--txt-mid);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.user-pill{font-size:11px;color:var(--txt-mid);padding:4px 10px;border:1px solid var(--border);border-radius:6px;}
+.user-pill strong{color:var(--txt-hi);font-weight:700;}
+.btn-topbar{font-size:10px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:transparent;white-space:nowrap;}
+.btn-topbar:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+
+/* ── LAYOUT ── */
+.main{max-width:1100px;margin:0 auto;padding:20px 20px;}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;}
+.page-title{font-size:18px;font-weight:800;}
+.page-sub{font-size:11px;color:var(--txt-mid);margin-top:3px;}
+
+/* ── STATS ROW ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.stat-val{font-size:28px;font-weight:800;line-height:1;margin-bottom:3px;}
+.stat-label{font-size:10px;color:var(--txt-mid);font-weight:600;letter-spacing:.04em;}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--txt-mid);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;}
+.tab.active{color:var(--vault);border-bottom-color:var(--vault);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.search-box{flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.search-box::placeholder{color:var(--txt-lo);}
+.search-box:focus{border-color:var(--border-hi);}
+.btn-primary{background:var(--vault);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.12s;}
+.btn-primary:hover{opacity:.85;}
+
+/* ── FILTER CHIPS ── */
+.filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.filter-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--txt-mid);background:transparent;transition:.12s;}
+.filter-chip:hover{border-color:var(--border-hi);}
+.filter-chip.active{background:var(--vault-dim);border-color:var(--vault);color:var(--vault);}
+.filter-chip.f-ok.active{background:var(--ok-dim);border-color:var(--ok);color:var(--ok);}
+.filter-chip.f-notice.active{background:#eab30820;border-color:#eab308;color:#eab308;}
+.filter-chip.f-warn.active{background:var(--warn-dim);border-color:var(--warn);color:var(--warn);}
+.filter-chip.f-danger.active{background:var(--danger-dim);border-color:var(--danger);color:var(--danger);}
+
+/* ── MASTER CARDS ── */
+.master-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.master-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:.15s;}
+.master-card:hover{border-color:var(--border-hi);}
+.mc-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.mc-company{font-size:13px;font-weight:700;color:var(--txt-hi);line-height:1.3;}
+.mc-contact{font-size:11px;color:var(--txt-mid);margin-bottom:3px;}
+.mc-email{font-size:11px;color:var(--vault);margin-bottom:11px;min-height:16px;}
+.mc-ip-label{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+.mc-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.mc-chip{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--vault-dim);color:var(--vault);font-weight:600;}
+.mc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);}
+.mc-region{font-size:10px;color:var(--txt-lo);}
+.mc-link{font-size:11px;color:var(--accent);cursor:pointer;}
+.mc-link:hover{color:var(--txt-hi);}
+
+/* ── STATUS BADGE ── */
+.status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+.status-ok{background:var(--ok-dim);color:var(--ok);}
+.status-notice{background:#eab30820;color:#eab308;}
+.status-warn{background:var(--warn-dim);color:var(--warn);}
+.status-danger{background:var(--danger-dim);color:var(--danger);}
+
+/* ── CONTRACT ROWS ── */
+.contract-list{display:flex;flex-direction:column;gap:8px;}
+.ct-row{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:.15s;}
+.ct-row:hover{border-color:var(--border-hi);}
+.ct-row.ct-urgent{border-left:3px solid var(--danger);}
+.ct-row.ct-warn{border-left:3px solid var(--warn);}
+.ct-row.ct-notice{border-left:3px solid #eab308;}
+.ct-main{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;user-select:none;}
+.ct-emoji{font-size:20px;flex-shrink:0;width:28px;text-align:center;}
+.ct-info{flex:1;min-width:0;}
+.ct-ip{font-size:13px;font-weight:700;color:var(--txt-hi);}
+.ct-owner{font-size:11px;color:var(--txt-mid);margin-top:1px;}
+.ct-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.ct-expiry-col{text-align:right;}
+.ct-expiry-date{font-size:12px;font-weight:700;color:var(--txt-hi);}
+.ct-days{font-size:10px;color:var(--txt-mid);}
+.ct-mg{font-size:11px;color:var(--txt-mid);min-width:100px;text-align:right;}
+.ct-expand-btn{background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:14px;padding:4px;transition:.15s;line-height:1;}
+.ct-expand-btn:hover{color:var(--txt-mid);}
+.ct-detail{display:none;padding:0 14px 14px 54px;border-top:1px solid var(--border);}
+.ct-detail.open{display:block;}
+.ct-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.ct-detail-item label{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px;}
+.ct-detail-item span{font-size:12px;color:var(--txt-hi);}
+.ct-note{margin-top:10px;font-size:11px;color:var(--txt-mid);background:var(--card2);border-radius:6px;padding:8px 10px;line-height:1.5;}
+.ct-anran-link{display:inline-block;margin-top:10px;font-size:11px;color:var(--accent);text-decoration:none;}
+.ct-anran-link:hover{color:var(--txt-hi);}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--txt-lo);}
+.empty-state .ei{font-size:40px;margin-bottom:12px;}
+.empty-state p{font-size:13px;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:300;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:540px;padding:20px;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--txt-mid);font-size:18px;cursor:pointer;padding:4px;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;color:var(--txt-mid);font-weight:600;display:block;margin-bottom:5px;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--txt-hi);outline:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--vault);}
+.form-select option{background:var(--card);}
+.form-textarea{resize:vertical;min-height:70px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-result{font-size:12px;margin-top:8px;display:none;}
+.btn-submit{width:100%;background:var(--vault);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;transition:.12s;}
+.btn-submit:hover{opacity:.85;}
+
+@media(max-width:640px){
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .master-grid{grid-template-columns:1fr;}
+  .ct-detail-grid{grid-template-columns:1fr;}
+  .ct-mg{display:none;}
+  .form-row{grid-template-columns:1fr;}
+  .main{padding:16px 14px;}
+}
+</style>
+</head>
+<body>
+
+<script>
+const _sess=JSON.parse(sessionStorage.getItem('erp_sess')||'{}');
+if(!_sess.name){location.href='login.html';}
+const SESS=_sess;
+</script>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div>
+      <div class="brand-name">IP 版權庫</div>
+      <div class="brand-sub">版權方 · 合約 · 授權管理</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="user-pill"><strong id="tb-name">—</strong><span id="tb-role" style="margin-left:5px;font-size:10px;"></span></div>
+    <a class="btn-topbar" href="erp-war-room.html">← 戰情室</a>
+    <a class="btn-topbar" href="erp-anran.html">安然廳</a>
+    <button class="btn-topbar" onclick="sessionStorage.clear();location.href='login.html'">登出</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">IP 版權庫</div>
+      <div class="page-sub">授權方基本資料 · 合約狀態一覽 · 到期自動追蹤</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-val" id="stat-total" style="color:var(--vault)">—</div>
+      <div class="stat-label">授權版權方</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="stat-contracts" style="color:var(--ok)">—</div>
+      <div class="stat-label">有效合約</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="stat-expiring" style="color:var(--warn)">—</div>
+      <div class="stat-label">180 天內到期</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="stat-urgent" style="color:var(--danger)">—</div>
+      <div class="stat-label">90 天內緊急</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" id="tab-bar">
+    <div class="tab active" data-tab="masters" onclick="switchTab(this)">版權方</div>
+    <div class="tab" data-tab="contracts" onclick="switchTab(this)">合約</div>
+  </div>
+
+  <!-- TAB 1: 版權方 -->
+  <div class="tab-pane active" id="pane-masters">
+    <div class="toolbar">
+      <input class="search-box" id="master-search" placeholder="搜尋版權方 / IP 名稱…" oninput="renderMasters()">
+      <button class="btn-primary" onclick="openModal('modal-master')">+ 新增版權方</button>
+    </div>
+    <div class="master-grid" id="master-grid"></div>
+  </div>
+
+  <!-- TAB 2: 合約 -->
+  <div class="tab-pane" id="pane-contracts">
+    <div class="toolbar">
+      <div class="filter-row" id="contract-filter-row">
+        <button class="filter-chip active" data-f="all" onclick="setFilter('all',this)">全部</button>
+        <button class="filter-chip f-ok" data-f="ok" onclick="setFilter('ok',this)">有效</button>
+        <button class="filter-chip f-notice" data-f="notice" onclick="setFilter('notice',this)">注意 (&lt;180天)</button>
+        <button class="filter-chip f-warn" data-f="warn" onclick="setFilter('warn',this)">即將到期 (&lt;90天)</button>
+        <button class="filter-chip f-danger" data-f="danger" onclick="setFilter('danger',this)">緊急 (&lt;30天)</button>
+      </div>
+      <button class="btn-primary" onclick="openModal('modal-contract')">+ 新增合約</button>
+    </div>
+    <div id="master-filter-hint" style="display:none;font-size:11px;color:var(--txt-mid);margin-bottom:10px;"></div>
+    <div class="contract-list" id="contract-list"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── MODAL: 新增版權方 ── -->
+<div class="modal-overlay" id="modal-master">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title">新增版權方</span>
+      <button class="modal-close" onclick="closeModal('modal-master')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">版權方公司名稱 *</label>
+      <input class="form-input" id="am-company" placeholder="e.g. Peanuts Worldwide LLC">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">聯絡人</label>
+        <input class="form-input" id="am-contact" placeholder="姓名 / 職稱">
+      </div>
+      <div class="form-group">
+        <label class="form-label">聯絡 Email</label>
+        <input class="form-input" id="am-email" placeholder="contact@example.com" type="email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">授權 IP 清單（逗號分隔）</label>
+      <input class="form-input" id="am-ips" placeholder="e.g. Snoopy, Charlie Brown">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">主要授權地區</label>
+        <input class="form-input" id="am-region" placeholder="e.g. 中國大陸 / 泰國">
+      </div>
+      <div class="form-group">
+        <label class="form-label">合作狀態</label>
+        <select class="form-select" id="am-status">
+          <option value="合作中">合作中</option>
+          <option value="洽談中">洽談中</option>
+          <option value="已終止">已終止</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">備注</label>
+      <textarea class="form-textarea" id="am-note" placeholder="關係說明、往來紀錄…"></textarea>
+    </div>
+    <div class="form-result" id="am-result"></div>
+    <button class="btn-submit" onclick="submitMaster()">建立版權方</button>
+  </div>
+</div>
+
+<!-- ── MODAL: 新增合約 ── -->
+<div class="modal-overlay" id="modal-contract">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title">新增合約</span>
+      <button class="modal-close" onclick="closeModal('modal-contract')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">IP 品牌 *</label>
+        <input class="form-input" id="ac-ip" placeholder="e.g. Snoopy（史努比）">
+      </div>
+      <div class="form-group">
+        <label class="form-label">版權方 *</label>
+        <select class="form-select" id="ac-master">
+          <option value="">— 選擇版權方 —</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">授權開始日</label>
+        <input class="form-input" id="ac-start" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">授權到期日 *</label>
+        <input class="form-input" id="ac-end" type="date">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">保底金 MG</label>
+        <input class="form-input" id="ac-mg" placeholder="e.g. 100000" type="number">
+      </div>
+      <div class="form-group">
+        <label class="form-label">MG 幣別</label>
+        <select class="form-select" id="ac-currency">
+          <option value="RMB">RMB</option>
+          <option value="USD">USD</option>
+          <option value="TWD">TWD</option>
+          <option value="THB">THB</option>
+          <option value="HKD">HKD</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">版稅率</label>
+        <input class="form-input" id="ac-royalty" placeholder="e.g. 8%（Net Sales）">
+      </div>
+      <div class="form-group">
+        <label class="form-label">分潤階梯（選填）</label>
+        <input class="form-input" id="ac-tier" placeholder="e.g. 10% (<¥100萬) / 12% (>¥100萬)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">授權品類</label>
+      <input class="form-input" id="ac-category" placeholder="e.g. 12cm以下 PVC公仔（任意系列）">
+    </div>
+    <div class="form-group">
+      <label class="form-label">授權地區</label>
+      <input class="form-input" id="ac-region" placeholder="e.g. 中國大陸＋泰國">
+    </div>
+    <div class="form-group">
+      <label class="form-label">備注</label>
+      <textarea class="form-textarea" id="ac-note" placeholder="特殊條款、談判紀錄…"></textarea>
+    </div>
+    <div class="form-result" id="ac-result"></div>
+    <button class="btn-submit" onclick="submitContract()">建立合約</button>
+  </div>
+</div>
+
+<script src="mock-data.js"></script>
+<script>
+/* ── SESSION ── */
+document.getElementById('tb-name').textContent = SESS.name||'—';
+document.getElementById('tb-role').textContent = SESS.role||'';
+
+/* ── TABLE IDs ── */
+const _TBLS = {
+  ip_masters: 'tblIPMastersPlaceholder',
+  contract:   'tblWn4PwOVRgt7c1'
+};
+
+/* ── IP EMOJI ── */
+const IP_EMOJI = {Snoopy:'🐾',Muziktiger:'🎵',Opanchu:'🍙',Mofusand:'🐱',貓福珊迪:'🐱'};
+function ipEmoji(n){ const k=Object.keys(IP_EMOJI).find(k=>n&&n.includes(k)); return k?IP_EMOJI[k]:'📄'; }
+
+/* ── EXPIRY HELPERS ── */
+function daysLeft(ts){ return Math.floor((ts-Date.now())/86400000); }
+function expiryStatus(days){
+  if(days<0)   return {key:'expired', label:'已到期',   cls:'status-danger', rowCls:'ct-urgent'};
+  if(days<30)  return {key:'danger',  label:'緊急到期', cls:'status-danger', rowCls:'ct-urgent'};
+  if(days<90)  return {key:'warn',    label:'即將到期', cls:'status-warn',   rowCls:'ct-warn'};
+  if(days<180) return {key:'notice',  label:'注意',     cls:'status-notice', rowCls:'ct-notice'};
+  return               {key:'ok',     label:'有效',     cls:'status-ok',     rowCls:''};
+}
+function fmtMon(ts){ const d=new Date(ts); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+
+/* ── FEISHU FETCH ── */
+async function _fetchAll(tbl){
+  const mock=window._mockCheck&&window._mockCheck(tbl);
+  if(mock) return mock;
+  const r=await fetch(`https://feishu-proxy.raychou6913.workers.dev/bitable/v1/apps/YlVkb0ACjacJVqsgRT5j4c6gpeh/tables/${tbl}/records?page_size=200`);
+  const j=await r.json();
+  return (j.data&&j.data.items)||[];
+}
+
+/* ── STATE ── */
+let _masters=[], _contracts=[], _contractFilter='all', _masterFilterCompany=null;
+function fv(f,k){ return f&&f[k]!==undefined?f[k]:null; }
+
+/* ── LOAD ── */
+async function loadAll(){
+  [_masters,_contracts]=await Promise.all([_fetchAll(_TBLS.ip_masters),_fetchAll(_TBLS.contract)]);
+  updateStats();
+  renderMasters();
+  renderContracts();
+  populateMasterSelect();
+}
+
+/* ── STATS ── */
+function updateStats(){
+  const expiring=_contracts.filter(c=>{const d=daysLeft(fv(c.fields,'授權到期日')||0);return d>=0&&d<180;}).length;
+  const urgent  =_contracts.filter(c=>{const d=daysLeft(fv(c.fields,'授權到期日')||0);return d>=0&&d<90;}).length;
+  document.getElementById('stat-total').textContent    =_masters.length;
+  document.getElementById('stat-contracts').textContent=_contracts.length;
+  document.getElementById('stat-expiring').textContent =expiring;
+  document.getElementById('stat-urgent').textContent   =urgent;
+}
+
+/* ── RENDER MASTERS ── */
+function renderMasters(){
+  const q=(document.getElementById('master-search').value||'').toLowerCase();
+  const grid=document.getElementById('master-grid');
+  const data=_masters.filter(m=>{
+    const f=m.fields;
+    return !q||(fv(f,'版權方公司')||'').toLowerCase().includes(q)||(fv(f,'授權IP清單')||'').toLowerCase().includes(q);
+  });
+  if(!data.length){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="ei">🔍</div><p>沒有符合的版權方</p></div>`;
+    return;
+  }
+  grid.innerHTML=data.map(m=>{
+    const f=m.fields;
+    const company=fv(f,'版權方公司')||'—';
+    const contact=fv(f,'聯絡人')||'—';
+    const email  =fv(f,'聯絡Email')||'';
+    const ipRaw  =fv(f,'授權IP清單')||'';
+    const ips    =ipRaw.split(/[，,、/]/).map(s=>s.trim()).filter(Boolean);
+    const region =fv(f,'主要授權地區')||'—';
+    const status =fv(f,'合作狀態')||'合作中';
+    const badgeCls=status==='合作中'?'status-ok':status==='洽談中'?'status-warn':'status-danger';
+    const ctCount=_contracts.filter(c=>fv(c.fields,'版權方')===company||fv(c.fields,'版權方ID')===m.record_id).length;
+    return `<div class="master-card">
+      <div class="mc-header">
+        <div class="mc-company">${company}</div>
+        <span class="status-badge ${badgeCls}">${status}</span>
+      </div>
+      <div class="mc-contact">聯絡人：${contact}</div>
+      <div class="mc-email">${email}</div>
+      <div class="mc-ip-label">授權 IP</div>
+      <div class="mc-chips">${ips.map(ip=>`<span class="mc-chip">${ip}</span>`).join('')||'<span style="font-size:11px;color:var(--txt-lo)">尚未登記</span>'}</div>
+      <div class="mc-footer">
+        <span class="mc-region">📍 ${region}</span>
+        <span class="mc-link" onclick="goToContracts('${company}')">${ctCount} 份合約 →</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── RENDER CONTRACTS ── */
+function goToContracts(company){
+  _masterFilterCompany=company;
+  document.getElementById('master-filter-hint').style.display='block';
+  document.getElementById('master-filter-hint').innerHTML=
+    `篩選中：<strong style="color:var(--vault)">${company}</strong> &nbsp;<span style="cursor:pointer;color:var(--txt-mid)" onclick="clearMasterFilter()">× 清除篩選</span>`;
+  document.querySelectorAll('.tab')[1].click();
+}
+function clearMasterFilter(){
+  _masterFilterCompany=null;
+  document.getElementById('master-filter-hint').style.display='none';
+  renderContracts();
+}
+
+function setFilter(f,el){
+  _contractFilter=f;
+  _masterFilterCompany=null;
+  document.getElementById('master-filter-hint').style.display='none';
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderContracts();
+}
+
+function renderContracts(){
+  const list=document.getElementById('contract-list');
+  let data=[..._contracts];
+  if(_masterFilterCompany){
+    data=data.filter(c=>fv(c.fields,'版權方')===_masterFilterCompany||fv(c.fields,'版權方ID')===_masterFilterCompany);
+  } else if(_contractFilter!=='all'){
+    data=data.filter(c=>{
+      const d=daysLeft(fv(c.fields,'授權到期日')||0);
+      const s=expiryStatus(d).key;
+      if(_contractFilter==='notice') return s==='notice';
+      return s===_contractFilter;
+    });
+  }
+  if(!data.length){
+    list.innerHTML=`<div class="empty-state"><div class="ei">📋</div><p>沒有符合條件的合約</p></div>`;
+    return;
+  }
+  // Sort by days left ascending (urgent first)
+  data.sort((a,b)=>daysLeft(fv(a.fields,'授權到期日')||0)-daysLeft(fv(b.fields,'授權到期日')||0));
+  list.innerHTML=data.map(c=>{
+    const f=c.fields;
+    const ip      =fv(f,'IP品牌')||'—';
+    const owner   =fv(f,'版權方')||'—';
+    const expTs   =fv(f,'授權到期日')||0;
+    const days    =daysLeft(expTs);
+    const st      =expiryStatus(days);
+    const mg         =fv(f,'保底金MG');
+    const mgCur      =fv(f,'MG幣別')||'RMB';
+    const mgConsumed =Number(fv(f,'MG已消耗')||0);
+    const mgTxt      =mg?`MG ${mgCur} ${Number(mg).toLocaleString()}`:fv(f,'MG_總保底')||'—';
+    const royalty =fv(f,'版稅率')||'—';
+    const tier    =fv(f,'分潤階梯')||'';
+    const region  =fv(f,'授權地區')||'—';
+    const category=fv(f,'授權品類')||'—';
+    const note    =fv(f,'備注')||'';
+    const daysLabel=days<0?'已到期':`${days} 天後到期`;
+    const did=`ctd-${c.record_id}`;
+    return `<div class="ct-row ${st.rowCls}">
+      <div class="ct-main" onclick="toggleDetail('${did}',this)">
+        <div class="ct-emoji">${ipEmoji(ip)}</div>
+        <div class="ct-info">
+          <div class="ct-ip">${ip}</div>
+          <div class="ct-owner">${owner}</div>
+        </div>
+        <div class="ct-right">
+          <span class="status-badge ${st.cls}">${st.label}</span>
+          <div class="ct-expiry-col">
+            <div class="ct-expiry-date">${fmtMon(expTs)}</div>
+            <div class="ct-days">${daysLabel}</div>
+          </div>
+          <div class="ct-mg">${mgTxt}</div>
+          <button class="ct-expand-btn">▾</button>
+        </div>
+      </div>
+      <div class="ct-detail" id="${did}">
+        <div class="ct-detail-grid">
+          <div class="ct-detail-item"><label>授權品類</label><span>${category}</span></div>
+          <div class="ct-detail-item"><label>授權地區</label><span>${region}</span></div>
+          <div class="ct-detail-item"><label>版稅率</label><span>${royalty}</span></div>
+          <div class="ct-detail-item"><label>分潤階梯</label><span>${tier||'—'}</span></div>
+        </div>
+        ${mg?`<div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:5px">
+            <span style="color:var(--txt-lo);font-weight:600;letter-spacing:.04em;text-transform:uppercase">MG 消耗進度</span>
+            <span style="color:var(--txt-hi);font-weight:700">${Math.min(Math.round(mgConsumed/Number(mg)*100),100)}%（已用 ${mgCur} ${mgConsumed.toLocaleString()} / ${Number(mg).toLocaleString()}）</span>
+          </div>
+          <div style="background:var(--bg);border-radius:4px;height:8px;overflow:hidden">
+            <div style="width:${Math.min(Math.round(mgConsumed/Number(mg)*100),100)}%;height:100%;border-radius:4px;background:${mgConsumed/Number(mg)>=0.9?'var(--danger)':mgConsumed/Number(mg)>=0.6?'var(--warn)':'var(--ok)'};transition:.3s"></div>
+          </div>
+          <div style="font-size:10px;color:var(--txt-mid);margin-top:4px">${mgCur} 剩餘額度 ${(Number(mg)-mgConsumed).toLocaleString()} ${mgConsumed/Number(mg)>=0.6?'⚠ 消耗超過 60%，評估是否需提前談判':'✓ 充裕'}</div>
+        </div>`:''}
+        ${note?`<div class="ct-note">${note}</div>`:''}
+        <a class="ct-anran-link" href="erp-anran.html#ip-contracts">在安然廳查看完整合約詳情 →</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDetail(id,row){
+  const el=document.getElementById(id);
+  const btn=row.querySelector('.ct-expand-btn');
+  el.classList.toggle('open');
+  if(btn) btn.textContent=el.classList.contains('open')?'▴':'▾';
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pane-'+el.dataset.tab).classList.add('active');
+}
+
+/* ── MODAL ── */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+/* ── POPULATE MASTER SELECT ── */
+function populateMasterSelect(){
+  const sel=document.getElementById('ac-master');
+  sel.innerHTML='<option value="">— 選擇版權方 —</option>';
+  _masters.forEach(m=>{
+    const opt=document.createElement('option');
+    opt.value=m.record_id;
+    opt.textContent=fv(m.fields,'版權方公司')||m.record_id;
+    sel.appendChild(opt);
+  });
+}
+
+/* ── SUBMIT MASTER ── */
+async function submitMaster(){
+  const company=document.getElementById('am-company').value.trim();
+  if(!company){ alert('請填寫版權方公司名稱'); return; }
+  const res=document.getElementById('am-result');
+  res.style.display='block'; res.style.color='var(--txt-mid)'; res.textContent='建立中…';
+  const fields={
+    '版權方公司':company,
+    '聯絡人':document.getElementById('am-contact').value.trim()||undefined,
+    '聯絡Email':document.getElementById('am-email').value.trim()||undefined,
+    '授權IP清單':document.getElementById('am-ips').value.trim()||undefined,
+    '主要授權地區':document.getElementById('am-region').value.trim()||undefined,
+    '合作狀態':document.getElementById('am-status').value,
+    '備注':document.getElementById('am-note').value.trim()||undefined,
+  };
+  Object.keys(fields).forEach(k=>{ if(fields[k]===undefined) delete fields[k]; });
+  if(window.USE_MOCK){
+    const rid='recM'+Date.now();
+    if(!window.MOCK_DB.ip_masters) window.MOCK_DB.ip_masters=[];
+    window.MOCK_DB.ip_masters.unshift({record_id:rid,fields});
+    _masters=window.MOCK_DB.ip_masters;
+    res.style.color='var(--ok)'; res.textContent='✓ 已建立（Demo 模式）';
+    setTimeout(()=>{ closeModal('modal-master'); updateStats(); renderMasters(); populateMasterSelect(); },1000);
+    return;
+  }
+  try{
+    const r=await fetch(`https://feishu-proxy.raychou6913.workers.dev/bitable/v1/apps/YlVkb0ACjacJVqsgRT5j4c6gpeh/tables/${_TBLS.ip_masters}/records`,
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});
+    const j=await r.json();
+    if(j.code===0){ res.style.color='var(--ok)'; res.textContent='✓ 已存入飛書'; setTimeout(()=>{ closeModal('modal-master'); loadAll(); },1200); }
+    else { res.style.color='var(--danger)'; res.textContent='存入失敗：'+j.msg; }
+  }catch(e){ res.style.color='var(--danger)'; res.textContent='建立失敗：'+e.message; }
+}
+
+/* ── SUBMIT CONTRACT ── */
+async function submitContract(){
+  const ip =document.getElementById('ac-ip').value.trim();
+  const end =document.getElementById('ac-end').value;
+  if(!ip||!end){ alert('請填寫 IP 品牌與授權到期日'); return; }
+  const masterId=document.getElementById('ac-master').value;
+  const master  =_masters.find(m=>m.record_id===masterId);
+  const res=document.getElementById('ac-result');
+  res.style.display='block'; res.style.color='var(--txt-mid)'; res.textContent='建立中…';
+  const mgVal=document.getElementById('ac-mg').value;
+  const start=document.getElementById('ac-start').value;
+  const fields={
+    'IP品牌':ip,
+    '版權方':master?fv(master.fields,'版權方公司'):'',
+    '版權方ID':masterId||undefined,
+    '授權開始日':start?new Date(start).getTime():undefined,
+    '授權到期日':new Date(end).getTime(),
+    '保底金MG':mgVal?Number(mgVal):undefined,
+    'MG幣別':document.getElementById('ac-currency').value,
+    '版稅率':document.getElementById('ac-royalty').value.trim()||undefined,
+    '分潤階梯':document.getElementById('ac-tier').value.trim()||undefined,
+    '授權品類':document.getElementById('ac-category').value.trim()||undefined,
+    '授權地區':document.getElementById('ac-region').value.trim()||undefined,
+    '備注':document.getElementById('ac-note').value.trim()||undefined,
+  };
+  Object.keys(fields).forEach(k=>{ if(fields[k]===undefined) delete fields[k]; });
+  if(window.USE_MOCK){
+    const rid='recK'+Date.now();
+    window.MOCK_DB.contract.unshift({record_id:rid,fields});
+    _contracts=window.MOCK_DB.contract;
+    res.style.color='var(--ok)'; res.textContent='✓ 已建立（Demo 模式）';
+    setTimeout(()=>{ closeModal('modal-contract'); updateStats(); renderContracts(); },1000);
+    return;
+  }
+  try{
+    const r=await fetch(`https://feishu-proxy.raychou6913.workers.dev/bitable/v1/apps/YlVkb0ACjacJVqsgRT5j4c6gpeh/tables/${_TBLS.contract}/records`,
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});
+    const j=await r.json();
+    if(j.code===0){ res.style.color='var(--ok)'; res.textContent='✓ 已存入飛書'; setTimeout(()=>{ closeModal('modal-contract'); loadAll(); },1200); }
+    else { res.style.color='var(--danger)'; res.textContent='存入失敗：'+j.msg; }
+  }catch(e){ res.style.color='var(--danger)'; res.textContent='建立失敗：'+e.message; }
+}
+
+/* ── INIT ── */
+loadAll();
+</script>
+</body>
+</html>

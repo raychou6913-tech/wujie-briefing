@@ -161,7 +161,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <option>批發</option><option>快閃店</option><option>代工</option>
         <option>設計服務</option><option>授權</option><option>其他</option>
       </select></div>
-    <div class="field"><label>所在地</label>
+    <div class="field"><label>團隊辦公地</label>
       <select id="m-loc">
         <option>台北</option><option>北京</option><option>曼谷</option><option>跨地區</option>
       </select></div>
@@ -324,7 +324,7 @@ function renderCard(p){
   const stagePct=isFinished?100:stageIdx>=0?Math.round((stageIdx+1)/stageTotal*100):0;
   const stageLabel=isFinished?stage:(stageIdx>=0?`第 ${stageIdx+1} 關 / ${stageTotal} 關`:"未設定");
   const owner=fv(p,"負責人","—");
-  const loc=fv(p,"所在地","—");
+  const loc=fv(p,"團隊辦公地","—");
   const start=tsToDate(fn(p,"開始日期")||null);
   const end=tsToDate(fn(p,"截止日期")||null);
   const ipColor=IP_COLOR[ip]||"#64748b";
@@ -567,7 +567,7 @@ function openModal(id=null){
       document.getElementById("m-name").value=fv(p,"項目名稱");
       populateLicensorSelect(fv(p,"版權方"), fv(p,"合約名稱"));
       document.getElementById("m-type").value=fv(p,"業務類型");
-      document.getElementById("m-loc").value=fv(p,"所在地");
+      document.getElementById("m-loc").value=fv(p,"團隊辦公地");
       document.getElementById("m-owner").value=fv(p,"負責人");
       const s=fn(p,"開始日期"); document.getElementById("m-start").value=s?tsToDate(s):"";
       const e=fn(p,"截止日期"); document.getElementById("m-end").value=e?tsToDate(e):"";
@@ -607,7 +607,7 @@ async function saveProject(){
     "IP品牌":    contractChosen?.dataset?.ip||document.getElementById("m-ip").value||"",
     "版權方":    contractChosen?.dataset?.licensor||"",
     "業務類型":  document.getElementById("m-type").value,
-    "所在地":    document.getElementById("m-loc").value,
+    "團隊辦公地":    document.getElementById("m-loc").value,
     "負責人":    document.getElementById("m-owner").value,
     "開始日期":  dateToTs(document.getElementById("m-start").value),
     "截止日期":  dateToTs(document.getElementById("m-end").value),

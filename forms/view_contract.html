@@ -95,7 +95,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
   <div id="card-view"><div class="empty">載入中...</div></div>
   <div id="table-view">
     <table class="dt">
-      <thead><tr><th>合約名稱</th><th>類型</th><th>對方公司</th><th>狀態</th><th>我方聯絡人</th><th>我方簽約公司</th><th>到期日</th><th>保底金</th></tr></thead>
+      <thead><tr><th>合約名稱</th><th>類型</th><th>對方公司</th><th>狀態</th><th>我方聯絡人</th><th>歸屬主體</th><th>到期日</th><th>保底金</th></tr></thead>
       <tbody id="table-body"></tbody>
     </table>
   </div>
@@ -373,11 +373,11 @@ function cardHTML(f){
       <span class="badge" style="background:${sc};color:#fff">${status}</span>
     </div>
     <div class="db-card-body">
-      <div>👤 我方：${fv(f,"我方聯絡人")||fv(f,"我方簽署人")||"—"}${fv(f,"我方簽約公司")?" ("+fv(f,"我方簽約公司")+")":""}</div>
+      <div>👤 我方：${fv(f,"我方聯絡人")||fv(f,"我方簽署人")||"—"}${fv(f,"歸屬主體")?" ("+fv(f,"歸屬主體")+")":""}</div>
       <div style="margin-top:4px">${_expTag(f)}</div>
     </div>
     <div class="db-card-row">
-      <span style="font-size:12px;color:#64748b">金額：${fv(f,"保底金額")||"—"} ${fv(f,"幣別")||""}</span>
+      <span style="font-size:12px;color:#64748b">金額：${fv(f,"MG_總保底")||"—"} ${fv(f,"幣別")||""}</span>
       <span style="font-size:12px;color:#64748b">對接：${fv(f,"對方聯絡人")||"—"}</span>
     </div>
   </div>`;
@@ -391,9 +391,9 @@ function rowHTML(f){
     <td>${fv(f,"對方公司")||"—"}</td>
     <td><span class="badge" style="background:${sc};color:#fff">${status}</span></td>
     <td style="color:#6366f1">${fv(f,"我方聯絡人")||fv(f,"我方簽署人")||"—"}</td>
-    <td>${fv(f,"我方簽約公司")||"—"}</td>
+    <td>${fv(f,"歸屬主體")||"—"}</td>
     <td>${_expTag(f)}</td>
-    <td style="text-align:right;color:#64748b">${fv(f,"保底金額")||"—"} ${fv(f,"幣別")||""}</td>
+    <td style="text-align:right;color:#64748b">${fv(f,"MG_總保底")||"—"} ${fv(f,"幣別")||""}</td>
   </tr>`;
 }
 

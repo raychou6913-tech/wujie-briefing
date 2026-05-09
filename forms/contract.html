@@ -109,7 +109,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
         <input id="f-party" required placeholder="直接輸入，或從上方選取後自動填入" style="margin-top:6px">
         <div class="hint">版權方 / 代理商名單自動從資料庫載入</div></div>
       <div class="row2">
-        <div class="f"><label>我方簽約公司</label>
+        <div class="f"><label>歸屬主體</label>
           <select id="f-our-company">
             <option value="">— 請選擇 —</option>
             <option>蕪解HK</option><option>蕪解SZ</option><option>蕪解BJ</option><option>UJ BKK</option><option>有你共創</option>
@@ -303,7 +303,7 @@ async function _getProjects(typeFilter){
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
     const iv=f["IP品牌"];
     const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
-    const lv=f["所在地"];
+    const lv=f["團隊辦公地"];
     const loc=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
     return {name,type,ip,loc};
   }).filter(Boolean);
@@ -402,7 +402,7 @@ async function _getContracts(ipFilter){
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["對方公司"])||_t(f["版權方"]),
         status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
-        amount:_n(f["保底金額"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
+        amount:_n(f["MG_總保底"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
         royalRetail:_n(f["授權金_零售%"]), royalWholesale:_n(f["授權金_批發%"]),
         wholesaleRatio:_n(f["批發折數"]),
         startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
@@ -674,12 +674,12 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "合約類型":     document.getElementById("f-type").value,
       "合約狀態":     document.getElementById("f-status").value,
       "對方公司":     document.getElementById("f-party").value,
-      "我方簽約公司": document.getElementById("f-our-company").value,
+      "歸屬主體": document.getElementById("f-our-company").value,
       "我方簽署人":   document.getElementById("f-signer").value,
       "對方聯絡人":   document.getElementById("f-contact").value,
       "授權品類":     (document.getElementById("cats-chips-contract")?._getMerged?.()||document.getElementById("f-cats").value),
       "授權地區":     (document.getElementById("region-chips-contract")?._getMerged?.()||document.getElementById("f-region").value),
-      "保底金額":       parseFloat(document.getElementById("f-amount").value)||0,
+      "MG_總保底":       parseFloat(document.getElementById("f-amount").value)||0,
       "一次性授權費":   parseFloat(document.getElementById("f-flat-fee").value)||null,
       "幣別":           document.getElementById("f-cur").value,
       "授權金_零售%":   parseFloat(document.getElementById("f-royal-retail").value)||0,

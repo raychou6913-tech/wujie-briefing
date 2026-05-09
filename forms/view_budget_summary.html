@@ -182,7 +182,7 @@ function applyFilter(){
     const pn=projName(f).toLowerCase();
     if(q&&!pn.includes(q)&&!fv(f,"預算名稱").toLowerCase().includes(q))return false;
     if(yr&&fv(f,"年度")!==yr)return false;
-    if(loc&&fv(f,"所在地")!==loc)return false;
+    if(loc&&fv(f,"團隊辦公地")!==loc)return false;
     return true;
   });
   grouped={};
@@ -257,7 +257,7 @@ function openDetail(pn){
   const items=grouped[pn]||[];
   document.getElementById("d-title").textContent=pn;
   const yrs=[...new Set(items.map(f=>fv(f,"年度")).filter(Boolean))].sort().join("、");
-  const locs=[...new Set(items.map(f=>fv(f,"所在地")).filter(Boolean))].join("、");
+  const locs=[...new Set(items.map(f=>fv(f,"團隊辦公地")).filter(Boolean))].join("、");
   const batches=[...new Set(items.map(f=>fv(f,"批次")).filter(Boolean))].join(" / ");
   document.getElementById("d-sub").textContent=(yrs?yrs+"年　":"")+locs+(batches?" ｜ 批次："+batches:"");
   let income=0,expense=0;
@@ -377,10 +377,10 @@ async function saveBudgetEdit(){
   finally{btn.disabled=false;btn.textContent="💾 儲存";}
 }
 function _buildCSV(rows){
-  const headers=["項目","預算名稱","類別","性質","單價","數量","預算金額","幣別","批次","已使用","剩餘","執行率%","年度","季度","所在地","備註"];
+  const headers=["項目","預算名稱","類別","性質","單價","數量","預算金額","幣別","批次","已使用","剩餘","執行率%","年度","季度","團隊辦公地","備註"];
   const lines=[headers.join(",")];
   for(const f of rows){
-    const cols=[projName(f),fv(f,"預算名稱"),fv(f,"類別"),fv(f,"預算性質"),fv(f,"單價"),fv(f,"數量"),fv(f,"預算金額"),fv(f,"幣別"),fv(f,"批次"),fv(f,"已使用金額"),fv(f,"剩餘預算"),fv(f,"執行率%"),fv(f,"年度"),fv(f,"季度"),fv(f,"所在地"),fv(f,"備註")];
+    const cols=[projName(f),fv(f,"預算名稱"),fv(f,"類別"),fv(f,"預算性質"),fv(f,"單價"),fv(f,"數量"),fv(f,"預算金額"),fv(f,"幣別"),fv(f,"批次"),fv(f,"已使用金額"),fv(f,"剩餘預算"),fv(f,"執行率%"),fv(f,"年度"),fv(f,"季度"),fv(f,"團隊辦公地"),fv(f,"備註")];
     lines.push(cols.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(","));
   }
   return "﻿"+lines.join("\n");

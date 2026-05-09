@@ -141,7 +141,7 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
             <option>設計服務</option><option>授權</option><option>其他</option>
           </select>
         </div>
-        <div class="f"><label>所在地</label>
+        <div class="f"><label>團隊辦公地</label>
           <select id="m-loc">
             <option>台北</option><option>北京</option><option>曼谷</option><option>跨地區</option>
           </select>
@@ -341,7 +341,7 @@ async function _getProjects(typeFilter){
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
     const iv=f["IP品牌"];
     const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
-    const lv=f["所在地"];
+    const lv=f["團隊辦公地"];
     const loc=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
     return {name,type,ip,loc};
   }).filter(Boolean);
@@ -440,7 +440,7 @@ async function _getContracts(ipFilter){
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["對方公司"])||_t(f["版權方"]),
         status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
-        amount:_n(f["保底金額"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
+        amount:_n(f["MG_總保底"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
         royalRetail:_n(f["授權金_零售%"]), royalWholesale:_n(f["授權金_批發%"]),
         wholesaleRatio:_n(f["批發折數"]),
         startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
@@ -842,7 +842,7 @@ document.getElementById("frm").onsubmit=async(e)=>{
     ["合約", contractVal],
     ["項目名稱", document.getElementById("m-name").value],
     ["業務類型", typeVal],
-    ["所在地", document.getElementById("m-loc").value],
+    ["團隊辦公地", document.getElementById("m-loc").value],
     ["授權品類", cats.join("、")||"—"],
     ["保底金(MG)", (document.getElementById("m-mg").value?document.getElementById("m-mg").value+" "+cur:"—")],
     ["權利金(零售%)", (()=>{const v=parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalRetail||0);return v?v+"%":"—";})()],
@@ -859,12 +859,12 @@ document.getElementById("frm").onsubmit=async(e)=>{
       "合約名稱":    contractVal,
       "IP品牌":      ipVal,
       "業務類型":    document.getElementById("m-type").value,
-      "所在地":      document.getElementById("m-loc").value,
+      "團隊辦公地":      document.getElementById("m-loc").value,
       "版權對接人":  document.getElementById("m-owner").value,
       "版權方":      document.getElementById("m-licensor").value,
       "簽約狀態":    document.getElementById("m-sign").value,
       "授權地區範圍":document.getElementById("m-territory").value,
-      "保底金額":    parseFloat(document.getElementById("m-mg").value)||0,
+      "MG_總保底":    parseFloat(document.getElementById("m-mg").value)||0,
       "幣別":        cur,
       "權利金_零售%": parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalRetail||0)||0,
       "權利金_批發%": parseFloat(document.getElementById("m-contract").selectedOptions[0]?.dataset.royalWholesale||0)||0,

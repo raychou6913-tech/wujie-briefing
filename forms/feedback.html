@@ -203,7 +203,7 @@ async function _getProjects(typeFilter){
     const type=Array.isArray(tv)?tv[0]?.text||"":String(tv||"");
     const iv=f["IP品牌"];
     const ip=Array.isArray(iv)?iv[0]?.text||"":String(iv||"");
-    const lv=f["所在地"];
+    const lv=f["團隊辦公地"];
     const loc=Array.isArray(lv)?lv[0]?.text||"":String(lv||"");
     return {name,type,ip,loc};
   }).filter(Boolean);
@@ -302,7 +302,7 @@ async function _getContracts(ipFilter){
       return {
         name, ip:_t(f["IP品牌"]), licensor:_t(f["對方公司"])||_t(f["版權方"]),
         status:_t(f["合約狀態"]), cats:_t(f["授權品類"]), region:_t(f["授權地區"]),
-        amount:_n(f["保底金額"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
+        amount:_n(f["MG_總保底"]), flatFee:_n(f["一次性授權費"]), cur:_t(f["幣別"])||"USD",
         royalRetail:_n(f["授權金_零售%"]), royalWholesale:_n(f["授權金_批發%"]),
         wholesaleRatio:_n(f["批發折數"]),
         startTs:_n(f["簽署日期"]), endTs:_n(f["到期日期"])
