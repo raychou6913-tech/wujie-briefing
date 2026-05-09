@@ -305,7 +305,7 @@
 | 13 | 存放位置 | Text | — |
 | 14 | 負責人 | Text | — |
 | 15 | 對方公司 | Text | — |
-| 16 | 我方簽署人 | SingleSelect | Ray / 安然 / Shawn / 躍明 / 賴哥 / Bevis / 木子 / 老董 |
+| 16 | 我方簽署人 | SingleSelect | Ray / 安然 / Shawn / 躍明 / 賴哥 / Bevis / 木子 / 董亮 |
 | 17 | 對方聯絡人 | Text | — |
 | 18 | 簽署日期 | DateTime | format: yyyy/MM/dd |
 | 19 | 主要條款摘要 | Text | — |
