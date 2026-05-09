@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UJ BKK · Operations Hub</title>
+<title>UJ BKK · 營運中心（中文 review 版）</title>
 <style>
 :root{
   --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
@@ -131,162 +131,162 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="brand-dot"></div>
     <div>
       <div class="brand-name">UJ BKK</div>
-      <div class="brand-sub">Bangkok Operations Hub</div>
+      <div class="brand-sub">曼谷營運中心（中文 review 版）</div>
     </div>
   </div>
   <div class="topbar-right">
     <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
-    <a href="erp-bkk-zh.html" class="btn-sm" style="border-color:#9333ea60;color:#c084fc;">中文 review →</a>
-    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">Sign Out</a>
+    <a href="erp-bkk-en.html" class="btn-sm" style="border-color:#9333ea60;color:#c084fc;">EN 版 →</a>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">登出</a>
   </div>
 </div>
 
 <div class="main">
 
   <div class="greet">
-    <div class="greet-hi" id="greet-hi">Welcome</div>
-    <div class="greet-sub" id="greet-sub">Bangkok operations dashboard</div>
+    <div class="greet-hi" id="greet-hi">歡迎</div>
+    <div class="greet-sub" id="greet-sub">曼谷營運看板</div>
   </div>
 
   <!-- Pipeline KPIs -->
   <div class="kpi-row">
     <div class="kpi-big">
-      <div class="kpi-label">Live Now</div>
+      <div class="kpi-label">營業中</div>
       <div class="kpi-val" style="color:var(--ok);" id="kpi-live">1</div>
-      <div class="kpi-sub" id="kpi-live-sub">Siam Paragon · Mofusand Summer</div>
+      <div class="kpi-sub" id="kpi-live-sub">Siam Paragon · Mofusand 夏日系列</div>
     </div>
     <div class="kpi-big">
-      <div class="kpi-label">In Approval</div>
+      <div class="kpi-label">送審中</div>
       <div class="kpi-val" style="color:var(--warn);" id="kpi-approval">1</div>
-      <div class="kpi-sub" id="kpi-approval-sub">Central Embassy · venue / promo design</div>
+      <div class="kpi-sub" id="kpi-approval-sub">Central Embassy · 場地／宣傳物設計</div>
     </div>
     <div class="kpi-big">
-      <div class="kpi-label">Pipeline</div>
+      <div class="kpi-label">籌備中</div>
       <div class="kpi-val" id="kpi-pipeline">2</div>
-      <div class="kpi-sub" id="kpi-pipeline-sub">Proposal & design stage</div>
+      <div class="kpi-sub" id="kpi-pipeline-sub">提案與產品設計階段</div>
     </div>
   </div>
 
   <!-- Pop-up Pipeline (main feature) -->
   <div class="sec-hdr">
-    <span class="sec-title">Pop-up Pipeline · 7 Stages</span>
-    <span class="sec-link" onclick="newPopupPlaceholder()">+ New Pop-up Plan</span>
+    <span class="sec-title">快閃店流水線・7 階段</span>
+    <span class="sec-link" onclick="newPopupPlaceholder()">+ 新增快閃店企劃</span>
   </div>
   <div style="font-size:10px;color:var(--txt-lo);margin-bottom:12px;line-height:1.6;">
-    Each pop-up flows through: <b style="color:var(--txt-mid);">Proposal → Venue Lock → Product Design → Venue Build Approval → Promo Material Approval → Live → Wrap-up</b>. Click stages to mark complete.
+    每場快閃店依序經過：<b style="color:var(--txt-mid);">提案 → 場地確認 → 產品設計 → 場地裝修送審 → 宣傳物送審 → 營業中 → 撤店覆盤</b>。點擊階段可標記完成。
   </div>
   <div id="pipeline-list"></div>
 
   <!-- Today's Pipeline Tasks (auto-derived from current stages) -->
   <div class="sec-hdr" style="margin-top:24px;">
-    <span class="sec-title">Today's Pipeline Tasks</span>
+    <span class="sec-title">本日流水線待辦</span>
   </div>
   <div id="tasks-list"></div>
 
   <!-- Bangkok Warehouse -->
   <div class="sec-hdr" style="margin-top:24px;">
-    <span class="sec-title">Bangkok Warehouse Inventory</span>
-    <span class="sec-link">Full list →</span>
+    <span class="sec-title">曼谷倉庫庫存</span>
+    <span class="sec-link">完整清單 →</span>
   </div>
   <table class="inv-table">
     <thead>
       <tr>
         <th>SKU / IP</th>
-        <th class="num">Units</th>
-        <th class="num">Cost (THB)</th>
-        <th>Age</th>
-        <th>Source</th>
+        <th class="num">數量</th>
+        <th class="num">成本（THB）</th>
+        <th>庫齡</th>
+        <th>來源</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="ip-tag" style="color:#c084fc;">Mofusand</span> Plush keychain (2024)</td>
+        <td><span class="ip-tag" style="color:#c084fc;">Mofusand</span> 絨毛掛飾（2024）</td>
         <td class="num">52</td>
         <td class="num">฿ 31,200</td>
-        <td><span class="aging-bad">128 days</span></td>
-        <td>Pop-up leftover</td>
+        <td><span class="aging-bad">128 天</span></td>
+        <td>快閃剩貨</td>
       </tr>
       <tr>
-        <td><span class="ip-tag" style="color:#fbbf24;">Snoopy</span> Tote bag</td>
+        <td><span class="ip-tag" style="color:#fbbf24;">Snoopy</span> 帆布托特包</td>
         <td class="num">38</td>
         <td class="num">฿ 22,800</td>
-        <td><span class="aging-warn">94 days</span></td>
-        <td>Pop-up leftover</td>
+        <td><span class="aging-warn">94 天</span></td>
+        <td>快閃剩貨</td>
       </tr>
       <tr>
-        <td><span class="ip-tag" style="color:#38bdf8;">Opanchu</span> Acrylic stand set</td>
+        <td><span class="ip-tag" style="color:#38bdf8;">Opanchu</span> 壓克力立牌組</td>
         <td class="num">120</td>
         <td class="num">฿ 84,000</td>
-        <td>34 days</td>
-        <td>Wholesale (slow)</td>
+        <td>34 天</td>
+        <td>批發滯銷</td>
       </tr>
       <tr>
-        <td><span class="ip-tag" style="color:#4ade80;">Muziktiger</span> Sticker pack</td>
+        <td><span class="ip-tag" style="color:#4ade80;">Muziktiger</span> 貼紙包</td>
         <td class="num">285</td>
         <td class="num">฿ 42,750</td>
-        <td>21 days</td>
-        <td>Wholesale (slow)</td>
+        <td>21 天</td>
+        <td>批發滯銷</td>
       </tr>
       <tr>
-        <td colspan="5" style="text-align:center;color:var(--txt-mid);font-size:10px;padding:12px;">Total: 495 units · ฿ 180,750 (selected slow-moving SKUs)</td>
+        <td colspan="5" style="text-align:center;color:var(--txt-mid);font-size:10px;padding:12px;">合計：495 件 · ฿ 180,750（精選滯銷 SKU）</td>
       </tr>
     </tbody>
   </table>
 
   <!-- Submit Expense -->
   <div class="sec-hdr" style="margin-top:24px;">
-    <span class="sec-title">Submit Expense</span>
+    <span class="sec-title">送出費用申請</span>
   </div>
   <div class="exp-form">
-    <div class="exp-form-title">💸 Submit Expense</div>
-    <div class="exp-form-sub">Submit Bangkok ops expenses (venue, marketing, transport, etc.) in THB. Approval workflow runs automatically once submitted.</div>
+    <div class="exp-form-title">💸 送出費用申請</div>
+    <div class="exp-form-sub">提交曼谷在地營運費用（場地、行銷、交通等），以泰銖計算。送出後系統自動進入審批流程。</div>
 
     <div class="exp-row">
       <div class="exp-field">
-        <label>Category</label>
+        <label>類別</label>
         <select id="exp-cat">
-          <option value="venue">Venue / pop-up rent</option>
-          <option value="marketing">Marketing / promotion</option>
-          <option value="logistics">Local logistics</option>
-          <option value="warehouse">Warehouse / storage</option>
-          <option value="travel">Local transport / travel</option>
-          <option value="meal">Meal / hospitality</option>
-          <option value="other">Other</option>
+          <option value="venue">場地租金 / 快閃店租</option>
+          <option value="marketing">行銷推廣</option>
+          <option value="logistics">在地物流</option>
+          <option value="warehouse">倉儲</option>
+          <option value="travel">交通 / 差旅</option>
+          <option value="meal">餐飲 / 招待</option>
+          <option value="other">其他</option>
         </select>
       </div>
       <div class="exp-field">
-        <label>Amount (THB)</label>
-        <input id="exp-amt" type="number" step="0.01" placeholder="e.g. 12000.00">
+        <label>金額（THB）</label>
+        <input id="exp-amt" type="number" step="0.01" placeholder="例：12000.00">
       </div>
     </div>
 
     <div class="exp-row">
       <div class="exp-field">
-        <label>Date</label>
+        <label>日期</label>
         <input id="exp-date" type="date">
       </div>
       <div class="exp-field">
-        <label>Linked pop-up (optional)</label>
+        <label>關聯快閃店（選填）</label>
         <select id="exp-popup">
-          <option value="">— None —</option>
-          <option>Siam Paragon · Mofusand Summer</option>
+          <option value="">— 無 —</option>
+          <option>Siam Paragon · Mofusand 夏日系列</option>
           <option>Central Embassy · Opanchu × Snoopy</option>
-          <option>EmQuartier · JJK Theme (Q3)</option>
-          <option>General BKK ops</option>
+          <option>EmQuartier · JJK 主題（Q3）</option>
+          <option>曼谷一般營運</option>
         </select>
       </div>
     </div>
 
     <div class="exp-field">
-      <label>Description</label>
-      <textarea id="exp-desc" placeholder="Briefly describe the expense purpose..."></textarea>
+      <label>說明</label>
+      <textarea id="exp-desc" placeholder="簡短描述費用用途..."></textarea>
     </div>
 
     <div class="exp-routing" id="exp-routing">
-      <strong>✓ Auto-routing enabled.</strong> Your submission is logged and routed to the regional approver. You'll get a status update once reviewed.
+      <strong>✓ 自動派發審批。</strong>送出後系統會自動記錄並派給區域負責人審核，審核完成會通知你。
     </div>
 
-    <button class="exp-submit" onclick="submitExp()">Submit Expense Request →</button>
+    <button class="exp-submit" onclick="submitExp()">送出申請 →</button>
   </div>
 
 </div>
@@ -300,35 +300,35 @@ if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
   localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html'); return;
 }
 const tb=document.getElementById('tb-user');
-if(tb) tb.textContent=(SESS.name||SESS.user)+' · '+(SESS.role||'staff');
+if(tb) tb.textContent=(SESS.name||SESS.user)+' · '+(SESS.role||'員工');
 
 const greet=document.getElementById('greet-hi');
 const sub=document.getElementById('greet-sub');
 const hour=new Date().getHours();
-const hi=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+const hi=hour<12?'早安':hour<18?'午安':'晚安';
 const name=SESS.name||SESS.user;
-if(greet) greet.textContent=`${hi}, ${name}`;
-const today=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'short',day:'numeric'});
+if(greet) greet.textContent=`${hi}，${name}`;
+const today=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
 
-// ── Pop-up Pipeline Data (7 stages) ─────────────────────────
-const STAGE_NAMES = ['Proposal','Venue Lock','Product Design','Venue Build Approval','Promo Material Approval','Live','Wrap-up'];
-const STAGE_SHORT = ['Prop','Venue','Product','Build','Promo','Live','Wrap'];
-const PIPELINE_KEY = 'bkk_pipeline_v1';
+// ── 快閃店流水線（7 階段） ─────────────────────────
+const STAGE_NAMES = ['提案','場地確認','產品設計','場地裝修送審','宣傳物送審','營業中','撤店覆盤'];
+const STAGE_SHORT = ['提案','場地','產品','裝修','宣傳','營業','覆盤'];
+const PIPELINE_KEY = 'bkk_pipeline_zh_v1'; // 中文 review 版獨立 key，避免與 EN 版 localStorage 衝突
 
 const SEED_POPUPS = [
   {
     id:'pp1',
-    name:'Siam Paragon · Mofusand Summer',
-    venue:'Siam Paragon · 4F Atrium',
+    name:'Siam Paragon · Mofusand 夏日系列',
+    venue:'Siam Paragon · 4F 中庭',
     period:'2026-04-20 → 2026-05-31',
-    ip:'Mofusand', target:'฿ 1.20M',
+    ip:'Mofusand', target:'฿ 120 萬',
     stages:[
-      {n:1, done:true, owner:'Meaw',   date:'2026-02-15', note:'Concept approved'},
-      {n:2, done:true, owner:'Somsak', date:'2026-03-01', note:'Lease signed, deposit paid'},
-      {n:3, done:true, owner:'Meaw',   date:'2026-03-20', note:'8 limited SKUs finalized'},
-      {n:4, done:true, owner:'Somsak', date:'2026-04-05', note:'Booth layout approved'},
-      {n:5, done:true, owner:'Ploy',   date:'2026-04-15', note:'Posters + photo wall approved'},
-      {n:6, done:false, current:true, owner:'Ploy', note:'Daily sales report due 6 PM'},
+      {n:1, done:true, owner:'Meaw',   date:'2026-02-15', note:'概念提案 Ray 已批准'},
+      {n:2, done:true, owner:'Somsak', date:'2026-03-01', note:'場地合約簽訂，押金已付'},
+      {n:3, done:true, owner:'Meaw',   date:'2026-03-20', note:'8 款限定 SKU 設計定稿'},
+      {n:4, done:true, owner:'Somsak', date:'2026-04-05', note:'場地裝修圖商場已批准'},
+      {n:5, done:true, owner:'Ploy',   date:'2026-04-15', note:'海報＋打卡背板版權方批准'},
+      {n:6, done:false, current:true, owner:'Ploy', note:'每日銷售報告 18:00 前上傳'},
       {n:7, done:false},
     ],
   },
@@ -337,36 +337,36 @@ const SEED_POPUPS = [
     name:'Central Embassy · Opanchu × Snoopy',
     venue:'Central Embassy · 5F',
     period:'2026-05-15 → 2026-06-30',
-    ip:'Opanchu × Snoopy', target:'฿ 950K',
+    ip:'Opanchu × Snoopy', target:'฿ 95 萬',
     stages:[
-      {n:1, done:true, owner:'Meaw',   date:'2026-03-10', note:'Crossover concept approved'},
-      {n:2, done:true, owner:'Somsak', date:'2026-04-01', note:'Venue locked, deposit ฿200K'},
-      {n:3, done:true, owner:'Meaw',   date:'2026-04-20', note:'12 SKUs ready for production'},
-      {n:4, done:false, current:true, owner:'Somsak', note:'Booth render awaiting landlord signature'},
-      {n:5, done:false, owner:'Ploy', note:'Promo posters drafted, awaiting IP holder approval'},
+      {n:1, done:true, owner:'Meaw',   date:'2026-03-10', note:'雙 IP 聯名概念已批准'},
+      {n:2, done:true, owner:'Somsak', date:'2026-04-01', note:'場地鎖定，押金 ฿20 萬已付'},
+      {n:3, done:true, owner:'Meaw',   date:'2026-04-20', note:'12 款 SKU 已可投產'},
+      {n:4, done:false, current:true, owner:'Somsak', note:'裝修效果圖待商場業主簽章'},
+      {n:5, done:false, owner:'Ploy', note:'宣傳海報草案已備，等版權方批准'},
       {n:6, done:false},
       {n:7, done:false},
     ],
   },
   {
     id:'pp3',
-    name:'EmQuartier · JJK Theme',
-    venue:'EmQuartier · TBD floor',
+    name:'EmQuartier · JJK 主題',
+    venue:'EmQuartier · 樓層待定',
     period:'2026-08-01 → 2026-09-15',
     ip:'JJK', target:'USD $187K',
     stages:[
-      {n:1, done:false, current:true, owner:'Meaw', note:'Proposal draft v2 — pending review'},
+      {n:1, done:false, current:true, owner:'Meaw', note:'提案 v2 撰寫中，待 Ray 審閱'},
       {n:2, done:false},{n:3, done:false},{n:4, done:false},{n:5, done:false},{n:6, done:false},{n:7, done:false},
     ],
   },
   {
     id:'pp4',
     name:'Iconsiam · Muziktiger Q4',
-    venue:'Iconsiam · TBD',
+    venue:'Iconsiam · 待定',
     period:'2026-11-10 → 2026-12-25',
-    ip:'Muziktiger', target:'฿ 1.60M',
+    ip:'Muziktiger', target:'฿ 160 萬',
     stages:[
-      {n:1, done:false, current:true, owner:'Meaw', note:'Initial venue inquiry sent'},
+      {n:1, done:false, current:true, owner:'Meaw', note:'場地初步詢問已寄出'},
       {n:2, done:false},{n:3, done:false},{n:4, done:false},{n:5, done:false},{n:6, done:false},{n:7, done:false},
     ],
   },
@@ -388,11 +388,11 @@ function getCurrentStageNum(p){
 }
 function getStatus(p){
   const cur=getCurrentStageNum(p);
-  if(cur>=8) return {label:'WRAPPED', cls:'s-wrap'};
-  if(cur===7) return {label:'WRAPPING', cls:'s-wrap'};
-  if(cur===6) return {label:'● LIVE', cls:'s-live'};
-  if(cur>=4) return {label:'● PREP', cls:'s-prep'};
-  return {label:'● PLAN', cls:'s-plan'};
+  if(cur>=8) return {label:'已撤店', cls:'s-wrap'};
+  if(cur===7) return {label:'撤店中', cls:'s-wrap'};
+  if(cur===6) return {label:'● 營業中', cls:'s-live'};
+  if(cur>=4) return {label:'● 籌備中', cls:'s-prep'};
+  return {label:'● 規劃中', cls:'s-plan'};
 }
 
 function renderPipeline(){
@@ -419,24 +419,24 @@ function renderPipeline(){
     const curStage=p.stages.find(s=>s.n===cur);
     const ctHtml = curStage && cur<8 ? `<div class="pl-current-task">
       <div class="pl-ct-info">
-        <div class="pl-ct-label">Current Stage · ${STAGE_NAMES[cur-1]}</div>
-        <div class="pl-ct-text">${curStage.note||'Awaiting next action'}</div>
-        <div class="pl-ct-meta">Owner: ${curStage.owner||'Unassigned'}</div>
+        <div class="pl-ct-label">當前階段 · ${STAGE_NAMES[cur-1]}</div>
+        <div class="pl-ct-text">${curStage.note||'待下一個動作'}</div>
+        <div class="pl-ct-meta">負責人：${curStage.owner||'未指派'}</div>
       </div>
-      <button class="pl-ct-action" onclick="markStageComplete('${p.id}',${cur})">Mark Complete ✓</button>
+      <button class="pl-ct-action" onclick="markStageComplete('${p.id}',${cur})">標記完成 ✓</button>
     </div>` : '';
     const detailRows=p.stages.map((s,i)=>{
       const isDone=s.done, isCur=cur===s.n && cur<8;
       const mark = isDone?'✓':(isCur?s.n:s.n);
       const cls = isDone?'done':(isCur?'current':'');
       const statusBadge = isDone
-        ? `<span class="pl-stage-status" style="background:var(--ok-dim);color:var(--ok);">Done</span>`
-        : (isCur ? `<span class="pl-stage-status" style="background:var(--bkk-dim);color:var(--bkk-glow);">Current</span>` : `<span class="pl-stage-status" style="background:var(--card2);color:var(--txt-lo);">Pending</span>`);
+        ? `<span class="pl-stage-status" style="background:var(--ok-dim);color:var(--ok);">已完成</span>`
+        : (isCur ? `<span class="pl-stage-status" style="background:var(--bkk-dim);color:var(--bkk-glow);">進行中</span>` : `<span class="pl-stage-status" style="background:var(--card2);color:var(--txt-lo);">未開始</span>`);
       return `<div class="pl-stage-row">
         <div class="pl-stage-mark ${cls}" onclick="toggleStage('${p.id}',${s.n})">${mark}</div>
         <div class="pl-stage-info">
-          <div class="pl-stage-name">Stage ${s.n} · ${STAGE_NAMES[i]}</div>
-          <div class="pl-stage-meta">${s.owner?'Owner: '+s.owner:''}${s.date?' · '+s.date:''}${s.note?' · '+s.note:''}</div>
+          <div class="pl-stage-name">階段 ${s.n} · ${STAGE_NAMES[i]}</div>
+          <div class="pl-stage-meta">${s.owner?'負責人：'+s.owner:''}${s.date?' · '+s.date:''}${s.note?' · '+s.note:''}</div>
         </div>
         ${statusBadge}
       </div>`;
@@ -445,7 +445,7 @@ function renderPipeline(){
       <div class="popup-head">
         <div>
           <div class="popup-name">${p.name}</div>
-          <div class="popup-loc">📍 ${p.venue} · ${p.period} · IP: ${p.ip} · Target: ${p.target}</div>
+          <div class="popup-loc">📍 ${p.venue} · ${p.period} · IP：${p.ip} · 目標：${p.target}</div>
         </div>
         <span class="popup-status ${status.cls}">${status.label}</span>
       </div>
@@ -454,7 +454,7 @@ function renderPipeline(){
         ${trackHtml}
       </div>
       ${ctHtml}
-      <div class="pl-toggle" onclick="document.getElementById('detail-${p.id}').classList.toggle('open');this.textContent=document.getElementById('detail-${p.id}').classList.contains('open')?'Hide stage details ▲':'Show all stage details ▼';">Show all stage details ▼</div>
+      <div class="pl-toggle" onclick="document.getElementById('detail-${p.id}').classList.toggle('open');this.textContent=document.getElementById('detail-${p.id}').classList.contains('open')?'隱藏階段明細 ▲':'展開所有階段明細 ▼';">展開所有階段明細 ▼</div>
       <div class="pl-detail" id="detail-${p.id}">${detailRows}</div>
     </div>`;
   }).join('');
@@ -480,20 +480,20 @@ window.markStageComplete=function(popupId,stageNum){
   savePopups(arr);
   renderPipeline();
   renderTasks();
-  showToast(`✓ Stage ${stageNum} (${STAGE_NAMES[stageNum-1]}) marked complete`);
+  showToast(`✓ 階段 ${stageNum}（${STAGE_NAMES[stageNum-1]}）已標記完成`);
 };
 
 window.toggleStage=function(popupId,stageNum){
-  // For now just expand details (future: edit stage)
+  // 暫時：點擊展開明細（未來可改為直接編輯階段）
   const detail=document.getElementById('detail-'+popupId);
   if(detail) detail.classList.add('open');
 };
 
 window.newPopupPlaceholder=function(){
-  showToast('💡 New pop-up plan form coming soon — for now contact regional team','var(--bkk-glow)');
+  showToast('💡 新增快閃店企劃表單建置中 — 目前請聯繫區域負責人','var(--bkk-glow)');
 };
 
-// ── Auto-derived Today's Tasks ─────────────────────────────
+// ── 由各 popup 當前階段自動派生的今日待辦 ─────────────────────
 function renderTasks(){
   const arr=loadPopups();
   const tasks=[];
@@ -503,20 +503,20 @@ function renderTasks(){
     const stage=p.stages.find(s=>s.n===cur);
     if(!stage) return;
     let urgency='med';
-    if(cur===6) urgency='high'; // Live = daily reporting
-    if(cur===4||cur===5) urgency='high'; // Approval blocking
+    if(cur===6) urgency='high'; // 營業中＝每日銷售上報
+    if(cur===4||cur===5) urgency='high'; // 送審卡關
     tasks.push({
       title:`${p.name.split(' · ')[0]} · ${STAGE_NAMES[cur-1]}`,
-      meta:`${stage.note||'Awaiting next action'} · Owner: ${stage.owner||'Unassigned'}`,
+      meta:`${stage.note||'待下一個動作'} · 負責人：${stage.owner||'未指派'}`,
       urgency, popupId:p.id, stageNum:cur,
     });
   });
   if(!tasks.length){
-    document.getElementById('tasks-list').innerHTML='<div style="text-align:center;color:var(--txt-lo);font-size:11px;padding:20px;">All pop-ups wrapped up ✓</div>';
+    document.getElementById('tasks-list').innerHTML='<div style="text-align:center;color:var(--txt-lo);font-size:11px;padding:20px;">所有快閃店均已完成 ✓</div>';
     return;
   }
   const colorMap={high:'var(--danger)',med:'var(--warn)',low:'var(--accent)'};
-  const labelMap={high:'High',med:'Medium',low:'Normal'};
+  const labelMap={high:'急',med:'中',low:'一般'};
   document.getElementById('tasks-list').innerHTML=tasks.map(t=>`
     <div class="task-card${t.urgency==='high'?' urgent':''}" onclick="document.getElementById('card-${t.popupId}').scrollIntoView({behavior:'smooth',block:'start'});">
       <div class="task-bar" style="background:${colorMap[t.urgency]};"></div>
@@ -531,7 +531,7 @@ function renderTasks(){
 renderPipeline();
 renderTasks();
 const taskCount=loadPopups().filter(p=>getCurrentStageNum(p)<8).length;
-if(sub) sub.textContent=`${today} · ${taskCount} active pop-ups in pipeline`;
+if(sub) sub.textContent=`${today} · 流水線中 ${taskCount} 場快閃店進行中`;
 
 const PROXY='https://feishu-proxy.raychou6913.workers.dev';
 const AT='Sg7ObNELHaAdZzshGIFjWPVhpce';
@@ -565,9 +565,9 @@ window.submitExp=function(){
   const date=document.getElementById('exp-date').value;
   const popup=document.getElementById('exp-popup').value;
   const desc=document.getElementById('exp-desc').value.trim();
-  if(!amt){ showToast('⚠ Please enter amount','var(--danger)'); return; }
-  if(!date){ showToast('⚠ Please pick a date','var(--danger)'); return; }
-  const submitter=SESS.name||SESS.user||'BKK staff';
+  if(!amt){ showToast('⚠ 請輸入金額','var(--danger)'); return; }
+  if(!date){ showToast('⚠ 請選擇日期','var(--danger)'); return; }
+  const submitter=SESS.name||SESS.user||'BKK 員工';
   writeApproval({
     '標題':`[BKK] ${submitter} ${catLabel} ฿${amt}`,
     '審批標題':`[UJ BKK] ${catLabel} ฿${amt}${popup?' / '+popup:''}`,
@@ -581,7 +581,7 @@ window.submitExp=function(){
     'Email已發送':'否',
     '申請說明':`${catLabel}${popup?' · '+popup:''}${desc?' / '+desc:''}`,
   });
-  showToast('✓ Submitted · awaiting approval');
+  showToast('✓ 已送出，等待審批');
   document.getElementById('exp-amt').value='';
   document.getElementById('exp-desc').value='';
 };
