@@ -163,7 +163,7 @@
 | # | 欄位 | 類型 | 選項 / 備註 |
 |---|---|---|---|
 | 1 | 標題 | Text | — |
-| 2 | 客戶名稱 | Text | — |
+| 2 | 客戶名稱 | SingleLink | — |
 | 3 | 產品/項目 | Text | — |
 | 4 | IP品牌 | SingleSelect | Snoopy / Mofusand / Chiikawa / Labubu / Fuggler / 其他 / Miffy / 加菲貓 / LINE FRIENDS / 小熊維尼 / 吉依卡哇 / Muziktiger / 飯糰與梅子 / Opanchu |
 | 5 | 所在地 | SingleSelect | 台北 / 北京 / 曼谷 / 歐洲 / 北美 / 其他 / 台灣 / 泰國 / 中國大陸 |
@@ -305,7 +305,7 @@
 | 13 | 存放位置 | Text | — |
 | 14 | 負責人 | Text | — |
 | 15 | 對方公司 | Text | — |
-| 16 | 我方簽署人 | SingleSelect | Ray / 安然 / Shawn / 躍明 / 賴哥 / Bevis |
+| 16 | 我方簽署人 | SingleSelect | Ray / 安然 / Shawn / 躍明 / 賴哥 / Bevis / 木子 / 老董 |
 | 17 | 對方聯絡人 | Text | — |
 | 18 | 簽署日期 | DateTime | format: yyyy/MM/dd |
 | 19 | 主要條款摘要 | Text | — |
@@ -444,12 +444,12 @@
 |---|---|---|---|
 | 1 | 多行文本 | Text | — |
 | 2 | 客戶名稱 | Text | — |
-| 3 | 客戶類型 | SingleSelect | KA大客戶 / 流通渠道 / 電商平台 / 零售門店 / 批發商 / 其他 / 百貨/商場 / 流通渠道商 / 海外經銷商 / 展覽/快閃 |
+| 3 | 客戶類型 | SingleSelect | KA大客戶 / 流通渠道 / 電商平台 / 零售門店 / 批發商 / 其他 / 百貨/商場 / 流通渠道商 / 海外經銷商 / 展覽/快閃 / 通路商 |
 | 4 | 所在地區 | SingleSelect | 台灣 / 中國大陸 / 香港 / 澳門 / 泰國 / 東南亞 / 其他 / 歐洲 / 北美 / 澳洲/紐西蘭 / 中東 / 印度 / 北京 / 上海 / 廣州/深圳 |
 | 5 | 聯絡人 | Text | — |
 | 6 | 聯絡方式 | Text | — |
 | 7 | 帳期 | SingleSelect | 即期 / 30天 / 60天 / 90天 / 其他 / Net45 / Net30 / 預付 / Net60 |
-| 8 | 合作狀態 | SingleSelect | 洽談中 / 合作中 / 暫停 / 已流失 / 潛在客戶 / 目標開發中 / 活躍合作中 |
+| 8 | 合作狀態 | SingleSelect | 洽談中 / 合作中 / 暫停 / 已流失 / 潛在客戶 / 目標開發中 / 活躍合作中 / 活躍 |
 | 9 | 品類偏好 | Text | — |
 | 10 | 主要對接業務 | SingleSelect | 安然 / 董亮 / Shawn / Ray |
 | 11 | 備註 | Text | — |
