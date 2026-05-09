@@ -468,8 +468,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="mini-prog"><div class="mini-prog-fill" style="width:40%;background:var(--ok)"></div></div>
         </div>
       </div>
-      <div style="margin-top:14px;padding:12px 14px;background:var(--card2);border-radius:8px;font-size:11px;color:var(--txt-mid);">
-        💡 收入來源拆解：批發訂單 約 65%　快閃店 約 30%　其他 5%　　毛利率目標 40%，目前 39.1% 略低於標準。
+      <div id="channel-mix-hint" style="margin-top:14px;padding:12px 14px;background:var(--card2);border-radius:8px;font-size:11px;color:var(--txt-mid);">
+        💡 收入來源拆解：載入中…
       </div>
     </div>
 
@@ -1654,6 +1654,23 @@ async function loadBudgetKPI(){
     const pct=Math.round(actual/target*100);
     const el=document.getElementById("budget-kpi-hint");
     if(el) el.textContent=`深圳+香港 收入達成率：${pct}%（實際 ${(actual/10000).toFixed(1)}萬 / 目標 ${(target/10000).toFixed(1)}萬）`;
+
+    // 渠道占比（按預算金額計算，動態從 類別 欄位讀取）
+    const byChannel = incRows.reduce((m,r)=>{
+      const cat=_fv(r.fields,"類別")||"其他";
+      const bud=parseFloat(_fv(r.fields,"預算金額"))||0;
+      m[cat]=(m[cat]||0)+bud; return m;
+    },{});
+    const wholesale = byChannel["批發收入"]||0;
+    const retail    = byChannel["零售收入"]||0;
+    const others    = target - wholesale - retail;
+    const r = n => target ? Math.round(n/target*100) : 0;
+    const mixEl=document.getElementById("channel-mix-hint");
+    if(mixEl){
+      const parts=[`批發訂單 ${r(wholesale)}%`,`快閃／零售 ${r(retail)}%`];
+      if(others>target*0.005) parts.push(`其他 ${r(others)}%`);
+      mixEl.innerHTML=`💡 收入來源拆解：${parts.join("　")}　　毛利率目標 40%，目前 39.1% 略低於標準。`;
+    }
   }catch(e){ console.error("budget",e); }
 }
 

@@ -399,8 +399,31 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <button class="tab-btn" onclick="switchTab('tools')">⚙ 工具</button>
   </div>
 
-  <!-- ══ TAB: 工具（異常補錄 + 今日待辦）══ -->
+  <!-- ══ TAB: 工具（匯率表 + 異常補錄 + 今日待辦）══ -->
   <div class="tab-panel" id="tab-tools">
+
+    <!-- 匯率換算表（5 幣種對 CNY） -->
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.04em;">💱 匯率換算表（基準：CNY）</div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;line-height:1.6;">合并報表口徑用。新建跨境匯款 modal 預設帶入此表當日匯率，個別交易仍可手動覆蓋。</div>
+        </div>
+        <button onclick="openFxEditModal()" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:7px;background:var(--fin);color:#fff;border:none;cursor:pointer;white-space:nowrap;">編輯 →</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;">
+        <thead>
+          <tr style="color:var(--txt-lo);font-size:10px;">
+            <th style="text-align:left;padding:6px 8px;font-weight:700;">幣別</th>
+            <th style="text-align:right;padding:6px 8px;font-weight:700;">1 單位 = ? CNY</th>
+            <th style="text-align:right;padding:6px 8px;font-weight:700;">1 CNY = ? 單位</th>
+            <th style="text-align:right;padding:6px 8px;font-weight:700;">用途</th>
+          </tr>
+        </thead>
+        <tbody id="fx-tbody"></tbody>
+      </table>
+      <div id="fx-meta" style="font-size:10px;color:var(--txt-lo);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"></div>
+    </div>
 
     <!-- 異常補錄 -->
     <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
@@ -1124,6 +1147,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 </div><!-- /main -->
 
+<!-- 匯率編輯 MODAL -->
+<div class="modal-overlay" id="fx-modal" onclick="if(event.target===this)closeModal('fx-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">編輯匯率（基準：CNY）</div>
+    <div class="modal-sub">輸入「1 外幣 = ? CNY」。儲存後當天起所有跨境匯款 modal 預設帶入此值。</div>
+    <div id="fx-modal-rows"></div>
+    <div class="mf">
+      <label>更新者</label>
+      <input id="fx-updater" placeholder="例：躍明">
+    </div>
+    <div class="m-actions">
+      <button class="mbtn ghost" onclick="closeModal('fx-modal')">取消</button>
+      <button class="mbtn primary" onclick="saveFxRates()">儲存</button>
+    </div>
+  </div>
+</div>
+
 <!-- 科目入帳 MODAL -->
 <div class="modal-overlay" id="subject-modal" onclick="if(event.target===this)closeModal('subject-modal')">
   <div class="modal-sheet">
@@ -1504,6 +1545,7 @@ function switchTab(tab){
   if(tab==='project') renderProjectPL();
   if(tab==='pl'){ loadBudgetAchievement(); renderMgmtPL('ytd'); }
   if(tab==='cash'){ renderCashTable(); renderCashTxList('all'); renderLeoBankSection(); }
+  if(tab==='tools') renderFxTable();
 }
 function prefillAndScrollToForm(company, month){
   const sel=document.getElementById('cf-company');
@@ -1540,6 +1582,70 @@ async function submitCashflowEntry(){
     showToast('⚠ 暫時無法連線，請稍後再試');
   }
 }
+// ── 匯率換算表（5 幣種對 CNY，存於 localStorage 跨頁可讀） ──────────────────
+const FX_KEY='fx_rates_v1';
+const FX_DEFAULTS={
+  rates:{HKD:0.9180, USD:7.21, TWD:0.2218, THB:0.2020}, // 1 外幣 = ? CNY（CNY 自身=1）
+  updatedAt:'2026-04-28', updatedBy:'躍明（台銀牌告 + 中銀港 mid）'
+};
+const FX_USAGE={CNY:'集團合并基準', HKD:'香港JV 結算', USD:'IP MG / 跨境 SOW', TWD:'台灣悍草', THB:'UJ BKK 結算'};
+function loadFxRates(){
+  const stored=localStorage.getItem(FX_KEY);
+  if(stored) try{return JSON.parse(stored);}catch(e){}
+  return FX_DEFAULTS;
+}
+function saveFxRates(){
+  const data=loadFxRates();
+  ['HKD','USD','TWD','THB'].forEach(c=>{
+    const v=parseFloat(document.getElementById('fx-input-'+c).value);
+    if(v>0) data.rates[c]=v;
+  });
+  data.updatedAt=new Date().toISOString().slice(0,10);
+  data.updatedBy=document.getElementById('fx-updater').value||data.updatedBy||'—';
+  localStorage.setItem(FX_KEY, JSON.stringify(data));
+  closeModal('fx-modal');
+  renderFxTable();
+  showToast('✓ 匯率已更新');
+}
+function renderFxTable(){
+  const tbody=document.getElementById('fx-tbody');
+  if(!tbody) return;
+  const d=loadFxRates();
+  const rows=[
+    {ccy:'CNY', toCny:1},
+    {ccy:'HKD', toCny:d.rates.HKD},
+    {ccy:'USD', toCny:d.rates.USD},
+    {ccy:'TWD', toCny:d.rates.TWD},
+    {ccy:'THB', toCny:d.rates.THB},
+  ];
+  tbody.innerHTML=rows.map(r=>{
+    const inv = r.ccy==='CNY' ? 1 : (1/r.toCny);
+    const invStr = r.ccy==='CNY' ? '—' : inv.toFixed(r.ccy==='USD'?4:3);
+    const isBase = r.ccy==='CNY';
+    return `<tr style="border-top:1px solid var(--border);">
+      <td style="padding:7px 8px;font-weight:700;color:${isBase?'var(--fin)':'var(--txt-hi)'};">${r.ccy}${isBase?' <span style="font-size:9px;color:var(--txt-lo);font-weight:500;">基準</span>':''}</td>
+      <td style="padding:7px 8px;text-align:right;font-family:ui-monospace,monospace;color:var(--txt-hi);">${r.toCny.toFixed(4)}</td>
+      <td style="padding:7px 8px;text-align:right;font-family:ui-monospace,monospace;color:var(--txt-mid);">${invStr}</td>
+      <td style="padding:7px 8px;text-align:right;font-size:10px;color:var(--txt-lo);">${FX_USAGE[r.ccy]||''}</td>
+    </tr>`;
+  }).join('');
+  const meta=document.getElementById('fx-meta');
+  if(meta) meta.textContent=`📅 最後更新：${d.updatedAt} · ${d.updatedBy}`;
+}
+function openFxEditModal(){
+  const d=loadFxRates();
+  const html=['HKD','USD','TWD','THB'].map(c=>`
+    <div class="mf">
+      <label>1 ${c} = ? CNY</label>
+      <input id="fx-input-${c}" type="number" step="0.0001" value="${d.rates[c]}" placeholder="例：${FX_DEFAULTS.rates[c]}">
+    </div>`).join('');
+  document.getElementById('fx-modal-rows').innerHTML=html;
+  document.getElementById('fx-updater').value='';
+  document.getElementById('fx-modal').classList.add('open');
+}
+window.openFxEditModal=openFxEditModal;
+window.saveFxRates=saveFxRates;
+
 // ── 躍明入帳佇列（讀取自 Leo / 楊子 的 yuming_pending_v1） ─────────────────────
 const YM_QUEUE_KEY='yuming_pending_v1';
 function loadYumingQueue(){
@@ -2623,6 +2729,7 @@ renderYumingQueue();
 loadPendingList();
 renderCashTable();
 renderCashTxList('all');
+renderFxTable();
 
 // ── Leo 銀行帳戶（從 leo_bank_v1 讀取）──────────────────────
 function renderLeoBankSection(){
