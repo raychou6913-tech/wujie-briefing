@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UJ BKK · 送審追蹤</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --bkk:#9333ea;--bkk-glow:#c084fc;--bkk-dim:#9333ea18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --ip:#0284c7;--ip-dim:#0284c718;
+  --mall:#f97316;--mall-dim:#f9731618;
+  --gov:#94a3b8;--gov-dim:#94a3b818;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-mark{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--bkk-glow);box-shadow:0 0 8px var(--bkk-glow);}
+.brand-name{font-size:14px;font-weight:800;}
+.hall-chip{background:var(--bkk-dim);border:1px solid #9333ea40;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--bkk-glow);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:1080px;margin:0 auto;padding:18px 24px;}
+
+.page-hdr{margin-bottom:18px;}
+.page-title{font-size:22px;font-weight:800;}
+.page-sub{font-size:11px;color:var(--txt-mid);margin-top:4px;line-height:1.6;}
+
+/* SUMMARY */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;}
+.kpi-big:hover{border-color:#9333ea60;}
+.kpi-label{font-size:10px;color:var(--txt-mid);font-weight:700;letter-spacing:.05em;margin-bottom:6px;}
+.kpi-val{font-size:24px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);}
+
+/* FILTER */
+.filter-row{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.filter-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);font-size:11px;font-weight:700;cursor:pointer;}
+.filter-btn.active{background:var(--bkk-dim);border-color:#9333ea60;color:var(--bkk-glow);}
+
+/* APPROVAL CARD */
+.appr-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
+.appr-card.urgent{border-left:4px solid var(--danger);}
+.appr-card.warn{border-left:4px solid var(--warn);}
+.appr-card.normal{border-left:4px solid var(--bkk);}
+.appr-card.done{border-left:4px solid var(--ok);opacity:.75;}
+.appr-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.appr-info{flex:1;min-width:0;}
+.appr-row1{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
+.appr-title{font-size:13px;font-weight:800;color:var(--txt-hi);}
+.appr-cat{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.04em;}
+.cat-ip{background:var(--ip-dim);color:var(--ip);}
+.cat-mall{background:var(--mall-dim);color:var(--mall);}
+.cat-gov{background:var(--gov-dim);color:var(--gov);}
+.appr-meta{font-size:11px;color:var(--txt-mid);margin-bottom:8px;line-height:1.5;}
+.appr-detail{font-size:10px;color:var(--txt-lo);background:var(--card2);border-radius:6px;padding:8px 10px;margin-top:6px;}
+.appr-detail-row{display:flex;justify-content:space-between;padding:2px 0;}
+.appr-detail-label{color:var(--txt-mid);}
+.appr-detail-val{color:var(--txt-hi);font-weight:600;}
+.appr-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.appr-btn{font-size:10px;font-weight:700;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;}
+.appr-btn.primary{background:var(--bkk);border-color:var(--bkk);color:#fff;}
+.appr-btn.warn{color:var(--warn);border-color:#f59e0b40;}
+.appr-right{flex-shrink:0;text-align:right;}
+.appr-status{font-size:11px;font-weight:800;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:5px;}
+.s-await{background:var(--warn-dim);color:var(--warn);}
+.s-overdue{background:var(--danger-dim);color:var(--danger);}
+.s-done{background:var(--ok-dim);color:var(--ok);}
+.appr-days{font-size:10px;color:var(--txt-lo);}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px;}
+.sec-title{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:9px;font-size:12px;font-weight:700;transition:.3s;z-index:300;opacity:0;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand-mark"><div class="brand-dot"></div><div class="brand-name">UJ BKK</div></div>
+    <span class="hall-chip">送審追蹤</span>
+  </div>
+  <div class="tb-right">
+    <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
+    <a href="bkk-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="page-hdr">
+    <div class="page-title">送審追蹤中心</div>
+    <div class="page-sub">IP 版權方／商場場地／政府監管 全集中追蹤。每筆顯示送出日、預計回覆日、實際狀態、可催辦動作。</div>
+  </div>
+
+  <!-- SUMMARY KPIs -->
+  <div class="kpi-row">
+    <div class="kpi-big">
+      <div class="kpi-label">IP 版權方送審</div>
+      <div class="kpi-val" style="color:var(--ip);">2</div>
+      <div class="kpi-sub">1 急件 · Mofusand 已批 / 待 Opanchu × Peanuts</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">商場場地審查</div>
+      <div class="kpi-val" style="color:var(--mall);">2</div>
+      <div class="kpi-sub">Central Embassy 急 · Iconsiam 詢價中</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">政府監管</div>
+      <div class="kpi-val" style="color:var(--gov);">1</div>
+      <div class="kpi-sub">Q3 IP 進口報關預先準備</div>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterAppr(this,'all')">全部 (5)</button>
+    <button class="filter-btn" onclick="filterAppr(this,'urgent')">急件 (2)</button>
+    <button class="filter-btn" onclick="filterAppr(this,'ip')">IP 版權方</button>
+    <button class="filter-btn" onclick="filterAppr(this,'mall')">商場場地</button>
+    <button class="filter-btn" onclick="filterAppr(this,'gov')">政府監管</button>
+    <button class="filter-btn" onclick="filterAppr(this,'done')">最近完成</button>
+  </div>
+
+  <div id="appr-list">
+
+    <!-- 1. Central Embassy 場地裝修圖（urgent）-->
+    <div class="appr-card urgent" data-cat="mall" data-urgent="1">
+      <div class="appr-icon">🏬</div>
+      <div class="appr-info">
+        <div class="appr-row1">
+          <span class="appr-title">Central Embassy 場地裝修圖</span>
+          <span class="appr-cat cat-mall">商場場地</span>
+        </div>
+        <div class="appr-meta">5/15 開店倒數 6 天 · 商場業主 (Khun Sirin) 簽章未回 · 已催辦 1 次</div>
+        <div class="appr-detail">
+          <div class="appr-detail-row"><span class="appr-detail-label">關聯快閃店</span><span class="appr-detail-val">Central Embassy · Opanchu × Snoopy</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送出日</span><span class="appr-detail-val">2026-05-04</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">預計回覆</span><span class="appr-detail-val">2026-05-07（已逾期 2 天）</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送審負責人</span><span class="appr-detail-val">Somsak</span></div>
+        </div>
+        <div class="appr-actions">
+          <button class="appr-btn primary" onclick="action('再次催辦')">再次催辦 →</button>
+          <button class="appr-btn" onclick="action('上傳新版')">上傳修改版</button>
+          <button class="appr-btn warn" onclick="action('上報 Ray')">⚠ 上報 Ray</button>
+        </div>
+      </div>
+      <div class="appr-right">
+        <span class="appr-status s-overdue">逾期</span>
+        <div class="appr-days">已等 5 天</div>
+      </div>
+    </div>
+
+    <!-- 2. Opanchu × Snoopy 宣傳海報 -->
+    <div class="appr-card warn" data-cat="ip" data-urgent="0">
+      <div class="appr-icon">🎨</div>
+      <div class="appr-info">
+        <div class="appr-row1">
+          <span class="appr-title">Opanchu × Snoopy 宣傳海報</span>
+          <span class="appr-cat cat-ip">IP 版權方</span>
+        </div>
+        <div class="appr-meta">雙 IP 聯名需兩方批准：Opanchu Co. Ltd. + Peanuts Worldwide LLC · 已送 2 天</div>
+        <div class="appr-detail">
+          <div class="appr-detail-row"><span class="appr-detail-label">關聯快閃店</span><span class="appr-detail-val">Central Embassy · Opanchu × Snoopy</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送出日</span><span class="appr-detail-val">2026-05-06</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">預計回覆</span><span class="appr-detail-val">2026-05-13</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">Opanchu 進度</span><span class="appr-detail-val" style="color:var(--ok);">✓ 5/8 已批准</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">Peanuts 進度</span><span class="appr-detail-val" style="color:var(--warn);">審核中</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送審負責人</span><span class="appr-detail-val">Ploy</span></div>
+        </div>
+        <div class="appr-actions">
+          <button class="appr-btn primary" onclick="action('查看全部素材')">查看素材包 →</button>
+          <button class="appr-btn" onclick="action('催辦 Peanuts')">催辦 Peanuts</button>
+        </div>
+      </div>
+      <div class="appr-right">
+        <span class="appr-status s-await">審核中</span>
+        <div class="appr-days">5 天內回覆</div>
+      </div>
+    </div>
+
+    <!-- 3. Iconsiam 場地詢問 -->
+    <div class="appr-card normal" data-cat="mall" data-urgent="0">
+      <div class="appr-icon">🏬</div>
+      <div class="appr-info">
+        <div class="appr-row1">
+          <span class="appr-title">Iconsiam Q4 場地詢問（Muziktiger）</span>
+          <span class="appr-cat cat-mall">商場場地</span>
+        </div>
+        <div class="appr-meta">Q4 11/10 - 12/25 檔期詢問 · 預期 4F 或 G/F · 已寄出 4 天</div>
+        <div class="appr-detail">
+          <div class="appr-detail-row"><span class="appr-detail-label">關聯快閃店</span><span class="appr-detail-val">Iconsiam · Muziktiger Q4（規劃中）</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">寄出日</span><span class="appr-detail-val">2026-05-05</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">預計回覆</span><span class="appr-detail-val">2026-05-19（兩週）</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送審負責人</span><span class="appr-detail-val">Meaw</span></div>
+        </div>
+        <div class="appr-actions">
+          <button class="appr-btn" onclick="action('追加聯絡')">追加聯絡</button>
+        </div>
+      </div>
+      <div class="appr-right">
+        <span class="appr-status s-await">等待回覆</span>
+        <div class="appr-days">10 天內回覆</div>
+      </div>
+    </div>
+
+    <!-- 4. EmQuartier JJK 提案內審 -->
+    <div class="appr-card normal" data-cat="ip" data-urgent="0">
+      <div class="appr-icon">📑</div>
+      <div class="appr-info">
+        <div class="appr-row1">
+          <span class="appr-title">EmQuartier JJK 提案 v2（內審 Ray）</span>
+          <span class="appr-cat cat-ip">IP 版權方</span>
+        </div>
+        <div class="appr-meta">內部審閱階段，Ray 通過後再送 JJK 版權方 · 已送審 1 天</div>
+        <div class="appr-detail">
+          <div class="appr-detail-row"><span class="appr-detail-label">關聯快閃店</span><span class="appr-detail-val">EmQuartier · JJK Theme（Q3）</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送出日</span><span class="appr-detail-val">2026-05-08</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">預計回覆</span><span class="appr-detail-val">2026-05-15</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">送審負責人</span><span class="appr-detail-val">Meaw</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">v1 駁回原因</span><span class="appr-detail-val" style="color:var(--warn);">需補 USD $187K 成本拆解</span></div>
+        </div>
+        <div class="appr-actions">
+          <button class="appr-btn" onclick="action('查看 v2 提案')">查看 v2 提案</button>
+        </div>
+      </div>
+      <div class="appr-right">
+        <span class="appr-status s-await">內審中</span>
+        <div class="appr-days">7 天內回覆</div>
+      </div>
+    </div>
+
+    <!-- 5. Q3 進口報關預先準備 (政府) -->
+    <div class="appr-card normal" data-cat="gov" data-urgent="0">
+      <div class="appr-icon">📋</div>
+      <div class="appr-info">
+        <div class="appr-row1">
+          <span class="appr-title">Q3 IP 商品進口報關預先文件</span>
+          <span class="appr-cat cat-gov">政府監管</span>
+        </div>
+        <div class="appr-meta">JJK Q3 約 USD $187K 商品 8 月入境 · 泰國海關建議提前 30 天準備 · 高維協助北京端</div>
+        <div class="appr-detail">
+          <div class="appr-detail-row"><span class="appr-detail-label">關聯快閃店</span><span class="appr-detail-val">EmQuartier · JJK Theme（Q3）</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">準備期限</span><span class="appr-detail-val">2026-07-01 前</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">負責</span><span class="appr-detail-val">Niran（曼谷端）+ 高維（北京端）</span></div>
+          <div class="appr-detail-row"><span class="appr-detail-label">關鍵文件</span><span class="appr-detail-val">IP 授權證明 / 進口許可 / 商業發票</span></div>
+        </div>
+        <div class="appr-actions">
+          <button class="appr-btn" onclick="action('查看清單')">查看文件清單</button>
+          <button class="appr-btn" onclick="action('聯絡高維')">聯絡高維</button>
+        </div>
+      </div>
+      <div class="appr-right">
+        <span class="appr-status s-await">準備中</span>
+        <div class="appr-days">53 天</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 最近完成 -->
+  <div class="sec-hdr"><span class="sec-title">最近完成（5 月份）</span></div>
+
+  <div class="appr-card done" data-cat="ip" data-urgent="0">
+    <div class="appr-icon">✓</div>
+    <div class="appr-info">
+      <div class="appr-row1">
+        <span class="appr-title">Opanchu Co. Ltd. 批准聯名海報</span>
+        <span class="appr-cat cat-ip">IP 版權方</span>
+      </div>
+      <div class="appr-meta">5/8 收到批准 · 比預期提前 5 天 · 雙 IP 聯名一半已通過</div>
+    </div>
+    <div class="appr-right"><span class="appr-status s-done">✓ 已批准</span><div class="appr-days">5/8</div></div>
+  </div>
+
+  <div class="appr-card done" data-cat="ip" data-urgent="0">
+    <div class="appr-icon">✓</div>
+    <div class="appr-info">
+      <div class="appr-row1">
+        <span class="appr-title">Mofusand Inc. 批准夏日系列宣傳物</span>
+        <span class="appr-cat cat-ip">IP 版權方</span>
+      </div>
+      <div class="appr-meta">4/15 收到批准 · 一次過審 · Siam Paragon popup 順利開店</div>
+    </div>
+    <div class="appr-right"><span class="appr-status s-done">✓ 已批准</span><div class="appr-days">4/15</div></div>
+  </div>
+
+  <div class="appr-card done" data-cat="mall" data-urgent="0">
+    <div class="appr-icon">✓</div>
+    <div class="appr-info">
+      <div class="appr-row1">
+        <span class="appr-title">Siam Paragon 場地裝修圖</span>
+        <span class="appr-cat cat-mall">商場場地</span>
+      </div>
+      <div class="appr-meta">4/5 收到批准 · 比預期提前 3 天 · 打卡牆設計微調後即批</div>
+    </div>
+    <div class="appr-right"><span class="appr-status s-done">✓ 已批准</span><div class="appr-days">4/5</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('bkk_sess')||'null');
+if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
+  localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html');
+}
+const tb = document.getElementById('tb-user');
+if(tb) tb.textContent = `${SESS.name} · ${SESS.role||''}`;
+
+function filterAppr(btn, type){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.appr-card');
+  cards.forEach(c => {
+    if(type === 'all') c.style.display = c.classList.contains('done') ? '' : 'flex';
+    else if(type === 'urgent') c.style.display = c.dataset.urgent === '1' ? 'flex' : 'none';
+    else if(type === 'done') c.style.display = c.classList.contains('done') ? 'flex' : 'none';
+    else c.style.display = c.dataset.cat === type ? 'flex' : 'none';
+  });
+}
+
+function action(label){
+  showToast(`✓ ${label} 已執行（模擬）`);
+}
+
+function showToast(msg, color){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = color || 'var(--ok)';
+  el.style.color = color || 'var(--ok)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+</script>
+
+</body>
+</html>

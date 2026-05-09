@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UJ BKK · 快閃店流水線</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --bkk:#9333ea;--bkk-glow:#c084fc;--bkk-dim:#9333ea18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-mark{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--bkk-glow);box-shadow:0 0 8px var(--bkk-glow);}
+.brand-name{font-size:14px;font-weight:800;}
+.hall-chip{background:var(--bkk-dim);border:1px solid #9333ea40;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--bkk-glow);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+.btn-sm.primary{background:var(--bkk);color:#fff;border-color:var(--bkk);}
+
+.main{max-width:1080px;margin:0 auto;padding:18px 24px;}
+
+.page-hdr{margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;}
+.page-title{font-size:22px;font-weight:800;}
+.page-sub{font-size:11px;color:var(--txt-mid);margin-top:4px;line-height:1.6;}
+
+/* FILTER TABS */
+.filter-row{display:flex;gap:6px;margin-bottom:18px;}
+.filter-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);font-size:11px;font-weight:700;cursor:pointer;}
+.filter-btn.active{background:var(--bkk-dim);border-color:#9333ea60;color:var(--bkk-glow);}
+
+/* POPUP CARD */
+.popup-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;}
+.popup-card.live{border-color:#22c55e40;}
+.popup-card.prep{border-color:#f59e0b40;}
+.popup-card.plan{border-color:#9333ea30;}
+.popup-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px;}
+.popup-head-left{flex:1;min-width:0;}
+.popup-name{font-size:15px;font-weight:800;}
+.popup-meta{font-size:11px;color:var(--txt-mid);margin-top:4px;line-height:1.5;}
+.popup-badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.popup-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;}
+.b-ip{background:var(--bkk-dim);color:var(--bkk-glow);}
+.b-target{background:var(--card2);color:var(--txt-mid);}
+.popup-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;flex-shrink:0;}
+.s-live{background:var(--ok-dim);color:var(--ok);}
+.s-prep{background:var(--warn-dim);color:var(--warn);}
+.s-plan{background:var(--bkk-dim);color:var(--bkk-glow);}
+.s-wrap{background:#94a3b818;color:#94a3b8;}
+
+/* PIPELINE TRACK */
+.pl-track{display:flex;align-items:center;gap:0;margin:18px 0 12px;position:relative;}
+.pl-step{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.pl-dot{width:26px;height:26px;border-radius:50%;background:var(--card2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--txt-lo);transition:.15s;z-index:2;}
+.pl-step.done .pl-dot{background:var(--ok);border-color:var(--ok);color:#fff;}
+.pl-step.current .pl-dot{background:var(--bkk);border-color:var(--bkk-glow);color:#fff;box-shadow:0 0 14px #9333ea60;}
+.pl-step.future .pl-dot{opacity:.45;}
+.pl-label{font-size:9px;font-weight:700;color:var(--txt-mid);margin-top:6px;text-align:center;line-height:1.3;}
+.pl-step.done .pl-label{color:var(--ok);}
+.pl-step.current .pl-label{color:var(--bkk-glow);}
+.pl-line{position:absolute;top:13px;height:2px;background:var(--border);z-index:1;}
+.pl-line.done{background:var(--ok);}
+
+/* CURRENT TASK BOX */
+.cur-task{background:#9333ea12;border:1px solid #9333ea40;border-radius:10px;padding:12px 14px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.ct-info{flex:1;min-width:0;}
+.ct-label{font-size:9px;color:var(--bkk-glow);font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.ct-text{font-size:13px;font-weight:700;color:var(--txt-hi);margin-top:3px;}
+.ct-meta{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+.ct-action{background:var(--bkk);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* DETAIL ACCORDION */
+.pl-toggle{font-size:11px;color:var(--bkk-glow);cursor:pointer;font-weight:700;text-align:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.pl-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.pl-detail.open{display:block;}
+
+/* STAGE DETAIL CARD */
+.stage-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.stage-card.done{border-left:3px solid var(--ok);}
+.stage-card.current{border-left:3px solid var(--bkk);}
+.stage-card.future{border-left:3px solid var(--border-hi);opacity:.7;}
+.sc-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:10px;}
+.sc-name{font-size:12px;font-weight:800;}
+.sc-stat{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;}
+.sc-stat.done{background:var(--ok-dim);color:var(--ok);}
+.sc-stat.current{background:var(--bkk-dim);color:var(--bkk-glow);}
+.sc-stat.future{background:var(--card2);color:var(--txt-lo);border:1px solid var(--border);}
+.sc-meta{font-size:10px;color:var(--txt-mid);margin-bottom:8px;}
+
+/* ATTACHMENTS */
+.att-list{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.att-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--txt-mid);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 9px;}
+.att-icon{flex-shrink:0;font-size:12px;}
+.att-name{flex:1;min-width:0;color:var(--txt-hi);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.att-meta{flex-shrink:0;font-size:9px;color:var(--txt-lo);}
+.att-stat{flex-shrink:0;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;}
+.att-stat.ok{background:var(--ok-dim);color:var(--ok);}
+.att-stat.pending{background:var(--warn-dim);color:var(--warn);}
+
+/* AUDIT TRAIL */
+.audit-row{display:flex;gap:8px;font-size:10px;color:var(--txt-mid);padding:5px 0;border-top:1px solid var(--border);}
+.audit-row:first-child{border-top:none;}
+.audit-time{color:var(--txt-lo);min-width:80px;}
+
+/* NEW POPUP MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:#000a;z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal-sheet{background:var(--surface);border:1px solid var(--border-hi);border-radius:16px;width:100%;max-width:540px;padding:22px;max-height:85vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:6px;}
+.modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;line-height:1.6;}
+.mf{margin-bottom:12px;}
+.mf label{display:block;font-size:10px;font-weight:700;color:var(--txt-mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.mf input,.mf select,.mf textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);font-size:13px;padding:9px 11px;outline:none;font-family:inherit;}
+.mf input:focus,.mf select:focus{border-color:var(--bkk);}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-actions{display:flex;gap:10px;margin-top:14px;}
+.mbtn{flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.mbtn.primary{background:var(--bkk);color:#fff;}
+.mbtn.ghost{background:var(--card2);color:var(--txt-mid);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:9px;font-size:12px;font-weight:700;transition:.3s;z-index:300;opacity:0;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand-mark"><div class="brand-dot"></div><div class="brand-name">UJ BKK</div></div>
+    <span class="hall-chip">快閃店流水線</span>
+  </div>
+  <div class="tb-right">
+    <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
+    <a href="bkk-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">快閃店流水線</div>
+      <div class="page-sub">7 階段管理：提案 → 場地確認 → 產品設計 → 場地裝修送審 → 宣傳物送審 → 營業中 → 撤店覆盤</div>
+    </div>
+    <button class="btn-sm primary" onclick="openNewModal()" style="font-size:12px;padding:8px 16px;">+ 新增企劃</button>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterPopups(this,'all')">全部 (4)</button>
+    <button class="filter-btn" onclick="filterPopups(this,'live')">營業中 (1)</button>
+    <button class="filter-btn" onclick="filterPopups(this,'prep')">籌備中 (1)</button>
+    <button class="filter-btn" onclick="filterPopups(this,'plan')">規劃中 (2)</button>
+    <button class="filter-btn" onclick="filterPopups(this,'wrap')">已撤店 (0)</button>
+  </div>
+
+  <div id="popups-container"></div>
+
+</div>
+
+<!-- NEW POPUP MODAL -->
+<div class="modal-bg" id="new-modal" onclick="if(event.target===this)closeNewModal()">
+  <div class="modal-sheet">
+    <div class="modal-title">新增快閃店企劃（提案階段）</div>
+    <div class="modal-sub">填寫基本資訊。送出後進入「階段 1：提案」，待 Ray 審閱。</div>
+
+    <div class="mf">
+      <label>快閃店名稱</label>
+      <input id="np-name" placeholder="例：Iconsiam · Mofusand 聖誕特別企劃">
+    </div>
+
+    <div class="mrow">
+      <div class="mf">
+        <label>場地</label>
+        <input id="np-venue" placeholder="例：Iconsiam · 4F">
+      </div>
+      <div class="mf">
+        <label>IP / 主題</label>
+        <input id="np-ip" placeholder="例：Mofusand 聖誕款">
+      </div>
+    </div>
+
+    <div class="mrow">
+      <div class="mf">
+        <label>預計開店日</label>
+        <input id="np-start" type="date">
+      </div>
+      <div class="mf">
+        <label>預計撤店日</label>
+        <input id="np-end" type="date">
+      </div>
+    </div>
+
+    <div class="mrow">
+      <div class="mf">
+        <label>目標營收</label>
+        <input id="np-target" placeholder="例：฿ 1,200,000">
+      </div>
+      <div class="mf">
+        <label>主負責人</label>
+        <select id="np-owner">
+          <option>Meaw</option>
+          <option>Somsak</option>
+          <option>Niran</option>
+          <option>Ploy</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mf">
+      <label>提案重點</label>
+      <textarea id="np-pitch" rows="3" placeholder="IP 選品理由 / 預期銷售模式 / 與既有 popup 差異..."></textarea>
+    </div>
+
+    <div class="m-actions">
+      <button class="mbtn ghost" onclick="closeNewModal()">取消</button>
+      <button class="mbtn primary" onclick="submitNewPopup()">送出提案 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('bkk_sess')||'null');
+if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
+  localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html');
+}
+const tb = document.getElementById('tb-user');
+if(tb) tb.textContent = `${SESS.name} · ${SESS.role||''}`;
+
+const STAGE_NAMES = ['提案','場地確認','產品設計','場地裝修送審','宣傳物送審','營業中','撤店覆盤'];
+const STAGE_SHORT = ['提案','場地','產品','裝修','宣傳','營業','覆盤'];
+
+// Demo data — same 4 popups as in hub, with full attachments
+const POPUPS = [
+  {
+    id:'pp1', class:'live',
+    name:'Siam Paragon · Mofusand 夏日',
+    venue:'Siam Paragon · 4F 中庭',
+    period:'2026-04-20 → 2026-05-31',
+    ip:'Mofusand', target:'฿ 120 萬',
+    owner:'Meaw',
+    stages:[
+      {n:1, done:true, owner:'Meaw',   date:'2026-02-15', note:'概念提案 Ray 已批准',
+       atts:[
+         {name:'夏日系列提案_v3.pdf', up:'2026-02-10', user:'Meaw', stat:'已批准'},
+         {name:'IP選品理由.docx', up:'2026-02-12', user:'Meaw', stat:'已批准'},
+         {name:'預期收入估算.xlsx', up:'2026-02-14', user:'Meaw', stat:'已批准'},
+       ]},
+      {n:2, done:true, owner:'Somsak', date:'2026-03-01', note:'場地合約簽訂，押金已付',
+       atts:[
+         {name:'Siam_Paragon_合約_簽署版.pdf', up:'2026-03-01', user:'Somsak', stat:'已簽署'},
+         {name:'押金匯款收據_฿200K.jpg', up:'2026-03-02', user:'Somsak', stat:'已存檔'},
+       ]},
+      {n:3, done:true, owner:'Meaw',   date:'2026-03-20', note:'8 款限定 SKU 設計定稿',
+       atts:[
+         {name:'夏日_8款SKU清單.xlsx', up:'2026-03-15', user:'Meaw', stat:'已定稿'},
+         {name:'絨毛掛飾_2D設計稿_v5.ai', up:'2026-03-18', user:'珮玲', stat:'已定稿'},
+         {name:'帆布袋_3D建模.zip', up:'2026-03-19', user:'詩彤', stat:'已定稿'},
+       ]},
+      {n:4, done:true, owner:'Somsak', date:'2026-04-05', note:'場地裝修圖商場已批准',
+       atts:[
+         {name:'裝修平面圖_v3.pdf', up:'2026-03-28', user:'Somsak', stat:'已批准'},
+         {name:'Siam_Paragon_批准信.pdf', up:'2026-04-05', user:'Somsak', stat:'已批准'},
+         {name:'打卡牆_3D效果圖.png', up:'2026-04-02', user:'珮玲', stat:'已批准'},
+       ]},
+      {n:5, done:true, owner:'Ploy',   date:'2026-04-15', note:'海報＋打卡背板版權方批准',
+       atts:[
+         {name:'主視覺海報.png', up:'2026-04-10', user:'Ploy', stat:'已批准'},
+         {name:'Mofusand_Inc_批准信.pdf', up:'2026-04-15', user:'Ploy', stat:'已批准'},
+         {name:'SNS素材包.zip', up:'2026-04-12', user:'Ploy', stat:'已批准'},
+       ]},
+      {n:6, done:false, current:true, owner:'Ploy', note:'每日銷售報告 18:00 前上傳',
+       atts:[
+         {name:'2026-05-08_銷售_฿42K.csv', up:'2026-05-08', user:'Ploy', stat:'已上傳'},
+         {name:'2026-05-07_銷售_฿38K.csv', up:'2026-05-07', user:'Ploy', stat:'已上傳'},
+         {name:'2026-05-06_銷售_฿51K.csv', up:'2026-05-06', user:'Ploy', stat:'已上傳'},
+       ]},
+      {n:7, done:false, atts:[]},
+    ],
+    audit:[
+      {t:'2026-05-08 18:23', user:'Ploy', act:'上傳每日銷售報告 ฿42K'},
+      {t:'2026-04-20 10:00', user:'Meaw', act:'階段 5 → 6 切換（開店）'},
+      {t:'2026-04-15 16:45', user:'Ploy', act:'階段 5 完成（宣傳物批准）'},
+      {t:'2026-04-05 14:20', user:'Somsak', act:'階段 4 完成（裝修圖批准）'},
+    ],
+  },
+  {
+    id:'pp2', class:'prep',
+    name:'Central Embassy · Opanchu × Snoopy',
+    venue:'Central Embassy · 5F',
+    period:'2026-05-15 → 2026-06-30',
+    ip:'Opanchu × Snoopy', target:'฿ 95 萬',
+    owner:'Somsak',
+    stages:[
+      {n:1, done:true, owner:'Meaw',   date:'2026-03-10', note:'雙 IP 聯名概念已批准',
+       atts:[
+         {name:'雙IP聯名提案.pdf', up:'2026-03-08', user:'Meaw', stat:'已批准'},
+         {name:'競品分析.xlsx', up:'2026-03-09', user:'Meaw', stat:'已批准'},
+       ]},
+      {n:2, done:true, owner:'Somsak', date:'2026-04-01', note:'場地鎖定，押金 ฿200K 已付',
+       atts:[
+         {name:'Central_Embassy_合約.pdf', up:'2026-04-01', user:'Somsak', stat:'已簽署'},
+       ]},
+      {n:3, done:true, owner:'Meaw',   date:'2026-04-20', note:'12 款 SKU 已可投產',
+       atts:[
+         {name:'12款SKU清單.xlsx', up:'2026-04-18', user:'Meaw', stat:'已定稿'},
+         {name:'聯名公仔_3D稿.zip', up:'2026-04-20', user:'珮玲', stat:'已定稿'},
+       ]},
+      {n:4, done:false, current:true, owner:'Somsak', note:'裝修效果圖待商場業主簽章（已等 4 天）',
+       atts:[
+         {name:'裝修_3D效果圖_v2.pdf', up:'2026-05-04', user:'Somsak', stat:'待批准'},
+         {name:'Central_Embassy_催辦信.eml', up:'2026-05-08', user:'Somsak', stat:'已寄出'},
+       ]},
+      {n:5, done:false, owner:'Ploy', note:'宣傳海報草案已備，等版權方批准',
+       atts:[
+         {name:'聯名海報_草案_v2.png', up:'2026-05-06', user:'Ploy', stat:'內審中'},
+       ]},
+      {n:6, done:false, atts:[]},
+      {n:7, done:false, atts:[]},
+    ],
+    audit:[
+      {t:'2026-05-08 11:00', user:'Somsak', act:'催辦商場業主（裝修圖簽章）'},
+      {t:'2026-05-04 09:30', user:'Somsak', act:'裝修圖 v2 上傳，送商場批准'},
+      {t:'2026-04-20 17:00', user:'Meaw', act:'階段 3 完成（SKU 定稿）'},
+    ],
+  },
+  {
+    id:'pp3', class:'plan',
+    name:'EmQuartier · JJK 主題',
+    venue:'EmQuartier · 樓層 TBD',
+    period:'2026-08-01 → 2026-09-15',
+    ip:'JJK', target:'USD $187K',
+    owner:'Meaw',
+    stages:[
+      {n:1, done:false, current:true, owner:'Meaw', note:'提案 v2 撰寫中，待 Ray 審閱',
+       atts:[
+         {name:'JJK_Q3_提案_v1.pdf', up:'2026-04-22', user:'Meaw', stat:'已駁回'},
+         {name:'JJK_Q3_提案_v2_draft.pdf', up:'2026-05-07', user:'Meaw', stat:'撰寫中'},
+         {name:'2024_BKK_JJK_對標案例.xlsx', up:'2026-04-20', user:'Meaw', stat:'參考'},
+       ]},
+      {n:2, done:false, atts:[]},
+      {n:3, done:false, atts:[]},
+      {n:4, done:false, atts:[]},
+      {n:5, done:false, atts:[]},
+      {n:6, done:false, atts:[]},
+      {n:7, done:false, atts:[]},
+    ],
+    audit:[
+      {t:'2026-05-07 14:30', user:'Meaw', act:'提案 v2 草稿上傳'},
+      {t:'2026-04-25 10:15', user:'Ray', act:'駁回 v1：要求補充 USD $187K 的成本拆解'},
+      {t:'2026-04-22 16:00', user:'Meaw', act:'提案 v1 送出'},
+    ],
+  },
+  {
+    id:'pp4', class:'plan',
+    name:'Iconsiam · Muziktiger Q4',
+    venue:'Iconsiam · 待定',
+    period:'2026-11-10 → 2026-12-25',
+    ip:'Muziktiger', target:'฿ 160 萬',
+    owner:'Meaw',
+    stages:[
+      {n:1, done:false, current:true, owner:'Meaw', note:'場地初步詢問已寄出',
+       atts:[
+         {name:'Iconsiam_詢問信.eml', up:'2026-05-05', user:'Meaw', stat:'已寄出'},
+         {name:'Q4_Muziktiger_提案_outline.docx', up:'2026-05-06', user:'Meaw', stat:'草稿'},
+       ]},
+      {n:2, done:false, atts:[]},
+      {n:3, done:false, atts:[]},
+      {n:4, done:false, atts:[]},
+      {n:5, done:false, atts:[]},
+      {n:6, done:false, atts:[]},
+      {n:7, done:false, atts:[]},
+    ],
+    audit:[
+      {t:'2026-05-06 11:00', user:'Meaw', act:'提案 outline 草稿建立'},
+      {t:'2026-05-05 14:00', user:'Meaw', act:'場地詢問信寄出至 Iconsiam'},
+    ],
+  },
+];
+
+const STATUS_MAP = {
+  live:{label:'● 營業中', cls:'s-live'},
+  prep:{label:'● 籌備中', cls:'s-prep'},
+  plan:{label:'● 規劃中', cls:'s-plan'},
+  wrap:{label:'已撤店', cls:'s-wrap'},
+};
+
+function getCurrentStage(p){
+  for(let i=0;i<p.stages.length;i++) if(!p.stages[i].done) return i+1;
+  return 8;
+}
+
+function renderPopups(filter){
+  filter = filter || 'all';
+  const arr = filter==='all' ? POPUPS : POPUPS.filter(p=>p.class===filter);
+  const c = document.getElementById('popups-container');
+  if(!arr.length){
+    c.innerHTML = '<div style="text-align:center;color:var(--txt-lo);padding:30px;font-size:12px;">此類別目前無 popup</div>';
+    return;
+  }
+  c.innerHTML = arr.map(p => {
+    const cur = getCurrentStage(p);
+    const status = STATUS_MAP[p.class];
+
+    // Pipeline track
+    const trackHtml = p.stages.map((s,i) => {
+      const cls = s.done ? 'done' : (s.current||cur===s.n) ? 'current' : 'future';
+      return `<div class="pl-step ${cls}" onclick="document.getElementById('detail-${p.id}').classList.toggle('open');document.getElementById('detail-${p.id}').classList.add('open');">
+        <div class="pl-dot">${s.done?'✓':s.n}</div>
+        <div class="pl-label">${STAGE_SHORT[i]}</div>
+      </div>`;
+    }).join('');
+    const lineHtml = p.stages.slice(0,-1).map((s,i) => {
+      const left = ((i+0.5)/p.stages.length)*100;
+      const w = (1/p.stages.length)*100;
+      return `<div class="pl-line ${s.done?'done':''}" style="left:${left}%;width:${w}%;"></div>`;
+    }).join('');
+
+    // Current task
+    const curStage = p.stages.find(s=>s.n===cur);
+    const ctHtml = curStage && cur<8 ? `<div class="cur-task">
+      <div class="ct-info">
+        <div class="ct-label">當前階段 · ${STAGE_NAMES[cur-1]}</div>
+        <div class="ct-text">${curStage.note||'待下一個動作'}</div>
+        <div class="ct-meta">負責人：${curStage.owner||'未指派'}${curStage.atts && curStage.atts.length ? ' · '+curStage.atts.length+' 個附件' : ''}</div>
+      </div>
+      <button class="ct-action" onclick="markStage('${p.id}',${cur})">標記完成 ✓</button>
+    </div>` : '';
+
+    // Detail (all stages with attachments)
+    const stagesDetail = p.stages.map((s,i) => {
+      const isDone = s.done, isCur = cur===s.n && cur<8;
+      const cls = isDone?'done':(isCur?'current':'future');
+      const stat = isDone ? `<span class="sc-stat done">已完成</span>` :
+                   isCur ? `<span class="sc-stat current">進行中</span>` :
+                   `<span class="sc-stat future">未開始</span>`;
+      const meta = s.owner ? `負責人 ${s.owner}${s.date?' · 完成 '+s.date:''}${s.note?' · '+s.note:''}` : '尚未指派';
+      const atts = (s.atts && s.atts.length) ? `<div class="att-list">${s.atts.map(a=>`
+        <div class="att-row">
+          <span class="att-icon">📎</span>
+          <span class="att-name">${a.name}</span>
+          <span class="att-meta">${a.up} · ${a.user}</span>
+          <span class="att-stat ${a.stat==='已批准'||a.stat==='已簽署'||a.stat==='已上傳'||a.stat==='已存檔'||a.stat==='已定稿'||a.stat==='已寄出'?'ok':'pending'}">${a.stat}</span>
+        </div>
+      `).join('')}</div>` : '';
+      return `<div class="stage-card ${cls}">
+        <div class="sc-row1">
+          <div class="sc-name">階段 ${s.n} · ${STAGE_NAMES[i]}</div>
+          ${stat}
+        </div>
+        <div class="sc-meta">${meta}</div>
+        ${atts}
+      </div>`;
+    }).join('');
+
+    const auditHtml = p.audit.map(a => `<div class="audit-row">
+      <span class="audit-time">${a.t}</span>
+      <span><b style="color:var(--txt-hi);">${a.user}</b> · ${a.act}</span>
+    </div>`).join('');
+
+    return `<div class="popup-card ${p.class}" id="card-${p.id}">
+      <div class="popup-head">
+        <div class="popup-head-left">
+          <div class="popup-name">${p.name}</div>
+          <div class="popup-meta">📍 ${p.venue} · ${p.period}</div>
+          <div class="popup-badges">
+            <span class="popup-badge b-ip">IP: ${p.ip}</span>
+            <span class="popup-badge b-target">目標 ${p.target}</span>
+            <span class="popup-badge b-target">主負責 ${p.owner}</span>
+          </div>
+        </div>
+        <span class="popup-status ${status.cls}">${status.label}</span>
+      </div>
+
+      <div class="pl-track" style="position:relative;">
+        ${lineHtml}
+        ${trackHtml}
+      </div>
+
+      ${ctHtml}
+
+      <div class="pl-toggle" onclick="document.getElementById('detail-${p.id}').classList.toggle('open');this.textContent=document.getElementById('detail-${p.id}').classList.contains('open')?'隱藏明細 ▲':'展開所有階段明細與附件 ▼';">展開所有階段明細與附件 ▼</div>
+
+      <div class="pl-detail" id="detail-${p.id}">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--txt-mid);text-transform:uppercase;margin:8px 0 10px;">7 階段詳細</div>
+        ${stagesDetail}
+        <div style="font-size:11px;font-weight:800;letter-spacing:.05em;color:var(--txt-mid);text-transform:uppercase;margin:14px 0 8px;">變更歷史</div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">
+          ${auditHtml}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterPopups(btn, filter){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPopups(filter);
+}
+
+function markStage(popupId, stageNum){
+  showToast(`✓ ${popupId} 階段 ${stageNum}（${STAGE_NAMES[stageNum-1]}）已標記完成`);
+  // 真實版會更新 demo data 並 re-render；mockup 只 toast
+}
+
+function openNewModal(){ document.getElementById('new-modal').classList.add('open'); }
+function closeNewModal(){ document.getElementById('new-modal').classList.remove('open'); }
+
+function submitNewPopup(){
+  const name = document.getElementById('np-name').value.trim();
+  if(!name){ showToast('⚠ 請填寫快閃店名稱','var(--danger)'); return; }
+  closeNewModal();
+  showToast('✓ 新企劃已送出，待 Ray 審閱（模擬）');
+  // 真實版會 POST 到飛書 + 更新 popup list
+}
+
+function showToast(msg, color){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = color || 'var(--ok)';
+  el.style.color = color || 'var(--ok)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+// Init
+renderPopups('all');
+
+// If URL has hash, scroll to that popup
+if(location.hash){
+  setTimeout(()=>{
+    const card = document.querySelector(location.hash);
+    if(card){
+      card.scrollIntoView({behavior:'smooth', block:'start'});
+      const detailId = 'detail-'+location.hash.replace('#','');
+      const detail = document.getElementById(detailId);
+      if(detail) detail.classList.add('open');
+    }
+    if(location.hash === '#new') openNewModal();
+  }, 100);
+}
+</script>
+
+</body>
+</html>

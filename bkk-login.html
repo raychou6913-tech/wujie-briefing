@@ -89,14 +89,14 @@ function doLogin(){
   if(!a||a.pass!==pwd){ document.getElementById('err').classList.add('show'); document.getElementById('pwd').value=''; return; }
   document.getElementById('err').classList.remove('show');
   localStorage.setItem('bkk_sess',JSON.stringify({user:usr,name:a.name,role:a.role,color:a.color,ts:Date.now()}));
-  location.href='erp-bkk-en.html';
+  location.href='bkk-lobby.html';
 }
 document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('usr').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pwd').focus();});
 
 // Auto-redirect if valid session
 const s=JSON.parse(localStorage.getItem('bkk_sess')||'null');
-if(s&&Date.now()-s.ts<7*86400000) location.href='erp-bkk-en.html';
+if(s&&Date.now()-s.ts<7*86400000) location.href='bkk-lobby.html';
 </script>
 </body>
 </html>

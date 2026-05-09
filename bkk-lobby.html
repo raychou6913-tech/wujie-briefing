@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UJ BKK · 營運中心</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --bkk:#9333ea;--bkk-glow:#c084fc;--bkk-dim:#9333ea18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+  --radius:12px;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-mark{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--bkk-glow);box-shadow:0 0 8px var(--bkk-glow);}
+.brand-name{font-size:14px;font-weight:800;letter-spacing:.04em;}
+.brand-sub{font-size:10px;color:var(--txt-mid);margin-left:2px;}
+.lobby-chip{background:var(--bkk-dim);border:1px solid #9333ea40;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--bkk-glow);letter-spacing:.06em;}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+.btn-sm.review{border-color:#9333ea60;color:var(--bkk-glow);}
+
+/* MAIN */
+.main{max-width:760px;margin:0 auto;padding:18px 18px;}
+
+/* GREETING */
+.greeting{background:linear-gradient(135deg,#9333ea15 0%,var(--card) 100%);border:1px solid #9333ea40;border-radius:16px;padding:20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.greet-hi{font-size:20px;font-weight:800;margin-bottom:4px;}
+.greet-role{font-size:11px;color:var(--txt-mid);margin-bottom:10px;}
+.greet-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.badge.urgent{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
+.badge.med{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
+.badge.ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
+.go-hall-btn{background:var(--bkk);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;white-space:nowrap;}
+.go-hall-btn .hall-sub{font-size:9px;font-weight:400;opacity:.75;display:block;margin-top:1px;}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;}
+.sec-title{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .15s;}
+.kpi-card:hover{border-color:#9333ea60;}
+.kpi-label{font-size:10px;color:var(--txt-mid);font-weight:700;letter-spacing:.05em;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);}
+
+/* HALLS */
+.halls-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
+.hall-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-decoration:none;display:block;transition:.15s;color:var(--txt-hi);position:relative;overflow:hidden;}
+.hall-card:hover{border-color:#9333ea60;transform:translateY(-1px);}
+.hall-card.featured{border-color:var(--bkk);background:linear-gradient(135deg,#9333ea18 0%,var(--card) 100%);}
+.hall-card.featured::before{content:'★ 你的主廳';position:absolute;top:6px;right:8px;font-size:9px;font-weight:800;color:var(--bkk-glow);letter-spacing:.05em;}
+.hall-icon{font-size:24px;margin-bottom:8px;}
+.hall-name{font-size:13px;font-weight:800;color:var(--txt-hi);margin-bottom:3px;}
+.hall-desc{font-size:10px;color:var(--txt-mid);line-height:1.5;margin-bottom:8px;}
+.hall-stat{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--card2);color:var(--txt-mid);display:inline-block;}
+.hall-stat.alert{background:var(--warn-dim);color:var(--warn);}
+
+/* QUICK ACTIONS */
+.actions-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px;}
+.action-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt-hi);transition:.15s;cursor:pointer;}
+.action-btn:hover{border-color:var(--border-hi);background:var(--card2);}
+.action-icon{font-size:18px;flex-shrink:0;}
+.action-text{flex:1;min-width:0;}
+.action-title{font-size:12px;font-weight:700;}
+.action-sub{font-size:10px;color:var(--txt-lo);margin-top:1px;}
+
+/* ANNOUNCEMENT */
+.ann-list{display:flex;flex-direction:column;gap:6px;}
+.ann-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+.ann-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.ann-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:.06em;}
+.ann-tag.notice{background:#3b82f618;border:1px solid #3b82f635;color:#60a5fa;}
+.ann-tag.warn{background:var(--warn-dim);border:1px solid #f59e0b35;color:var(--warn);}
+.ann-tag.ok{background:var(--ok-dim);border:1px solid #22c55e35;color:var(--ok);}
+.ann-date{font-size:10px;color:var(--txt-lo);margin-left:auto;}
+.ann-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.ann-body{font-size:11px;color:var(--txt-mid);line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand-mark">
+      <div class="brand-dot"></div>
+      <div>
+        <div class="brand-name">UJ BKK</div>
+      </div>
+    </div>
+    <span class="lobby-chip">大廳</span>
+  </div>
+  <div class="tb-right">
+    <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- GREETING -->
+  <div class="greeting">
+    <div>
+      <div class="greet-hi" id="greet-hi">歡迎回來</div>
+      <div class="greet-role" id="greet-role">—</div>
+      <div class="greet-badges" id="greet-badges">
+        <span class="badge urgent">⚡ 1 件急件</span>
+        <span class="badge med">⏳ 2 件本週到期</span>
+        <span class="badge ok">✓ 4 場 popup 進行中</span>
+      </div>
+    </div>
+    <a href="bkk-hub.html" class="go-hall-btn">
+      進入主廳
+      <span class="hall-sub" id="primary-hall-name">營運中心</span>
+    </a>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="sec-hdr"><span class="sec-title">即時概況</span></div>
+  <div class="kpi-strip">
+    <div class="kpi-card" onclick="location.href='bkk-popup.html'">
+      <div class="kpi-label">流水線狀態</div>
+      <div class="kpi-val" style="color:var(--bkk-glow);">4 場</div>
+      <div class="kpi-sub">1 營業中 · 1 送審中 · 2 規劃中</div>
+    </div>
+    <div class="kpi-card" onclick="location.href='bkk-warehouse.html'">
+      <div class="kpi-label">倉庫警示</div>
+      <div class="kpi-val" style="color:var(--warn);">2 SKU</div>
+      <div class="kpi-sub">庫齡 > 90 天，需折扣處理</div>
+    </div>
+  </div>
+
+  <!-- HALLS -->
+  <div class="sec-hdr"><span class="sec-title">主要廳室</span></div>
+  <div class="halls-grid" id="halls-grid">
+    <a class="hall-card" data-hall="hub" href="bkk-hub.html">
+      <div class="hall-icon">🎯</div>
+      <div class="hall-name">營運中心</div>
+      <div class="hall-desc">今日重點 · KPIs · 跨廳概覽</div>
+      <span class="hall-stat">Manager 主廳</span>
+    </a>
+    <a class="hall-card" data-hall="popup" href="bkk-popup.html">
+      <div class="hall-icon">🎪</div>
+      <div class="hall-name">快閃店流水線</div>
+      <div class="hall-desc">7 階段管理 · 提案 → 撤店覆盤</div>
+      <span class="hall-stat alert">2 場待動作</span>
+    </a>
+    <a class="hall-card" data-hall="warehouse" href="bkk-warehouse.html">
+      <div class="hall-icon">📦</div>
+      <div class="hall-name">倉庫管理</div>
+      <div class="hall-desc">曼谷倉 SKU · 入出庫 · 滯銷處理</div>
+      <span class="hall-stat alert">2 SKU 過齡</span>
+    </a>
+    <a class="hall-card" data-hall="approval" href="bkk-approval.html">
+      <div class="hall-icon">📋</div>
+      <div class="hall-name">送審追蹤</div>
+      <div class="hall-desc">IP 版權方 · 商場 · 政府監管</div>
+      <span class="hall-stat alert">3 件待回覆</span>
+    </a>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="sec-hdr"><span class="sec-title">快速動作</span></div>
+  <div class="actions-row">
+    <a class="action-btn" href="bkk-popup.html#new">
+      <div class="action-icon">➕</div>
+      <div class="action-text">
+        <div class="action-title">新增快閃店企劃</div>
+        <div class="action-sub">提案表單 → 送審 Ray</div>
+      </div>
+    </a>
+    <a class="action-btn" href="bkk-hub.html#expense">
+      <div class="action-icon">💸</div>
+      <div class="action-text">
+        <div class="action-title">送出費用申請</div>
+        <div class="action-sub">THB 在地費用</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- ANNOUNCEMENTS -->
+  <div class="sec-hdr"><span class="sec-title">公告</span></div>
+  <div class="ann-list">
+    <div class="ann-item">
+      <div class="ann-hdr">
+        <span class="ann-tag ok">系統</span>
+        <span style="font-size:11px;color:var(--txt-hi);font-weight:700;">UJ BKK ERP Tier 1 上線</span>
+        <span class="ann-date">2026-05-09</span>
+      </div>
+      <div class="ann-body">流水線管理／倉庫／送審 三大主廳已建置完成。費用申請流程不變。</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-hdr">
+        <span class="ann-tag warn">提醒</span>
+        <span style="font-size:11px;color:var(--txt-hi);font-weight:700;">Central Embassy popup 場地裝修圖待商場簽章</span>
+        <span class="ann-date">2026-05-08</span>
+      </div>
+      <div class="ann-body">5/15 開店倒數 6 天，需主動催商場。Somsak 已聯繫業主 contact。</div>
+    </div>
+    <div class="ann-item">
+      <div class="ann-hdr">
+        <span class="ann-tag notice">資訊</span>
+        <span style="font-size:11px;color:var(--txt-hi);font-weight:700;">EmQuartier JJK 提案 v2 待 Ray 審閱</span>
+        <span class="ann-date">2026-05-07</span>
+      </div>
+      <div class="ann-body">Q3 計畫，預估 USD $187K（對標 2024 BKK JJK pop-up）。</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('bkk_sess')||'null');
+if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
+  localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html');
+}
+
+const hour = new Date().getHours();
+const hi = hour<12?'早安':hour<18?'午安':'晚安';
+const name = SESS.name || SESS.user;
+document.getElementById('greet-hi').textContent = `${hi}，${name}`;
+document.getElementById('greet-role').textContent = `${SESS.role||'員工'} · ${new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'})}`;
+
+const tb = document.getElementById('tb-user');
+if(tb) tb.textContent = `${SESS.name} · ${SESS.role||''}`;
+
+// 角色 → 主廳對應（featured hall）
+const PRIMARY_HALL = {
+  'meaw':    {hall:'hub',       name:'營運中心'},
+  'somsak':  {hall:'popup',     name:'快閃店流水線'},
+  'niran':   {hall:'warehouse', name:'倉庫管理'},
+  'ploy':    {hall:'approval',  name:'送審追蹤'},
+};
+const primary = PRIMARY_HALL[SESS.user] || PRIMARY_HALL['meaw'];
+
+// Mark featured hall
+document.querySelectorAll('.hall-card').forEach(card => {
+  if(card.dataset.hall === primary.hall) card.classList.add('featured');
+});
+
+// Update primary hall button
+const primaryBtn = document.querySelector('.go-hall-btn');
+if(primary.hall !== 'hub'){
+  primaryBtn.href = `bkk-${primary.hall}.html`;
+  document.getElementById('primary-hall-name').textContent = primary.name;
+}
+</script>
+
+</body>
+</html>

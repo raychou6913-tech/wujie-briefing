@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UJ BKK · 營運中心</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --bkk:#9333ea;--bkk-glow:#c084fc;--bkk-dim:#9333ea18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-mark{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--bkk-glow);box-shadow:0 0 8px var(--bkk-glow);}
+.brand-name{font-size:14px;font-weight:800;}
+.hall-chip{background:var(--bkk-dim);border:1px solid #9333ea40;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--bkk-glow);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:1080px;margin:0 auto;padding:18px 24px;}
+
+.greet{margin-bottom:18px;}
+.greet-hi{font-size:22px;font-weight:800;margin-bottom:4px;}
+.greet-sub{font-size:12px;color:var(--txt-mid);}
+
+/* TODAY KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.kpi-label{font-size:10px;color:var(--txt-mid);font-weight:700;letter-spacing:.05em;margin-bottom:6px;}
+.kpi-val{font-size:24px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px;}
+.sec-title{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-link{font-size:11px;color:var(--bkk-glow);cursor:pointer;font-weight:700;text-decoration:none;}
+
+/* POPUP MINI CARDS */
+.popup-mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px;}
+.popup-mini{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:.15s;text-decoration:none;color:var(--txt-hi);display:block;}
+.popup-mini:hover{border-color:#9333ea60;}
+.popup-mini.live{border-color:#22c55e40;}
+.popup-mini.prep{border-color:#f59e0b40;}
+.popup-mini.plan{border-color:#9333ea30;}
+.popup-name{font-size:13px;font-weight:800;margin-bottom:3px;}
+.popup-meta{font-size:10px;color:var(--txt-mid);margin-bottom:10px;}
+.popup-stage-mini{display:flex;align-items:center;gap:4px;margin-bottom:6px;}
+.stage-dot-mini{width:14px;height:14px;border-radius:50%;background:var(--card2);border:1.5px solid var(--border);font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--txt-lo);}
+.stage-dot-mini.done{background:var(--ok);border-color:var(--ok);color:#fff;}
+.stage-dot-mini.current{background:var(--bkk);border-color:var(--bkk);color:#fff;box-shadow:0 0 8px #9333ea60;}
+.stage-line{flex:1;height:1.5px;background:var(--border);}
+.stage-line.done{background:var(--ok);}
+.popup-status-row{display:flex;align-items:center;justify-content:space-between;}
+.popup-status-text{font-size:10px;color:var(--txt-mid);}
+.popup-status-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;}
+.s-live{background:var(--ok-dim);color:var(--ok);}
+.s-prep{background:var(--warn-dim);color:var(--warn);}
+.s-plan{background:var(--bkk-dim);color:var(--bkk-glow);}
+
+/* TWO COLUMN */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+@media (max-width: 720px){ .two-col{grid-template-columns:1fr;} }
+
+/* APPROVAL LIST / WAREHOUSE LIST */
+.list-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.list-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border);}
+.list-row:first-child{border-top:none;padding-top:4px;}
+.list-row:last-child{padding-bottom:4px;}
+.list-bar{width:3px;align-self:stretch;border-radius:2px;}
+.list-info{flex:1;min-width:0;}
+.list-title{font-size:12px;font-weight:700;}
+.list-sub{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.list-stat{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;flex-shrink:0;}
+
+/* WHOLESALE SUMMARY */
+.ws-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.ws-info{flex:1;min-width:0;}
+.ws-title{font-size:13px;font-weight:800;margin-bottom:4px;}
+.ws-sub{font-size:11px;color:var(--txt-mid);line-height:1.5;}
+.ws-num{text-align:right;flex-shrink:0;}
+.ws-num-val{font-size:18px;font-weight:800;color:var(--ok);}
+.ws-num-sub{font-size:10px;color:var(--txt-mid);}
+
+/* EXPENSE FAB */
+.exp-fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;border-radius:50%;background:var(--bkk);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #9333ea50;z-index:150;display:flex;align-items:center;justify-content:center;}
+.exp-fab:active{transform:scale(.92);}
+
+/* expense modal */
+.modal-bg{display:none;position:fixed;inset:0;background:#000a;z-index:200;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-sheet{background:var(--surface);border-top:1px solid var(--border-hi);border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
+.modal-title{font-size:15px;font-weight:800;margin-bottom:6px;}
+.modal-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;line-height:1.6;}
+.mf{margin-bottom:12px;}
+.mf label{display:block;font-size:10px;font-weight:700;color:var(--txt-mid);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.mf input,.mf select,.mf textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);font-size:13px;padding:9px 11px;outline:none;font-family:inherit;}
+.mf input:focus,.mf select:focus{border-color:var(--bkk);}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.m-actions{display:flex;gap:10px;margin-top:14px;}
+.mbtn{flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.mbtn.primary{background:var(--bkk);color:#fff;}
+.mbtn.ghost{background:var(--card2);color:var(--txt-mid);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:9px;font-size:12px;font-weight:700;transition:.3s;z-index:300;opacity:0;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand-mark">
+      <div class="brand-dot"></div>
+      <div class="brand-name">UJ BKK</div>
+    </div>
+    <span class="hall-chip">營運中心</span>
+  </div>
+  <div class="tb-right">
+    <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
+    <a href="bkk-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="greet">
+    <div class="greet-hi" id="greet-hi">歡迎</div>
+    <div class="greet-sub" id="greet-sub">曼谷營運看板</div>
+  </div>
+
+  <!-- TODAY KPIs -->
+  <div class="kpi-row">
+    <div class="kpi-big">
+      <div class="kpi-label">營業中</div>
+      <div class="kpi-val" style="color:var(--ok);">1</div>
+      <div class="kpi-sub">Siam Paragon · Mofusand</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">送審中</div>
+      <div class="kpi-val" style="color:var(--warn);">1</div>
+      <div class="kpi-sub">Central Embassy · 場地圖待簽</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">籌備中</div>
+      <div class="kpi-val">2</div>
+      <div class="kpi-sub">JJK Q3 + Muziktiger Q4</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">5月營收（THB）</div>
+      <div class="kpi-val">฿ 0.86M</div>
+      <div class="kpi-sub">≈ ¥17.4 萬 · 目標達成 71%</div>
+    </div>
+  </div>
+
+  <!-- POPUP PIPELINE OVERVIEW -->
+  <div class="sec-hdr">
+    <span class="sec-title">快閃店流水線（4 場）</span>
+    <a class="sec-link" href="bkk-popup.html">深度視圖 →</a>
+  </div>
+  <div class="popup-mini-grid">
+
+    <a class="popup-mini live" href="bkk-popup.html#pp1">
+      <div class="popup-name">Siam Paragon · Mofusand 夏日</div>
+      <div class="popup-meta">📍 4F 中庭 · 2026-04-20 → 05-31</div>
+      <div class="popup-stage-mini">
+        <div class="stage-dot-mini done">✓</div><div class="stage-line done"></div>
+        <div class="stage-dot-mini done">✓</div><div class="stage-line done"></div>
+        <div class="stage-dot-mini done">✓</div><div class="stage-line done"></div>
+        <div class="stage-dot-mini done">✓</div><div class="stage-line done"></div>
+        <div class="stage-dot-mini done">✓</div><div class="stage-line"></div>
+        <div class="stage-dot-mini current">6</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">7</div>
+      </div>
+      <div class="popup-status-row">
+        <span class="popup-status-text">階段 6：營業中（每日銷售上報）</span>
+        <span class="popup-status-badge s-live">● 營業中</span>
+      </div>
+    </a>
+
+    <a class="popup-mini prep" href="bkk-popup.html#pp2">
+      <div class="popup-name">Central Embassy · Opanchu × Snoopy</div>
+      <div class="popup-meta">📍 5F · 2026-05-15 → 06-30</div>
+      <div class="popup-stage-mini">
+        <div class="stage-dot-mini done">✓</div><div class="stage-line done"></div>
+        <div class="stage-dot-mini done">✓</div><div class="stage-line done"></div>
+        <div class="stage-dot-mini done">✓</div><div class="stage-line"></div>
+        <div class="stage-dot-mini current">4</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">5</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">6</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">7</div>
+      </div>
+      <div class="popup-status-row">
+        <span class="popup-status-text">階段 4：場地裝修圖待商場簽章</span>
+        <span class="popup-status-badge s-prep">⚠ 籌備</span>
+      </div>
+    </a>
+
+    <a class="popup-mini plan" href="bkk-popup.html#pp3">
+      <div class="popup-name">EmQuartier · JJK 主題</div>
+      <div class="popup-meta">📍 樓層 TBD · 2026-08-01 → 09-15</div>
+      <div class="popup-stage-mini">
+        <div class="stage-dot-mini current">1</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">2</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">3</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">4</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">5</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">6</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">7</div>
+      </div>
+      <div class="popup-status-row">
+        <span class="popup-status-text">階段 1：提案 v2 待 Ray 審閱</span>
+        <span class="popup-status-badge s-plan">● 規劃</span>
+      </div>
+    </a>
+
+    <a class="popup-mini plan" href="bkk-popup.html#pp4">
+      <div class="popup-name">Iconsiam · Muziktiger Q4</div>
+      <div class="popup-meta">📍 待定 · 2026-11-10 → 12-25</div>
+      <div class="popup-stage-mini">
+        <div class="stage-dot-mini current">1</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">2</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">3</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">4</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">5</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">6</div><div class="stage-line"></div>
+        <div class="stage-dot-mini">7</div>
+      </div>
+      <div class="popup-status-row">
+        <span class="popup-status-text">階段 1：場地初步詢問已寄出</span>
+        <span class="popup-status-badge s-plan">● 規劃</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- TWO COLUMN: 待批准事項 + 庫存警示 -->
+  <div class="two-col">
+
+    <div>
+      <div class="sec-hdr">
+        <span class="sec-title">待批准事項</span>
+        <a class="sec-link" href="bkk-approval.html">送審中心 →</a>
+      </div>
+      <div class="list-card">
+
+        <div class="list-row">
+          <div class="list-bar" style="background:var(--danger);"></div>
+          <div class="list-info">
+            <div class="list-title">Central Embassy 場地裝修圖</div>
+            <div class="list-sub">商場業主簽章 · 已等 4 天 · 開店倒數 6 天</div>
+          </div>
+          <span class="list-stat" style="background:var(--danger-dim);color:var(--danger);">急</span>
+        </div>
+
+        <div class="list-row">
+          <div class="list-bar" style="background:var(--warn);"></div>
+          <div class="list-info">
+            <div class="list-title">Opanchu × Snoopy 宣傳海報</div>
+            <div class="list-sub">IP 版權方批准 · 已送審 2 天</div>
+          </div>
+          <span class="list-stat" style="background:var(--warn-dim);color:var(--warn);">中</span>
+        </div>
+
+        <div class="list-row">
+          <div class="list-bar" style="background:var(--bkk);"></div>
+          <div class="list-info">
+            <div class="list-title">EmQuartier JJK 提案 v2</div>
+            <div class="list-sub">Ray 審閱 · 已送審 1 天</div>
+          </div>
+          <span class="list-stat" style="background:var(--bkk-dim);color:var(--bkk-glow);">一般</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-hdr">
+        <span class="sec-title">倉庫警示</span>
+        <a class="sec-link" href="bkk-warehouse.html">庫存中心 →</a>
+      </div>
+      <div class="list-card">
+
+        <div class="list-row">
+          <div class="list-bar" style="background:var(--danger);"></div>
+          <div class="list-info">
+            <div class="list-title">Mofusand 絨毛掛飾（2024）</div>
+            <div class="list-sub">52 件 · 庫齡 128 天 · ฿ 31,200</div>
+          </div>
+          <span class="list-stat" style="background:var(--danger-dim);color:var(--danger);">過齡</span>
+        </div>
+
+        <div class="list-row">
+          <div class="list-bar" style="background:var(--warn);"></div>
+          <div class="list-info">
+            <div class="list-title">Snoopy 帆布托特包</div>
+            <div class="list-sub">38 件 · 庫齡 94 天 · ฿ 22,800</div>
+          </div>
+          <span class="list-stat" style="background:var(--warn-dim);color:var(--warn);">接近</span>
+        </div>
+
+        <div class="list-row">
+          <div class="list-bar" style="background:var(--ok);"></div>
+          <div class="list-info">
+            <div class="list-title">本月總出貨</div>
+            <div class="list-sub">235 件 · 來源：Mofusand 快閃</div>
+          </div>
+          <span class="list-stat" style="background:var(--ok-dim);color:var(--ok);">正常</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 在地批發摘要 -->
+  <div class="sec-hdr"><span class="sec-title">在地批發業務</span></div>
+  <div class="ws-card">
+    <div class="ws-info">
+      <div class="ws-title">泰國本地通路批發</div>
+      <div class="ws-sub">King Power / Central / Iconsiam 通路訂單。Q2 累計 2 筆 PO，總額 ฿ 380K。<br>下游主要由 Ploy 對接，新訂單需先過倉庫庫存檢核。</div>
+    </div>
+    <div class="ws-num">
+      <div class="ws-num-val">฿ 380K</div>
+      <div class="ws-num-sub">Q2 累計</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- EXPENSE FAB -->
+<button class="exp-fab" onclick="openExpModal()" title="送出費用申請">💸</button>
+
+<!-- EXPENSE MODAL -->
+<div class="modal-bg" id="exp-modal" onclick="if(event.target===this)closeExpModal()">
+  <div class="modal-sheet">
+    <div class="modal-title">送出費用申請</div>
+    <div class="modal-sub">在地營運費用（場地／行銷／物流／差旅／餐飲），以泰銖計算。送出後系統自動進入審批流程。</div>
+
+    <div class="mrow">
+      <div class="mf">
+        <label>類別</label>
+        <select id="exp-cat">
+          <option value="venue">場地租金 / 快閃店租</option>
+          <option value="marketing">行銷推廣</option>
+          <option value="logistics">在地物流</option>
+          <option value="warehouse">倉儲</option>
+          <option value="travel">交通 / 差旅</option>
+          <option value="meal">餐飲 / 招待</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+      <div class="mf">
+        <label>金額（THB）</label>
+        <input id="exp-amt" type="number" step="0.01" placeholder="例：12000">
+      </div>
+    </div>
+
+    <div class="mrow">
+      <div class="mf">
+        <label>日期</label>
+        <input id="exp-date" type="date">
+      </div>
+      <div class="mf">
+        <label>關聯快閃店（選填）</label>
+        <select id="exp-popup">
+          <option value="">— 無 —</option>
+          <option>Siam Paragon · Mofusand 夏日</option>
+          <option>Central Embassy · Opanchu × Snoopy</option>
+          <option>EmQuartier · JJK 主題（Q3）</option>
+          <option>Iconsiam · Muziktiger Q4</option>
+          <option>曼谷一般營運</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mf">
+      <label>說明</label>
+      <textarea id="exp-desc" placeholder="簡短描述費用用途..." rows="3"></textarea>
+    </div>
+
+    <div class="m-actions">
+      <button class="mbtn ghost" onclick="closeExpModal()">取消</button>
+      <button class="mbtn primary" onclick="submitExp()">送出申請 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('bkk_sess')||'null');
+if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
+  localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html');
+}
+const tb = document.getElementById('tb-user');
+if(tb) tb.textContent = `${SESS.name} · ${SESS.role||''}`;
+const hour = new Date().getHours();
+const hi = hour<12?'早安':hour<18?'午安':'晚安';
+document.getElementById('greet-hi').textContent = `${hi}，${SESS.name||SESS.user}`;
+document.getElementById('greet-sub').textContent = `${new Date().toLocaleDateString('zh-TW',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} · 4 場 popup 進行中 · 3 件待批准`;
+
+// Auto-open expense if URL has #expense
+if(location.hash === '#expense') openExpModal();
+
+const PROXY = 'https://feishu-proxy.raychou6913.workers.dev';
+const AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const APPROVAL_TBL = 'tbl4OBNvsNkqS4mQ';
+
+async function writeApproval(fields){
+  try{
+    const tr = await fetch(PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const {tenant_access_token:tk} = await tr.json();
+    await fetch(PROXY+'/open-apis/bitable/v1/apps/'+AT+'/tables/'+APPROVAL_TBL+'/records',
+      {method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({fields})});
+  }catch(e){console.warn('Feishu write skipped',e);}
+}
+
+function openExpModal(){
+  document.getElementById('exp-date').valueAsDate = new Date();
+  document.getElementById('exp-modal').classList.add('open');
+}
+function closeExpModal(){ document.getElementById('exp-modal').classList.remove('open'); }
+
+function showToast(msg,color){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = color || 'var(--ok)';
+  el.style.color = color || 'var(--ok)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+function submitExp(){
+  const cat = document.getElementById('exp-cat');
+  const catLabel = cat.options[cat.selectedIndex].text;
+  const amt = parseFloat(document.getElementById('exp-amt').value)||0;
+  const date = document.getElementById('exp-date').value;
+  const popup = document.getElementById('exp-popup').value;
+  const desc = document.getElementById('exp-desc').value.trim();
+  if(!amt){ showToast('⚠ 請輸入金額','var(--danger)'); return; }
+  if(!date){ showToast('⚠ 請選擇日期','var(--danger)'); return; }
+  const submitter = SESS.name || SESS.user || 'BKK 員工';
+  writeApproval({
+    '標題': `[BKK] ${submitter} ${catLabel} ฿${amt}`,
+    '審批標題': `[UJ BKK] ${catLabel} ฿${amt}${popup?' / '+popup:''}`,
+    '審批類型': '費用申請',
+    '申請人': submitter,
+    '申請日期': Date.now(),
+    '金額': amt,
+    '幣別': 'THB',
+    '審批人': 'Shawn',
+    '審批狀態': '待審批',
+    'Email已發送': '否',
+    '申請說明': `${catLabel}${popup?' · '+popup:''}${desc?' / '+desc:''}`,
+  });
+  closeExpModal();
+  showToast('✓ 已送出，等待審批');
+  document.getElementById('exp-amt').value = '';
+  document.getElementById('exp-desc').value = '';
+}
+</script>
+
+</body>
+</html>

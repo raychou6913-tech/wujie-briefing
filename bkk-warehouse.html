@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UJ BKK · 倉庫管理</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --bkk:#9333ea;--bkk-glow:#c084fc;--bkk-dim:#9333ea18;
+  --ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-mark{display:flex;align-items:center;gap:8px;}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--bkk-glow);box-shadow:0 0 8px var(--bkk-glow);}
+.brand-name{font-size:14px;font-weight:800;}
+.hall-chip{background:var(--bkk-dim);border:1px solid #9333ea40;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--bkk-glow);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.btn-sm{font-size:10px;font-weight:700;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
+.btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+.btn-sm.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:1080px;margin:0 auto;padding:18px 24px;}
+
+.page-hdr{margin-bottom:18px;}
+.page-title{font-size:22px;font-weight:800;}
+.page-sub{font-size:11px;color:var(--txt-mid);margin-top:4px;line-height:1.6;}
+
+/* SUMMARY KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.kpi-big{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.kpi-label{font-size:10px;color:var(--txt-mid);font-weight:700;letter-spacing:.05em;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:10px;color:var(--txt-mid);}
+
+/* TAB BAR */
+.tab-bar{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:10px;}
+.tab-btn{padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--txt-mid);font-size:12px;font-weight:700;cursor:pointer;}
+.tab-btn.active{background:var(--bkk-dim);color:var(--bkk-glow);}
+
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* SECTION */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px;}
+.sec-title{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+
+/* INVENTORY TABLE */
+.inv-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.inv-table{width:100%;border-collapse:collapse;}
+.inv-table th{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--txt-lo);padding:10px 12px;text-align:left;background:var(--card2);}
+.inv-table td{font-size:11px;padding:11px 12px;border-top:1px solid var(--border);}
+.inv-table tr:hover td{background:var(--card2);}
+.inv-table .num{text-align:right;font-family:ui-monospace,monospace;}
+.ip-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:var(--card2);}
+.aging-warn{color:var(--warn);font-weight:700;}
+.aging-bad{color:var(--danger);font-weight:700;}
+.action-btn{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;}
+.action-btn.warn{color:var(--warn);border-color:#f59e0b40;}
+.action-btn.danger{color:var(--danger);border-color:#ef444440;}
+
+/* INBOUND CARDS */
+.inbound-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.in-icon{width:40px;height:40px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.in-info{flex:1;min-width:0;}
+.in-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.in-meta{font-size:10px;color:var(--txt-mid);}
+.in-status{flex-shrink:0;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;}
+.s-transit{background:var(--warn-dim);color:var(--warn);}
+.s-arrived{background:var(--ok-dim);color:var(--ok);}
+
+/* DISCOUNT ACTION */
+.disc-card{background:var(--card);border:1.5px solid #ef444430;border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.disc-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.disc-info{flex:1;min-width:0;}
+.disc-title{font-size:13px;font-weight:800;}
+.disc-sub{font-size:11px;color:var(--txt-mid);margin-top:3px;}
+.disc-num{text-align:right;flex-shrink:0;}
+.disc-units{font-size:18px;font-weight:800;color:var(--danger);}
+.disc-amount{font-size:10px;color:var(--txt-mid);}
+.disc-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.disc-btn{font-size:11px;font-weight:700;padding:7px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--txt-hi);cursor:pointer;}
+.disc-btn.primary{background:var(--bkk);border-color:var(--bkk);color:#fff;}
+
+/* MOVEMENT LOG */
+.log-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.log-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border);}
+.log-row:first-child{border-top:none;padding-top:4px;}
+.log-row:last-child{padding-bottom:4px;}
+.log-icon{font-size:14px;flex-shrink:0;}
+.log-info{flex:1;min-width:0;}
+.log-title{font-size:11px;font-weight:700;}
+.log-sub{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.log-time{font-size:10px;color:var(--txt-lo);flex-shrink:0;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:9px;font-size:12px;font-weight:700;transition:.3s;z-index:300;opacity:0;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand-mark"><div class="brand-dot"></div><div class="brand-name">UJ BKK</div></div>
+    <span class="hall-chip">倉庫管理</span>
+  </div>
+  <div class="tb-right">
+    <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
+    <a href="bkk-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="page-hdr">
+    <div class="page-title">曼谷倉庫</div>
+    <div class="page-sub">SKU 庫存 · 入出庫記錄 · 滯銷處理 · 倉位：曼谷物流園區 B7 倉</div>
+  </div>
+
+  <!-- SUMMARY KPIs -->
+  <div class="kpi-row">
+    <div class="kpi-big">
+      <div class="kpi-label">總庫存件數</div>
+      <div class="kpi-val">495</div>
+      <div class="kpi-sub">12 個 SKU</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">總庫存價值</div>
+      <div class="kpi-val">฿ 180K</div>
+      <div class="kpi-sub">≈ ¥36.4 萬</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">過齡 SKU（>90 天）</div>
+      <div class="kpi-val" style="color:var(--danger);">2</div>
+      <div class="kpi-sub">需折扣處理</div>
+    </div>
+    <div class="kpi-big">
+      <div class="kpi-label">在途入庫</div>
+      <div class="kpi-val" style="color:var(--warn);">3</div>
+      <div class="kpi-sub">本週預計到達</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(this,'inventory')">📦 SKU 清單</button>
+    <button class="tab-btn" onclick="switchTab(this,'inbound')">🚚 入庫追蹤</button>
+    <button class="tab-btn" onclick="switchTab(this,'discount')">🏷 滯銷處理</button>
+    <button class="tab-btn" onclick="switchTab(this,'log')">📋 異動紀錄</button>
+  </div>
+
+  <!-- TAB: SKU 清單 -->
+  <div class="tab-panel active" id="tab-inventory">
+    <div class="sec-hdr"><span class="sec-title">完整 SKU 清單（12 項）</span></div>
+    <div class="inv-card">
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>SKU 名稱</th>
+            <th>IP</th>
+            <th class="num">數量</th>
+            <th class="num">單位成本</th>
+            <th class="num">總成本</th>
+            <th>庫齡</th>
+            <th>來源</th>
+            <th>動作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>絨毛掛飾（2024 夏日）</td>
+            <td><span class="ip-tag" style="color:#c084fc;">Mofusand</span></td>
+            <td class="num">52</td>
+            <td class="num">฿ 600</td>
+            <td class="num">฿ 31,200</td>
+            <td><span class="aging-bad">128 天</span></td>
+            <td>快閃剩貨</td>
+            <td><button class="action-btn danger" onclick="goDiscount()">折扣處理 →</button></td>
+          </tr>
+          <tr>
+            <td>帆布托特包</td>
+            <td><span class="ip-tag" style="color:#fbbf24;">Snoopy</span></td>
+            <td class="num">38</td>
+            <td class="num">฿ 600</td>
+            <td class="num">฿ 22,800</td>
+            <td><span class="aging-warn">94 天</span></td>
+            <td>快閃剩貨</td>
+            <td><button class="action-btn warn" onclick="goDiscount()">建議折扣</button></td>
+          </tr>
+          <tr>
+            <td>壓克力立牌組</td>
+            <td><span class="ip-tag" style="color:#38bdf8;">Opanchu</span></td>
+            <td class="num">120</td>
+            <td class="num">฿ 700</td>
+            <td class="num">฿ 84,000</td>
+            <td>34 天</td>
+            <td>批發滯銷</td>
+            <td><button class="action-btn">查看詳情</button></td>
+          </tr>
+          <tr>
+            <td>貼紙包</td>
+            <td><span class="ip-tag" style="color:#4ade80;">Muziktiger</span></td>
+            <td class="num">285</td>
+            <td class="num">฿ 150</td>
+            <td class="num">฿ 42,750</td>
+            <td>21 天</td>
+            <td>批發滯銷</td>
+            <td><button class="action-btn">查看詳情</button></td>
+          </tr>
+          <tr>
+            <td>限定款抱枕</td>
+            <td><span class="ip-tag" style="color:#c084fc;">Mofusand</span></td>
+            <td class="num">68</td>
+            <td class="num">฿ 850</td>
+            <td class="num">฿ 57,800</td>
+            <td>15 天</td>
+            <td>快閃進行中</td>
+            <td><button class="action-btn">查看詳情</button></td>
+          </tr>
+          <tr>
+            <td>聯名 T 恤（5 色）</td>
+            <td><span class="ip-tag" style="color:#38bdf8;">Opanchu × Snoopy</span></td>
+            <td class="num">240</td>
+            <td class="num">฿ 320</td>
+            <td class="num">฿ 76,800</td>
+            <td>3 天</td>
+            <td>新貨入庫</td>
+            <td><button class="action-btn">查看詳情</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: 入庫追蹤 -->
+  <div class="tab-panel" id="tab-inbound">
+    <div class="sec-hdr"><span class="sec-title">在途批次（3 筆）</span></div>
+
+    <div class="inbound-card">
+      <div class="in-icon">🚚</div>
+      <div class="in-info">
+        <div class="in-title">Opanchu × Snoopy 聯名 SKU 12 款 · 北京 → 曼谷</div>
+        <div class="in-meta">總數 480 件 · 5/12 預計到達 · DHL 國際快遞 · 海運 + 報關</div>
+      </div>
+      <span class="in-status s-transit">在途中</span>
+    </div>
+
+    <div class="inbound-card">
+      <div class="in-icon">🛬</div>
+      <div class="in-info">
+        <div class="in-title">Mofusand 補貨（限定款抱枕）· 工廠直送</div>
+        <div class="in-meta">總數 100 件 · 5/13 預計到達 · 順豐國際 · 已過清關</div>
+      </div>
+      <span class="in-status s-transit">清關完成</span>
+    </div>
+
+    <div class="inbound-card">
+      <div class="in-icon">🚚</div>
+      <div class="in-info">
+        <div class="in-title">Muziktiger 貼紙包補貨 · 北京 → 曼谷</div>
+        <div class="in-meta">總數 200 件 · 5/14 預計到達 · DHL 國際快遞</div>
+      </div>
+      <span class="in-status s-transit">在途中</span>
+    </div>
+
+    <div class="sec-hdr" style="margin-top:18px;"><span class="sec-title">本月已入庫（最近 3 筆）</span></div>
+
+    <div class="inbound-card">
+      <div class="in-icon">📥</div>
+      <div class="in-info">
+        <div class="in-title">聯名 T 恤 5 色 · Central Embassy 預備庫存</div>
+        <div class="in-meta">240 件 · 2026-05-06 入庫 · 來自上海工廠</div>
+      </div>
+      <span class="in-status s-arrived">已入庫</span>
+    </div>
+
+    <div class="inbound-card">
+      <div class="in-icon">📥</div>
+      <div class="in-info">
+        <div class="in-title">Mofusand 限定款抱枕（先期樣 50 件）</div>
+        <div class="in-meta">50 件 · 2026-04-25 入庫 · 來自有你共創上海倉</div>
+      </div>
+      <span class="in-status s-arrived">已入庫</span>
+    </div>
+
+  </div>
+
+  <!-- TAB: 滯銷處理 -->
+  <div class="tab-panel" id="tab-discount">
+    <div class="sec-hdr"><span class="sec-title">需處理 SKU（庫齡 > 90 天）</span></div>
+
+    <div class="disc-card">
+      <div class="disc-row1">
+        <div class="disc-info">
+          <div class="disc-title">Mofusand 絨毛掛飾（2024 夏日）</div>
+          <div class="disc-sub">128 天無動銷 · 來自 Mofusand 2024 夏日 popup 剩貨 · 過季款 · 建議 5 折出清</div>
+        </div>
+        <div class="disc-num">
+          <div class="disc-units">52 件</div>
+          <div class="disc-amount">฿ 31,200</div>
+        </div>
+      </div>
+      <div class="disc-actions">
+        <button class="disc-btn primary" onclick="proposeAction('discount')">提折扣方案 → Shawn</button>
+        <button class="disc-btn" onclick="proposeAction('return')">提退回有你共創</button>
+        <button class="disc-btn" onclick="proposeAction('destroy')">提銷毀</button>
+      </div>
+    </div>
+
+    <div class="disc-card" style="border-color:#f59e0b30;">
+      <div class="disc-row1">
+        <div class="disc-info">
+          <div class="disc-title">Snoopy 帆布托特包</div>
+          <div class="disc-sub">94 天無動銷 · 來自 Snoopy Q1 popup 剩貨 · 接近過齡警戒 · 建議納入 6 月折扣促銷</div>
+        </div>
+        <div class="disc-num">
+          <div class="disc-units" style="color:var(--warn);">38 件</div>
+          <div class="disc-amount">฿ 22,800</div>
+        </div>
+      </div>
+      <div class="disc-actions">
+        <button class="disc-btn primary" onclick="proposeAction('discount')">提折扣方案 → Shawn</button>
+        <button class="disc-btn" onclick="proposeAction('keep')">繼續觀察</button>
+      </div>
+    </div>
+
+    <div class="sec-hdr" style="margin-top:18px;"><span class="sec-title">已處理（最近 3 筆）</span></div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;">JJK 鑰匙圈（2024 Q4）→ 7 折出清</div>
+          <div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">4/15 完成清貨 · 80 件 / 80 件 · ฿ 28,000</div>
+        </div>
+        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:var(--ok-dim);color:var(--ok);">已清空</span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;">排球少年限定貼紙 → 退回有你共創</div>
+          <div style="font-size:10px;color:var(--txt-mid);margin-top:3px;">3/28 退貨完成 · 120 件 · ฿ 18,000 退款</div>
+        </div>
+        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:#94a3b818;color:#94a3b8;">已退回</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB: 異動紀錄 -->
+  <div class="tab-panel" id="tab-log">
+    <div class="sec-hdr"><span class="sec-title">最近 14 天異動</span></div>
+    <div class="log-card">
+      <div class="log-row">
+        <div class="log-icon">📤</div>
+        <div class="log-info">
+          <div class="log-title">出庫：Mofusand 絨毛掛飾 → Siam Paragon popup（補貨）</div>
+          <div class="log-sub">8 件 · Niran 操作</div>
+        </div>
+        <span class="log-time">5/8 14:23</span>
+      </div>
+      <div class="log-row">
+        <div class="log-icon">📥</div>
+        <div class="log-info">
+          <div class="log-title">入庫：聯名 T 恤 5 色 240 件</div>
+          <div class="log-sub">來自上海工廠 · 完成清關</div>
+        </div>
+        <span class="log-time">5/6 11:00</span>
+      </div>
+      <div class="log-row">
+        <div class="log-icon">📤</div>
+        <div class="log-info">
+          <div class="log-title">出庫：Mofusand 限定抱枕 → Siam Paragon</div>
+          <div class="log-sub">15 件 · Ploy 操作</div>
+        </div>
+        <span class="log-time">5/5 09:30</span>
+      </div>
+      <div class="log-row">
+        <div class="log-icon">🏷</div>
+        <div class="log-info">
+          <div class="log-title">折扣處理：JJK 鑰匙圈 7 折出清完成</div>
+          <div class="log-sub">80 件清空 · 進帳 ฿ 28,000 · Shawn 批准</div>
+        </div>
+        <span class="log-time">4/15 16:00</span>
+      </div>
+      <div class="log-row">
+        <div class="log-icon">📥</div>
+        <div class="log-info">
+          <div class="log-title">入庫：Mofusand 抱枕先期樣 50 件</div>
+          <div class="log-sub">來自有你共創上海倉</div>
+        </div>
+        <span class="log-time">4/25 14:15</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SESS = JSON.parse(localStorage.getItem('bkk_sess')||'null');
+if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
+  localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html');
+}
+const tb = document.getElementById('tb-user');
+if(tb) tb.textContent = `${SESS.name} · ${SESS.role||''}`;
+
+function switchTab(btn, tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function goDiscount(){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[2].classList.add('active');
+  document.getElementById('tab-discount').classList.add('active');
+}
+
+function proposeAction(type){
+  const map = {discount:'折扣方案已送 Shawn 審批',return:'退貨提案已送有你共創',destroy:'銷毀提案已送 Ray 審批',keep:'已標記繼續觀察'};
+  showToast('✓ '+ (map[type]||'已送出'));
+}
+
+function showToast(msg, color){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = color || 'var(--ok)';
+  el.style.color = color || 'var(--ok)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+</script>
+
+</body>
+</html>
