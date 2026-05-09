@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UJ BKK · Operations Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
+  --border:#222535;--border-hi:#363b58;
+  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
+  --bkk:#9333ea;--bkk-glow:#c084fc;--ok:#22c55e;--danger:#ef4444;
+}
+body{background:radial-gradient(circle at 30% 20%, #9333ea18 0%, var(--bg) 50%);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'Inter','Helvetica Neue',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.wrap{width:100%;max-width:420px;}
+.logo{text-align:center;margin-bottom:32px;}
+.logo-mark{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border:1px solid #9333ea40;border-radius:30px;background:#9333ea12;}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--bkk-glow);box-shadow:0 0 10px var(--bkk-glow);}
+.logo-name{font-size:18px;font-weight:800;letter-spacing:.02em;}
+.logo-sub{font-size:10px;color:var(--txt-lo);margin-top:14px;letter-spacing:.18em;text-transform:uppercase;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
+.card-title{font-size:15px;font-weight:700;margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--txt-mid);margin-bottom:20px;line-height:1.6;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:10px;color:var(--txt-mid);font-weight:700;margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase;}
+.field input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--txt-hi);outline:none;transition:border-color .2s;font-family:inherit;}
+.field input::placeholder{color:var(--txt-lo);}
+.field input:focus{border-color:var(--bkk);}
+.btn-login{width:100%;background:var(--bkk);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;transition:opacity .2s;font-family:inherit;}
+.btn-login:hover{opacity:.88;}
+.err{background:#ef444412;border:1px solid #ef444435;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger);margin-bottom:14px;display:none;}
+.err.show{display:block;}
+.hint-title{font-size:9px;color:var(--txt-lo);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:24px 0 10px;text-align:center;}
+.acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.acc{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:8px;}
+.acc:hover{border-color:#9333ea60;}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.acc-name{font-size:11px;font-weight:700;}
+.acc-role{font-size:9px;color:var(--txt-lo);}
+.foot{text-align:center;font-size:9px;color:var(--txt-lo);margin-top:18px;letter-spacing:.06em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-mark">
+      <span class="logo-dot"></span>
+      <span class="logo-name">UJ BKK</span>
+    </div>
+    <div class="logo-sub">Bangkok Operations Hub</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sign in to continue</div>
+    <div class="card-sub">Operations workbench for the Bangkok team. Submit expenses, track pop-up store performance, and manage local inventory.</div>
+    <div class="err" id="err">Incorrect username or password. Please try again.</div>
+    <div class="field"><label>Username</label><input id="usr" type="text" placeholder="e.g. meaw" autocapitalize="none"></div>
+    <div class="field"><label>Password</label><input id="pwd" type="password" placeholder="••••••••"></div>
+    <button class="btn-login" onclick="doLogin()">Sign In →</button>
+  </div>
+
+  <div class="hint-title">Quick switch (demo)</div>
+  <div class="acc-grid" id="acc-grid"></div>
+  <div class="foot">Demo password: ujbkk2026</div>
+</div>
+
+<script>
+const ACCS = {
+  meaw:    {pass:'ujbkk2026', name:'Meaw',     role:'BKK Ops Manager',  color:'#9333ea'},
+  somsak:  {pass:'ujbkk2026', name:'Somsak',   role:'Pop-up Lead',      color:'#7c3aed'},
+  niran:   {pass:'ujbkk2026', name:'Niran',    role:'Warehouse / Logistics', color:'#a855f7'},
+  ploy:    {pass:'ujbkk2026', name:'Ploy',     role:'Retail Sales',     color:'#c084fc'},
+};
+
+const grid=document.getElementById('acc-grid');
+Object.entries(ACCS).forEach(([id,a])=>{
+  const d=document.createElement('div');
+  d.className='acc';
+  d.innerHTML=`<div class="av" style="background:${a.color}">${[...a.name][0]}</div><div><div class="acc-name">${a.name}</div><div class="acc-role">${a.role}</div></div>`;
+  d.onclick=()=>{document.getElementById('usr').value=id;document.getElementById('pwd').value=a.pass;doLogin();};
+  grid.appendChild(d);
+});
+
+function doLogin(){
+  const usr=document.getElementById('usr').value.trim().toLowerCase();
+  const pwd=document.getElementById('pwd').value;
+  const a=ACCS[usr];
+  if(!a||a.pass!==pwd){ document.getElementById('err').classList.add('show'); document.getElementById('pwd').value=''; return; }
+  document.getElementById('err').classList.remove('show');
+  localStorage.setItem('bkk_sess',JSON.stringify({user:usr,name:a.name,role:a.role,color:a.color,ts:Date.now()}));
+  location.href='erp-bkk-en.html';
+}
+document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('usr').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pwd').focus();});
+
+// Auto-redirect if valid session
+const s=JSON.parse(localStorage.getItem('bkk_sess')||'null');
+if(s&&Date.now()-s.ts<7*86400000) location.href='erp-bkk-en.html';
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wujie ERP · UJ BKK Workbench</title>
+<title>UJ BKK · Operations Hub</title>
 <style>
 :root{
   --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
@@ -101,22 +101,21 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   <div class="brand">
     <div class="brand-dot"></div>
     <div>
-      <div class="brand-name">UJ BKK Workbench</div>
-      <div class="brand-sub">Bangkok JV · Wujie Group</div>
+      <div class="brand-name">UJ BKK</div>
+      <div class="brand-sub">Bangkok Operations Hub</div>
     </div>
   </div>
   <div class="topbar-right">
     <span id="tb-user" style="font-size:11px;color:var(--txt-mid);"></span>
-    <a href="erp-shawn.html" class="btn-sm">Shawn (COO) →</a>
-    <a href="login.html" class="btn-sm danger" onclick="localStorage.removeItem('erp_sess');return true;">Logout</a>
+    <a href="bkk-login.html" class="btn-sm danger" onclick="localStorage.removeItem('bkk_sess');return true;">Sign Out</a>
   </div>
 </div>
 
 <div class="main">
 
   <div class="greet">
-    <div class="greet-hi" id="greet-hi">Welcome to UJ BKK</div>
-    <div class="greet-sub" id="greet-sub">Bangkok ops dashboard · expenses route to Shawn → Ray</div>
+    <div class="greet-hi" id="greet-hi">Welcome</div>
+    <div class="greet-sub" id="greet-sub">Bangkok operations dashboard</div>
   </div>
 
   <!-- KPIs -->
@@ -151,7 +150,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="task-bar" style="background:var(--danger);"></div>
       <div class="task-info">
         <div class="task-title">Siam Paragon · Daily sales report due</div>
-        <div class="task-meta">Submit by 6 PM Bangkok time · Send to Shawn via LINE</div>
+        <div class="task-meta">Submit by 6 PM Bangkok time · upload via Sales tab</div>
       </div>
       <span class="task-due" style="background:var(--danger-dim);color:var(--danger);">Due today</span>
     </div>
@@ -167,7 +166,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       <div class="task-bar" style="background:var(--accent);"></div>
       <div class="task-info">
         <div class="task-title">Inventory check · Mofusand 2024 leftover stock</div>
-        <div class="task-meta">52 units aging >90 days · propose discount strategy to Shawn</div>
+        <div class="task-meta">52 units aging >90 days · propose discount strategy</div>
       </div>
       <span class="task-due" style="background:var(--card2);color:var(--txt-mid);">This week</span>
     </div>
@@ -220,7 +219,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
       </div>
       <span class="popup-status s-plan">● PLAN</span>
     </div>
-    <div style="font-size:11px;color:var(--txt-mid);">Initial proposal pending Ray's review · target USD $187K (benchmark from 2024 BKK JJK pop-up)</div>
+    <div style="font-size:11px;color:var(--txt-mid);">Initial proposal under review · target USD $187K (benchmark from 2024 BKK JJK pop-up)</div>
   </div>
 
   <!-- Bangkok Warehouse -->
@@ -278,8 +277,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <span class="sec-title">Submit Expense</span>
   </div>
   <div class="exp-form">
-    <div class="exp-form-title">💸 Local Expense Submission</div>
-    <div class="exp-form-sub">For Bangkok ops costs (venue, marketing, transport, etc.). Routes to Shawn for review, then Ray for final approval. Submitted in THB.</div>
+    <div class="exp-form-title">💸 Submit Expense</div>
+    <div class="exp-form-sub">Submit Bangkok ops expenses (venue, marketing, transport, etc.) in THB. Approval workflow runs automatically once submitted.</div>
 
     <div class="exp-row">
       <div class="exp-field">
@@ -323,7 +322,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     </div>
 
     <div class="exp-routing" id="exp-routing">
-      Routing: <strong>Submit → Shawn (COO review) → Ray (final approval)</strong>
+      <strong>✓ Auto-routing enabled.</strong> Your submission is logged and routed to the regional approver. You'll get a status update once reviewed.
     </div>
 
     <button class="exp-submit" onclick="submitExp()">Submit Expense Request →</button>
@@ -335,15 +334,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 <script>
 (function(){
-const SESS=JSON.parse(localStorage.getItem('erp_sess')||'null');
+const SESS=JSON.parse(localStorage.getItem('bkk_sess')||'null');
 if(!SESS||(SESS.ts&&Date.now()-SESS.ts>7*86400000)){
-  localStorage.removeItem('erp_sess'); location.replace('login.html'); return;
-}
-// Allow only Shawn / Ray / future BKK accounts (read-only for others)
-const allowed=['ray','shawn','meaw','bkk'];
-if(!allowed.includes(SESS.user)){
-  // soft redirect — allow read access but log
-  console.log('UJ BKK page accessed by',SESS.user);
+  localStorage.removeItem('bkk_sess'); location.replace('bkk-login.html'); return;
 }
 const tb=document.getElementById('tb-user');
 if(tb) tb.textContent=(SESS.name||SESS.user)+' · '+(SESS.role||'staff');
@@ -405,7 +398,7 @@ window.submitExp=function(){
     'Email已發送':'否',
     '申請說明':`${catLabel}${popup?' · '+popup:''}${desc?' / '+desc:''}`,
   });
-  showToast('✓ Submitted · routed to Shawn for review');
+  showToast('✓ Submitted · awaiting approval');
   document.getElementById('exp-amt').value='';
   document.getElementById('exp-desc').value='';
 };
