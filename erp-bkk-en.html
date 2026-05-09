@@ -54,20 +54,49 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .task-meta{font-size:10px;color:var(--txt-mid);margin-top:3px;}
 .task-due{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;flex-shrink:0;}
 
-.popup-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;}
-.popup-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.popup-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.popup-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;}
 .popup-name{font-size:14px;font-weight:800;}
-.popup-loc{font-size:10px;color:var(--txt-mid);margin-top:2px;}
-.popup-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;}
+.popup-loc{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+.popup-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;flex-shrink:0;}
 .s-live{background:var(--ok-dim);color:var(--ok);}
 .s-prep{background:var(--warn-dim);color:var(--warn);}
 .s-plan{background:var(--bkk-dim);color:#c084fc;}
-.popup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
-.ps-cell{background:var(--card2);border-radius:7px;padding:8px 10px;}
-.ps-label{font-size:9px;color:var(--txt-lo);font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
-.ps-val{font-size:14px;font-weight:800;margin-top:3px;}
-.popup-bar{background:var(--card2);height:4px;border-radius:2px;overflow:hidden;margin-top:8px;}
-.popup-bar-fill{height:100%;background:var(--ok);border-radius:2px;}
+.s-wrap{background:#94a3b818;color:#94a3b8;}
+
+/* Pipeline progress (7 stages) */
+.pl-track{display:flex;align-items:center;gap:0;margin:14px 0 10px;position:relative;}
+.pl-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;cursor:pointer;}
+.pl-dot{width:22px;height:22px;border-radius:50%;background:var(--card2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--txt-lo);transition:.15s;z-index:2;}
+.pl-step.done .pl-dot{background:var(--ok);border-color:var(--ok);color:#fff;}
+.pl-step.current .pl-dot{background:var(--bkk);border-color:var(--bkk-glow);color:#fff;box-shadow:0 0 12px #9333ea60;}
+.pl-step.skip .pl-dot{background:var(--card2);border-color:var(--border);color:var(--txt-lo);opacity:.4;}
+.pl-label{font-size:9px;font-weight:700;color:var(--txt-mid);margin-top:6px;text-align:center;line-height:1.3;}
+.pl-step.done .pl-label{color:var(--ok);}
+.pl-step.current .pl-label{color:var(--bkk-glow);}
+.pl-line{position:absolute;top:11px;height:2px;background:var(--border);z-index:1;}
+.pl-line.done{background:var(--ok);}
+
+.pl-current-task{background:#9333ea12;border:1px solid #9333ea40;border-radius:8px;padding:10px 12px;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.pl-ct-info{flex:1;min-width:0;}
+.pl-ct-label{font-size:9px;color:var(--bkk-glow);font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.pl-ct-text{font-size:12px;font-weight:600;color:var(--txt-hi);margin-top:3px;}
+.pl-ct-meta{font-size:10px;color:var(--txt-mid);margin-top:2px;}
+.pl-ct-action{background:var(--bkk);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.pl-ct-action:hover{opacity:.85;}
+
+.pl-toggle{font-size:10px;color:var(--bkk-glow);cursor:pointer;font-weight:700;text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.pl-detail{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.pl-detail.open{display:block;}
+.pl-stage-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:11px;}
+.pl-stage-row + .pl-stage-row{border-top:1px solid var(--border);}
+.pl-stage-mark{width:20px;height:20px;border-radius:50%;background:var(--card2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;cursor:pointer;}
+.pl-stage-mark.done{background:var(--ok);border-color:var(--ok);color:#fff;}
+.pl-stage-mark.current{background:var(--bkk);border-color:var(--bkk);color:#fff;}
+.pl-stage-info{flex:1;min-width:0;}
+.pl-stage-name{font-weight:700;font-size:11px;}
+.pl-stage-meta{font-size:9px;color:var(--txt-mid);margin-top:2px;}
+.pl-stage-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0;}
 
 .inv-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .inv-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txt-lo);padding:10px 12px;text-align:left;background:var(--card2);}
@@ -118,109 +147,40 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="greet-sub" id="greet-sub">Bangkok operations dashboard</div>
   </div>
 
-  <!-- KPIs -->
+  <!-- Pipeline KPIs -->
   <div class="kpi-row">
     <div class="kpi-big">
-      <div class="kpi-label">Active Pop-ups</div>
-      <div class="kpi-val">2</div>
-      <div class="kpi-sub">Siam Paragon (live) · Central Embassy (prep)</div>
-      <div class="kpi-trend trend-up">+1 this month</div>
+      <div class="kpi-label">Live Now</div>
+      <div class="kpi-val" style="color:var(--ok);" id="kpi-live">1</div>
+      <div class="kpi-sub" id="kpi-live-sub">Siam Paragon · Mofusand Summer</div>
     </div>
     <div class="kpi-big">
-      <div class="kpi-label">BKK Warehouse</div>
-      <div class="kpi-val">฿ 1.42M</div>
-      <div class="kpi-sub">Slow-moving + pop-up leftover stock</div>
-      <div class="kpi-trend trend-warn">2 SKUs aging >90d</div>
+      <div class="kpi-label">In Approval</div>
+      <div class="kpi-val" style="color:var(--warn);" id="kpi-approval">1</div>
+      <div class="kpi-sub" id="kpi-approval-sub">Central Embassy · venue / promo design</div>
     </div>
     <div class="kpi-big">
-      <div class="kpi-label">May Revenue (THB)</div>
-      <div class="kpi-val">฿ 0.86M</div>
-      <div class="kpi-sub">≈ ¥174K · Target ฿ 1.20M</div>
-      <div class="kpi-trend trend-warn">71% of target</div>
+      <div class="kpi-label">Pipeline</div>
+      <div class="kpi-val" id="kpi-pipeline">2</div>
+      <div class="kpi-sub" id="kpi-pipeline-sub">Proposal & design stage</div>
     </div>
   </div>
 
-  <!-- Today's Tasks -->
+  <!-- Pop-up Pipeline (main feature) -->
   <div class="sec-hdr">
-    <span class="sec-title">Today's Tasks</span>
-    <span class="sec-link">View all →</span>
+    <span class="sec-title">Pop-up Pipeline · 7 Stages</span>
+    <span class="sec-link" onclick="newPopupPlaceholder()">+ New Pop-up Plan</span>
   </div>
-  <div id="tasks-list">
-    <div class="task-card urgent">
-      <div class="task-bar" style="background:var(--danger);"></div>
-      <div class="task-info">
-        <div class="task-title">Siam Paragon · Daily sales report due</div>
-        <div class="task-meta">Submit by 6 PM Bangkok time · upload via Sales tab</div>
-      </div>
-      <span class="task-due" style="background:var(--danger-dim);color:var(--danger);">Due today</span>
-    </div>
-    <div class="task-card">
-      <div class="task-bar" style="background:var(--warn);"></div>
-      <div class="task-info">
-        <div class="task-title">Central Embassy · Confirm venue contract signature</div>
-        <div class="task-meta">Pop-up opens 2026-05-15 · landlord requesting deposit invoice</div>
-      </div>
-      <span class="task-due" style="background:var(--warn-dim);color:var(--warn);">3 days</span>
-    </div>
-    <div class="task-card">
-      <div class="task-bar" style="background:var(--accent);"></div>
-      <div class="task-info">
-        <div class="task-title">Inventory check · Mofusand 2024 leftover stock</div>
-        <div class="task-meta">52 units aging >90 days · propose discount strategy</div>
-      </div>
-      <span class="task-due" style="background:var(--card2);color:var(--txt-mid);">This week</span>
-    </div>
+  <div style="font-size:10px;color:var(--txt-lo);margin-bottom:12px;line-height:1.6;">
+    Each pop-up flows through: <b style="color:var(--txt-mid);">Proposal → Venue Lock → Product Design → Venue Build Approval → Promo Material Approval → Live → Wrap-up</b>. Click stages to mark complete.
   </div>
+  <div id="pipeline-list"></div>
 
-  <!-- Pop-up Stores -->
+  <!-- Today's Pipeline Tasks (auto-derived from current stages) -->
   <div class="sec-hdr" style="margin-top:24px;">
-    <span class="sec-title">Pop-up Stores</span>
-    <span class="sec-link">+ New plan</span>
+    <span class="sec-title">Today's Pipeline Tasks</span>
   </div>
-
-  <div class="popup-card">
-    <div class="popup-head">
-      <div>
-        <div class="popup-name">Siam Paragon · Mofusand Summer</div>
-        <div class="popup-loc">📍 Bangkok · 4F Atrium · 2026-04-20 → 2026-05-31</div>
-      </div>
-      <span class="popup-status s-live">● LIVE</span>
-    </div>
-    <div class="popup-stats">
-      <div class="ps-cell"><div class="ps-label">Sales (MTD)</div><div class="ps-val">฿ 862K</div></div>
-      <div class="ps-cell"><div class="ps-label">Target</div><div class="ps-val">฿ 1.20M</div></div>
-      <div class="ps-cell"><div class="ps-label">Days left</div><div class="ps-val">22</div></div>
-    </div>
-    <div class="popup-bar"><div class="popup-bar-fill" style="width:71.8%;"></div></div>
-    <div style="font-size:10px;color:var(--txt-mid);margin-top:6px;">71.8% of target · need ฿ 15.4K/day to close gap</div>
-  </div>
-
-  <div class="popup-card">
-    <div class="popup-head">
-      <div>
-        <div class="popup-name">Central Embassy · Opanchu × Snoopy</div>
-        <div class="popup-loc">📍 Bangkok · 5F · 2026-05-15 → 2026-06-30</div>
-      </div>
-      <span class="popup-status s-prep">● PREP</span>
-    </div>
-    <div class="popup-stats">
-      <div class="ps-cell"><div class="ps-label">Setup status</div><div class="ps-val" style="font-size:11px;">Contract sign</div></div>
-      <div class="ps-cell"><div class="ps-label">Stock arrival</div><div class="ps-val" style="font-size:11px;">2026-05-12</div></div>
-      <div class="ps-cell"><div class="ps-label">Opens in</div><div class="ps-val">7 days</div></div>
-    </div>
-    <div style="font-size:10px;color:var(--warn);margin-top:8px;">⚠ Awaiting landlord signature · deposit invoice ready to send</div>
-  </div>
-
-  <div class="popup-card">
-    <div class="popup-head">
-      <div>
-        <div class="popup-name">EmQuartier · JJK Theme (Q3)</div>
-        <div class="popup-loc">📍 Bangkok · planning · 2026-08-01 → 2026-09-15</div>
-      </div>
-      <span class="popup-status s-plan">● PLAN</span>
-    </div>
-    <div style="font-size:11px;color:var(--txt-mid);">Initial proposal under review · target USD $187K (benchmark from 2024 BKK JJK pop-up)</div>
-  </div>
+  <div id="tasks-list"></div>
 
   <!-- Bangkok Warehouse -->
   <div class="sec-hdr" style="margin-top:24px;">
@@ -348,7 +308,229 @@ const hi=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
 const name=SESS.name||SESS.user;
 if(greet) greet.textContent=`${hi}, ${name}`;
 const today=new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'short',day:'numeric'});
-if(sub) sub.textContent=`${today} · 3 active tasks · 2 pop-ups running`;
+
+// ── Pop-up Pipeline Data (7 stages) ─────────────────────────
+const STAGE_NAMES = ['Proposal','Venue Lock','Product Design','Venue Build Approval','Promo Material Approval','Live','Wrap-up'];
+const STAGE_SHORT = ['Prop','Venue','Product','Build','Promo','Live','Wrap'];
+const PIPELINE_KEY = 'bkk_pipeline_v1';
+
+const SEED_POPUPS = [
+  {
+    id:'pp1',
+    name:'Siam Paragon · Mofusand Summer',
+    venue:'Siam Paragon · 4F Atrium',
+    period:'2026-04-20 → 2026-05-31',
+    ip:'Mofusand', target:'฿ 1.20M',
+    stages:[
+      {n:1, done:true, owner:'Meaw',   date:'2026-02-15', note:'Concept approved'},
+      {n:2, done:true, owner:'Somsak', date:'2026-03-01', note:'Lease signed, deposit paid'},
+      {n:3, done:true, owner:'Meaw',   date:'2026-03-20', note:'8 limited SKUs finalized'},
+      {n:4, done:true, owner:'Somsak', date:'2026-04-05', note:'Booth layout approved'},
+      {n:5, done:true, owner:'Ploy',   date:'2026-04-15', note:'Posters + photo wall approved'},
+      {n:6, done:false, current:true, owner:'Ploy', note:'Daily sales report due 6 PM'},
+      {n:7, done:false},
+    ],
+  },
+  {
+    id:'pp2',
+    name:'Central Embassy · Opanchu × Snoopy',
+    venue:'Central Embassy · 5F',
+    period:'2026-05-15 → 2026-06-30',
+    ip:'Opanchu × Snoopy', target:'฿ 950K',
+    stages:[
+      {n:1, done:true, owner:'Meaw',   date:'2026-03-10', note:'Crossover concept approved'},
+      {n:2, done:true, owner:'Somsak', date:'2026-04-01', note:'Venue locked, deposit ฿200K'},
+      {n:3, done:true, owner:'Meaw',   date:'2026-04-20', note:'12 SKUs ready for production'},
+      {n:4, done:false, current:true, owner:'Somsak', note:'Booth render awaiting landlord signature'},
+      {n:5, done:false, owner:'Ploy', note:'Promo posters drafted, awaiting IP holder approval'},
+      {n:6, done:false},
+      {n:7, done:false},
+    ],
+  },
+  {
+    id:'pp3',
+    name:'EmQuartier · JJK Theme',
+    venue:'EmQuartier · TBD floor',
+    period:'2026-08-01 → 2026-09-15',
+    ip:'JJK', target:'USD $187K',
+    stages:[
+      {n:1, done:false, current:true, owner:'Meaw', note:'Proposal draft v2 — pending review'},
+      {n:2, done:false},{n:3, done:false},{n:4, done:false},{n:5, done:false},{n:6, done:false},{n:7, done:false},
+    ],
+  },
+  {
+    id:'pp4',
+    name:'Iconsiam · Muziktiger Q4',
+    venue:'Iconsiam · TBD',
+    period:'2026-11-10 → 2026-12-25',
+    ip:'Muziktiger', target:'฿ 1.60M',
+    stages:[
+      {n:1, done:false, current:true, owner:'Meaw', note:'Initial venue inquiry sent'},
+      {n:2, done:false},{n:3, done:false},{n:4, done:false},{n:5, done:false},{n:6, done:false},{n:7, done:false},
+    ],
+  },
+];
+
+function loadPopups(){
+  const stored=localStorage.getItem(PIPELINE_KEY);
+  if(stored) try{return JSON.parse(stored);}catch(e){}
+  localStorage.setItem(PIPELINE_KEY, JSON.stringify(SEED_POPUPS));
+  return SEED_POPUPS;
+}
+function savePopups(arr){ localStorage.setItem(PIPELINE_KEY, JSON.stringify(arr)); }
+
+function getCurrentStageNum(p){
+  for(let i=0;i<p.stages.length;i++){
+    if(!p.stages[i].done) return i+1;
+  }
+  return 8; // all done
+}
+function getStatus(p){
+  const cur=getCurrentStageNum(p);
+  if(cur>=8) return {label:'WRAPPED', cls:'s-wrap'};
+  if(cur===7) return {label:'WRAPPING', cls:'s-wrap'};
+  if(cur===6) return {label:'● LIVE', cls:'s-live'};
+  if(cur>=4) return {label:'● PREP', cls:'s-prep'};
+  return {label:'● PLAN', cls:'s-plan'};
+}
+
+function renderPipeline(){
+  const arr=loadPopups();
+  const el=document.getElementById('pipeline-list');
+  if(!el) return;
+  el.innerHTML=arr.map(p=>{
+    const cur=getCurrentStageNum(p);
+    const status=getStatus(p);
+    const trackHtml=p.stages.map((s,i)=>{
+      const cls=s.done?'done':(s.current||(cur===s.n)?'current':'skip');
+      return `<div class="pl-step ${cls}" onclick="toggleStage('${p.id}',${s.n})">
+        <div class="pl-dot">${s.done?'✓':s.n}</div>
+        <div class="pl-label">${STAGE_SHORT[i]}</div>
+      </div>`;
+    }).join('');
+    // Connector lines between dots — calculate position via flexbox alignment
+    const lineHtml=p.stages.slice(0,-1).map((s,i)=>{
+      const isDone = s.done && p.stages[i+1] && (p.stages[i+1].done || p.stages[i+1].current || cur===p.stages[i+1].n);
+      const leftPct = ((i+0.5)/p.stages.length)*100;
+      const widthPct = (1/p.stages.length)*100;
+      return `<div class="pl-line ${s.done?'done':''}" style="left:${leftPct}%;width:${widthPct}%;"></div>`;
+    }).join('');
+    const curStage=p.stages.find(s=>s.n===cur);
+    const ctHtml = curStage && cur<8 ? `<div class="pl-current-task">
+      <div class="pl-ct-info">
+        <div class="pl-ct-label">Current Stage · ${STAGE_NAMES[cur-1]}</div>
+        <div class="pl-ct-text">${curStage.note||'Awaiting next action'}</div>
+        <div class="pl-ct-meta">Owner: ${curStage.owner||'Unassigned'}</div>
+      </div>
+      <button class="pl-ct-action" onclick="markStageComplete('${p.id}',${cur})">Mark Complete ✓</button>
+    </div>` : '';
+    const detailRows=p.stages.map((s,i)=>{
+      const isDone=s.done, isCur=cur===s.n && cur<8;
+      const mark = isDone?'✓':(isCur?s.n:s.n);
+      const cls = isDone?'done':(isCur?'current':'');
+      const statusBadge = isDone
+        ? `<span class="pl-stage-status" style="background:var(--ok-dim);color:var(--ok);">Done</span>`
+        : (isCur ? `<span class="pl-stage-status" style="background:var(--bkk-dim);color:var(--bkk-glow);">Current</span>` : `<span class="pl-stage-status" style="background:var(--card2);color:var(--txt-lo);">Pending</span>`);
+      return `<div class="pl-stage-row">
+        <div class="pl-stage-mark ${cls}" onclick="toggleStage('${p.id}',${s.n})">${mark}</div>
+        <div class="pl-stage-info">
+          <div class="pl-stage-name">Stage ${s.n} · ${STAGE_NAMES[i]}</div>
+          <div class="pl-stage-meta">${s.owner?'Owner: '+s.owner:''}${s.date?' · '+s.date:''}${s.note?' · '+s.note:''}</div>
+        </div>
+        ${statusBadge}
+      </div>`;
+    }).join('');
+    return `<div class="popup-card" id="card-${p.id}">
+      <div class="popup-head">
+        <div>
+          <div class="popup-name">${p.name}</div>
+          <div class="popup-loc">📍 ${p.venue} · ${p.period} · IP: ${p.ip} · Target: ${p.target}</div>
+        </div>
+        <span class="popup-status ${status.cls}">${status.label}</span>
+      </div>
+      <div class="pl-track" style="position:relative;">
+        ${lineHtml}
+        ${trackHtml}
+      </div>
+      ${ctHtml}
+      <div class="pl-toggle" onclick="document.getElementById('detail-${p.id}').classList.toggle('open');this.textContent=document.getElementById('detail-${p.id}').classList.contains('open')?'Hide stage details ▲':'Show all stage details ▼';">Show all stage details ▼</div>
+      <div class="pl-detail" id="detail-${p.id}">${detailRows}</div>
+    </div>`;
+  }).join('');
+  // Update KPIs
+  const live=arr.filter(p=>getCurrentStageNum(p)===6).length;
+  const inApproval=arr.filter(p=>{const c=getCurrentStageNum(p);return c===4||c===5;}).length;
+  const pipeline=arr.filter(p=>{const c=getCurrentStageNum(p);return c<=3;}).length;
+  document.getElementById('kpi-live').textContent=live;
+  document.getElementById('kpi-approval').textContent=inApproval;
+  document.getElementById('kpi-pipeline').textContent=pipeline;
+}
+
+window.markStageComplete=function(popupId,stageNum){
+  const arr=loadPopups();
+  const p=arr.find(x=>x.id===popupId); if(!p) return;
+  const s=p.stages.find(x=>x.n===stageNum); if(!s) return;
+  s.done=true; s.current=false;
+  s.date=new Date().toISOString().slice(0,10);
+  s.completedBy=SESS.name||SESS.user;
+  // Mark next stage as current
+  const next=p.stages.find(x=>x.n===stageNum+1);
+  if(next && !next.done) next.current=true;
+  savePopups(arr);
+  renderPipeline();
+  renderTasks();
+  showToast(`✓ Stage ${stageNum} (${STAGE_NAMES[stageNum-1]}) marked complete`);
+};
+
+window.toggleStage=function(popupId,stageNum){
+  // For now just expand details (future: edit stage)
+  const detail=document.getElementById('detail-'+popupId);
+  if(detail) detail.classList.add('open');
+};
+
+window.newPopupPlaceholder=function(){
+  showToast('💡 New pop-up plan form coming soon — for now contact regional team','var(--bkk-glow)');
+};
+
+// ── Auto-derived Today's Tasks ─────────────────────────────
+function renderTasks(){
+  const arr=loadPopups();
+  const tasks=[];
+  arr.forEach(p=>{
+    const cur=getCurrentStageNum(p);
+    if(cur>=8) return;
+    const stage=p.stages.find(s=>s.n===cur);
+    if(!stage) return;
+    let urgency='med';
+    if(cur===6) urgency='high'; // Live = daily reporting
+    if(cur===4||cur===5) urgency='high'; // Approval blocking
+    tasks.push({
+      title:`${p.name.split(' · ')[0]} · ${STAGE_NAMES[cur-1]}`,
+      meta:`${stage.note||'Awaiting next action'} · Owner: ${stage.owner||'Unassigned'}`,
+      urgency, popupId:p.id, stageNum:cur,
+    });
+  });
+  if(!tasks.length){
+    document.getElementById('tasks-list').innerHTML='<div style="text-align:center;color:var(--txt-lo);font-size:11px;padding:20px;">All pop-ups wrapped up ✓</div>';
+    return;
+  }
+  const colorMap={high:'var(--danger)',med:'var(--warn)',low:'var(--accent)'};
+  const labelMap={high:'High',med:'Medium',low:'Normal'};
+  document.getElementById('tasks-list').innerHTML=tasks.map(t=>`
+    <div class="task-card${t.urgency==='high'?' urgent':''}" onclick="document.getElementById('card-${t.popupId}').scrollIntoView({behavior:'smooth',block:'start'});">
+      <div class="task-bar" style="background:${colorMap[t.urgency]};"></div>
+      <div class="task-info">
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">${t.meta}</div>
+      </div>
+      <span class="task-due" style="background:${colorMap[t.urgency]}22;color:${colorMap[t.urgency]};">${labelMap[t.urgency]}</span>
+    </div>`).join('');
+}
+
+renderPipeline();
+renderTasks();
+const taskCount=loadPopups().filter(p=>getCurrentStageNum(p)<8).length;
+if(sub) sub.textContent=`${today} · ${taskCount} active pop-ups in pipeline`;
 
 const PROXY='https://feishu-proxy.raychou6913.workers.dev';
 const AT='Sg7ObNELHaAdZzshGIFjWPVhpce';
