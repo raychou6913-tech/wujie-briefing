@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ERP 優先功能 Mockup</title>
+<style>
+:root{
+  --bg:#0f172a;--surface:#1e293b;--surface2:#263349;--border:#334155;
+  --text:#f1f5f9;--sub:#94a3b8;--dim:#475569;
+  --indigo:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--cyan:#06b6d4;--orange:#f97316;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.brand{font-size:15px;font-weight:800}
+.tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#6366f120;color:#818cf8;border:1px solid #6366f130}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);padding:0 24px}
+.tab{padding:12px 20px;font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--indigo);border-bottom-color:var(--indigo)}
+
+.view{display:none;max-width:1100px;margin:0 auto;padding:24px}
+.view.active{display:block}
+
+.hero{margin-bottom:24px}
+.hero-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.hero-sub{font-size:13px;color:var(--sub)}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.ph{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.pt{font-size:13px;font-weight:700}
+.pb{padding:16px 18px}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:700px){.two,.three{grid-template-columns:1fr}}
+
+/* form elements */
+.field{margin-bottom:14px}
+.label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
+.input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;transition:border-color .15s}
+.input:focus{border-color:var(--indigo)}
+select.input option{background:var(--surface2)}
+textarea.input{resize:vertical;min-height:70px}
+.row{display:flex;gap:10px}
+.row .field{flex:1}
+
+.btn{padding:9px 20px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--indigo);color:#fff}
+.btn-primary:hover{background:#4f46e5}
+.btn-green{background:#22c55e;color:#fff}
+.btn-green:hover{background:#16a34a}
+.btn-outline{background:transparent;color:var(--sub);border:1px solid var(--border)}
+.btn-outline:hover{color:var(--text);border-color:var(--sub)}
+
+/* status */
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.sdot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sdot.amber{background:var(--amber)}
+.sdot.red{background:var(--red)}
+.sdot.dim{background:var(--dim)}
+
+.srow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.sm{flex:1}
+.st{font-size:12px;font-weight:600;color:var(--text)}
+.ss{font-size:11px;color:var(--sub)}
+
+/* notification preview */
+.notif-preview{background:#1a1033;border:1px solid #6366f140;border-radius:10px;padding:14px 16px;margin-top:12px}
+.notif-header{font-size:10px;font-weight:700;color:var(--indigo);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.notif-body{font-size:12px;color:var(--text);line-height:1.7}
+.notif-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:#6366f120;color:#a5b4fc;border:1px solid #6366f130}
+
+/* AI parse */
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
+.upload-zone:hover{border-color:var(--indigo);background:#6366f108}
+.upload-icon{font-size:36px;margin-bottom:8px}
+.upload-hint{font-size:13px;color:var(--sub)}
+
+.parse-result{background:var(--surface2);border:1px solid var(--green)40;border-radius:10px;overflow:hidden;margin-top:12px}
+.parse-hdr{background:#22c55e10;padding:8px 14px;font-size:11px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:6px}
+table.parse-table{width:100%;border-collapse:collapse}
+table.parse-table th{font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;padding:8px 14px;border-bottom:1px solid var(--border);text-align:left}
+table.parse-table td{font-size:12px;color:var(--text);padding:8px 14px;border-bottom:1px solid var(--border)}
+table.parse-table tr:last-child td{border-bottom:none}
+.edit-cell{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:12px;color:var(--text);width:100%}
+
+/* compare table */
+.compare-wrap{overflow-x:auto}
+table.compare{width:100%;border-collapse:collapse;min-width:500px}
+table.compare th{font-size:11px;font-weight:700;color:var(--sub);padding:10px 14px;border-bottom:1px solid var(--border);text-align:left}
+table.compare td{font-size:12px;padding:10px 14px;border-bottom:1px solid var(--border)}
+table.compare tr.best td{background:#22c55e08}
+table.compare .best-tag{font-size:9px;font-weight:700;color:var(--green);background:#22c55e20;border-radius:4px;padding:1px 5px;margin-left:6px}
+
+/* contract */
+.ask-bar{display:flex;gap:10px;margin-bottom:20px}
+.ask-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--text);outline:none}
+.ask-input:focus{border-color:var(--indigo)}
+.ask-btn{background:var(--indigo);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer}
+
+.answer-card{background:linear-gradient(135deg,#1a1033,#0f172a);border:1px solid #6366f140;border-radius:12px;padding:20px;margin-bottom:16px}
+.answer-q{font-size:12px;color:var(--indigo);font-weight:700;margin-bottom:10px}
+.answer-a{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.answer-src{font-size:11px;color:var(--dim)}
+.answer-detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.ad-item{background:#ffffff08;border-radius:8px;padding:10px 12px}
+.ad-label{font-size:10px;color:var(--sub);margin-bottom:3px}
+.ad-val{font-size:13px;font-weight:700;color:var(--text)}
+
+.contract-list .cl-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.contract-list .cl-item:last-child{border-bottom:none}
+.cl-icon{font-size:24px}
+.cl-main{flex:1}
+.cl-name{font-size:13px;font-weight:700;color:var(--text)}
+.cl-meta{font-size:11px;color:var(--sub);margin-top:2px}
+.cl-tags{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.cl-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px}
+
+/* task queue */
+.tq-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.tq-item:last-child{border-bottom:none}
+.tq-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tq-check.done{background:var(--green);border-color:var(--green);color:#fff;font-size:11px}
+.tq-main{flex:1}
+.tq-title{font-size:13px;font-weight:600;color:var(--text)}
+.tq-sub{font-size:11px;color:var(--sub);margin-top:2px}
+.tq-due{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.due-ok{background:#22c55e20;color:#86efac}
+.due-warn{background:#f59e0b20;color:#fcd34d}
+.due-over{background:#ef444420;color:#fca5a5}
+
+.kpi-mini{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+.km-label{font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.km-val{font-size:22px;font-weight:800;color:var(--text)}
+.km-sub{font-size:11px;color:var(--sub);margin-top:3px}
+
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.finance-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.finance-row:last-child{border-bottom:none}
+.fr-l{font-size:12px;color:var(--sub)}
+.fr-r{font-size:13px;font-weight:700;color:var(--text)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">蕪解 ERP</div>
+  <span class="tag">優先功能 Mockup</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('v1',this)">① 版權送審狀態</div>
+  <div class="tab" onclick="show('v2',this)">② 採購 AI 解析</div>
+  <div class="tab" onclick="show('v3',this)">③ 合約知識庫</div>
+  <div class="tab" onclick="show('v4',this)">④ 躍明 / 楊子佇列</div>
+</div>
+
+
+<!-- ════════════════════════════════
+     ① 版權送審狀態系統
+════════════════════════════════ -->
+<div class="view active" id="v1">
+  <div class="hero">
+    <div class="hero-title">©️ 版權送審狀態系統</div>
+    <div class="hero-sub">珮玲更新 → 全公司 7 人即時收到通知</div>
+  </div>
+
+  <div class="two">
+
+    <!-- 更新表單（珮玲用） -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">📝 更新送審狀態（珮玲）</div>
+        <span class="badge" style="background:#6366f120;color:#a5b4fc">Bevis 可查看進度</span>
+      </div>
+      <div class="pb">
+        <div class="field">
+          <label class="label">選擇產品</label>
+          <select class="input">
+            <option>Snoopy · 超級變變變 毛絨公仔</option>
+            <option>Snoopy · 絨毛掛件（明）</option>
+            <option>Opanchu · 城市系列公仔</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label class="label">審核節點</label>
+            <select class="input">
+              <option>版權概念確認</option>
+              <option>2D 過審</option>
+              <option>3D 過審</option>
+              <option selected>打樣 / 色彩樣過審</option>
+              <option>模具大貨</option>
+              <option>大貨生產</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label">狀態</label>
+            <select class="input">
+              <option>已送出，等回覆</option>
+              <option selected>版權方已回覆</option>
+              <option>通過 ✅</option>
+              <option>需修改 ⚠️</option>
+              <option>被退回 ❌</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">版權方回覆內容</label>
+          <textarea class="input" placeholder="例：版權方要求調整手的長度，需重新修改後再送審…">版權方反饋：需調整手的長度，預計 4/28 重新送審單體形態照片，預計 5/8 給我們反饋。</textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label class="label">預計回覆日期</label>
+            <input type="date" class="input" value="2026-05-08">
+          </div>
+          <div class="field">
+            <label class="label">下一步負責人</label>
+            <select class="input">
+              <option>珮玲</option>
+              <option>Bevis</option>
+              <option>安然</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 通知預覽 -->
+        <div class="notif-preview">
+          <div class="notif-header">📣 送出後自動通知以下人員</div>
+          <div class="notif-body">
+            【版權送審更新】Snoopy · 超級變變變<br>
+            節點：打樣/色彩樣過審 ｜ 狀態：版權方已回覆<br>
+            預計下次回覆：2026/5/8<br>
+            詳情：需調整手的長度
+          </div>
+          <div class="notif-chips">
+            <span class="chip">Ray</span>
+            <span class="chip">安然</span>
+            <span class="chip">Shawn</span>
+            <span class="chip">老董</span>
+            <span class="chip">德寶</span>
+            <span class="chip">賴哥</span>
+            <span class="chip">木子</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button class="btn btn-primary" style="flex:1" onclick="this.textContent='✅ 已更新並通知'">送出更新</button>
+          <button class="btn btn-outline">存草稿</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 目前所有產品狀態（右欄，全公司可見） -->
+    <div>
+      <div class="panel">
+        <div class="ph">
+          <div class="pt">📊 所有產品送審狀態</div>
+          <span style="font-size:11px;color:var(--sub)">全公司可見</span>
+        </div>
+        <div class="pb">
+          <div class="srow">
+            <span class="sdot amber"></span>
+            <div class="sm">
+              <div class="st">Snoopy · 超級變變變</div>
+              <div class="ss">打樣/色彩樣過審 · 等版權方反饋 · 截止 5/8</div>
+            </div>
+            <span style="font-size:10px;color:var(--amber);font-weight:700">進行中</span>
+          </div>
+          <div class="srow">
+            <span class="sdot amber"></span>
+            <div class="sm">
+              <div class="st">Snoopy · 絨毛掛件（明）</div>
+              <div class="ss">吊卡設計 + 色彩樣 · 4/29 照片已送</div>
+            </div>
+            <span style="font-size:10px;color:var(--amber);font-weight:700">等回覆</span>
+          </div>
+          <div class="srow">
+            <span class="sdot red"></span>
+            <div class="sm">
+              <div class="st">Opanchu · 城市系列公仔</div>
+              <div class="ss">2D 退回修改 · Bevis 處理中 · 逾期 2 天</div>
+            </div>
+            <span style="font-size:10px;color:var(--red);font-weight:700">需修改</span>
+          </div>
+          <div class="srow">
+            <span class="sdot green"></span>
+            <div class="sm">
+              <div class="st">Opanchu · 亞克力掛件</div>
+              <div class="ss">版權全部通過 · 進入大貨</div>
+            </div>
+            <span style="font-size:10px;color:var(--green);font-weight:700">通過 ✅</span>
+          </div>
+          <div class="srow">
+            <span class="sdot dim"></span>
+            <div class="sm">
+              <div class="st">慫蛋 · 表情包貼紙</div>
+              <div class="ss">概念階段 · 尚未送審</div>
+            </div>
+            <span style="font-size:10px;color:var(--dim);font-weight:700">未開始</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><div class="pt">⏰ 近期截止日提醒</div></div>
+        <div class="pb">
+          <div class="srow">
+            <span class="sdot red"></span>
+            <div class="sm">
+              <div class="st">Opanchu 城市公仔 修改回送</div>
+              <div class="ss">逾期 2 天 · 安然需催 Bevis</div>
+            </div>
+          </div>
+          <div class="srow">
+            <span class="sdot amber"></span>
+            <div class="sm">
+              <div class="st">Opanchu Q3 合約續約</div>
+              <div class="ss">5/10 截止 · 需 Ray 簽回</div>
+            </div>
+          </div>
+          <div class="srow">
+            <span class="sdot green"></span>
+            <div class="sm">
+              <div class="st">Snoopy 夏日主題</div>
+              <div class="ss">版權方預計 5/8 回覆</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     ② 採購 AI 解析入口
+════════════════════════════════ -->
+<div class="view" id="v2">
+  <div class="hero">
+    <div class="hero-title">🛒 採購詢比議 + AI 解析入口</div>
+    <div class="hero-sub">賴哥丟截圖 → AI 填好表 → 確認 → Ray 批核</div>
+  </div>
+
+  <div class="two">
+
+    <!-- 左：AI 解析入口 -->
+    <div>
+      <div class="panel">
+        <div class="ph"><div class="pt">📎 上傳報價（賴哥用）</div></div>
+        <div class="pb">
+          <div class="upload-zone" onclick="showParsed()">
+            <div class="upload-icon">📄</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">點擊上傳或直接拖入</div>
+            <div class="upload-hint">支援：微信截圖、PDF 報價單、圖片</div>
+            <div style="margin-top:12px;font-size:11px;color:var(--indigo)">→ 點擊模擬 AI 解析</div>
+          </div>
+
+          <div id="parsed-result" style="display:none">
+            <div class="parse-result">
+              <div class="parse-hdr">✨ AI 已解析完成，請確認數字是否正確</div>
+              <table class="parse-table">
+                <tr><th>品項</th><th>單價（元）</th><th>MOQ</th><th>交期</th></tr>
+                <tr>
+                  <td><input class="edit-cell" value="Snoopy 毛絨公仔 8寸"></td>
+                  <td><input class="edit-cell" value="¥ 38.5"></td>
+                  <td><input class="edit-cell" value="200 個"></td>
+                  <td><input class="edit-cell" value="30 天"></td>
+                </tr>
+                <tr>
+                  <td><input class="edit-cell" value="Snoopy 毛絨公仔 10寸"></td>
+                  <td><input class="edit-cell" value="¥ 52.0"></td>
+                  <td><input class="edit-cell" value="200 個"></td>
+                  <td><input class="edit-cell" value="35 天"></td>
+                </tr>
+                <tr>
+                  <td><input class="edit-cell" value="Snoopy 抱枕 40cm"></td>
+                  <td><input class="edit-cell" value="¥ 45.0"></td>
+                  <td><input class="edit-cell" value="100 個"></td>
+                  <td><input class="edit-cell" value="28 天"></td>
+                </tr>
+              </table>
+            </div>
+            <div class="field" style="margin-top:12px">
+              <label class="label">供應商</label>
+              <input class="input" value="廣州盛美工藝品有限公司">
+            </div>
+            <div class="field">
+              <label class="label">備注</label>
+              <input class="input" placeholder="選填：付款條件、特殊備注…">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn btn-green" style="flex:1" onclick="this.textContent='✅ 已送出，等 Ray 批核'">確認無誤，送出比價</button>
+              <button class="btn btn-outline">重新上傳</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：比價總覽（多家供應商） -->
+    <div>
+      <div class="panel">
+        <div class="ph">
+          <div class="pt">📊 比價總覽 — Snoopy 毛絨公仔 8寸</div>
+          <span class="badge" style="background:#22c55e20;color:#86efac">3 家報價</span>
+        </div>
+        <div class="pb">
+          <div class="compare-wrap">
+            <table class="compare">
+              <tr>
+                <th>供應商</th><th>單價</th><th>MOQ</th><th>交期</th><th>品質</th>
+              </tr>
+              <tr class="best">
+                <td>廣州盛美<span class="best-tag">最低價</span></td>
+                <td style="color:var(--green);font-weight:700">¥ 38.5</td>
+                <td>200</td><td>30天</td>
+                <td><span style="color:var(--green)">★★★★☆</span></td>
+              </tr>
+              <tr>
+                <td>深圳俊達</td>
+                <td>¥ 41.0</td>
+                <td>300</td><td>25天</td>
+                <td><span style="color:var(--green)">★★★★★</span></td>
+              </tr>
+              <tr>
+                <td>東莞創盈</td>
+                <td>¥ 43.5</td>
+                <td>100</td><td>40天</td>
+                <td><span style="color:var(--amber)">★★★☆☆</span></td>
+              </tr>
+            </table>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:#6366f110;border:1px solid #6366f130;border-radius:8px">
+            <div style="font-size:11px;font-weight:700;color:var(--indigo);margin-bottom:4px">💡 AI 建議</div>
+            <div style="font-size:12px;color:var(--sub)">廣州盛美報價最低，但深圳俊達品質評分更高且交期快 5 天。建議詢問盛美能否提前交期，若可以優先選盛美。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><div class="pt">⏳ 待 Ray 批核</div><span class="badge" style="background:#ef444420;color:#fca5a5">2 件</span></div>
+        <div class="pb">
+          <div class="srow">
+            <span class="sdot amber"></span>
+            <div class="sm">
+              <div class="st">Snoopy Q3 主題商品 採購申請</div>
+              <div class="ss">廣州盛美 · ¥ 28,000 · 賴哥提交 2h 前</div>
+            </div>
+          </div>
+          <div class="srow">
+            <span class="sdot amber"></span>
+            <div class="sm">
+              <div class="st">Opanchu 亞克力掛件 補單</div>
+              <div class="ss">深圳亞創 · ¥ 6,500 · 木子提交昨日</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     ③ 合約知識庫
+════════════════════════════════ -->
+<div class="view" id="v3">
+  <div class="hero">
+    <div class="hero-title">📚 合約知識庫</div>
+    <div class="hero-sub">PDF 合約 → AI 一次解析 → 開會直接問，秒回</div>
+  </div>
+
+  <!-- AI 問答 -->
+  <div class="panel" style="margin-bottom:24px">
+    <div class="ph"><div class="pt">🤖 直接問問題</div><span style="font-size:11px;color:var(--sub)">安然/Ray/Shawn 開會時用</span></div>
+    <div class="pb">
+      <div class="ask-bar">
+        <input class="ask-input" value="Snoopy 台灣區的授權MG_總保底是多少？" id="ask-q">
+        <button class="ask-btn" onclick="showAnswer()">問</button>
+      </div>
+
+      <div id="answer-area">
+        <div class="answer-card">
+          <div class="answer-q">Q：Snoopy 台灣區的授權MG_總保底是多少？</div>
+          <div class="answer-a">年保底授權金：USD 15,000</div>
+          <div class="answer-src">來源：Peanuts Worldwide LLC 授權合約 2025 版 · 第 4.2 條</div>
+          <div class="answer-detail">
+            <div class="ad-item"><div class="ad-label">授權地區</div><div class="ad-val">台灣全境</div></div>
+            <div class="ad-item"><div class="ad-label">授權期限</div><div class="ad-val">2025/01–2026/12</div></div>
+            <div class="ad-item"><div class="ad-label">版稅抽成</div><div class="ad-val">淨銷售額 12%</div></div>
+            <div class="ad-item"><div class="ad-label">保底金</div><div class="ad-val" style="color:var(--amber)">USD 15,000 / 年</div></div>
+            <div class="ad-item"><div class="ad-label">付款方式</div><div class="ad-val">半年結一次</div></div>
+            <div class="ad-item"><div class="ad-label">合約到期</div><div class="ad-val" style="color:var(--amber)">2026/12/31</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快捷問題 -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <span style="font-size:11px;color:var(--dim)">常見問題：</span>
+        <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('ask-q').value='Snoopy 全球授權地區有哪些？'">Snoopy 授權地區</button>
+        <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('ask-q').value='Opanchu 授權合約何時到期？'">Opanchu 到期日</button>
+        <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('ask-q').value='各 IP 的版稅抽成比例？'">版稅比較</button>
+        <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="document.getElementById('ask-q').value='Muziktiger 違約條款是什麼？'">違約條款</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="two">
+    <!-- 合約列表 -->
+    <div class="panel">
+      <div class="ph">
+        <div class="pt">📁 合約資料庫</div>
+        <button class="btn btn-outline" style="font-size:11px;padding:5px 12px">+ 上傳新合約</button>
+      </div>
+      <div class="pb contract-list">
+        <div class="cl-item">
+          <div class="cl-icon">📄</div>
+          <div class="cl-main">
+            <div class="cl-name">Snoopy · Peanuts Worldwide LLC</div>
+            <div class="cl-meta">2025/01 – 2026/12 · 全球版圖</div>
+            <div class="cl-tags">
+              <span class="cl-tag" style="background:#3b82f620;color:#60a5fa">台灣</span>
+              <span class="cl-tag" style="background:#3b82f620;color:#60a5fa">香港</span>
+              <span class="cl-tag" style="background:#3b82f620;color:#60a5fa">中國大陸</span>
+              <span class="cl-tag" style="background:#3b82f620;color:#60a5fa">東南亞</span>
+              <span class="cl-tag" style="background:#22c55e20;color:#86efac">AI 已解析 ✓</span>
+            </div>
+          </div>
+        </div>
+        <div class="cl-item">
+          <div class="cl-icon">📄</div>
+          <div class="cl-main">
+            <div class="cl-name">Opanchu · 版權方</div>
+            <div class="cl-meta">2025/06 – 2026/05 · 即將到期</div>
+            <div class="cl-tags">
+              <span class="cl-tag" style="background:#ec489920;color:#f472b6">台灣</span>
+              <span class="cl-tag" style="background:#ec489920;color:#f472b6">香港</span>
+              <span class="cl-tag" style="background:#22c55e20;color:#86efac">AI 已解析 ✓</span>
+              <span class="cl-tag" style="background:#ef444420;color:#fca5a5">⚠ 60天後到期</span>
+            </div>
+          </div>
+        </div>
+        <div class="cl-item">
+          <div class="cl-icon">📄</div>
+          <div class="cl-main">
+            <div class="cl-name">Muziktiger · 版權方</div>
+            <div class="cl-meta">2024/03 – 2026/12</div>
+            <div class="cl-tags">
+              <span class="cl-tag" style="background:#8b5cf620;color:#a78bfa">台灣</span>
+              <span class="cl-tag" style="background:#8b5cf620;color:#a78bfa">東南亞</span>
+              <span class="cl-tag" style="background:#f59e0b20;color:#fcd34d">待解析</span>
+            </div>
+          </div>
+        </div>
+        <div class="cl-item">
+          <div class="cl-icon">📄</div>
+          <div class="cl-main">
+            <div class="cl-name">Snoopy · 舊版合約（存檔）</div>
+            <div class="cl-meta">2023/01 – 2024/12 · 已到期</div>
+            <div class="cl-tags">
+              <span class="cl-tag" style="background:#33415520;color:#64748b">已存檔</span>
+              <span class="cl-tag" style="background:#22c55e20;color:#86efac">AI 已解析 ✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 一次性解析入口 -->
+    <div class="panel">
+      <div class="ph"><div class="pt">✨ 一次性匯入舊合約</div></div>
+      <div class="pb">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.7">
+          把過去所有 PDF 合約拖進來，Gemini 自動抽取關鍵條款，安然確認一遍後進知識庫，之後開會直接問系統。
+        </div>
+        <div class="upload-zone" style="margin-bottom:14px">
+          <div class="upload-icon">📂</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">拖入所有合約 PDF</div>
+          <div class="upload-hint">支援批次上傳，Gemini 自動逐份解析</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--sub)">
+          <div style="font-weight:700;color:var(--amber);margin-bottom:6px">⚠️ 解析完成後，安然需確認每份合約的關鍵數字</div>
+          合約數字出錯後果嚴重，AI 解析僅供初稿，人工確認是必要步驟。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════
+     ④ 躍明 / 楊子 工作佇列
+════════════════════════════════ -->
+<div class="view" id="v4">
+  <div class="hero">
+    <div class="hero-title">📋 躍明 / 楊子 工作佇列</div>
+    <div class="hero-sub">系統每月自動建立任務清單，不需要被人催</div>
+  </div>
+
+  <div class="two">
+
+    <!-- 躍明 -->
+    <div>
+      <div class="panel">
+        <div class="ph">
+          <div class="pt">📊 躍明 — 本月財務任務</div>
+          <span class="badge" style="background:#f59e0b20;color:#fcd34d">3/6 完成</span>
+        </div>
+        <div class="pb">
+          <div class="tq-item">
+            <div class="tq-check done" onclick="this.className='tq-check'">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">4月損益表</div>
+              <div class="tq-sub">每月 3 日前完成 → Ray 戰情室自動更新</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check done" onclick="this.className='tq-check'">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">三城業績彙整核對</div>
+              <div class="tq-sub">與 Shawn 數字交叉確認</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check done" onclick="this.className='tq-check'">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">4月版權費支出核對</div>
+              <div class="tq-sub">對帳安然的版權付款記錄</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check" onclick="this.className='tq-check done';this.textContent='✓'"></div>
+            <div class="tq-main">
+              <div class="tq-title">現金流預測（30/60/90天）</div>
+              <div class="tq-sub">每月 5 日前更新 → Ray + 安然同時看到</div>
+            </div>
+            <span class="tq-due due-warn">5/5 截止</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check" onclick="this.className='tq-check done';this.textContent='✓'"></div>
+            <div class="tq-main">
+              <div class="tq-title">應收帳款逾期清單</div>
+              <div class="tq-sub">整理後自動推給安然催款</div>
+            </div>
+            <span class="tq-due due-warn">5/6 截止</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check" onclick="this.className='tq-check done';this.textContent='✓'"></div>
+            <div class="tq-main">
+              <div class="tq-title">Q2 預算執行率報告</div>
+              <div class="tq-sub">季度任務 · 送 Ray + Shawn 審閱</div>
+            </div>
+            <span class="tq-due due-over">逾期 1 天</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="three" style="margin-top:0">
+        <div class="kpi-mini"><div class="km-label">完成率</div><div class="km-val">50%</div><div class="km-sub">3 / 6 項</div></div>
+        <div class="kpi-mini"><div class="km-label">逾期</div><div class="km-val" style="color:var(--red)">1 項</div><div class="km-sub">Q2預算報告</div></div>
+        <div class="kpi-mini"><div class="km-label">本月截止</div><div class="km-val">5/6</div><div class="km-sub">現金流預測</div></div>
+      </div>
+    </div>
+
+    <!-- 楊子 -->
+    <div>
+      <div class="panel">
+        <div class="ph">
+          <div class="pt">👩‍💼 楊子 — 本月行政人事任務</div>
+          <span class="badge" style="background:#06b6d420;color:#67e8f9">5/7 完成</span>
+        </div>
+        <div class="pb">
+          <div class="tq-item">
+            <div class="tq-check done">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">4月薪資核算</div>
+              <div class="tq-sub">確認出勤記錄 → 安然複核 → 發薪</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check done">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">費用報銷審核（4月）</div>
+              <div class="tq-sub">核實單據 → 轉安然批准 → 躍明入帳</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check done">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">出勤記錄彙整</div>
+              <div class="tq-sub">送 Shawn 查看全員狀態</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check done">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">請假申請處理（本月）</div>
+              <div class="tq-sub">3 件已批，1 件轉安然</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check done">✓</div>
+            <div class="tq-main">
+              <div class="tq-title">社保公積金申報</div>
+              <div class="tq-sub">每月 15 日前完成</div>
+            </div>
+            <span class="tq-due due-ok">已完成</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check" onclick="this.className='tq-check done';this.textContent='✓'"></div>
+            <div class="tq-main">
+              <div class="tq-title">德寶試用期追蹤</div>
+              <div class="tq-sub">試用期 5/30 到期 → 需提前發轉正/終止通知</div>
+            </div>
+            <span class="tq-due due-warn">5/15 前處理</span>
+          </div>
+          <div class="tq-item">
+            <div class="tq-check" onclick="this.className='tq-check done';this.textContent='✓'"></div>
+            <div class="tq-main">
+              <div class="tq-title">辦公室耗材採購</div>
+              <div class="tq-sub">庫存不足提醒 → 提交採購申請</div>
+            </div>
+            <span class="tq-due due-ok">本月內</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">🔔 系統自動提醒機制</div>
+        <div class="finance-row"><span class="fr-l">每月 1 日</span><span class="fr-r" style="font-size:12px">損益表任務建立 → 通知躍明</span></div>
+        <div class="finance-row"><span class="fr-l">每月 25 日</span><span class="fr-r" style="font-size:12px">下月薪資任務建立 → 通知楊子</span></div>
+        <div class="finance-row"><span class="fr-l">合約到期前 60 天</span><span class="fr-r" style="font-size:12px">提醒安然 + Ray 續約</span></div>
+        <div class="finance-row"><span class="fr-l">試用期到期前 15 天</span><span class="fr-r" style="font-size:12px">提醒楊子 + 安然決策</span></div>
+        <div class="finance-row" style="border:none"><span class="fr-l">逾期任務</span><span class="fr-r" style="font-size:12px;color:var(--red)">自動升級通知 Shawn</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+function show(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+function showParsed(){
+  document.getElementById('parsed-result').style.display='block';
+}
+function showAnswer(){
+  document.getElementById('answer-area').style.display='block';
+}
+</script>
+</body>
+</html>

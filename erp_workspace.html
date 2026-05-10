@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP — 工作大廳</title>
+<style>
+:root{
+  --bg:#0f172a;--surface:#1e293b;--surface2:#263349;--border:#334155;
+  --text:#f1f5f9;--sub:#94a3b8;--dim:#475569;
+  --indigo:#6366f1;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--orange:#f97316;--cyan:#06b6d4;
+  --indigo-dim:#6366f120;--green-dim:#22c55e20;--amber-dim:#f59e0b20;--red-dim:#ef444420;--orange-dim:#f9731620;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+
+/* ── Topbar ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.tb-left{display:flex;align-items:center;gap:16px}
+.tb-brand{font-size:15px;font-weight:800;color:var(--text);letter-spacing:.3px}
+.tb-role-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+.tb-right{display:flex;align-items:center;gap:12px}
+.tb-name{font-size:13px;color:var(--sub)}
+.tb-date{font-size:11px;color:var(--dim)}
+.logout-btn{font-size:12px;color:var(--dim);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s}
+.logout-btn:hover{border-color:var(--indigo);color:var(--indigo)}
+
+/* ── Demo switcher ── */
+.demo-bar{background:#1a1033;border-bottom:1px solid #6366f130;padding:8px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.demo-label{font-size:11px;color:#6366f1;font-weight:700;letter-spacing:.4px}
+.dbtn{background:#6366f115;color:#94a3b8;border:1px solid #6366f130;border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-weight:600;transition:all .15s}
+.dbtn:hover{background:#6366f125;color:var(--text)}
+.dbtn.active{background:#6366f1;color:#fff;border-color:#6366f1}
+
+/* ── Workspace ── */
+.workspace{display:none;max-width:1200px;margin:0 auto;padding:24px}
+.workspace.active{display:block}
+
+/* ── Section headers ── */
+.ws-hero{margin-bottom:24px}
+.ws-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.ws-sub{font-size:13px;color:var(--sub)}
+
+/* ── KPI row ── */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--c,var(--indigo))}
+.kpi-label{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.kpi-val{font-size:26px;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px}
+.kpi-delta{font-size:11px;color:var(--sub)}
+.kpi-delta.up{color:var(--green)}
+.kpi-delta.down{color:var(--red)}
+
+/* ── Two-col layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:768px){.two-col,.three-col{grid-template-columns:1fr}}
+
+/* ── Panel ── */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.panel-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.panel-title{font-size:13px;font-weight:700;color:var(--text)}
+.panel-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.panel-body{padding:16px 18px}
+
+/* ── Approve queue ── */
+.approve-item{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;background:var(--surface2)}
+.approve-item:last-child{margin-bottom:0}
+.approve-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.approve-content{flex:1}
+.approve-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.approve-meta{font-size:11px;color:var(--sub);margin-bottom:10px}
+.approve-actions{display:flex;gap:8px}
+.btn-approve{background:var(--green-dim);color:var(--green);border:1px solid #22c55e40;border-radius:7px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-approve:hover{background:#22c55e;color:#fff}
+.btn-reject{background:var(--red-dim);color:var(--red);border:1px solid #ef444440;border-radius:7px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-reject:hover{background:var(--red);color:#fff}
+.btn-view{background:transparent;color:var(--sub);border:1px solid var(--border);border-radius:7px;padding:5px 14px;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-view:hover{color:var(--text);border-color:var(--sub)}
+.amount-tag{font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-dim);border-radius:5px;padding:2px 7px;display:inline-block;margin-bottom:4px}
+
+/* ── Kanban ── */
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.kanban-col{min-width:180px;flex:1}
+.kanban-col-hdr{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;justify-content:space-between}
+.kanban-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.kanban-card:hover{border-color:var(--indigo)}
+.kc-ip{font-size:10px;font-weight:700;color:var(--indigo);margin-bottom:4px}
+.kc-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4}
+.kc-meta{font-size:10px;color:var(--dim)}
+.kc-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px}
+
+/* ── Status list ── */
+.status-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.status-row:last-child{border-bottom:none}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-dot.amber{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.status-dot.red{background:var(--red)}
+.status-dot.dim{background:var(--dim)}
+.sr-main{flex:1}
+.sr-title{font-size:12px;font-weight:600;color:var(--text)}
+.sr-sub{font-size:11px;color:var(--sub)}
+.sr-right{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap}
+
+/* ── Vam ring ── */
+.vam-wrap{display:flex;align-items:center;gap:20px;padding:16px 0}
+.vam-ring{width:90px;height:90px;flex-shrink:0}
+.vam-info{flex:1}
+.vam-label{font-size:11px;color:var(--sub);margin-bottom:4px}
+.vam-val{font-size:20px;font-weight:800;color:var(--text)}
+.vam-target{font-size:11px;color:var(--dim);margin-top:2px}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-top:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:var(--c,var(--indigo));transition:width .4s ease}
+
+/* ── City cards ── */
+.city-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
+.city-name{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.city-val{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px}
+.city-target{font-size:10px;color:var(--dim)}
+
+/* ── People chips ── */
+.people-row{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0}
+.person-chip{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+.person-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.person-name{font-size:11px;font-weight:600;color:var(--text)}
+.person-status{font-size:10px;color:var(--sub)}
+
+/* ── IP pipeline ── */
+.ip-pipe{display:flex;align-items:center;gap:0;margin-bottom:16px}
+.pipe-step{flex:1;text-align:center;font-size:10px;color:var(--sub);padding:6px 4px;border-top:2px solid var(--border);position:relative}
+.pipe-step.done{color:var(--green);border-color:var(--green)}
+.pipe-step.active{color:var(--amber);border-color:var(--amber);font-weight:700}
+.pipe-step::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:var(--border)}
+.pipe-step.done::before{background:var(--green)}
+.pipe-step.active::before{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+
+/* ── Quick actions ── */
+.quick-actions{display:flex;flex-wrap:wrap;gap:10px}
+.qa-btn{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px}
+.qa-btn:hover{border-color:var(--indigo);background:var(--indigo-dim);color:var(--indigo)}
+
+/* ── Finance row ── */
+.finance-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.finance-row:last-child{border-bottom:none}
+.fr-label{font-size:12px;color:var(--sub)}
+.fr-val{font-size:13px;font-weight:700;color:var(--text)}
+.fr-val.pos{color:var(--green)}
+.fr-val.neg{color:var(--red)}
+
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:32px 20px;color:var(--dim)}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.empty-text{font-size:12px}
+
+/* ── Tag colors ── */
+.tag-snoopy{background:#3b82f620;color:#60a5fa;border:1px solid #3b82f640}
+.tag-opanchu{background:#ec489920;color:#f472b6;border:1px solid #ec489940}
+.tag-muzik{background:#8b5cf620;color:#a78bfa;border:1px solid #8b5cf640}
+.tag-songdan{background:#22c55e20;color:#86efac;border:1px solid #22c55e40}
+.tag-urgent{background:#ef444420;color:#fca5a5;border:1px solid #ef444440}
+.tag-ok{background:#22c55e20;color:#86efac;border:1px solid #22c55e40}
+.tag-pending{background:#f59e0b20;color:#fcd34d;border:1px solid #f59e0b40}
+
+.full-col{grid-column:1/-1}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-brand">蕪解創意 ERP</div>
+    <span class="tb-role-tag" id="tb-role-tag" style="background:#6366f120;color:#818cf8;border:1px solid #6366f140">—</span>
+  </div>
+  <div class="tb-right">
+    <span class="tb-date" id="tb-date"></span>
+    <span class="tb-name" id="tb-name"></span>
+    <button class="logout-btn" onclick="location.href='home.html'">← 首頁</button>
+  </div>
+</div>
+
+<!-- Demo switcher (mockup only) -->
+<div class="demo-bar">
+  <span class="demo-label">▸ MOCKUP 預覽視角</span>
+  <button class="dbtn active" onclick="switchDemo('ray')">Ray 戰情室</button>
+  <button class="dbtn" onclick="switchDemo('anran')">安然 中控</button>
+  <button class="dbtn" onclick="switchDemo('shawn')">Shawn 營運</button>
+  <button class="dbtn" onclick="switchDemo('pipeline')">產品開發</button>
+  <button class="dbtn" onclick="switchDemo('design')">IP 工坊</button>
+  <button class="dbtn" onclick="switchDemo('supply')">供應鏈</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE 1: RAY 戰情室
+═══════════════════════════════════════ -->
+<div class="workspace active" id="ws-ray">
+  <div class="workspace" style="max-width:1200px;margin:0 auto;padding:24px;display:block">
+
+  <div class="ws-hero">
+    <div class="ws-title">⚡ 戰情室</div>
+    <div class="ws-sub">今日 2026-05-01 · 3 項待批核</div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi" style="--c:#22c55e">
+      <div class="kpi-label">本月業績</div>
+      <div class="kpi-val">¥ 82.4萬</div>
+      <div class="kpi-delta up">↑ 12% vs 上月</div>
+    </div>
+    <div class="kpi" style="--c:#f59e0b">
+      <div class="kpi-label">VAM 進度 Y1</div>
+      <div class="kpi-val">61%</div>
+      <div class="kpi-delta">目標 750萬淨利</div>
+    </div>
+    <div class="kpi" style="--c:#06b6d4">
+      <div class="kpi-label">現金流（月底預測）</div>
+      <div class="kpi-val">¥ 34.1萬</div>
+      <div class="kpi-delta up">健康</div>
+    </div>
+    <div class="kpi" style="--c:#ef4444">
+      <div class="kpi-label">待批核</div>
+      <div class="kpi-val">3</div>
+      <div class="kpi-delta down">需今日處理</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Approve Queue -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <div class="panel-title">🔔 待批核清單</div>
+        <span class="panel-badge" style="background:#ef444420;color:#fca5a5">3 項</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="approve-item">
+          <div class="approve-icon">🛒</div>
+          <div class="approve-content">
+            <div class="amount-tag">¥ 28,000</div>
+            <div class="approve-title">Snoopy Q3 主題商品採購申請</div>
+            <div class="approve-meta">賴哥 · 採購 · 2小時前提交 · 供應商：廣州盛美</div>
+            <div class="approve-actions">
+              <button class="btn-approve" onclick="this.closest('.approve-item').style.opacity='.4'">✓ 批准</button>
+              <button class="btn-reject" onclick="this.closest('.approve-item').style.opacity='.4'">✕ 退回</button>
+              <button class="btn-view">查看詳情</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="approve-item">
+          <div class="approve-icon">📋</div>
+          <div class="approve-content">
+            <div class="amount-tag">¥ 6,500</div>
+            <div class="approve-title">曼谷快閃店 5月場地費用</div>
+            <div class="approve-meta">Shawn · 場地 · 昨日提交 · 泰國 Siam Paragon</div>
+            <div class="approve-actions">
+              <button class="btn-approve" onclick="this.closest('.approve-item').style.opacity='.4'">✓ 批准</button>
+              <button class="btn-reject" onclick="this.closest('.approve-item').style.opacity='.4'">✕ 退回</button>
+              <button class="btn-view">查看詳情</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="approve-item">
+          <div class="approve-icon">📝</div>
+          <div class="approve-content">
+            <div class="approve-title">Opanchu 版權使用協議 Q3 續約</div>
+            <div class="approve-meta">安然 · 版權 · 3天前提交 · 需 5/10 前簽回</div>
+            <div class="approve-actions">
+              <button class="btn-approve" onclick="this.closest('.approve-item').style.opacity='.4'">✓ 簽核</button>
+              <button class="btn-reject" onclick="this.closest('.approve-item').style.opacity='.4'">✕ 退回</button>
+              <button class="btn-view">查看合約</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VAM + 三城 -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">🎯 VAM 對賭進度</div></div>
+        <div class="panel-body">
+          <div class="vam-wrap">
+            <svg class="vam-ring" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#334155" stroke-width="10"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#22c55e" stroke-width="10"
+                stroke-dasharray="152 251" stroke-dashoffset="63" stroke-linecap="round"/>
+              <text x="50" y="46" text-anchor="middle" fill="#f1f5f9" font-size="16" font-weight="800">61%</text>
+              <text x="50" y="60" text-anchor="middle" fill="#94a3b8" font-size="9">Y1</text>
+            </svg>
+            <div class="vam-info">
+              <div class="vam-label">Year 1 目標淨利</div>
+              <div class="vam-val">¥ 750萬</div>
+              <div class="vam-target">目前累計：¥ 457.5萬</div>
+              <div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="--c:#22c55e;width:61%"></div></div>
+            </div>
+          </div>
+          <div class="three-col" style="margin:0">
+            <div class="city-card">
+              <div class="city-name">🇹🇼 台北</div>
+              <div class="city-val">¥ 31.2萬</div>
+              <div class="city-target">目標 40萬</div>
+              <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="--c:#6366f1;width:78%"></div></div>
+            </div>
+            <div class="city-card">
+              <div class="city-name">🇨🇳 北京</div>
+              <div class="city-val">¥ 38.6萬</div>
+              <div class="city-target">目標 50萬</div>
+              <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="--c:#f97316;width:77%"></div></div>
+            </div>
+            <div class="city-card">
+              <div class="city-name">🇹🇭 曼谷</div>
+              <div class="city-val">¥ 12.6萬</div>
+              <div class="city-target">目標 20萬</div>
+              <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="--c:#06b6d4;width:63%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /two-col -->
+
+  <!-- IP 開發狀態 -->
+  <div class="panel" style="margin-bottom:24px">
+    <div class="panel-hdr"><div class="panel-title">🎨 IP 開發流水線概覽</div></div>
+    <div class="panel-body">
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:8px;font-weight:700">SNOOPY · Q3 夏日海灘主題</div>
+        <div class="ip-pipe">
+          <div class="pipe-step done">創意提案</div>
+          <div class="pipe-step done">內部立項</div>
+          <div class="pipe-step active">版權送審</div>
+          <div class="pipe-step">採購詢價</div>
+          <div class="pipe-step">打樣驗收</div>
+          <div class="pipe-step">大貨確認</div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:8px;font-weight:700">OPANCHU · 城市系列公仔</div>
+        <div class="ip-pipe">
+          <div class="pipe-step done">創意提案</div>
+          <div class="pipe-step done">內部立項</div>
+          <div class="pipe-step done">版權送審</div>
+          <div class="pipe-step active">採購詢價</div>
+          <div class="pipe-step">打樣驗收</div>
+          <div class="pipe-step">大貨確認</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--sub);margin-bottom:8px;font-weight:700">慫蛋 · 首批表情包貼紙</div>
+        <div class="ip-pipe">
+          <div class="pipe-step active">創意提案</div>
+          <div class="pipe-step">內部立項</div>
+          <div class="pipe-step">版權送審</div>
+          <div class="pipe-step">採購詢價</div>
+          <div class="pipe-step">打樣驗收</div>
+          <div class="pipe-step">大貨確認</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div><!-- /ws-ray -->
+
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE 2: 安然 中控
+═══════════════════════════════════════ -->
+<div class="workspace" id="ws-anran">
+  <div class="workspace" style="max-width:1200px;margin:0 auto;padding:24px;display:block">
+
+  <div class="ws-hero">
+    <div class="ws-title">🗂 安然中控</div>
+    <div class="ws-sub">批發業務 · 版權窗口 · 財務出納</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" style="--c:#f97316">
+      <div class="kpi-label">本月批發業績</div>
+      <div class="kpi-val">¥ 38.6萬</div>
+      <div class="kpi-delta up">↑ 8% vs 上月</div>
+    </div>
+    <div class="kpi" style="--c:#22c55e">
+      <div class="kpi-label">版權跟進中</div>
+      <div class="kpi-val">4 件</div>
+      <div class="kpi-delta">1 件需本週回覆</div>
+    </div>
+    <div class="kpi" style="--c:#06b6d4">
+      <div class="kpi-label">應收帳款</div>
+      <div class="kpi-val">¥ 12.3萬</div>
+      <div class="kpi-delta down">2 筆逾期 30天</div>
+    </div>
+    <div class="kpi" style="--c:#6366f1">
+      <div class="kpi-label">活躍 B2B 客戶</div>
+      <div class="kpi-val">23 家</div>
+      <div class="kpi-delta up">本月新增 3 家</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- B2B 銷售跟進 -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <div class="panel-title">🎯 批發業務跟進</div>
+        <span class="panel-badge" style="background:#f9731620;color:#fdba74">7 個活躍</span>
+      </div>
+      <div class="panel-body">
+        <div class="status-row">
+          <div class="status-dot green"></div>
+          <div class="sr-main">
+            <div class="sr-title">上海玩具博覽會採購商 — 張經理</div>
+            <div class="sr-sub">報價已送出 · 等回覆 · Snoopy Q3 系列</div>
+          </div>
+          <div class="sr-right">¥ 8萬</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot amber"></div>
+          <div class="sr-main">
+            <div class="sr-title">北京王府井旗艦店 — 採購部</div>
+            <div class="sr-sub">需 5/5 前確認訂單數量</div>
+          </div>
+          <div class="sr-right">¥ 15萬</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot green"></div>
+          <div class="sr-main">
+            <div class="sr-title">廣州潮玩買手店 YOYO</div>
+            <div class="sr-sub">簽約完成 · 等開票</div>
+          </div>
+          <div class="sr-right">¥ 4.2萬</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot red"></div>
+          <div class="sr-main">
+            <div class="sr-title">成都遠洋太古里選品店</div>
+            <div class="sr-sub">逾期 35 天未付款 · 需催款</div>
+          </div>
+          <div class="sr-right" style="color:var(--red)">¥ 6.8萬</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot amber"></div>
+          <div class="sr-main">
+            <div class="sr-title">深圳萬象城潮流館</div>
+            <div class="sr-sub">寄樣品中 · 等反饋</div>
+          </div>
+          <div class="sr-right">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 版權跟進 -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <div class="panel-title">©️ 版權跟進</div>
+        <span class="panel-badge" style="background:#6366f120;color:#a5b4fc">4 進行中</span>
+      </div>
+      <div class="panel-body">
+        <div class="status-row">
+          <div class="status-dot amber"></div>
+          <div class="sr-main">
+            <div class="sr-title">Snoopy · Q3 夏日主題 送審稿</div>
+            <div class="sr-sub">已送出 3 天 · 等版權方回覆 · 截止 5/8</div>
+          </div>
+          <button class="btn-view" style="font-size:11px;padding:3px 9px">催稿</button>
+        </div>
+        <div class="status-row">
+          <div class="status-dot red"></div>
+          <div class="sr-main">
+            <div class="sr-title">Opanchu · 城市系列 修改意見</div>
+            <div class="sr-sub">版權方退回 · 需修改 2 點 · 逾期 2 天</div>
+          </div>
+          <button class="btn-view" style="font-size:11px;padding:3px 9px;color:var(--amber);border-color:var(--amber)">轉 Bevis</button>
+        </div>
+        <div class="status-row">
+          <div class="status-dot green"></div>
+          <div class="sr-main">
+            <div class="sr-title">Opanchu · Q3 合約續約</div>
+            <div class="sr-sub">已提交 Ray 批核 · 等簽回</div>
+          </div>
+          <button class="btn-view" style="font-size:11px;padding:3px 9px">追蹤</button>
+        </div>
+        <div class="status-row">
+          <div class="status-dot dim"></div>
+          <div class="sr-main">
+            <div class="sr-title">Muziktiger · 下半年授權範圍確認</div>
+            <div class="sr-sub">計畫 6月啟動 · 暫掛起</div>
+          </div>
+          <button class="btn-view" style="font-size:11px;padding:3px 9px">查看</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 財務出納 -->
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title">💰 本月財務概要</div></div>
+      <div class="panel-body">
+        <div class="finance-row">
+          <span class="fr-label">批發收款（本月）</span>
+          <span class="fr-val pos">+ ¥ 24.5萬</span>
+        </div>
+        <div class="finance-row">
+          <span class="fr-label">採購付款（本月）</span>
+          <span class="fr-val neg">- ¥ 18.2萬</span>
+        </div>
+        <div class="finance-row">
+          <span class="fr-label">版權費（季付）</span>
+          <span class="fr-val neg">- ¥ 4.1萬</span>
+        </div>
+        <div class="finance-row">
+          <span class="fr-label">人員工資</span>
+          <span class="fr-val neg">- ¥ 8.6萬</span>
+        </div>
+        <div class="finance-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:12px">
+          <span class="fr-label" style="font-weight:700;color:var(--text)">淨現金流</span>
+          <span class="fr-val pos" style="font-size:16px">+ ¥ 6.4萬 ↑</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title">⚡ 快捷動作</div></div>
+      <div class="panel-body">
+        <div class="quick-actions">
+          <button class="qa-btn">📨 新增客戶跟進</button>
+          <button class="qa-btn">🧾 開具發票申請</button>
+          <button class="qa-btn">💳 報銷費用</button>
+          <button class="qa-btn">📋 新版權送審</button>
+          <button class="qa-btn">📞 催款記錄</button>
+          <button class="qa-btn">📦 出貨申請</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div><!-- /ws-anran -->
+
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE 3: SHAWN 營運中控
+═══════════════════════════════════════ -->
+<div class="workspace" id="ws-shawn">
+  <div class="workspace" style="max-width:1200px;margin:0 auto;padding:24px;display:block">
+
+  <div class="ws-hero">
+    <div class="ws-title">🌏 Shawn 營運中控</div>
+    <div class="ws-sub">全員狀態 · 三城業績 · 快閃店 · 物流</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" style="--c:#6366f1">
+      <div class="kpi-label">🇹🇼 台北本月</div>
+      <div class="kpi-val">¥ 31.2萬</div>
+      <div class="kpi-delta up">↑ 78% 達標</div>
+    </div>
+    <div class="kpi" style="--c:#f97316">
+      <div class="kpi-label">🇨🇳 北京本月</div>
+      <div class="kpi-val">¥ 38.6萬</div>
+      <div class="kpi-delta up">↑ 77% 達標</div>
+    </div>
+    <div class="kpi" style="--c:#06b6d4">
+      <div class="kpi-label">🇹🇭 曼谷本月</div>
+      <div class="kpi-val">¥ 12.6萬</div>
+      <div class="kpi-delta">63% 達標</div>
+    </div>
+    <div class="kpi" style="--c:#22c55e">
+      <div class="kpi-label">全員在線</div>
+      <div class="kpi-val">13 / 15</div>
+      <div class="kpi-delta down">2 人請假</div>
+    </div>
+  </div>
+
+  <!-- 全員狀態 -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-hdr"><div class="panel-title">👥 全員今日狀態</div></div>
+    <div class="panel-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+
+        <!-- 台北 -->
+        <div style="border-right:1px solid var(--border);padding-right:16px;margin-right:16px">
+          <div style="font-size:10px;font-weight:800;color:var(--indigo);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🇹🇼 台北</div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">Bevis</div><div class="sr-sub">Opanchu 修改意見處理中</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot amber"></div>
+            <div class="sr-main"><div class="sr-title">珮玲</div><div class="sr-sub">Snoopy 版權送審準備中</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">詩彤</div><div class="sr-sub">慫蛋 LoRA 素材整理</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">賴哥</div><div class="sr-sub">廣州盛美採購跟進</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">木子</div><div class="sr-sub">Q3 報價整理</div></div>
+          </div>
+        </div>
+
+        <!-- 北京 -->
+        <div style="border-right:1px solid var(--border);padding-right:16px;margin-right:16px">
+          <div style="font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🇨🇳 北京</div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">安然</div><div class="sr-sub">版權方商務溝通、帳款催收</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">老董</div><div class="sr-sub">出差上海 · 王府井客戶拜訪</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">德寶</div><div class="sr-sub">跟進 3 個潛在客戶</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">高維</div><div class="sr-sub">倉庫備貨 · 曼谷補貨準備</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot amber"></div>
+            <div class="sr-main"><div class="sr-title">春雷</div><div class="sr-sub">小紅書排期延誤 ⚠️</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot red"></div>
+            <div class="sr-main"><div class="sr-title">佳音</div><div class="sr-sub">請假半天</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">小川</div><div class="sr-sub">5月促銷物料製作</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">躍明</div><div class="sr-sub">4月報表製作中</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">楊子</div><div class="sr-sub">5月薪資核算</div></div>
+          </div>
+        </div>
+
+        <!-- 曼谷 -->
+        <div>
+          <div style="font-size:10px;font-weight:800;color:var(--cyan);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🇹🇭 曼谷</div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">Den</div><div class="sr-sub">泰國業務拓展洽談</div></div>
+          </div>
+          <div class="status-row" style="padding:7px 0">
+            <div class="status-dot green"></div>
+            <div class="sr-main"><div class="sr-title">Meaw</div><div class="sr-sub">Siam Paragon 快閃店值班</div></div>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:10px;font-weight:800;color:var(--sub);margin-bottom:8px">🏪 快閃店</div>
+            <div class="finance-row" style="padding:5px 0"><span class="fr-label">場地</span><span class="fr-val" style="font-size:11px">Siam Paragon B1</span></div>
+            <div class="finance-row" style="padding:5px 0"><span class="fr-label">本月銷售</span><span class="fr-val pos">¥ 12.6萬</span></div>
+            <div class="finance-row" style="padding:5px 0"><span class="fr-label">庫存</span><span class="fr-val" style="color:var(--amber)">約 40%</span></div>
+            <div class="finance-row" style="padding:5px 0;border:none"><span class="fr-label">補貨</span><span class="fr-val" style="color:var(--cyan);font-size:11px">高維備貨中·5/4到</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 物流在途 -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-hdr"><div class="panel-title">🚚 物流在途</div></div>
+    <div class="panel-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--green)30">
+          <div style="font-size:10px;color:var(--green);font-weight:700;margin-bottom:4px">● 在途</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">北京 → 曼谷補貨</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:3px">預計 5/4 到</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--amber)30">
+          <div style="font-size:10px;color:var(--amber);font-weight:700;margin-bottom:4px">● 生產中</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">廣州工廠 → 北京倉</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:3px">Snoopy Q3 打樣批次</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--dim);font-weight:700;margin-bottom:4px">● 計劃中</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">台北 → 曼谷樣品</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:3px">計劃 5/10 出貨</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div><!-- /ws-shawn -->
+
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE 4: 產品開發流水線
+═══════════════════════════════════════ -->
+<div class="workspace" id="ws-pipeline">
+  <div class="workspace" style="max-width:1200px;margin:0 auto;padding:24px;display:block">
+
+  <div class="ws-hero">
+    <div class="ws-title">🏭 產品開發流水線</div>
+    <div class="ws-sub">全公司可見 · 版權送審狀態 · 銷售定價 · 預估數量</div>
+  </div>
+
+  <!-- 篩選列 -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="dbtn active" style="font-size:11px">全部 (6)</button>
+    <button class="dbtn" style="font-size:11px">Snoopy (2)</button>
+    <button class="dbtn" style="font-size:11px">Opanchu (2)</button>
+    <button class="dbtn" style="font-size:11px">慫蛋 (1)</button>
+    <button class="dbtn" style="font-size:11px">Muziktiger (1)</button>
+    <button class="dbtn" style="font-size:11px;margin-left:auto;background:#22c55e15;color:#86efac;border-color:#22c55e30">+ 新增產品</button>
+  </div>
+
+  <!-- 產品卡：超級變變變 -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-hdr" style="flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="kc-tag tag-snoopy" style="font-size:10px;padding:3px 8px;border-radius:5px">Snoopy</span>
+        <div class="panel-title">超級變變變 毛絨公仔</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:11px;color:var(--amber);font-weight:700">● 打樣/色彩樣過審</span>
+        <span style="font-size:10px;color:var(--sub)">珮玲負責 · Bevis盯進度</span>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <!-- 版權審核時間軸 -->
+      <div style="margin-bottom:18px">
+        <div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">版權審核進度</div>
+        <div style="display:flex;align-items:flex-start;gap:0">
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:14px">✓</div>
+            <div style="font-size:10px;color:#60a5fa;font-weight:600;line-height:1.3">版權<br>概念確認</div>
+          </div>
+          <div style="flex:0 0 20px;height:2px;background:#3b82f6;margin-top:16px"></div>
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:14px">✓</div>
+            <div style="font-size:10px;color:#60a5fa;font-weight:600;line-height:1.3">2D<br>過審</div>
+          </div>
+          <div style="flex:0 0 20px;height:2px;background:#3b82f6;margin-top:16px"></div>
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:14px">✓</div>
+            <div style="font-size:10px;color:#60a5fa;font-weight:600;line-height:1.3">包裝<br>外發</div>
+          </div>
+          <div style="flex:0 0 20px;height:2px;background:#3b82f6;margin-top:16px"></div>
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:14px">✓</div>
+            <div style="font-size:10px;color:#60a5fa;font-weight:600;line-height:1.3">3D<br>過審</div>
+          </div>
+          <div style="flex:0 0 20px;height:2px;background:#f59e0b;margin-top:16px"></div>
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:16px;box-shadow:0 0 12px #f59e0b60">●</div>
+            <div style="font-size:10px;color:#fcd34d;font-weight:700;line-height:1.3">打樣/<br>色彩樣</div>
+          </div>
+          <div style="flex:0 0 20px;height:2px;background:var(--border);margin-top:16px"></div>
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:14px;color:var(--dim)">○</div>
+            <div style="font-size:10px;color:var(--dim);line-height:1.3">模具<br>大貨</div>
+          </div>
+          <div style="flex:0 0 20px;height:2px;background:var(--border);margin-top:16px"></div>
+          <div style="flex:1;text-align:center">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:14px;color:var(--dim)">○</div>
+            <div style="font-size:10px;color:var(--dim);line-height:1.3">大貨<br>生產</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- 活動記錄 -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">版權方回覆記錄</div>
+          <div style="background:var(--surface2);border-radius:8px;padding:10px 12px">
+            <div style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
+              <div style="font-size:10px;color:var(--dim);margin-bottom:2px">4/28</div>
+              <div style="font-size:12px;color:var(--text)">單打一隻形體給版權照片送審</div>
+            </div>
+            <div style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
+              <div style="font-size:10px;color:var(--red);margin-bottom:2px">4/24 版權反饋</div>
+              <div style="font-size:12px;color:var(--text)">須調整手的長度</div>
+            </div>
+            <div style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
+              <div style="font-size:10px;color:var(--dim);margin-bottom:2px">4/15</div>
+              <div style="font-size:12px;color:var(--text)">送審素模照片</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--green);margin-bottom:2px">4/13 通過</div>
+              <div style="font-size:12px;color:var(--text)">3D 過審</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--amber);margin-top:8px;font-weight:600">⏰ 預計 5/8 給我們反饋</div>
+        </div>
+
+        <!-- 銷售確認 -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">銷售確認（老董 / 德寶）</div>
+          <div style="background:var(--surface2);border-radius:8px;padding:12px">
+            <div class="finance-row" style="padding:6px 0">
+              <span class="fr-label">建議零售價</span>
+              <span class="fr-val">¥ 89 / 個</span>
+            </div>
+            <div class="finance-row" style="padding:6px 0">
+              <span class="fr-label">預估首批數量</span>
+              <span class="fr-val">500 個</span>
+            </div>
+            <div class="finance-row" style="padding:6px 0">
+              <span class="fr-label">主要銷售渠道</span>
+              <span class="fr-val" style="font-size:11px">北京門市 + 曼谷快閃</span>
+            </div>
+            <div class="finance-row" style="padding:6px 0;border:none">
+              <span class="fr-label">Shawn 預算確認</span>
+              <span style="font-size:11px;color:var(--green);font-weight:700">✓ 已確認</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--indigo-dim);border:1px solid var(--indigo)30;border-radius:8px">
+            <div style="font-size:10px;color:var(--indigo);font-weight:700;margin-bottom:3px">採購可啟動詢價</div>
+            <div style="font-size:11px;color:var(--sub)">銷售數量已確認，等色彩樣通過後賴哥報價</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 產品卡：絨毛掛件 -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-hdr" style="flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="kc-tag tag-snoopy" style="font-size:10px;padding:3px 8px;border-radius:5px">Snoopy</span>
+        <div class="panel-title">絨毛掛件（明）</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:11px;color:var(--amber);font-weight:700">● 打樣/色彩樣過審</span>
+        <span style="font-size:10px;color:var(--sub)">珮玲負責</span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div style="display:flex;align-items:flex-start;gap:0;margin-bottom:14px">
+        <div style="flex:1;text-align:center">
+          <div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:12px">✓</div>
+          <div style="font-size:9px;color:#60a5fa;font-weight:600;line-height:1.3">版權<br>概念</div>
+        </div>
+        <div style="flex:0 0 16px;height:2px;background:#3b82f6;margin-top:14px"></div>
+        <div style="flex:1;text-align:center">
+          <div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:12px">✓</div>
+          <div style="font-size:9px;color:#60a5fa;font-weight:600;line-height:1.3">2D<br>過審</div>
+        </div>
+        <div style="flex:0 0 16px;height:2px;background:#f59e0b;margin-top:14px"></div>
+        <div style="flex:1;text-align:center">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:14px;box-shadow:0 0 10px #f59e0b60">●</div>
+          <div style="font-size:9px;color:#fcd34d;font-weight:700;line-height:1.3">吊卡<br>設計</div>
+        </div>
+        <div style="flex:0 0 16px;height:2px;background:#f59e0b;margin-top:14px"></div>
+        <div style="flex:1;text-align:center">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b30;border:2px solid #f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:14px;color:#fcd34d">●</div>
+          <div style="font-size:9px;color:#fcd34d;font-weight:600;line-height:1.3">打樣/<br>色彩樣</div>
+        </div>
+        <div style="flex:0 0 16px;height:2px;background:var(--border);margin-top:14px"></div>
+        <div style="flex:1;text-align:center">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:12px;color:var(--dim)">○</div>
+          <div style="font-size:9px;color:var(--dim);line-height:1.3">大貨<br>生產</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--amber);font-weight:600">⏰ 預計 4/29 照片送審 + 實體樣寄出</div>
+      <div style="margin-top:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--sub)">
+        💡 此產品不需素模審核，版權方同意直接進色彩樣階段
+      </div>
+    </div>
+  </div>
+
+  <!-- 產品卡：Opanchu 城市公仔（收合狀態） -->
+  <div class="panel" style="margin-bottom:16px;opacity:.85">
+    <div class="panel-hdr" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="kc-tag tag-opanchu" style="font-size:10px;padding:3px 8px;border-radius:5px">Opanchu</span>
+        <div class="panel-title">城市系列公仔</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:11px;color:var(--red);font-weight:700">⚠ 版權退回修改</span>
+        <span style="font-size:10px;color:var(--sub)">Bevis 處理中</span>
+        <span style="font-size:12px;color:var(--dim)">▸</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 產品卡：慫蛋（早期） -->
+  <div class="panel" style="margin-bottom:16px;opacity:.7">
+    <div class="panel-hdr">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="kc-tag tag-songdan" style="font-size:10px;padding:3px 8px;border-radius:5px">慫蛋</span>
+        <div class="panel-title">首批表情包貼紙</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <span style="font-size:11px;color:var(--indigo);font-weight:700">概念提案階段</span>
+        <span style="font-size:10px;color:var(--amber)">待銷售確認定價</span>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:10px 18px">
+      <div style="background:var(--amber-dim);border:1px solid var(--amber)30;border-radius:8px;padding:10px 14px;font-size:12px;color:var(--amber)">
+        ⚡ 需老董/德寶填入：建議定價 + 預估首批數量 → Shawn 才能做預算判斷
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div><!-- /ws-pipeline -->
+
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE 5: IP 工坊（設計師）
+═══════════════════════════════════════ -->
+<div class="workspace" id="ws-design">
+  <div class="workspace" style="max-width:1200px;margin:0 auto;padding:24px;display:block">
+
+  <div class="ws-hero">
+    <div class="ws-title">🎨 IP 工坊</div>
+    <div class="ws-sub">設計創作 · Forge 生圖 · 版權送審準備</div>
+  </div>
+
+  <!-- Direct Forge link -->
+  <div style="background:linear-gradient(135deg,#1e1040,#0f172a);border:1px solid #6366f140;border-radius:16px;padding:28px 24px;margin-bottom:24px;display:flex;align-items:center;gap:20px">
+    <div style="font-size:48px">⚡</div>
+    <div style="flex:1">
+      <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">WUJIE Forge</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:12px">AI 圖庫生成工作台 · LoRA 批次主題生成 · 資產庫管理</div>
+      <button onclick="window.open('../wujie-studio/index.html')" style="background:#6366f1;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">開啟 Forge →</button>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:var(--sub);margin-bottom:6px">本月已生成</div>
+      <div style="font-size:28px;font-weight:800;color:var(--text)">147 張</div>
+      <div style="font-size:11px;color:var(--green)">核准率 68%</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- 今日設計任務 -->
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title">📋 今日任務</div><span class="panel-badge" style="background:#f59e0b20;color:#fcd34d">3 件進行中</span></div>
+      <div class="panel-body">
+        <div class="status-row">
+          <div class="status-dot amber"></div>
+          <div class="sr-main">
+            <div class="sr-title">Opanchu 城市系列 — 修改意見處理</div>
+            <div class="sr-sub">版權方退回 2 點修改 · 安然轉派 · 今日需完成</div>
+          </div>
+          <span class="kc-tag tag-urgent" style="font-size:9px;padding:2px 6px;border-radius:4px">急</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot amber"></div>
+          <div class="sr-main">
+            <div class="sr-title">慫蛋 LoRA 訓練素材整理</div>
+            <div class="sr-sub">目標 30 張 · 目前 12 張 · 需標記 骨架/靈動</div>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot green"></div>
+          <div class="sr-main">
+            <div class="sr-title">Snoopy 夏日海灘 — Forge 批次生成</div>
+            <div class="sr-sub">主題已設定 · 跑完 6 個階段</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IP 核准資產 -->
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title">✅ 近期核准資產</div></div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#1a3a2a,#0d2318);border-radius:8px;border:1px solid #22c55e30;display:flex;align-items:center;justify-content:center;font-size:20px">🐶</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#1a2a3a,#0d1823);border-radius:8px;border:1px solid #3b82f630;display:flex;align-items:center;justify-content:center;font-size:20px">🐾</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#2a1a3a,#180d23);border-radius:8px;border:1px solid #8b5cf630;display:flex;align-items:center;justify-content:center;font-size:20px">🎨</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#3a2a1a,#231809);border-radius:8px;border:1px solid #f59e0b30;display:flex;align-items:center;justify-content:center;font-size:20px">⭐</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#1a1a3a,#0d0d23);border-radius:8px;border:1px solid #6366f130;display:flex;align-items:center;justify-content:center;font-size:20px">🌊</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#3a1a1a,#230d0d);border-radius:8px;border:1px solid #ef444430;display:flex;align-items:center;justify-content:center;font-size:20px">🏖</div>
+          <div style="aspect-ratio:1;background:linear-gradient(135deg,#1a3a3a,#0d2323);border-radius:8px;border:1px solid #06b6d430;display:flex;align-items:center;justify-content:center;font-size:20px">🐟</div>
+          <div style="aspect-ratio:1;background:var(--surface2);border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--dim);cursor:pointer" onclick="window.open('../wujie-studio/index.html')">全部 →</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  </div>
+</div><!-- /ws-design -->
+
+
+<!-- ═══════════════════════════════════════
+     WORKSPACE 5: 供應鏈
+═══════════════════════════════════════ -->
+<div class="workspace" id="ws-supply">
+  <div class="workspace" style="max-width:1200px;margin:0 auto;padding:24px;display:block">
+
+  <div class="ws-hero">
+    <div class="ws-title">🏭 供應鏈中心</div>
+    <div class="ws-sub">採購 · 打樣驗收 · 出貨物流 — 賴哥 / 木子 / 高維</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" style="--c:#f59e0b">
+      <div class="kpi-label">採購在途</div>
+      <div class="kpi-val">5 筆</div>
+      <div class="kpi-delta">¥ 58.4萬</div>
+    </div>
+    <div class="kpi" style="--c:#06b6d4">
+      <div class="kpi-label">打樣進行中</div>
+      <div class="kpi-val">3 件</div>
+      <div class="kpi-delta">1 件待驗收</div>
+    </div>
+    <div class="kpi" style="--c:#22c55e">
+      <div class="kpi-label">本月出貨</div>
+      <div class="kpi-val">12 批</div>
+      <div class="kpi-delta up">正常</div>
+    </div>
+    <div class="kpi" style="--c:#ef4444">
+      <div class="kpi-label">異常待處理</div>
+      <div class="kpi-val">1 件</div>
+      <div class="kpi-delta down">廣州廠延誤</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- 採購跟進 -->
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title">🛒 採購進度</div></div>
+      <div class="panel-body">
+        <div class="status-row">
+          <div class="status-dot amber"></div>
+          <div class="sr-main">
+            <div class="sr-title">Snoopy 夏日主題 毛絨公仔 × 500</div>
+            <div class="sr-sub">廣州盛美 · 等 Ray 批核 · ¥ 28,000</div>
+          </div>
+          <span class="kc-tag tag-pending">待批</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot green"></div>
+          <div class="sr-main">
+            <div class="sr-title">Opanchu 城市系列 亞克力掛件 × 1000</div>
+            <div class="sr-sub">深圳亞創 · 生產中 · 預計 5/15 交貨</div>
+          </div>
+          <span class="kc-tag tag-ok">生產中</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot red"></div>
+          <div class="sr-main">
+            <div class="sr-title">Snoopy Q2 補單 抱枕 × 200</div>
+            <div class="sr-sub">廣州廠延誤 7 天 · 原因：物料缺貨</div>
+          </div>
+          <span class="kc-tag tag-urgent">延誤</span>
+        </div>
+        <div class="status-row">
+          <div class="status-dot green"></div>
+          <div class="sr-main">
+            <div class="sr-title">曼谷補貨 綜合品項 × 3箱</div>
+            <div class="sr-sub">已出貨 · 空運 · 預計 5/4 到</div>
+          </div>
+          <span class="kc-tag tag-ok">在途</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 打樣狀態 -->
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title">🔍 打樣驗收</div></div>
+      <div class="panel-body">
+
+        <div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;background:var(--surface2)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div>
+              <span class="kc-tag tag-snoopy" style="font-size:9px;padding:2px 6px;border-radius:4px;margin-right:6px">Snoopy</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text)">Q3 夏日毛絨公仔</span>
+            </div>
+            <span style="font-size:11px;color:var(--amber);font-weight:700">待收樣</span>
+          </div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:10px">廣州盛美 · 預計 5/6 到北京倉 · 高維負責收樣</div>
+          <div class="ip-pipe" style="margin:0">
+            <div class="pipe-step done">下單</div>
+            <div class="pipe-step done">生產</div>
+            <div class="pipe-step active">寄樣</div>
+            <div class="pipe-step">驗收</div>
+            <div class="pipe-step">大貨</div>
+          </div>
+        </div>
+
+        <div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface2)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div>
+              <span class="kc-tag tag-opanchu" style="font-size:9px;padding:2px 6px;border-radius:4px;margin-right:6px">Opanchu</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text)">城市系列 亞克力掛件</span>
+            </div>
+            <span style="font-size:11px;color:var(--green);font-weight:700">版權通過</span>
+          </div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:10px">深圳亞創 · 已通過版權審核 · 進入大貨</div>
+          <div class="ip-pipe" style="margin:0">
+            <div class="pipe-step done">下單</div>
+            <div class="pipe-step done">生產</div>
+            <div class="pipe-step done">寄樣</div>
+            <div class="pipe-step done">驗收</div>
+            <div class="pipe-step active">大貨</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel" style="margin-bottom:24px">
+    <div class="panel-hdr"><div class="panel-title">⚡ 快捷操作</div></div>
+    <div class="panel-body">
+      <div class="quick-actions">
+        <button class="qa-btn">🛒 新增採購申請</button>
+        <button class="qa-btn">📦 登記出貨</button>
+        <button class="qa-btn">✅ 打樣驗收回報</button>
+        <button class="qa-btn">🚨 異常通報</button>
+        <button class="qa-btn">📊 查看庫存</button>
+        <button class="qa-btn">🏭 供應商資料庫</button>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div><!-- /ws-supply -->
+
+
+<script>
+const PROXY="https://feishu-proxy.raychou6913.workers.dev";
+const _s=JSON.parse(localStorage.getItem("wujie_session")||"null");
+
+const ROLE_MAP={
+  "ray":"ray","anran":"anran","shawn":"shawn",
+  "bevis":"design","peiling":"design","shitong":"design",
+  "laige":"supply","gawei":"supply","muzi":"supply"
+};
+
+function init(){
+  // date
+  document.getElementById("tb-date").textContent=new Date().toLocaleDateString("zh-TW",{month:"long",day:"numeric",weekday:"short"});
+
+  if(_s&&Date.now()<_s.expires){
+    document.getElementById("tb-name").textContent=_s.name;
+    const ws=ROLE_MAP[_s.username]||"ray";
+    setRole(ws,_s.name);
+    switchWorkspace(ws);
+    // hide demo bar for real users
+    document.querySelector(".demo-bar").style.display="none";
+  } else {
+    // mockup mode
+    setRole("ray","Ray");
+    switchWorkspace("ray");
+  }
+}
+
+function setRole(ws,name){
+  const labels={
+    ray:["⚡ 戰情室","background:#ef444420;color:#fca5a5"],
+    anran:["🗂 中控","background:#f9731620;color:#fdba74"],
+    shawn:["🌏 營運","background:#06b6d420;color:#67e8f9"],
+    design:["🎨 IP 工坊","background:#6366f120;color:#a5b4fc"],
+    supply:["🏭 供應鏈","background:#f59e0b20;color:#fcd34d"]
+  };
+  const tag=document.getElementById("tb-role-tag");
+  const [text,style]=labels[ws]||labels.ray;
+  tag.textContent=text;
+  tag.style.cssText=style+";font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px";
+  document.getElementById("tb-name").textContent=name||"";
+}
+
+function switchWorkspace(ws){
+  document.querySelectorAll(".workspace").forEach(el=>el.classList.remove("active"));
+  const target=document.getElementById("ws-"+ws);
+  if(target) target.classList.add("active");
+}
+
+function switchDemo(ws){
+  document.querySelectorAll(".dbtn").forEach(b=>b.classList.remove("active"));
+  event.target.classList.add("active");
+  const names={ray:"Ray",anran:"安然",shawn:"Shawn",pipeline:"全員可見（預覽）",design:"Bevis",supply:"賴哥"};
+  setRole(ws,names[ws]);
+  switchWorkspace(ws);
+}
+
+init();
+</script>
+</body>
+</html>
