@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 合約整理上傳</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0b12;--surface:#13151f;--card:#1a1d29;--card-2:#22253a;
+  --border:#2a2d42;--border-hi:#3d4268;
+  --txt-hi:#f5f6ff;--txt-mid:#9ca3c5;--txt-lo:#5d6388;
+  --accent:#a78bfa;--accent-glow:#c4b5fd;--accent-warm:#fb923c;
+  --ok:#34d399;--ok-soft:#34d39915;
+  --warn:#fbbf24;--warn-soft:#fbbf2415;
+  --danger:#f87171;--danger-soft:#f8717115;
+}
+body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#fb923c10 0%,var(--bg) 60%);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;letter-spacing:-.005em;}
+
+.topbar{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#fb923c,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;}
+.brand-text{font-size:14px;font-weight:700;}
+.brand-sub{font-size:9px;color:var(--txt-lo);letter-spacing:.08em;text-transform:uppercase;}
+.back-link{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 11px;border:1px solid var(--border);border-radius:8px;}
+.back-link:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+
+.main{max-width:760px;margin:0 auto;padding:32px 24px;}
+
+.hero{margin-bottom:32px;}
+.hero-emoji{font-size:48px;margin-bottom:14px;}
+.hero-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+.hero-sub{font-size:14px;color:var(--txt-mid);line-height:1.7;}
+
+.section-label{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;margin:24px 0 12px;}
+
+.tab-bar{display:flex;gap:8px;margin-bottom:16px;}
+.tab-btn{flex:1;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);color:var(--txt-mid);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.tab-btn:hover{border-color:var(--accent);}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent)20,var(--accent-warm)20);border-color:var(--accent);color:var(--txt-hi);}
+.tab-emoji{font-size:22px;}
+.tab-desc{font-size:10px;color:var(--txt-lo);font-weight:500;line-height:1.4;}
+.tab-btn.active .tab-desc{color:var(--accent-glow);}
+
+/* contract entry form */
+.entry-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.field{margin-bottom:12px;}
+.field-label{font-size:11px;color:var(--txt-mid);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;}
+.field-input{width:100%;background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.field-input:focus{border-color:var(--accent);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.drop-zone{background:var(--card-2);border:2px dashed var(--border-hi);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:.15s;}
+.drop-zone:hover, .drop-zone.dragover{border-color:var(--accent);background:#a78bfa10;}
+.drop-zone-icon{font-size:32px;margin-bottom:8px;color:var(--txt-mid);}
+.drop-zone-text{font-size:13px;color:var(--txt-mid);}
+.drop-zone-hint{font-size:11px;color:var(--txt-lo);margin-top:5px;}
+
+.btn-primary{display:block;width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-warm));color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-ghost{display:inline-block;background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+
+/* contract list */
+.list-section{margin-top:24px;}
+.list-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.list-tag{font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.04em;}
+.tag-historic{background:#94a3b822;color:#94a3b8;border:1px solid #94a3b840;}
+.tag-current{background:var(--ok-soft);color:var(--ok);border:1px solid #34d39940;}
+.list-body{flex:1;min-width:0;}
+.list-title{font-size:13px;font-weight:700;}
+.list-meta{font-size:10px;color:var(--txt-mid);margin-top:3px;}
+.list-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;}
+.status-pending{background:var(--warn-soft);color:var(--warn);}
+.status-parsed{background:var(--ok-soft);color:var(--ok);}
+.list-remove{background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;}
+.list-remove:hover{color:var(--danger);background:var(--danger-soft);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--ok);color:var(--ok);padding:10px 16px;border-radius:9px;font-size:12px;font-weight:700;transition:.3s;z-index:300;opacity:0;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.banner{background:linear-gradient(90deg,#a78bfa20,#fb923c20);border-bottom:1px solid #a78bfa30;padding:6px 20px;font-size:10px;font-weight:600;color:var(--accent-glow);letter-spacing:.04em;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="banner">📜 合約整理上傳 · 安然專屬任務 · 上傳後由 MJ 用 AI 解析自動填入 IP 庫常數</div>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">📜</div>
+    <div>
+      <div class="brand-text">合約整理</div>
+      <div class="brand-sub">contracts</div>
+    </div>
+  </div>
+  <a href="questionnaire.html" class="back-link">← 回問卷首頁</a>
+</div>
+
+<div class="main">
+
+  <div class="hero">
+    <div class="hero-emoji">📜</div>
+    <div class="hero-title">合約整理上傳</div>
+    <div class="hero-sub">
+      請把蕪解過往跟現有的所有合約分兩類上傳。<br>
+      上傳後 MJ 會用 AI 解析（Gemini OCR）抽出 MG／Royalty／結算週期等資訊，自動填入「IP 庫常數」資料庫，<b style="color:var(--accent-glow);">你不用再手動填問卷</b>。
+    </div>
+  </div>
+
+  <div class="section-label">這份合約屬於</div>
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-current" onclick="switchCat('current')">
+      <span class="tab-emoji">✅</span>
+      <span>現有合約</span>
+      <span class="tab-desc">合約期還沒過</span>
+    </button>
+    <button class="tab-btn" id="tab-historic" onclick="switchCat('historic')">
+      <span class="tab-emoji">📚</span>
+      <span>過往參考</span>
+      <span class="tab-desc">已過期合約</span>
+    </button>
+  </div>
+
+  <div class="section-label">登錄合約資訊</div>
+  <div class="entry-form">
+
+    <div class="field">
+      <div class="field-label">合約名稱 / IP 品牌 *</div>
+      <input class="field-input" id="contract-name" placeholder="例如：Mofusand 中國大陸授權合約 2024-2026">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-label">版權方</div>
+        <input class="field-input" id="contract-licensor" placeholder="例如：Mofusand Inc.">
+      </div>
+      <div class="field">
+        <div class="field-label">我方簽約主體</div>
+        <select class="field-input" id="contract-entity">
+          <option>香港 JV</option>
+          <option>深圳子公司</option>
+          <option>北京蕪解</option>
+          <option>有你共創</option>
+          <option>其他</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-label">簽約日期</div>
+        <input class="field-input" id="contract-signed" type="date">
+      </div>
+      <div class="field">
+        <div class="field-label">到期日期</div>
+        <input class="field-input" id="contract-expires" type="date">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">合約 PDF（拖入或點擊上傳）</div>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div class="drop-zone-icon">📎</div>
+        <div class="drop-zone-text" id="drop-zone-text">拖入 PDF 檔案或點擊選擇</div>
+        <div class="drop-zone-hint">可一次上傳多個 PDF。檔案會記在你本機，待 MJ 串接 AI OCR 後正式解析。</div>
+      </div>
+      <input type="file" id="file-input" accept=".pdf,.doc,.docx" multiple style="display:none;" onchange="handleFiles(this.files)">
+    </div>
+
+    <div class="field">
+      <div class="field-label">備註 / 重點摘要</div>
+      <textarea class="field-input" id="contract-note" rows="2" placeholder="特殊條款、注意事項等（選填）" style="resize:vertical;"></textarea>
+    </div>
+
+    <button class="btn-primary" onclick="addContract()">➕ 加入合約清單</button>
+  </div>
+
+  <div class="section-label">
+    <span style="display:flex;justify-content:space-between;align-items:center;">
+      <span>已登錄合約清單（<span id="count-current">0</span> 現有 · <span id="count-historic">0</span> 過往）</span>
+      <span class="btn-ghost" style="color:var(--danger);border-color:var(--danger);cursor:pointer;" onclick="clearAll()">🗑 清空全部</span>
+    </span>
+  </div>
+  <div id="contract-list"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'wujie_contracts_v1';
+let state = {
+  category: 'current', // 'current' | 'historic'
+  files: [], // 暫存當前未送出的檔名清單
+  contracts: JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'),
+};
+
+function switchCat(cat){
+  state.category = cat;
+  document.getElementById('tab-current').classList.toggle('active', cat === 'current');
+  document.getElementById('tab-historic').classList.toggle('active', cat === 'historic');
+}
+
+function handleFiles(fileList){
+  for(const f of fileList){
+    state.files.push(f.name);
+  }
+  document.getElementById('drop-zone-text').textContent = `已選 ${state.files.length} 個檔案：${state.files.join('、')}`;
+}
+
+// Drag and drop
+const dz = document.getElementById('drop-zone');
+['dragenter','dragover'].forEach(e => dz.addEventListener(e, ev => {
+  ev.preventDefault(); ev.stopPropagation(); dz.classList.add('dragover');
+}));
+['dragleave','drop'].forEach(e => dz.addEventListener(e, ev => {
+  ev.preventDefault(); ev.stopPropagation(); dz.classList.remove('dragover');
+}));
+dz.addEventListener('drop', ev => {
+  handleFiles(ev.dataTransfer.files);
+});
+
+function showToast(msg, color){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = color || 'var(--ok)';
+  el.style.color = color || 'var(--ok)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function addContract(){
+  const name = document.getElementById('contract-name').value.trim();
+  if(!name){ showToast('⚠ 請填合約名稱／IP 品牌','var(--danger)'); return; }
+  const contract = {
+    id: 'c' + Date.now(),
+    category: state.category,
+    name,
+    licensor: document.getElementById('contract-licensor').value.trim(),
+    entity: document.getElementById('contract-entity').value,
+    signed: document.getElementById('contract-signed').value,
+    expires: document.getElementById('contract-expires').value,
+    files: state.files.slice(),
+    note: document.getElementById('contract-note').value.trim(),
+    submittedAt: new Date().toISOString(),
+    status: 'pending', // 'pending' | 'parsed'
+  };
+  state.contracts.push(contract);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.contracts));
+  showToast('✓ 已加入清單');
+  // Reset form
+  ['contract-name','contract-licensor','contract-signed','contract-expires','contract-note'].forEach(id => document.getElementById(id).value = '');
+  state.files = [];
+  document.getElementById('drop-zone-text').textContent = '拖入 PDF 檔案或點擊選擇';
+  document.getElementById('file-input').value = '';
+  renderList();
+}
+
+function removeContract(id){
+  if(!confirm('確定要從清單移除這筆？')) return;
+  state.contracts = state.contracts.filter(c => c.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.contracts));
+  renderList();
+}
+
+function clearAll(){
+  if(!confirm('確定要清空所有已登錄合約？此操作不可復原。')) return;
+  state.contracts = [];
+  localStorage.removeItem(STORAGE_KEY);
+  renderList();
+  showToast('✓ 已清空');
+}
+
+function renderList(){
+  document.getElementById('count-current').textContent = state.contracts.filter(c=>c.category==='current').length;
+  document.getElementById('count-historic').textContent = state.contracts.filter(c=>c.category==='historic').length;
+  const el = document.getElementById('contract-list');
+  if(!state.contracts.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--txt-lo);text-align:center;padding:30px;background:var(--card);border:1px dashed var(--border);border-radius:10px;">尚未登錄任何合約。上方填表 + 上傳 PDF，按「加入合約清單」開始。</div>';
+    return;
+  }
+  el.innerHTML = state.contracts.map(c => {
+    const tagCls = c.category === 'current' ? 'tag-current' : 'tag-historic';
+    const tagLabel = c.category === 'current' ? '✅ 現有' : '📚 過往';
+    const statusCls = c.status === 'parsed' ? 'status-parsed' : 'status-pending';
+    const statusLabel = c.status === 'parsed' ? 'AI 已解析' : '待 AI 解析';
+    const filesStr = c.files.length ? `· ${c.files.length} 個檔案` : '';
+    return `<div class="list-card">
+      <span class="list-tag ${tagCls}">${tagLabel}</span>
+      <div class="list-body">
+        <div class="list-title">${c.name}</div>
+        <div class="list-meta">${c.licensor||'—'} · ${c.entity} · 到期 ${c.expires||'—'} ${filesStr}${c.note?' · 備註：'+c.note:''}</div>
+      </div>
+      <span class="list-status ${statusCls}">${statusLabel}</span>
+      <button class="list-remove" onclick="removeContract('${c.id}')" title="移除">✕</button>
+    </div>`;
+  }).join('');
+}
+
+renderList();
+</script>
+
+</body>
+</html>

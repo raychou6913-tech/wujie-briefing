@@ -287,6 +287,19 @@ body{
 
   <!-- START SCREEN -->
   <div class="screen active" id="screen-start">
+
+    <!-- 安然的並行任務 banner -->
+    <div style="background:linear-gradient(135deg,#fb923c20,#a78bfa20);border:1px solid #fb923c40;border-radius:14px;padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div style="font-size:32px;flex-shrink:0;">📜</div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:13px;font-weight:800;color:var(--accent-warm);margin-bottom:4px;">📌 同步進行：安然請整理合約</div>
+        <div style="font-size:11px;color:var(--txt-mid);line-height:1.6;">
+          請把蕪解過往跟現有的合約分兩類上傳：<b style="color:var(--txt-hi);">過往參考</b>（已過期合約）／<b style="color:var(--txt-hi);">現有合約</b>（合約期還沒過）。系統會自動 AI 解析填入 IP 庫常數，不用再手動回答問卷。
+        </div>
+      </div>
+      <a href="contract-upload.html" style="background:var(--accent);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;white-space:nowrap;">上傳合約 →</a>
+    </div>
+
     <div class="start-hero">
       <div class="dept-emoji" id="start-emoji">📋</div>
       <div class="dept-title" id="start-title">經驗收集</div>
@@ -356,7 +369,8 @@ body{
       <button class="btn-ghost" onclick="location.reload()">填寫其他部門問卷</button>
       <div style="margin-top:24px;padding-top:18px;border-top:1px dashed var(--border);">
         <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;letter-spacing:.04em;">⚙ Stage 1 測試工具</div>
-        <button class="btn-ghost" style="font-size:11px;color:var(--danger);border-color:var(--danger);" onclick="clearAllTestData()">🗑 清掉所有試填資料（含進度＋提交）</button>
+        <button class="btn-ghost" style="font-size:11px;color:var(--danger);border-color:var(--danger);" onclick="clearMyOwnData()">🗑 清掉「我自己」的試填資料</button>
+        <div style="font-size:10px;color:var(--txt-lo);margin-top:6px;line-height:1.5;">只會清你自己的，不會影響其他同事已填的內容。</div>
       </div>
     </div>
   </div>
@@ -1744,16 +1758,18 @@ function submitAll(){
   document.getElementById('progress-text').textContent = '';
 }
 
-window.clearAllTestData = function(){
-  if(!confirm('確定要清掉所有試填資料？這會刪除所有 localStorage 內的提交記錄和進行中進度。')) return;
-  // Clear all wujie_q_* keys
-  const keys = [];
-  for(let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if(k && k.startsWith('wujie_q_')) keys.push(k);
-  }
-  keys.forEach(k => localStorage.removeItem(k));
-  alert(`✓ 已清除 ${keys.length} 筆試填資料。即將重新整理頁面。`);
+window.clearMyOwnData = function(){
+  const me = state.filler;
+  if(!me){ alert('找不到當前填寫人，請先在首頁選擇你的名字'); return; }
+  if(!confirm(`確定要清掉「${me}」在「${DEPTS[state.dept].name}」問卷的所有資料嗎？\n\n⚠️ 只會清你自己的，不會影響其他同事已填的內容。`)) return;
+  // Only clear this dept + this filler's data
+  const progressKey = STORAGE_KEY_PREFIX + state.dept + '_' + me;
+  localStorage.removeItem(progressKey);
+  const all = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
+  const remaining = all.filter(s => !(s.dept === state.dept && s.filler === me));
+  localStorage.setItem('wujie_q_submissions', JSON.stringify(remaining));
+  const removed = all.length - remaining.length;
+  alert(`✓ 已清掉「${me}」於「${DEPTS[state.dept].name}」問卷的進度與 ${removed} 筆提交記錄。其他同事資料完全沒動。`);
   location.reload();
 };
 
