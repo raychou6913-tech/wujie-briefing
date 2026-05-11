@@ -113,6 +113,11 @@ body{
 .pill:hover{border-color:var(--accent);color:var(--txt-hi);}
 .pill.selected{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
 .pill-multi.pill.selected{background:linear-gradient(135deg,var(--accent),#8b5cf6);}
+.other-input-wrap{margin-top:10px;display:none;animation:fadeIn .2s;}
+.other-input-wrap.show{display:block;}
+.other-input{width:100%;background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.other-input:focus{border-color:var(--accent-glow);}
+.other-input-hint{font-size:10px;color:var(--accent-glow);margin-top:5px;font-weight:600;}
 
 /* TEXT */
 .text-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:15px;color:var(--txt-hi);outline:none;font-family:inherit;}
@@ -276,6 +281,7 @@ body{
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
+    <button id="btn-back-to-start" style="display:none;background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;" onclick="backToStart()">← 回首頁切換</button>
     <div class="topbar-dept" id="topbar-dept"><span class="topbar-dept-emoji">📋</span><span id="topbar-dept-name">經驗收集</span></div>
     <div class="progress-text" id="progress-text"></div>
   </div>
@@ -980,7 +986,30 @@ document.addEventListener('input', e => {
 function goToScreen(name){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
+  // Show "回首頁" button on every screen except start
+  const backBtn = document.getElementById('btn-back-to-start');
+  if(backBtn) backBtn.style.display = (name === 'start') ? 'none' : 'inline-block';
 }
+
+window.backToStart = function(){
+  // Save current progress so user can continue
+  try{
+    const d = DEPTS[state.dept];
+    const q = d.questions[state.qIdx];
+    if(q) state.answers[q.id] = collectAnswer(q);
+    saveState();
+  }catch(e){}
+  // Reset transient state so picking another filler starts fresh
+  state.filler = '';
+  state.fillerRole = '';
+  state.qIdx = 0;
+  state.answers = {};
+  state.feedback = {badQuestions:[], newQuestions:[]};
+  state._routes = state._paymentStages = state._designStages = state._routeQ = state._designQ = null;
+  goToScreen('start');
+  renderStart();
+  window.scrollTo({top:0, behavior:'smooth'});
+};
 
 function renderQuestion(){
   const d = DEPTS[state.dept];
@@ -1058,21 +1087,46 @@ function renderNumberSlider(q, ans){
   `;
 }
 
+function _hasOther(q){ return q.options && q.options.includes('其他'); }
+function _parseOther(val){
+  // If "其他：xxx" → return text part. Otherwise null.
+  if(typeof val !== 'string') return null;
+  const m = val.match(/^其他[：:]\s*(.*)$/);
+  return m ? m[1] : null;
+}
+
 function renderPillSingle(q, ans){
+  const hasOther = _hasOther(q);
+  const otherText = _parseOther(ans);
+  const isOtherSel = otherText !== null || ans === '其他';
   return `<div class="pill-grid">${
-    q.options.map((opt, i) => `
-      <button class="pill ${ans === opt ? 'selected' : ''}" data-val="${opt}" onclick="selectPillSingle(this)">${opt}</button>
-    `).join('')
-  }</div>`;
+    q.options.map((opt) => {
+      const isSel = (opt === '其他' ? isOtherSel : ans === opt);
+      return `<button class="pill ${isSel ? 'selected' : ''}" data-val="${opt}" onclick="selectPillSingle(this)">${opt}</button>`;
+    }).join('')
+  }</div>${hasOther ? `
+    <div class="other-input-wrap ${isOtherSel ? 'show' : ''}" id="other-wrap">
+      <input class="other-input" id="other-input" type="text" value="${otherText||''}" placeholder="請說明你的「其他」...">
+      <div class="other-input-hint">選了「其他」必須說明，否則此題視同未填</div>
+    </div>` : ''}`;
 }
 
 function renderPillMulti(q, ans){
   const selected = ans || [];
+  const hasOther = _hasOther(q);
+  // For multi, find 「其他：xxx」item
+  const otherItem = selected.find(v => typeof v === 'string' && v.startsWith('其他'));
+  const otherText = otherItem ? (_parseOther(otherItem) || '') : '';
+  const isOtherSel = !!otherItem;
   return `<div class="pill-grid">${
-    q.options.map(opt => `
-      <button class="pill pill-multi ${selected.includes(opt) ? 'selected' : ''}" data-val="${opt}" onclick="togglePillMulti(this)">${opt}</button>
-    `).join('')
-  }</div>`;
+    q.options.map(opt => {
+      const isSel = (opt === '其他' ? isOtherSel : selected.includes(opt));
+      return `<button class="pill pill-multi ${isSel ? 'selected' : ''}" data-val="${opt}" onclick="togglePillMulti(this)">${opt}</button>`;
+    }).join('')
+  }</div>${hasOther ? `
+    <div class="other-input-wrap ${isOtherSel ? 'show' : ''}" id="other-wrap">
+      <input class="other-input" id="other-input" type="text" value="${otherText}" placeholder="請說明你的「其他」...">
+    </div>` : ''}`;
 }
 
 function renderText(q, ans){
@@ -1436,10 +1490,24 @@ function bindInputEvents(q){
 function selectPillSingle(btn){
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
   btn.classList.add('selected');
+  const wrap = document.getElementById('other-wrap');
+  if(wrap){
+    const isOther = btn.dataset.val === '其他';
+    wrap.classList.toggle('show', isOther);
+    if(isOther) setTimeout(()=>document.getElementById('other-input')?.focus(), 100);
+  }
 }
 
 function togglePillMulti(btn){
   btn.classList.toggle('selected');
+  if(btn.dataset.val === '其他'){
+    const wrap = document.getElementById('other-wrap');
+    if(wrap){
+      const show = btn.classList.contains('selected');
+      wrap.classList.toggle('show', show);
+      if(show) setTimeout(()=>document.getElementById('other-input')?.focus(), 100);
+    }
+  }
 }
 
 function updateSumCheck(){
@@ -1467,10 +1535,22 @@ function collectAnswer(q){
     case 'number-slider': return parseFloat(document.getElementById('ns-num').value);
     case 'pill-single': {
       const sel = document.querySelector('.pill.selected');
-      return sel ? sel.dataset.val : null;
+      if(!sel) return null;
+      const val = sel.dataset.val;
+      if(val === '其他'){
+        const text = (document.getElementById('other-input')?.value || '').trim();
+        return text ? `其他：${text}` : '其他';
+      }
+      return val;
     }
     case 'pill-multi': {
-      return Array.from(document.querySelectorAll('.pill.selected')).map(p => p.dataset.val);
+      const otherText = (document.getElementById('other-input')?.value || '').trim();
+      return Array.from(document.querySelectorAll('.pill.selected')).map(p => {
+        if(p.dataset.val === '其他'){
+          return otherText ? `其他：${otherText}` : '其他';
+        }
+        return p.dataset.val;
+      });
     }
     case 'text': return document.getElementById('text-input').value.trim();
     case 'textarea': return document.getElementById('textarea-input').value.trim();
@@ -1509,6 +1589,9 @@ function validateAnswer(q, ans){
   if(!q.required) return true;
   if(ans === null || ans === undefined || ans === '') return false;
   if(Array.isArray(ans) && ans.length === 0) return false;
+  // 若選了「其他」但沒填內容，視同未填
+  if(typeof ans === 'string' && ans === '其他') return false;
+  if(Array.isArray(ans) && ans.some(v => v === '其他')) return false;
   if(q.type === 'multi-num' && !q.noSum){
     const sum = ans.reduce((s,v) => s + v, 0);
     if(Math.abs(sum - q.sumTarget) > 0.1) return false;
