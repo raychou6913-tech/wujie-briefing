@@ -168,6 +168,28 @@ body{
 .thank-title{font-size:28px;font-weight:800;margin-bottom:12px;}
 .thank-sub{font-size:14px;color:var(--txt-mid);line-height:1.6;margin-bottom:32px;}
 
+/* MULTI-RANGE (label + min ~ max) */
+.range-grid{display:flex;flex-direction:column;gap:10px;}
+.range-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.range-label{font-size:13px;color:var(--txt-mid);font-weight:600;line-height:1.4;}
+.range-inputs{display:flex;align-items:center;gap:8px;}
+.range-input{width:80px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:15px;font-weight:700;color:var(--txt-hi);outline:none;font-family:inherit;text-align:center;}
+.range-input:focus{border-color:var(--accent);}
+.range-tilde{color:var(--txt-lo);font-size:14px;}
+.range-suffix{font-size:12px;color:var(--txt-mid);font-weight:600;}
+
+/* VENDOR LIST (name + category pills) */
+.vendor-grid{display:flex;flex-direction:column;gap:12px;}
+.vendor-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.vendor-row-top{display:flex;align-items:center;gap:10px;}
+.vendor-num{width:24px;height:24px;background:var(--card-2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--txt-mid);flex-shrink:0;}
+.vendor-input{flex:1;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.vendor-input:focus{border-color:var(--accent);}
+.vendor-cats{display:flex;flex-wrap:wrap;gap:5px;padding-left:34px;}
+.vendor-cat{font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-lo);cursor:pointer;font-family:inherit;}
+.vendor-cat:hover{border-color:var(--accent);color:var(--accent-glow);}
+.vendor-cat.selected{background:var(--accent);border-color:var(--accent);color:#fff;}
+
 /* MOCKUP BANNER */
 .mockup-banner{background:linear-gradient(90deg,#a78bfa20,#fb923c20);border-bottom:1px solid #a78bfa30;padding:6px 20px;font-size:10px;font-weight:600;color:var(--accent-glow);letter-spacing:.04em;text-align:center;}
 </style>
@@ -312,27 +334,38 @@ const DEPTS = {
           {label:'驗收時付', default:40, suffix:'%'},
           {label:'出貨後付', default:30, suffix:'%'},
         ], sumTarget:100},
-      {id:'1.10', type:'abc-tier', vam:true, required:true,
-        text:'PVC 公仔模具費分三級',
-        help:'依產品複雜度分 A/B/C 三級。系統建項目時根據選擇直接帶入預算。',
+      {id:'1.10', type:'multi-range', vam:true, required:true,
+        text:'每款模具費（用售價回推會比較好估）',
+        help:'以「售價 69 元 RMB 盲盒」為例，依款式數量回答區間範圍即可，不用定死。',
         unit:'萬 RMB',
-        tiers:[
-          {tier:'A', name:'複雜／多配件', default:30},
-          {tier:'B', name:'一般盲盒', default:12},
-          {tier:'C', name:'簡單小件', default:6},
+        rows:[
+          {label:'6+1 款（69 元盲盒）', minDefault:3, maxDefault:6},
+          {label:'9+1 款（69 元盲盒）', minDefault:5, maxDefault:9},
+          {label:'12+1 款（69 元盲盒）', minDefault:6, maxDefault:12},
+          {label:'5cm 以下小公仔（單款）', minDefault:1, maxDefault:3},
         ]},
-      {id:'1.11', type:'number-slider', vam:false, required:false,
-        text:'樣品費 default（一套）',
-        unit:'元 RMB', min:0, max:30000, default:3000},
+      {id:'1.11', type:'multi-num', vam:false, required:false,
+        text:'各類樣品費 default（一套）',
+        help:'依樣品類型分別估算，沒做過的填 0',
+        noSum:true,
+        rows:[
+          {label:'PVC 素胚（未上色）', default:1500, suffix:'元'},
+          {label:'PVC 上色樣品', default:3000, suffix:'元'},
+          {label:'絨毛樣品', default:2000, suffix:'元'},
+          {label:'文創周邊樣品', default:1000, suffix:'元'},
+        ]},
       {id:'1.12', type:'number-slider', vam:false, required:false,
         text:'試模費 default',
+        help:'試模費＝工廠開完模具後，試打第一批產品驗證模具是否合格的費用',
         unit:'元 RMB', min:0, max:50000, default:5000},
-      {id:'1.13', type:'text-multi', vam:false, required:false,
+      {id:'1.13', type:'vendor-list', vam:false, required:false,
         text:'你常用的工廠（top 5）',
-        help:'寫簡稱即可，例如「深圳A廠」',
-        count:5},
+        help:'每家工廠寫名稱，並點選擅長的品類（可複選）',
+        count:5,
+        categories:['PVC 公仔','絨毛','壓克力／立牌','文具','包裝盒','服裝','其他']},
       {id:'1.15', type:'number-slider', vam:false, required:false,
-        text:'旺季（Q4）量產要 +幾天緩衝？',
+        text:'旺季（Q4）PVC 公仔量產要 +幾天緩衝？',
+        help:'承接題 1.3（標準量產 60 天）— 旺季要再加幾天',
         unit:'+天', min:0, max:30, default:10},
       {id:'1.16', type:'number-slider', vam:true, required:true,
         text:'PVC 公仔大貨平均不良／耗損率？',
@@ -342,8 +375,13 @@ const DEPTS = {
         text:'絨毛／文創周邊不良率？',
         unit:'%', min:0, max:10, default:2, step:0.5},
       {id:'1.18', type:'number-slider', vam:false, required:false,
-        text:'工廠平均交期準時率？（你估）',
+        text:'你常用的工廠平均交期準時率？（你估）',
+        help:'承接題 1.13 你列的常用工廠，平均能準時交貨的比率',
         unit:'%', min:50, max:100, default:87},
+      {id:'1.18a', type:'pill-multi', vam:false, required:false,
+        text:'準時率受影響時，通常是哪些狀況？',
+        help:'承接題 1.18 — 工廠交期不準的常見原因（可複選）',
+        options:['原料短缺','工廠排程衝突','工人不夠','模具出問題','物流延遲','配件供應商出問題','旺季產能不足','政策／環保限產','其他']},
       {id:'1.19', type:'textarea', vam:false, required:false,
         text:'採購流程中還有什麼系統該知道的？',
         help:'選填，自由分享',
@@ -560,38 +598,42 @@ const DEPTS = {
       {id:'5.9', type:'text-multi', vam:false, required:false,
         text:'常用外包工作室（top 3）',
         count:3},
-      {id:'5.10', type:'abc-tier', vam:true, required:true,
-        text:'PVC 公仔 2D 外包報價',
-        help:'依複雜度分級',
+      {id:'5.10', type:'multi-range', vam:true, required:true,
+        text:'PVC 公仔 2D 外包報價（依產品類型）',
+        help:'同樣以「售價 69 元盲盒」為基準回推每款設計費區間。沒做過的填 0。',
         unit:'元 RMB',
-        tiers:[
-          {tier:'A', name:'精細', default:15000},
-          {tier:'B', name:'一般', default:8000},
-          {tier:'C', name:'簡單', default:4000},
+        rows:[
+          {label:'6+1 款盲盒 · 每款 2D', minDefault:5000, maxDefault:10000},
+          {label:'9+1 款盲盒 · 每款 2D', minDefault:5000, maxDefault:10000},
+          {label:'12+1 款盲盒 · 每款 2D', minDefault:5000, maxDefault:10000},
+          {label:'5cm 以下小公仔 · 每款 2D', minDefault:3000, maxDefault:6000},
         ]},
-      {id:'5.11', type:'abc-tier', vam:true, required:true,
-        text:'PVC 3D 建模外包報價',
+      {id:'5.11', type:'multi-range', vam:true, required:true,
+        text:'PVC 3D 建模外包報價（依產品類型）',
+        help:'每款 3D 建模費區間',
         unit:'元 RMB',
-        tiers:[
-          {tier:'A', name:'精細', default:30000},
-          {tier:'B', name:'一般', default:15000},
-          {tier:'C', name:'簡單', default:8000},
+        rows:[
+          {label:'6+1 款盲盒 · 每款 3D', minDefault:10000, maxDefault:20000},
+          {label:'9+1 款盲盒 · 每款 3D', minDefault:10000, maxDefault:20000},
+          {label:'12+1 款盲盒 · 每款 3D', minDefault:10000, maxDefault:20000},
+          {label:'5cm 以下小公仔 · 每款 3D', minDefault:6000, maxDefault:12000},
         ]},
-      {id:'5.12', type:'abc-tier', vam:false, required:false,
+      {id:'5.12', type:'multi-range', vam:false, required:false,
         text:'包裝設計外包報價',
+        help:'依包裝類型給區間',
         unit:'元 RMB',
-        tiers:[
-          {tier:'A', name:'精細', default:12000},
-          {tier:'B', name:'一般', default:6000},
-          {tier:'C', name:'簡單', default:3000},
+        rows:[
+          {label:'盲盒外盒設計（含展示盒）', minDefault:8000, maxDefault:18000},
+          {label:'單品包裝（吊卡／盒裝）', minDefault:3000, maxDefault:8000},
+          {label:'紙袋／提袋設計', minDefault:2000, maxDefault:5000},
         ]},
-      {id:'5.13', type:'abc-tier', vam:false, required:false,
-        text:'平面 KV 外包報價',
+      {id:'5.13', type:'multi-range', vam:false, required:false,
+        text:'平面 KV／宣傳物外包報價',
         unit:'元 RMB',
-        tiers:[
-          {tier:'A', name:'精細', default:10000},
-          {tier:'B', name:'一般', default:5000},
-          {tier:'C', name:'簡單', default:2500},
+        rows:[
+          {label:'主視覺 KV（一套）', minDefault:6000, maxDefault:15000},
+          {label:'快閃店宣傳物全套', minDefault:8000, maxDefault:20000},
+          {label:'單張海報／DM', minDefault:1500, maxDefault:4000},
         ]},
       {id:'5.14', type:'number-slider', vam:false, required:false,
         text:'同時可以 handle 幾個項目？',
@@ -895,6 +937,8 @@ function renderInput(q){
     case 'multi-num': return renderMultiNum(q, ans);
     case 'abc-tier': return renderAbcTier(q, ans);
     case 'text-multi': return renderTextMulti(q, ans);
+    case 'multi-range': return renderMultiRange(q, ans);
+    case 'vendor-list': return renderVendorList(q, ans);
     default: return '<div>Unknown type</div>';
   }
 }
@@ -948,7 +992,7 @@ function renderMultiNum(q, ans){
           <div class="multi-num-suffix">${r.suffix}</div>
         </div>
       `).join('')}
-      <div class="sum-check" id="sum-check" data-target="${q.sumTarget}"></div>
+      ${q.noSum ? '' : `<div class="sum-check" id="sum-check" data-target="${q.sumTarget}"></div>`}
     </div>
   `;
 }
@@ -986,6 +1030,53 @@ function renderTextMulti(q, ans){
   `;
 }
 
+function renderMultiRange(q, ans){
+  const vals = ans || q.rows.map(r => ({min: r.minDefault, max: r.maxDefault}));
+  return `
+    <div class="range-grid">
+      ${q.rows.map((r,i) => `
+        <div class="range-row">
+          <div class="range-label">${r.label}</div>
+          <div class="range-inputs">
+            <input class="range-input" type="number" data-idx="${i}" data-kind="min" value="${vals[i]?.min ?? r.minDefault}" step="0.1">
+            <span class="range-tilde">~</span>
+            <input class="range-input" type="number" data-idx="${i}" data-kind="max" value="${vals[i]?.max ?? r.maxDefault}" step="0.1">
+            <span class="range-suffix">${q.unit||''}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderVendorList(q, ans){
+  const vals = ans || Array(q.count).fill(null).map(() => ({name:'', cats:[]}));
+  return `
+    <div class="vendor-grid">
+      ${Array.from({length: q.count}, (_, i) => {
+        const v = vals[i] || {name:'', cats:[]};
+        return `
+          <div class="vendor-row" data-idx="${i}">
+            <div class="vendor-row-top">
+              <div class="vendor-num">${i+1}</div>
+              <input class="vendor-input" type="text" value="${v.name||''}" placeholder="${i === 0 ? '例如: 深圳A廠' : '工廠名稱'}">
+            </div>
+            <div class="vendor-cats">
+              ${q.categories.map(cat => `
+                <button class="vendor-cat ${v.cats.includes(cat) ? 'selected' : ''}" data-val="${cat}" onclick="toggleVendorCat(this)">${cat}</button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+window.toggleVendorCat = function(btn){
+  btn.classList.toggle('selected');
+};
+
 // ═══════════════════════════════════════════════════════════════
 // INPUT EVENTS
 // ═══════════════════════════════════════════════════════════════
@@ -1014,8 +1105,9 @@ function togglePillMulti(btn){
 function updateSumCheck(){
   const inputs = document.querySelectorAll('.multi-num-input');
   if(!inputs.length) return;
-  const sum = Array.from(inputs).reduce((s,i) => s + (parseFloat(i.value)||0), 0);
   const check = document.getElementById('sum-check');
+  if(!check) return; // noSum mode, no sum check element
+  const sum = Array.from(inputs).reduce((s,i) => s + (parseFloat(i.value)||0), 0);
   const target = parseFloat(check.dataset.target);
   let cls = 'ok', icon = '✓';
   if(Math.abs(sum - target) > 0.1){
@@ -1045,6 +1137,21 @@ function collectAnswer(q){
     case 'multi-num': return Array.from(document.querySelectorAll('.multi-num-input')).map(i => parseFloat(i.value)||0);
     case 'abc-tier': return Array.from(document.querySelectorAll('.abc-input')).map(i => parseFloat(i.value)||0);
     case 'text-multi': return Array.from(document.querySelectorAll('.text-multi-input')).map(i => i.value.trim());
+    case 'multi-range': {
+      const rows = document.querySelectorAll('.range-row');
+      return Array.from(rows).map(row => {
+        const inputs = row.querySelectorAll('.range-input');
+        return {min: parseFloat(inputs[0].value)||0, max: parseFloat(inputs[1].value)||0};
+      });
+    }
+    case 'vendor-list': {
+      const rows = document.querySelectorAll('.vendor-row');
+      return Array.from(rows).map(row => {
+        const name = row.querySelector('.vendor-input').value.trim();
+        const cats = Array.from(row.querySelectorAll('.vendor-cat.selected')).map(c => c.dataset.val);
+        return {name, cats};
+      }).filter(v => v.name);
+    }
     default: return null;
   }
 }
@@ -1053,11 +1160,18 @@ function validateAnswer(q, ans){
   if(!q.required) return true;
   if(ans === null || ans === undefined || ans === '') return false;
   if(Array.isArray(ans) && ans.length === 0) return false;
-  if(Array.isArray(ans) && ans.every(v => !v || v === 0)) return false;
-  if(q.type === 'multi-num'){
+  if(q.type === 'multi-num' && !q.noSum){
     const sum = ans.reduce((s,v) => s + v, 0);
     if(Math.abs(sum - q.sumTarget) > 0.1) return false;
+    return true;
   }
+  if(q.type === 'multi-range'){
+    return ans.some(r => (r.min > 0 || r.max > 0));
+  }
+  if(q.type === 'vendor-list'){
+    return ans.some(v => v.name && v.name.length > 0);
+  }
+  if(Array.isArray(ans) && ans.every(v => !v || v === 0)) return false;
   return true;
 }
 
@@ -1138,6 +1252,8 @@ function formatAnswer(q, ans){
     if(q.type === 'multi-num') return q.rows.map((r,i) => `${r.label}: ${ans[i]||0}${r.suffix}`).join(' · ');
     if(q.type === 'abc-tier') return q.tiers.map((t,i) => `${t.tier} ${ans[i]||0} ${q.unit}`).join(' · ');
     if(q.type === 'text-multi') return ans.filter(v => v).join('、') || '（未填）';
+    if(q.type === 'multi-range') return q.rows.map((r,i) => `${r.label}: ${ans[i]?.min||0}-${ans[i]?.max||0} ${q.unit}`).join('；');
+    if(q.type === 'vendor-list') return ans.map(v => `${v.name}${v.cats.length ? '（' + v.cats.join('/') + '）' : ''}`).join('、') || '（未填）';
     return ans.join('、');
   }
   if(typeof ans === 'number') return ans + (q.unit ? ' ' + q.unit : '');
