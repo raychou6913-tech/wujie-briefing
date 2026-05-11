@@ -497,7 +497,12 @@ const DEPTS = {
         help:'承接題 1.3 — 通常是哪些狀況讓量產拉長（複選）',
         options:['原料短缺','工廠排程衝突','工人不夠','模具出問題','配件供應商出問題','旺季產能不足','政策／環保限產','客戶臨時改規格','其他']},
 
-      {id:'1.14', type:'textarea', vam:false, required:false,
+      {id:'1.14', type:'textarea', vam:true, required:false,
+        text:'目前是否有與工廠約定年度採購達標返點（Rebate）？',
+        help:'若有，請寫工廠名稱 + 達標門檻 + 預估返點比例。這是隱藏利潤，VAM 戰情室要看。沒有就跳過。',
+        placeholder:'例：A 工廠年採購額 ¥500 萬以上返 3%'},
+
+      {id:'1.15', type:'textarea', vam:false, required:false,
         text:'採購流程中還有什麼系統該知道的？',
         help:'選填，自由分享',
         placeholder:'例：某工廠最近搬廠加 5 天...'},
@@ -616,6 +621,16 @@ const DEPTS = {
           {label:'KA 大客戶', default:2, suffix:'%'},
           {label:'流通商', default:3, suffix:'%'},
           {label:'電商通路', default:5, suffix:'%'},
+        ]},
+
+      {id:'3.8a', type:'multi-num', vam:true, required:false,
+        text:'通路常態性扣抵費用佔該客戶營收 %（除退貨外）',
+        help:'KA / 流通商常見的「上架費 / 行銷贊助 / 退換貨補貼」等隱形扣抵。這會直接吃毛利。沒有就填 0。',
+        noSum:true,
+        rows:[
+          {label:'KA 大客戶 通路費佔比', default:0, suffix:'%'},
+          {label:'流通商 通路費佔比', default:0, suffix:'%'},
+          {label:'電商 平台抽成（如適用）', default:0, suffix:'%'},
         ]},
 
       {id:'3.9', type:'text-multi', vam:false, required:false,

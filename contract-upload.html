@@ -105,17 +105,27 @@ body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#fb923c10 0%,var(--b
     </div>
   </div>
 
-  <div class="section-label">這份合約屬於</div>
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tab-current" onclick="switchCat('current')">
-      <span class="tab-emoji">✅</span>
-      <span>現有合約</span>
-      <span class="tab-desc">合約期還沒過</span>
+  <div class="section-label">這份合約屬於（對齊 VAM 漏斗 4 類）</div>
+  <div class="tab-bar" style="grid-template-columns:repeat(2,1fr);display:grid;gap:8px;">
+    <button class="tab-btn active" id="tab-tbd" onclick="switchCat('tbd')">
+      <span class="tab-emoji">🌱</span>
+      <span>未啟動 TBD</span>
+      <span class="tab-desc">已簽約或意向，未建預算（潛在彈藥庫）</span>
     </button>
-    <button class="tab-btn" id="tab-historic" onclick="switchCat('historic')">
+    <button class="tab-btn" id="tab-active" onclick="switchCat('active')">
+      <span class="tab-emoji">⚡</span>
+      <span>執行中 Active</span>
+      <span class="tab-desc">開發或銷售中，MG 扣抵中（VAM 主力）</span>
+    </button>
+    <button class="tab-btn" id="tab-warning" onclick="switchCat('warning')">
+      <span class="tab-emoji">⚠️</span>
+      <span>快過期／續約中</span>
+      <span class="tab-desc">到期 &lt; 3 個月 或 MG 快扣完（紅燈）</span>
+    </button>
+    <button class="tab-btn" id="tab-archived" onclick="switchCat('archived')">
       <span class="tab-emoji">📚</span>
-      <span>過往參考</span>
-      <span class="tab-desc">已過期合約</span>
+      <span>已結案／過往</span>
+      <span class="tab-desc">死掉的案子，僅供歷史參考</span>
     </button>
   </div>
 
@@ -175,7 +185,7 @@ body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#fb923c10 0%,var(--b
 
   <div class="section-label">
     <span style="display:flex;justify-content:space-between;align-items:center;">
-      <span>已登錄合約清單（<span id="count-current">0</span> 現有 · <span id="count-historic">0</span> 過往）</span>
+      <span>已登錄合約清單（<span id="count-tbd">0</span> 未啟動 · <span id="count-active">0</span> 執行中 · <span id="count-warning">0</span> 快過期 · <span id="count-archived">0</span> 過往）</span>
       <span class="btn-ghost" style="color:var(--danger);border-color:var(--danger);cursor:pointer;" onclick="clearAll()">🗑 清空全部</span>
     </span>
   </div>
@@ -188,15 +198,25 @@ body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#fb923c10 0%,var(--b
 <script>
 const STORAGE_KEY = 'wujie_contracts_v1';
 let state = {
-  category: 'current', // 'current' | 'historic'
-  files: [], // 暫存當前未送出的檔名清單
+  category: 'active', // 'tbd' | 'active' | 'warning' | 'archived'
+  files: [],
   contracts: JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'),
+};
+
+const CAT_TABS = ['tbd','active','warning','archived'];
+const CAT_LABELS = {
+  tbd:      {emoji:'🌱', label:'未啟動 TBD'},
+  active:   {emoji:'⚡', label:'執行中 Active'},
+  warning:  {emoji:'⚠️', label:'快過期／續約中'},
+  archived: {emoji:'📚', label:'已結案／過往'},
 };
 
 function switchCat(cat){
   state.category = cat;
-  document.getElementById('tab-current').classList.toggle('active', cat === 'current');
-  document.getElementById('tab-historic').classList.toggle('active', cat === 'historic');
+  CAT_TABS.forEach(c => {
+    const btn = document.getElementById('tab-'+c);
+    if(btn) btn.classList.toggle('active', cat === c);
+  });
 }
 
 function handleFiles(fileList){
@@ -270,21 +290,27 @@ function clearAll(){
 }
 
 function renderList(){
-  document.getElementById('count-current').textContent = state.contracts.filter(c=>c.category==='current').length;
-  document.getElementById('count-historic').textContent = state.contracts.filter(c=>c.category==='historic').length;
+  CAT_TABS.forEach(c => {
+    const el = document.getElementById('count-'+c);
+    if(el) el.textContent = state.contracts.filter(x=>x.category===c).length;
+  });
   const el = document.getElementById('contract-list');
   if(!state.contracts.length){
-    el.innerHTML = '<div style="font-size:12px;color:var(--txt-lo);text-align:center;padding:30px;background:var(--card);border:1px dashed var(--border);border-radius:10px;">尚未登錄任何合約。上方填表 + 上傳 PDF，按「加入合約清單」開始。</div>';
+    el.innerHTML = '<div style="font-size:12px;color:var(--txt-lo);text-align:center;padding:30px;background:var(--card);border:1px dashed var(--border);border-radius:10px;">尚未登錄任何合約。上方選分類 + 填表 + 上傳 PDF，按「加入合約清單」開始。</div>';
     return;
   }
-  el.innerHTML = state.contracts.map(c => {
-    const tagCls = c.category === 'current' ? 'tag-current' : 'tag-historic';
-    const tagLabel = c.category === 'current' ? '✅ 現有' : '📚 過往';
+  // Sort by category priority: tbd > active > warning > archived
+  const order = {tbd:0, active:1, warning:2, archived:3};
+  const sorted = state.contracts.slice().sort((a,b) => (order[a.category]||9) - (order[b.category]||9));
+  const tagColors = {tbd:'#94a3b8', active:'var(--ok)', warning:'var(--warn)', archived:'#5d6388'};
+  el.innerHTML = sorted.map(c => {
+    const cat = CAT_LABELS[c.category] || {emoji:'❓', label:'未分類'};
+    const color = tagColors[c.category] || 'var(--txt-mid)';
     const statusCls = c.status === 'parsed' ? 'status-parsed' : 'status-pending';
     const statusLabel = c.status === 'parsed' ? 'AI 已解析' : '待 AI 解析';
     const filesStr = c.files.length ? `· ${c.files.length} 個檔案` : '';
     return `<div class="list-card">
-      <span class="list-tag ${tagCls}">${tagLabel}</span>
+      <span class="list-tag" style="background:${color}22;color:${color};border:1px solid ${color}40;">${cat.emoji} ${cat.label}</span>
       <div class="list-body">
         <div class="list-title">${c.name}</div>
         <div class="list-meta">${c.licensor||'—'} · ${c.entity} · 到期 ${c.expires||'—'} ${filesStr}${c.note?' · 備註：'+c.note:''}</div>
