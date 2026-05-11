@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 經驗收集</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0a0b12;
+  --surface:#13151f;
+  --card:#1a1d29;
+  --card-2:#22253a;
+  --border:#2a2d42;
+  --border-hi:#3d4268;
+  --txt-hi:#f5f6ff;
+  --txt-mid:#9ca3c5;
+  --txt-lo:#5d6388;
+  --accent:#a78bfa;
+  --accent-glow:#c4b5fd;
+  --accent-warm:#fb923c;
+  --ok:#34d399;
+  --ok-soft:#34d39915;
+  --warn:#fbbf24;
+  --warn-soft:#fbbf2415;
+  --danger:#f87171;
+  --danger-soft:#f8717115;
+  --vam:#fb923c;
+  --vam-soft:#fb923c15;
+}
+body{
+  background:radial-gradient(ellipse 80% 50% at 50% -10%,#a78bfa10 0%,var(--bg) 60%);
+  color:var(--txt-hi);
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;
+  min-height:100vh;
+  letter-spacing:-.005em;
+  line-height:1.5;
+}
+
+/* TOP BAR */
+.topbar{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#a78bfa,#fb923c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;}
+.brand-text{font-size:14px;font-weight:700;}
+.brand-sub{font-size:9px;color:var(--txt-lo);letter-spacing:.08em;text-transform:uppercase;}
+.progress-text{font-size:11px;color:var(--txt-mid);font-weight:600;}
+
+/* PROGRESS BAR */
+.progress-bar{height:3px;background:var(--card);overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-warm));transition:width .4s ease;}
+
+/* MAIN */
+.main{max-width:680px;margin:0 auto;padding:40px 24px 80px;}
+
+/* SCREEN STATES */
+.screen{display:none;}
+.screen.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* START SCREEN */
+.start-hero{text-align:center;margin-bottom:40px;}
+.dept-emoji{font-size:48px;margin-bottom:16px;}
+.dept-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;}
+.dept-subtitle{font-size:14px;color:var(--txt-mid);margin-bottom:20px;line-height:1.6;}
+.dept-meta{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:32px;}
+.dept-meta-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt-mid);}
+.dept-meta-icon{color:var(--accent-glow);}
+
+.start-form{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;}
+.start-form-label{font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;}
+.start-form-input{width:100%;background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:16px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.start-form-input:focus{border-color:var(--accent);}
+
+.btn-primary{display:block;width:100%;background:linear-gradient(135deg,var(--accent),var(--accent-warm));color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .15s,opacity .15s;}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+
+.btn-ghost{display:inline-block;background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+.btn-ghost:hover{color:var(--txt-hi);border-color:var(--txt-mid);}
+
+.dept-picker{margin-top:24px;text-align:center;}
+.dept-picker-label{font-size:11px;color:var(--txt-lo);margin-bottom:10px;}
+.dept-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.dept-pill{font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;font-family:inherit;}
+.dept-pill:hover{border-color:var(--accent);color:var(--accent-glow);}
+
+/* QUESTION SCREEN */
+.q-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.q-num{font-size:11px;color:var(--txt-lo);font-weight:700;letter-spacing:.04em;}
+.q-vam-tag{background:var(--vam-soft);color:var(--vam);font-size:10px;font-weight:800;padding:3px 9px;border-radius:6px;letter-spacing:.04em;}
+.q-required-tag{background:var(--accent)20;color:var(--accent-glow);font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.q-text{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px;line-height:1.45;}
+.q-help{font-size:13px;color:var(--txt-mid);margin-bottom:24px;line-height:1.6;}
+
+.q-input-block{margin-bottom:32px;}
+
+/* NUMBER + SLIDER */
+.num-slider-row{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.num-input{width:100px;background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:24px;font-weight:700;color:var(--txt-hi);outline:none;font-family:inherit;text-align:center;}
+.num-input:focus{border-color:var(--accent);}
+.num-unit{font-size:13px;color:var(--txt-mid);font-weight:600;flex-shrink:0;}
+.slider{flex:1;-webkit-appearance:none;appearance:none;height:6px;background:var(--card-2);border-radius:3px;outline:none;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;background:var(--accent-glow);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--accent);}
+.slider::-moz-range-thumb{width:20px;height:20px;background:var(--accent-glow);border-radius:50%;cursor:pointer;border:none;}
+.slider-range{display:flex;justify-content:space-between;font-size:10px;color:var(--txt-lo);margin-top:6px;padding:0 4px;}
+
+/* PILL OPTIONS */
+.pill-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{background:var(--card);border:1.5px solid var(--border);color:var(--txt-mid);padding:11px 18px;border-radius:30px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;}
+.pill:hover{border-color:var(--accent);color:var(--txt-hi);}
+.pill.selected{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+.pill-multi.pill.selected{background:linear-gradient(135deg,var(--accent),#8b5cf6);}
+
+/* TEXT */
+.text-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:15px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.text-input:focus{border-color:var(--accent);}
+.textarea-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:14px;color:var(--txt-hi);outline:none;font-family:inherit;resize:vertical;min-height:100px;line-height:1.6;}
+
+/* MULTI NUMBER (sum validation) */
+.multi-num-grid{display:flex;flex-direction:column;gap:10px;}
+.multi-num-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;}
+.multi-num-label{flex:1;font-size:13px;color:var(--txt-mid);font-weight:600;}
+.multi-num-input{width:90px;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:16px;font-weight:700;color:var(--txt-hi);outline:none;font-family:inherit;text-align:right;}
+.multi-num-input:focus{border-color:var(--accent);}
+.multi-num-suffix{font-size:13px;color:var(--txt-mid);font-weight:600;width:20px;}
+.sum-check{font-size:11px;font-weight:700;text-align:right;padding:8px 4px;}
+.sum-check.ok{color:var(--ok);}
+.sum-check.warn{color:var(--warn);}
+.sum-check.bad{color:var(--danger);}
+
+/* ABC TIER */
+.abc-grid{display:flex;flex-direction:column;gap:10px;}
+.abc-row{display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.abc-badge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;}
+.abc-a{background:linear-gradient(135deg,#fb923c,#f97316);}
+.abc-b{background:linear-gradient(135deg,#a78bfa,#8b5cf6);}
+.abc-c{background:linear-gradient(135deg,#34d399,#10b981);}
+.abc-content{display:flex;align-items:center;gap:10px;}
+.abc-name{font-size:12px;color:var(--txt-mid);font-weight:600;min-width:120px;}
+.abc-input{flex:1;background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:16px;font-weight:700;color:var(--txt-hi);outline:none;font-family:inherit;text-align:right;max-width:140px;}
+.abc-suffix{font-size:13px;color:var(--txt-mid);font-weight:600;}
+
+/* TEXT MULTI (top N) */
+.text-multi-grid{display:flex;flex-direction:column;gap:8px;}
+.text-multi-row{display:flex;align-items:center;gap:12px;}
+.text-multi-num{width:28px;height:28px;background:var(--card-2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--txt-mid);flex-shrink:0;}
+.text-multi-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--txt-hi);outline:none;font-family:inherit;}
+.text-multi-input:focus{border-color:var(--accent);}
+
+/* VALIDATION FEEDBACK */
+.input-error{font-size:11px;color:var(--danger);margin-top:8px;padding-left:4px;}
+
+/* NAV BUTTONS */
+.q-nav{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:20px;padding-top:24px;border-top:1px solid var(--border);}
+.q-nav-left{display:flex;gap:10px;}
+.q-skip{font-size:12px;color:var(--txt-lo);background:transparent;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;}
+
+/* REVIEW SCREEN */
+.review-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:8px;}
+.review-q{font-size:12px;color:var(--txt-mid);font-weight:600;margin-bottom:6px;}
+.review-a{font-size:14px;color:var(--txt-hi);font-weight:700;}
+.review-a.empty{color:var(--txt-lo);font-weight:400;font-style:italic;}
+.review-edit{font-size:11px;color:var(--accent-glow);cursor:pointer;float:right;}
+
+/* THANK YOU */
+.thank-hero{text-align:center;padding:60px 20px;}
+.thank-emoji{font-size:64px;margin-bottom:24px;}
+.thank-title{font-size:28px;font-weight:800;margin-bottom:12px;}
+.thank-sub{font-size:14px;color:var(--txt-mid);line-height:1.6;margin-bottom:32px;}
+
+/* MOCKUP BANNER */
+.mockup-banner{background:linear-gradient(90deg,#a78bfa20,#fb923c20);border-bottom:1px solid #a78bfa30;padding:6px 20px;font-size:10px;font-weight:600;color:var(--accent-glow);letter-spacing:.04em;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="mockup-banner" id="mockup-banner">
+  ✨ Stage 1 Mockup · 答案目前只存本機（localStorage），尚未接飛書後端
+</div>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">蕪</div>
+    <div>
+      <div class="brand-text">蕪解</div>
+      <div class="brand-sub">經驗收集</div>
+    </div>
+  </div>
+  <div class="progress-text" id="progress-text"></div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
+
+<div class="main">
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="screen-start">
+    <div class="start-hero">
+      <div class="dept-emoji" id="start-emoji">📋</div>
+      <div class="dept-title" id="start-title">經驗收集</div>
+      <div class="dept-subtitle" id="start-subtitle">這份問卷會把你腦袋裡的經驗變成系統的預設值。<br>越精準，未來系統算出來的數字越接近真實。</div>
+      <div class="dept-meta">
+        <div class="dept-meta-item"><span class="dept-meta-icon">⏱</span> <span id="meta-time">預估 15 分鐘</span></div>
+        <div class="dept-meta-item"><span class="dept-meta-icon">📝</span> <span id="meta-count">— 題</span></div>
+        <div class="dept-meta-item"><span class="dept-meta-icon">💾</span> 自動存進度</div>
+      </div>
+    </div>
+
+    <div class="start-form">
+      <div class="start-form-label">先告訴系統你是誰</div>
+      <input class="start-form-input" id="filler-name" type="text" placeholder="例如：賴哥">
+    </div>
+
+    <button class="btn-primary" id="btn-start" onclick="startQuestionnaire()">開始填寫 →</button>
+
+    <div class="dept-picker">
+      <div class="dept-picker-label">或選擇其他部門問卷：</div>
+      <div class="dept-pills" id="dept-pills"></div>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="screen" id="screen-question">
+    <div class="q-header" id="q-header"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-help" id="q-help"></div>
+    <div class="q-input-block" id="q-input-block"></div>
+    <div class="q-nav">
+      <div class="q-nav-left">
+        <button class="btn-ghost" id="btn-back" onclick="prevQuestion()">← 上一題</button>
+        <button class="q-skip" id="btn-skip" onclick="skipQuestion()" style="display:none;">略過此題</button>
+      </div>
+      <button class="btn-primary" id="btn-next" style="max-width:160px;" onclick="nextQuestion()">下一題 →</button>
+    </div>
+  </div>
+
+  <!-- REVIEW SCREEN -->
+  <div class="screen" id="screen-review">
+    <div class="start-hero">
+      <div class="dept-emoji">📋</div>
+      <div class="dept-title">檢視你的答案</div>
+      <div class="dept-subtitle">所有答案最後一次確認，送出後會寫入系統。</div>
+    </div>
+    <div id="review-list"></div>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button class="btn-ghost" style="flex:1;" onclick="goToScreen('question')">繼續填</button>
+      <button class="btn-primary" style="flex:2;" onclick="submitAll()">確認送出 ✓</button>
+    </div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div class="screen" id="screen-thank">
+    <div class="thank-hero">
+      <div class="thank-emoji">🎉</div>
+      <div class="thank-title">送出完成！</div>
+      <div class="thank-sub">感謝你的時間。<br>你的經驗即將成為系統的預設值。</div>
+      <button class="btn-ghost" onclick="location.reload()">填寫其他部門問卷</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// QUESTIONNAIRE DEFINITIONS
+// ═══════════════════════════════════════════════════════════════
+
+const DEPTS = {
+  procurement: {
+    emoji:'📦', name:'採購', sub:'賴哥 + 木子',
+    color:'#fb923c',
+    intro:'收集生產／成本／工廠常數，影響每個項目的時間表與預算。',
+    questions:[
+      {id:'1.1', type:'pill-multi', vam:false, required:true,
+        text:'你最常做的產品類型有哪些？',
+        help:'複選，所有你經手過的都選。',
+        options:['PVC 公仔','絨毛','壓克力立牌','文具（筆/便利貼）','包裝盒','服裝（T恤/帽）','其他']},
+      {id:'1.2', type:'number-slider', vam:false, required:true,
+        text:'PVC 公仔開模平均要幾天？',
+        help:'從下單到收到模具的天數',
+        unit:'天', min:30, max:90, default:45},
+      {id:'1.3', type:'number-slider', vam:false, required:true,
+        text:'PVC 公仔量產平均要幾天？（單款）',
+        help:'從模具完成到出貨的天數',
+        unit:'天', min:30, max:120, default:60},
+      {id:'1.4', type:'number-slider', vam:false, required:false,
+        text:'多款一起量產會 +幾天？',
+        help:'如果同時多款並行，需要的額外天數',
+        unit:'+天', min:0, max:30, default:10},
+      {id:'1.5', type:'number-slider', vam:false, required:false,
+        text:'絨毛產品量產要幾天？',
+        help:'沒做過填 0',
+        unit:'天', min:0, max:90, default:30},
+      {id:'1.6', type:'number-slider', vam:false, required:false,
+        text:'壓克力／文具量產要幾天？',
+        unit:'天', min:0, max:60, default:21},
+      {id:'1.7', type:'number-slider', vam:false, required:false,
+        text:'包裝盒量產要幾天？',
+        unit:'天', min:0, max:30, default:14},
+      {id:'1.8', type:'multi-num', vam:false, required:true,
+        text:'模具費通常付款比例？',
+        help:'總和必須 = 100%',
+        rows:[
+          {label:'開模時付', default:30, suffix:'%'},
+          {label:'驗收時付', default:70, suffix:'%'},
+        ], sumTarget:100},
+      {id:'1.9', type:'multi-num', vam:false, required:true,
+        text:'量產款付款比例？',
+        help:'總和必須 = 100%',
+        rows:[
+          {label:'下單時付', default:30, suffix:'%'},
+          {label:'驗收時付', default:40, suffix:'%'},
+          {label:'出貨後付', default:30, suffix:'%'},
+        ], sumTarget:100},
+      {id:'1.10', type:'abc-tier', vam:true, required:true,
+        text:'PVC 公仔模具費分三級',
+        help:'依產品複雜度分 A/B/C 三級。系統建項目時根據選擇直接帶入預算。',
+        unit:'萬 RMB',
+        tiers:[
+          {tier:'A', name:'複雜／多配件', default:30},
+          {tier:'B', name:'一般盲盒', default:12},
+          {tier:'C', name:'簡單小件', default:6},
+        ]},
+      {id:'1.11', type:'number-slider', vam:false, required:false,
+        text:'樣品費 default（一套）',
+        unit:'元 RMB', min:0, max:30000, default:3000},
+      {id:'1.12', type:'number-slider', vam:false, required:false,
+        text:'試模費 default',
+        unit:'元 RMB', min:0, max:50000, default:5000},
+      {id:'1.13', type:'text-multi', vam:false, required:false,
+        text:'你常用的工廠（top 5）',
+        help:'寫簡稱即可，例如「深圳A廠」',
+        count:5},
+      {id:'1.15', type:'number-slider', vam:false, required:false,
+        text:'旺季（Q4）量產要 +幾天緩衝？',
+        unit:'+天', min:0, max:30, default:10},
+      {id:'1.16', type:'number-slider', vam:true, required:true,
+        text:'PVC 公仔大貨平均不良／耗損率？',
+        help:'這會直接吃掉毛利，請依實際估算',
+        unit:'%', min:0, max:10, default:3, step:0.5},
+      {id:'1.17', type:'number-slider', vam:false, required:false,
+        text:'絨毛／文創周邊不良率？',
+        unit:'%', min:0, max:10, default:2, step:0.5},
+      {id:'1.18', type:'number-slider', vam:false, required:false,
+        text:'工廠平均交期準時率？（你估）',
+        unit:'%', min:50, max:100, default:87},
+      {id:'1.19', type:'textarea', vam:false, required:false,
+        text:'採購流程中還有什麼系統該知道的？',
+        help:'選填，自由分享',
+        placeholder:'例：某工廠最近搬廠加 5 天...'},
+    ],
+  },
+
+  logistics: {
+    emoji:'🚚', name:'物流／報關', sub:'高維',
+    color:'#34d399',
+    intro:'物流天數＋成本佔比，影響項目交期與毛利計算。',
+    questions:[
+      {id:'2.1', type:'number-slider', vam:false, required:true,
+        text:'北京 → 台灣（海運）幾天？',
+        unit:'天', min:5, max:30, default:15},
+      {id:'2.2', type:'number-slider', vam:false, required:false,
+        text:'北京 → 台灣（空運）幾天？',
+        unit:'天', min:1, max:14, default:5},
+      {id:'2.3', type:'number-slider', vam:false, required:true,
+        text:'北京 → 曼谷 海運？',
+        unit:'天', min:5, max:30, default:18},
+      {id:'2.4', type:'number-slider', vam:false, required:false,
+        text:'北京 → 曼谷 空運？',
+        unit:'天', min:1, max:14, default:5},
+      {id:'2.5', type:'number-slider', vam:false, required:true,
+        text:'北京 → 香港？',
+        unit:'天', min:1, max:14, default:7},
+      {id:'2.6', type:'number-slider', vam:false, required:true,
+        text:'北京 → 廣州／深圳（國內）？',
+        unit:'天', min:1, max:14, default:5},
+      {id:'2.9', type:'number-slider', vam:false, required:false,
+        text:'報關文件準備緩衝？',
+        help:'從下單到能出關的緩衝天數',
+        unit:'天', min:0, max:14, default:3},
+      {id:'2.10', type:'number-slider', vam:false, required:false,
+        text:'旺季（11-12 月）跨境物流 +幾天？',
+        unit:'+天', min:0, max:21, default:5},
+      {id:'2.11', type:'number-slider', vam:true, required:true,
+        text:'跨國海運物流＋報關費佔總貨值幾 %？',
+        help:'這是吃掉毛利的隱形殺手',
+        unit:'%', min:0, max:20, default:8, step:0.5},
+      {id:'2.12', type:'number-slider', vam:true, required:true,
+        text:'跨國空運佔貨值幾 %？',
+        unit:'%', min:0, max:30, default:18, step:0.5},
+      {id:'2.13', type:'number-slider', vam:false, required:true,
+        text:'實體樣品寄海外版權方（如日本）單趟幾天？',
+        help:'送審必經之路，常被忽略',
+        unit:'天', min:1, max:14, default:5},
+      {id:'2.14', type:'number-slider', vam:false, required:false,
+        text:'跨境匯款到帳幾天？',
+        unit:'天', min:0, max:10, default:3},
+      {id:'2.15', type:'text-multi', vam:false, required:false,
+        text:'常用物流商（top 3）',
+        count:3},
+      {id:'2.16', type:'pill-single', vam:false, required:false,
+        text:'跨境發票標示「商業價值」按哪個？',
+        options:['Transfer Pricing','實際進價','其他']},
+      {id:'2.17', type:'textarea', vam:false, required:false,
+        text:'物流／報關還有什麼系統該提醒的？',
+        placeholder:'例：某些 IP 商品需特殊報關...'},
+    ],
+  },
+
+  sales: {
+    emoji:'💼', name:'業務', sub:'安然 + 老董 + 德寶',
+    color:'#a78bfa',
+    intro:'客戶帳期 + 版權方送審節奏，影響現金流預測與項目交期。',
+    questions:[
+      {id:'3.1', type:'number-slider', vam:false, required:true,
+        text:'你目前固定接觸的客戶數？',
+        unit:'家', min:1, max:200, default:30},
+      {id:'3.2', type:'pill-single', vam:false, required:true,
+        text:'KA 大客戶通常帳期？',
+        options:['出貨收','Net30','Net60','Net90']},
+      {id:'3.3', type:'pill-single', vam:false, required:true,
+        text:'流通商通常帳期？',
+        options:['出貨收','Net30','Net60','Net90']},
+      {id:'3.4', type:'pill-single', vam:false, required:true,
+        text:'電商通常帳期？',
+        options:['出貨收','Net30','Net60','Net90']},
+      {id:'3.5', type:'pill-single', vam:false, required:true,
+        text:'通常訂金比例？',
+        options:['0%','30%','50%','70%','100%']},
+      {id:'3.6', type:'text-multi', vam:false, required:false,
+        text:'會拖款的客戶（top 3）',
+        count:3},
+      {id:'3.7', type:'text-multi', vam:false, required:false,
+        text:'準時的客戶（top 3）',
+        count:3},
+      {id:'3.8', type:'pill-single', vam:false, required:true,
+        text:'Snoopy / Peanuts 平均多久回覆？',
+        options:['每週','每兩週','每月','不定期']},
+      {id:'3.9', type:'pill-single', vam:false, required:true,
+        text:'Mofusand 平均多久回覆？',
+        options:['每週','每兩週','每月','不定期']},
+      {id:'3.10', type:'pill-single', vam:false, required:true,
+        text:'Opanchu 平均多久回覆？',
+        options:['每週','每兩週','每月','不定期']},
+      {id:'3.11', type:'pill-single', vam:false, required:true,
+        text:'Muziktiger（佳盛）平均多久回覆?',
+        options:['每週','每兩週','每月','不定期']},
+      {id:'3.12', type:'pill-single', vam:false, required:true,
+        text:'飯糰與梅子 平均多久回覆?',
+        options:['每週','每兩週','每月','不定期']},
+      {id:'3.13', type:'pill-single', vam:false, required:true,
+        text:'平面 2D 設計審批平均幾輪過?',
+        options:['1 輪','2 輪','3 輪','4+ 輪']},
+      {id:'3.14', type:'pill-single', vam:false, required:true,
+        text:'3D 建模 / 打樣實體審批平均幾輪過?',
+        options:['1 輪','2 輪','3 輪','4+ 輪']},
+      {id:'3.15', type:'pill-multi', vam:false, required:false,
+        text:'版權方對哪類修改最嚴?',
+        options:['顏色','造型','文字','授權範圍','規格','其他']},
+      {id:'3.16', type:'pill-multi', vam:false, required:false,
+        text:'簽合約時通常會跟業務窗口確認哪些條件?',
+        options:['MG','版稅率','送審週期','授權地區','品類限制','到期日']},
+      {id:'3.17', type:'number-slider', vam:true, required:true,
+        text:'電商通路平均退貨／損耗率?',
+        help:'吃毛利的怪獸',
+        unit:'%', min:0, max:30, default:5, step:0.5},
+      {id:'3.18', type:'number-slider', vam:true, required:true,
+        text:'平台抽成費率平均 (淘寶/天貓/抖音/蝦皮)?',
+        unit:'%', min:0, max:30, default:8, step:0.5},
+      {id:'3.19', type:'text-multi', vam:false, required:false,
+        text:'你個人最常追的客戶（top 3）',
+        count:3},
+      {id:'3.20', type:'textarea', vam:false, required:false,
+        text:'業務跟客戶／版權方互動還有什麼系統該知道的?',
+        placeholder:'選填'},
+    ],
+  },
+
+  shawn: {
+    emoji:'🎯', name:'COO 整合', sub:'Shawn',
+    color:'#22c55e',
+    intro:'公司整體收入結構 + 毛利目標 + VAM 分配 — 預算模板的核心。',
+    questions:[
+      {id:'4.1', type:'multi-num', vam:true, required:true,
+        text:'預估 2026 年收入結構比例',
+        help:'總和必須 = 100%',
+        rows:[
+          {label:'批發', default:50, suffix:'%'},
+          {label:'快閃', default:30, suffix:'%'},
+          {label:'電商', default:15, suffix:'%'},
+          {label:'其他', default:5, suffix:'%'},
+        ], sumTarget:100},
+      {id:'4.2', type:'number-slider', vam:true, required:true,
+        text:'批發業務目標毛利率?',
+        unit:'%', min:0, max:50, default:30},
+      {id:'4.3', type:'number-slider', vam:true, required:true,
+        text:'快閃業務目標毛利率?',
+        unit:'%', min:0, max:50, default:35},
+      {id:'4.4', type:'number-slider', vam:true, required:true,
+        text:'電商業務目標毛利率?',
+        unit:'%', min:0, max:50, default:25},
+      {id:'4.5', type:'number-slider', vam:false, required:false,
+        text:'預算建立時 default 緩衝比例？',
+        help:'預算超支接受幾%',
+        unit:'%', min:0, max:30, default:10},
+      {id:'4.6', type:'number-slider', vam:false, required:true,
+        text:'一個 PVC 公仔項目從預算到出貨平均幾個月?',
+        unit:'個月', min:3, max:12, default:6},
+      {id:'4.7', type:'pill-multi', vam:false, required:false,
+        text:'你會主動關心的項目進度節點?',
+        options:['預算建立','提案通過','設計定稿','送審通過','打樣完成','量產完成','出貨','結案']},
+      {id:'4.8', type:'multi-num', vam:true, required:true,
+        text:'VAM 800 萬目標分配給五法人的比例?',
+        help:'總和必須 = 100%',
+        rows:[
+          {label:'香港 JV', default:40, suffix:'%'},
+          {label:'深圳子公司', default:30, suffix:'%'},
+          {label:'北京蕪解', default:10, suffix:'%'},
+          {label:'台灣悍草', default:10, suffix:'%'},
+          {label:'UJ BKK', default:10, suffix:'%'},
+        ], sumTarget:100},
+      {id:'4.9', type:'number-slider', vam:true, required:true,
+        text:'五法人之間的轉移定價（TP）加成率 default?',
+        unit:'%', min:0, max:30, default:18},
+      {id:'4.10', type:'textarea', vam:false, required:false,
+        text:'預算建立流程／最常忘記填的欄位／其他盲點?',
+        placeholder:'例：每次都忘記填物流費...'},
+    ],
+  },
+
+  design: {
+    emoji:'🎨', name:'設計／企劃', sub:'Bevis + 珮玲 + 詩彤',
+    color:'#ec4899',
+    intro:'設計時長／送審輪數／外包報價 — 影響項目交期與設計預算。',
+    questions:[
+      {id:'5.1', type:'pill-single', vam:false, required:true,
+        text:'PVC 公仔 草圖→定稿 平均幾輪?',
+        options:['2 輪','3 輪','4 輪','5+ 輪']},
+      {id:'5.2', type:'number-slider', vam:false, required:true,
+        text:'PVC 公仔 每輪平均幾天?',
+        unit:'天', min:3, max:14, default:5},
+      {id:'5.3', type:'pill-single', vam:false, required:false,
+        text:'文創周邊（壓克力／文具）幾輪?',
+        options:['2 輪','3 輪','4 輪','5+ 輪']},
+      {id:'5.4', type:'number-slider', vam:false, required:false,
+        text:'文創周邊每輪幾天?',
+        unit:'天', min:0, max:14, default:3},
+      {id:'5.5', type:'number-slider', vam:false, required:false,
+        text:'包裝設計平均幾天?',
+        unit:'天', min:0, max:30, default:7},
+      {id:'5.6', type:'pill-multi', vam:false, required:false,
+        text:'送審被退回最常見原因?',
+        options:['顏色','造型','文字','授權範圍','規格','其他']},
+      {id:'5.7', type:'pill-single', vam:false, required:false,
+        text:'修改一輪平均工時?',
+        options:['4 小時內','1 天','2-3 天','1 週+']},
+      {id:'5.8', type:'number-slider', vam:false, required:true,
+        text:'外包設計 % 案件?',
+        unit:'%', min:0, max:100, default:30},
+      {id:'5.9', type:'text-multi', vam:false, required:false,
+        text:'常用外包工作室（top 3）',
+        count:3},
+      {id:'5.10', type:'abc-tier', vam:true, required:true,
+        text:'PVC 公仔 2D 外包報價',
+        help:'依複雜度分級',
+        unit:'元 RMB',
+        tiers:[
+          {tier:'A', name:'精細', default:15000},
+          {tier:'B', name:'一般', default:8000},
+          {tier:'C', name:'簡單', default:4000},
+        ]},
+      {id:'5.11', type:'abc-tier', vam:true, required:true,
+        text:'PVC 3D 建模外包報價',
+        unit:'元 RMB',
+        tiers:[
+          {tier:'A', name:'精細', default:30000},
+          {tier:'B', name:'一般', default:15000},
+          {tier:'C', name:'簡單', default:8000},
+        ]},
+      {id:'5.12', type:'abc-tier', vam:false, required:false,
+        text:'包裝設計外包報價',
+        unit:'元 RMB',
+        tiers:[
+          {tier:'A', name:'精細', default:12000},
+          {tier:'B', name:'一般', default:6000},
+          {tier:'C', name:'簡單', default:3000},
+        ]},
+      {id:'5.13', type:'abc-tier', vam:false, required:false,
+        text:'平面 KV 外包報價',
+        unit:'元 RMB',
+        tiers:[
+          {tier:'A', name:'精細', default:10000},
+          {tier:'B', name:'一般', default:5000},
+          {tier:'C', name:'簡單', default:2500},
+        ]},
+      {id:'5.14', type:'number-slider', vam:false, required:false,
+        text:'同時可以 handle 幾個項目？',
+        unit:'個', min:1, max:10, default:3},
+      {id:'5.15', type:'textarea', vam:false, required:false,
+        text:'設計流程盲點／最常卡的環節?',
+        placeholder:'例：等版權方回覆最久...'},
+    ],
+  },
+
+  finance: {
+    emoji:'💰', name:'財務', sub:'躍明',
+    color:'#0ea5e9',
+    intro:'固定費用 + 稅率 + 跨境預扣稅 + 鎖定匯率 — VAM 計算的命脈。',
+    questions:[
+      {id:'6.1', type:'number-slider', vam:true, required:true,
+        text:'香港 JV 月固定費用?',
+        unit:'萬 RMB', min:0, max:50, default:8, step:0.5},
+      {id:'6.2', type:'number-slider', vam:true, required:true,
+        text:'深圳子公司 月固定費用?',
+        unit:'萬 RMB', min:0, max:50, default:6, step:0.5},
+      {id:'6.3', type:'number-slider', vam:true, required:true,
+        text:'北京蕪解 月固定費用?',
+        unit:'萬 RMB', min:0, max:50, default:10, step:0.5},
+      {id:'6.4', type:'number-slider', vam:true, required:true,
+        text:'台灣悍草 月固定費用（換算 RMB）?',
+        unit:'萬 RMB', min:0, max:50, default:5, step:0.5},
+      {id:'6.5', type:'number-slider', vam:true, required:true,
+        text:'UJ BKK 月固定費用（換算 RMB）?',
+        unit:'萬 RMB', min:0, max:50, default:4, step:0.5},
+      {id:'6.6', type:'number-slider', vam:false, required:false,
+        text:'北京蕪解銀行貸款餘額?',
+        unit:'萬 RMB', min:0, max:1000, default:0},
+      {id:'6.7', type:'number-slider', vam:false, required:false,
+        text:'貸款月利息?',
+        unit:'萬 RMB', min:0, max:20, default:0, step:0.1},
+      {id:'6.8', type:'number-slider', vam:false, required:false,
+        text:'貸款月本金攤還?',
+        unit:'萬 RMB', min:0, max:50, default:0, step:0.5},
+      {id:'6.9', type:'number-slider', vam:true, required:true,
+        text:'中國增值稅率?',
+        unit:'%', min:0, max:25, default:13, step:0.5},
+      {id:'6.10', type:'number-slider', vam:true, required:true,
+        text:'中國企業所得稅率?',
+        unit:'%', min:0, max:30, default:25, step:0.5},
+      {id:'6.11', type:'number-slider', vam:true, required:true,
+        text:'跨境匯款匯費比例?',
+        unit:'%', min:0, max:3, default:0.2, step:0.05},
+      {id:'6.12', type:'number-slider', vam:true, required:true,
+        text:'香港稅率?',
+        unit:'%', min:0, max:30, default:16.5, step:0.5},
+      {id:'6.13', type:'number-slider', vam:true, required:true,
+        text:'台灣營業稅／所得稅?',
+        unit:'%', min:0, max:30, default:20, step:0.5},
+      {id:'6.14', type:'number-slider', vam:true, required:true,
+        text:'泰國稅率?',
+        unit:'%', min:0, max:30, default:20, step:0.5},
+      {id:'6.15', type:'number-slider', vam:true, required:true,
+        text:'DTA 跨境預扣稅率（如匯日本版權金）?',
+        help:'匯款給日本／韓國版權方會扣',
+        unit:'%', min:0, max:30, default:10, step:0.5},
+      {id:'6.16', type:'number-slider', vam:true, required:true,
+        text:'1 HKD = ? CNY（鎖定基準匯率）',
+        unit:'CNY', min:0.5, max:1.5, default:0.918, step:0.001},
+      {id:'6.17', type:'number-slider', vam:true, required:true,
+        text:'1 USD = ? CNY',
+        unit:'CNY', min:5, max:10, default:7.21, step:0.01},
+      {id:'6.18', type:'number-slider', vam:true, required:true,
+        text:'1 TWD = ? CNY',
+        unit:'CNY', min:0.15, max:0.30, default:0.222, step:0.001},
+      {id:'6.19', type:'number-slider', vam:true, required:true,
+        text:'1 THB = ? CNY',
+        unit:'CNY', min:0.15, max:0.30, default:0.202, step:0.001},
+      {id:'6.20', type:'pill-single', vam:false, required:false,
+        text:'月底結帳大概要幾天?',
+        options:['1-2 天','3-5 天','1 週','2 週+']},
+      {id:'6.21', type:'textarea', vam:false, required:false,
+        text:'財務流程盲點／結帳最卡哪/其他建議?',
+        placeholder:'選填'},
+    ],
+  },
+
+  cashier: {
+    emoji:'🏦', name:'出納', sub:'Leo + 楊子',
+    color:'#64748b',
+    intro:'銀行帳戶 + 員工薪資結構 + 期望系統幫做什麼。',
+    questions:[
+      {id:'7.1', type:'number-slider', vam:false, required:true,
+        text:'你管理的銀行帳戶數量?',
+        unit:'個', min:1, max:20, default:5},
+      {id:'7.2', type:'textarea', vam:false, required:true,
+        text:'每個主體用哪些銀行?',
+        help:'每行一個主體，例如：北京蕪解 - 工商銀行/招商銀行',
+        placeholder:'北京蕪解 - 工商銀行、招商銀行\n台灣悍草 - 台新銀行\n香港 JV - 滙豐'},
+      {id:'7.3', type:'number-slider', vam:false, required:true,
+        text:'員工薪資每月固定總額（你管的範圍）?',
+        unit:'萬 RMB', min:0, max:100, default:20, step:0.5},
+      {id:'7.4', type:'number-slider', vam:false, required:true,
+        text:'勞健保／社保 每月總額?',
+        unit:'萬 RMB', min:0, max:30, default:5, step:0.5},
+      {id:'7.5', type:'number-slider', vam:false, required:true,
+        text:'員工人數（你管轄）?',
+        unit:'人', min:1, max:50, default:8},
+      {id:'7.6', type:'pill-single', vam:false, required:false,
+        text:'投保級距 NHI 表是否需更新?',
+        options:['是','否','不適用']},
+      {id:'7.7', type:'pill-single', vam:false, required:false,
+        text:'員工報銷最常遲交的類別?',
+        options:['交通','餐飲','差旅','辦公雜費','其他']},
+      {id:'7.8', type:'pill-multi', vam:false, required:false,
+        text:'希望系統自動做什麼?',
+        options:['自動分類員工費用','自動算勞健保','自動對銀行帳戶','自動產出薪資單','其他']},
+      {id:'7.9', type:'textarea', vam:false, required:false,
+        text:'出納流程痛點／對帳最常出錯哪?',
+        placeholder:'選填'},
+    ],
+  },
+
+  ip: {
+    emoji:'🎭', name:'IP 庫常數', sub:'安然 + 珮玲',
+    color:'#fb7185',
+    intro:'每個 IP 的 MG／Royalty／結算週期 — 直接影響 VAM 與合約管理。建議每個簽約 IP 都填一次。',
+    questions:[
+      {id:'8.1', type:'pill-single', vam:false, required:true,
+        text:'這份填寫哪個 IP?',
+        help:'如果有多個 IP，填完一個後可重新進入填下一個',
+        options:['Snoopy','Mofusand','Opanchu','Muziktiger','飯糰與梅子']},
+      {id:'8.2', type:'number-slider', vam:true, required:true,
+        text:'批發 royalty 抽成 %?',
+        unit:'%', min:0, max:30, default:14, step:0.5},
+      {id:'8.3', type:'number-slider', vam:true, required:true,
+        text:'零售 royalty 抽成 %?',
+        unit:'%', min:0, max:30, default:8, step:0.5},
+      {id:'8.4', type:'number-slider', vam:true, required:true,
+        text:'MG（保底金）金額?',
+        unit:'萬', min:0, max:500, default:30, step:1},
+      {id:'8.5', type:'pill-single', vam:true, required:true,
+        text:'MG 幣別?',
+        options:['CNY','USD','JPY','HKD','其他']},
+      {id:'8.6', type:'pill-single', vam:true, required:true,
+        text:'超過 MG 後的結算週期?',
+        options:['月結','季結','半年結','年結']},
+      {id:'8.7', type:'pill-multi', vam:false, required:true,
+        text:'授權地區限制?',
+        options:['全球','中國大陸','港澳台','東南亞','日韓','歐美','其他']},
+      {id:'8.8', type:'pill-single', vam:false, required:true,
+        text:'是否需實體打樣寄海外版權方?',
+        options:['是','否']},
+      {id:'8.9', type:'pill-single', vam:false, required:false,
+        text:'此 IP 簽約主體（我方）?',
+        options:['香港 JV','深圳子公司','北京蕪解','有你共創','其他']},
+      {id:'8.10', type:'pill-single', vam:false, required:false,
+        text:'此 IP 是否 12 個月內快到期?',
+        options:['是','否']},
+      {id:'8.11', type:'text-multi', vam:false, required:false,
+        text:'業務窗口（對方聯絡人）',
+        count:2},
+      {id:'8.12', type:'textarea', vam:false, required:false,
+        text:'此 IP 特殊條款／注意事項',
+        placeholder:'例：本 IP 需用 PANTONE...'},
+    ],
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+
+let state = {
+  dept: 'procurement',
+  filler: '',
+  qIdx: 0,
+  answers: {},
+};
+
+const STORAGE_KEY_PREFIX = 'wujie_q_';
+
+function getStorageKey(){ return STORAGE_KEY_PREFIX + state.dept; }
+function saveState(){
+  localStorage.setItem(getStorageKey(), JSON.stringify({
+    filler: state.filler, qIdx: state.qIdx, answers: state.answers
+  }));
+}
+function loadState(){
+  const s = localStorage.getItem(getStorageKey());
+  if(s){
+    const parsed = JSON.parse(s);
+    state.filler = parsed.filler || '';
+    state.qIdx = parsed.qIdx || 0;
+    state.answers = parsed.answers || {};
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+
+function init(){
+  const params = new URLSearchParams(location.search);
+  const dept = params.get('dept');
+  if(dept && DEPTS[dept]) state.dept = dept;
+
+  loadState();
+  renderStart();
+}
+
+function renderStart(){
+  const d = DEPTS[state.dept];
+  document.getElementById('start-emoji').textContent = d.emoji;
+  document.getElementById('start-title').textContent = d.name + '（' + d.sub + '）';
+  document.getElementById('start-subtitle').textContent = d.intro;
+  document.getElementById('meta-count').textContent = d.questions.length + ' 題';
+  document.getElementById('meta-time').textContent = '預估 ' + Math.ceil(d.questions.length * 0.8) + ' 分鐘';
+  document.getElementById('filler-name').value = state.filler;
+
+  // Persona pills (other departments)
+  const pills = document.getElementById('dept-pills');
+  pills.innerHTML = Object.entries(DEPTS).filter(([k]) => k !== state.dept).map(([k,v]) =>
+    `<button class="dept-pill" onclick="switchDept('${k}')">${v.emoji} ${v.name}</button>`
+  ).join('');
+}
+
+function switchDept(d){
+  state.dept = d;
+  state.qIdx = 0;
+  state.answers = {};
+  loadState();
+  history.replaceState(null, '', '?dept=' + d);
+  renderStart();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUESTIONNAIRE FLOW
+// ═══════════════════════════════════════════════════════════════
+
+function startQuestionnaire(){
+  const filler = document.getElementById('filler-name').value.trim();
+  if(!filler){ alert('請先告訴系統你是誰'); return; }
+  state.filler = filler;
+  saveState();
+  goToScreen('question');
+  renderQuestion();
+}
+
+function goToScreen(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function renderQuestion(){
+  const d = DEPTS[state.dept];
+  const q = d.questions[state.qIdx];
+  if(!q){ renderReview(); return; }
+
+  // Progress
+  const total = d.questions.length;
+  const progress = ((state.qIdx + 1) / total) * 100;
+  document.getElementById('progress-text').textContent = (state.qIdx + 1) + ' / ' + total;
+  document.getElementById('progress-fill').style.width = progress + '%';
+
+  // Header
+  const headerHtml = [
+    `<span class="q-num">問題 ${state.qIdx + 1} / ${total}</span>`,
+    q.vam ? '<span class="q-vam-tag">🚨 VAM 命脈</span>' : '',
+    q.required ? '<span class="q-required-tag">必填</span>' : '',
+  ].filter(Boolean).join('');
+  document.getElementById('q-header').innerHTML = headerHtml;
+
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-help').textContent = q.help || '';
+  document.getElementById('q-help').style.display = q.help ? 'block' : 'none';
+
+  // Render input based on type
+  const inputBlock = document.getElementById('q-input-block');
+  inputBlock.innerHTML = renderInput(q);
+
+  // Bind events for special types
+  bindInputEvents(q);
+
+  // Skip button
+  document.getElementById('btn-skip').style.display = q.required ? 'none' : 'inline-block';
+  document.getElementById('btn-back').style.display = state.qIdx > 0 ? 'inline-block' : 'none';
+
+  // Update next button text on last question
+  const isLast = state.qIdx === total - 1;
+  document.getElementById('btn-next').textContent = isLast ? '看答案 →' : '下一題 →';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INPUT RENDERING
+// ═══════════════════════════════════════════════════════════════
+
+function renderInput(q){
+  const ans = state.answers[q.id];
+  switch(q.type){
+    case 'number-slider': return renderNumberSlider(q, ans);
+    case 'pill-single': return renderPillSingle(q, ans);
+    case 'pill-multi': return renderPillMulti(q, ans);
+    case 'text': return renderText(q, ans);
+    case 'textarea': return renderTextarea(q, ans);
+    case 'multi-num': return renderMultiNum(q, ans);
+    case 'abc-tier': return renderAbcTier(q, ans);
+    case 'text-multi': return renderTextMulti(q, ans);
+    default: return '<div>Unknown type</div>';
+  }
+}
+
+function renderNumberSlider(q, ans){
+  const val = ans !== undefined ? ans : q.default;
+  const step = q.step || 1;
+  return `
+    <div class="num-slider-row">
+      <input class="num-input" type="number" id="ns-num" value="${val}" min="${q.min}" max="${q.max}" step="${step}">
+      <div class="num-unit">${q.unit||''}</div>
+      <input class="slider" type="range" id="ns-slider" value="${val}" min="${q.min}" max="${q.max}" step="${step}">
+    </div>
+    <div class="slider-range"><span>${q.min}</span><span>${q.max}</span></div>
+  `;
+}
+
+function renderPillSingle(q, ans){
+  return `<div class="pill-grid">${
+    q.options.map((opt, i) => `
+      <button class="pill ${ans === opt ? 'selected' : ''}" data-val="${opt}" onclick="selectPillSingle(this)">${opt}</button>
+    `).join('')
+  }</div>`;
+}
+
+function renderPillMulti(q, ans){
+  const selected = ans || [];
+  return `<div class="pill-grid">${
+    q.options.map(opt => `
+      <button class="pill pill-multi ${selected.includes(opt) ? 'selected' : ''}" data-val="${opt}" onclick="togglePillMulti(this)">${opt}</button>
+    `).join('')
+  }</div>`;
+}
+
+function renderText(q, ans){
+  return `<input class="text-input" id="text-input" type="text" value="${ans||''}" placeholder="${q.placeholder||''}">`;
+}
+
+function renderTextarea(q, ans){
+  return `<textarea class="textarea-input" id="textarea-input" placeholder="${q.placeholder||''}">${ans||''}</textarea>`;
+}
+
+function renderMultiNum(q, ans){
+  const vals = ans || q.rows.map(r => r.default);
+  return `
+    <div class="multi-num-grid">
+      ${q.rows.map((r,i) => `
+        <div class="multi-num-row">
+          <div class="multi-num-label">${r.label}</div>
+          <input class="multi-num-input" type="number" data-idx="${i}" value="${vals[i]}" oninput="updateSumCheck()">
+          <div class="multi-num-suffix">${r.suffix}</div>
+        </div>
+      `).join('')}
+      <div class="sum-check" id="sum-check" data-target="${q.sumTarget}"></div>
+    </div>
+  `;
+}
+
+function renderAbcTier(q, ans){
+  const vals = ans || q.tiers.map(t => t.default);
+  const cls = ['abc-a','abc-b','abc-c'];
+  return `
+    <div class="abc-grid">
+      ${q.tiers.map((t,i) => `
+        <div class="abc-row">
+          <div class="abc-badge ${cls[i]}">${t.tier}</div>
+          <div class="abc-content">
+            <div class="abc-name">${t.name}</div>
+            <input class="abc-input" type="number" data-idx="${i}" value="${vals[i]}">
+            <div class="abc-suffix">${q.unit}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderTextMulti(q, ans){
+  const vals = ans || Array(q.count).fill('');
+  return `
+    <div class="text-multi-grid">
+      ${Array.from({length: q.count}, (_, i) => `
+        <div class="text-multi-row">
+          <div class="text-multi-num">${i+1}</div>
+          <input class="text-multi-input" type="text" data-idx="${i}" value="${vals[i]||''}" placeholder="${i === 0 ? '例如: 深圳A廠' : ''}">
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INPUT EVENTS
+// ═══════════════════════════════════════════════════════════════
+
+function bindInputEvents(q){
+  if(q.type === 'number-slider'){
+    const num = document.getElementById('ns-num');
+    const sl = document.getElementById('ns-slider');
+    num.addEventListener('input', () => sl.value = num.value);
+    sl.addEventListener('input', () => num.value = sl.value);
+  }
+  if(q.type === 'multi-num'){
+    setTimeout(updateSumCheck, 50);
+  }
+}
+
+function selectPillSingle(btn){
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function togglePillMulti(btn){
+  btn.classList.toggle('selected');
+}
+
+function updateSumCheck(){
+  const inputs = document.querySelectorAll('.multi-num-input');
+  if(!inputs.length) return;
+  const sum = Array.from(inputs).reduce((s,i) => s + (parseFloat(i.value)||0), 0);
+  const check = document.getElementById('sum-check');
+  const target = parseFloat(check.dataset.target);
+  let cls = 'ok', icon = '✓';
+  if(Math.abs(sum - target) > 0.1){
+    cls = sum > target ? 'bad' : 'warn';
+    icon = sum > target ? '⚠' : '➕';
+  }
+  check.className = 'sum-check ' + cls;
+  check.textContent = `${icon} 總和 ${sum} / ${target}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COLLECT ANSWER
+// ═══════════════════════════════════════════════════════════════
+
+function collectAnswer(q){
+  switch(q.type){
+    case 'number-slider': return parseFloat(document.getElementById('ns-num').value);
+    case 'pill-single': {
+      const sel = document.querySelector('.pill.selected');
+      return sel ? sel.dataset.val : null;
+    }
+    case 'pill-multi': {
+      return Array.from(document.querySelectorAll('.pill.selected')).map(p => p.dataset.val);
+    }
+    case 'text': return document.getElementById('text-input').value.trim();
+    case 'textarea': return document.getElementById('textarea-input').value.trim();
+    case 'multi-num': return Array.from(document.querySelectorAll('.multi-num-input')).map(i => parseFloat(i.value)||0);
+    case 'abc-tier': return Array.from(document.querySelectorAll('.abc-input')).map(i => parseFloat(i.value)||0);
+    case 'text-multi': return Array.from(document.querySelectorAll('.text-multi-input')).map(i => i.value.trim());
+    default: return null;
+  }
+}
+
+function validateAnswer(q, ans){
+  if(!q.required) return true;
+  if(ans === null || ans === undefined || ans === '') return false;
+  if(Array.isArray(ans) && ans.length === 0) return false;
+  if(Array.isArray(ans) && ans.every(v => !v || v === 0)) return false;
+  if(q.type === 'multi-num'){
+    const sum = ans.reduce((s,v) => s + v, 0);
+    if(Math.abs(sum - q.sumTarget) > 0.1) return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function nextQuestion(){
+  const d = DEPTS[state.dept];
+  const q = d.questions[state.qIdx];
+  const ans = collectAnswer(q);
+
+  if(!validateAnswer(q, ans)){
+    alert(q.required ? '這是必填題，請完成後再前進' : '請填寫');
+    return;
+  }
+  state.answers[q.id] = ans;
+  state.qIdx++;
+  saveState();
+
+  if(state.qIdx >= d.questions.length){
+    renderReview();
+  }else{
+    renderQuestion();
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function prevQuestion(){
+  if(state.qIdx > 0){
+    // Save current answer (don't validate, allow incomplete)
+    const q = DEPTS[state.dept].questions[state.qIdx];
+    try{ state.answers[q.id] = collectAnswer(q); }catch(e){}
+    state.qIdx--;
+    saveState();
+    renderQuestion();
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function skipQuestion(){
+  state.qIdx++;
+  saveState();
+  const d = DEPTS[state.dept];
+  if(state.qIdx >= d.questions.length){
+    renderReview();
+  }else{
+    renderQuestion();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REVIEW
+// ═══════════════════════════════════════════════════════════════
+
+function renderReview(){
+  goToScreen('review');
+  const d = DEPTS[state.dept];
+  document.getElementById('progress-text').textContent = '檢視答案';
+  document.getElementById('progress-fill').style.width = '100%';
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = d.questions.map((q,i) => {
+    const ans = state.answers[q.id];
+    const ansDisplay = formatAnswer(q, ans);
+    return `
+      <div class="review-section">
+        <div class="review-q">${q.id} · ${q.text} <span class="review-edit" onclick="editQuestion(${i})">編輯</span></div>
+        <div class="review-a ${!ans ? 'empty' : ''}">${ansDisplay}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function formatAnswer(q, ans){
+  if(ans === null || ans === undefined || ans === '') return '（未填）';
+  if(Array.isArray(ans)){
+    if(q.type === 'multi-num') return q.rows.map((r,i) => `${r.label}: ${ans[i]||0}${r.suffix}`).join(' · ');
+    if(q.type === 'abc-tier') return q.tiers.map((t,i) => `${t.tier} ${ans[i]||0} ${q.unit}`).join(' · ');
+    if(q.type === 'text-multi') return ans.filter(v => v).join('、') || '（未填）';
+    return ans.join('、');
+  }
+  if(typeof ans === 'number') return ans + (q.unit ? ' ' + q.unit : '');
+  return ans;
+}
+
+function editQuestion(i){
+  state.qIdx = i;
+  saveState();
+  goToScreen('question');
+  renderQuestion();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════════════
+
+function submitAll(){
+  const d = DEPTS[state.dept];
+  const submission = {
+    dept: state.dept,
+    deptName: d.name,
+    filler: state.filler,
+    submittedAt: new Date().toISOString(),
+    answers: state.answers,
+  };
+  // Stage 1: localStorage only
+  const allSubmissions = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
+  allSubmissions.push(submission);
+  localStorage.setItem('wujie_q_submissions', JSON.stringify(allSubmissions));
+
+  // Clear in-progress
+  localStorage.removeItem(getStorageKey());
+
+  console.log('Submitted:', submission);
+  goToScreen('thank');
+  document.getElementById('progress-text').textContent = '';
+}
+
+init();
+</script>
+
+</body>
+</html>
