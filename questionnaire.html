@@ -179,6 +179,23 @@ body{
 .range-tilde{color:var(--txt-lo);font-size:14px;}
 .range-suffix{font-size:12px;color:var(--txt-mid);font-weight:600;}
 
+/* PAYMENT STAGES (動態增減付款階段) */
+.pay-grid{display:flex;flex-direction:column;gap:10px;}
+.pay-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.pay-num{width:24px;height:24px;background:var(--accent)20;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent-glow);flex-shrink:0;}
+.pay-label{background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--txt-hi);outline:none;font-family:inherit;flex:1;min-width:120px;}
+.pay-pct{background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--txt-hi);outline:none;font-family:inherit;width:60px;text-align:center;}
+.pay-after{background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--txt-hi);outline:none;font-family:inherit;width:80px;text-align:center;display:none;}
+.pay-after.show{display:inline-block;}
+.pay-after-label{font-size:11px;color:var(--txt-mid);display:none;}
+.pay-after-label.show{display:inline;}
+.pay-remove{background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;flex-shrink:0;}
+.pay-remove:hover{color:var(--danger);background:var(--danger-soft);}
+.pay-sum{font-size:11px;font-weight:700;text-align:right;padding:8px 4px;}
+.pay-sum.ok{color:var(--ok);}
+.pay-sum.warn{color:var(--warn);}
+.pay-sum.bad{color:var(--danger);}
+
 /* ROUTE LIST (動態新增物流路線) */
 .route-list-grid{display:flex;flex-direction:column;gap:10px;}
 .route-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;}
@@ -303,6 +320,10 @@ body{
       <div class="thank-title">送出完成！</div>
       <div class="thank-sub">感謝你的時間。<br>你的經驗即將成為系統的預設值。</div>
       <button class="btn-ghost" onclick="location.reload()">填寫其他部門問卷</button>
+      <div style="margin-top:24px;padding-top:18px;border-top:1px dashed var(--border);">
+        <div style="font-size:10px;color:var(--txt-lo);margin-bottom:8px;letter-spacing:.04em;">⚙ Stage 1 測試工具</div>
+        <button class="btn-ghost" style="font-size:11px;color:var(--danger);border-color:var(--danger);" onclick="clearAllTestData()">🗑 清掉所有試填資料（含進度＋提交）</button>
+      </div>
     </div>
   </div>
 
@@ -324,44 +345,64 @@ const DEPTS = {
         text:'你最常做的產品類型有哪些？',
         help:'複選，所有你經手過的都選。',
         options:['PVC 公仔','絨毛','壓克力立牌','文具（筆/便利貼）','包裝盒','服裝（T恤/帽）','其他']},
-      {id:'1.2', type:'number-slider', vam:false, required:true,
-        text:'PVC 公仔開模平均要幾天？',
-        help:'從下單到收到模具的天數',
-        unit:'天', min:30, max:90, default:45},
-      {id:'1.3', type:'number-slider', vam:false, required:true,
-        text:'PVC 公仔量產平均要幾天？（單款）',
-        help:'從模具完成到出貨的天數',
-        unit:'天', min:30, max:120, default:60},
-      {id:'1.4', type:'number-slider', vam:false, required:false,
-        text:'多款一起量產會 +幾天？',
-        help:'如果同時多款並行，需要的額外天數',
-        unit:'+天', min:0, max:30, default:10},
-      {id:'1.5', type:'number-slider', vam:false, required:false,
-        text:'絨毛產品量產要幾天？',
-        help:'沒做過填 0',
-        unit:'天', min:0, max:90, default:30},
-      {id:'1.6', type:'number-slider', vam:false, required:false,
-        text:'壓克力／文具量產要幾天？',
-        unit:'天', min:0, max:60, default:21},
-      {id:'1.7', type:'number-slider', vam:false, required:false,
-        text:'包裝盒量產要幾天？',
-        unit:'天', min:0, max:30, default:14},
-      {id:'1.8', type:'multi-num', vam:false, required:true,
-        text:'模具費通常付款比例？',
-        help:'總和必須 = 100%',
+      {id:'1.2', type:'multi-range', vam:false, required:true,
+        text:'PVC 公仔開模天數',
+        help:'依複雜度給區間範圍',
+        unit:'天',
         rows:[
-          {label:'開模時付', default:30, suffix:'%'},
-          {label:'驗收時付', default:70, suffix:'%'},
-        ], sumTarget:100},
-      {id:'1.9', type:'multi-num', vam:false, required:true,
-        text:'量產款付款比例？',
-        help:'總和必須 = 100%',
+          {label:'單款開模（標準複雜度）', minDefault:35, maxDefault:50},
+          {label:'多款一起開模（6+1 或 9+1）', minDefault:45, maxDefault:60},
+        ]},
+
+      {id:'1.3', type:'multi-range', vam:true, required:true,
+        text:'PVC 公仔量產時長（依數量 × 款式組合）',
+        help:'依「一款多少只」+「總共多少款」回填區間範圍。其他組合可到末頁補充。',
+        unit:'天',
         rows:[
-          {label:'下單時付', default:30, suffix:'%'},
-          {label:'驗收時付', default:40, suffix:'%'},
-          {label:'出貨後付', default:30, suffix:'%'},
-        ], sumTarget:100},
-      {id:'1.10', type:'multi-range', vam:true, required:true,
+          {label:'單款 1 萬只', minDefault:30, maxDefault:40},
+          {label:'單款 2 萬只', minDefault:40, maxDefault:50},
+          {label:'單款 3 萬只', minDefault:50, maxDefault:60},
+          {label:'6+1 款（每款 ~1 萬只）', minDefault:40, maxDefault:55},
+          {label:'9+1 款（每款 ~1 萬只）', minDefault:45, maxDefault:60},
+          {label:'12+1 款（每款 ~1 萬只）', minDefault:50, maxDefault:65},
+        ]},
+
+      {id:'1.4', type:'multi-num', vam:false, required:false,
+        text:'其他產品類型：量產 + 打樣天數',
+        help:'各品類的量產天數 ＋ 打樣天數。沒做過填 0。',
+        noSum:true,
+        rows:[
+          {label:'絨毛 量產', default:45, suffix:'天'},
+          {label:'絨毛 打樣', default:21, suffix:'天'},
+          {label:'壓克力／文具 量產', default:21, suffix:'天'},
+          {label:'壓克力／文具 打樣', default:10, suffix:'天'},
+          {label:'包裝盒 量產', default:14, suffix:'天'},
+          {label:'包裝盒 打樣', default:7, suffix:'天'},
+        ]},
+
+      {id:'1.4a', type:'textarea', vam:false, required:false,
+        text:'還有其他常用的生產／加工流程要補充嗎？',
+        help:'寫流程名稱 + 所需天數，例如「鐳射標印製 7 天」「特殊上色工藝 +14 天」',
+        placeholder:'選填'},
+
+      {id:'1.5', type:'payment-stages', vam:false, required:true,
+        text:'模具費付款階段（可動態增減）',
+        help:'總和必須 = 100%。預設兩階段，可加可減。',
+        defaults:[
+          {label:'開模時付', pct:30, isAfterShip:false},
+          {label:'驗收時付', pct:70, isAfterShip:false},
+        ]},
+
+      {id:'1.6', type:'payment-stages', vam:false, required:true,
+        text:'量產費付款階段（可動態增減）',
+        help:'總和必須 = 100%。「出貨後付」階段請填「出貨後幾天」要付清。',
+        defaults:[
+          {label:'下單時付', pct:30, isAfterShip:false},
+          {label:'驗收時付', pct:40, isAfterShip:false},
+          {label:'出貨後付', pct:30, isAfterShip:true, afterDays:30},
+        ]},
+
+      {id:'1.7', type:'multi-range', vam:true, required:true,
         text:'每款模具費（用售價回推會比較好估）',
         help:'以「售價 69 元 RMB 盲盒」為例，依款式數量回答區間範圍即可，不用定死。',
         unit:'萬 RMB',
@@ -371,9 +412,10 @@ const DEPTS = {
           {label:'12+1 款（69 元盲盒）', minDefault:6, maxDefault:12},
           {label:'5cm 以下小公仔（單款）', minDefault:1, maxDefault:3},
         ]},
-      {id:'1.11', type:'multi-num', vam:false, required:false,
-        text:'各類樣品費 default（一套）',
-        help:'依樣品類型分別估算，沒做過的填 0',
+
+      {id:'1.8', type:'multi-num', vam:false, required:false,
+        text:'各類樣品費預設（一套）',
+        help:'依樣品類型分別估算，沒做過的填 0。如有其他類型，到末頁「補充新題目」加。',
         noSum:true,
         rows:[
           {label:'PVC 素胚（未上色）', default:1500, suffix:'元'},
@@ -381,35 +423,33 @@ const DEPTS = {
           {label:'絨毛樣品', default:2000, suffix:'元'},
           {label:'文創周邊樣品', default:1000, suffix:'元'},
         ]},
-      {id:'1.12', type:'number-slider', vam:false, required:false,
-        text:'試模費 default',
+
+      {id:'1.9', type:'number-slider', vam:false, required:false,
+        text:'試模費預設',
         help:'試模費＝工廠開完模具後，試打第一批產品驗證模具是否合格的費用',
         unit:'元 RMB', min:0, max:50000, default:5000},
-      {id:'1.13', type:'vendor-list', vam:false, required:false,
-        text:'你常用的工廠（top 5）',
-        help:'每家工廠寫名稱，並點選擅長的品類（可複選）',
+
+      {id:'1.10', type:'vendor-list', vam:false, required:false,
+        text:'常用工廠（top 5，可新增）',
+        help:'每家工廠寫名稱 + 擅長品類（可複選）。如不夠用，到末頁「補充新題目」加。',
         count:5,
         categories:['PVC 公仔','絨毛','壓克力／立牌','文具','包裝盒','服裝','其他']},
-      {id:'1.15', type:'number-slider', vam:false, required:false,
-        text:'旺季（Q4）PVC 公仔量產要 +幾天緩衝？',
-        help:'承接題 1.3（標準量產 60 天）— 旺季要再加幾天',
-        unit:'+天', min:0, max:30, default:10},
-      {id:'1.16', type:'number-slider', vam:true, required:true,
+
+      {id:'1.11', type:'number-slider', vam:true, required:true,
         text:'PVC 公仔大貨平均不良／耗損率？',
         help:'這會直接吃掉毛利，請依實際估算',
         unit:'%', min:0, max:10, default:3, step:0.5},
-      {id:'1.17', type:'number-slider', vam:false, required:false,
+
+      {id:'1.12', type:'number-slider', vam:false, required:false,
         text:'絨毛／文創周邊不良率？',
         unit:'%', min:0, max:10, default:2, step:0.5},
-      {id:'1.18', type:'number-slider', vam:false, required:false,
-        text:'你常用的工廠平均交期準時率？（你估）',
-        help:'承接題 1.13 你列的常用工廠，平均能準時交貨的比率',
-        unit:'%', min:50, max:100, default:87},
-      {id:'1.18a', type:'pill-multi', vam:false, required:false,
-        text:'準時率受影響時，通常是哪些狀況？',
-        help:'承接題 1.18 — 工廠交期不準的常見原因（可複選）',
-        options:['原料短缺','工廠排程衝突','工人不夠','模具出問題','物流延遲','配件供應商出問題','旺季產能不足','政策／環保限產','其他']},
-      {id:'1.19', type:'textarea', vam:false, required:false,
+
+      {id:'1.13', type:'pill-multi', vam:false, required:false,
+        text:'量產時長為什麼會落到區間最高值？',
+        help:'承接題 1.3 — 通常是哪些狀況讓量產拉長（複選）',
+        options:['原料短缺','工廠排程衝突','工人不夠','模具出問題','配件供應商出問題','旺季產能不足','政策／環保限產','客戶臨時改規格','其他']},
+
+      {id:'1.14', type:'textarea', vam:false, required:false,
         text:'採購流程中還有什麼系統該知道的？',
         help:'選填，自由分享',
         placeholder:'例：某工廠最近搬廠加 5 天...'},
@@ -1132,6 +1172,7 @@ function renderInput(q){
     case 'multi-range': return renderMultiRange(q, ans);
     case 'vendor-list': return renderVendorList(q, ans);
     case 'route-list': return renderRouteList(q, ans);
+    case 'payment-stages': return renderPaymentStages(q, ans);
     default: return '<div>Unknown type</div>';
   }
 }
@@ -1327,6 +1368,74 @@ window.updateRoute = function(i, field, value){
   state._routes[i][field] = value;
 };
 
+function renderPaymentStages(q, ans){
+  const stages = ans || q.defaults.map(d => ({...d}));
+  state._paymentStages = stages;
+  return `
+    <div class="pay-grid" id="payment-stages">
+      ${stages.map((s,i) => renderOneStage(s, i)).join('')}
+    </div>
+    <button class="route-add-btn" style="margin-top:10px;" onclick="addStage()">＋ 新增階段</button>
+    <div class="pay-sum" id="pay-sum"></div>
+  `;
+}
+
+function renderOneStage(s, i){
+  return `
+    <div class="pay-card" data-idx="${i}">
+      <div class="pay-num">${i+1}</div>
+      <input class="pay-label" value="${s.label}" placeholder="階段名稱（例：開模時付）" onchange="updateStage(${i},'label',this.value)">
+      <input class="pay-pct" type="number" min="0" max="100" value="${s.pct}" oninput="updateStage(${i},'pct',parseFloat(this.value)||0)">
+      <span class="pay-num-suffix" style="font-size:11px;color:var(--txt-mid);">%</span>
+      <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt-mid);cursor:pointer;">
+        <input type="checkbox" ${s.isAfterShip?'checked':''} onchange="toggleAfterShip(${i},this.checked)">
+        出貨後付
+      </label>
+      <span class="pay-after-label ${s.isAfterShip?'show':''}" id="pay-after-label-${i}">出貨後</span>
+      <input class="pay-after ${s.isAfterShip?'show':''}" id="pay-after-${i}" type="number" min="0" value="${s.afterDays||30}" placeholder="30" onchange="updateStage(${i},'afterDays',parseFloat(this.value)||0)">
+      <span class="pay-after-label ${s.isAfterShip?'show':''}" id="pay-after-day-${i}">天</span>
+      <button class="pay-remove" onclick="removeStage(${i})" title="移除">✕</button>
+    </div>
+  `;
+}
+
+function reRenderStages(){
+  document.getElementById('payment-stages').innerHTML = state._paymentStages.map((s,i) => renderOneStage(s,i)).join('');
+  updatePaySum();
+}
+
+function updatePaySum(){
+  const el = document.getElementById('pay-sum');
+  if(!el || !state._paymentStages) return;
+  const sum = state._paymentStages.reduce((s,x) => s + (x.pct||0), 0);
+  let cls = 'ok', icon = '✓';
+  if(Math.abs(sum - 100) > 0.1){
+    cls = sum > 100 ? 'bad' : 'warn';
+    icon = sum > 100 ? '⚠' : '➕';
+  }
+  el.className = 'pay-sum ' + cls;
+  el.textContent = `${icon} 總和 ${sum} / 100%`;
+}
+
+window.addStage = function(){
+  state._paymentStages.push({label:'新階段', pct:0, isAfterShip:false});
+  reRenderStages();
+};
+window.removeStage = function(i){
+  if(state._paymentStages.length <= 1){ alert('至少要保留一個階段'); return; }
+  state._paymentStages.splice(i,1);
+  reRenderStages();
+};
+window.updateStage = function(i, field, value){
+  state._paymentStages[i][field] = value;
+  if(field === 'pct') updatePaySum();
+};
+window.toggleAfterShip = function(i, checked){
+  state._paymentStages[i].isAfterShip = checked;
+  if(checked && !state._paymentStages[i].afterDays) state._paymentStages[i].afterDays = 30;
+  reRenderStages();
+};
+
 // ═══════════════════════════════════════════════════════════════
 // INPUT EVENTS
 // ═══════════════════════════════════════════════════════════════
@@ -1340,6 +1449,9 @@ function bindInputEvents(q){
   }
   if(q.type === 'multi-num'){
     setTimeout(updateSumCheck, 50);
+  }
+  if(q.type === 'payment-stages'){
+    setTimeout(updatePaySum, 50);
   }
 }
 
@@ -1405,6 +1517,9 @@ function collectAnswer(q){
     case 'route-list': {
       return (state._routes || []).slice();
     }
+    case 'payment-stages': {
+      return (state._paymentStages || []).slice();
+    }
     default: return null;
   }
 }
@@ -1426,6 +1541,11 @@ function validateAnswer(q, ans){
   }
   if(q.type === 'route-list'){
     return ans.length > 0 && ans.every(r => r.days > 0);
+  }
+  if(q.type === 'payment-stages'){
+    if(!ans.length) return false;
+    const sum = ans.reduce((s,x) => s + (x.pct||0), 0);
+    return Math.abs(sum - 100) < 0.1;
   }
   if(Array.isArray(ans) && ans.every(v => !v || v === 0)) return false;
   return true;
@@ -1626,6 +1746,7 @@ function formatAnswer(q, ans){
     if(q.type === 'multi-range') return q.rows.map((r,i) => `${r.label}: ${ans[i]?.min||0}-${ans[i]?.max||0} ${q.unit}`).join('；');
     if(q.type === 'vendor-list') return ans.map(v => `${v.name}${v.cats.length ? '（' + v.cats.join('/') + '）' : ''}`).join('、') || '（未填）';
     if(q.type === 'route-list') return ans.map(r => `${r.from}→${r.to}（${r.mode}）${r.days}天/${r.costPct}%`).join('；');
+    if(q.type === 'payment-stages') return ans.map(s => `${s.label} ${s.pct}%${s.isAfterShip ? `（出貨後 ${s.afterDays||0} 天）` : ''}`).join(' · ');
     return ans.join('、');
   }
   if(typeof ans === 'number') return ans + (q.unit ? ' ' + q.unit : '');
@@ -1666,6 +1787,19 @@ function submitAll(){
   goToScreen('thank');
   document.getElementById('progress-text').textContent = '';
 }
+
+window.clearAllTestData = function(){
+  if(!confirm('確定要清掉所有試填資料？這會刪除所有 localStorage 內的提交記錄和進行中進度。')) return;
+  // Clear all wujie_q_* keys
+  const keys = [];
+  for(let i=0; i<localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith('wujie_q_')) keys.push(k);
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+  alert(`✓ 已清除 ${keys.length} 筆試填資料。即將重新整理頁面。`);
+  location.reload();
+};
 
 init();
 </script>
