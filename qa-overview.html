@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 問卷總覽</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0a0b12;--surface:#13151f;--card:#1a1d29;--card-2:#22253a;
+  --border:#2a2d42;--border-hi:#3d4268;
+  --txt-hi:#f5f6ff;--txt-mid:#9ca3c5;--txt-lo:#5d6388;
+  --accent:#a78bfa;--accent-glow:#c4b5fd;--accent-warm:#fb923c;
+  --ok:#34d399;--ok-soft:#34d39915;
+  --warn:#fbbf24;--warn-soft:#fbbf2415;
+  --danger:#f87171;--danger-soft:#f8717115;
+}
+body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#a78bfa10 0%,var(--bg) 60%);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:80px;letter-spacing:-.005em;}
+
+.topbar{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#a78bfa,#fb923c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;}
+.brand-text{font-size:14px;font-weight:700;}
+.brand-sub{font-size:9px;color:var(--txt-lo);letter-spacing:.08em;text-transform:uppercase;}
+.tb-actions{display:flex;gap:8px;align-items:center;}
+.btn{font-size:11px;font-weight:700;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;font-family:inherit;}
+.btn:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.danger{border-color:var(--danger);color:var(--danger);}
+
+.main{max-width:1080px;margin:0 auto;padding:24px;}
+
+.hero{margin-bottom:28px;}
+.hero-title{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+.hero-sub{font-size:13px;color:var(--txt-mid);line-height:1.6;}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.kpi-label{font-size:11px;color:var(--txt-mid);font-weight:700;letter-spacing:.04em;margin-bottom:8px;}
+.kpi-val{font-size:30px;font-weight:800;line-height:1;}
+.kpi-val.ok{color:var(--ok);}
+.kpi-val.warn{color:var(--warn);}
+.kpi-val.danger{color:var(--danger);}
+.kpi-sub{font-size:11px;color:var(--txt-mid);margin-top:6px;}
+
+.sec-title{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--txt-mid);text-transform:uppercase;margin:24px 0 12px;display:flex;align-items:center;justify-content:space-between;}
+.sec-title .sub{font-size:10px;color:var(--txt-lo);font-weight:500;letter-spacing:.02em;text-transform:none;}
+
+/* DEPT GRID */
+.dept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;}
+.dept-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.dept-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.dept-emoji{font-size:26px;}
+.dept-info{flex:1;min-width:0;}
+.dept-name{font-size:15px;font-weight:800;}
+.dept-meta{font-size:11px;color:var(--txt-mid);margin-top:2px;}
+.dept-progress{font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;}
+.dp-empty{background:var(--card-2);color:var(--txt-lo);}
+.dp-partial{background:var(--warn-soft);color:var(--warn);}
+.dp-full{background:var(--ok-soft);color:var(--ok);}
+
+.filler-list{display:flex;flex-direction:column;gap:6px;}
+.filler-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card-2);border-radius:8px;font-size:12px;}
+.filler-icon{font-size:14px;}
+.filler-name{flex:1;font-weight:700;color:var(--txt-hi);}
+.filler-time{font-size:10px;color:var(--txt-lo);}
+.filler-action{font-size:10px;color:var(--accent-glow);cursor:pointer;font-weight:700;}
+
+.guest-row{background:#a78bfa10;border-left:2px solid var(--accent);}
+.guest-row .filler-name::before{content:'➕ ';color:var(--accent-glow);font-weight:600;}
+
+/* SUBMISSION DETAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:20px;z-index:100;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border-hi);border-radius:16px;max-width:760px;width:100%;max-height:85vh;overflow-y:auto;padding:24px;}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:12px;}
+.modal-title{font-size:18px;font-weight:800;}
+.modal-meta{font-size:12px;color:var(--txt-mid);margin-top:4px;}
+.modal-close{background:none;border:none;color:var(--txt-lo);font-size:20px;cursor:pointer;padding:4px 10px;border-radius:6px;}
+.modal-close:hover{color:var(--txt-hi);background:var(--card);}
+.modal-sec-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;margin:18px 0 8px;}
+.answer-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:6px;}
+.answer-q{font-size:11px;color:var(--txt-mid);margin-bottom:4px;}
+.answer-a{font-size:13px;color:var(--txt-hi);font-weight:600;line-height:1.5;}
+.answer-a.empty{color:var(--txt-lo);font-style:italic;font-weight:400;}
+
+.feedback-card{background:var(--card);border:1.5px solid #fb923c40;border-radius:10px;padding:12px 14px;margin-bottom:6px;}
+.fb-label{font-size:10px;font-weight:700;color:var(--accent-warm);margin-bottom:4px;}
+.fb-content{font-size:13px;color:var(--txt-hi);line-height:1.5;}
+.fb-content em{color:var(--txt-mid);font-style:normal;}
+
+/* FEEDBACK SUMMARY */
+.feedback-summary-list{display:flex;flex-direction:column;gap:8px;}
+
+.loading{text-align:center;padding:48px;color:var(--txt-lo);font-size:13px;}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--card);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.empty-state{background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:32px;text-align:center;color:var(--txt-lo);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">蕪</div>
+    <div>
+      <div class="brand-text">蕪解 · 問卷總覽</div>
+      <div class="brand-sub">QUESTIONNAIRE ADMIN</div>
+    </div>
+  </div>
+  <div class="tb-actions">
+    <button class="btn" onclick="refresh()">🔄 重新整理</button>
+    <a href="questionnaire.html" class="btn">→ 看問卷</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="hero">
+    <div class="hero-title">📊 問卷填寫進度總覽</div>
+    <div class="hero-sub">即時從飛書「系統常數設定」表讀取。指定填寫人 + 跨部門補充意見都看得到。</div>
+  </div>
+
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi"><div class="kpi-label">總提交數</div><div class="kpi-val" id="kpi-total">—</div><div class="kpi-sub" id="kpi-total-sub">載入中...</div></div>
+    <div class="kpi"><div class="kpi-label">已交件部門</div><div class="kpi-val ok" id="kpi-dept-done">—</div><div class="kpi-sub">5 個部門中</div></div>
+    <div class="kpi"><div class="kpi-label">指定人員完成率</div><div class="kpi-val warn" id="kpi-filler-rate">—</div><div class="kpi-sub" id="kpi-filler-sub">—</div></div>
+    <div class="kpi"><div class="kpi-label">跨部門補充意見</div><div class="kpi-val" id="kpi-guest">—</div><div class="kpi-sub">非指定但自願填寫</div></div>
+  </div>
+
+  <div class="sec-title">
+    <span>📋 各部門進度</span>
+    <span class="sub">點擊填寫人查看完整答案</span>
+  </div>
+  <div class="dept-grid" id="dept-grid">
+    <div class="loading"><span class="spinner"></span> 載入中...</div>
+  </div>
+
+  <div class="sec-title">
+    <span>💬 反饋彙總</span>
+    <span class="sub">同事提到「題目問得不好」或「想補充題目」的內容</span>
+  </div>
+  <div id="feedback-summary"></div>
+
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title">—</div>
+        <div class="modal-meta" id="modal-meta">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const FEISHU = {
+  PROXY: 'https://feishu-proxy.raychou6913.workers.dev',
+  AT: 'Sg7ObNELHaAdZzshGIFjWPVhpce',
+  CONSTANTS_TBL: 'tbljwhJpTHxdpqLI',
+};
+
+const DEPT_CONFIG = {
+  procurement: {emoji:'📦', name:'採購', officialFillers:['賴哥','木子'], feishuName:'採購'},
+  logistics:   {emoji:'🚚', name:'物流／報關', officialFillers:['高維','Shawn'], feishuName:'物流'},
+  sales:       {emoji:'💼', name:'業務', officialFillers:['安然','董亮','德寶'], feishuName:'業務'},
+  design:      {emoji:'🎨', name:'設計／企劃', officialFillers:['Bevis','珮玲','詩彤'], feishuName:'設計企劃'},
+  shawn:       {emoji:'🎯', name:'COO 整合', officialFillers:['Shawn'], feishuName:'COO 整合'},
+};
+const FEISHU_TO_DEPT = Object.fromEntries(Object.entries(DEPT_CONFIG).map(([k,v])=>[v.feishuName, k]));
+
+let _submissions = [];
+
+async function feishuToken(){
+  const r = await fetch(FEISHU.PROXY+'/auth/token', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+  return (await r.json()).tenant_access_token;
+}
+
+async function fetchSubmissions(){
+  const tk = await feishuToken();
+  const url = `${FEISHU.PROXY}/open-apis/bitable/v1/apps/${FEISHU.AT}/tables/${FEISHU.CONSTANTS_TBL}/records?page_size=200`;
+  const r = await fetch(url, {headers:{'Authorization':'Bearer '+tk}});
+  const d = await r.json();
+  return (d.data?.items || []).map(rec => {
+    const f = rec.fields || {};
+    let answers={}, feedback={};
+    try{ answers = JSON.parse(f['答案 JSON']||'{}'); }catch(e){}
+    try{ feedback = JSON.parse(f['反饋 JSON']||'{}'); }catch(e){}
+    return {
+      record_id: rec.record_id,
+      dept: FEISHU_TO_DEPT[f['部門']] || f['部門'],
+      deptFeishuName: f['部門'],
+      filler: f['填寫人'] || '—',
+      fillerRole: f['填寫人身份'] === '指定填寫人' ? 'official' : 'guest',
+      submittedAt: f['提交時間'] || 0,
+      status: f['狀態'] || '待 Ray review',
+      answers, feedback,
+    };
+  }).sort((a,b) => b.submittedAt - a.submittedAt);
+}
+
+async function refresh(){
+  document.getElementById('dept-grid').innerHTML = '<div class="loading"><span class="spinner"></span> 重新載入...</div>';
+  try{
+    _submissions = await fetchSubmissions();
+    render();
+  }catch(e){
+    document.getElementById('dept-grid').innerHTML = `<div class="empty-state">⚠ 載入失敗：${e.message}</div>`;
+  }
+}
+
+function render(){
+  renderKPIs();
+  renderDepts();
+  renderFeedbackSummary();
+}
+
+function renderKPIs(){
+  const total = _submissions.length;
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-total-sub').textContent = total > 0 ? '已收到答案' : '尚無提交';
+
+  // Dept done = all official fillers of that dept submitted at least once
+  let deptDone = 0;
+  let totalOfficialNeeded = 0;
+  let officialDone = 0;
+  Object.entries(DEPT_CONFIG).forEach(([k,v]) => {
+    const officialFillers = v.officialFillers;
+    totalOfficialNeeded += officialFillers.length;
+    const filledNames = new Set(_submissions.filter(s => s.dept === k && s.fillerRole === 'official').map(s => s.filler));
+    const allFilled = officialFillers.every(n => filledNames.has(n));
+    if(allFilled) deptDone++;
+    officialFillers.forEach(n => { if(filledNames.has(n)) officialDone++; });
+  });
+  document.getElementById('kpi-dept-done').textContent = deptDone + ' / 5';
+  document.getElementById('kpi-dept-done').className = 'kpi-val ' + (deptDone === 5 ? 'ok' : (deptDone === 0 ? 'danger' : 'warn'));
+
+  const pct = totalOfficialNeeded > 0 ? Math.round(officialDone / totalOfficialNeeded * 100) : 0;
+  document.getElementById('kpi-filler-rate').textContent = pct + '%';
+  document.getElementById('kpi-filler-rate').className = 'kpi-val ' + (pct === 100 ? 'ok' : (pct < 50 ? 'danger' : 'warn'));
+  document.getElementById('kpi-filler-sub').textContent = `${officialDone} / ${totalOfficialNeeded} 位指定人員完成`;
+
+  const guests = _submissions.filter(s => s.fillerRole === 'guest').length;
+  document.getElementById('kpi-guest').textContent = guests;
+}
+
+function fmtTime(ts){
+  if(!ts) return '—';
+  const d = new Date(ts);
+  const now = Date.now();
+  const diff = (now - ts) / 1000;
+  if(diff < 60) return '剛剛';
+  if(diff < 3600) return Math.round(diff/60) + ' 分鐘前';
+  if(diff < 86400) return Math.round(diff/3600) + ' 小時前';
+  return d.toLocaleDateString('zh-TW') + ' ' + d.toTimeString().slice(0,5);
+}
+
+function renderDepts(){
+  const grid = document.getElementById('dept-grid');
+  grid.innerHTML = Object.entries(DEPT_CONFIG).map(([deptKey, cfg]) => {
+    const deptSubs = _submissions.filter(s => s.dept === deptKey);
+    const officialSubs = deptSubs.filter(s => s.fillerRole === 'official');
+    const guestSubs = deptSubs.filter(s => s.fillerRole === 'guest');
+
+    // Build official filler rows
+    const officialRows = cfg.officialFillers.map(name => {
+      // Find latest submission by this filler
+      const latest = officialSubs.filter(s => s.filler === name).sort((a,b)=>b.submittedAt - a.submittedAt)[0];
+      if(latest){
+        return `<div class="filler-row">
+          <span class="filler-icon">🟢</span>
+          <span class="filler-name">${name}</span>
+          <span class="filler-time">${fmtTime(latest.submittedAt)}</span>
+          <span class="filler-action" onclick="showDetail('${latest.record_id}')">看答案 →</span>
+        </div>`;
+      }else{
+        return `<div class="filler-row">
+          <span class="filler-icon">⚪</span>
+          <span class="filler-name" style="color:var(--txt-mid);">${name}</span>
+          <span class="filler-time" style="color:var(--danger);">未填</span>
+        </div>`;
+      }
+    }).join('');
+
+    // Guest rows
+    const guestRows = guestSubs.map(s => `<div class="filler-row guest-row">
+      <span class="filler-icon">🟢</span>
+      <span class="filler-name">${s.filler}</span>
+      <span class="filler-time">${fmtTime(s.submittedAt)}</span>
+      <span class="filler-action" onclick="showDetail('${s.record_id}')">看答案 →</span>
+    </div>`).join('');
+
+    // Progress label
+    const totalNeeded = cfg.officialFillers.length;
+    const doneCount = new Set(officialSubs.map(s => s.filler)).size;
+    let progCls = 'dp-empty', progLabel = '0 / ' + totalNeeded;
+    if(doneCount === totalNeeded){ progCls = 'dp-full'; progLabel = '✓ ' + doneCount + ' / ' + totalNeeded; }
+    else if(doneCount > 0){ progCls = 'dp-partial'; progLabel = doneCount + ' / ' + totalNeeded; }
+
+    return `<div class="dept-card">
+      <div class="dept-head">
+        <div class="dept-emoji">${cfg.emoji}</div>
+        <div class="dept-info">
+          <div class="dept-name">${cfg.name}</div>
+          <div class="dept-meta">${cfg.officialFillers.join(' / ')}${guestSubs.length ? ' · +'+guestSubs.length+' 位補充' : ''}</div>
+        </div>
+        <span class="dept-progress ${progCls}">${progLabel}</span>
+      </div>
+      <div class="filler-list">${officialRows}${guestRows}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderFeedbackSummary(){
+  const el = document.getElementById('feedback-summary');
+  const allBad = [];
+  const allNew = [];
+  _submissions.forEach(s => {
+    (s.feedback?.badQuestions || []).forEach(b => allBad.push({...b, dept: DEPT_CONFIG[s.dept]?.name, filler: s.filler}));
+    (s.feedback?.newQuestions || []).forEach(n => allNew.push({...n, dept: DEPT_CONFIG[s.dept]?.name, filler: s.filler}));
+  });
+  if(!allBad.length && !allNew.length){
+    el.innerHTML = '<div class="empty-state">尚未收到反饋意見。</div>';
+    return;
+  }
+  let html = '';
+  if(allBad.length){
+    html += `<div class="modal-sec-label">🔧 題目問得不好 (${allBad.length})</div>`;
+    html += allBad.map(b => `<div class="feedback-card">
+      <div class="fb-label">${b.dept} · ${b.filler} · 對題目 ${b.qId||'?'}</div>
+      <div class="fb-content">建議改成：<em>${b.betterQuestion||'(未填)'}</em>${b.answer?'<br>他的答案：<em>'+b.answer+'</em>':''}</div>
+    </div>`).join('');
+  }
+  if(allNew.length){
+    html += `<div class="modal-sec-label">💡 補充新題目 (${allNew.length})</div>`;
+    html += allNew.map(n => `<div class="feedback-card">
+      <div class="fb-label">${n.dept} · ${n.filler}</div>
+      <div class="fb-content">新題目：<em>${n.question||'(未填)'}</em>${n.answer?'<br>他的答案：<em>'+n.answer+'</em>':''}</div>
+    </div>`).join('');
+  }
+  el.innerHTML = html;
+}
+
+function showDetail(recordId){
+  const s = _submissions.find(x => x.record_id === recordId);
+  if(!s) return;
+  const cfg = DEPT_CONFIG[s.dept] || {name: s.deptFeishuName};
+  document.getElementById('modal-title').textContent = `${cfg.emoji||'📋'} ${cfg.name} · ${s.filler}`;
+  const role = s.fillerRole === 'official' ? '指定填寫人' : '跨部門補充';
+  document.getElementById('modal-meta').textContent = `${role} · 提交於 ${fmtTime(s.submittedAt)} · ${s.status}`;
+
+  // Render all answers
+  const answerKeys = Object.keys(s.answers || {});
+  const body = document.getElementById('modal-body');
+  let html = '<div class="modal-sec-label">📝 答案 ('+ answerKeys.length +' 題)</div>';
+  if(!answerKeys.length){
+    html += '<div class="empty-state" style="padding:16px;">無答案資料</div>';
+  } else {
+    html += answerKeys.map(k => {
+      const ans = s.answers[k];
+      const display = formatAnswer(ans);
+      return `<div class="answer-row">
+        <div class="answer-q">題 ${k}</div>
+        <div class="answer-a ${!ans?'empty':''}">${display}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Feedback
+  const bad = s.feedback?.badQuestions || [];
+  const newQ = s.feedback?.newQuestions || [];
+  if(bad.length || newQ.length){
+    html += '<div class="modal-sec-label">💬 反饋</div>';
+    bad.forEach(b => {
+      html += `<div class="feedback-card">
+        <div class="fb-label">🔧 對題目 ${b.qId||'?'} 的建議</div>
+        <div class="fb-content">建議改成：<em>${b.betterQuestion||'—'}</em><br>他的答案：<em>${b.answer||'—'}</em></div>
+      </div>`;
+    });
+    newQ.forEach(n => {
+      html += `<div class="feedback-card">
+        <div class="fb-label">💡 想補充新題目</div>
+        <div class="fb-content">題目：<em>${n.question||'—'}</em><br>答案：<em>${n.answer||'—'}</em></div>
+      </div>`;
+    });
+  }
+  body.innerHTML = html;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+}
+
+function formatAnswer(ans){
+  if(ans === null || ans === undefined || ans === '') return '（未填）';
+  if(typeof ans === 'string') return ans;
+  if(typeof ans === 'number') return String(ans);
+  if(Array.isArray(ans)){
+    return ans.map(v => {
+      if(typeof v === 'object' && v !== null){
+        // routes / vendor / payment-stages / multi-range / abc-tier
+        if('from' in v && 'to' in v) return `${v.from}→${v.to}（${v.mode||'?'}）${v.days||0}天/${v.costPct||0}%`;
+        if('name' in v && 'cats' in v) return `${v.name}（${(v.cats||[]).join('/')||'無分類'}）`;
+        if('label' in v && 'pct' in v) return `${v.label} ${v.pct}%${v.isAfterShip?'（出貨後 '+v.afterDays+' 天）':''}`;
+        if('min' in v && 'max' in v) return `${v.min}~${v.max}`;
+        if('enabled' in v) return `${v.name||'?'} (${v.enabled?'使用':'不使用'} · ${v.days||0}天${v.outsource?' · 外包':''})`;
+        return JSON.stringify(v);
+      }
+      return v;
+    }).join('、');
+  }
+  if(typeof ans === 'object') return JSON.stringify(ans);
+  return String(ans);
+}
+
+refresh();
+// Auto-refresh every 30s
+setInterval(refresh, 30000);
+</script>
+
+</body>
+</html>
