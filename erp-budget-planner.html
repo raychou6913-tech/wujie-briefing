@@ -217,8 +217,12 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
         <div class="gl-grp">
           <span class="gl-lbl">OPEX / 月</span>
           <span class="opex-chip" onclick="toggleOpexPanel()" id="opexChip">
+            <span style="font-size:11px;">🔒</span>
             <span id="opexDisplay">¥300,000</span>
             <span id="opexArrow" style="font-size:10px;color:var(--txt-lo);">▾ 展開明細</span>
+          </span>
+          <span style="font-size:11px;color:var(--accent);font-weight:600;background:#a78bfa18;border:1px solid #a78bfa40;padding:3px 8px;border-radius:6px;">
+            由躍明財務維護 · 你只能看不能改
           </span>
         </div>
         <button class="btn-sm" onclick="resetAll()">↩ 重置所有預設值</button>
@@ -311,8 +315,12 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
     <!-- REORDER PANEL -->
     <div id="panelReorder">
       <div class="modal-field">
-        <div class="modal-lbl">選擇基礎產品（複製變動成本，一次性費用不再計）</div>
-        <select class="modal-inp" id="rBase"></select>
+        <div class="modal-lbl">選擇 IP</div>
+        <select class="modal-inp" id="rIp"></select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-lbl">新產品名稱</div>
+        <input class="modal-inp" id="rName" placeholder="e.g. 夏日限定盲袋 / Q4 聖誕款">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="modal-field">
@@ -324,24 +332,18 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
           <input class="modal-inp" id="rVol" type="number" min="0" placeholder="e.g. 50000">
         </div>
       </div>
-      <div class="modal-hint">⚠ 同 IP 新品複製原產品的變動成本與版稅參數；一次性費用（設計/建模/模具）可在展開詳細後自行調整。</div>
+      <div class="modal-hint">⚠ 同 IP 新品沿用該 IP 既有的版稅與成本參數；單品變動成本（設計/建模/模具）可在新增後展開詳細調整。</div>
     </div>
 
     <!-- NEW PRODUCT PANEL -->
     <div id="panelNew" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="modal-field">
-          <div class="modal-lbl">IP 名稱</div>
-          <input class="modal-inp" id="nIp" placeholder="e.g. Maniani">
-        </div>
-        <div class="modal-field">
-          <div class="modal-lbl">IP 顯示色（hex）</div>
-          <input class="modal-inp" id="nColor" value="#a78bfa" placeholder="#a78bfa">
-        </div>
+      <div class="modal-field">
+        <div class="modal-lbl">IP 名稱（未簽約 / 新探索）</div>
+        <input class="modal-inp" id="nIp" placeholder="e.g. Maniani / Miffy / 還沒簽合約的 IP">
       </div>
       <div class="modal-field">
         <div class="modal-lbl">產品名稱</div>
-        <input class="modal-inp" id="nName" placeholder="e.g. 首款盲袋 XX款">
+        <input class="modal-inp" id="nName" placeholder="e.g. 首款盲袋 / 文具組 / 公仔系列">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
         <div class="modal-field">
@@ -657,10 +659,10 @@ function renderOpexPanel(){
       </tr>`;
     }
     return `<tr>
-      <td style="color:var(--txt-mid);padding:5px 16px;">${o.label}</td>
-      <td style="text-align:right;padding:5px 16px;">
-        <input class="gl-inp" style="width:110px;" value="${o.val.toLocaleString()}" oninput="opexItemChange(${i},this.value)">
+      <td style="color:var(--txt-mid);padding:5px 16px;">
+        <span style="font-size:9px;color:var(--txt-lo);margin-right:4px;">🔒</span>${o.label}
       </td>
+      <td style="text-align:right;padding:5px 16px;font-weight:700;color:var(--txt-hi);">¥${o.val.toLocaleString()}</td>
       <td style="text-align:right;color:var(--txt-lo);font-size:10px;padding:5px 16px;">${pct}%</td>
     </tr>`;
   }).join('');
@@ -1288,12 +1290,33 @@ function applyChannelToVol(i){
 }
 
 // ── ADD PRODUCT MODAL ─────────────────────────────────────────────
+// 系統內建的 IP 顏色對照（5 個簽約 IP）
+const IP_COLOR_MAP = {
+  'Snoopy 史努比':'#fbbf24', 'Snoopy':'#fbbf24',
+  'Mofusand 貓福珊迪':'#fb923c', 'Mofusand':'#fb923c', '貓福珊迪':'#fb923c',
+  'Opanchu 褲褲兔':'#818cf8', 'Opanchu':'#818cf8', '褲褲兔':'#818cf8',
+  'Muziktiger':'#38bdf8', '無業老虎':'#38bdf8',
+  '飯糰與梅子':'#f472b6', 'おにうめ':'#f472b6',
+};
+const NEW_IP_COLOR_POOL = ['#a78bfa','#22c55e','#f43f5e','#10b981','#06b6d4','#eab308'];
+function _autoIpColor(ipName){
+  if(IP_COLOR_MAP[ipName]) return IP_COLOR_MAP[ipName];
+  // Hash-based pick from pool
+  let h = 0; for(const c of (ipName||'')) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return NEW_IP_COLOR_POOL[Math.abs(h) % NEW_IP_COLOR_POOL.length];
+}
+
 function openAddModal(){
-  const baseOpts = prods.map((p,i)=>`<option value="${i}">[${p.ipShort}] ${p.name}</option>`).join('');
-  document.getElementById('rBase').innerHTML = baseOpts;
+  // IP picker: 從現有產品歸納出 IP 列表（去重）
+  const uniqueIPs = [...new Set(prods.map(p => p.ip))];
+  const ipOpts = uniqueIPs.map(ip => `<option value="${ip}">${ip}</option>`).join('');
+  document.getElementById('rIp').innerHTML = ipOpts;
   const monthOpts = MONTHS.slice(0,21).map(m=>`<option>${m}</option>`).join('');
   document.getElementById('rLaunch').innerHTML = monthOpts;
   document.getElementById('nLaunch').innerHTML = monthOpts;
+  // Clear inputs
+  document.getElementById('rName').value = '';
+  document.getElementById('rVol').value = '';
   document.getElementById('mCoopMode').value = '';
   document.getElementById('mEntity').value = '';
   document.getElementById('mCurrency').value = 'RMB';
@@ -1410,11 +1433,16 @@ function switchAddTab(tab){
 function confirmAdd(){
   const uid = 'cust_'+Date.now();
   if(addTab==='reorder'){
-    const baseIdx = parseInt(document.getElementById('rBase').value)||0;
-    const base = prods[baseIdx];
+    // 同 IP 新品：選 IP + 手填產品名稱
+    const ipSel = document.getElementById('rIp').value;
+    const newName = document.getElementById('rName').value.trim();
     const volBoxes = parseInt(document.getElementById('rVol').value)||0;
     const launch = document.getElementById('rLaunch').value;
+    if(!ipSel){ alert('請選擇 IP'); return; }
+    if(!newName){ alert('請填寫新產品名稱'); return; }
     if(!volBoxes||!launch){ alert('請填寫上市月與箱數'); return; }
+    // 找該 IP 的代表產品作為成本/版稅參數來源
+    const base = prods.find(p => p.ip === ipSel) || prods[0];
     const ppc = _piecesPerCarton(base);
     const newProd = { ...base, ..._bp({
       hiddenOT:[...( base.hiddenOT||[])],
@@ -1422,7 +1450,7 @@ function confirmAdd(){
       extraOT:[],extraVar:[],
       reorderLeadDays:base.reorderLeadDays||45,
     }), id:uid,
-      name: base.name + '（新品）',
+      name: newName,
       launch, volFirst:volBoxes*ppc, volReorder:0,
       royalty:{...base.royalty},
       entity: document.getElementById('mEntity').value,
@@ -1431,12 +1459,13 @@ function confirmAdd(){
       coopParams: _readCoopParams() };
     prods.push(newProd);
   } else {
+    // 全新產品：手填 IP 名稱 + 產品名稱（IP 顏色自動分配）
     const ip = document.getElementById('nIp').value.trim() || '新IP';
     const name = document.getElementById('nName').value.trim() || '新產品';
     const launch = document.getElementById('nLaunch').value;
     const srp = parseFloat(document.getElementById('nSrp').value)||29.9;
     const volBoxes = parseInt(document.getElementById('nVol').value)||250;
-    const color = document.getElementById('nColor').value.trim()||'#a78bfa';
+    const color = _autoIpColor(ip); // 系統自動分配
     const _ppc = 15*16;
     prods.push({ ..._bp(), id:uid, ip, ipShort:ip, color,
       name, launch, volFirst:volBoxes*_ppc, volReorder:0, srp, wsDiscount:0.46,
