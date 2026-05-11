@@ -816,6 +816,19 @@ function getFillerProgress(dept, filler){
 
 function init(){
   const params = new URLSearchParams(location.search);
+  // ?reset=all — admin 清掉本機所有試填資料（給 Ray 用）
+  if(params.get('reset') === 'all'){
+    const keys = [];
+    for(let i=0; i<localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && (k.startsWith('wujie_q_') || k === 'wujie_contracts_v1')) keys.push(k);
+    }
+    keys.forEach(k => localStorage.removeItem(k));
+    alert(`✓ 已清掉本機 ${keys.length} 筆試填資料（含問卷進度／提交記錄／合約清單）。`);
+    // Remove reset param and reload
+    location.replace(location.pathname);
+    return;
+  }
   const dept = params.get('dept');
   if(dept && DEPTS[dept]) state.dept = dept;
   // Don't pre-load filler state — wait for user to pick filler
