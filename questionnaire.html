@@ -433,14 +433,16 @@ function loadFillerState(filler){
 }
 
 function getFillerStatus(dept, filler){
-  // 1. Cloud (Stage 2)：飛書是否有 submission
-  if(_cloudSubmissions){
+  if(_cloudFetchedOk){
+    // 雲端為真相來源
     if(_cloudSubmissions.some(s => s.dept === dept && s.filler === filler)) return 'done';
+    // 雲端 = 沒有，但本機可能還在填一半（in-progress 只看本機）
+  }else{
+    // 雲端撈失敗 → 回退本機 backup
+    const subs = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
+    if(subs.some(s => s.dept === dept && s.filler === filler)) return 'done';
   }
-  // 2. Local submission backup
-  const subs = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
-  if(subs.some(s => s.dept === dept && s.filler === filler)) return 'done';
-  // 3. In-progress (local only)
+  // In-progress 永遠看本機（同一台電腦的同一個 filler 才有意義）
   const progress = localStorage.getItem(STORAGE_KEY_PREFIX + dept + '_' + filler);
   if(progress){
     try{
@@ -1684,6 +1686,7 @@ async function feishuSubmit(submission){
 
 let _cloudSubmissions = null;
 let _cloudCacheTime = 0;
+let _cloudFetchedOk = false; // 雲端撈成功 → 以雲端為準；失敗 → 才 fallback 本機
 async function feishuFetchSubmissions(force){
   if(!force && _cloudSubmissions && Date.now() - _cloudCacheTime < 15000) return _cloudSubmissions;
   try{
@@ -1698,7 +1701,12 @@ async function feishuFetchSubmissions(force){
       submittedAt: rec.fields['提交時間'],
     }));
     _cloudCacheTime = Date.now();
-  }catch(e){ console.warn('feishu fetch fail', e); if(!_cloudSubmissions) _cloudSubmissions = []; }
+    _cloudFetchedOk = true;
+  }catch(e){
+    console.warn('feishu fetch fail', e);
+    _cloudFetchedOk = false;
+    if(!_cloudSubmissions) _cloudSubmissions = [];
+  }
   return _cloudSubmissions;
 }
 
