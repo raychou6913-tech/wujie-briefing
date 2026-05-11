@@ -399,10 +399,10 @@ const DEPTS = {
   },
 
   logistics: {
-    emoji:'🚚', name:'物流／報關', sub:'高維',
+    emoji:'🚚', name:'物流／報關', sub:'高維 + Shawn',
     color:'#34d399',
     intro:'物流天數＋成本佔比，影響項目交期與毛利計算。',
-    officialFillers:['高維'],
+    officialFillers:['高維','Shawn'],
     questions:[
       {id:'2.1', type:'number-slider', vam:false, required:true,
         text:'北京 → 台灣（海運）幾天？',
@@ -824,29 +824,60 @@ let state = {
   fillerRole: '', // 'official' | 'guest'
   qIdx: 0,
   answers: {},
+  feedback: {badQuestions:[], newQuestions:[]},
 };
 
 const STORAGE_KEY_PREFIX = 'wujie_q_';
 
-function getStorageKey(){ return STORAGE_KEY_PREFIX + state.dept; }
+// Progress storage is per-(dept + filler) so multiple people can fill same dept on same device
+function getStorageKey(){ return STORAGE_KEY_PREFIX + state.dept + '_' + (state.filler||'_anon'); }
+
 function saveState(){
+  if(!state.filler) return; // can't save without identity
   localStorage.setItem(getStorageKey(), JSON.stringify({
-    filler: state.filler, fillerRole: state.fillerRole, qIdx: state.qIdx, answers: state.answers
+    filler: state.filler, fillerRole: state.fillerRole, qIdx: state.qIdx, answers: state.answers, feedback: state.feedback
   }));
 }
-function loadState(){
-  state.filler = '';
-  state.fillerRole = '';
-  state.qIdx = 0;
-  state.answers = {};
-  const s = localStorage.getItem(getStorageKey());
+
+function loadFillerState(filler){
+  // Load specific filler's state (for resume)
+  const key = STORAGE_KEY_PREFIX + state.dept + '_' + filler;
+  const s = localStorage.getItem(key);
   if(s){
     const parsed = JSON.parse(s);
-    state.filler = parsed.filler || '';
-    state.fillerRole = parsed.fillerRole || '';
     state.qIdx = parsed.qIdx || 0;
     state.answers = parsed.answers || {};
+    state.feedback = parsed.feedback || {badQuestions:[], newQuestions:[]};
+  }else{
+    state.qIdx = 0;
+    state.answers = {};
+    state.feedback = {badQuestions:[], newQuestions:[]};
   }
+}
+
+function getFillerStatus(dept, filler){
+  // Check submissions first
+  const subs = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
+  if(subs.some(s => s.dept === dept && s.filler === filler)) return 'done';
+  // Check in-progress
+  const progress = localStorage.getItem(STORAGE_KEY_PREFIX + dept + '_' + filler);
+  if(progress){
+    try{
+      const parsed = JSON.parse(progress);
+      const hasContent = (parsed.qIdx||0) > 0 || Object.keys(parsed.answers||{}).length > 0;
+      if(hasContent) return 'in_progress';
+    }catch(e){}
+  }
+  return 'not_started';
+}
+
+function getFillerProgress(dept, filler){
+  const progress = localStorage.getItem(STORAGE_KEY_PREFIX + dept + '_' + filler);
+  if(!progress) return null;
+  try{
+    const parsed = JSON.parse(progress);
+    return {qIdx: parsed.qIdx||0, total: DEPTS[dept].questions.length};
+  }catch(e){ return null; }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -857,8 +888,7 @@ function init(){
   const params = new URLSearchParams(location.search);
   const dept = params.get('dept');
   if(dept && DEPTS[dept]) state.dept = dept;
-
-  loadState();
+  // Don't pre-load filler state — wait for user to pick filler
   renderStart();
 }
 
@@ -870,19 +900,39 @@ function renderStart(){
   document.getElementById('meta-count').textContent = d.questions.length + ' 題';
   document.getElementById('meta-time').textContent = '預估 ' + Math.ceil(d.questions.length * 0.8) + ' 分鐘';
 
-  // Render official fillers (this dept's expected people)
+  // Render official fillers with status badges
   const officialArea = document.getElementById('filler-official-area');
   const officials = d.officialFillers || [];
+  const statusIcons = {
+    'not_started': {icon:'⚪', label:'未填', color:'var(--txt-lo)'},
+    'in_progress': {icon:'🟡', label:'進行中', color:'var(--warn)'},
+    'done': {icon:'🟢', label:'已填', color:'var(--ok)'},
+  };
   officialArea.innerHTML = `
-    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-      ${officials.map(name => `
-        <button class="pill ${state.filler === name && state.fillerRole === 'official' ? 'selected' : ''}"
-                style="flex:0 0 auto;"
-                onclick="pickOfficialFiller('${name}')">${name}</button>
-      `).join('')}
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${officials.map(name => {
+        const status = getFillerStatus(state.dept, name);
+        const s = statusIcons[status];
+        const isSelected = state.filler === name && state.fillerRole === 'official';
+        const progress = status === 'in_progress' ? getFillerProgress(state.dept, name) : null;
+        const progressTxt = progress ? ` ${progress.qIdx}/${progress.total}` : '';
+        return `
+          <button class="pill ${isSelected ? 'selected' : ''} ${status === 'done' ? 'filler-done' : ''}"
+                  style="flex:0 0 auto;display:flex;align-items:center;gap:10px;justify-content:space-between;text-align:left;width:100%;"
+                  onclick="pickOfficialFiller('${name}')">
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:16px;">${s.icon}</span>
+              <span>${name}</span>
+            </span>
+            <span style="font-size:11px;font-weight:600;color:${isSelected ? '#fff' : s.color};">
+              ${s.label}${progressTxt}${status === 'done' ? ' ✓' : ''}
+            </span>
+          </button>
+        `;
+      }).join('')}
     </div>
-    <div style="font-size:11px;color:var(--txt-lo);margin-top:8px;">
-      ↑ 這個部門指定的填寫人，請該位同事點選自己的名字
+    <div style="font-size:11px;color:var(--txt-lo);margin-top:10px;line-height:1.5;">
+      ↑ 此部門指定的填寫人。${officials.length > 1 ? `每位都需各自填寫，<br>避免「我以為你會填」的狀況。` : ''}
     </div>
   `;
 
@@ -904,14 +954,14 @@ function renderStart(){
 function pickOfficialFiller(name){
   state.filler = name;
   state.fillerRole = 'official';
+  // Load this filler's progress (if any)
+  loadFillerState(name);
   // Clear guest mode
   document.getElementById('guest-input-wrap').style.display = 'none';
   document.getElementById('btn-guest-toggle').classList.remove('selected');
   document.getElementById('filler-guest-name').value = '';
-  // Re-render to update selected pill
-  document.querySelectorAll('#filler-official-area .pill').forEach(p => p.classList.remove('selected'));
-  event.target.classList.add('selected');
-  updateStartButton();
+  // Re-render to reflect selection
+  renderStart();
 }
 
 function toggleGuestMode(){
@@ -944,7 +994,15 @@ function updateStartButton(){
   if(hasOfficial || hasGuest){
     btn.disabled = false;
     btn.style.opacity = '1';
-    btn.textContent = '開始填寫 →';
+    // If filler has progress, show "繼續填"
+    const status = state.fillerRole === 'official' ? getFillerStatus(state.dept, state.filler) : 'not_started';
+    if(status === 'in_progress'){
+      btn.textContent = '繼續填寫 →';
+    }else if(status === 'done'){
+      btn.textContent = '重新填一次 →';
+    }else{
+      btn.textContent = '開始填寫 →';
+    }
   }else{
     btn.disabled = true;
     btn.style.opacity = '.4';
@@ -954,9 +1012,11 @@ function updateStartButton(){
 
 function switchDept(d){
   state.dept = d;
+  state.filler = '';
+  state.fillerRole = '';
   state.qIdx = 0;
   state.answers = {};
-  loadState();
+  state.feedback = {badQuestions:[], newQuestions:[]};
   history.replaceState(null, '', '?dept=' + d);
   renderStart();
 }
@@ -1352,7 +1412,122 @@ function renderReview(){
       </div>
     `;
   }).join('');
+
+  renderFeedbackSection();
 }
+
+function renderFeedbackSection(){
+  const d = DEPTS[state.dept];
+  let html = `
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+      <div style="font-size:14px;font-weight:800;margin-bottom:6px;">📝 對這份問卷的反饋（選填）</div>
+      <div style="font-size:12px;color:var(--txt-mid);margin-bottom:18px;line-height:1.6;">
+        你最了解這個工作環節。哪些題目問得不夠好？或者有什麼系統該問但沒問？跟我們說。
+      </div>
+
+      <!-- BAD QUESTIONS -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:10px;">🔧 有題目問得不好嗎？</div>
+        <div id="bad-questions-list"></div>
+        <button class="dept-pill" style="margin-top:10px;" onclick="addBadQuestion()">＋ 加一條建議</button>
+      </div>
+
+      <!-- NEW QUESTIONS -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:10px;">💡 想補充新題目？</div>
+        <div style="font-size:11px;color:var(--txt-lo);margin-bottom:10px;">
+          系統沒問到、但你覺得很重要的常數或經驗，這裡補上。
+        </div>
+        <div id="new-questions-list"></div>
+        <button class="dept-pill" style="margin-top:10px;" onclick="addNewQuestion()">＋ 加一條補充</button>
+      </div>
+    </div>
+  `;
+
+  // Append after review-list, but inside the screen
+  const reviewScreen = document.getElementById('screen-review');
+  let feedbackBlock = document.getElementById('feedback-block');
+  if(!feedbackBlock){
+    feedbackBlock = document.createElement('div');
+    feedbackBlock.id = 'feedback-block';
+    // Insert before the bottom button row
+    const reviewList = document.getElementById('review-list');
+    reviewList.parentNode.insertBefore(feedbackBlock, reviewList.nextSibling);
+  }
+  feedbackBlock.innerHTML = html;
+
+  renderBadQuestions();
+  renderNewQuestions();
+}
+
+function renderBadQuestions(){
+  const d = DEPTS[state.dept];
+  const list = document.getElementById('bad-questions-list');
+  if(!state.feedback.badQuestions.length){
+    list.innerHTML = '<div style="font-size:11px;color:var(--txt-lo);font-style:italic;">尚未添加。</div>';
+    return;
+  }
+  list.innerHTML = state.feedback.badQuestions.map((bq,i) => `
+    <div style="background:var(--card-2);border-radius:10px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <select class="text-input" style="font-size:12px;flex:1;margin-right:8px;" onchange="updateBadQuestion(${i},'qId',this.value)">
+          <option value="">選擇題號...</option>
+          ${d.questions.map(q => `<option value="${q.id}" ${bq.qId === q.id ? 'selected' : ''}>${q.id} · ${q.text.slice(0,30)}...</option>`).join('')}
+        </select>
+        <button class="dept-pill" style="font-size:10px;color:var(--danger);" onclick="removeBadQuestion(${i})">移除</button>
+      </div>
+      <input class="text-input" style="font-size:12px;margin-bottom:6px;" placeholder="應該怎麼問？" value="${bq.betterQuestion||''}" oninput="updateBadQuestion(${i},'betterQuestion',this.value)">
+      <input class="text-input" style="font-size:12px;" placeholder="你的答案（依新問法）" value="${bq.answer||''}" oninput="updateBadQuestion(${i},'answer',this.value)">
+    </div>
+  `).join('');
+}
+
+function renderNewQuestions(){
+  const list = document.getElementById('new-questions-list');
+  if(!state.feedback.newQuestions.length){
+    list.innerHTML = '<div style="font-size:11px;color:var(--txt-lo);font-style:italic;">尚未添加。</div>';
+    return;
+  }
+  list.innerHTML = state.feedback.newQuestions.map((nq,i) => `
+    <div style="background:var(--card-2);border-radius:10px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:11px;color:var(--txt-mid);font-weight:700;">補充題 ${i+1}</div>
+        <button class="dept-pill" style="font-size:10px;color:var(--danger);" onclick="removeNewQuestion(${i})">移除</button>
+      </div>
+      <input class="text-input" style="font-size:12px;margin-bottom:6px;" placeholder="題目（系統該問什麼？）" value="${nq.question||''}" oninput="updateNewQuestion(${i},'question',this.value)">
+      <input class="text-input" style="font-size:12px;" placeholder="你的答案" value="${nq.answer||''}" oninput="updateNewQuestion(${i},'answer',this.value)">
+    </div>
+  `).join('');
+}
+
+window.addBadQuestion = function(){
+  state.feedback.badQuestions.push({qId:'', betterQuestion:'', answer:''});
+  saveState();
+  renderBadQuestions();
+};
+window.removeBadQuestion = function(i){
+  state.feedback.badQuestions.splice(i,1);
+  saveState();
+  renderBadQuestions();
+};
+window.updateBadQuestion = function(i, field, value){
+  state.feedback.badQuestions[i][field] = value;
+  saveState();
+};
+window.addNewQuestion = function(){
+  state.feedback.newQuestions.push({question:'', answer:''});
+  saveState();
+  renderNewQuestions();
+};
+window.removeNewQuestion = function(i){
+  state.feedback.newQuestions.splice(i,1);
+  saveState();
+  renderNewQuestions();
+};
+window.updateNewQuestion = function(i, field, value){
+  state.feedback.newQuestions[i][field] = value;
+  saveState();
+};
 
 function formatAnswer(q, ans){
   if(ans === null || ans === undefined || ans === '') return '（未填）';
@@ -1388,6 +1563,7 @@ function submitAll(){
     fillerRole: state.fillerRole, // 'official' | 'guest'
     submittedAt: new Date().toISOString(),
     answers: state.answers,
+    feedback: state.feedback,
   };
   // Stage 1: localStorage only
   const allSubmissions = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
