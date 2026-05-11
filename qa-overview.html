@@ -160,7 +160,15 @@ body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#a78bfa10 0%,var(--b
   </div>
 </div>
 
+<script src="questionnaire-data.js"></script>
 <script>
+const DEPTS_DATA = window.QUESTIONNAIRE_DEPTS;
+function getQuestionDef(deptKey, questionId){
+  const d = DEPTS_DATA?.[deptKey];
+  if(!d) return null;
+  return d.questions.find(q => q.id === questionId);
+}
+
 const FEISHU = {
   PROXY: 'https://feishu-proxy.raychou6913.workers.dev',
   AT: 'Sg7ObNELHaAdZzshGIFjWPVhpce',
@@ -333,10 +341,16 @@ function renderFeedbackSummary(){
   let html = '';
   if(allBad.length){
     html += `<div class="modal-sec-label">🔧 題目問得不好 (${allBad.length})</div>`;
-    html += allBad.map(b => `<div class="feedback-card">
-      <div class="fb-label">${b.dept} · ${b.filler} · 對題目 ${b.qId||'?'}</div>
-      <div class="fb-content">建議改成：<em>${b.betterQuestion||'(未填)'}</em>${b.answer?'<br>他的答案：<em>'+b.answer+'</em>':''}</div>
-    </div>`).join('');
+    html += allBad.map(b => {
+      // Find original question text
+      const deptKey = Object.keys(DEPT_CONFIG).find(k => DEPT_CONFIG[k].name === b.dept);
+      const qDef = deptKey ? getQuestionDef(deptKey, b.qId) : null;
+      const qText = qDef ? qDef.text : '';
+      return `<div class="feedback-card">
+        <div class="fb-label">${b.dept} · ${b.filler} · 對題目 ${b.qId||'?'}${qText?'「'+qText+'」':''}</div>
+        <div class="fb-content">建議改成：<em>${b.betterQuestion||'(未填)'}</em>${b.answer?'<br>他的答案：<em>'+b.answer+'</em>':''}</div>
+      </div>`;
+    }).join('');
   }
   if(allNew.length){
     html += `<div class="modal-sec-label">💡 補充新題目 (${allNew.length})</div>`;
@@ -356,19 +370,29 @@ function showDetail(recordId){
   const role = s.fillerRole === 'official' ? '指定填寫人' : '跨部門補充';
   document.getElementById('modal-meta').textContent = `${role} · 提交於 ${fmtTime(s.submittedAt)} · ${s.status}`;
 
-  // Render all answers
-  const answerKeys = Object.keys(s.answers || {});
+  // Render all answers — 依問卷順序（不是 submission 內部 key 順序）
   const body = document.getElementById('modal-body');
-  let html = '<div class="modal-sec-label">📝 答案 ('+ answerKeys.length +' 題)</div>';
-  if(!answerKeys.length){
-    html += '<div class="empty-state" style="padding:16px;">無答案資料</div>';
+  const deptDef = DEPTS_DATA?.[s.dept];
+  const orderedQuestions = deptDef ? deptDef.questions : [];
+  const answers = s.answers || {};
+
+  let html = '<div class="modal-sec-label">📝 答案 ('+ orderedQuestions.length +' 題)</div>';
+  if(!orderedQuestions.length){
+    // Fallback: 從 answers keys 直接列
+    const ks = Object.keys(answers);
+    html += ks.map(k => `<div class="answer-row">
+      <div class="answer-q">題 ${k}</div>
+      <div class="answer-a">${formatAnswer(answers[k])}</div>
+    </div>`).join('') || '<div class="empty-state" style="padding:16px;">無題目定義可對照</div>';
   } else {
-    html += answerKeys.map(k => {
-      const ans = s.answers[k];
-      const display = formatAnswer(ans);
+    html += orderedQuestions.map(q => {
+      const ans = answers[q.id];
+      const isEmpty = (ans === undefined || ans === null || ans === '' || (Array.isArray(ans) && ans.length === 0));
+      const display = isEmpty ? '（未填）' : formatAnswerByType(q, ans);
+      const vamTag = q.vam ? ' <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--warn-soft);color:var(--warn);margin-left:6px;">🚨 VAM</span>' : '';
       return `<div class="answer-row">
-        <div class="answer-q">題 ${k}</div>
-        <div class="answer-a ${!ans?'empty':''}">${display}</div>
+        <div class="answer-q"><b style="color:var(--accent-glow);">題 ${q.id}</b>${vamTag} · ${q.text}</div>
+        <div class="answer-a ${isEmpty?'empty':''}">${display}</div>
       </div>`;
     }).join('');
   }
@@ -397,6 +421,57 @@ function showDetail(recordId){
 
 function closeModal(){
   document.getElementById('modal').classList.remove('show');
+}
+
+function formatAnswerByType(q, ans){
+  if(ans === null || ans === undefined || ans === '') return '（未填）';
+  switch(q.type){
+    case 'number-slider':
+      return `<b>${ans}</b> ${q.unit||''}`;
+    case 'pill-single':
+      return `<b>${ans}</b>`;
+    case 'pill-multi':
+      return Array.isArray(ans) ? ans.map(v=>`<b>${v}</b>`).join('、') : ans;
+    case 'text':
+    case 'textarea':
+      return ans;
+    case 'multi-num':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return q.rows.map((r,i) => `<div>${r.label}: <b>${ans[i]||0}</b> ${r.suffix||''}</div>`).join('');
+    case 'multi-range':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return q.rows.map((r,i) => {
+        const v = ans[i] || {};
+        return `<div>${r.label}: <b>${v.min||0} ~ ${v.max||0}</b> ${q.unit||''}</div>`;
+      }).join('');
+    case 'abc-tier':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return q.tiers.map((t,i) => `<div><b>${t.tier}（${t.name}）</b>: ${ans[i]||0} ${q.unit||''}</div>`).join('');
+    case 'text-multi':
+      if(!Array.isArray(ans)) return ans;
+      return ans.filter(v=>v).map(v=>`<b>${v}</b>`).join('、') || '（未填）';
+    case 'payment-stages':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return ans.map((s,i) => `<div>${i+1}. ${s.label} <b>${s.pct}%</b>${s.isAfterShip?` <span style="color:var(--warn);">（出貨後 ${s.afterDays||0} 天）</span>`:''}</div>`).join('');
+    case 'route-list':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return ans.map((r,i) => `<div>${i+1}. <b>${r.from}→${r.to}</b> · ${r.mode} · ${r.days}天 · ${r.costPct}% 貨值</div>`).join('');
+    case 'vendor-list':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return ans.map(v => `<div><b>${v.name}</b>${v.cats?.length?` （${v.cats.join('、')}）`:''}</div>`).join('') || '（未填）';
+    case 'design-stage-list':
+      if(!Array.isArray(ans)) return formatAnswer(ans);
+      return ans.map((s,i) => {
+        if(!s.enabled) return `<div style="opacity:.5;">${i+1}. <s>${s.name}</s>（不使用）</div>`;
+        let line = `<div><b>${i+1}. ${s.name}</b> · ${s.days||0} 天`;
+        if(s.refusalReasons?.length) line += ` · 退回原因：${s.refusalReasons.join('、')}`;
+        if(s.outsource) line += ` · <span style="color:var(--accent-warm);">外包 ${s.outsourceType||'?'}：${s.outsourceMin||0}-${s.outsourceMax||0} 元</span>`;
+        line += '</div>';
+        return line;
+      }).join('');
+    default:
+      return formatAnswer(ans);
+  }
 }
 
 function formatAnswer(ans){
