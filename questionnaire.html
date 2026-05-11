@@ -179,6 +179,24 @@ body{
 .range-tilde{color:var(--txt-lo);font-size:14px;}
 .range-suffix{font-size:12px;color:var(--txt-mid);font-weight:600;}
 
+/* ROUTE LIST (動態新增物流路線) */
+.route-list-grid{display:flex;flex-direction:column;gap:10px;}
+.route-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;}
+.route-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.route-card-num{font-size:11px;color:var(--txt-lo);font-weight:700;letter-spacing:.04em;}
+.route-card-remove{background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;}
+.route-card-remove:hover{color:var(--danger);background:var(--danger-soft);}
+.route-card-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.route-card-row:last-child{margin-bottom:0;}
+.route-arrow{color:var(--txt-mid);font-size:14px;}
+.route-select{background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--txt-hi);outline:none;font-family:inherit;cursor:pointer;min-width:90px;}
+.route-select:focus{border-color:var(--accent);}
+.route-num-input{background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;color:var(--txt-hi);outline:none;font-family:inherit;width:70px;text-align:center;}
+.route-num-input:focus{border-color:var(--accent);}
+.route-num-suffix{font-size:11px;color:var(--txt-mid);}
+.route-add-btn{background:transparent;border:1.5px dashed var(--border-hi);color:var(--accent-glow);padding:12px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;transition:.15s;}
+.route-add-btn:hover{border-color:var(--accent);background:var(--card);}
+
 /* VENDOR LIST (name + category pills) */
 .vendor-grid{display:flex;flex-direction:column;gap:12px;}
 .vendor-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
@@ -401,57 +419,59 @@ const DEPTS = {
   logistics: {
     emoji:'🚚', name:'物流／報關', sub:'高維 + Shawn',
     color:'#34d399',
-    intro:'物流天數＋成本佔比，影響項目交期與毛利計算。',
+    intro:'物流路線、報關方式、貨代清單 — 影響項目交期與毛利計算。',
     officialFillers:['高維','Shawn'],
     questions:[
-      {id:'2.1', type:'number-slider', vam:false, required:true,
-        text:'北京 → 台灣（海運）幾天？',
-        unit:'天', min:5, max:30, default:15},
-      {id:'2.2', type:'number-slider', vam:false, required:false,
-        text:'北京 → 台灣（空運）幾天？',
-        unit:'天', min:1, max:14, default:5},
-      {id:'2.3', type:'number-slider', vam:false, required:true,
-        text:'北京 → 曼谷 海運？',
-        unit:'天', min:5, max:30, default:18},
+      {id:'2.1', type:'route-list', vam:true, required:true,
+        text:'物流路線清單（含天數 + 成本佔比）',
+        help:'列出公司常用的路線。每條路線一行，可新增、修改、刪除。海運 / 空運 / 陸運 整合在這。',
+        fromOptions:['北京','上海','廣州','深圳','其他'],
+        toOptions:['台灣','曼谷','香港','東京（日本）','首爾（韓國）','美國','歐洲','國內城市','其他'],
+        modeOptions:['海運（一般）','海運（加急）','空運（一般）','空運（加急）','陸運','快遞'],
+        defaults:[
+          {from:'北京', to:'台灣', mode:'海運（一般）', days:15, costPct:8},
+          {from:'北京', to:'曼谷', mode:'海運（一般）', days:18, costPct:10},
+          {from:'北京', to:'香港', mode:'海運（一般）', days:7, costPct:6},
+          {from:'北京', to:'國內城市', mode:'陸運', days:5, costPct:3},
+        ]},
+      {id:'2.2', type:'pill-single', vam:true, required:true,
+        text:'跨境出口報關時，貨值通常按什麼標準報？',
+        help:'這是 Transfer Pricing 防線。系統做合併報表會看這個。',
+        options:['按 Transfer Pricing（內部約定價）','按工廠實際進價','按市場零售價打折','視客戶要求調整','其他']},
+      {id:'2.2a', type:'pill-single', vam:false, required:false,
+        text:'報關時會低報或高報嗎？',
+        help:'承接上題 — 通常為了節稅、配合客戶清關、或其他原因，會調整申報貨值嗎？',
+        options:['幾乎不會（按實申報）','偶爾配合客戶調整','常常會調整','視情況而定']},
+      {id:'2.3', type:'multi-num', vam:false, required:true,
+        text:'實體樣品寄海外版權方（單趟天數）',
+        help:'各地區單趟物流時間，沒寄過的填 0',
+        noSum:true,
+        rows:[
+          {label:'日本', default:5, suffix:'天'},
+          {label:'韓國', default:5, suffix:'天'},
+          {label:'美國', default:7, suffix:'天'},
+          {label:'歐洲', default:7, suffix:'天'},
+          {label:'東南亞', default:5, suffix:'天'},
+        ]},
       {id:'2.4', type:'number-slider', vam:false, required:false,
-        text:'北京 → 曼谷 空運？',
-        unit:'天', min:1, max:14, default:5},
-      {id:'2.5', type:'number-slider', vam:false, required:true,
-        text:'北京 → 香港？',
-        unit:'天', min:1, max:14, default:7},
-      {id:'2.6', type:'number-slider', vam:false, required:true,
-        text:'北京 → 廣州／深圳（國內）？',
-        unit:'天', min:1, max:14, default:5},
-      {id:'2.9', type:'number-slider', vam:false, required:false,
         text:'報關文件準備緩衝？',
         help:'從下單到能出關的緩衝天數',
         unit:'天', min:0, max:14, default:3},
-      {id:'2.10', type:'number-slider', vam:false, required:false,
-        text:'旺季（11-12 月）跨境物流 +幾天？',
+      {id:'2.5', type:'number-slider', vam:false, required:false,
+        text:'旺季（11-12 月）跨境物流 +幾天緩衝？',
         unit:'+天', min:0, max:21, default:5},
-      {id:'2.11', type:'number-slider', vam:true, required:true,
-        text:'跨國海運物流＋報關費佔總貨值幾 %？',
-        help:'這是吃掉毛利的隱形殺手',
-        unit:'%', min:0, max:20, default:8, step:0.5},
-      {id:'2.12', type:'number-slider', vam:true, required:true,
-        text:'跨國空運佔貨值幾 %？',
-        unit:'%', min:0, max:30, default:18, step:0.5},
-      {id:'2.13', type:'number-slider', vam:false, required:true,
-        text:'實體樣品寄海外版權方（如日本）單趟幾天？',
-        help:'送審必經之路，常被忽略',
-        unit:'天', min:1, max:14, default:5},
-      {id:'2.14', type:'number-slider', vam:false, required:false,
-        text:'跨境匯款到帳幾天？',
-        unit:'天', min:0, max:10, default:3},
-      {id:'2.15', type:'text-multi', vam:false, required:false,
-        text:'常用物流商（top 3）',
+      {id:'2.6', type:'text-multi', vam:false, required:false,
+        text:'國內物流商（top 3）',
+        help:'國內運輸的物流公司',
         count:3},
-      {id:'2.16', type:'pill-single', vam:false, required:false,
-        text:'跨境發票標示「商業價值」按哪個？',
-        options:['Transfer Pricing','實際進價','其他']},
-      {id:'2.17', type:'textarea', vam:false, required:false,
+      {id:'2.7', type:'vendor-list', vam:false, required:false,
+        text:'國際貨代（top 5）',
+        help:'跨境物流通常聯繫貨代（貨代會配合物流商＋報關行）。寫貨代名稱＋他們擅長的路線。',
+        count:5,
+        categories:['日本線','韓國線','東南亞線','歐美線','港澳台線','整櫃','散櫃']},
+      {id:'2.8', type:'textarea', vam:false, required:false,
         text:'物流／報關還有什麼系統該提醒的？',
-        placeholder:'例：某些 IP 商品需特殊報關...'},
+        placeholder:'例：某些 IP 商品需特殊報關 / 某些路線旺季要提前訂艙...'},
     ],
   },
 
@@ -696,6 +716,10 @@ const DEPTS = {
       {id:'6.11', type:'number-slider', vam:true, required:true,
         text:'跨境匯款匯費比例?',
         unit:'%', min:0, max:3, default:0.2, step:0.05},
+      {id:'6.11a', type:'number-slider', vam:false, required:false,
+        text:'跨境匯款到帳通常幾天?',
+        help:'從匯出到對方收到（含銀行作業 + 中轉行）',
+        unit:'天', min:0, max:10, default:3},
       {id:'6.12', type:'number-slider', vam:true, required:true,
         text:'香港稅率?',
         unit:'%', min:0, max:30, default:16.5, step:0.5},
@@ -1107,6 +1131,7 @@ function renderInput(q){
     case 'text-multi': return renderTextMulti(q, ans);
     case 'multi-range': return renderMultiRange(q, ans);
     case 'vendor-list': return renderVendorList(q, ans);
+    case 'route-list': return renderRouteList(q, ans);
     default: return '<div>Unknown type</div>';
   }
 }
@@ -1245,6 +1270,63 @@ window.toggleVendorCat = function(btn){
   btn.classList.toggle('selected');
 };
 
+function renderRouteList(q, ans){
+  const routes = ans || q.defaults.map(d => ({...d}));
+  // Stash routes in module state so add/remove can mutate
+  state._routes = routes;
+  state._routeQ = q;
+  return `
+    <div class="route-list-grid" id="route-list">
+      ${routes.map((r,i) => renderOneRoute(q, r, i)).join('')}
+    </div>
+    <button class="route-add-btn" style="margin-top:10px;" onclick="addRoute()">＋ 新增路線</button>
+  `;
+}
+
+function renderOneRoute(q, r, i){
+  const fromOpts = q.fromOptions.map(o => `<option value="${o}" ${r.from===o?'selected':''}>${o}</option>`).join('');
+  const toOpts = q.toOptions.map(o => `<option value="${o}" ${r.to===o?'selected':''}>${o}</option>`).join('');
+  const modeOpts = q.modeOptions.map(o => `<option value="${o}" ${r.mode===o?'selected':''}>${o}</option>`).join('');
+  return `
+    <div class="route-card" data-idx="${i}">
+      <div class="route-card-head">
+        <div class="route-card-num">路線 ${i+1}</div>
+        <button class="route-card-remove" onclick="removeRoute(${i})" title="移除這條路線">✕</button>
+      </div>
+      <div class="route-card-row">
+        <select class="route-select" onchange="updateRoute(${i},'from',this.value)">${fromOpts}</select>
+        <span class="route-arrow">→</span>
+        <select class="route-select" onchange="updateRoute(${i},'to',this.value)">${toOpts}</select>
+      </div>
+      <div class="route-card-row">
+        <select class="route-select" onchange="updateRoute(${i},'mode',this.value)" style="min-width:130px;">${modeOpts}</select>
+        <input class="route-num-input" type="number" min="0" value="${r.days}" onchange="updateRoute(${i},'days',parseFloat(this.value)||0)">
+        <span class="route-num-suffix">天</span>
+        <input class="route-num-input" type="number" min="0" step="0.5" value="${r.costPct}" onchange="updateRoute(${i},'costPct',parseFloat(this.value)||0)">
+        <span class="route-num-suffix">% 貨值</span>
+      </div>
+    </div>
+  `;
+}
+
+function reRenderRouteList(){
+  const q = state._routeQ;
+  document.getElementById('route-list').innerHTML = state._routes.map((r,i) => renderOneRoute(q, r, i)).join('');
+}
+
+window.addRoute = function(){
+  state._routes.push({from:state._routeQ.fromOptions[0], to:state._routeQ.toOptions[0], mode:state._routeQ.modeOptions[0], days:7, costPct:5});
+  reRenderRouteList();
+};
+window.removeRoute = function(i){
+  if(state._routes.length <= 1){ alert('至少要保留一條路線'); return; }
+  state._routes.splice(i,1);
+  reRenderRouteList();
+};
+window.updateRoute = function(i, field, value){
+  state._routes[i][field] = value;
+};
+
 // ═══════════════════════════════════════════════════════════════
 // INPUT EVENTS
 // ═══════════════════════════════════════════════════════════════
@@ -1320,6 +1402,9 @@ function collectAnswer(q){
         return {name, cats};
       }).filter(v => v.name);
     }
+    case 'route-list': {
+      return (state._routes || []).slice();
+    }
     default: return null;
   }
 }
@@ -1338,6 +1423,9 @@ function validateAnswer(q, ans){
   }
   if(q.type === 'vendor-list'){
     return ans.some(v => v.name && v.name.length > 0);
+  }
+  if(q.type === 'route-list'){
+    return ans.length > 0 && ans.every(r => r.days > 0);
   }
   if(Array.isArray(ans) && ans.every(v => !v || v === 0)) return false;
   return true;
@@ -1537,6 +1625,7 @@ function formatAnswer(q, ans){
     if(q.type === 'text-multi') return ans.filter(v => v).join('、') || '（未填）';
     if(q.type === 'multi-range') return q.rows.map((r,i) => `${r.label}: ${ans[i]?.min||0}-${ans[i]?.max||0} ${q.unit}`).join('；');
     if(q.type === 'vendor-list') return ans.map(v => `${v.name}${v.cats.length ? '（' + v.cats.join('/') + '）' : ''}`).join('、') || '（未填）';
+    if(q.type === 'route-list') return ans.map(r => `${r.from}→${r.to}（${r.mode}）${r.days}天/${r.costPct}%`).join('；');
     return ans.join('、');
   }
   if(typeof ans === 'number') return ans + (q.unit ? ' ' + q.unit : '');
