@@ -1211,6 +1211,9 @@ function renderVendorList(q, ans){
     <div class="vendor-grid">
       ${Array.from({length: q.count}, (_, i) => {
         const v = vals[i] || {name:'', cats:[]};
+        const otherCat = (v.cats||[]).find(c => typeof c === 'string' && c.startsWith('其他'));
+        const otherText = otherCat ? otherCat.replace(/^其他[：:]\s*/,'') : '';
+        const isOtherSel = !!otherCat;
         return `
           <div class="vendor-row" data-idx="${i}">
             <div class="vendor-row-top">
@@ -1218,10 +1221,17 @@ function renderVendorList(q, ans){
               <input class="vendor-input" type="text" value="${v.name||''}" placeholder="${i === 0 ? '例如: 深圳A廠' : '工廠名稱'}">
             </div>
             <div class="vendor-cats">
-              ${q.categories.map(cat => `
-                <button class="vendor-cat ${v.cats.includes(cat) ? 'selected' : ''}" data-val="${cat}" onclick="toggleVendorCat(this)">${cat}</button>
-              `).join('')}
+              ${q.categories.map(cat => {
+                const isSel = (cat === '其他' ? isOtherSel : v.cats.includes(cat));
+                return `<button class="vendor-cat ${isSel ? 'selected' : ''}" data-val="${cat}" onclick="toggleVendorCat(this, ${i})">${cat}</button>`;
+              }).join('')}
             </div>
+            <input class="other-input" type="text"
+              data-vendor-other="${i}"
+              value="${otherText}"
+              placeholder="請說明「其他」品類..."
+              style="margin-top:6px;font-size:11px;padding:7px 10px;display:${isOtherSel?'block':'none'};"
+              oninput="updateVendorOther(${i}, this.value)">
           </div>
         `;
       }).join('')}
@@ -1229,8 +1239,23 @@ function renderVendorList(q, ans){
   `;
 }
 
-window.toggleVendorCat = function(btn){
+window.toggleVendorCat = function(btn, rowIdx){
   btn.classList.toggle('selected');
+  if(btn.dataset.val === '其他' && rowIdx !== undefined){
+    const inp = document.querySelector(`input[data-vendor-other="${rowIdx}"]`);
+    if(inp){
+      const show = btn.classList.contains('selected');
+      inp.style.display = show ? 'block' : 'none';
+      if(show) setTimeout(()=>inp.focus(), 50);
+      else inp.value = '';
+    }
+  }
+};
+
+window.updateVendorOther = function(rowIdx, text){
+  // Store on a temp map to merge in collectAnswer
+  state._vendorOtherTexts = state._vendorOtherTexts || {};
+  state._vendorOtherTexts[rowIdx] = text;
 };
 
 function renderRouteList(q, ans){
@@ -1247,8 +1272,19 @@ function renderRouteList(q, ans){
 }
 
 function renderOneRoute(q, r, i){
-  const fromOpts = q.fromOptions.map(o => `<option value="${o}" ${r.from===o?'selected':''}>${o}</option>`).join('');
-  const toOpts = q.toOptions.map(o => `<option value="${o}" ${r.to===o?'selected':''}>${o}</option>`).join('');
+  // "其他" handling for from / to
+  const fromIsOther = typeof r.from === 'string' && r.from.startsWith('其他');
+  const fromOtherText = fromIsOther ? r.from.replace(/^其他[：:]\s*/,'') : '';
+  const toIsOther = typeof r.to === 'string' && r.to.startsWith('其他');
+  const toOtherText = toIsOther ? r.to.replace(/^其他[：:]\s*/,'') : '';
+  const fromOpts = q.fromOptions.map(o => {
+    const isSel = (o === '其他' ? fromIsOther : r.from === o);
+    return `<option value="${o}" ${isSel?'selected':''}>${o}</option>`;
+  }).join('');
+  const toOpts = q.toOptions.map(o => {
+    const isSel = (o === '其他' ? toIsOther : r.to === o);
+    return `<option value="${o}" ${isSel?'selected':''}>${o}</option>`;
+  }).join('');
   const modeOpts = q.modeOptions.map(o => `<option value="${o}" ${r.mode===o?'selected':''}>${o}</option>`).join('');
   return `
     <div class="route-card" data-idx="${i}">
@@ -1257,9 +1293,11 @@ function renderOneRoute(q, r, i){
         <button class="route-card-remove" onclick="removeRoute(${i})" title="移除這條路線">✕</button>
       </div>
       <div class="route-card-row">
-        <select class="route-select" onchange="updateRoute(${i},'from',this.value)">${fromOpts}</select>
+        <select class="route-select" onchange="updateRouteSelect(${i},'from',this.value)">${fromOpts}</select>
+        <input class="other-input" type="text" data-route-from-other="${i}" value="${fromOtherText}" placeholder="出發地" style="width:120px;font-size:12px;padding:6px 10px;display:${fromIsOther?'inline-block':'none'};" oninput="updateRouteOther(${i},'from',this.value)">
         <span class="route-arrow">→</span>
-        <select class="route-select" onchange="updateRoute(${i},'to',this.value)">${toOpts}</select>
+        <select class="route-select" onchange="updateRouteSelect(${i},'to',this.value)">${toOpts}</select>
+        <input class="other-input" type="text" data-route-to-other="${i}" value="${toOtherText}" placeholder="到達地" style="width:120px;font-size:12px;padding:6px 10px;display:${toIsOther?'inline-block':'none'};" oninput="updateRouteOther(${i},'to',this.value)">
       </div>
       <div class="route-card-row">
         <select class="route-select" onchange="updateRoute(${i},'mode',this.value)" style="min-width:130px;">${modeOpts}</select>
@@ -1271,6 +1309,20 @@ function renderOneRoute(q, r, i){
     </div>
   `;
 }
+
+window.updateRouteSelect = function(i, field, value){
+  state._routes[i][field] = value;
+  const inp = document.querySelector(`input[data-route-${field}-other="${i}"]`);
+  if(inp){
+    const isOther = value === '其他';
+    inp.style.display = isOther ? 'inline-block' : 'none';
+    if(isOther) setTimeout(()=>inp.focus(), 50);
+    else inp.value = '';
+  }
+};
+window.updateRouteOther = function(i, field, text){
+  state._routes[i][field] = text ? `其他：${text}` : '其他';
+};
 
 function reRenderRouteList(){
   const q = state._routeQ;
@@ -1371,10 +1423,21 @@ function renderDesignStageList(q, ans){
 }
 
 function renderOneStageCard(q, s, i){
-  const refusalPills = q.refusalOptions.map(opt => `
-    <button class="stage-pill ${s.refusalReasons.includes(opt) ? 'selected' : ''}" onclick="toggleRefusal(${i}, '${opt}')">${opt}</button>
-  `).join('');
-  const outsourceTypeOpts = q.outsourceTypeOptions.map(opt => `<option value="${opt}" ${s.outsourceType === opt ? 'selected' : ''}>${opt}</option>`).join('');
+  // 處理「其他」refusal 的展開：state.refusalReasons 內若有「其他：xxx」字串視為選中
+  const refusalOtherItem = (s.refusalReasons||[]).find(v => typeof v === 'string' && v.startsWith('其他'));
+  const refusalOtherText = refusalOtherItem ? (refusalOtherItem.replace(/^其他[：:]\s*/,'') || '') : '';
+  const refusalOtherSelected = !!refusalOtherItem;
+  const refusalPills = q.refusalOptions.map(opt => {
+    const isSel = (opt === '其他' ? refusalOtherSelected : (s.refusalReasons||[]).includes(opt));
+    return `<button class="stage-pill ${isSel ? 'selected' : ''}" onclick="toggleRefusal(${i}, '${opt}', this)">${opt}</button>`;
+  }).join('');
+  // 處理外包類型「其他」
+  const outsourceTypeIsOther = typeof s.outsourceType === 'string' && s.outsourceType.startsWith('其他');
+  const outsourceOtherText = outsourceTypeIsOther ? s.outsourceType.replace(/^其他[：:]\s*/,'') : '';
+  const outsourceTypeOpts = q.outsourceTypeOptions.map(opt => {
+    const isSel = (opt === '其他' ? outsourceTypeIsOther : s.outsourceType === opt);
+    return `<option value="${opt}" ${isSel ? 'selected' : ''}>${opt}</option>`;
+  }).join('');
   return `
     <div class="stage-card ${s.enabled?'open':'disabled'}" data-idx="${i}">
       <div class="stage-head" onclick="event.target.closest('.stage-card').classList.toggle('open')">
@@ -1395,7 +1458,15 @@ function renderOneStageCard(q, s, i){
         </div>
         <div class="stage-row" style="align-items:flex-start;">
           <span class="stage-row-label" style="margin-top:6px;">退回常見原因</span>
-          <div class="stage-pills">${refusalPills}</div>
+          <div style="flex:1;">
+            <div class="stage-pills">${refusalPills}</div>
+            <input class="other-input" type="text"
+              data-stage-refusal-other="${i}"
+              value="${refusalOtherText}"
+              placeholder="請說明你選的「其他」退回原因..."
+              style="margin-top:8px;display:${refusalOtherSelected?'block':'none'};font-size:12px;padding:8px 12px;"
+              oninput="updateStageRefusalOther(${i}, this.value)">
+          </div>
         </div>
         <div class="stage-outsource-row">
           <label class="stage-outsource-check">
@@ -1406,10 +1477,16 @@ function renderOneStageCard(q, s, i){
         <div class="stage-outsource-detail ${s.outsource?'show':''}">
           <div class="stage-row">
             <span class="stage-row-label">外包類型</span>
-            <select class="route-select" style="min-width:140px;" onchange="updateDesignStage(${i},'outsourceType',this.value)">
+            <select class="route-select" style="min-width:140px;" onchange="updateStageOutsourceType(${i}, this.value)">
               <option value="">選擇...</option>${outsourceTypeOpts}
             </select>
           </div>
+          <input class="other-input" type="text"
+            data-stage-outsource-other="${i}"
+            value="${outsourceOtherText}"
+            placeholder="請說明「其他」外包類型..."
+            style="display:${outsourceTypeIsOther?'block':'none'};font-size:12px;padding:8px 12px;margin-top:-2px;"
+            oninput="updateStageOutsourceTypeOther(${i}, this.value)">
           <div class="stage-row">
             <span class="stage-row-label">外包報價</span>
             <input class="range-input" type="number" min="0" value="${s.outsourceMin}" onchange="updateDesignStage(${i},'outsourceMin',parseFloat(this.value)||0)">
@@ -1439,13 +1516,51 @@ window.toggleStageEnabled = function(i, checked){
 window.updateDesignStage = function(i, field, value){
   state._designStages[i][field] = value;
 };
-window.toggleRefusal = function(i, opt){
+window.toggleRefusal = function(i, opt, btn){
   const arr = state._designStages[i].refusalReasons;
-  const idx = arr.indexOf(opt);
-  if(idx > -1) arr.splice(idx,1);
-  else arr.push(opt);
-  // Toggle pill visual without re-render
-  event.target.classList.toggle('selected');
+  if(opt === '其他'){
+    // Find existing 「其他」item (might be 「其他：xxx」)
+    const otherIdx = arr.findIndex(v => typeof v === 'string' && v.startsWith('其他'));
+    if(otherIdx > -1){
+      arr.splice(otherIdx, 1);
+      btn?.classList.remove('selected');
+      // Hide input
+      const inp = document.querySelector(`input[data-stage-refusal-other="${i}"]`);
+      if(inp){ inp.style.display = 'none'; inp.value = ''; }
+    }else{
+      arr.push('其他');
+      btn?.classList.add('selected');
+      const inp = document.querySelector(`input[data-stage-refusal-other="${i}"]`);
+      if(inp){ inp.style.display = 'block'; setTimeout(()=>inp.focus(), 50); }
+    }
+  }else{
+    const idx = arr.indexOf(opt);
+    if(idx > -1) arr.splice(idx,1);
+    else arr.push(opt);
+    btn?.classList.toggle('selected');
+  }
+};
+
+window.updateStageRefusalOther = function(i, text){
+  const arr = state._designStages[i].refusalReasons;
+  const otherIdx = arr.findIndex(v => typeof v === 'string' && v.startsWith('其他'));
+  const newVal = text ? `其他：${text}` : '其他';
+  if(otherIdx > -1) arr[otherIdx] = newVal;
+  else arr.push(newVal);
+};
+
+window.updateStageOutsourceType = function(i, val){
+  state._designStages[i].outsourceType = val;
+  const otherInput = document.querySelector(`input[data-stage-outsource-other="${i}"]`);
+  if(otherInput){
+    const isOther = val === '其他';
+    otherInput.style.display = isOther ? 'block' : 'none';
+    if(isOther) setTimeout(()=>otherInput.focus(), 50);
+  }
+};
+
+window.updateStageOutsourceTypeOther = function(i, text){
+  state._designStages[i].outsourceType = text ? `其他：${text}` : '其他';
 };
 window.toggleOutsource = function(i, checked){
   state._designStages[i].outsource = checked;
@@ -1566,9 +1681,16 @@ function collectAnswer(q){
     }
     case 'vendor-list': {
       const rows = document.querySelectorAll('.vendor-row');
-      return Array.from(rows).map(row => {
+      const otherTexts = state._vendorOtherTexts || {};
+      return Array.from(rows).map((row, i) => {
         const name = row.querySelector('.vendor-input').value.trim();
-        const cats = Array.from(row.querySelectorAll('.vendor-cat.selected')).map(c => c.dataset.val);
+        const cats = Array.from(row.querySelectorAll('.vendor-cat.selected')).map(c => {
+          if(c.dataset.val === '其他'){
+            const t = (otherTexts[i] || row.querySelector(`input[data-vendor-other="${i}"]`)?.value || '').trim();
+            return t ? `其他：${t}` : '其他';
+          }
+          return c.dataset.val;
+        });
         return {name, cats};
       }).filter(v => v.name);
     }
