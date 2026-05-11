@@ -786,10 +786,14 @@ function loadFillerState(filler){
 }
 
 function getFillerStatus(dept, filler){
-  // Check submissions first
+  // 1. Cloud (Stage 2)：飛書是否有 submission
+  if(_cloudSubmissions){
+    if(_cloudSubmissions.some(s => s.dept === dept && s.filler === filler)) return 'done';
+  }
+  // 2. Local submission backup
   const subs = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
   if(subs.some(s => s.dept === dept && s.filler === filler)) return 'done';
-  // Check in-progress
+  // 3. In-progress (local only)
   const progress = localStorage.getItem(STORAGE_KEY_PREFIX + dept + '_' + filler);
   if(progress){
     try{
@@ -814,24 +818,42 @@ function getFillerProgress(dept, filler){
 // INIT
 // ═══════════════════════════════════════════════════════════════
 
-function init(){
+async function init(){
   const params = new URLSearchParams(location.search);
-  // ?reset=all — admin 清掉本機所有試填資料（給 Ray 用）
+  // ?reset=all — 清本機 + 雲端所有試填資料（給 Ray 用）
   if(params.get('reset') === 'all'){
+    if(!confirm('⚠️ 這會清掉：\n1. 本機所有試填資料\n2. 飛書「系統常數設定」表的所有 submission\n\n確定要清嗎？此操作不可復原。')){
+      location.replace(location.pathname);
+      return;
+    }
+    // 1. Local
     const keys = [];
     for(let i=0; i<localStorage.length; i++){
       const k = localStorage.key(i);
       if(k && (k.startsWith('wujie_q_') || k === 'wujie_contracts_v1')) keys.push(k);
     }
     keys.forEach(k => localStorage.removeItem(k));
-    alert(`✓ 已清掉本機 ${keys.length} 筆試填資料（含問卷進度／提交記錄／合約清單）。`);
-    // Remove reset param and reload
+    // 2. Cloud — delete all submission records
+    let cloudDeleted = 0;
+    try{
+      const tk = await feishuToken();
+      const url = `${FEISHU.PROXY}/open-apis/bitable/v1/apps/${FEISHU.AT}/tables/${FEISHU.CONSTANTS_TBL}/records?page_size=200`;
+      const r = await fetch(url, {headers:{'Authorization':'Bearer '+tk}});
+      const d = await r.json();
+      const ids = (d.data?.items || []).map(rec => rec.record_id);
+      // batch delete (max 500 per call but our scale tiny)
+      if(ids.length){
+        const batchUrl = `${FEISHU.PROXY}/open-apis/bitable/v1/apps/${FEISHU.AT}/tables/${FEISHU.CONSTANTS_TBL}/records/batch_delete`;
+        await fetch(batchUrl, {method:'POST', headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'}, body:JSON.stringify({records:ids})});
+        cloudDeleted = ids.length;
+      }
+    }catch(e){ console.warn('cloud reset fail', e); }
+    alert(`✓ 已清：\n- 本機 ${keys.length} 筆\n- 雲端 ${cloudDeleted} 筆 submission`);
     location.replace(location.pathname);
     return;
   }
   const dept = params.get('dept');
   if(dept && DEPTS[dept]) state.dept = dept;
-  // Don't pre-load filler state — wait for user to pick filler
   renderStart();
 }
 
@@ -841,9 +863,15 @@ function updateTopbarDept(){
   document.getElementById('topbar-dept-name').textContent = d.name + ' 問卷';
 }
 
-function renderStart(){
+async function renderStart(){
   const d = DEPTS[state.dept];
   updateTopbarDept();
+  // Fetch cloud submissions first so status badges show real cross-device state
+  await feishuFetchSubmissions();
+  _renderStartUI(d);
+}
+
+function _renderStartUI(d){
   document.getElementById('start-emoji').textContent = d.emoji;
   document.getElementById('start-title').textContent = d.name + '（' + d.sub + '）';
   document.getElementById('start-subtitle').textContent = d.intro;
@@ -1967,28 +1995,110 @@ function editQuestion(i){
 // SUBMIT
 // ═══════════════════════════════════════════════════════════════
 
-function submitAll(){
+// ═══════════════════════════════════════════════════════════════
+// FEISHU BACKEND (Stage 2)
+// ═══════════════════════════════════════════════════════════════
+
+const FEISHU = {
+  PROXY: 'https://feishu-proxy.raychou6913.workers.dev',
+  AT: 'Sg7ObNELHaAdZzshGIFjWPVhpce',
+  CONSTANTS_TBL: 'tbljwhJpTHxdpqLI', // 系統常數設定表
+};
+// Map dept key → 飛書 SingleSelect value
+const DEPT_FEISHU_NAME = {
+  procurement: '採購', logistics: '物流', sales: '業務',
+  shawn: 'COO 整合', design: '設計企劃',
+};
+const FEISHU_NAME_TO_DEPT = Object.fromEntries(Object.entries(DEPT_FEISHU_NAME).map(([k,v])=>[v,k]));
+
+async function feishuToken(){
+  const r = await fetch(FEISHU.PROXY+'/auth/token', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+  return (await r.json()).tenant_access_token;
+}
+
+async function feishuSubmit(submission){
+  const tk = await feishuToken();
+  const url = `${FEISHU.PROXY}/open-apis/bitable/v1/apps/${FEISHU.AT}/tables/${FEISHU.CONSTANTS_TBL}/records`;
+  const d = DEPTS[submission.dept];
+  const body = {
+    fields: {
+      '部門': DEPT_FEISHU_NAME[submission.dept] || submission.dept,
+      '填寫人': submission.filler,
+      '填寫人身份': submission.fillerRole === 'official' ? '指定填寫人' : '跨部門補充',
+      '提交時間': new Date(submission.submittedAt).getTime(),
+      '答案 JSON': JSON.stringify(submission.answers || {}),
+      '反饋 JSON': JSON.stringify(submission.feedback || {}),
+      '狀態': '待 Ray review',
+    }
+  };
+  const r = await fetch(url, {method:'POST', headers:{'Authorization':'Bearer '+tk, 'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  return await r.json();
+}
+
+let _cloudSubmissions = null;
+let _cloudCacheTime = 0;
+async function feishuFetchSubmissions(force){
+  if(!force && _cloudSubmissions && Date.now() - _cloudCacheTime < 15000) return _cloudSubmissions;
+  try{
+    const tk = await feishuToken();
+    const url = `${FEISHU.PROXY}/open-apis/bitable/v1/apps/${FEISHU.AT}/tables/${FEISHU.CONSTANTS_TBL}/records?page_size=200`;
+    const r = await fetch(url, {headers:{'Authorization':'Bearer '+tk}});
+    const d = await r.json();
+    _cloudSubmissions = (d.data?.items || []).map(rec => ({
+      record_id: rec.record_id,
+      dept: FEISHU_NAME_TO_DEPT[rec.fields['部門']] || rec.fields['部門'],
+      filler: rec.fields['填寫人'],
+      submittedAt: rec.fields['提交時間'],
+    }));
+    _cloudCacheTime = Date.now();
+  }catch(e){ console.warn('feishu fetch fail', e); if(!_cloudSubmissions) _cloudSubmissions = []; }
+  return _cloudSubmissions;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════════════
+
+async function submitAll(){
+  const submitBtn = document.querySelector('#screen-review .btn-primary');
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = '送出中... ⏳'; submitBtn.style.opacity = '.6'; }
+
   const d = DEPTS[state.dept];
   const submission = {
     dept: state.dept,
     deptName: d.name,
     filler: state.filler,
-    fillerRole: state.fillerRole, // 'official' | 'guest'
+    fillerRole: state.fillerRole,
     submittedAt: new Date().toISOString(),
     answers: state.answers,
     feedback: state.feedback,
   };
-  // Stage 1: localStorage only
+
+  // localStorage backup
   const allSubmissions = JSON.parse(localStorage.getItem('wujie_q_submissions')||'[]');
   allSubmissions.push(submission);
   localStorage.setItem('wujie_q_submissions', JSON.stringify(allSubmissions));
 
-  // Clear in-progress
-  localStorage.removeItem(getStorageKey());
+  // POST to feishu (Stage 2)
+  let cloudOk = false;
+  try{
+    const resp = await feishuSubmit(submission);
+    cloudOk = (resp.code === 0);
+    if(!cloudOk) console.warn('feishu submit code:', resp);
+  }catch(e){ console.warn('feishu submit error', e); }
 
-  console.log('Submitted:', submission);
+  // Clear in-progress (only this filler's)
+  localStorage.removeItem(getStorageKey());
+  // Invalidate cloud cache so next status check re-fetches
+  _cloudSubmissions = null;
+
   goToScreen('thank');
   document.getElementById('progress-text').textContent = '';
+  // Update thank screen msg if cloud failed
+  if(!cloudOk){
+    const sub = document.querySelector('#screen-thank .thank-sub');
+    if(sub) sub.innerHTML = '答案已存本機，雲端同步暫時失敗。<br>請通知 Ray／MJ 確認連線。';
+  }
 }
 
 window.clearMyOwnData = function(){
