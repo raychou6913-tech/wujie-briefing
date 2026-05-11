@@ -44,6 +44,8 @@ body{
 .brand-text{font-size:14px;font-weight:700;}
 .brand-sub{font-size:9px;color:var(--txt-lo);letter-spacing:.08em;text-transform:uppercase;}
 .progress-text{font-size:11px;color:var(--txt-mid);font-weight:600;}
+.topbar-dept{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:700;color:var(--txt-hi);}
+.topbar-dept-emoji{font-size:14px;}
 
 /* PROGRESS BAR */
 .progress-bar{height:3px;background:var(--card);overflow:hidden;}
@@ -179,6 +181,35 @@ body{
 .range-tilde{color:var(--txt-lo);font-size:14px;}
 .range-suffix{font-size:12px;color:var(--txt-mid);font-weight:600;}
 
+/* DESIGN STAGE LIST (設計階段每階段含天數/退回原因/外包) */
+.stage-list{display:flex;flex-direction:column;gap:10px;}
+.stage-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.stage-card.disabled{opacity:.45;}
+.stage-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
+.stage-head-num{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--accent-warm));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.stage-card.disabled .stage-head-num{background:var(--card-2);color:var(--txt-lo);}
+.stage-name-input{background:transparent;border:none;color:var(--txt-hi);font-size:14px;font-weight:700;outline:none;flex:1;min-width:0;font-family:inherit;}
+.stage-name-input:focus{border-bottom:1px solid var(--accent);}
+.stage-toggle{font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;}
+.stage-remove{background:none;border:none;color:var(--txt-lo);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;}
+.stage-remove:hover{color:var(--danger);background:var(--danger-soft);}
+.stage-collapse-icon{font-size:12px;color:var(--txt-mid);transition:transform .2s;}
+.stage-card.open .stage-collapse-icon{transform:rotate(90deg);}
+.stage-body{display:none;padding:0 14px 14px;}
+.stage-card.open .stage-body{display:block;}
+.stage-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.stage-row-label{font-size:11px;color:var(--txt-mid);font-weight:700;letter-spacing:.04em;min-width:80px;}
+.stage-days-input{background:var(--card-2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:14px;font-weight:700;color:var(--txt-hi);outline:none;width:70px;text-align:center;font-family:inherit;}
+.stage-days-input:focus{border-color:var(--accent);}
+.stage-pills{display:flex;flex-wrap:wrap;gap:5px;flex:1;min-width:0;}
+.stage-pill{font-size:10px;font-weight:600;padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;font-family:inherit;}
+.stage-pill:hover{border-color:var(--accent);color:var(--accent-glow);}
+.stage-pill.selected{background:var(--accent);border-color:var(--accent);color:#fff;}
+.stage-outsource-row{display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px dashed var(--border);}
+.stage-outsource-check{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt-mid);cursor:pointer;}
+.stage-outsource-detail{display:none;flex-direction:column;gap:8px;margin-top:10px;padding:10px;background:var(--card-2);border-radius:8px;}
+.stage-outsource-detail.show{display:flex;}
+
 /* PAYMENT STAGES (動態增減付款階段) */
 .pay-grid{display:flex;flex-direction:column;gap:10px;}
 .pay-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
@@ -244,7 +275,10 @@ body{
       <div class="brand-sub">經驗收集</div>
     </div>
   </div>
-  <div class="progress-text" id="progress-text"></div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="topbar-dept" id="topbar-dept"><span class="topbar-dept-emoji">📋</span><span id="topbar-dept-name">經驗收集</span></div>
+    <div class="progress-text" id="progress-text"></div>
+  </div>
 </div>
 
 <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
@@ -634,79 +668,42 @@ const DEPTS = {
   design: {
     emoji:'🎨', name:'設計／企劃', sub:'Bevis + 珮玲 + 詩彤',
     color:'#ec4899',
-    intro:'設計時長／送審輪數／外包報價 — 影響項目交期與設計預算。',
+    intro:'產品設計流水線 — 每階段的天數、退回原因、外包設定全部綁定到該階段。',
     officialFillers:['Bevis','珮玲','詩彤'],
     questions:[
-      {id:'5.1', type:'pill-single', vam:false, required:true,
-        text:'PVC 公仔 草圖→定稿 平均幾輪?',
-        options:['2 輪','3 輪','4 輪','5+ 輪']},
-      {id:'5.2', type:'number-slider', vam:false, required:true,
-        text:'PVC 公仔 每輪平均幾天?',
-        unit:'天', min:3, max:14, default:5},
-      {id:'5.3', type:'pill-single', vam:false, required:false,
-        text:'文創周邊（壓克力／文具）幾輪?',
-        options:['2 輪','3 輪','4 輪','5+ 輪']},
-      {id:'5.4', type:'number-slider', vam:false, required:false,
-        text:'文創周邊每輪幾天?',
-        unit:'天', min:0, max:14, default:3},
-      {id:'5.5', type:'number-slider', vam:false, required:false,
-        text:'包裝設計平均幾天?',
-        unit:'天', min:0, max:30, default:7},
-      {id:'5.6', type:'pill-multi', vam:false, required:false,
-        text:'送審被退回最常見原因?',
-        options:['顏色','造型','文字','授權範圍','規格','其他']},
-      {id:'5.7', type:'pill-single', vam:false, required:false,
-        text:'修改一輪平均工時?',
-        options:['4 小時內','1 天','2-3 天','1 週+']},
-      {id:'5.8', type:'number-slider', vam:false, required:true,
-        text:'外包設計 % 案件?',
-        unit:'%', min:0, max:100, default:30},
-      {id:'5.9', type:'text-multi', vam:false, required:false,
-        text:'常用外包工作室（top 3）',
-        count:3},
-      {id:'5.10', type:'multi-range', vam:true, required:true,
-        text:'PVC 公仔 2D 外包報價（依產品類型）',
-        help:'同樣以「售價 69 元盲盒」為基準回推每款設計費區間。沒做過的填 0。',
-        unit:'元 RMB',
-        rows:[
-          {label:'6+1 款盲盒 · 每款 2D', minDefault:5000, maxDefault:10000},
-          {label:'9+1 款盲盒 · 每款 2D', minDefault:5000, maxDefault:10000},
-          {label:'12+1 款盲盒 · 每款 2D', minDefault:5000, maxDefault:10000},
-          {label:'5cm 以下小公仔 · 每款 2D', minDefault:3000, maxDefault:6000},
+      {id:'5.1', type:'design-stage-list', vam:true, required:true,
+        text:'產品設計流水線階段',
+        help:'每個階段獨立設定：天數 / 退回常見原因 / 是否需外包 / 外包報價類型。預設 7 階段，可勾選「不需要」、改名、新增。',
+        refusalOptions:['創意方向不對','顏色不符','造型不符','文字／文案','授權範圍','規格／尺寸','其他'],
+        outsourceTypeOptions:['平面 2D 設計','2D 手繪／插畫','3D 建模','文案／企劃','其他'],
+        defaults:[
+          {name:'概念提案 / IP 選品', enabled:true, days:5,
+           refusalReasons:['創意方向不對'], outsource:false,
+           outsourceType:'', outsourceMin:0, outsourceMax:0},
+          {name:'草圖 sketch', enabled:true, days:3,
+           refusalReasons:['創意方向不對','造型不符'], outsource:false,
+           outsourceType:'', outsourceMin:0, outsourceMax:0},
+          {name:'平面 2D 設計', enabled:true, days:7,
+           refusalReasons:['顏色不符','造型不符','文字／文案'], outsource:true,
+           outsourceType:'平面 2D 設計', outsourceMin:5000, outsourceMax:12000},
+          {name:'3D 建模', enabled:true, days:10,
+           refusalReasons:['造型不符','規格／尺寸'], outsource:true,
+           outsourceType:'3D 建模', outsourceMin:10000, outsourceMax:25000},
+          {name:'打樣樣品（PVC 素胚 + 上色）', enabled:true, days:14,
+           refusalReasons:['顏色不符','造型不符','規格／尺寸'], outsource:false,
+           outsourceType:'', outsourceMin:0, outsourceMax:0},
+          {name:'送審（版權方）', enabled:true, days:14,
+           refusalReasons:['顏色不符','造型不符','授權範圍'], outsource:false,
+           outsourceType:'', outsourceMin:0, outsourceMax:0},
+          {name:'定稿 / 量產前審核', enabled:true, days:3,
+           refusalReasons:[], outsource:false,
+           outsourceType:'', outsourceMin:0, outsourceMax:0},
         ]},
-      {id:'5.11', type:'multi-range', vam:true, required:true,
-        text:'PVC 3D 建模外包報價（依產品類型）',
-        help:'每款 3D 建模費區間',
-        unit:'元 RMB',
-        rows:[
-          {label:'6+1 款盲盒 · 每款 3D', minDefault:10000, maxDefault:20000},
-          {label:'9+1 款盲盒 · 每款 3D', minDefault:10000, maxDefault:20000},
-          {label:'12+1 款盲盒 · 每款 3D', minDefault:10000, maxDefault:20000},
-          {label:'5cm 以下小公仔 · 每款 3D', minDefault:6000, maxDefault:12000},
-        ]},
-      {id:'5.12', type:'multi-range', vam:false, required:false,
-        text:'包裝設計外包報價',
-        help:'依包裝類型給區間',
-        unit:'元 RMB',
-        rows:[
-          {label:'盲盒外盒設計（含展示盒）', minDefault:8000, maxDefault:18000},
-          {label:'單品包裝（吊卡／盒裝）', minDefault:3000, maxDefault:8000},
-          {label:'紙袋／提袋設計', minDefault:2000, maxDefault:5000},
-        ]},
-      {id:'5.13', type:'multi-range', vam:false, required:false,
-        text:'平面 KV／宣傳物外包報價',
-        unit:'元 RMB',
-        rows:[
-          {label:'主視覺 KV（一套）', minDefault:6000, maxDefault:15000},
-          {label:'快閃店宣傳物全套', minDefault:8000, maxDefault:20000},
-          {label:'單張海報／DM', minDefault:1500, maxDefault:4000},
-        ]},
-      {id:'5.14', type:'number-slider', vam:false, required:false,
-        text:'同時可以 handle 幾個項目？',
-        unit:'個', min:1, max:10, default:3},
-      {id:'5.15', type:'textarea', vam:false, required:false,
-        text:'設計流程盲點／最常卡的環節?',
-        placeholder:'例：等版權方回覆最久...'},
+
+      {id:'5.2', type:'textarea', vam:false, required:false,
+        text:'設計流程盲點／流水線之外還有什麼？',
+        help:'選填。例如：等版權方回覆最久、某類產品額外需求、跨部門協作的卡點...',
+        placeholder:'選填'},
     ],
   },
 
@@ -975,8 +972,15 @@ function init(){
   renderStart();
 }
 
+function updateTopbarDept(){
+  const d = DEPTS[state.dept];
+  document.querySelector('#topbar-dept .topbar-dept-emoji').textContent = d.emoji;
+  document.getElementById('topbar-dept-name').textContent = d.name + ' 問卷';
+}
+
 function renderStart(){
   const d = DEPTS[state.dept];
+  updateTopbarDept();
   document.getElementById('start-emoji').textContent = d.emoji;
   document.getElementById('start-title').textContent = d.name + '（' + d.sub + '）';
   document.getElementById('start-subtitle').textContent = d.intro;
@@ -1192,6 +1196,7 @@ function renderInput(q){
     case 'vendor-list': return renderVendorList(q, ans);
     case 'route-list': return renderRouteList(q, ans);
     case 'payment-stages': return renderPaymentStages(q, ans);
+    case 'design-stage-list': return renderDesignStageList(q, ans);
     default: return '<div>Unknown type</div>';
   }
 }
@@ -1455,6 +1460,116 @@ window.toggleAfterShip = function(i, checked){
   reRenderStages();
 };
 
+function renderDesignStageList(q, ans){
+  const stages = ans || q.defaults.map(d => ({...d, refusalReasons: [...(d.refusalReasons||[])]}));
+  state._designStages = stages;
+  state._designQ = q;
+  return `
+    <div class="stage-list" id="stage-list">
+      ${stages.map((s,i) => renderOneStageCard(q, s, i)).join('')}
+    </div>
+    <button class="route-add-btn" style="margin-top:10px;" onclick="addDesignStage()">＋ 新增設計階段</button>
+  `;
+}
+
+function renderOneStageCard(q, s, i){
+  const refusalPills = q.refusalOptions.map(opt => `
+    <button class="stage-pill ${s.refusalReasons.includes(opt) ? 'selected' : ''}" onclick="toggleRefusal(${i}, '${opt}')">${opt}</button>
+  `).join('');
+  const outsourceTypeOpts = q.outsourceTypeOptions.map(opt => `<option value="${opt}" ${s.outsourceType === opt ? 'selected' : ''}>${opt}</option>`).join('');
+  return `
+    <div class="stage-card ${s.enabled?'open':'disabled'}" data-idx="${i}">
+      <div class="stage-head" onclick="event.target.closest('.stage-card').classList.toggle('open')">
+        <span class="stage-collapse-icon">▶</span>
+        <div class="stage-head-num">${i+1}</div>
+        <input class="stage-name-input" value="${s.name}" onclick="event.stopPropagation()" onchange="updateDesignStage(${i},'name',this.value)">
+        <label class="stage-toggle" onclick="event.stopPropagation()">
+          <input type="checkbox" ${s.enabled?'checked':''} onchange="toggleStageEnabled(${i},this.checked)">
+          使用
+        </label>
+        <button class="stage-remove" onclick="event.stopPropagation();removeDesignStage(${i})" title="移除階段">✕</button>
+      </div>
+      <div class="stage-body">
+        <div class="stage-row">
+          <span class="stage-row-label">所需天數</span>
+          <input class="stage-days-input" type="number" min="0" value="${s.days}" onchange="updateDesignStage(${i},'days',parseFloat(this.value)||0)">
+          <span style="font-size:12px;color:var(--txt-mid);">天</span>
+        </div>
+        <div class="stage-row" style="align-items:flex-start;">
+          <span class="stage-row-label" style="margin-top:6px;">退回常見原因</span>
+          <div class="stage-pills">${refusalPills}</div>
+        </div>
+        <div class="stage-outsource-row">
+          <label class="stage-outsource-check">
+            <input type="checkbox" ${s.outsource?'checked':''} onchange="toggleOutsource(${i},this.checked)">
+            <span>此階段需外包</span>
+          </label>
+        </div>
+        <div class="stage-outsource-detail ${s.outsource?'show':''}">
+          <div class="stage-row">
+            <span class="stage-row-label">外包類型</span>
+            <select class="route-select" style="min-width:140px;" onchange="updateDesignStage(${i},'outsourceType',this.value)">
+              <option value="">選擇...</option>${outsourceTypeOpts}
+            </select>
+          </div>
+          <div class="stage-row">
+            <span class="stage-row-label">外包報價</span>
+            <input class="range-input" type="number" min="0" value="${s.outsourceMin}" onchange="updateDesignStage(${i},'outsourceMin',parseFloat(this.value)||0)">
+            <span class="range-tilde">~</span>
+            <input class="range-input" type="number" min="0" value="${s.outsourceMax}" onchange="updateDesignStage(${i},'outsourceMax',parseFloat(this.value)||0)">
+            <span class="range-suffix">元 RMB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function reRenderDesignStages(){
+  const q = state._designQ;
+  document.getElementById('stage-list').innerHTML = state._designStages.map((s,i) => renderOneStageCard(q,s,i)).join('');
+}
+
+window.toggleStageEnabled = function(i, checked){
+  state._designStages[i].enabled = checked;
+  const card = document.querySelector(`.stage-card[data-idx="${i}"]`);
+  if(card){
+    card.classList.toggle('disabled', !checked);
+    if(!checked) card.classList.remove('open');
+  }
+};
+window.updateDesignStage = function(i, field, value){
+  state._designStages[i][field] = value;
+};
+window.toggleRefusal = function(i, opt){
+  const arr = state._designStages[i].refusalReasons;
+  const idx = arr.indexOf(opt);
+  if(idx > -1) arr.splice(idx,1);
+  else arr.push(opt);
+  // Toggle pill visual without re-render
+  event.target.classList.toggle('selected');
+};
+window.toggleOutsource = function(i, checked){
+  state._designStages[i].outsource = checked;
+  const card = document.querySelector(`.stage-card[data-idx="${i}"]`);
+  const detail = card?.querySelector('.stage-outsource-detail');
+  if(detail) detail.classList.toggle('show', checked);
+};
+window.addDesignStage = function(){
+  state._designStages.push({
+    name:'新階段', enabled:true, days:5,
+    refusalReasons:[], outsource:false,
+    outsourceType:'', outsourceMin:0, outsourceMax:0,
+  });
+  reRenderDesignStages();
+};
+window.removeDesignStage = function(i){
+  if(state._designStages.length <= 1){ alert('至少要保留一個階段'); return; }
+  if(!confirm('確定要移除這個階段？')) return;
+  state._designStages.splice(i,1);
+  reRenderDesignStages();
+};
+
 // ═══════════════════════════════════════════════════════════════
 // INPUT EVENTS
 // ═══════════════════════════════════════════════════════════════
@@ -1539,6 +1654,9 @@ function collectAnswer(q){
     case 'payment-stages': {
       return (state._paymentStages || []).slice();
     }
+    case 'design-stage-list': {
+      return (state._designStages || []).slice();
+    }
     default: return null;
   }
 }
@@ -1565,6 +1683,9 @@ function validateAnswer(q, ans){
     if(!ans.length) return false;
     const sum = ans.reduce((s,x) => s + (x.pct||0), 0);
     return Math.abs(sum - 100) < 0.1;
+  }
+  if(q.type === 'design-stage-list'){
+    return ans.some(s => s.enabled && s.days > 0);
   }
   if(Array.isArray(ans) && ans.every(v => !v || v === 0)) return false;
   return true;
@@ -1766,6 +1887,7 @@ function formatAnswer(q, ans){
     if(q.type === 'vendor-list') return ans.map(v => `${v.name}${v.cats.length ? '（' + v.cats.join('/') + '）' : ''}`).join('、') || '（未填）';
     if(q.type === 'route-list') return ans.map(r => `${r.from}→${r.to}（${r.mode}）${r.days}天/${r.costPct}%`).join('；');
     if(q.type === 'payment-stages') return ans.map(s => `${s.label} ${s.pct}%${s.isAfterShip ? `（出貨後 ${s.afterDays||0} 天）` : ''}`).join(' · ');
+    if(q.type === 'design-stage-list') return ans.filter(s => s.enabled).map(s => `${s.name}（${s.days}天${s.outsource?'·外包'+s.outsourceMin+'-'+s.outsourceMax:''}）`).join('；');
     return ans.join('、');
   }
   if(typeof ans === 'number') return ans + (q.unit ? ' ' + q.unit : '');
