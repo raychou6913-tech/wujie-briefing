@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>新增項目 · 蕪解 ERP</title>
+<style>
+*{box-sizing:border-box;}
+:root{
+  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
+  --border:#334155;--border-hi:#475569;
+  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+body{margin:0;background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;}
+.brand-name{font-size:13px;font-weight:700;color:var(--txt-hi);}
+.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:8px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.btn-topbar{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
+
+.wrap{max-width:680px;margin:0 auto;padding:24px 20px 60px;}
+.hero{margin-bottom:20px;}
+.hero-title{font-size:22px;font-weight:800;color:var(--txt-hi);margin-bottom:6px;}
+.hero-sub{font-size:12px;color:var(--txt-mid);line-height:1.6;}
+
+/* 步驟條 */
+.stepper{display:flex;align-items:center;gap:10px;margin:24px 0 20px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;}
+.step{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt-lo);}
+.step.active{color:var(--accent);font-weight:700;}
+.step.done{color:var(--ok);}
+.step-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--card2);align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.step.active .step-num{background:var(--accent);color:#fff;}
+.step.done .step-num{background:var(--ok);color:#fff;}
+.step-line{flex:1;height:1px;background:var(--border);}
+
+/* 卡片 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;}
+.card-title{font-size:14px;font-weight:700;color:var(--txt-hi);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-sub{font-size:11px;color:var(--txt-mid);margin-bottom:16px;line-height:1.6;}
+
+/* 表單 */
+.field{margin-bottom:14px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+label{display:block;font-size:11px;font-weight:600;color:var(--txt-mid);letter-spacing:.04em;margin-bottom:5px;}
+label .req{color:var(--danger);margin-left:3px;}
+input,select,textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;color:var(--txt-hi);font-size:13px;padding:9px 11px;outline:none;font-family:inherit;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:60px;}
+.hint{font-size:10px;color:var(--txt-lo);margin-top:4px;line-height:1.5;}
+.hint-good{color:var(--ok);}
+.hint-warn{color:var(--warn);}
+
+/* IP 資訊面板 */
+.ip-info{display:none;margin-top:8px;padding:10px 12px;background:var(--card2);border-left:3px solid var(--accent);border-radius:6px;font-size:11px;color:var(--txt-mid);line-height:1.7;}
+.ip-info.show{display:block;}
+.ip-info strong{color:var(--txt-hi);}
+
+/* 摘要區 */
+.summary{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:12px;}
+.sum-k{color:var(--txt-mid);}
+.sum-v{color:var(--txt-hi);font-weight:600;}
+.sum-section-title{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--accent);margin-top:12px;margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase;}
+
+/* 按鈕 */
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);}
+.btn{padding:10px 22px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--txt-mid);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--txt-hi);border-color:var(--border-hi);}
+
+/* 確認頁特殊樣式 */
+.confirm-banner{padding:14px 16px;background:var(--warn-dim);border:1px solid var(--warn);border-radius:8px;font-size:12px;color:var(--warn);margin-bottom:16px;line-height:1.7;}
+.confirm-banner strong{color:var(--txt-hi);}
+
+/* 成功頁 */
+.done-hero{text-align:center;padding:30px 20px;}
+.done-icon{font-size:48px;margin-bottom:10px;}
+.done-title{font-size:18px;font-weight:700;color:var(--ok);margin-bottom:6px;}
+.done-sub{font-size:12px;color:var(--txt-mid);margin-bottom:20px;line-height:1.7;}
+
+@media(max-width:520px){
+  .field-row,.field-row-3{grid-template-columns:1fr;}
+  .stepper{flex-direction:column;align-items:stretch;}
+  .step-line{display:none;}
+  .summary{grid-template-columns:1fr;gap:2px 0;}
+  .sum-k{margin-top:8px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <div class="brand-dot"></div>
+    <span class="brand-name">蕪解 ERP</span>
+    <span class="brand-sub">新項目註冊</span>
+  </div>
+  <div class="topbar-right">
+    <a class="btn-topbar" href="erp-lobby.html">← 返回大廳</a>
+    <span style="font-size:11px;color:var(--txt-mid);font-weight:600;">👤 <span id="bp-user">—</span></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-title">＋ 新增項目</div>
+    <div class="hero-sub">建立項目是 ERP 一切資料的起點 — 收入、支出、合約、產品、預算、現金流都掛在項目下。<br>建好後狀態為「待 Ray 確認」，Ray 點過才算 baseline，VAM 數字才有人信。</div>
+  </div>
+
+  <!-- 步驟條 -->
+  <div class="stepper">
+    <div class="step active" id="s1">
+      <span class="step-num">1</span><span>基本資料</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="s2">
+      <span class="step-num">2</span><span>財務預期</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="s3">
+      <span class="step-num">3</span><span>確認鎖定</span>
+    </div>
+  </div>
+
+  <!-- STEP 1：基本資料 -->
+  <div class="card" id="card-1">
+    <div class="card-title">📋 Step 1 · 基本資料</div>
+    <div class="card-sub">告訴系統「這是什麼項目」。IP 從合約資料庫拉，若還沒簽合約選「探索中 IP」並自填名稱。</div>
+
+    <div class="field">
+      <label>項目名稱 <span class="req">*</span></label>
+      <input id="f-name" placeholder="例：Mofusand Q4 大陸批發、Snoopy 曼谷快閃店、褲褲兔變變變">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>類別 <span class="req">*</span></label>
+        <select id="f-category">
+          <option value="">— 請選擇 —</option>
+          <option>商品批發</option>
+          <option>快閃店</option>
+          <option>IP商品授權</option>
+          <option>其他</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>業務類型</label>
+        <select id="f-biztype">
+          <option value="">— 選填 —</option>
+          <option>商品開發</option>
+          <option>批發</option>
+          <option>快閃店零售</option>
+          <option>代工</option>
+          <option>設計服務</option>
+          <option>授權</option>
+          <option>其他</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>IP 品牌 <span class="req">*</span></label>
+      <select id="f-ip" onchange="onIpChange(this.value)">
+        <option value="">— 載入中 —</option>
+      </select>
+      <input id="f-ip-explore" placeholder="自填探索中 IP 名稱（例：Maniani / Miffy / Doraemon）" style="margin-top:6px;display:none;">
+      <div class="ip-info" id="ip-info"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>所在地</label>
+        <select id="f-region">
+          <option>台北</option>
+          <option>北京</option>
+          <option>曼谷</option>
+          <option>跨地區</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>負責人 <span class="req">*</span></label>
+        <select id="f-owner">
+          <option>Ray</option>
+          <option>安然</option>
+          <option>Shawn</option>
+          <option>賴哥</option>
+          <option>木子</option>
+          <option>老董</option>
+          <option>德寶</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>開始日期 <span class="req">*</span></label>
+        <input id="f-start" type="date">
+      </div>
+      <div class="field">
+        <label>預計截止日期</label>
+        <input id="f-end" type="date">
+      </div>
+    </div>
+
+    <div class="actions">
+      <a href="erp-lobby.html" class="btn btn-ghost">取消</a>
+      <button class="btn btn-primary" onclick="goStep(2)">下一步：財務預期 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2：財務預期 -->
+  <div class="card" id="card-2" style="display:none;">
+    <div class="card-title">💰 Step 2 · 財務預期</div>
+    <div class="card-sub">填預估金額。鎖定匯率會把當下匯率寫進項目，未來匯率波動不影響此項目的 RMB 口徑（合併報表用）。</div>
+
+    <div class="field-row-3">
+      <div class="field">
+        <label>幣別 <span class="req">*</span></label>
+        <select id="f-currency" onchange="onCurrencyChange(this.value)">
+          <option value="CNY">RMB 人民幣（CNY）</option>
+          <option value="USD">USD 美元</option>
+          <option value="HKD">HKD 港幣</option>
+          <option value="TWD">TWD 新台幣</option>
+          <option value="THB">THB 泰銖</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>鎖定匯率（1 原幣 = ? RMB）<span class="req">*</span></label>
+        <input id="f-rate" type="number" step="0.0001" value="1.0000">
+        <div class="hint" id="rate-hint">RMB 不需匯率</div>
+      </div>
+      <div class="field">
+        <label style="visibility:hidden;">.</label>
+        <button class="btn btn-ghost" onclick="useDefaultRate()" style="padding:9px 12px;font-size:11px;width:100%;">套用今日預設</button>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>預計收入 <span class="req">*</span></label>
+        <input id="f-income" type="number" placeholder="0" oninput="recalcProfit()">
+        <div class="hint" id="income-rmb"></div>
+      </div>
+      <div class="field">
+        <label>預計支出 <span class="req">*</span></label>
+        <input id="f-expense" type="number" placeholder="0" oninput="recalcProfit()">
+        <div class="hint" id="expense-rmb"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>預計淨利（自動計算）</label>
+      <input id="f-profit" type="text" readonly style="background:var(--card2);color:var(--ok);font-weight:700;font-size:15px;">
+      <div class="hint" id="profit-rmb"></div>
+    </div>
+
+    <div class="field">
+      <label>備註（選填）</label>
+      <textarea id="f-notes" placeholder="例：Year 1 VAM 分配 ¥200 萬；首批 600 箱 KA 訂單預估..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="goStep(1)">← 上一步</button>
+      <button class="btn btn-primary" onclick="goStep(3)">下一步：確認鎖定 →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3：確認鎖定 -->
+  <div class="card" id="card-3" style="display:none;">
+    <div class="card-title">🔒 Step 3 · 確認鎖定 baseline</div>
+
+    <div class="confirm-banner">
+      <strong>⚠ 鎖定後不可直接修改</strong>，要改要走「項目變更申請」流程。<br>
+      建好後狀態為「<strong>待 Ray 確認</strong>」，Ray 在戰情室點過後才算 baseline。
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="goStep(2)">← 上一步</button>
+      <button class="btn btn-primary" id="submit-btn" onclick="submitProject()">✓ 確認建立項目</button>
+    </div>
+  </div>
+
+  <!-- STEP DONE -->
+  <div class="card" id="card-done" style="display:none;">
+    <div class="done-hero">
+      <div class="done-icon">🎉</div>
+      <div class="done-title">項目已建立</div>
+      <div class="done-sub" id="done-msg">已送出 · 等待 Ray 在戰情室確認後正式 baseline</div>
+      <button class="btn btn-primary" onclick="location.href='erp-lobby.html'">回大廳</button>
+      <button class="btn btn-ghost" onclick="location.reload()" style="margin-left:8px;">再建一個</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="erp-currency.js"></script>
+<script>
+const PROXY = 'https://feishu-proxy.raychou6913.workers.dev';
+const APP = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const TBL_PROJECT = 'tblPLJ2dLkdkWUAa';   // 項目排期
+const TBL_IP = 'tblt9DOm4hf5Mr5r';        // IP 版權資料庫
+
+// 顯示登入者
+try{
+  const sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(sess?.name) document.getElementById('bp-user').textContent = sess.name;
+}catch(e){}
+
+let ipMaster = {};  // IP 名稱 → 版稅/MG 等
+
+async function feishuToken(){
+  const r = await fetch(PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const d = await r.json();
+  return d.tenant_access_token;
+}
+
+async function loadIPs(){
+  try{
+    const tk = await feishuToken();
+    const r = await fetch(`${PROXY}/open-apis/bitable/v1/apps/${APP}/tables/${TBL_IP}/records?page_size=50`, {
+      headers:{Authorization:'Bearer '+tk}
+    });
+    const d = await r.json();
+    const sel = document.getElementById('f-ip');
+    let opts = '<option value="">— 請選擇 —</option>';
+    (d.data?.items||[]).forEach(it=>{
+      const f = it.fields||{};
+      const name = f['IP名稱'] || '';
+      if(!name) return;
+      ipMaster[name] = {
+        publisher: f['版權方'] || '',
+        agent: f['版權代理商'] || '',
+        region: f['授權地區'] || '',
+        notes: f['備註'] || '',
+      };
+      opts += `<option value="${name}">${name}</option>`;
+    });
+    opts += '<option value="__EXPLORE__">+ 探索中 IP（未簽合約）</option>';
+    sel.innerHTML = opts;
+  }catch(e){
+    console.warn('load IPs fail', e);
+    document.getElementById('f-ip').innerHTML = '<option>— 載入失敗，請手動輸入 —</option><option value="__EXPLORE__">+ 探索中 IP</option>';
+  }
+}
+loadIPs();
+
+function onIpChange(val){
+  const exploreInput = document.getElementById('f-ip-explore');
+  const info = document.getElementById('ip-info');
+  if(val === '__EXPLORE__'){
+    exploreInput.style.display = '';
+    info.classList.remove('show');
+    return;
+  }
+  exploreInput.style.display = 'none';
+  const ip = ipMaster[val];
+  if(!ip){ info.classList.remove('show'); return; }
+  info.classList.add('show');
+  info.innerHTML = `
+    <div><strong>📋 從 IP 版權資料庫帶入</strong></div>
+    <div>版權方：${ip.publisher||'—'}　│　代理：${ip.agent||'—'}</div>
+    <div>授權地區：${ip.region||'—'}</div>
+    <div style="color:var(--txt-lo);">${ip.notes||''}</div>
+  `;
+}
+
+function onCurrencyChange(cur){
+  const rate = window.FX_DEFAULTS[cur] || 1;
+  document.getElementById('f-rate').value = rate.toFixed(4);
+  const hint = document.getElementById('rate-hint');
+  hint.textContent = (cur === 'CNY' || cur === 'RMB') ? 'RMB 不需匯率' : `預設：1 ${cur} = ¥${rate.toFixed(4)}（可手動覆寫）`;
+  hint.className = 'hint';
+  recalcProfit();
+}
+
+function useDefaultRate(){
+  const cur = document.getElementById('f-currency').value;
+  document.getElementById('f-rate').value = (window.FX_DEFAULTS[cur]||1).toFixed(4);
+  recalcProfit();
+}
+
+function recalcProfit(){
+  const income = parseFloat(document.getElementById('f-income').value)||0;
+  const expense = parseFloat(document.getElementById('f-expense').value)||0;
+  const rate = parseFloat(document.getElementById('f-rate').value)||1;
+  const cur = document.getElementById('f-currency').value;
+  const profit = income - expense;
+  const sym = {USD:'US$',HKD:'HK$',TWD:'NT$',THB:'฿',CNY:'¥',RMB:'¥'}[cur]||cur;
+  document.getElementById('f-profit').value = `${sym} ${profit.toLocaleString()}`;
+  // RMB 換算 hint（CNY = RMB，不需換算）
+  const isRMB = (cur === 'CNY' || cur === 'RMB');
+  if(!isRMB){
+    document.getElementById('income-rmb').textContent = `≈ ¥${Math.round(income*rate).toLocaleString()}`;
+    document.getElementById('expense-rmb').textContent = `≈ ¥${Math.round(expense*rate).toLocaleString()}`;
+    document.getElementById('profit-rmb').textContent = `≈ ¥${Math.round(profit*rate).toLocaleString()}`;
+  }else{
+    ['income-rmb','expense-rmb','profit-rmb'].forEach(id=>document.getElementById(id).textContent='');
+  }
+}
+onCurrencyChange('CNY');
+
+// 步驟切換
+function validateStep1(){
+  const name = document.getElementById('f-name').value.trim();
+  const cat = document.getElementById('f-category').value;
+  const ip = document.getElementById('f-ip').value;
+  const owner = document.getElementById('f-owner').value;
+  const start = document.getElementById('f-start').value;
+  if(!name){ alert('請填項目名稱'); return false; }
+  if(!cat){ alert('請選擇類別'); return false; }
+  if(!ip){ alert('請選擇 IP 品牌'); return false; }
+  if(ip==='__EXPLORE__' && !document.getElementById('f-ip-explore').value.trim()){
+    alert('請填寫探索中 IP 名稱'); return false;
+  }
+  if(!owner){ alert('請選擇負責人'); return false; }
+  if(!start){ alert('請選擇開始日期'); return false; }
+  return true;
+}
+function validateStep2(){
+  const inc = parseFloat(document.getElementById('f-income').value);
+  const exp = parseFloat(document.getElementById('f-expense').value);
+  if(!(inc>0)){ alert('預計收入要 > 0'); return false; }
+  if(!(exp>=0)){ alert('預計支出要 ≥ 0'); return false; }
+  return true;
+}
+
+function goStep(n){
+  if(n===2 && !validateStep1()) return;
+  if(n===3 && !validateStep2()) return;
+  // 隱藏全部
+  [1,2,3].forEach(i=>{
+    document.getElementById('card-'+i).style.display = i===n ? '' : 'none';
+    document.getElementById('s'+i).classList.toggle('active', i===n);
+    document.getElementById('s'+i).classList.toggle('done', i<n);
+  });
+  if(n===3) renderSummary();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderSummary(){
+  const ipVal = document.getElementById('f-ip').value;
+  const ipName = ipVal==='__EXPLORE__' ? document.getElementById('f-ip-explore').value.trim()+'（探索中）' : ipVal;
+  const cur = document.getElementById('f-currency').value;
+  const rate = parseFloat(document.getElementById('f-rate').value)||1;
+  const inc = parseFloat(document.getElementById('f-income').value)||0;
+  const exp = parseFloat(document.getElementById('f-expense').value)||0;
+  const profit = inc - exp;
+  const sym = {USD:'US$',HKD:'HK$',TWD:'NT$',THB:'฿',CNY:'¥',RMB:'¥'}[cur]||cur;
+  const isRMB = (cur === 'CNY' || cur === 'RMB');
+  const rmbHint = !isRMB ? n => ` (≈¥${Math.round(n*rate).toLocaleString()})` : ()=>'';
+
+  document.getElementById('summary').innerHTML = `
+    <div class="sum-section-title">基本資料</div>
+    <div class="sum-k">項目名稱</div><div class="sum-v">${document.getElementById('f-name').value}</div>
+    <div class="sum-k">類別</div><div class="sum-v">${document.getElementById('f-category').value}</div>
+    <div class="sum-k">業務類型</div><div class="sum-v">${document.getElementById('f-biztype').value||'—'}</div>
+    <div class="sum-k">IP 品牌</div><div class="sum-v">${ipName}</div>
+    <div class="sum-k">所在地</div><div class="sum-v">${document.getElementById('f-region').value}</div>
+    <div class="sum-k">負責人</div><div class="sum-v">${document.getElementById('f-owner').value}</div>
+    <div class="sum-k">開始日期</div><div class="sum-v">${document.getElementById('f-start').value}</div>
+    <div class="sum-k">截止日期</div><div class="sum-v">${document.getElementById('f-end').value||'—'}</div>
+
+    <div class="sum-section-title">財務預期</div>
+    <div class="sum-k">幣別</div><div class="sum-v">${cur}</div>
+    <div class="sum-k">鎖定匯率</div><div class="sum-v">${isRMB?'—':`🔒 1 ${cur} = ¥${rate.toFixed(4)}`}</div>
+    <div class="sum-k">預計收入</div><div class="sum-v">${sym} ${inc.toLocaleString()}${rmbHint(inc)}</div>
+    <div class="sum-k">預計支出</div><div class="sum-v">${sym} ${exp.toLocaleString()}${rmbHint(exp)}</div>
+    <div class="sum-k">預計淨利</div><div class="sum-v" style="color:${profit>=0?'var(--ok)':'var(--danger)'};font-size:14px;">${sym} ${profit.toLocaleString()}${rmbHint(profit)}</div>
+    <div class="sum-k">備註</div><div class="sum-v">${document.getElementById('f-notes').value||'—'}</div>
+  `;
+}
+
+async function submitProject(){
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '送出中...';
+
+  try{
+    const ipVal = document.getElementById('f-ip').value;
+    const ipName = ipVal==='__EXPLORE__' ? document.getElementById('f-ip-explore').value.trim() : ipVal;
+    const cur = document.getElementById('f-currency').value;
+    const rate = parseFloat(document.getElementById('f-rate').value)||1;
+    const inc = parseFloat(document.getElementById('f-income').value)||0;
+    const exp = parseFloat(document.getElementById('f-expense').value)||0;
+    const profit = inc - exp;
+
+    const fields = {
+      '項目名稱': document.getElementById('f-name').value.trim(),
+      '類別': document.getElementById('f-category').value,
+      '業務類型': document.getElementById('f-biztype').value || undefined,
+      'IP品牌': ipName,
+      '所在地': document.getElementById('f-region').value,
+      '負責人': document.getElementById('f-owner').value,
+      '開始日期': new Date(document.getElementById('f-start').value).getTime(),
+      '狀態': '待 Ray 確認',
+      '預計收入': inc,
+      '預計支出': exp,
+      '預計淨利': profit,
+      '幣別': cur,
+      '鎖定匯率': rate,
+      '備註': document.getElementById('f-notes').value || undefined,
+    };
+    const endDate = document.getElementById('f-end').value;
+    if(endDate) fields['截止日期'] = new Date(endDate).getTime();
+
+    // 移除 undefined
+    Object.keys(fields).forEach(k => fields[k] === undefined && delete fields[k]);
+
+    const tk = await feishuToken();
+    const r = await fetch(`${PROXY}/open-apis/bitable/v1/apps/${APP}/tables/${TBL_PROJECT}/records`,{
+      method:'POST',
+      headers:{Authorization:'Bearer '+tk,'Content-Type':'application/json'},
+      body: JSON.stringify({fields})
+    });
+    const d = await r.json();
+    if(d.code !== 0){
+      throw new Error(d.msg || '寫入飛書失敗');
+    }
+    // 成功 → 切到 done 頁
+    ['card-1','card-2','card-3'].forEach(id=>document.getElementById(id).style.display='none');
+    document.getElementById('card-done').style.display = '';
+    document.getElementById('done-msg').innerHTML = `項目「<strong>${fields['項目名稱']}</strong>」已寫入飛書 · 狀態「待 Ray 確認」<br>Ray 在戰情室點過後正式 baseline`;
+    [1,2,3].forEach(i=>{
+      document.getElementById('s'+i).classList.remove('active');
+      document.getElementById('s'+i).classList.add('done');
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){
+    alert('送出失敗：'+e.message+'\n\n資料已暫存在本機，可重試');
+    btn.disabled = false;
+    btn.textContent = '✓ 確認建立項目';
+  }
+}
+</script>
+</body>
+</html>
