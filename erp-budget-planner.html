@@ -534,7 +534,34 @@ const CH_DEFAULTS = ()=>[
   { id:'ch_br',  label:'品牌客戶', count:5, boxPerCh:5  },
   { id:'ch_di',  label:'流通客戶', count:8, boxPerCh:3  },
 ];
-function _bp(extra={}){ return { reorderLeadDays:45, hiddenOT:[], hiddenVar:[], extraOT:[], extraVar:[], channels:CH_DEFAULTS(), ...BOX_STD, ...extra }; }
+function _bp(extra={}){ return { stage:'v1', reorderLeadDays:45, hiddenOT:[], hiddenVar:[], extraOT:[], extraVar:[], channels:CH_DEFAULTS(), ...BOX_STD, ...extra }; }
+
+// 預算階段定義
+const STAGES = {
+  v1:{label:'V1 幻想版', color:'#a78bfa', desc:'簽 IP 時的財務假設'},
+  v2:{label:'V2 實際版', color:'#22c55e', desc:'客戶已確認，渠道配貨／定價已有'},
+  v3:{label:'V3 結算版', color:'#fb923c', desc:'已上市，實際出貨／毛利已知'},
+};
+function stageOf(p){ return p.stage || 'v1'; }
+function advanceStage(i){
+  const cur = stageOf(prods[i]);
+  const next = cur==='v1'?'v2':cur==='v2'?'v3':'v3';
+  if(cur===next){ alert('已是最後階段（V3 結算版）'); return; }
+  const msg = cur==='v1'
+    ? '推進到 V2 實際版？\n\n代表此產品已有客戶確認，可以開始填渠道配貨與實際定價。'
+    : '推進到 V3 結算版？\n\n代表此產品已上市出貨，將開放填寫實際出貨與毛利。';
+  if(!confirm(msg)) return;
+  prods[i].stage = next;
+  renderParams(); renderTable();
+}
+function regressStage(i){
+  const cur = stageOf(prods[i]);
+  const prev = cur==='v3'?'v2':cur==='v2'?'v1':'v1';
+  if(cur===prev) return;
+  if(!confirm('退回到 '+STAGES[prev].label+'？此操作不會清除已填資料。')) return;
+  prods[i].stage = prev;
+  renderParams(); renderTable();
+}
 
 const DEFAULTS = [
   { id:'muz1', ip:'Muziktiger', ipShort:'無業老虎', color:'#38bdf8',
@@ -822,7 +849,10 @@ function renderParams(){
     return `
       <tr class="prod-hdr-row" onclick="toggleRow('${p.id}')">
         <td>
-          <span class="ip-badge" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.ipShort}</span>${p.name}${p.isExplore?`<span style="margin-left:6px;font-size:9px;background:#a78bfa20;color:#a78bfa;border:1px solid #a78bfa44;border-radius:4px;padding:1px 5px;">🔍 探索中 IP</span>`:''}
+          <span class="ip-badge" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.ipShort}</span>${p.name}${(()=>{
+            const st = STAGES[stageOf(p)];
+            return `<span style="margin-left:6px;font-size:9px;background:${st.color}20;color:${st.color};border:1px solid ${st.color}44;border-radius:4px;padding:1px 5px;" title="${st.desc}">${st.label}</span>`;
+          })()}${p.isExplore?`<span style="margin-left:6px;font-size:9px;background:#a78bfa20;color:#a78bfa;border:1px solid #a78bfa44;border-radius:4px;padding:1px 5px;">🔍 探索中 IP</span>`:''}
         </td>
         <td>
           <select class="msel" onclick="event.stopPropagation()" onchange="fc(${i},'launch',this.value)">
@@ -854,6 +884,24 @@ const _XB = `background:none;border:none;color:var(--txt-lo);cursor:pointer;font
 const _XBH = `onmouseenter="this.style.opacity='1';this.style.color='var(--danger)'" onmouseleave="this.style.opacity='.6';this.style.color='var(--txt-lo)'"`;
 
 function buildChannelHTML(p,i){
+  // V1 階段：鎖定渠道配貨，因為還沒客戶確認
+  if(stageOf(p)==='v1'){
+    return `<div style="margin-top:14px;padding:14px 16px;border-top:1px solid var(--border);background:repeating-linear-gradient(45deg,var(--card2),var(--card2) 8px,var(--card) 8px,var(--card) 16px);border-radius:0 0 8px 8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--txt-mid);">🔒 渠道配貨規劃</div>
+          <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;line-height:1.6;">
+            目前是 <strong style="color:#a78bfa;">V1 幻想版</strong> — 還沒有客戶確認下單，先不用填渠道配貨。<br>
+            等業務談下訂單，按右側按鈕推進到 V2 實際版即可開放編輯。
+          </div>
+        </div>
+        <button onclick="event.stopPropagation();advanceStage(${i})"
+          style="font-size:11px;font-weight:600;color:#22c55e;background:#22c55e15;border:1px solid #22c55e66;border-radius:6px;padding:6px 14px;cursor:pointer;white-space:nowrap;">
+          ✓ 客戶已確認 → 進入 V2
+        </button>
+      </div>
+    </div>`;
+  }
   const ppc = _piecesPerCarton(p);
   const chs = p.channels||[];
   const totalBoxes = chs.reduce((s,c)=>s+(c.count||0)*(c.boxPerCh||0),0);
@@ -950,7 +998,26 @@ function buildDetHTML(p,i){
   </tr>`).join('');
   const varHiddenCount = new Set(p.hiddenVar||[]).size;
 
+  const curStage = stageOf(p);
+  const stageBar = (()=>{
+    const items = ['v1','v2','v3'].map(s=>{
+      const cfg = STAGES[s];
+      const active = s===curStage;
+      return `<span style="font-size:10px;padding:3px 8px;border-radius:4px;${active?`background:${cfg.color}25;color:${cfg.color};border:1px solid ${cfg.color}66;font-weight:700;`:`color:var(--txt-lo);border:1px solid var(--border);`}">${cfg.label}</span>`;
+    }).join('<span style="color:var(--txt-lo);font-size:10px;">→</span>');
+    const advBtn = curStage==='v3' ? '' :
+      `<button onclick="event.stopPropagation();advanceStage(${i})" style="margin-left:auto;font-size:10px;font-weight:600;color:${curStage==='v1'?'#22c55e':'#fb923c'};background:${curStage==='v1'?'#22c55e15':'#fb923c15'};border:1px solid ${curStage==='v1'?'#22c55e66':'#fb923c66'};border-radius:5px;padding:4px 10px;cursor:pointer;">推進到 ${curStage==='v1'?'V2 實際版':'V3 結算版'} →</button>`;
+    const regBtn = curStage==='v1' ? '' :
+      `<button onclick="event.stopPropagation();regressStage(${i})" style="font-size:10px;color:var(--txt-lo);background:none;border:1px solid var(--border);border-radius:5px;padding:4px 8px;cursor:pointer;">↩ 退回</button>`;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--border);flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--txt-lo);font-weight:600;">📊 預算階段：</span>
+      ${items}
+      <span style="font-size:10px;color:var(--txt-lo);margin-left:6px;">${STAGES[curStage].desc}</span>
+      ${regBtn}${advBtn}
+    </div>`;
+  })();
   return `<div class="det-body">
+    ${stageBar}
     <div class="det-grid">
       <!-- LEFT: One-time costs -->
       <div>
@@ -1310,6 +1377,14 @@ function applyChannelToVol(i){
 }
 
 // ── ADD PRODUCT MODAL ─────────────────────────────────────────────
+// 公司級常數（之後從飛書系統常數設定表讀）
+const COMPANY_CONSTANTS = {
+  antiForgeUnit: 0.106,       // 一般防偽標單價 ¥/件
+  antiForgeHologram: 0.106,   // hologram 單價（Opanchu 強制；實際單價待安然查證）
+  warehouseUnit: 0.056,       // 雲倉費 ¥/件（Shawn 可手動覆寫）
+  wsDiscountDefault: 0.46,    // 預設批發折扣
+};
+
 // 系統內建的 IP 主檔（5 個已簽約 IP，從合約解析）
 const IP_MASTER = {
   'Mofusand 貓福珊迪': {
@@ -1321,6 +1396,8 @@ const IP_MASTER = {
     region:'中港澳台',
     period:'2025/12/1 – 2026/11/30',
     mg:'¥304,234.56',
+    antiForge: COMPANY_CONSTANTS.antiForgeUnit,
+    allowedCategoriesNote:'待安然從合約 Schedule 抽出（盲盒/絨毛/文具…）',
   },
   'Snoopy 史努比': {
     color:'#fbbf24',
@@ -1331,6 +1408,8 @@ const IP_MASTER = {
     region:'EEA + 大陸 + 港澳台 + 東南亞等（OFAC 排除）',
     period:'2026/2/1 – 2027/6/30',
     mg:'USD 100,000',
+    antiForge: COMPANY_CONSTANTS.antiForgeUnit,
+    allowedCategoriesNote:'待安然從合約 Schedule I 抽出',
   },
   'Opanchu 褲褲兔': {
     color:'#818cf8',
@@ -1338,10 +1417,12 @@ const IP_MASTER = {
     royaltyDesc:'SRP × 40% × 14%（批發）',
     entity:'UNIICREATIVE（台灣）',
     settlement:'季結',
-    region:'T1 大陸 / T2 東南亞 6 國（**無港澳台**）',
+    region:'T1 大陸 / T2 東南亞 6 國（無港澳台）',
     period:'2025/9/1 – 2026/10/30',
     mg:'USD 65,000（T1 49k + T2 16k）',
     needsHologram:true,
+    antiForge: COMPANY_CONSTANTS.antiForgeHologram,
+    allowedCategoriesNote:'待安然從合約 Schedule 抽出（合約要求 hologram 防偽 + co-brand UNIPOP）',
   },
   'Muziktiger 無業老虎': {
     color:'#38bdf8',
@@ -1352,6 +1433,8 @@ const IP_MASTER = {
     region:'僅大陸',
     period:'2025/12/1 – 2027/2/28',
     mg:'¥80,000',
+    antiForge: COMPANY_CONSTANTS.antiForgeUnit,
+    allowedCategoriesNote:'待安然從合約 Schedule 抽出',
   },
   '飯糰與梅子': {
     color:'#f472b6',
@@ -1359,10 +1442,12 @@ const IP_MASTER = {
     royaltyDesc:'含稅批發價 × 12% × 生產量（不論賣出與否）',
     entity:'有你共創（台灣）',
     settlement:'月結（每月10號）',
-    region:'大陸 + 港澳（**無台灣**）',
+    region:'大陸 + 港澳（無台灣）',
     period:'2025/12/15 – 2027/2/28',
     mg:'¥200,000',
     byProduction:true,
+    antiForge: COMPANY_CONSTANTS.antiForgeUnit,
+    allowedCategoriesNote:'待安然從合約 Schedule 抽出',
   },
 };
 // 兼容舊欄位（不同寫法都對應同一個 IP）
@@ -1428,7 +1513,7 @@ function onReorderIpChange(ipName){
     return;
   }
   info.style.display = 'block';
-  const hologramFlag = master.needsHologram ? '<br>🛡 強制 hologram 防偽標' : '';
+  const hologramFlag = master.needsHologram ? '<br>🛡 強制 hologram 防偽標（單價待安然查證）' : '';
   const byProd = master.byProduction ? '<br>⚠ 按<strong>生產量</strong>計版稅（非銷售量）' : '';
   info.innerHTML = `
     <div style="padding:8px 10px;background:var(--card2);border-left:3px solid ${master.color};border-radius:5px;margin-top:4px;">
@@ -1436,7 +1521,8 @@ function onReorderIpChange(ipName){
       <div>版稅：${master.royaltyDesc}</div>
       <div>合約主體：${master.entity}　│　結算：${master.settlement}</div>
       <div>授權地區：${master.region}</div>
-      <div style="color:var(--txt-lo);">期限：${master.period}　│　MG：${master.mg}</div>
+      <div>授權品項：${master.allowedCategoriesNote||'待補'}</div>
+      <div style="color:var(--txt-lo);">期限：${master.period}　│　MG：${master.mg}　│　防偽標 ¥${master.antiForge}/件</div>
       ${hologramFlag}${byProd}
     </div>`;
 }
