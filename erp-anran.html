@@ -170,6 +170,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 </style>
 <script src="mock-data.js"></script>
 <script src="demo-eoy2026.js"></script>
+<script src="erp-project-link.js"></script>
 </head>
 <body>
 
@@ -1380,6 +1381,13 @@ loadContractFromFeishu();
 <div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
 <div class="exp-sheet">
   <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
+  <div class="exp-field" style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #475569;">
+    <label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;">對應項目 <span style="color:#ef4444;">*</span></label>
+    <select id="expProject" style="width:100%;background:#2d3a52;border:1px solid #475569;border-radius:8px;color:#f1f5f9;font-size:13px;padding:8px 10px;outline:none;">
+      <option value="">— 載入中 —</option>
+    </select>
+    <div style="font-size:10px;color:#64748b;margin-top:4px;">所有費用必須掛在項目下，方便追蹤該項目實際成本</div>
+  </div>
   <div class="exp-type-row" id="expTypeRow">
     <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
     <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
@@ -1440,6 +1448,8 @@ function openExpModal(){
   document.getElementById('expDate').valueAsDate=new Date();
   setExpType('personal');
   document.getElementById('expOverlay').classList.add('open');
+  // 注入項目下拉（從飛書「項目排期」抓 active 項目）
+  if(window.injectProjectSelect) window.injectProjectSelect('expProject');
 }
 function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
 function setExpType(t){
@@ -1451,6 +1461,12 @@ function setExpType(t){
 }
 function submitExpense(){
   const u=getUser();const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:'Ray'};
+  // 必選「對應項目」
+  const proj = window.getSelectedProject ? window.getSelectedProject('expProject') : null;
+  if(!proj){
+    alert('請選擇對應項目（所有費用必須掛在項目下）\n\n若還沒有項目，請先到「+ 新增項目」建立。');
+    return;
+  }
   let rec;
   if(expType==='personal'){
     const amt=document.getElementById('expAmt').value;
@@ -1477,7 +1493,7 @@ function submitExpense(){
   const q=JSON.parse(localStorage.getItem(key)||'[]');
   q.push(rec);localStorage.setItem(key,JSON.stringify(q));
   const _acy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[rec.ccy]||'CNY';
-  _arWriteApproval({'標題':`【${rec.type}】安然 ${rec.amt}${rec.ccy}`,'審批標題':`【${rec.type}】安然 ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':'安然','申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':_acy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':rec.desc||rec.cat||'','預算科目':rec.subject||''});
+  _arWriteApproval({'標題':`【${rec.type}】安然 ${rec.amt}${rec.ccy}`,'審批標題':`【${rec.type}】安然 ${rec.amt}${rec.ccy}`,'審批類型':'費用申請','申請人':'安然','申請日期':Date.now(),'金額':parseFloat(rec.amt)||0,'幣別':_acy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':rec.desc||rec.cat||'','預算科目':rec.subject||'','對應項目':proj.name,'對應項目ID':proj.id});
   closeExpModal();
   alert(`✅ 申請已送出 · 待 ${r.nextLabel} 審核`);
 }
