@@ -178,9 +178,19 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
   </div>
   <div class="topbar-right">
     <a href="erp-war-room.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 戰情室</a>
-    <span style="font-size:11px;color:var(--txt-mid);" id="bp-date"></span>
+    <span style="font-size:11px;color:var(--txt-mid);font-weight:600;">👤 <span id="bp-user">—</span></span>
+    <span style="font-size:11px;color:var(--txt-lo);" id="bp-date"></span>
   </div>
 </div>
+<script>
+// 顯示登入者（跨頁統一 topbar 顯示）
+(function(){
+  try{
+    const sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
+    if(sess?.name) document.getElementById('bp-user').textContent = sess.name;
+  }catch(e){}
+})();
+</script>
 
 <div class="main">
 

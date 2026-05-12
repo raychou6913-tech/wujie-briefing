@@ -953,21 +953,23 @@ async function _createRecord(fields){
 }
 
 /* ─── STAGE DEFINITIONS ─── */
+// Bevis 2026-05-11 反饋：「概念2D圖+送審」應該在 step 2，不該獨立成後段步驟
+// 重排：先送版權方確認方向（概念2D+送審），再展開正式 2D 設計
 const STAGES_FIG=[
-  {key:"主題確認",   label:"主題",   owner:"Ray/Shawn"},
-  {key:"概念視覺",   label:"概念圖",  owner:"詩彤/Forge"},
-  {key:"2D送審",    label:"2D送審",  owner:"珮玲"},
-  {key:"3D建模",    label:"3D建模",  owner:"Bevis/外包"},
-  {key:"打樣送審",   label:"打樣",   owner:"採購寄出"},
-  {key:"上色打樣",   label:"上色",   owner:"採購寄出"},
-  {key:"大貨生產",   label:"大貨",   owner:"採購/設計"},
+  {key:"主題確認",       label:"主題",       owner:"Ray/Shawn"},
+  {key:"概念2D+送審",    label:"概念2D",     owner:"詩彤/Forge"},
+  {key:"2D設計+送審",    label:"2D設計",     owner:"珮玲"},
+  {key:"3D建模+送審",    label:"3D建模",     owner:"Bevis/外包"},
+  {key:"打樣+上色送審",  label:"打樣",       owner:"採購"},
+  {key:"最終確認",       label:"最終確認",   owner:"珮玲/詩彤"},
+  {key:"大貨生產",       label:"大貨",       owner:"採購/設計"},
 ];
 const STAGES_NONFIG=[
-  {key:"主題確認",    label:"主題",   owner:"Ray/Shawn"},
-  {key:"概念視覺",    label:"概念圖",  owner:"詩彤/Forge"},
-  {key:"產品設計送審", label:"設計送審", owner:"珮玲"},
-  {key:"打樣送審",    label:"打樣",   owner:"採購"},
-  {key:"大貨生產",    label:"大貨",   owner:"採購/設計"},
+  {key:"主題確認",       label:"主題",       owner:"Ray/Shawn"},
+  {key:"概念2D+送審",    label:"概念2D",     owner:"詩彤/Forge"},
+  {key:"產品設計+送審",  label:"設計送審",   owner:"珮玲"},
+  {key:"打樣送審",       label:"打樣",       owner:"採購"},
+  {key:"大貨生產",       label:"大貨",       owner:"採購/設計"},
 ];
 
 /*
@@ -1327,8 +1329,8 @@ function renderDemoDetail(key, d){
   const m=META[key]||{name:key,ip:"—",owner:"—",launch:"—",price:"—",qty:"—",gm:"—"};
 
   const branchDesc=isFig
-    ?"公仔走 <strong>7 輪送審</strong>：主題確認 → 概念圖 → 2D送審 → 3D建模 → 打樣送審 → 上色打樣 → 大貨生產。每輪版權方可能要求修改。"
-    :"非公仔走 <strong>5 輪送審</strong>：主題確認 → 概念圖 → 產品設計送審 → 打樣送審 → 大貨生產。跳過 3D建模環節。";
+    ?"公仔走 <strong>7 輪送審</strong>：主題確認 → 概念2D+送審 → 2D設計+送審 → 3D建模+送審 → 打樣+上色送審 → 最終確認 → 大貨生產。每輪版權方可能要求修改。"
+    :"非公仔走 <strong>5 輪送審</strong>：主題確認 → 概念2D+送審 → 產品設計+送審 → 打樣送審 → 大貨生產。跳過 3D建模環節。";
 
   const barHtml=stages.map((s,i)=>{
     let cls=i<curIdx?"sp-seg sp-done":i===curIdx?(d.blocked?"sp-seg sp-blocked":"sp-seg sp-warn"):"sp-seg";
@@ -1648,8 +1650,8 @@ function renderDetailFromFeishu(proj){
   const owner=fv(f,"設計負責人")||fv(f,"負責人")||"—";
 
   const branchDesc=isFig
-    ?"公仔走 <strong>7 輪送審</strong>：主題確認 → 概念圖 → 2D送審 → 3D建模 → 打樣送審 → 上色打樣 → 大貨生產。"
-    :"非公仔走 <strong>5 輪送審</strong>：主題確認 → 概念圖 → 產品設計送審 → 打樣送審 → 大貨生產。";
+    ?"公仔走 <strong>7 輪送審</strong>：主題確認 → 概念2D+送審 → 2D設計+送審 → 3D建模+送審 → 打樣+上色送審 → 最終確認 → 大貨生產。"
+    :"非公仔走 <strong>5 輪送審</strong>：主題確認 → 概念2D+送審 → 產品設計+送審 → 打樣送審 → 大貨生產。";
 
   const barSegs=stages.map((s,i)=>{
     let cls=i<safeIdx?"sp-seg sp-done":i===safeIdx?(isBlocked?"sp-seg sp-blocked":"sp-seg sp-warn"):"sp-seg";

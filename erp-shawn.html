@@ -181,6 +181,29 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
   .two-col{grid-template-columns:1fr;}
   .action-row{grid-template-columns:1fr 1fr;}
 }
+/* 窄螢幕（375px）：KPI 展開的 grid 改成卡片式 stack，避免擠成不可讀 */
+@media(max-width:480px){
+  .main{padding:10px;}
+  .action-row{grid-template-columns:1fr;}
+  .kpi-big{padding:12px 14px;}
+  .kpi-big-val{font-size:24px;}
+  /* KPI 卡片展開區域：通用 grid → 改 stack，每行 label 在上、值在下 */
+  .kpi-big > div[id^="sk-"] > div[style*="grid-template-columns"]{
+    display:flex !important;
+    flex-direction:column;
+    gap:8px !important;
+  }
+  .kpi-big > div[id^="sk-"] > div[style*="grid-template-columns"] > *{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:6px 8px;
+    background:var(--card2);
+    border-radius:6px;
+    font-size:11px;
+  }
+  .people-grid{grid-template-columns:1fr;}
+}
 </style>
 <script src="mock-data.js"></script>
 <script src="demo-eoy2026.js"></script>
@@ -1334,141 +1357,6 @@ async function loadSales(){
 }
 
 Promise.allSettled([loadBudget(), loadApprovals(), loadSales()]);
-</script>
-
-<!-- 費用申請 -->
-<style>
-.exp-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:#10b981;border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px #10b98140;z-index:150;display:flex;align-items:center;justify-content:center;transition:transform .12s;}
-.exp-fab:active{transform:scale(.92);}
-.exp-overlay{display:none;position:fixed;inset:0;background:#00000080;z-index:200;align-items:flex-end;justify-content:center;}
-.exp-overlay.open{display:flex;}
-.exp-sheet{background:#1e293b;border:1px solid #334155;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:20px;max-height:85vh;overflow-y:auto;}
-.exp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.exp-title{font-size:15px;font-weight:700;color:#f1f5f9;}
-.exp-close{background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;}
-.exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
-.exp-type-btn{flex:1;padding:8px;border:1px solid #334155;border-radius:8px;background:#263349;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:.1s;}
-.exp-type-btn.active{border-color:#10b981;color:#10b981;background:#10b98112;}
-.exp-field{margin-bottom:12px;}
-.exp-field label{display:block;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;}
-.exp-field input,.exp-field select,.exp-field textarea{width:100%;background:#263349;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:13px;padding:8px 10px;outline:none;}
-.exp-field textarea{resize:vertical;font-family:inherit;}
-.exp-amt-row{display:flex;gap:6px;}
-.exp-amt-row input{flex:1;}
-.exp-amt-row select{width:90px;}
-.exp-routing{font-size:11px;color:#94a3b8;padding:8px 10px;background:#263349;border-radius:8px;margin-bottom:12px;border:1px solid #334155;}
-.exp-routing strong{color:#10b981;}
-.exp-submit{width:100%;padding:12px;background:#10b981;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
-.exp-submit:active{opacity:.85;}
-</style>
-
-<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
-<div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
-<div class="exp-sheet">
-  <div class="exp-header"><span class="exp-title">費用申請</span><button class="exp-close" onclick="closeExpModal()">✕</button></div>
-  <div class="exp-type-row">
-    <button class="exp-type-btn active" id="expTypePersonal" onclick="setExpType('personal')">個人報銷</button>
-    <button class="exp-type-btn" id="expTypeSupplier" onclick="setExpType('supplier')">供應商付款申請</button>
-  </div>
-  <div id="expPersonalFields">
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expCcy"><option>THB</option><option>RMB</option><option>TWD</option><option>HKD</option><option>USD</option></select></div></div>
-    <div class="exp-field"><label>類別</label><select id="expCat"><option value="venue">場地費</option><option value="marketing">行銷費用</option><option value="transport">交通 / 車資</option><option value="meal">餐飲</option><option value="lodging">住宿</option><option value="business">業務招待</option><option value="trip">出差費用</option><option value="other">其他</option></select></div>
-    <div class="exp-field">
-      <label>對應預算科目 <span style="color:#818cf8;font-size:9px;font-weight:700;">▸ 財務入帳用</span></label>
-      <select id="expBudgetSubject" style="background:#263349;border:1px solid #334155;color:#f1f5f9;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;">
-        <option value="">— 選擇科目（必填）—</option>
-        <option value="快閃店場地費">快閃店場地費</option>
-        <option value="行銷推廣費">行銷推廣費</option>
-        <option value="倉儲物流費">倉儲物流費</option>
-        <option value="差旅費">差旅費</option>
-        <option value="辦公管銷">辦公管銷</option>
-        <option value="其他">其他（不在預算範圍）</option>
-      </select>
-    </div>
-    <div class="exp-field"><label>日期</label><input id="expDate" type="date"></div>
-    <div class="exp-field"><label>說明</label><textarea id="expDesc" rows="2" placeholder="費用說明、事由..."></textarea></div>
-  </div>
-  <div id="expSupplierFields" style="display:none">
-    <div class="exp-field"><label>供應商名稱</label><input id="expSupName" placeholder="例：Siam Paragon、曼谷物流商"></div>
-    <div class="exp-field"><label>關聯 PO#（選填）</label><input id="expSupPO" placeholder="例：PO-BKK-2026-018"></div>
-    <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expSupAmt" type="number" placeholder="0.00" min="0" step="0.01"><select id="expSupCcy"><option>THB</option><option>RMB</option><option>TWD</option><option>HKD</option><option>USD</option></select></div></div>
-    <div class="exp-field">
-      <label>對應預算科目 <span style="color:#818cf8;font-size:9px;font-weight:700;">▸ 財務入帳用</span></label>
-      <select id="expSupBudgetSubject" style="background:#263349;border:1px solid #334155;color:#f1f5f9;border-radius:8px;padding:8px 10px;font-size:12px;width:100%;">
-        <option value="快閃店場地費">快閃店場地費</option>
-        <option value="採購貨款">採購貨款（備貨/代購）</option>
-        <option value="倉儲物流費">倉儲物流費</option>
-        <option value="行銷推廣費">行銷推廣費</option>
-        <option value="其他">其他（不在預算範圍）</option>
-      </select>
-    </div>
-    <div class="exp-field"><label>付款說明</label><textarea id="expSupDesc" rows="2" placeholder="付款條件、發票情況..."></textarea></div>
-  </div>
-  <div class="exp-routing" id="expRouting">送審路徑：<strong>Ray 直接批核</strong></div>
-  <button class="exp-submit" onclick="submitExpense()">送出申請</button>
-</div>
-</div>
-
-<script>
-(function(){
-let expType='personal';
-function getUser(){try{return(JSON.parse(localStorage.getItem('erp_sess')||'null')||{}).user||'';}catch(e){return '';}}
-function openExpModal(){
-  document.getElementById('expDate').valueAsDate=new Date();
-  setExpType('personal');
-  document.getElementById('expOverlay').classList.add('open');
-}
-function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
-function setExpType(t){
-  expType=t;
-  document.getElementById('expPersonalFields').style.display=t==='personal'?'':'none';
-  document.getElementById('expSupplierFields').style.display=t==='supplier'?'':'none';
-  document.getElementById('expTypePersonal').classList.toggle('active',t==='personal');
-  document.getElementById('expTypeSupplier').classList.toggle('active',t==='supplier');
-}
-async function _shWriteApproval(fields){
-  try{
-    const tr=await fetch(_P+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-    const {tenant_access_token:tk}=await tr.json();
-    await fetch(_P+'/open-apis/bitable/v1/apps/Sg7ObNELHaAdZzshGIFjWPVhpce/tables/tbl4OBNvsNkqS4mQ/records',
-      {method:'POST',headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({fields})});
-  }catch(e){console.warn('Feishu write skipped',e);}
-}
-function submitExpense(){
-  const u=getUser();
-  const sess=JSON.parse(localStorage.getItem('erp_sess')||'null');
-  const name=sess?.name||'Shawn';
-  let rec;
-  if(expType==='personal'){
-    const amt=document.getElementById('expAmt').value;
-    const ccy=document.getElementById('expCcy').value;
-    const cat=document.getElementById('expCat').options[document.getElementById('expCat').selectedIndex].text;
-    const date=document.getElementById('expDate').value;
-    const desc=document.getElementById('expDesc').value;
-    const subj=document.getElementById('expBudgetSubject').value;
-    if(!amt||!date){(window._shToast||alert)('請填寫金額與日期');return;}
-    if(!subj){(window._shToast||alert)('請選擇預算科目（財務入帳用）');return;}
-    rec={type:'個人報銷',amt,ccy,cat,date,desc,subject:subj};
-    const _cy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[ccy]||'THB';
-    _shWriteApproval({'標題':`【費用】${name} ${amt}${ccy}`,'審批標題':`【費用】${name} ${cat} ${amt}${ccy}`,'審批類型':'費用申請','申請人':name,'申請日期':Date.now(),'金額':parseFloat(amt)||0,'幣別':_cy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':desc||cat||'','預算科目':subj});
-  }else{
-    const supplier=document.getElementById('expSupName').value;
-    const po=document.getElementById('expSupPO').value;
-    const amt=document.getElementById('expSupAmt').value;
-    const ccy=document.getElementById('expSupCcy').value;
-    const desc=document.getElementById('expSupDesc').value;
-    const supSubj=document.getElementById('expSupBudgetSubject').value||'快閃店場地費';
-    if(!supplier||!amt){(window._shToast||alert)('請填寫供應商名稱與金額');return;}
-    rec={type:'供應商付款申請',supplier,po,amt,ccy,desc,subject:supSubj};
-    const _cy={'TWD':'TWD','HKD':'HKD','USD':'USD','THB':'THB','CNY':'CNY','RMB':'CNY'}[ccy]||'THB';
-    _shWriteApproval({'標題':`【付款】${name} ${supplier} ${amt}${ccy}`,'審批標題':`【付款】${name} ${supplier} ${amt}${ccy}`,'審批類型':'費用申請','申請人':name,'申請日期':Date.now(),'金額':parseFloat(amt)||0,'幣別':_cy,'審批人':'Ray','審批狀態':'待審批','Email已發送':'否','申請說明':desc||'供應商付款申請','預算科目':supSubj});
-  }
-  closeExpModal();
-  const msg=`✅ ${rec.type}已送出 · 待 Ray 批核`;
-  if(window._shToast) _shToast(msg); else alert(msg);
-}
-window.openExpModal=openExpModal;window.closeExpModal=closeExpModal;window.setExpType=setExpType;window.submitExpense=submitExpense;
-})();
 </script>
 
 </body>

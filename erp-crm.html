@@ -218,7 +218,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
           <div class="prod-block-name">Snoopy 夏季盲盒</div>
           <div class="prod-block-meta">大貨銷售中</div>
         </div>
-        <div class="prod-block-right" id="pb-snoopy-total" style="color:var(--ok)">¥ 107 萬</div>
+        <div class="prod-block-right" id="pb-snoopy-total" style="color:var(--ok)">¥ 278 萬</div>
       </div>
       <div class="prod-block-body">
         <table class="ord-tbl">
@@ -303,6 +303,24 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
     <div class="sec-title">即將到期（<span id="upcoming-count">0</span> 項）</div>
   </div>
   <div id="upcoming-list"></div>
+
+  <!-- 目標未拿下客戶 -->
+  <div class="sec-hdr" style="margin-top:28px;">
+    <div class="sec-title">🎯 目標未拿下客戶（<span id="target-count">1</span> 項）</div>
+    <span style="font-size:9px;color:var(--txt-lo);">想開發但還沒拿下訂單的客戶</span>
+  </div>
+  <div id="target-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--txt-hi);margin-bottom:3px;">Miniso（名創優品）</div>
+        <div style="font-size:11px;color:var(--txt-mid);">全球連鎖零售 · 想開發但目前沒有資源觸碰 · 安然標註</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-size:10px;font-weight:700;color:var(--warn);background:var(--warn-dim);border:1px solid var(--warn);border-radius:4px;padding:3px 8px;">📌 高優先</span>
+        <button onclick="alert('待 V2 接通飛書後支援編輯')" style="font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:6px;padding:4px 10px;cursor:pointer;">記錄接觸</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 上市後銷售反饋 -->
   <div class="sec-hdr" style="margin-top:28px">
@@ -803,9 +821,10 @@ function renderMyKPI(){
   if(!SESS) return;
   const myUser = SESS.user;
   // Demo data: per-user order totals
+  // 對齊 anran 明細加總（LOG-ON 199 + 廣州名創 58 + 泡泡瑪特 21 = 老董 278；上海美陳 35 = 德寶）
   const MY_DATA = {
-    laodong: { month: 107, quarter: 243, ar: 0,   arSub:'全部已收款' },
-    debao:   { month: 36,  quarter: 98,  ar: 18,  arSub:'LOG-ON 尾款逾期 3天' },
+    laodong: { month: 278, quarter: 750, ar: 0,   arSub:'全部已收款' },
+    debao:   { month: 35,  quarter: 110, ar: 18,  arSub:'LOG-ON 尾款逾期 3天' },
   };
   const d = MY_DATA[myUser] || { month: 62, quarter: 148, ar: 35, arSub:'訂金待尾款' };
   const fmt = v => v >= 100 ? `¥ ${v} 萬` : `¥ ${v} 萬`;
@@ -893,7 +912,7 @@ function renderMyProductOrders(){
   // Update totals
   const snTotal = document.getElementById('pb-snoopy-total');
   if(snTotal){
-    if(myUser==='laodong'){ snTotal.textContent='¥ 107 萬'; snTotal.style.color='var(--ok)'; }
+    if(myUser==='laodong'){ snTotal.textContent='¥ 278 萬'; snTotal.style.color='var(--ok)'; }
     else { snTotal.textContent='—'; snTotal.style.color='var(--txt-lo)'; }
   }
 }
