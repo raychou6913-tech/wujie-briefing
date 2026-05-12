@@ -249,7 +249,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
       <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--card2);display:flex;align-items:center;gap:10px;">
         <button class="btn-sm" onclick="openPricingSettings()" title="定價參數設定" style="padding:5px 10px;">⚙ 定價參數</button>
         <button class="btn-sm" onclick="openAddModal()" style="font-size:12px;color:var(--accent);border-color:var(--accent);padding:5px 14px;">＋ 新增項目</button>
-        <span style="font-size:10px;color:var(--txt-lo);">同 IP 新品 或 全新產品</span>
+        <span style="font-size:10px;color:var(--txt-lo);">現有 IP 新增商品 或 新建 IP</span>
       </div>
     </div>
   </div>
@@ -305,10 +305,10 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
     <div class="modal-title">新增預算項目</div>
     <div class="modal-tabs">
       <div class="modal-tab active" id="tabReorder" onclick="switchAddTab('reorder')">
-        📦 同 IP 新品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">同 IP 不同產品線</span>
+        📦 現有 IP 新增商品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">已簽約 IP 的新產品</span>
       </div>
       <div class="modal-tab" id="tabNew" onclick="switchAddTab('new')">
-        ✨ 全新產品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">新 IP / 新設計</span>
+        ✨ 新建 IP 並新增商品<br><span style="font-size:10px;font-weight:400;color:var(--txt-lo);">探索中 IP / 尚未簽約</span>
       </div>
     </div>
 
@@ -316,29 +316,34 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
     <div id="panelReorder">
       <div class="modal-field">
         <div class="modal-lbl">選擇 IP</div>
-        <select class="modal-inp" id="rIp"></select>
+        <select class="modal-inp" id="rIp" onchange="onReorderIpChange(this.value)"></select>
+        <div id="rIpInfo" style="font-size:10px;color:var(--txt-lo);margin-top:4px;display:none;line-height:1.5;"></div>
       </div>
       <div class="modal-field">
-        <div class="modal-lbl">新產品名稱</div>
+        <div class="modal-lbl">產品名稱</div>
         <input class="modal-inp" id="rName" placeholder="e.g. 夏日限定盲袋 / Q4 聖誕款">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
         <div class="modal-field">
-          <div class="modal-lbl">新品上市月</div>
+          <div class="modal-lbl">上市月</div>
           <select class="modal-inp" id="rLaunch"></select>
         </div>
         <div class="modal-field">
-          <div class="modal-lbl">新品首批數量（箱）</div>
-          <input class="modal-inp" id="rVol" type="number" min="0" placeholder="e.g. 50000">
+          <div class="modal-lbl">SRP（¥）</div>
+          <input class="modal-inp" id="rSrp" type="number" step="0.1" placeholder="e.g. 29.9">
+        </div>
+        <div class="modal-field">
+          <div class="modal-lbl">首批數量（箱）</div>
+          <input class="modal-inp" id="rVol" type="number" min="0" placeholder="e.g. 600">
         </div>
       </div>
-      <div class="modal-hint">⚠ 同 IP 新品沿用該 IP 既有的版稅與成本參數；單品變動成本（設計/建模/模具）可在新增後展開詳細調整。</div>
+      <div class="modal-hint">⚠ 沿用該 IP 既有的版稅與成本參數；單品變動成本（設計/建模/模具）可在新增後展開詳細調整。</div>
     </div>
 
     <!-- NEW PRODUCT PANEL -->
     <div id="panelNew" style="display:none;">
       <div class="modal-field">
-        <div class="modal-lbl">IP 名稱（未簽約 / 新探索）</div>
+        <div class="modal-lbl">探索中 IP 名稱（尚未簽合約）</div>
         <input class="modal-inp" id="nIp" placeholder="e.g. Maniani / Miffy / 還沒簽合約的 IP">
       </div>
       <div class="modal-field">
@@ -359,7 +364,7 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
           <input class="modal-inp" id="nVol" type="number" value="60000">
         </div>
       </div>
-      <div class="modal-hint">其餘成本細節（模具費、版稅等）在新增後展開列展開調整。預設套用通用成本範本。</div>
+      <div class="modal-hint">🔍 此 IP 會標記為「探索中」（尚未簽合約）。等安然建立正式合約後可升級為簽約 IP，並自動帶入版稅條款。其餘成本細節（模具費、版稅等）可在新增後展開調整。</div>
     </div>
 
     <!-- 法人資訊（兩個 tab 共用） -->
@@ -700,7 +705,18 @@ function opexScenarioChange(rawVal){
 }
 
 // ── STATE ─────────────────────────────────────────────────────────
-let prods = DEFAULTS.map(p=>({...p, royalty:{...p.royalty}}));
+const BUDGET_LS_KEY = 'erp_budget_prods_v1';
+function _loadProds(){
+  try{
+    const saved = localStorage.getItem(BUDGET_LS_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      if(Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  }catch(e){ console.warn('load budget fail', e); }
+  return DEFAULTS.map(p=>({...p, royalty:{...p.royalty}}));
+}
+let prods = _loadProds();
 let opex = 300000;
 let viewMode = 'gross';
 let assumeOpen = true;
@@ -724,9 +740,15 @@ const VAR_STD = [
   {key:'unitWarehouse', label:'雲倉費'},
   {key:'unitOther',     label:'其他'},
 ];
-function _pkgUnit(p){ return (p.pkgPerBox||0)/Math.max(p.piecesPerBoxPkg||1,1); }
+function _pkgUnit(p){
+  if(p.unitPkg!==undefined && p.unitPkg!==null) return Number(p.unitPkg)||0;
+  return (p.pkgPerBox||0)/Math.max(p.piecesPerBoxPkg||1,1);
+}
 function _piecesPerCarton(p){ return Math.max(p.piecesPerBoxPkg||1,1)*Math.max(p.innerPerBox||1,1); }
-function _logUnit(p){ return (p.logisticsPerBox||0)/Math.max(_piecesPerCarton(p),1); }
+function _logUnit(p){
+  if(p.unitLog!==undefined && p.unitLog!==null) return Number(p.unitLog)||0;
+  return (p.logisticsPerBox||0)/Math.max(_piecesPerCarton(p),1);
+}
 
 function oneTimeCost(p){
   const hidden = new Set(p.hiddenOT||[]);
@@ -800,7 +822,7 @@ function renderParams(){
     return `
       <tr class="prod-hdr-row" onclick="toggleRow('${p.id}')">
         <td>
-          <span class="ip-badge" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.ipShort}</span>${p.name}
+          <span class="ip-badge" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.ipShort}</span>${p.name}${p.isExplore?`<span style="margin-left:6px;font-size:9px;background:#a78bfa20;color:#a78bfa;border:1px solid #a78bfa44;border-radius:4px;padding:1px 5px;">🔍 探索中 IP</span>`:''}
         </td>
         <td>
           <select class="msel" onclick="event.stopPropagation()" onchange="fc(${i},'launch',this.value)">
@@ -892,7 +914,7 @@ function buildDetHTML(p,i){
         <button style="${_XB}" ${_XBH} title="隱藏此列" onclick="event.stopPropagation();hideRow(${i},'OT','${r.key}')">✕</button>
         ${r.label}
       </td>
-      <td><input class="det-inp" value="${v}" oninput="dc(${i},'${r.key}',this.value)"></td>
+      <td>¥<input class="det-inp" value="${v}" oninput="dc(${i},'${r.key}',this.value)"></td>
       <td style="color:var(--txt-lo);font-size:10px;">${fp(v/Math.max(p.volFirst,1)/ws)}/件</td>
     </tr>`;
   }).join('');
@@ -901,7 +923,7 @@ function buildDetHTML(p,i){
       <button style="${_XB}" ${_XBH} title="刪除" onclick="event.stopPropagation();delCustomRow(${i},'OT','${r.id}')">✕</button>
       <input class="det-inp" style="width:80px;display:inline-block;" value="${r.label}" oninput="renameCustomRow(${i},'OT','${r.id}',this.value)">
     </td>
-    <td><input class="det-inp" value="${r.val}" oninput="updateCustomRow(${i},'OT','${r.id}',this.value)"></td>
+    <td>¥<input class="det-inp" value="${r.val}" oninput="updateCustomRow(${i},'OT','${r.id}',this.value)"></td>
     <td style="color:var(--txt-lo);font-size:10px;">${fp(r.val/Math.max(p.volFirst,1)/ws)}/件</td>
   </tr>`).join('');
   const otHiddenCount = hiddenOT.size;
@@ -914,7 +936,7 @@ function buildDetHTML(p,i){
         <button style="${_XB}" ${_XBH} title="隱藏此列" onclick="event.stopPropagation();hideRow(${i},'Var','${r.key}')">✕</button>
         ${r.label}
       </td>
-      <td><input class="det-inp" value="${v}" oninput="dc(${i},'${r.key}',this.value)"></td>
+      <td>¥<input class="det-inp" value="${v}" oninput="dc(${i},'${r.key}',this.value)"></td>
       <td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(v/ws)}</td>
     </tr>`;
   }).join('');
@@ -923,7 +945,7 @@ function buildDetHTML(p,i){
       <button style="${_XB}" ${_XBH} title="刪除" onclick="event.stopPropagation();delCustomRow(${i},'Var','${r.id}')">✕</button>
       <input class="det-inp" style="width:80px;display:inline-block;" value="${r.label}" oninput="renameCustomRow(${i},'Var','${r.id}',this.value)">
     </td>
-    <td><input class="det-inp" value="${r.val}" oninput="updateCustomRow(${i},'Var','${r.id}',this.value)"></td>
+    <td>¥<input class="det-inp" value="${r.val}" oninput="updateCustomRow(${i},'Var','${r.id}',this.value)"></td>
     <td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(r.val/ws)}</td>
   </tr>`).join('');
   const varHiddenCount = new Set(p.hiddenVar||[]).size;
@@ -949,23 +971,16 @@ function buildDetHTML(p,i){
       <div>
         <div class="det-col-title">每件變動成本（每批都有）</div>
         <table class="det-tbl">
-          <tr><td>公仔本體</td><td><input class="det-inp" value="${p.unitMfg}" oninput="dc(${i},'unitMfg',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp((p.unitMfg||0)/ws)}</td></tr>
+          <tr><td>公仔本體</td><td>¥<input class="det-inp" value="${p.unitMfg}" oninput="dc(${i},'unitMfg',this.value)"></td><td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp((p.unitMfg||0)/ws)}</td></tr>
           <tr>
-            <td style="white-space:nowrap;">通路包材（中盒）</td>
-            <td style="white-space:nowrap;">
-              ¥<input class="det-inp" style="width:42px;" value="${p.pkgPerBox||0}" oninput="dc(${i},'pkgPerBox',this.value)">/盒 ÷
-              <input class="det-inp" style="width:28px;" value="${p.piecesPerBoxPkg||15}" oninput="dc(${i},'piecesPerBoxPkg',this.value)">件/盒
-            </td>
-            <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(pkg,3)}/件 · ${fp(pkg/ws)}</td>
+            <td style="white-space:nowrap;">通路包材</td>
+            <td>¥<input class="det-inp" value="${fn(pkg,3)}" oninput="dc(${i},'unitPkg',this.value)"></td>
+            <td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(pkg/ws)}</td>
           </tr>
           <tr>
-            <td style="white-space:nowrap;">物流（箱）</td>
-            <td style="white-space:nowrap;">
-              ¥<input class="det-inp" style="width:42px;" value="${p.logisticsPerBox||0}" oninput="dc(${i},'logisticsPerBox',this.value)">/箱 ÷
-              (<input class="det-inp" style="width:28px;" value="${p.piecesPerBoxPkg||15}" oninput="dc(${i},'piecesPerBoxPkg',this.value)">件×
-              <input class="det-inp" style="width:28px;" value="${p.innerPerBox||16}" oninput="dc(${i},'innerPerBox',this.value)">盒)
-            </td>
-            <td style="color:var(--txt-lo);font-size:10px;">=¥${fn(logistics,3)}/件 · ${fp(logistics/ws)}<br><span style="font-size:9px;opacity:.6;">${p.piecesPerBoxPkg||15}件/中盒 × ${p.innerPerBox||16}盒/箱 = ${_piecesPerCarton(p)}件/箱</span></td>
+            <td style="white-space:nowrap;">物流</td>
+            <td>¥<input class="det-inp" value="${fn(logistics,3)}" oninput="dc(${i},'unitLog',this.value)"></td>
+            <td style="color:var(--txt-lo);font-size:10px;">¥/件 · ${fp(logistics/ws)}</td>
           </tr>
           ${varRows}
           ${extraVarRows}
@@ -1005,6 +1020,11 @@ function buildDetHTML(p,i){
     <div id="ch-${p.id}">${buildChannelHTML(p,i)}</div>
     <!-- ECONOMICS PREVIEW -->
     <div id="econ-${p.id}">${buildEconHTML(e, p)}</div>
+    <!-- SAVE FOOTER -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;align-items:center;gap:10px;">
+      <span id="save-status-${p.id}" style="font-size:10px;color:var(--txt-lo);"></span>
+      <button onclick="event.stopPropagation();saveBudget('${p.id}')" style="padding:6px 18px;font-size:12px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">💾 儲存</button>
+    </div>
   </div>`;
 }
 
@@ -1290,14 +1310,78 @@ function applyChannelToVol(i){
 }
 
 // ── ADD PRODUCT MODAL ─────────────────────────────────────────────
-// 系統內建的 IP 顏色對照（5 個簽約 IP）
+// 系統內建的 IP 主檔（5 個已簽約 IP，從合約解析）
+const IP_MASTER = {
+  'Mofusand 貓福珊迪': {
+    color:'#fb923c',
+    royalty:{type:'ws', d:1, r:0.14},
+    royaltyDesc:'銷售額 × 14%',
+    entity:'有你共創（台灣）',
+    settlement:'季結',
+    region:'中港澳台',
+    period:'2025/12/1 – 2026/11/30',
+    mg:'¥304,234.56',
+  },
+  'Snoopy 史努比': {
+    color:'#fbbf24',
+    royalty:{type:'std', d:0.40, r:0.13},
+    royaltyDesc:'SRP × 40% × 13%（Non-FOB；F.O.B. 禁止）',
+    entity:'深圳蕪解',
+    settlement:'季結',
+    region:'EEA + 大陸 + 港澳台 + 東南亞等（OFAC 排除）',
+    period:'2026/2/1 – 2027/6/30',
+    mg:'USD 100,000',
+  },
+  'Opanchu 褲褲兔': {
+    color:'#818cf8',
+    royalty:{type:'std', d:0.40, r:0.14},
+    royaltyDesc:'SRP × 40% × 14%（批發）',
+    entity:'UNIICREATIVE（台灣）',
+    settlement:'季結',
+    region:'T1 大陸 / T2 東南亞 6 國（**無港澳台**）',
+    period:'2025/9/1 – 2026/10/30',
+    mg:'USD 65,000（T1 49k + T2 16k）',
+    needsHologram:true,
+  },
+  'Muziktiger 無業老虎': {
+    color:'#38bdf8',
+    royalty:{type:'ws', d:1, r:0.08},
+    royaltyDesc:'實際出貨價 × 8%',
+    entity:'有你共創（台灣）',
+    settlement:'季結',
+    region:'僅大陸',
+    period:'2025/12/1 – 2027/2/28',
+    mg:'¥80,000',
+  },
+  '飯糰與梅子': {
+    color:'#f472b6',
+    royalty:{type:'ws', d:1, r:0.12},
+    royaltyDesc:'含稅批發價 × 12% × 生產量（不論賣出與否）',
+    entity:'有你共創（台灣）',
+    settlement:'月結（每月10號）',
+    region:'大陸 + 港澳（**無台灣**）',
+    period:'2025/12/15 – 2027/2/28',
+    mg:'¥200,000',
+    byProduction:true,
+  },
+};
+// 兼容舊欄位（不同寫法都對應同一個 IP）
 const IP_COLOR_MAP = {
   'Snoopy 史努比':'#fbbf24', 'Snoopy':'#fbbf24',
   'Mofusand 貓福珊迪':'#fb923c', 'Mofusand':'#fb923c', '貓福珊迪':'#fb923c',
   'Opanchu 褲褲兔':'#818cf8', 'Opanchu':'#818cf8', '褲褲兔':'#818cf8',
-  'Muziktiger':'#38bdf8', '無業老虎':'#38bdf8',
+  'Muziktiger':'#38bdf8', '無業老虎':'#38bdf8', 'Muziktiger 無業老虎':'#38bdf8',
   '飯糰與梅子':'#f472b6', 'おにうめ':'#f472b6',
 };
+function _findIpMaster(ipName){
+  if(IP_MASTER[ipName]) return IP_MASTER[ipName];
+  // 模糊比對：用 ipShort 或 keyword
+  const keys = Object.keys(IP_MASTER);
+  for(const k of keys){
+    if(k.includes(ipName) || ipName.includes(k.split(' ')[0])) return IP_MASTER[k];
+  }
+  return null;
+}
 const NEW_IP_COLOR_POOL = ['#a78bfa','#22c55e','#f43f5e','#10b981','#06b6d4','#eab308'];
 function _autoIpColor(ipName){
   if(IP_COLOR_MAP[ipName]) return IP_COLOR_MAP[ipName];
@@ -1307,16 +1391,22 @@ function _autoIpColor(ipName){
 }
 
 function openAddModal(){
-  // IP picker: 從現有產品歸納出 IP 列表（去重）
-  const uniqueIPs = [...new Set(prods.map(p => p.ip))];
+  // IP picker: 合併「現有產品的 IP」+「IP 主檔的已簽約 IP」
+  const fromProds = prods.filter(p=>!p.isExplore).map(p => p.ip);
+  const fromMaster = Object.keys(IP_MASTER);
+  const uniqueIPs = [...new Set([...fromMaster, ...fromProds])];
   const ipOpts = uniqueIPs.map(ip => `<option value="${ip}">${ip}</option>`).join('');
   document.getElementById('rIp').innerHTML = ipOpts;
+  // 預設選第一個並觸發資訊面板
+  if(uniqueIPs.length) onReorderIpChange(uniqueIPs[0]);
   const monthOpts = MONTHS.slice(0,21).map(m=>`<option>${m}</option>`).join('');
   document.getElementById('rLaunch').innerHTML = monthOpts;
   document.getElementById('nLaunch').innerHTML = monthOpts;
   // Clear inputs
   document.getElementById('rName').value = '';
   document.getElementById('rVol').value = '';
+  document.getElementById('rSrp').value = '';
+  document.getElementById('rIpInfo').style.display = 'none';
   document.getElementById('mCoopMode').value = '';
   document.getElementById('mEntity').value = '';
   document.getElementById('mCurrency').value = 'RMB';
@@ -1327,6 +1417,51 @@ function openAddModal(){
   document.getElementById('addModal').style.display='flex';
 }
 function closeAddModal(){ document.getElementById('addModal').style.display='none'; }
+
+// ── 選擇 IP 後顯示合約資訊（自動帶入版稅/主體/結算）─────────────
+function onReorderIpChange(ipName){
+  const info = document.getElementById('rIpInfo');
+  if(!info) return;
+  const master = _findIpMaster(ipName);
+  if(!master){
+    info.style.display = 'none';
+    return;
+  }
+  info.style.display = 'block';
+  const hologramFlag = master.needsHologram ? '<br>🛡 強制 hologram 防偽標' : '';
+  const byProd = master.byProduction ? '<br>⚠ 按<strong>生產量</strong>計版稅（非銷售量）' : '';
+  info.innerHTML = `
+    <div style="padding:8px 10px;background:var(--card2);border-left:3px solid ${master.color};border-radius:5px;margin-top:4px;">
+      <div style="font-weight:700;color:var(--txt-mid);margin-bottom:3px;">📋 從合約自動帶入</div>
+      <div>版稅：${master.royaltyDesc}</div>
+      <div>合約主體：${master.entity}　│　結算：${master.settlement}</div>
+      <div>授權地區：${master.region}</div>
+      <div style="color:var(--txt-lo);">期限：${master.period}　│　MG：${master.mg}</div>
+      ${hologramFlag}${byProd}
+    </div>`;
+}
+
+// ── 儲存預算到瀏覽器（之後可接飛書）────────────────────────────
+function saveBudget(prodId){
+  try{
+    localStorage.setItem(BUDGET_LS_KEY, JSON.stringify(prods));
+    const el = document.getElementById('save-status-'+prodId);
+    if(el){
+      el.textContent = '✓ 已儲存 '+new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+      el.style.color = 'var(--ok)';
+      setTimeout(()=>{ if(el) el.textContent=''; }, 3000);
+    }
+  }catch(e){
+    alert('儲存失敗：'+e.message);
+  }
+}
+
+// ── 還原預設（清掉本地儲存）─────────────────────────────────
+function resetBudget(){
+  if(!confirm('確定要還原預設預算？所有手動編輯會清除（不影響飛書資料）')) return;
+  localStorage.removeItem(BUDGET_LS_KEY);
+  location.reload();
+}
 
 // ── PRICING PARAMS（可調參數，存 localStorage）──────────────────
 let PRICING_PARAMS = (() => {
@@ -1437,9 +1572,10 @@ function confirmAdd(){
     const ipSel = document.getElementById('rIp').value;
     const newName = document.getElementById('rName').value.trim();
     const volBoxes = parseInt(document.getElementById('rVol').value)||0;
+    const srp = parseFloat(document.getElementById('rSrp').value);
     const launch = document.getElementById('rLaunch').value;
     if(!ipSel){ alert('請選擇 IP'); return; }
-    if(!newName){ alert('請填寫新產品名稱'); return; }
+    if(!newName){ alert('請填寫產品名稱'); return; }
     if(!volBoxes||!launch){ alert('請填寫上市月與箱數'); return; }
     // 找該 IP 的代表產品作為成本/版稅參數來源
     const base = prods.find(p => p.ip === ipSel) || prods[0];
@@ -1452,6 +1588,7 @@ function confirmAdd(){
     }), id:uid,
       name: newName,
       launch, volFirst:volBoxes*ppc, volReorder:0,
+      srp: (srp && srp>0) ? srp : base.srp,
       royalty:{...base.royalty},
       entity: document.getElementById('mEntity').value,
       currency: document.getElementById('mCurrency').value || 'RMB',
@@ -1459,7 +1596,7 @@ function confirmAdd(){
       coopParams: _readCoopParams() };
     prods.push(newProd);
   } else {
-    // 全新產品：手填 IP 名稱 + 產品名稱（IP 顏色自動分配）
+    // 全新產品：手填 IP 名稱 + 產品名稱（IP 顏色自動分配，標記為「探索中 IP」）
     const ip = document.getElementById('nIp').value.trim() || '新IP';
     const name = document.getElementById('nName').value.trim() || '新產品';
     const launch = document.getElementById('nLaunch').value;
@@ -1474,6 +1611,7 @@ function confirmAdd(){
       unitMfg:4.0, unitAntiForge:0.106,
       unitWarehouse:0.056, unitOther:0,
       royalty:{type:'std', d:0.40, r:0.12},
+      isExplore: true,  // 標記為探索中 IP（未簽合約）
       entity: document.getElementById('mEntity').value,
       currency: document.getElementById('mCurrency').value || 'RMB',
       coopMode: document.getElementById('mCoopMode').value,
