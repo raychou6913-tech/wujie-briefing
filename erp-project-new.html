@@ -216,10 +216,136 @@ textarea{resize:vertical;min-height:60px;}
     </div>
   </div>
 
-  <!-- STEP 2：財務預期 -->
+  <!-- STEP 2：業務型態特定欄位 + 財務預期 -->
   <div class="card" id="card-2" style="display:none;">
-    <div class="card-title">💰 Step 2 · 財務預期</div>
-    <div class="card-sub">填預估金額。鎖定匯率會把當下匯率寫進項目，未來匯率波動不影響此項目的 RMB 口徑（合併報表用）。</div>
+    <div class="card-title" id="step2-title">💰 Step 2 · 財務預期</div>
+    <div class="card-sub" id="step2-sub">填預估金額。鎖定匯率會把當下匯率寫進項目，未來匯率波動不影響此項目的 RMB 口徑（合併報表用）。</div>
+
+    <!-- 批發專屬欄位 -->
+    <div id="type-wholesale-fields" style="display:none;border-bottom:1px dashed var(--border);padding-bottom:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.04em;margin-bottom:10px;">📦 批發專屬</div>
+      <div class="field">
+        <label>主要客戶類型（可複選）</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;">
+          <label style="display:flex;align-items:center;gap:5px;"><input type="checkbox" class="ws-cust" value="KA">KA 客戶</label>
+          <label style="display:flex;align-items:center;gap:5px;"><input type="checkbox" class="ws-cust" value="品牌">品牌客戶</label>
+          <label style="display:flex;align-items:center;gap:5px;"><input type="checkbox" class="ws-cust" value="流通">流通客戶</label>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>預估出貨數量（箱）</label>
+          <input id="ws-boxes" type="number" placeholder="例：600">
+        </div>
+        <div class="field">
+          <label>預估批發折扣（%）</label>
+          <input id="ws-disc" type="number" placeholder="46" value="46">
+          <div class="hint">公司均值 46 折，可調整</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 快閃店專屬欄位 -->
+    <div id="type-popup-fields" style="display:none;border-bottom:1px dashed var(--border);padding-bottom:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--ok);letter-spacing:.04em;margin-bottom:10px;">🌏 快閃店專屬</div>
+      <div class="field-row">
+        <div class="field">
+          <label>場地名稱</label>
+          <input id="pop-venue" placeholder="例：Siam Paragon、北京三里屯、台北信義 ATT">
+        </div>
+        <div class="field">
+          <label>城市</label>
+          <select id="pop-city">
+            <option>台北</option>
+            <option>北京</option>
+            <option>上海</option>
+            <option>廣州</option>
+            <option>深圳</option>
+            <option>曼谷</option>
+            <option>香港</option>
+            <option>其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>開店日</label>
+          <input id="pop-open" type="date">
+        </div>
+        <div class="field">
+          <label>撤場日</label>
+          <input id="pop-close" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label>寄售方分潤模式</label>
+        <select id="pop-share">
+          <option value="self">自有（不寄售）</option>
+          <option value="commission">場地抽成（如 Siam 場地費）</option>
+          <option value="partner">寄售方分潤（外部設計師寄賣）</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ODM/OEM 專屬欄位 -->
+    <div id="type-odm-fields" style="display:none;border-bottom:1px dashed var(--border);padding-bottom:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--warn);letter-spacing:.04em;margin-bottom:10px;">🏭 ODM / OEM 專屬</div>
+      <div class="field">
+        <label>客戶名稱</label>
+        <input id="odm-client" placeholder="例：某品牌、某展會主辦方">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>服務型態</label>
+          <select id="odm-service">
+            <option>純設計</option>
+            <option>純採購生產</option>
+            <option>設計+生產全包</option>
+            <option>後段印刷加工</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>交期（天）</label>
+          <input id="odm-deadline" type="number" placeholder="60">
+        </div>
+      </div>
+      <div class="field">
+        <label>客戶 brief 摘要</label>
+        <textarea id="odm-brief" rows="2" placeholder="客戶需求重點、規格、品牌限制..."></textarea>
+      </div>
+    </div>
+
+    <!-- 服務類專屬欄位 -->
+    <div id="type-service-fields" style="display:none;border-bottom:1px dashed var(--border);padding-bottom:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:#06b6d4;letter-spacing:.04em;margin-bottom:10px;">🛠 服務類專屬</div>
+      <div class="field">
+        <label>客戶名稱</label>
+        <input id="srv-client" placeholder="例：某品牌、某 IP 持有方">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>服務型態</label>
+          <select id="srv-type">
+            <option>快閃店代運營</option>
+            <option>Style Guide / 圖庫開發</option>
+            <option>單次設計服務</option>
+            <option>顧問諮詢</option>
+            <option>其他</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>收費結構</label>
+          <select id="srv-fee">
+            <option>月固定費</option>
+            <option>按件計費</option>
+            <option>一次性報酬</option>
+            <option>分潤抽成</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--txt-mid);letter-spacing:.04em;margin-bottom:10px;">💰 通用財務預期</div>
 
     <div class="field-row-3">
       <div class="field">
@@ -296,7 +422,8 @@ textarea{resize:vertical;min-height:60px;}
       <div class="done-icon">🎉</div>
       <div class="done-title">項目已建立</div>
       <div class="done-sub" id="done-msg">已送出 · 等待 Ray 在戰情室確認後正式 baseline</div>
-      <button class="btn btn-primary" onclick="location.href='erp-lobby.html'">回大廳</button>
+      <div id="next-step-area" style="margin:18px 0 12px;font-size:12px;color:var(--txt-mid);"></div>
+      <button class="btn btn-primary" id="next-step-btn" onclick="location.href='erp-lobby.html'">回大廳</button>
       <button class="btn btn-ghost" onclick="location.reload()" style="margin-left:8px;">再建一個</button>
     </div>
   </div>
@@ -315,6 +442,64 @@ try{
   const sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
   if(sess?.name) document.getElementById('bp-user').textContent = sess.name;
 }catch(e){}
+
+// ── 業務型態（URL ?type=）──
+const TYPE_CONFIG = {
+  wholesale: {
+    icon:'📦', name:'批發項目',
+    feishuCategory:'商品批發',
+    hero:'＋ 新增批發項目',
+    heroSub:'KA / 品牌 / 流通客戶下訂。建好後到預算規劃器加產品線。',
+    nextStep:{ btn:'→ 去預算規劃器加產品線', url:'erp-budget-planner.html' },
+  },
+  popup: {
+    icon:'🌏', name:'快閃店項目',
+    feishuCategory:'快閃店',
+    hero:'＋ 新增快閃店項目',
+    heroSub:'兩岸三地都開（台北 / 北京 / 上海 / 廣州 / 深圳 / 曼谷 / 香港）。',
+    nextStep:{ btn:'→ 設定備貨與寄售', url:'erp-shawn.html' },
+  },
+  odm: {
+    icon:'🏭', name:'ODM / OEM 項目',
+    feishuCategory:'ODM/OEM',
+    hero:'＋ 新增 ODM / OEM 項目',
+    heroSub:'客戶委託代工。建好後到採購台開 PO。',
+    nextStep:{ btn:'→ 去採購台開 PO', url:'erp-procurement.html' },
+  },
+  service: {
+    icon:'🛠', name:'服務類項目',
+    feishuCategory:'服務類',
+    hero:'＋ 新增服務類項目',
+    heroSub:'快閃代運營 / Style Guide / 設計服務 / 顧問諮詢。',
+    nextStep:{ btn:'→ 回大廳', url:'erp-lobby.html' },
+  },
+};
+
+const _urlType = new URLSearchParams(location.search).get('type') || 'wholesale';
+const _typeCfg = TYPE_CONFIG[_urlType] || TYPE_CONFIG.wholesale;
+
+// 套用 type 到 UI
+(function applyType(){
+  document.querySelector('.hero-title').textContent = _typeCfg.hero;
+  document.querySelector('.hero-sub').innerHTML = _typeCfg.heroSub + '<br>建好後狀態為「待 Ray 確認」，Ray 點過才算 baseline，VAM 數字才有人信。';
+  // 預設「類別」下拉
+  const catSel = document.getElementById('f-category');
+  if(catSel){
+    // 加 ODM/服務類選項（如果不存在）
+    if(![...catSel.options].some(o=>o.value===_typeCfg.feishuCategory)){
+      const opt = document.createElement('option');
+      opt.value = _typeCfg.feishuCategory;
+      opt.textContent = _typeCfg.feishuCategory;
+      catSel.appendChild(opt);
+    }
+    catSel.value = _typeCfg.feishuCategory;
+  }
+  // 顯示對應 step2 專屬欄位
+  ['wholesale','popup','odm','service'].forEach(t => {
+    const el = document.getElementById('type-'+t+'-fields');
+    if(el) el.style.display = (t === _urlType) ? '' : 'none';
+  });
+})();
 
 let ipMaster = {};  // IP 名稱 → 版稅/MG 等
 
@@ -480,6 +665,55 @@ function renderSummary(){
   `;
 }
 
+function collectTypeSpecificFields(){
+  if(_urlType === 'wholesale'){
+    const custs = [...document.querySelectorAll('.ws-cust:checked')].map(i=>i.value);
+    const boxes = document.getElementById('ws-boxes').value;
+    const disc = document.getElementById('ws-disc').value;
+    const lines = [];
+    if(custs.length) lines.push(`【批發】主要客戶類型：${custs.join('、')}`);
+    if(boxes) lines.push(`預估出貨：${boxes} 箱`);
+    if(disc) lines.push(`預估折扣：${disc}%`);
+    return lines.join('\n');
+  }
+  if(_urlType === 'popup'){
+    const venue = document.getElementById('pop-venue').value;
+    const city = document.getElementById('pop-city').value;
+    const open = document.getElementById('pop-open').value;
+    const close = document.getElementById('pop-close').value;
+    const share = document.getElementById('pop-share').value;
+    const shareLbl = {self:'自有不寄售',commission:'場地抽成',partner:'寄售方分潤'}[share]||share;
+    const lines = [];
+    if(venue || city) lines.push(`【快閃店】${city||''}${venue?'·'+venue:''}`);
+    if(open || close) lines.push(`期間：${open||'?'} ~ ${close||'?'}`);
+    if(share) lines.push(`分潤模式：${shareLbl}`);
+    return lines.join('\n');
+  }
+  if(_urlType === 'odm'){
+    const client = document.getElementById('odm-client').value;
+    const service = document.getElementById('odm-service').value;
+    const deadline = document.getElementById('odm-deadline').value;
+    const brief = document.getElementById('odm-brief').value;
+    const lines = [];
+    if(client) lines.push(`【ODM/OEM】客戶：${client}`);
+    if(service) lines.push(`服務型態：${service}`);
+    if(deadline) lines.push(`交期：${deadline} 天`);
+    if(brief) lines.push(`Brief：${brief}`);
+    return lines.join('\n');
+  }
+  if(_urlType === 'service'){
+    const client = document.getElementById('srv-client').value;
+    const type = document.getElementById('srv-type').value;
+    const fee = document.getElementById('srv-fee').value;
+    const lines = [];
+    if(client) lines.push(`【服務類】客戶：${client}`);
+    if(type) lines.push(`服務型態：${type}`);
+    if(fee) lines.push(`收費結構：${fee}`);
+    return lines.join('\n');
+  }
+  return '';
+}
+
 async function submitProject(){
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
@@ -493,6 +727,12 @@ async function submitProject(){
     const inc = parseFloat(document.getElementById('f-income').value)||0;
     const exp = parseFloat(document.getElementById('f-expense').value)||0;
     const profit = inc - exp;
+
+    // 業務型態專屬欄位 → 序列化進「備註」（飛書 schema 沒對應欄位）
+    const typeSpecific = collectTypeSpecificFields();
+
+    const baseNotes = document.getElementById('f-notes').value || '';
+    const combinedNotes = [baseNotes, typeSpecific].filter(s=>s).join('\n\n──────\n') || undefined;
 
     const fields = {
       '項目名稱': document.getElementById('f-name').value.trim(),
@@ -508,7 +748,7 @@ async function submitProject(){
       '預計淨利': profit,
       '幣別': cur,
       '鎖定匯率': rate,
-      '備註': document.getElementById('f-notes').value || undefined,
+      '備註': combinedNotes,
     };
     const endDate = document.getElementById('f-end').value;
     if(endDate) fields['截止日期'] = new Date(endDate).getTime();
@@ -529,7 +769,15 @@ async function submitProject(){
     // 成功 → 切到 done 頁
     ['card-1','card-2','card-3'].forEach(id=>document.getElementById(id).style.display='none');
     document.getElementById('card-done').style.display = '';
-    document.getElementById('done-msg').innerHTML = `項目「<strong>${fields['項目名稱']}</strong>」已寫入飛書 · 狀態「待 Ray 確認」<br>Ray 在戰情室點過後正式 baseline`;
+    document.getElementById('done-msg').innerHTML = `${_typeCfg.icon} ${_typeCfg.name}「<strong>${fields['項目名稱']}</strong>」已寫入飛書<br>狀態「待 Ray 確認」 · Ray 在戰情室點過後正式 baseline`;
+    // 依 type 顯示對應下一步
+    const nextArea = document.getElementById('next-step-area');
+    const nextBtn = document.getElementById('next-step-btn');
+    if(nextArea && _typeCfg.nextStep){
+      nextArea.innerHTML = `<strong style="color:var(--accent);">下一步建議：</strong>${_typeCfg.nextStep.btn.replace('→','')}`;
+      nextBtn.textContent = _typeCfg.nextStep.btn;
+      nextBtn.onclick = () => location.href = _typeCfg.nextStep.url;
+    }
     [1,2,3].forEach(i=>{
       document.getElementById('s'+i).classList.remove('active');
       document.getElementById('s'+i).classList.add('done');
