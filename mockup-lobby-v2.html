@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · Lobby 極簡版 mockup</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
+  --border:#334155;--border-hi:#475569;
+  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
+  --accent:#818cf8;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+}
+body{background:radial-gradient(ellipse 80% 50% at 50% 0%,#818cf815 0%,var(--bg) 60%);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;font-size:13px;}
+
+/* 提示 banner（mockup 才有）*/
+.mockup-banner{background:linear-gradient(90deg,#818cf820,#fb923c20);border-bottom:1px solid #818cf830;padding:8px 20px;font-size:11px;font-weight:600;color:#c4b5fd;text-align:center;}
+
+.topbar{padding:20px 30px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#fb923c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;}
+.brand-name{font-size:15px;font-weight:700;}
+.user-pic{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;cursor:pointer;}
+
+.main{max-width:760px;margin:0 auto;padding:30px 30px 80px;}
+
+/* HERO：早安 + 今天 1 件最重要 */
+.hero{margin-bottom:36px;text-align:center;}
+.hero-time{font-size:11px;color:var(--txt-lo);font-weight:500;letter-spacing:.04em;margin-bottom:10px;}
+.hero-greeting{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:8px;}
+.hero-greeting .accent{background:linear-gradient(90deg,#c4b5fd,#fb923c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero-sub{font-size:14px;color:var(--txt-mid);font-weight:500;}
+
+/* 今天最重要的 1-3 件 */
+.today-strip{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:34px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.15s;}
+.today-strip:hover{border-color:var(--accent);transform:translateY(-1px);}
+.today-icon{width:42px;height:42px;border-radius:11px;background:var(--danger);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.today-info{flex:1;}
+.today-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.today-meta{font-size:11px;color:var(--txt-mid);}
+.today-arrow{color:var(--txt-lo);font-size:18px;}
+
+/* 大功能圖標 grid（最重要的 6 個入口）*/
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.app-tile{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 16px;text-align:center;cursor:pointer;transition:.18s;text-decoration:none;color:var(--txt-hi);position:relative;overflow:hidden;}
+.app-tile:hover{border-color:var(--border-hi);transform:translateY(-2px);background:var(--card);}
+.app-tile.primary{border-color:var(--accent);background:linear-gradient(135deg,var(--card),#818cf815);}
+.app-tile.primary:hover{border-color:#a78bfa;}
+.app-icon{font-size:32px;margin-bottom:10px;display:block;}
+.app-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.app-desc{font-size:10px;color:var(--txt-mid);font-weight:500;line-height:1.5;}
+.app-badge{position:absolute;top:8px;right:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:8px;}
+
+/* 第二排「更多功能」collapse */
+.more-section{margin-top:30px;}
+.more-toggle{background:none;border:none;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;margin:0 auto;padding:8px 14px;border-radius:8px;font-family:inherit;}
+.more-toggle:hover{background:var(--surface);color:var(--txt-hi);}
+.more-grid{display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
+.more-grid.open{display:grid;}
+.more-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;text-decoration:none;color:var(--txt-hi);}
+.more-tile:hover{border-color:var(--border-hi);background:var(--card);}
+.more-icon{font-size:20px;margin-bottom:6px;display:block;}
+.more-name{font-size:11px;font-weight:600;}
+
+@media(max-width:520px){
+  .app-grid{grid-template-columns:repeat(2,1fr);}
+  .more-grid{grid-template-columns:repeat(3,1fr);}
+  .main{padding:20px 16px 60px;}
+  .hero-greeting{font-size:24px;}
+}
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">
+  ✨ Lobby 極簡版 mockup · 純靜態示意，不接真實資料
+</div>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">蕪</div>
+    <div>
+      <div class="brand-name">蕪解 ERP</div>
+    </div>
+  </div>
+  <div class="user-pic">R</div>
+</div>
+
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-time">2026 年 5 月 13 日 · 星期三</div>
+    <div class="hero-greeting">下午好，<span class="accent">Ray</span></div>
+    <div class="hero-sub">今天有 1 件最重要的事要做</div>
+  </div>
+
+  <!-- 今天最重要的事（自動排序最緊急的 1 件）-->
+  <div class="today-strip">
+    <div class="today-icon">🔥</div>
+    <div class="today-info">
+      <div class="today-title">3 筆審批等你批，1 筆已等 4 天</div>
+      <div class="today-meta">最久等待：安然送的「上海訂單 ¥150 萬」· 已 4 天</div>
+    </div>
+    <div class="today-arrow">→</div>
+  </div>
+
+  <!-- 6 個大功能（依角色不同，這邊示意 Ray 視角）-->
+  <div class="app-grid">
+    <a href="#" class="app-tile primary">
+      <span class="app-icon">＋</span>
+      <div class="app-name">新增項目</div>
+      <div class="app-desc">批發 / 快閃 / ODM / 服務</div>
+    </a>
+    <a href="#" class="app-tile">
+      <span class="app-badge">3</span>
+      <span class="app-icon">🎯</span>
+      <div class="app-name">戰情室</div>
+      <div class="app-desc">VAM · 待批 · 法人總覽</div>
+    </a>
+    <a href="#" class="app-tile">
+      <span class="app-icon">📊</span>
+      <div class="app-name">預算規劃</div>
+      <div class="app-desc">兩年 VAM 推演</div>
+    </a>
+    <a href="#" class="app-tile">
+      <span class="app-icon">💰</span>
+      <div class="app-name">費用申請</div>
+      <div class="app-desc">報銷 / 付款</div>
+    </a>
+    <a href="#" class="app-tile">
+      <span class="app-icon">📜</span>
+      <div class="app-name">合約 / IP</div>
+      <div class="app-desc">5 個簽約 · MG 進度</div>
+    </a>
+    <a href="#" class="app-tile">
+      <span class="app-icon">👤</span>
+      <div class="app-name">客戶 / CRM</div>
+      <div class="app-desc">追跟進 / 目標客戶</div>
+    </a>
+  </div>
+
+  <!-- 「⋯ 更多功能」（預設摺疊，要點才展開）-->
+  <div class="more-section">
+    <button class="more-toggle" onclick="document.getElementById('more').classList.toggle('open');this.querySelector('.arrow').textContent=document.getElementById('more').classList.contains('open')?'▴':'▾'">
+      <span class="arrow">▾</span> 更多功能
+    </button>
+    <div class="more-grid" id="more">
+      <a href="#" class="more-tile"><span class="more-icon">🏗</span><div class="more-name">產品流水線</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">🛒</span><div class="more-name">採購台</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">📋</span><div class="more-name">驗收登錄</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">🌏</span><div class="more-name">快閃店模組</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">📝</span><div class="more-name">送審追蹤</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">🔄</span><div class="more-name">TP 設定</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">💱</span><div class="more-name">匯率管理</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">🎨</span><div class="more-name">IP 啟動清單</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">📦</span><div class="more-name">庫存物流</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">📈</span><div class="more-name">每日銷售</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">⚙</span><div class="more-name">系統設定</div></a>
+      <a href="#" class="more-tile"><span class="more-icon">🚪</span><div class="more-name">登出</div></a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
