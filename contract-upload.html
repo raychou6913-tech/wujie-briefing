@@ -247,7 +247,7 @@ function showToast(msg, color){
   setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-function addContract(){
+async function addContract(){
   const name = document.getElementById('contract-name').value.trim();
   if(!name){ showToast('⚠ 請填合約名稱／IP 品牌','var(--danger)'); return; }
   const contract = {
@@ -261,17 +261,72 @@ function addContract(){
     files: state.files.slice(),
     note: document.getElementById('contract-note').value.trim(),
     submittedAt: new Date().toISOString(),
-    status: 'pending', // 'pending' | 'parsed'
+    status: 'pending', // 'pending' | 'parsed' | 'cloud-synced'
   };
+
+  // 1. 本機暫存（fallback）
   state.contracts.push(contract);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.contracts));
-  showToast('✓ 已加入清單');
+
+  // 2. 同步寫進飛書「合約_AI草稿」staging table
+  try{
+    await writeToFeishuStaging(contract);
+    contract.status = 'cloud-synced';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.contracts));
+    showToast('✓ 已上傳到飛書（待 AI 解析）');
+  }catch(e){
+    console.warn('飛書同步失敗', e);
+    showToast('已存本機（飛書同步失敗，下次再試）', 'var(--warn)');
+  }
+
   // Reset form
   ['contract-name','contract-licensor','contract-signed','contract-expires','contract-note'].forEach(id => document.getElementById(id).value = '');
   state.files = [];
   document.getElementById('drop-zone-text').textContent = '拖入 PDF 檔案或點擊選擇';
   document.getElementById('file-input').value = '';
   renderList();
+}
+
+const FEISHU_PROXY = 'https://feishu-proxy.raychou6913.workers.dev';
+const FEISHU_APP = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const STAGING_TBL = 'tblApO2OHiXhXAd5'; // 合約_AI草稿
+
+async function writeToFeishuStaging(contract){
+  const r1 = await fetch(FEISHU_PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const tk = (await r1.json()).tenant_access_token;
+  if(!tk) throw new Error('無 token');
+
+  const draftContent = JSON.stringify({
+    category: contract.category,
+    name: contract.name,
+    licensor: contract.licensor,
+    entity: contract.entity,
+    signed: contract.signed,
+    expires: contract.expires,
+    note: contract.note,
+    fileCount: (contract.files||[]).length,
+    fileNames: (contract.files||[]).map(f=>f.name||'?'),
+  });
+
+  const fields = {
+    '主合約ID': contract.id,
+    '來源檔名': (contract.files||[]).map(f=>f.name||'?').join(', ') || '（無檔案）',
+    '解析時間': Date.now(),
+    '解析信心度': 0,  // 還沒 AI 解析
+    '草稿內容': draftContent,
+    '草稿狀態': '待 AI 解析',
+    '多行文本': `[${contract.category}] ${contract.name} · ${contract.licensor||''}`,
+  };
+
+  const r2 = await fetch(`${FEISHU_PROXY}/open-apis/bitable/v1/apps/${FEISHU_APP}/tables/${STAGING_TBL}/records`,{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+tk,'Content-Type':'application/json'},
+    body: JSON.stringify({fields})
+  });
+  const d = await r2.json();
+  if(d.code !== 0) throw new Error(d.msg || '寫入失敗');
+  contract.feishuRid = d.data?.record?.record_id;
+  return d;
 }
 
 function removeContract(id){

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IP 簽約啟動檢查清單 · 蕪解 ERP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
+  --border:#334155;--border-hi:#475569;
+  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
+  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  --warn:#f59e0b;--warn-dim:#f59e0b18;
+  --danger:#ef4444;--danger-dim:#ef444418;
+}
+body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;font-size:13px;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;}
+.brand-name{font-size:13px;font-weight:700;}
+.brand-sub{font-size:11px;color:var(--txt-mid);margin-left:8px;}
+.btn-sm{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
+
+.main{max-width:820px;margin:0 auto;padding:24px 20px;}
+.hero{margin-bottom:24px;}
+.hero-title{font-size:22px;font-weight:800;margin-bottom:6px;}
+.hero-sub{font-size:12px;color:var(--txt-mid);line-height:1.7;}
+
+.ip-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.ip-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.ip-color-dot{width:10px;height:10px;border-radius:50%;}
+.ip-name{font-size:15px;font-weight:800;flex:1;}
+.ip-progress{font-size:11px;color:var(--txt-mid);}
+.ip-progress strong{color:var(--ok);}
+
+.ck-list{display:flex;flex-direction:column;gap:8px;}
+.ck-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--card);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:.15s;}
+.ck-row:hover{border-color:var(--border-hi);}
+.ck-row.done{opacity:.55;background:var(--card2);}
+.ck-row.done .ck-label{text-decoration:line-through;color:var(--txt-mid);}
+.ck-checkbox{width:18px;height:18px;border-radius:4px;border:2px solid var(--border-hi);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:11px;color:var(--ok);}
+.ck-row.done .ck-checkbox{background:var(--ok);border-color:var(--ok);color:#fff;}
+.ck-info{flex:1;}
+.ck-label{font-size:12px;font-weight:600;color:var(--txt-hi);}
+.ck-hint{font-size:10px;color:var(--txt-mid);margin-top:3px;line-height:1.5;}
+
+.bar{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-top:10px;}
+.bar-fill{height:100%;background:var(--ok);transition:width .4s;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <div class="brand-dot"></div>
+    <span class="brand-name">蕪解 ERP</span>
+    <span class="brand-sub">IP 簽約啟動檢查</span>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a class="btn-sm" href="erp-lobby.html">⌂ 大廳</a>
+    <a class="btn-sm" href="erp-pipeline.html">→ 產品流水線</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="hero">
+    <div class="hero-title">📋 IP 簽約啟動檢查清單</div>
+    <div class="hero-sub">
+      Bevis 反映：包裝設計階段常因「版權圖素尚未給到、不齊全」被打回。<br>
+      <strong style="color:var(--accent);">這份清單在簽約後立即啟動，確認版權方交付完整素材後才開始設計</strong>，
+      避免設計師白做白改。<br>
+      <span style="color:var(--txt-lo);">每項打勾後本機暫存。等接通飛書「IP 版權資料庫」會自動同步狀態。</span>
+    </div>
+  </div>
+
+  <div id="ip-list"></div>
+</div>
+
+<script>
+const IPS = [
+  {key:'mofusand', name:'Mofusand 貓福珊迪', color:'#fb923c',
+   licensor:'阿里巴巴授權寶 / 有你共創', signedAt:'2025/12/1'},
+  {key:'snoopy', name:'Snoopy 史努比', color:'#fbbf24',
+   licensor:'Peanuts Worldwide / WildBrain CPLG', signedAt:'2026/2/1'},
+  {key:'opanchu', name:'Opanchu 褲褲兔', color:'#818cf8',
+   licensor:'Rights & Brands Asia / UNIICREATIVE', signedAt:'2025/9/1'},
+  {key:'muziktiger', name:'Muziktiger 無業老虎', color:'#38bdf8',
+   licensor:'北京佳盛 / 有你共創', signedAt:'2025/12/1'},
+  {key:'oniume', name:'飯糰與梅子 ONIUME', color:'#f472b6',
+   licensor:'多個朋友 / 有你共創', signedAt:'2025/12/15'},
+];
+
+const CHECKLIST = [
+  {key:'highres_assets', label:'高解析角色圖素庫', hint:'PNG / AI / PSD 全套，至少 4K 解析度。包含正反/側面、表情、姿態變體'},
+  {key:'character_bible', label:'角色設定書（character bible）', hint:'外觀規範、配色 (Pantone)、不可逾越的設計禁區'},
+  {key:'3d_models', label:'3D 模型檔（如有）', hint:'OBJ / FBX 格式。沒有就要請廠商從 2D 重建'},
+  {key:'world_view', label:'世界觀文件', hint:'故事背景、角色關係、可用情境清單'},
+  {key:'security_label', label:'雷標 / hologram 規範', hint:'防偽標位置、尺寸、廠商指定'},
+  {key:'approval_sla', label:'版權方審稿週期確認', hint:'每輪 N 個工作天 → 影響倒推排期'},
+  {key:'locale_rules', label:'地區語系規範', hint:'授權地區的語言要求 / 在地化用字禁忌'},
+  {key:'pkg_specs', label:'包裝規格範例', hint:'版權方接受的包裝樣板（盒/袋/卡） + Co-brand 規範'},
+  {key:'forbidden', label:'禁止使用情境清單', hint:'例：不能用於某些品類 / 不能跟特定品牌聯名'},
+  {key:'launch_pr', label:'上市 PR 規範', hint:'發圖時間限制、要 tag 哪些帳號、必須提前送審的素材類型'},
+];
+
+const STORAGE_KEY = 'erp_ip_onboarding_v1';
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function isDone(ipKey, ckKey){
+  return state[ipKey]?.[ckKey] === true;
+}
+
+function toggle(ipKey, ckKey){
+  if(!state[ipKey]) state[ipKey] = {};
+  state[ipKey][ckKey] = !state[ipKey][ckKey];
+  save();
+  render();
+}
+
+function render(){
+  const html = IPS.map(ip => {
+    const total = CHECKLIST.length;
+    const done = CHECKLIST.filter(c => isDone(ip.key, c.key)).length;
+    const pct = Math.round(done/total*100);
+    const items = CHECKLIST.map(c => {
+      const done = isDone(ip.key, c.key);
+      return `<div class="ck-row${done?' done':''}" onclick="toggle('${ip.key}','${c.key}')">
+        <div class="ck-checkbox">${done?'✓':''}</div>
+        <div class="ck-info">
+          <div class="ck-label">${c.label}</div>
+          <div class="ck-hint">${c.hint}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="ip-card">
+      <div class="ip-hdr">
+        <div class="ip-color-dot" style="background:${ip.color};"></div>
+        <div class="ip-name">${ip.name}</div>
+        <div class="ip-progress"><strong>${done}/${total}</strong>（${pct}%）· 簽約 ${ip.signedAt}</div>
+      </div>
+      <div style="font-size:10px;color:var(--txt-lo);margin-bottom:10px;">版權方：${ip.licensor}</div>
+      <div class="ck-list">${items}</div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${pct===100?'var(--ok)':pct>=50?'var(--warn)':'var(--danger)'};"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('ip-list').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
