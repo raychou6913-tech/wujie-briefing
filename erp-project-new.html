@@ -66,6 +66,11 @@ textarea{resize:vertical;min-height:60px;}
 .sum-v{color:var(--txt-hi);font-weight:600;}
 .sum-section-title{grid-column:1/-1;font-size:11px;font-weight:700;color:var(--accent);margin-top:12px;margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase;}
 
+/* 業務型態 tab */
+.type-tab:hover{background:var(--card2);}
+.type-tab.active{background:var(--accent);color:#fff;}
+.type-tab.active div{color:#fff !important;opacity:.9;}
+
 /* 按鈕 */
 .actions{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);}
 .btn{padding:10px 22px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;}
@@ -113,6 +118,26 @@ textarea{resize:vertical;min-height:60px;}
   <div class="hero">
     <div class="hero-title">＋ 新增項目</div>
     <div class="hero-sub">建立項目是 ERP 一切資料的起點 — 收入、支出、合約、產品、預算、現金流都掛在項目下。<br>建好後狀態為「待 Ray 確認」，Ray 點過才算 baseline，VAM 數字才有人信。</div>
+  </div>
+
+  <!-- 業務型態 tab 切換 -->
+  <div style="display:flex;gap:6px;margin-bottom:18px;padding:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow-x:auto;">
+    <button class="type-tab" data-type="wholesale" onclick="switchType('wholesale')" style="flex:1;min-width:120px;padding:10px 12px;border-radius:7px;border:none;background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:left;">
+      <div style="font-size:14px;margin-bottom:2px;">📦 批發項目</div>
+      <div style="font-size:9px;color:var(--txt-lo);font-weight:400;">KA / 品牌 / 流通客戶</div>
+    </button>
+    <button class="type-tab" data-type="popup" onclick="switchType('popup')" style="flex:1;min-width:120px;padding:10px 12px;border-radius:7px;border:none;background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:left;">
+      <div style="font-size:14px;margin-bottom:2px;">🌏 快閃店</div>
+      <div style="font-size:9px;color:var(--txt-lo);font-weight:400;">兩岸三地都開</div>
+    </button>
+    <button class="type-tab" data-type="odm" onclick="switchType('odm')" style="flex:1;min-width:120px;padding:10px 12px;border-radius:7px;border:none;background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:left;">
+      <div style="font-size:14px;margin-bottom:2px;">🏭 ODM/OEM</div>
+      <div style="font-size:9px;color:var(--txt-lo);font-weight:400;">客戶委託代工</div>
+    </button>
+    <button class="type-tab" data-type="service" onclick="switchType('service')" style="flex:1;min-width:120px;padding:10px 12px;border-radius:7px;border:none;background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:left;">
+      <div style="font-size:14px;margin-bottom:2px;">🛠 服務類</div>
+      <div style="font-size:9px;color:var(--txt-lo);font-weight:400;">代運營 / Style Guide</div>
+    </button>
   </div>
 
   <!-- 步驟條 -->
@@ -475,17 +500,19 @@ const TYPE_CONFIG = {
   },
 };
 
-const _urlType = new URLSearchParams(location.search).get('type') || 'wholesale';
-const _typeCfg = TYPE_CONFIG[_urlType] || TYPE_CONFIG.wholesale;
+let _urlType = new URLSearchParams(location.search).get('type') || 'wholesale';
+let _typeCfg = TYPE_CONFIG[_urlType] || TYPE_CONFIG.wholesale;
 
-// 套用 type 到 UI
-(function applyType(){
+function applyType(t){
+  _urlType = t;
+  _typeCfg = TYPE_CONFIG[t] || TYPE_CONFIG.wholesale;
   document.querySelector('.hero-title').textContent = _typeCfg.hero;
   document.querySelector('.hero-sub').innerHTML = _typeCfg.heroSub + '<br>建好後狀態為「待 Ray 確認」，Ray 點過才算 baseline，VAM 數字才有人信。';
+  // tab active 狀態
+  document.querySelectorAll('.type-tab').forEach(b => b.classList.toggle('active', b.dataset.type === t));
   // 預設「類別」下拉
   const catSel = document.getElementById('f-category');
   if(catSel){
-    // 加 ODM/服務類選項（如果不存在）
     if(![...catSel.options].some(o=>o.value===_typeCfg.feishuCategory)){
       const opt = document.createElement('option');
       opt.value = _typeCfg.feishuCategory;
@@ -495,11 +522,13 @@ const _typeCfg = TYPE_CONFIG[_urlType] || TYPE_CONFIG.wholesale;
     catSel.value = _typeCfg.feishuCategory;
   }
   // 顯示對應 step2 專屬欄位
-  ['wholesale','popup','odm','service'].forEach(t => {
-    const el = document.getElementById('type-'+t+'-fields');
-    if(el) el.style.display = (t === _urlType) ? '' : 'none';
+  ['wholesale','popup','odm','service'].forEach(tk => {
+    const el = document.getElementById('type-'+tk+'-fields');
+    if(el) el.style.display = (tk === t) ? '' : 'none';
   });
-})();
+}
+window.switchType = applyType;
+applyType(_urlType);
 
 let ipMaster = {};  // IP 名稱 → 版稅/MG 等
 
