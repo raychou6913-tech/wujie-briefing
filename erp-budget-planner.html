@@ -194,6 +194,43 @@ table.btbl{border-collapse:collapse;min-width:100%;table-layout:fixed;}
 
 <div class="main">
 
+  <!-- 公司事件流脈動（#10 簡化版：顯示飛書真實 count，讓 V1/V2/V3 階段切分有事實依據）-->
+  <div id="event-strip" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:11px;">
+    <div style="color:var(--txt-lo);font-weight:700;letter-spacing:.04em;">📊 飛書事件流：</div>
+    <div><span id="es-approvals" style="color:var(--txt-lo);">…</span> 筆待批審批</div>
+    <div style="color:var(--txt-lo);">·</div>
+    <div><span id="es-projects" style="color:var(--txt-lo);">…</span> 個待 Ray baseline 項目</div>
+    <div style="color:var(--txt-lo);">·</div>
+    <div><span id="es-month-appr" style="color:var(--txt-lo);">…</span> 筆本月送出</div>
+    <div style="color:var(--txt-lo);">·</div>
+    <div style="color:var(--txt-lo);">提示：當某項目開始累積實際事件，請手動推進到 V2 實際版</div>
+  </div>
+  <script>
+  (async function loadEventStrip(){
+    try{
+      const PROXY='https://feishu-proxy.raychou6913.workers.dev';
+      const APP='Sg7ObNELHaAdZzshGIFjWPVhpce';
+      const tk = (await (await fetch(PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).json()).tenant_access_token;
+      const q = async (tbl) => {
+        const r = await fetch(`${PROXY}/open-apis/bitable/v1/apps/${APP}/tables/${tbl}/records?page_size=200`,{headers:{Authorization:'Bearer '+tk}});
+        return (await r.json()).data?.items || [];
+      };
+      const [appr, proj] = await Promise.all([q('tbl4OBNvsNkqS4mQ'), q('tblPLJ2dLkdkWUAa')]);
+      const fv = x => (x && typeof x === 'object' && x.value!==undefined) ? x.value : x;
+      const pendApproval = appr.filter(r => fv(r.fields['審批狀態']) === '待審批').length;
+      const pendProject = proj.filter(r => fv(r.fields['狀態']) === '待 Ray 確認').length;
+      const monthAgo = Date.now() - 30*86400000;
+      const monthAppr = appr.filter(r => (r.fields['申請日期']||0) >= monthAgo).length;
+      document.getElementById('es-approvals').textContent = pendApproval;
+      document.getElementById('es-approvals').style.color = pendApproval > 0 ? 'var(--warn)' : 'var(--txt-mid)';
+      document.getElementById('es-projects').textContent = pendProject;
+      document.getElementById('es-projects').style.color = pendProject > 0 ? 'var(--accent)' : 'var(--txt-mid)';
+      document.getElementById('es-month-appr').textContent = monthAppr;
+      document.getElementById('es-month-appr').style.color = 'var(--ok)';
+    }catch(e){ console.warn('event strip',e); }
+  })();
+  </script>
+
   <div class="sec-title">VAM 對賭達標預測 · 基於當前假設（數字均可調整）</div>
   <div class="vam-strip">
     <div>
