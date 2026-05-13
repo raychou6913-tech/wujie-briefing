@@ -1634,6 +1634,91 @@ async function loadCashflow(){
 }
 
 /* ── LOAD BUDGET KPI ── */
+/* ── LOAD VAM（淨利進度，#19 接真實數字）── */
+async function loadVAM(){
+  try{
+    const items=await _fetchAll(_TBLS.budget);
+    if(!items.length) return;
+    const yr=new Date().getFullYear();
+    const VAM_ENTITIES=["深圳子公司","香港JV"];
+    const yItems=items.filter(r=>{
+      if((parseFloat(_fv(r.fields,"年度"))||0)!==yr) return false;
+      const entity=_fv(r.fields,"歸屬主體");
+      if(entity && !VAM_ENTITIES.includes(entity)) return false;
+      return true;
+    });
+    if(!yItems.length) return;
+    // 算收入/支出（actual）
+    const REV_NATURES=["收入"];
+    const COST_NATURES=["支出","費用","版稅支出","固定成本","一次性","資本支出"];
+    const actualRev=yItems.filter(r=>REV_NATURES.includes(_fv(r.fields,"預算性質")))
+      .reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0),0);
+    const actualCost=yItems.filter(r=>COST_NATURES.includes(_fv(r.fields,"預算性質")))
+      .reduce((s,r)=>s+(parseFloat(_fv(r.fields,"實際金額"))||0),0);
+    const actualProfit=actualRev-actualCost;
+    const TARGET=8_000_000;
+    const TARGET_2YR=16_000_000;
+    const wan = n => (n/10000).toFixed(1);
+    const wanRound = n => Math.round(n/10000);
+    const pctYr=Math.max(0,Math.min(100,actualProfit/TARGET*100));
+    const pct2yr=Math.max(0,Math.min(100,actualProfit/TARGET_2YR*100));
+    // 月均
+    const monthsElapsed=Math.max(1,new Date().getMonth()+1);
+    const monthlyAvg=actualProfit/monthsElapsed;
+    const monthlyTarget=TARGET/12;
+    const monthlyGap=monthlyTarget-monthlyAvg;
+    // 預期進度
+    const expectedPctYr=monthsElapsed/12*100;
+    const isAhead=pctYr>=expectedPctYr;
+    // remain 缺口
+    const remainProfit=Math.max(0,TARGET-actualProfit);
+    const monthsRemain=Math.max(1,12-monthsElapsed);
+    const remainMonthly=remainProfit/monthsRemain;
+
+    // 更新 DOM
+    const set=(id,txt)=>{ const el=document.getElementById(id); if(el) el.textContent=txt; };
+    set("vam-ytd-val",`¥ ${wan(actualProfit)} 萬`);
+    set("vam-ytd-sub",`/ ¥800萬 年目標 · ${pctYr.toFixed(1)}%`);
+    set("vam-gap-val",monthlyGap>0?`¥ ${wan(monthlyGap)} 萬/月`:`✓ 已達`);
+    set("vam-gap-sub",`目標 ¥66.7萬/月 · 實際月均 ¥${wan(monthlyAvg)} 萬`);
+    set("vam-remain-val",`¥ ${wan(remainProfit)} 萬`);
+    set("vam-remain-sub",`月均需達 ¥${wan(remainMonthly)}萬`);
+    set("vam-2yr-val",`¥${wanRound(actualProfit)} / ¥1,600萬`);
+    set("vam-2yr-sub",`整體 ${pct2yr.toFixed(1)}%`);
+    set("vam-yr-label",`${wanRound(actualProfit)} 萬 / 800 萬 = ${pctYr.toFixed(1)}%`);
+    set("vam-2yr-label",`${wanRound(actualProfit)} 萬 / 1,600 萬 = ${pct2yr.toFixed(1)}%`);
+
+    // Bar fills
+    const yrFill=document.getElementById("vam-yr-fill");
+    if(yrFill){ yrFill.style.width=pctYr+"%"; yrFill.className="prog-fill "+(isAhead?"ok":"warn"); }
+    const yrMarker=document.getElementById("vam-yr-marker");
+    if(yrMarker){ yrMarker.style.left=expectedPctYr+"%"; }
+    const yrMarkerLabel=document.getElementById("vam-yr-marker-label");
+    if(yrMarkerLabel) yrMarkerLabel.textContent=`預期進度 ${expectedPctYr.toFixed(1)}%`;
+    const yr2Fill=document.getElementById("vam-2yr-fill");
+    if(yr2Fill){ yr2Fill.style.width=pct2yr+"%"; yr2Fill.className="prog-fill "+(isAhead?"ok":"warn"); }
+
+    // Badge
+    const badge=document.getElementById("vam-badge");
+    if(badge){
+      if(actualProfit<=0){ badge.textContent="⏳ 尚無入帳"; badge.style.background="rgba(100,116,139,.15)"; badge.style.color="var(--txt-lo)"; }
+      else if(isAhead){ badge.textContent="✓ 超前進度"; badge.style.background="rgba(34,197,94,.15)"; badge.style.color="var(--ok)"; }
+      else { badge.textContent="⚠ 稍落後進度"; }
+    }
+    // Note
+    const note=document.getElementById("vam-note");
+    if(note){
+      if(actualProfit<=0){
+        note.innerHTML=`📌 飛書預算管理表 ${yItems.length} 筆 baseline 已存，但「實際金額」尚未開始入帳。隨業務跑起來，這裡會自動更新。`;
+      } else if(monthlyGap>0){
+        note.innerHTML=`📌 若本月（${new Date().getMonth()+1}月）達成 ¥${wan(monthlyGap+monthlyAvg)} 萬淨利，整體進度可追回至預期值。`;
+      } else {
+        note.innerHTML=`✓ 月均淨利已達標，繼續保持。`;
+      }
+    }
+  }catch(e){ console.error("loadVAM",e); }
+}
+
 async function loadBudgetKPI(){
   try{
     const items=await _fetchAll(_TBLS.budget);
@@ -2217,14 +2302,43 @@ function loadSellThruWarRoom(){
 }
 
 /* ── INIT ── */
-loadApprovals();
+loadApprovals().then(handleQueryParam);
 loadPipeline();
 loadCashflow();
 loadBudgetKPI();
+loadVAM();
 loadOrderStats();
 loadContractAlerts();
 loadVamProgress().then(() => loadPipelineCoverage());
 loadSellThruWarRoom();
+
+/* ── 處理 URL ?approval=record_id / ?project=record_id（從 today.html 點過來定位）── */
+function handleQueryParam(){
+  try{
+    const params = new URLSearchParams(location.search);
+    const apprId = params.get('approval');
+    const projId = params.get('project');
+    if(apprId){
+      // 在 approvals 列表找對應 record_id 的 row
+      const rows = document.querySelectorAll('.approval-row-wrap');
+      for(const row of rows){
+        const btn = row.querySelector('button[onclick*="'+apprId+'"]');
+        if(btn){
+          row.scrollIntoView({behavior:'smooth',block:'center'});
+          row.style.transition='box-shadow .4s';
+          row.style.boxShadow='0 0 0 3px var(--accent)';
+          setTimeout(()=>{ row.style.boxShadow=''; }, 3000);
+          return;
+        }
+      }
+    }
+    if(projId){
+      // 暫時 scroll 到 VAM section（之後可以接 project 卡片定位）
+      const vamSec=document.querySelector('.vam-hero,#kpi-vam');
+      if(vamSec) vamSec.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  }catch(e){ console.warn('handleQueryParam',e); }
+}
 
 // ── Leo 台灣帳戶餘額 ──
 (function(){
