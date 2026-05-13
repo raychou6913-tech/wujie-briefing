@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 極簡 hover sidebar mockup</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0a0b12;
+  --bg-soft:#11131b;
+  --surface:#1a1d29;
+  --surface-2:#22253a;
+  --border:rgba(255,255,255,.06);
+  --border-hi:rgba(255,255,255,.12);
+  --txt-hi:#f5f6ff;
+  --txt-mid:#a4abcc;
+  --txt-lo:#5d6388;
+  --txt-faint:#3a3f5c;
+  --accent:#a78bfa;
+  --accent-glow:#c4b5fd;
+  --warm:#fb923c;
+  --ok:#34d399;
+  --warn:#fbbf24;
+  --danger:#f87171;
+  --ease:cubic-bezier(0.32, 0.72, 0, 1);
+}
+html,body{height:100%;}
+body{
+  background:radial-gradient(ellipse 60% 40% at 20% 20%,#a78bfa0a 0%,transparent 60%),
+             radial-gradient(ellipse 40% 30% at 90% 80%,#fb923c08 0%,transparent 60%),
+             var(--bg);
+  color:var(--txt-hi);
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter','Noto Sans TC',sans-serif;
+  font-feature-settings:"ss01","cv11";
+  letter-spacing:-.005em;
+  overflow-x:hidden;
+}
+
+/* ───── MOCKUP banner ───── */
+.mockup-banner{
+  position:fixed;bottom:0;left:0;right:0;
+  background:linear-gradient(90deg,#a78bfa15,#fb923c10);
+  border-top:1px solid #a78bfa20;
+  padding:8px 20px;font-size:10px;font-weight:600;
+  color:var(--accent-glow);letter-spacing:.04em;
+  text-align:center;backdrop-filter:blur(8px);
+  z-index:50;
+}
+
+/* ───── Sidebar：hover-reveal ───── */
+.sidebar{
+  position:fixed;
+  left:0;top:0;bottom:0;
+  width:64px;
+  background:rgba(20,22,32,.6);
+  backdrop-filter:blur(20px) saturate(120%);
+  -webkit-backdrop-filter:blur(20px) saturate(120%);
+  border-right:1px solid var(--border);
+  transition:width .42s var(--ease);
+  z-index:40;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.sidebar:hover{ width:288px; }
+
+/* sidebar header（永遠顯示）*/
+.sb-head{
+  padding:20px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--border);
+  min-height:78px;
+}
+.sb-logo{
+  width:36px;height:36px;border-radius:11px;
+  background:linear-gradient(135deg,var(--accent),var(--warm));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:15px;
+  flex-shrink:0;
+  box-shadow:0 4px 12px #a78bfa30;
+}
+.sb-brand-text{
+  opacity:0;transform:translateX(-10px);
+  transition:opacity .3s .1s var(--ease),transform .3s .1s var(--ease);
+  white-space:nowrap;
+}
+.sidebar:hover .sb-brand-text{ opacity:1;transform:translateX(0); }
+.sb-brand-name{font-size:14px;font-weight:700;letter-spacing:-.01em;}
+.sb-brand-sub{font-size:10px;color:var(--txt-lo);font-weight:500;margin-top:2px;}
+
+/* sidebar 內容區 */
+.sb-content{
+  flex:1;
+  overflow-y:auto;
+  padding:14px 0 80px;
+}
+.sb-content::-webkit-scrollbar{width:0;}
+
+/* 分群 */
+.sb-group{ margin-bottom:18px; }
+.sb-group-title{
+  padding:8px 24px 6px;
+  font-size:9px;font-weight:700;
+  color:var(--txt-faint);
+  letter-spacing:.12em;text-transform:uppercase;
+  opacity:0;
+  transition:opacity .25s .15s var(--ease);
+  white-space:nowrap;
+  pointer-events:none;
+}
+.sidebar:hover .sb-group-title{ opacity:1; }
+
+.sb-item{
+  display:flex;align-items:center;gap:14px;
+  padding:9px 24px;
+  cursor:pointer;
+  color:var(--txt-mid);
+  font-size:13px;font-weight:500;
+  position:relative;
+  transition:background .15s,color .15s;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.sb-item:hover{ background:rgba(255,255,255,.04);color:var(--txt-hi); }
+.sb-item.active{ color:var(--txt-hi); }
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:6px;bottom:6px;
+  width:3px;border-radius:0 2px 2px 0;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+}
+.sb-icon{
+  width:20px;height:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.sb-label{
+  opacity:0;transform:translateX(-6px);
+  transition:opacity .28s .1s var(--ease),transform .28s .1s var(--ease);
+}
+.sidebar:hover .sb-label{ opacity:1;transform:translateX(0); }
+.sb-badge{
+  margin-left:auto;
+  background:var(--danger);
+  color:#fff;
+  font-size:9px;font-weight:800;
+  padding:2px 6px;border-radius:8px;
+  opacity:0;
+  transition:opacity .28s .15s var(--ease);
+}
+.sidebar:hover .sb-badge{ opacity:1; }
+
+/* sidebar footer：user */
+.sb-foot{
+  padding:14px 18px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:12px;
+  flex-shrink:0;
+}
+.sb-foot-info{
+  opacity:0;transition:opacity .3s .15s var(--ease);
+  white-space:nowrap;
+}
+.sidebar:hover .sb-foot-info{ opacity:1; }
+.sb-name{font-size:12px;font-weight:700;}
+.sb-role{font-size:10px;color:var(--txt-lo);margin-top:1px;}
+
+/* ───── Main content ───── */
+.main{
+  margin-left:64px;
+  min-height:100vh;
+  padding:80px 48px 80px;
+  transition:margin-left .42s var(--ease);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+.content{
+  max-width:680px;
+  width:100%;
+  animation:fadeUp .6s var(--ease);
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* HERO */
+.h-time{
+  font-size:11px;color:var(--txt-lo);
+  font-weight:500;letter-spacing:.08em;
+  margin-bottom:14px;
+  text-transform:uppercase;
+}
+.h-greet{
+  font-size:64px;font-weight:800;
+  letter-spacing:-.04em;line-height:1.05;
+  margin-bottom:12px;
+}
+.h-greet .a{
+  background:linear-gradient(135deg,var(--accent-glow) 0%,var(--warm) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.h-sub{
+  font-size:18px;
+  color:var(--txt-mid);
+  font-weight:400;
+  line-height:1.5;
+  max-width:520px;
+  margin-bottom:48px;
+}
+
+/* 今天最重要的一張卡（焦點卡）*/
+.focus-card{
+  background:linear-gradient(135deg,rgba(167,139,250,.08) 0%,rgba(251,146,60,.04) 100%);
+  border:1px solid rgba(167,139,250,.18);
+  border-radius:20px;
+  padding:28px 32px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:transform .3s var(--ease),border-color .3s;
+}
+.focus-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(167,139,250,.4);
+}
+.focus-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,.5),transparent);
+}
+.fc-eyebrow{
+  font-size:10px;font-weight:700;
+  color:var(--accent-glow);
+  letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:10px;
+}
+.fc-title{
+  font-size:22px;font-weight:700;
+  letter-spacing:-.02em;line-height:1.3;
+  margin-bottom:8px;
+}
+.fc-meta{
+  font-size:13px;
+  color:var(--txt-mid);
+  margin-bottom:20px;
+}
+.fc-meta strong{ color:var(--accent-glow); }
+.fc-action{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;
+  color:var(--accent-glow);
+}
+.fc-action::after{
+  content:'→';
+  transition:transform .3s var(--ease);
+}
+.focus-card:hover .fc-action::after{
+  transform:translateX(4px);
+}
+
+/* 次要 chips */
+.chip-row{
+  display:flex;gap:10px;flex-wrap:wrap;
+  margin-top:24px;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:100px;
+  font-size:11px;font-weight:500;
+  color:var(--txt-mid);
+  cursor:pointer;
+  transition:.2s var(--ease);
+}
+.chip:hover{
+  background:rgba(255,255,255,.06);
+  color:var(--txt-hi);
+  border-color:var(--border-hi);
+}
+.chip-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+}
+
+/* Demo content（點選單項目後展示用）*/
+.demo-content{
+  display:none;
+  animation:fadeUp .5s var(--ease);
+}
+.demo-content.active{ display:block; }
+.demo-title{
+  font-size:32px;font-weight:800;
+  letter-spacing:-.03em;
+  margin-bottom:12px;
+}
+.demo-sub{
+  font-size:14px;color:var(--txt-mid);
+  margin-bottom:32px;
+  line-height:1.6;
+}
+.demo-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.demo-card{
+  background:rgba(255,255,255,.02);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+}
+.demo-card h4{
+  font-size:11px;font-weight:700;color:var(--txt-lo);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.demo-card .v{
+  font-size:24px;font-weight:800;letter-spacing:-.02em;
+}
+.demo-card .s{
+  font-size:12px;color:var(--txt-mid);margin-top:4px;
+}
+
+/* Hover hint：sidebar 折疊時顯示小提示 */
+.hint{
+  position:fixed;
+  left:72px;bottom:30px;
+  font-size:10px;color:var(--txt-faint);
+  letter-spacing:.06em;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .3s;
+  animation:hintFade 4s ease-in-out 1s;
+}
+@keyframes hintFade{
+  0%,100%{opacity:0;}
+  20%,80%{opacity:1;}
+}
+
+@media(max-width:720px){
+  .sidebar{width:0;}
+  .sidebar:hover{width:288px;}
+  .main{margin-left:0;padding:60px 24px 80px;}
+  .h-greet{font-size:42px;}
+  .h-sub{font-size:16px;}
+  .demo-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR：滑鼠移過去自動展開 -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">蕪</div>
+    <div class="sb-brand-text">
+      <div class="sb-brand-name">蕪解 ERP</div>
+      <div class="sb-brand-sub">v0.13 · 內測中</div>
+    </div>
+  </div>
+
+  <div class="sb-content">
+
+    <div class="sb-group">
+      <div class="sb-group-title">今天</div>
+      <a class="sb-item active" onclick="show('home')">
+        <span class="sb-icon">🏠</span>
+        <span class="sb-label">首頁</span>
+      </a>
+      <a class="sb-item" onclick="show('today')">
+        <span class="sb-icon">📋</span>
+        <span class="sb-label">我的待辦</span>
+        <span class="sb-badge">3</span>
+      </a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-title">業務</div>
+      <a class="sb-item" onclick="show('new-project')">
+        <span class="sb-icon">＋</span>
+        <span class="sb-label">新增項目</span>
+      </a>
+      <a class="sb-item" onclick="show('crm')">
+        <span class="sb-icon">👥</span>
+        <span class="sb-label">客戶 / CRM</span>
+      </a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-title">財務</div>
+      <a class="sb-item" onclick="show('budget')">
+        <span class="sb-icon">📊</span>
+        <span class="sb-label">預算規劃</span>
+      </a>
+      <a class="sb-item" onclick="show('warroom')">
+        <span class="sb-icon">🎯</span>
+        <span class="sb-label">戰情室</span>
+      </a>
+      <a class="sb-item" onclick="show('expense')">
+        <span class="sb-icon">💰</span>
+        <span class="sb-label">費用申請</span>
+      </a>
+      <a class="sb-item" onclick="show('fx')">
+        <span class="sb-icon">💱</span>
+        <span class="sb-label">匯率 / TP</span>
+      </a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-title">開發</div>
+      <a class="sb-item" onclick="show('pipeline')">
+        <span class="sb-icon">🏗</span>
+        <span class="sb-label">產品流水線</span>
+      </a>
+      <a class="sb-item" onclick="show('procurement')">
+        <span class="sb-icon">🛒</span>
+        <span class="sb-label">採購台</span>
+      </a>
+      <a class="sb-item" onclick="show('inspect')">
+        <span class="sb-icon">📋</span>
+        <span class="sb-label">驗收登錄</span>
+      </a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-title">快閃店</div>
+      <a class="sb-item" onclick="show('venue')">
+        <span class="sb-icon">🌏</span>
+        <span class="sb-label">場地資料庫</span>
+      </a>
+      <a class="sb-item" onclick="show('consign')">
+        <span class="sb-icon">🤝</span>
+        <span class="sb-label">寄售管理</span>
+      </a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-title">IP</div>
+      <a class="sb-item" onclick="show('vault')">
+        <span class="sb-icon">📜</span>
+        <span class="sb-label">IP Vault</span>
+      </a>
+      <a class="sb-item" onclick="show('onboarding')">
+        <span class="sb-icon">🎨</span>
+        <span class="sb-label">簽約啟動清單</span>
+      </a>
+      <a class="sb-item" onclick="show('contract')">
+        <span class="sb-icon">🔒</span>
+        <span class="sb-label">合約管理</span>
+      </a>
+    </div>
+
+    <div class="sb-group">
+      <div class="sb-group-title">系統</div>
+      <a class="sb-item" onclick="show('settings')">
+        <span class="sb-icon">⚙</span>
+        <span class="sb-label">設定</span>
+      </a>
+      <a class="sb-item" onclick="alert('mockup 不能真的登出')">
+        <span class="sb-icon">🚪</span>
+        <span class="sb-label">登出</span>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="sb-foot">
+    <div class="sb-avatar">R</div>
+    <div class="sb-foot-info">
+      <div class="sb-name">Ray</div>
+      <div class="sb-role">CEO · 台北</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="content">
+
+    <!-- HOME（預設）-->
+    <div class="demo-content active" id="d-home">
+      <div class="h-time">2026 年 5 月 13 日 · 星期三</div>
+      <div class="h-greet">下午好，<span class="a">Ray</span></div>
+      <div class="h-sub">今天有一件事比較重要，其他可以慢慢處理。</div>
+
+      <div class="focus-card" onclick="show('today')">
+        <div class="fc-eyebrow">⚡ 今日重點</div>
+        <div class="fc-title">3 筆審批等你批准，1 筆已等 4 天</div>
+        <div class="fc-meta">最久：<strong>安然</strong> 送的上海訂單 ¥150 萬</div>
+        <div class="fc-action">去看看</div>
+      </div>
+
+      <div class="chip-row">
+        <div class="chip" onclick="show('new-project')"><span class="chip-dot"></span>新增項目</div>
+        <div class="chip" onclick="show('budget')"><span class="chip-dot" style="background:var(--warm);"></span>看 VAM 進度</div>
+        <div class="chip" onclick="show('warroom')"><span class="chip-dot" style="background:var(--ok);"></span>戰情室</div>
+      </div>
+    </div>
+
+    <!-- 其他 demo 內容 -->
+    <div class="demo-content" id="d-today">
+      <div class="demo-title">我的待辦</div>
+      <div class="demo-sub">3 筆審批等你動作。從最久的開始。</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="demo-card" style="border-left:3px solid var(--danger);">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <div style="font-size:14px;font-weight:700;">上海潮玩聯盟 · ¥150 萬訂單</div>
+            <div style="font-size:11px;color:var(--danger);font-weight:700;">已等 4 天</div>
+          </div>
+          <div class="s" style="margin-top:6px;">安然送出 · 對應項目：Mofusand Q4 大陸批發</div>
+        </div>
+        <div class="demo-card">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <div style="font-size:14px;font-weight:700;">躍明 · 5 月香港 JV 現金流</div>
+            <div style="font-size:11px;color:var(--warn);font-weight:700;">今天</div>
+          </div>
+          <div class="s" style="margin-top:6px;">5 法人已入帳，等你確認損益</div>
+        </div>
+        <div class="demo-card">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <div style="font-size:14px;font-weight:700;">老董 · Q3 Snoopy 全球展位</div>
+            <div style="font-size:11px;color:var(--txt-mid);font-weight:700;">本週</div>
+          </div>
+          <div class="s" style="margin-top:6px;">¥80 萬投資，預期 ¥320 萬訂單</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-content" id="d-new-project">
+      <div class="demo-title">新增項目</div>
+      <div class="demo-sub">選業務型態 → 填關鍵欄位 → Ray review baseline。</div>
+      <div class="demo-grid">
+        <div class="demo-card" style="cursor:pointer;"><h4>📦 批發</h4><div class="v" style="font-size:14px;">KA / 品牌 / 流通客戶</div><div class="s">占比 75%</div></div>
+        <div class="demo-card" style="cursor:pointer;"><h4>🌏 快閃店</h4><div class="v" style="font-size:14px;">兩岸三地都開</div><div class="s">占比 20%</div></div>
+        <div class="demo-card" style="cursor:pointer;"><h4>🏭 ODM/OEM</h4><div class="v" style="font-size:14px;">客戶委託代工</div><div class="s">占比 中</div></div>
+        <div class="demo-card" style="cursor:pointer;"><h4>🛠 服務類</h4><div class="v" style="font-size:14px;">代運營 / 設計</div><div class="s">占比 低</div></div>
+      </div>
+    </div>
+
+    <div class="demo-content" id="d-budget">
+      <div class="demo-title">預算規劃</div>
+      <div class="demo-sub">兩年 VAM 推演 · 各 IP 產品線損益試算。</div>
+      <div class="demo-grid">
+        <div class="demo-card"><h4>Year 1 進度</h4><div class="v">¥0 / 800 萬</div><div class="s">尚未入帳 · 0%</div></div>
+        <div class="demo-card"><h4>Year 2 進度</h4><div class="v">¥0 / 800 萬</div><div class="s">尚未啟動</div></div>
+        <div class="demo-card"><h4>進行中項目</h4><div class="v">0 個</div><div class="s">等 Shawn 匯入</div></div>
+        <div class="demo-card"><h4>待 Ray baseline</h4><div class="v">0 個</div><div class="s">準備中</div></div>
+      </div>
+    </div>
+
+    <div class="demo-content" id="d-warroom">
+      <div class="demo-title">戰情室</div>
+      <div class="demo-sub">5 法人合并總覽 · VAM 進度 · 批核佇列。</div>
+      <div class="demo-card" style="margin-top:14px;"><h4>VAM 對賭達標</h4><div class="v">35%（試算）</div><div class="s">假設模式 · 待真實 baseline</div></div>
+    </div>
+
+    <div class="demo-content" id="d-crm"><div class="demo-title">客戶 / CRM</div><div class="demo-sub">業務跟進 · 目標未拿下 · 銷售反饋。</div></div>
+    <div class="demo-content" id="d-expense"><div class="demo-title">費用申請</div><div class="demo-sub">個人報銷 / 供應商付款 · 強制掛項目下。</div></div>
+    <div class="demo-content" id="d-fx"><div class="demo-title">匯率 / TP</div><div class="demo-sub">5 種幣別 · 跨主體定價規則。</div></div>
+    <div class="demo-content" id="d-pipeline"><div class="demo-title">產品流水線</div><div class="demo-sub">7 階段送審 · 公仔 vs 非公仔分流。</div></div>
+    <div class="demo-content" id="d-procurement"><div class="demo-title">採購台</div><div class="demo-sub">三家比價 · PO 管理 · 工廠交期追蹤。</div></div>
+    <div class="demo-content" id="d-inspect"><div class="demo-title">驗收登錄</div><div class="demo-sub">批次質檢 · 不良率自動算 · 寫飛書。</div></div>
+    <div class="demo-content" id="d-venue"><div class="demo-title">快閃店場地</div><div class="demo-sub">兩岸三地場地資料庫。</div></div>
+    <div class="demo-content" id="d-consign"><div class="demo-title">寄售管理</div><div class="demo-sub">外部設計師寄賣 · 分潤結算。</div></div>
+    <div class="demo-content" id="d-vault"><div class="demo-title">IP Vault</div><div class="demo-sub">5 個簽約 IP · 合約條款 · MG 進度。</div></div>
+    <div class="demo-content" id="d-onboarding"><div class="demo-title">IP 簽約啟動清單</div><div class="demo-sub">確認版權方交付完整素材才開始設計。</div></div>
+    <div class="demo-content" id="d-contract"><div class="demo-title">合約管理</div><div class="demo-sub">簽約 / 續約 / 到期警示。</div></div>
+    <div class="demo-content" id="d-settings"><div class="demo-title">系統設定</div><div class="demo-sub">使用者 / 角色 / 通知。</div></div>
+
+  </div>
+</main>
+
+<div class="hint">← 把滑鼠移到左邊</div>
+<div class="mockup-banner">
+  ✨ Lobby 極簡 hover sidebar mockup · 把滑鼠移到左邊細條會展開 · 點選單項切換主畫面
+</div>
+
+<script>
+function show(key){
+  document.querySelectorAll('.demo-content').forEach(d => d.classList.remove('active'));
+  const target = document.getElementById('d-'+key);
+  if(target) target.classList.add('active');
+  // sidebar active 狀態
+  const items = document.querySelectorAll('.sb-item');
+  items.forEach(i => i.classList.remove('active'));
+  const clicked = [...items].find(i => i.getAttribute('onclick')?.includes(`'${key}'`));
+  if(clicked) clicked.classList.add('active');
+}
+</script>
+
+</body>
+</html>
