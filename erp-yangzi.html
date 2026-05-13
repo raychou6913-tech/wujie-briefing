@@ -151,6 +151,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .bi-row.total .bi-val{font-size:13px;}
 </style>
 <script src="mock-data.js"></script>
+<script src="erp-project-link.js"></script>
 </head>
 <body>
 
@@ -993,6 +994,15 @@ setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
     <button class="exp-close" onclick="closeExpModal()">✕</button>
   </div>
 
+  <!-- 對應項目（必選，所有費用必須掛項目下）-->
+  <div class="exp-field" style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #475569;">
+    <label style="display:block;font-size:10px;font-weight:700;color:#94a3b8;letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase;">對應項目 <span style="color:#ef4444;">*</span></label>
+    <select id="expProject" style="width:100%;background:#2d3a52;border:1px solid #475569;border-radius:8px;color:#f1f5f9;font-size:13px;padding:8px 10px;outline:none;">
+      <option value="">— 載入中 —</option>
+    </select>
+    <div style="font-size:10px;color:#64748b;margin-top:4px;">所有費用必須掛項目下，方便追蹤該項目實際成本</div>
+  </div>
+
   <!-- 第一層：日常費用 / 項目費用 / 人事行政 -->
   <div class="exp-main-row">
     <button class="exp-main-btn active-daily" id="expBtnDaily" onclick="setExpMainType('daily')">
@@ -1224,6 +1234,7 @@ function openExpModal(hint){
   if(supBtn) supBtn.style.display=SUPPLIER_ALLOWED.includes(u)?'':'none';
   setExpMainType(hint==='hr'?'hr':hint==='opex'?'proj':'daily');
   document.getElementById('expOverlay').classList.add('open');
+  if(window.injectProjectSelect) window.injectProjectSelect('expProject');
 }
 function closeExpModal(){document.getElementById('expOverlay').classList.remove('open');}
 
@@ -1306,6 +1317,9 @@ function updateBudgetRemaining(){
 function submitExpense(){
   const u=getUser();
   const r=EXP_ROUTES[u]||{next:'yangzi',nextLabel:'楊子',cc:null};
+  // 必選對應項目（所有費用必須掛項目下）
+  const proj=window.getSelectedProject?window.getSelectedProject('expProject'):null;
+  if(!proj){alert('請選擇對應項目（所有費用必須掛項目下）\n\n若還沒有項目，請先到「+ 新增項目」建立。');return;}
   const key='erp_expense_queue';
   const q=JSON.parse(localStorage.getItem(key)||'[]');
 
@@ -1327,7 +1341,8 @@ function submitExpense(){
       '審批標題':`【人事行政】${cat} ${amt}${ccy}`,
       '審批類型':'人事行政申請','申請人':u,'申請日期':Date.now(),
       '金額':parseFloat(amt)||0,'幣別':ccy,'審批人':'Ray',
-      '審批狀態':'待審批','申請說明':desc||cat});
+      '審批狀態':'待審批','申請說明':desc||cat,
+      '對應項目':proj.name,'對應項目ID':proj.id});
     closeExpModal();
     (window.showToast||alert)(`✅ 已送出：${cat} ${ccy}${parseFloat(amt).toLocaleString()} · 待 Ray 確認`);
     return;
@@ -1350,7 +1365,8 @@ function submitExpense(){
       '審批類型':'費用申請','申請人':u,'申請日期':Date.now(),
       '金額':parseFloat(amt)||0,'幣別':bl?.ccy||'CNY',
       '審批人':approver,'審批狀態':'待審批','Email已發送':'否',
-      '申請說明':`${desc} / 主體：${ent} / 科目：${bl?.cat} / 預算：${bl?.budget} 已用：${bl?.used}`});
+      '申請說明':`${desc} / 主體：${ent} / 科目：${bl?.cat} / 預算：${bl?.budget} 已用：${bl?.used}`,
+      '對應項目':proj.name,'對應項目ID':proj.id});
     closeExpModal();
     (window.showToast||alert)(`✅ 項目費用已送出 · 待 ${approver} → Ray 確認`);
   } else {
