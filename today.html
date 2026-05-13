@@ -145,6 +145,7 @@ body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#a78bfa10 0%,var(--b
     </div>
   </div>
   <div class="user-block">
+    <a id="go-hall-btn" href="erp-lobby.html" style="font-size:11px;color:#fff;background:var(--accent);text-decoration:none;padding:6px 12px;border-radius:6px;font-weight:600;">→ 進工作台</a>
     <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;">⌂ 大廳</a>
     <a href="login.html" onclick="localStorage.removeItem('erp_sess');return true;" style="font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;">登出</a>
     <div class="user-pic" id="user-pic"></div>
@@ -716,10 +717,33 @@ function getSession(){
   }catch(e){ return null; }
 }
 
+// user → hall 對應（依組織架構）
+const USER_TO_HALL = {
+  ray:'erp-war-room.html',
+  shawn:'erp-shawn.html',
+  anran:'erp-anran.html',
+  yaoge:'erp-war-room.html',
+  laige:'erp-procurement.html',
+  muzi:'erp-procurement.html',
+  bevis:'erp-pipeline.html',
+  shetong:'erp-shetong.html',
+  peiling:'erp-peiling.html',
+  gaowei:'erp-gaowei.html',
+  laodong:'erp-crm.html',
+  debao:'erp-crm.html',
+  yangzi:'erp-yangzi.html',
+  leo:'erp-leo.html',
+  yueming:'erp-finance.html',
+};
+
 async function initToday(){
   const sess = getSession();
   if(!sess){ location.replace('login.html'); return; }
   document.querySelector('.brand-sub').textContent = `${sess.name} · My Today`;
+  // 「→ 進工作台」按鈕指向角色對應廳
+  const hallUrl = USER_TO_HALL[sess.user] || sess.hall || 'erp-lobby.html';
+  const hallBtn = document.getElementById('go-hall-btn');
+  if(hallBtn) hallBtn.href = hallUrl;
   // Loading state
   document.getElementById('hero-greeting').innerHTML = `載入中…`;
   document.getElementById('hero-sub').textContent = '從飛書抓你今天的事';
