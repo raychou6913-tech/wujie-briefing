@@ -101,14 +101,14 @@ function doLogin(){
   if(!a||a.pass!==pwd){ document.getElementById('err').classList.add('show'); document.getElementById('pwd').value=''; return; }
   document.getElementById('err').classList.remove('show');
   localStorage.setItem('erp_sess',JSON.stringify({user:usr,name:a.name,role:a.role,hall:a.hall,color:a.color,ts:Date.now()}));
-  location.href='erp-lobby.html';
+  location.href='today.html';
 }
 document.getElementById('pwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('usr').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pwd').focus();});
 
 // Auto-redirect if valid session
 const s=JSON.parse(localStorage.getItem('erp_sess')||'null');
-if(s&&Date.now()-s.ts<7*86400000) location.href='erp-lobby.html';
+if(s&&Date.now()-s.ts<7*86400000) location.href='today.html';
 </script>
 </body>
 </html>

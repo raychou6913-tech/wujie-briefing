@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · Today</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0a0b12;
+  --bg-soft:#13151f;
+  --surface:#1a1d29;
+  --surface-2:#22253a;
+  --border:#2a2d42;
+  --border-hi:#3d4268;
+  --txt-hi:#f5f6ff;
+  --txt-mid:#9ca3c5;
+  --txt-lo:#5d6388;
+  --accent:#a78bfa;
+  --accent-glow:#c4b5fd;
+  --accent-warm:#fb923c;
+  --ok:#34d399;
+  --ok-soft:#34d39915;
+  --warn:#fbbf24;
+  --warn-soft:#fbbf2415;
+  --danger:#f87171;
+  --danger-soft:#f8717115;
+}
+body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#a78bfa10 0%,var(--bg) 60%);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Inter',sans-serif;min-height:100vh;padding-bottom:60px;letter-spacing:-.005em;}
+
+/* MOCKUP BANNER */
+.mockup-banner{background:linear-gradient(90deg,#a78bfa20,#fb923c20);border-bottom:1px solid #a78bfa30;padding:8px 20px;font-size:11px;font-weight:600;color:var(--accent-glow);letter-spacing:.04em;text-align:center;}
+
+/* TOPBAR */
+.topbar{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-logo{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#a78bfa,#fb923c);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;}
+.brand-text{font-size:15px;font-weight:700;letter-spacing:-.01em;}
+.brand-sub{font-size:10px;color:var(--txt-lo);font-weight:500;letter-spacing:.06em;text-transform:uppercase;}
+.user-block{display:flex;align-items:center;gap:10px;}
+.user-pic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;}
+
+/* PERSONA SWITCHER (mockup-only) */
+.persona-bar{margin:0 24px 24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.persona-label{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-right:6px;}
+.persona-btn{padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;display:flex;align-items:center;gap:8px;}
+.persona-btn:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+.persona-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 16px #a78bfa30;}
+.persona-emoji{font-size:14px;}
+
+/* MAIN */
+.main{max-width:760px;margin:0 auto;padding:0 24px;}
+
+/* HERO GREETING */
+.hero{margin-bottom:32px;}
+.hero-time{font-size:11px;color:var(--txt-lo);font-weight:500;margin-bottom:8px;letter-spacing:.04em;}
+.hero-greeting{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px;}
+.hero-greeting .accent{background:linear-gradient(90deg,var(--accent-glow),var(--accent-warm));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero-sub{font-size:14px;color:var(--txt-mid);font-weight:500;}
+
+/* SECTION TITLE */
+.sec-title{font-size:11px;font-weight:700;color:var(--txt-lo);letter-spacing:.12em;text-transform:uppercase;margin:24px 0 14px;display:flex;align-items:center;gap:10px;}
+.sec-count{background:var(--surface);border:1px solid var(--border);padding:2px 9px;border-radius:20px;font-size:10px;color:var(--txt-mid);font-weight:700;letter-spacing:.04em;}
+
+/* TODO CARD — main visual */
+.todo-list{display:flex;flex-direction:column;gap:10px;}
+.todo{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;transition:transform .15s,border-color .15s,background .15s;position:relative;overflow:hidden;}
+.todo:hover{transform:translateY(-1px);border-color:var(--border-hi);background:var(--surface-2);}
+.todo.urgent{border-left:none;}
+.todo.urgent::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--danger),#fb7185);}
+.todo.urgent{padding-left:24px;}
+.todo.warn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--warn);}
+.todo.warn{padding-left:23px;}
+.todo.normal::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+.todo.normal{padding-left:23px;}
+.todo.waiting{opacity:.75;}
+.todo.waiting::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--txt-lo);}
+.todo.waiting{padding-left:23px;}
+
+.todo-icon{width:42px;height:42px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.todo.urgent .todo-icon{background:var(--danger-soft);}
+.todo.warn .todo-icon{background:var(--warn-soft);}
+.todo.normal .todo-icon{background:#a78bfa15;}
+
+.todo-body{flex:1;min-width:0;}
+.todo-meta-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.todo-tag{font-size:9px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.06em;text-transform:uppercase;}
+.tag-urgent{background:var(--danger-soft);color:var(--danger);}
+.tag-warn{background:var(--warn-soft);color:var(--warn);}
+.tag-time{background:var(--surface-2);color:var(--txt-mid);}
+
+.todo-title{font-size:15px;font-weight:700;letter-spacing:-.005em;margin-bottom:4px;line-height:1.4;}
+.todo-why{font-size:12px;color:var(--txt-mid);line-height:1.5;}
+.todo-why .person{color:var(--accent-glow);font-weight:600;}
+
+.todo-action{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.todo-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit;}
+.todo-btn:hover{background:var(--accent-glow);}
+.todo-btn.ghost{background:transparent;border:1px solid var(--border-hi);color:var(--txt-mid);}
+.todo-btn.ghost:hover{background:var(--surface-2);color:var(--txt-hi);}
+.todo-est{font-size:10px;color:var(--txt-lo);font-weight:500;}
+
+/* NUMBERS BLOCK */
+.numbers-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+.number-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.number-label{font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:8px;letter-spacing:.02em;}
+.number-val{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1;margin-bottom:6px;}
+.number-val.ok{color:var(--ok);}
+.number-val.warn{color:var(--warn);}
+.number-meta{font-size:11px;color:var(--txt-lo);font-weight:500;}
+.number-bar{margin-top:10px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;}
+.number-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-glow));border-radius:3px;transition:width .8s ease;}
+.number-bar-fill.ok{background:linear-gradient(90deg,var(--ok),#6ee7b7);}
+.number-bar-fill.warn{background:linear-gradient(90deg,var(--warn),#fcd34d);}
+
+/* RELATIONS BLOCK */
+.relations{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.rel-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);}
+.rel-row:first-of-type{border-top:none;padding-top:4px;}
+.rel-row:last-of-type{padding-bottom:4px;}
+.rel-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0;}
+.rel-info{flex:1;min-width:0;}
+.rel-text{font-size:13px;color:var(--txt-hi);font-weight:500;line-height:1.5;}
+.rel-text .accent{color:var(--accent-glow);font-weight:700;}
+.rel-meta{font-size:11px;color:var(--txt-lo);margin-top:2px;}
+.rel-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;flex-shrink:0;}
+
+/* MORE LINK */
+.more-link{display:block;text-align:center;font-size:12px;color:var(--txt-mid);text-decoration:none;padding:14px;margin-top:8px;border:1px dashed var(--border);border-radius:12px;transition:.15s;cursor:pointer;}
+.more-link:hover{color:var(--txt-hi);border-color:var(--border-hi);background:var(--surface);}
+
+/* MICRO-ANIMATION */
+@keyframes pulse-soft{0%,100%{box-shadow:0 0 0 0 var(--danger-soft);}50%{box-shadow:0 0 0 6px transparent;}}
+.todo.urgent::before{animation:pulse-soft 2.5s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo" id="brand-logo">蕪</div>
+    <div>
+      <div class="brand-text">蕪解</div>
+      <div class="brand-sub">My Today</div>
+    </div>
+  </div>
+  <div class="user-block">
+    <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;">⌂ 大廳</a>
+    <a href="login.html" onclick="localStorage.removeItem('erp_sess');return true;" style="font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;">登出</a>
+    <div class="user-pic" id="user-pic"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-time" id="hero-time">2026 年 5 月 10 日 · 星期日</div>
+    <div class="hero-greeting" id="hero-greeting"></div>
+    <div class="hero-sub" id="hero-sub"></div>
+  </div>
+
+  <!-- TODAY'S 3 THINGS -->
+  <div class="sec-title">
+    今天要做的事
+    <span class="sec-count" id="todo-count">3 件</span>
+  </div>
+  <div class="todo-list" id="todo-list"></div>
+  <a class="more-link" id="more-todo">本週還有 5 件 · 點開看完整清單 →</a>
+
+  <!-- YOUR NUMBERS -->
+  <div class="sec-title">你的數字</div>
+  <div class="numbers-grid" id="numbers-grid"></div>
+
+  <!-- RELATIONS -->
+  <div class="sec-title">
+    別人在等你
+    <span class="sec-count" id="rel-count">2 件</span>
+  </div>
+  <div class="relations" id="relations"></div>
+
+  <div class="sec-title">你在等別人</div>
+  <div class="relations" id="waiting-on"></div>
+
+</div>
+
+<script>
+const PALETTES = {
+  shetong: '#9333ea',
+  bevis:   '#818cf8',
+  laige:   '#f59e0b',
+  anran:   '#4f46e5',
+  ray:     '#a78bfa',
+};
+
+const DATA = {
+  shetong: {
+    name: '詩彤',
+    initial: '詩',
+    role: '設計師 · 台北',
+    greeting: '今天有 <span class="accent">3 件事</span> 要做',
+    sub: '完成今天的，下週的事就不會堆。預計 4 小時可全部完成 ✓',
+    todos: [
+      {tier:'urgent', icon:'🎨', tag:'今天必做', est:'預計 90 分鐘',
+       title:'Mofusand 抱枕 — 完成 3D 上色稿',
+       why:'<span class="person">珮玲</span>在等這個送審，5/12 截止',
+       btn:'開始做'},
+      {tier:'warn', icon:'🔄', tag:'本週內', est:'預計 60 分鐘',
+       title:'Snoopy 帆布袋 — 第 2 輪修改',
+       why:'<span class="person">Bevis</span>昨天給了 3 個色值意見，照他建議改',
+       btn:'查看意見'},
+      {tier:'waiting', icon:'⏳', tag:'等別人', est:'已等 1 天',
+       title:'Opanchu 立牌 — 等 Bevis 批',
+       why:'你昨天交了，<span class="person">Bevis</span>還沒批，可以提醒一下',
+       btn:'提醒 Bevis', ghost:true},
+    ],
+    numbers: [
+      {label:'本月已完成', val:'5 件', meta:'比上月多 2 件 ↑', cls:'ok', barW:71, barCls:'ok'},
+      {label:'平均交付時間', val:'1.8 天', meta:'目標 2 天 ✓', cls:'ok', barW:90, barCls:'ok'},
+    ],
+    rels: [
+      {who:'珮玲', color:'#6d28d9', text:'<span class="accent">珮玲</span>在等你的 Mofusand 抱枕上色稿', meta:'她要趕 5/12 送審', stat:'急', statCls:'tag-urgent'},
+      {who:'賴哥', color:'#f59e0b', text:'<span class="accent">賴哥</span>在等你確認 Snoopy 打樣的最終色號', meta:'他要去工廠下單', stat:'本週', statCls:'tag-warn'},
+    ],
+    waiting: [
+      {who:'Bevis', color:'#818cf8', text:'<span class="accent">Bevis</span> 還沒批 Opanchu 立牌', meta:'你昨天 18:30 交付', stat:'1 天', statCls:'tag-time'},
+    ],
+  },
+
+  bevis: {
+    name: 'Bevis',
+    initial: 'B',
+    role: '設計主管 · 台北',
+    greeting: '<span class="accent">3 件事</span>等你決策',
+    sub: '詩彤今天交了 3 件等你批。珮玲那邊有 1 件卡了 5 天需要你介入。',
+    todos: [
+      {tier:'urgent', icon:'✅', tag:'今天必做', est:'預計 30 分鐘',
+       title:'詩彤交付 3 件設計稿待批准',
+       why:'Mofusand 上色 / Snoopy 帆布袋 / Opanchu 立牌',
+       btn:'一次批 3 件'},
+      {tier:'warn', icon:'⚠️', tag:'卡住了', est:'已等 5 天',
+       title:'珮玲 Mofusand stage 3 卡 5 天',
+       why:'系統偵測：<span class="person">珮玲</span>在等版權方回覆，可以一鍵幫她催',
+       btn:'幫忙催'},
+      {tier:'normal', icon:'📅', tag:'今天 14:00', est:'45 分鐘',
+       title:'Q3 設計排期會議',
+       why:'參與：詩彤、珮玲、安然。系統已準備會議資料',
+       btn:'進會議室'},
+    ],
+    numbers: [
+      {label:'本季送審件數', val:'12 件', meta:'目標 15 件 · Q3 還剩 6 週', cls:'', barW:80, barCls:''},
+      {label:'送審通過率', val:'92%', meta:'業內平均 75%', cls:'ok', barW:92, barCls:'ok'},
+    ],
+    rels: [
+      {who:'詩彤', color:'#9333ea', text:'<span class="accent">詩彤</span>等你批 3 件', meta:'昨天 18:30 交付', stat:'今天', statCls:'tag-urgent'},
+      {who:'珮玲', color:'#6d28d9', text:'<span class="accent">珮玲</span>等你看 Q3 排期', meta:'會議前需你過目', stat:'今天 14:00', statCls:'tag-warn'},
+    ],
+    waiting: [
+      {who:'珮玲', color:'#6d28d9', text:'<span class="accent">珮玲</span>還沒給 Mofusand 送審回覆', meta:'你 5 天前交付', stat:'5 天', statCls:'tag-time'},
+    ],
+  },
+
+  laige: {
+    name: '賴哥',
+    initial: '賴',
+    role: '採購主管 · 北京',
+    greeting: '<span class="accent">3 件</span>採購要動',
+    sub: '安然來了大訂單要備貨。鐳射標庫存快不夠了。C 工廠交期延遲。',
+    todos: [
+      {tier:'urgent', icon:'🛒', tag:'今天必做', est:'預計 60 分鐘',
+       title:'Mofusand 抱枕 800 件 — 比 3 家工廠報價',
+       why:'<span class="person">安然</span>客戶 ¥150 萬訂單剛批准，要 5/30 前到貨',
+       btn:'查看比價表'},
+      {tier:'warn', icon:'📊', tag:'庫存警示', est:'30 分鐘',
+       title:'Q4 鐳射標補貨 — 庫存剩 2 萬張',
+       why:'按目前出貨速度，預計 6 月中用完。建議下週下單',
+       btn:'下詢價單'},
+      {tier:'warn', icon:'⏰', tag:'本週處理', est:'45 分鐘',
+       title:'C 工廠 Snoopy 玩偶交期延遲 5 天',
+       why:'原 5/15 → 5/20。<span class="person">珮玲</span>可能會問，要不要切替代工廠？',
+       btn:'看替代方案'},
+    ],
+    numbers: [
+      {label:'在製 PO', val:'8 張', meta:'總值 ¥320 萬 · 7 張準時', cls:'', barW:85, barCls:''},
+      {label:'工廠準時率', val:'87%', meta:'近 30 天平均 · 目標 90%', cls:'warn', barW:87, barCls:'warn'},
+    ],
+    rels: [
+      {who:'安然', color:'#4f46e5', text:'<span class="accent">安然</span>等你確認 Mofusand 800 件 PO 估價', meta:'她要回客戶交期', stat:'今天', statCls:'tag-urgent'},
+      {who:'木子', color:'#d97706', text:'<span class="accent">木子</span>追的 3 家詢價已收到 2 家', meta:'最後 1 家催一下', stat:'本週', statCls:'tag-warn'},
+    ],
+    waiting: [
+      {who:'C 工廠', color:'#94a3b8', text:'C 工廠遲遲未確認新交期', meta:'你 2 天前發了延期確認', stat:'2 天', statCls:'tag-time'},
+    ],
+  },
+
+  anran: {
+    name: '安然',
+    initial: '安',
+    role: '北京 GM · 全球商務',
+    greeting: '<span class="accent">3 件</span>客戶事',
+    sub: '上海 ¥150 萬訂單卡 Ray 4 天。Snoopy 北京合約快到期。Mofusand MG 用了 73%。',
+    todos: [
+      {tier:'urgent', icon:'💼', tag:'卡 4 天', est:'5 分鐘',
+       title:'上海潮玩聯盟 ¥150 萬訂單 — Ray 已 4 天未批',
+       why:'你 5/6 送出，<span class="person">Ray</span>沒看到。可以一鍵 LINE 提醒',
+       btn:'催一下 Ray'},
+      {tier:'warn', icon:'📜', tag:'重要合約', est:'40 分鐘',
+       title:'Snoopy 北京代理合約 6/30 到期',
+       why:'剩 51 天，建議 5 月底前啟動續約。<span class="person">Ray</span>需確認續約意願',
+       btn:'準備續約資料'},
+      {tier:'warn', icon:'📈', tag:'MG 警示', est:'15 分鐘',
+       title:'Mofusand MG 已用 73%（¥21.7 萬 / 29.7 萬）',
+       why:'按目前銷售速度，預計 8 月中用完。下批訂單議價時要算進去',
+       btn:'看詳細試算'},
+    ],
+    numbers: [
+      {label:'本月業績', val:'¥82 萬', meta:'目標 ¥120 萬 · 月底還剩 21 天', cls:'', barW:68, barCls:''},
+      {label:'VAM 進度（年）', val:'73%', meta:'目標 ¥800 萬淨利 · 還缺 ¥215 萬', cls:'ok', barW:73, barCls:'ok'},
+    ],
+    rels: [
+      {who:'Ray', color:'#a78bfa', text:'<span class="accent">Ray</span>還沒批上海訂單', meta:'¥150 萬 · 已 4 天', stat:'急', statCls:'tag-urgent'},
+      {who:'賴哥', color:'#f59e0b', text:'<span class="accent">賴哥</span>等你給 Mofusand 800 件交期確認', meta:'他要去工廠下單', stat:'今天', statCls:'tag-warn'},
+    ],
+    waiting: [
+      {who:'Ray', color:'#a78bfa', text:'<span class="accent">Ray</span>還沒批上海 ¥150 萬訂單', meta:'5/6 送出', stat:'4 天', statCls:'tag-time'},
+      {who:'珮玲', color:'#6d28d9', text:'<span class="accent">珮玲</span>還沒給 Mofusand 送審進度更新', meta:'5/8 詢問', stat:'2 天', statCls:'tag-time'},
+    ],
+  },
+
+  ray: {
+    name: 'Ray',
+    initial: 'R',
+    role: '台北',
+    greeting: '<span class="accent">5 件事</span>等你拍板',
+    sub: '今天 5 件需要你的決策。VAM 進度 73%，5 法人合計淨利 ¥215 萬。',
+    todos: [
+      {tier:'urgent', icon:'💰', tag:'卡 4 天', est:'2 分鐘',
+       title:'安然送的：上海潮玩聯盟 ¥150 萬訂單批准',
+       why:'<span class="person">安然</span>5/6 送，等你批 4 天了。客戶要等回覆',
+       btn:'看單批准'},
+      {tier:'urgent', icon:'📊', tag:'今天必看', est:'5 分鐘',
+       title:'躍明送的：5 月香港 JV 現金流確認',
+       why:'<span class="person">躍明</span>剛入帳完，等你確認 5 月損益數字',
+       btn:'看數字'},
+      {tier:'warn', icon:'🌍', tag:'本週決策', est:'15 分鐘',
+       title:'老董送的：Q3 Snoopy 全球展位提案',
+       why:'<span class="person">老董</span>提案 ¥80 萬展位投資，預期 ¥320 萬訂單回收',
+       btn:'看提案'},
+    ],
+    numbers: [
+      {label:'VAM 進度（年度淨利目標）', val:'73%', meta:'已 ¥585 萬 / 目標 ¥800 萬 · 還缺 ¥215 萬', cls:'ok', barW:73, barCls:'ok'},
+      {label:'5 法人合計', val:'¥215 萬', meta:'本月淨利 · 比上月多 ¥38 萬 ↑', cls:'ok', barW:80, barCls:'ok'},
+    ],
+    rels: [
+      {who:'安然', color:'#4f46e5', text:'<span class="accent">安然</span>等你批上海訂單', meta:'¥150 萬 · 5/6 送', stat:'4 天', statCls:'tag-urgent'},
+      {who:'躍明', color:'#0284c7', text:'<span class="accent">躍明</span>等你確認 5 月現金流', meta:'5 法人都已入帳', stat:'今天', statCls:'tag-warn'},
+      {who:'老董', color:'#f97316', text:'<span class="accent">老董</span>等你看 Q3 全球展位提案', meta:'¥80 萬投資決策', stat:'本週', statCls:'tag-warn'},
+    ],
+    waiting: [
+      {who:'Shawn', color:'#22c55e', text:'<span class="accent">Shawn</span>還沒交 4 月曼谷快閃覆盤', meta:'你 5/8 詢問', stat:'2 天', statCls:'tag-time'},
+    ],
+  },
+};
+
+function render(p){
+  const d = DATA[p];
+  const color = PALETTES[p];
+
+  document.getElementById('user-pic').textContent = d.initial;
+  document.getElementById('user-pic').style.background = color;
+
+  const hour = new Date().getHours();
+  const hi = hour<5?'凌晨好':hour<12?'早安':hour<18?'下午好':'晚安';
+  document.getElementById('hero-greeting').innerHTML = `${hi}，${d.name}，${d.greeting}`;
+  document.getElementById('hero-sub').textContent = d.sub;
+
+  // Todos
+  document.getElementById('todo-count').textContent = `${d.todos.length} 件`;
+  document.getElementById('todo-list').innerHTML = d.todos.map(t => `
+    <div class="todo ${t.tier}">
+      <div class="todo-icon">${t.icon}</div>
+      <div class="todo-body">
+        <div class="todo-meta-top">
+          <span class="todo-tag ${t.tier==='urgent'?'tag-urgent':t.tier==='warn'?'tag-warn':'tag-time'}">${t.tag}</span>
+          <span class="todo-tag tag-time">${t.est}</span>
+        </div>
+        <div class="todo-title">${t.title}</div>
+        <div class="todo-why">${t.why}</div>
+      </div>
+      <div class="todo-action">
+        <button class="todo-btn ${t.ghost?'ghost':''}">${t.btn}</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Numbers
+  document.getElementById('numbers-grid').innerHTML = d.numbers.map(n => `
+    <div class="number-card">
+      <div class="number-label">${n.label}</div>
+      <div class="number-val ${n.cls}">${n.val}</div>
+      <div class="number-meta">${n.meta}</div>
+      <div class="number-bar"><div class="number-bar-fill ${n.barCls}" style="width:${n.barW}%;"></div></div>
+    </div>
+  `).join('');
+
+  // Relations - 別人在等你
+  document.getElementById('rel-count').textContent = `${d.rels.length} 件`;
+  document.getElementById('relations').innerHTML = d.rels.map(r => `
+    <div class="rel-row">
+      <div class="rel-avatar" style="background:${r.color};">${[...r.who][0]}</div>
+      <div class="rel-info">
+        <div class="rel-text">${r.text}</div>
+        <div class="rel-meta">${r.meta}</div>
+      </div>
+      <span class="todo-tag ${r.statCls}">${r.stat}</span>
+    </div>
+  `).join('');
+
+  // Waiting
+  document.getElementById('waiting-on').innerHTML = d.waiting.map(r => `
+    <div class="rel-row">
+      <div class="rel-avatar" style="background:${r.color};">${[...r.who][0]}</div>
+      <div class="rel-info">
+        <div class="rel-text">${r.text}</div>
+        <div class="rel-meta">${r.meta}</div>
+      </div>
+      <span class="todo-tag ${r.statCls}">${r.stat}</span>
+    </div>
+  `).join('');
+}
+
+// Time
+const now = new Date();
+const days = ['日','一','二','三','四','五','六'];
+document.getElementById('hero-time').textContent = `${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日 · 星期${days[now.getDay()]}`;
+
+// 角色 → persona key 映射（mockup 5 個 persona + 其他映射到通用版）
+const USER_TO_PERSONA = {
+  ray:'ray', anran:'anran', laige:'laige', bevis:'bevis', shetong:'shetong',
+  // 沒在 mockup 的，先 fallback 到關係近的：
+  shawn:'ray', muzi:'laige', peiling:'shetong',
+  yangzi:'anran', leo:'anran', yueming:'anran',
+  yaoge:'ray', gaowei:'laige', laodong:'anran', debao:'anran',
+};
+
+function getSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem('erp_sess')||'null');
+    if(!s || Date.now() - s.ts > 7*86400000) return null;
+    return s;
+  }catch(e){ return null; }
+}
+
+function initToday(){
+  const sess = getSession();
+  if(!sess){
+    location.replace('login.html'); return;
+  }
+  const persona = USER_TO_PERSONA[sess.user] || 'ray';
+  // 如果沒有完整 persona data（不在 5 個 demo persona），顯示 fallback
+  if(!DATA[persona]){
+    renderFallback(sess);
+    return;
+  }
+  render(persona);
+  // 用真實 session 名字覆蓋 mockup 名字
+  const d = DATA[persona];
+  const realName = sess.name || d.name;
+  document.querySelector('.brand-sub').textContent = `${realName} · My Today`;
+}
+
+function renderFallback(sess){
+  document.querySelector('.main').innerHTML = `
+    <div class="hero">
+      <div class="hero-time">${document.getElementById('hero-time').textContent}</div>
+      <div class="hero-greeting">嗨 <span class="accent">${sess.name||sess.user}</span></div>
+      <div class="hero-sub">Today 頁正在為你準備中。先進你的工作台。</div>
+    </div>
+    <a href="erp-lobby.html" style="display:inline-block;margin-top:20px;padding:14px 28px;background:var(--accent);color:#fff;border-radius:12px;font-weight:700;text-decoration:none;">→ 去大廳</a>`;
+  document.getElementById('user-pic').style.background = '#a78bfa';
+  document.getElementById('user-pic').textContent = (sess.name||sess.user||'?')[0];
+}
+
+initToday();
+</script>
+
+</body>
+</html>
