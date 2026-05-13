@@ -185,15 +185,289 @@ body{background:radial-gradient(ellipse 80% 50% at 50% -10%,#a78bfa10 0%,var(--b
 </div>
 
 <script>
-const PALETTES = {
-  shetong: '#9333ea',
-  bevis:   '#818cf8',
-  laige:   '#f59e0b',
-  anran:   '#4f46e5',
-  ray:     '#a78bfa',
+const PROXY = 'https://feishu-proxy.raychou6913.workers.dev';
+const APP = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const TBL = {
+  approval: 'tbl4OBNvsNkqS4mQ',  // 審批記錄
+  project: 'tblPLJ2dLkdkWUAa',   // 項目排期
+  design: 'tblSgCcB2aFcsPaw',    // 設計送審
+  budget: 'tblmlUoyZ6Bip6S3',    // 預算管理
 };
+const USER_COLOR = {
+  Ray:'#a78bfa', 安然:'#4f46e5', Shawn:'#22c55e',
+  賴哥:'#f59e0b', 木子:'#d97706',
+  Bevis:'#818cf8', 詩彤:'#9333ea', 珮玲:'#6d28d9',
+  高維:'#10b981', 老董:'#f97316', 德寶:'#06b6d4',
+  楊子:'#0284c7', Leo:'#0284c7', 躍明:'#0284c7',
+  堯哥:'#a78bfa',
+};
+const PALETTES = USER_COLOR;  // 兼容舊變數名
 
-const DATA = {
+// ───── 飛書資料抓取 ─────
+async function feishuToken(){
+  try{
+    const r = await fetch(PROXY+'/auth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    return (await r.json()).tenant_access_token;
+  }catch(e){ return null; }
+}
+async function feishuQuery(tblId, tk){
+  try{
+    const r = await fetch(`${PROXY}/open-apis/bitable/v1/apps/${APP}/tables/${tblId}/records?page_size=200`, {
+      headers:{'Authorization':'Bearer '+tk}
+    });
+    const d = await r.json();
+    return d.data?.items || [];
+  }catch(e){ return []; }
+}
+const _fv = x => (x && typeof x === 'object' && x.value!==undefined) ? x.value : x;
+const _f = (rec, key) => _fv(rec.fields?.[key]);
+
+function fmtMoney(amt, ccy){
+  const sym = {USD:'US$',HKD:'HK$',TWD:'NT$',THB:'฿',CNY:'¥',RMB:'¥'}[ccy]||(ccy||'¥');
+  return `${sym}${Math.round(amt||0).toLocaleString()}`;
+}
+function daysAgo(ts){
+  if(!ts) return '';
+  const d = Math.round((Date.now() - ts) / 86400000);
+  if(d <= 0) return '今天';
+  if(d === 1) return '1 天';
+  return `${d} 天`;
+}
+
+// ───── 為單一使用者組裝 today data ─────
+async function buildTodayData(sess){
+  const tk = await feishuToken();
+  if(!tk) return null;
+  const [approvals, projects, designs] = await Promise.all([
+    feishuQuery(TBL.approval, tk),
+    feishuQuery(TBL.project, tk),
+    feishuQuery(TBL.design, tk),
+  ]);
+
+  const myName = sess.name;
+  const todos = [];
+  const rels = [];
+  const waiting = [];
+
+  // 1. 等我審批的審批記錄
+  const myApprovalsPending = approvals.filter(r => {
+    return _f(r,'審批人') === myName && _f(r,'審批狀態') === '待審批';
+  });
+  myApprovalsPending.forEach(r => {
+    const applicant = _f(r,'申請人') || '?';
+    const type = _f(r,'審批類型') || '申請';
+    const amount = _f(r,'金額') || 0;
+    const ccy = _f(r,'幣別') || 'CNY';
+    const dateStr = daysAgo(_f(r,'申請日期'));
+    const recId = r.record_id;
+    todos.push({
+      tier: dateStr.includes('天') && parseInt(dateStr)>=3 ? 'urgent' : 'warn',
+      icon: '💰',
+      tag: dateStr+'前送來',
+      est: '5 分鐘',
+      title: _f(r,'審批標題') || _f(r,'標題') || `${type} ${fmtMoney(amount, ccy)}`,
+      why: `<span class="person">${applicant}</span> 送出 · ${fmtMoney(amount, ccy)} · 對應項目：${_f(r,'對應項目')||'未指定'}`,
+      btn: '看詳情批核',
+      action: `erp-war-room.html?approval=${recId}`,
+    });
+    rels.push({
+      who: applicant,
+      color: USER_COLOR[applicant] || '#94a3b8',
+      text: `<span class="accent">${applicant}</span> 送了 ${type}：${fmtMoney(amount, ccy)}`,
+      meta: `已等 ${dateStr} · 對應：${_f(r,'對應項目')||'—'}`,
+      stat: dateStr,
+      statCls: parseInt(dateStr)>=3 ? 'tag-urgent' : 'tag-warn',
+    });
+  });
+
+  // 2. 我送出但還在等別人批的
+  const mySent = approvals.filter(r => _f(r,'申請人') === myName && _f(r,'審批狀態') === '待審批');
+  mySent.forEach(r => {
+    const approver = _f(r,'審批人') || 'Ray';
+    waiting.push({
+      who: approver,
+      color: USER_COLOR[approver] || '#94a3b8',
+      text: `<span class="accent">${approver}</span> 還沒批你的 ${_f(r,'審批類型')||'申請'}`,
+      meta: `送出 ${daysAgo(_f(r,'申請日期'))} · ${fmtMoney(_f(r,'金額'), _f(r,'幣別'))}`,
+      stat: daysAgo(_f(r,'申請日期')),
+      statCls: 'tag-time',
+    });
+  });
+
+  // 3. 我負責的項目「待 Ray 確認」
+  if(myName !== 'Ray'){
+    const myPendingProjects = projects.filter(p =>
+      _f(p,'負責人') === myName && _f(p,'狀態') === '待 Ray 確認');
+    myPendingProjects.forEach(p => {
+      const rid = p.record_id;
+      todos.push({
+        tier: 'warn',
+        icon: '📌',
+        tag: '等 Ray 確認',
+        est: '—',
+        title: `${_f(p,'項目名稱')} — 等 Ray baseline 鎖定`,
+        why: `你建的項目還沒被 Ray review。預計收入 ${fmtMoney(_f(p,'預計收入'), _f(p,'幣別'))}`,
+        btn: '看項目',
+        action: `erp-war-room.html?project=${rid}`,
+      });
+      waiting.push({
+        who:'Ray', color:USER_COLOR.Ray,
+        text:`<span class="accent">Ray</span> 還沒確認你建的「${_f(p,'項目名稱')}」`,
+        meta:`預計收入 ${fmtMoney(_f(p,'預計收入'), _f(p,'幣別'))}`,
+        stat:'待確認', statCls:'tag-time',
+      });
+    });
+  }
+
+  // 4. Ray 視角：所有待確認項目
+  if(myName === 'Ray'){
+    const allPendingProjects = projects.filter(p => _f(p,'狀態') === '待 Ray 確認');
+    allPendingProjects.forEach(p => {
+      const rid = p.record_id;
+      const owner = _f(p,'負責人') || '?';
+      todos.push({
+        tier:'urgent', icon:'✅', tag:'你的確認',
+        est:'3 分鐘',
+        title: `${_f(p,'項目名稱')} — baseline 鎖定`,
+        why: `<span class="person">${owner}</span> 建立 · 預計收入 ${fmtMoney(_f(p,'預計收入'), _f(p,'幣別'))} · IP：${_f(p,'IP品牌')||'?'}`,
+        btn:'去確認',
+        action:`erp-war-room.html?project=${rid}`,
+      });
+      rels.push({
+        who: owner, color: USER_COLOR[owner] || '#94a3b8',
+        text:`<span class="accent">${owner}</span> 等你 baseline「${_f(p,'項目名稱')}」`,
+        meta:`預計淨利 ${fmtMoney(_f(p,'預計淨利'), _f(p,'幣別'))}`,
+        stat:'今天', statCls:'tag-urgent',
+      });
+    });
+  }
+
+  // ── 數字 ──
+  const numbers = [];
+  // 通用：本月通過/送出審批數
+  const thisMonth = new Date(); thisMonth.setDate(1); thisMonth.setHours(0,0,0,0);
+  const thisMonthApprovals = approvals.filter(r => (_f(r,'申請日期')||0) >= thisMonth.getTime());
+  if(myName === 'Ray'){
+    const totalProjs = projects.length;
+    const pendProjs = projects.filter(p => _f(p,'狀態')==='待 Ray 確認').length;
+    numbers.push({
+      label:'進行中項目', val: `${totalProjs} 個`,
+      meta: `其中 ${pendProjs} 個等你 baseline 確認`,
+      cls: pendProjs>0?'warn':'ok', barW: Math.min(totalProjs*10,100), barCls: pendProjs>0?'warn':'ok',
+    });
+    numbers.push({
+      label:'本月送來批的', val: `${myApprovalsPending.length} 筆`,
+      meta:'按時批核，避免卡同事',
+      cls:'', barW: Math.min(myApprovalsPending.length*15,100), barCls:'',
+    });
+  } else {
+    numbers.push({
+      label:'本月你送出的審批', val: `${mySent.length} 筆`,
+      meta:'等別人批',
+      cls:'', barW: Math.min(mySent.length*15,100), barCls:'',
+    });
+    const myProjs = projects.filter(p => _f(p,'負責人') === myName).length;
+    numbers.push({
+      label:'你負責的項目', val: `${myProjs} 個`,
+      meta:'進行中',
+      cls:'', barW: Math.min(myProjs*20,100), barCls:'',
+    });
+  }
+
+  return { todos, rels, waiting, numbers };
+}
+
+// ───── 渲染 ─────
+function renderToday(d, sess){
+  const myColor = USER_COLOR[sess.name] || '#a78bfa';
+  document.getElementById('user-pic').textContent = (sess.name||'?')[0];
+  document.getElementById('user-pic').style.background = myColor;
+
+  const hour = new Date().getHours();
+  const hi = hour<5?'凌晨好':hour<12?'早安':hour<18?'下午好':'晚安';
+  const totalCount = d.todos.length;
+  const greetTxt = totalCount===0
+    ? `<span class="accent">沒有等你的事</span>，享受一下難得的清閒`
+    : `今天有 <span class="accent">${totalCount} 件事</span> 要做`;
+  document.getElementById('hero-greeting').innerHTML = `${hi}，${sess.name}，${greetTxt}`;
+  document.getElementById('hero-sub').textContent = totalCount===0
+    ? '可以提前看看本週的事，或新建項目'
+    : '系統依你的角色，挑出真正需要你動手的事';
+
+  // Todos
+  document.getElementById('todo-count').textContent = `${totalCount} 件`;
+  if(totalCount === 0){
+    document.getElementById('todo-list').innerHTML = `
+      <div style="text-align:center;padding:30px;color:var(--txt-lo);font-size:13px;">
+        ✨ 沒有等你的待辦<br>
+        <a href="erp-project-new.html" style="display:inline-block;margin-top:10px;color:var(--accent);text-decoration:none;">＋ 新增項目</a>
+      </div>`;
+  } else {
+    document.getElementById('todo-list').innerHTML = d.todos.map(t => `
+      <div class="todo ${t.tier}" onclick="location.href='${t.action||'erp-lobby.html'}'" style="cursor:pointer;">
+        <div class="todo-icon">${t.icon}</div>
+        <div class="todo-body">
+          <div class="todo-meta-top">
+            <span class="todo-tag ${t.tier==='urgent'?'tag-urgent':t.tier==='warn'?'tag-warn':'tag-time'}">${t.tag}</span>
+            ${t.est?`<span class="todo-tag tag-time">${t.est}</span>`:''}
+          </div>
+          <div class="todo-title">${t.title}</div>
+          <div class="todo-why">${t.why}</div>
+        </div>
+        <div class="todo-action">
+          <button class="todo-btn ${t.ghost?'ghost':''}" onclick="event.stopPropagation();location.href='${t.action||'erp-lobby.html'}'">${t.btn}</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  const moreLink = document.getElementById('more-todo');
+  if(moreLink) moreLink.style.display = totalCount > 5 ? '' : 'none';
+
+  // Numbers
+  document.getElementById('numbers-grid').innerHTML = d.numbers.map(n => `
+    <div class="number-card">
+      <div class="number-label">${n.label}</div>
+      <div class="number-val ${n.cls}">${n.val}</div>
+      <div class="number-meta">${n.meta}</div>
+      <div class="number-bar"><div class="number-bar-fill ${n.barCls}" style="width:${n.barW}%;"></div></div>
+    </div>
+  `).join('');
+
+  // Relations - 別人在等你
+  document.getElementById('rel-count').textContent = `${d.rels.length} 件`;
+  if(d.rels.length === 0){
+    document.getElementById('relations').innerHTML = `<div style="color:var(--txt-lo);font-size:12px;padding:14px;">沒人在等你 ✓</div>`;
+  } else {
+    document.getElementById('relations').innerHTML = d.rels.map(r => `
+      <div class="rel-row">
+        <div class="rel-avatar" style="background:${r.color};">${[...r.who][0]}</div>
+        <div class="rel-info">
+          <div class="rel-text">${r.text}</div>
+          <div class="rel-meta">${r.meta}</div>
+        </div>
+        <span class="todo-tag ${r.statCls}">${r.stat}</span>
+      </div>
+    `).join('');
+  }
+
+  // Waiting
+  if(d.waiting.length === 0){
+    document.getElementById('waiting-on').innerHTML = `<div style="color:var(--txt-lo);font-size:12px;padding:14px;">沒在等任何人 ✓</div>`;
+  } else {
+    document.getElementById('waiting-on').innerHTML = d.waiting.map(r => `
+      <div class="rel-row">
+        <div class="rel-avatar" style="background:${r.color};">${[...r.who][0]}</div>
+        <div class="rel-info">
+          <div class="rel-text">${r.text}</div>
+          <div class="rel-meta">${r.meta}</div>
+        </div>
+        <span class="todo-tag ${r.statCls}">${r.stat}</span>
+      </div>
+    `).join('');
+  }
+}
+
+const DATA_LEGACY_UNUSED = {
   shetong: {
     name: '詩彤',
     initial: '詩',
@@ -434,15 +708,6 @@ const now = new Date();
 const days = ['日','一','二','三','四','五','六'];
 document.getElementById('hero-time').textContent = `${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日 · 星期${days[now.getDay()]}`;
 
-// 角色 → persona key 映射（mockup 5 個 persona + 其他映射到通用版）
-const USER_TO_PERSONA = {
-  ray:'ray', anran:'anran', laige:'laige', bevis:'bevis', shetong:'shetong',
-  // 沒在 mockup 的，先 fallback 到關係近的：
-  shawn:'ray', muzi:'laige', peiling:'shetong',
-  yangzi:'anran', leo:'anran', yueming:'anran',
-  yaoge:'ray', gaowei:'laige', laodong:'anran', debao:'anran',
-};
-
 function getSession(){
   try{
     const s = JSON.parse(localStorage.getItem('erp_sess')||'null');
@@ -451,34 +716,30 @@ function getSession(){
   }catch(e){ return null; }
 }
 
-function initToday(){
+async function initToday(){
   const sess = getSession();
-  if(!sess){
-    location.replace('login.html'); return;
-  }
-  const persona = USER_TO_PERSONA[sess.user] || 'ray';
-  // 如果沒有完整 persona data（不在 5 個 demo persona），顯示 fallback
-  if(!DATA[persona]){
-    renderFallback(sess);
-    return;
-  }
-  render(persona);
-  // 用真實 session 名字覆蓋 mockup 名字
-  const d = DATA[persona];
-  const realName = sess.name || d.name;
-  document.querySelector('.brand-sub').textContent = `${realName} · My Today`;
-}
+  if(!sess){ location.replace('login.html'); return; }
+  document.querySelector('.brand-sub').textContent = `${sess.name} · My Today`;
+  // Loading state
+  document.getElementById('hero-greeting').innerHTML = `載入中…`;
+  document.getElementById('hero-sub').textContent = '從飛書抓你今天的事';
+  document.getElementById('user-pic').textContent = (sess.name||'?')[0];
+  document.getElementById('user-pic').style.background = USER_COLOR[sess.name] || '#a78bfa';
 
-function renderFallback(sess){
-  document.querySelector('.main').innerHTML = `
-    <div class="hero">
-      <div class="hero-time">${document.getElementById('hero-time').textContent}</div>
-      <div class="hero-greeting">嗨 <span class="accent">${sess.name||sess.user}</span></div>
-      <div class="hero-sub">Today 頁正在為你準備中。先進你的工作台。</div>
-    </div>
-    <a href="erp-lobby.html" style="display:inline-block;margin-top:20px;padding:14px 28px;background:var(--accent);color:#fff;border-radius:12px;font-weight:700;text-decoration:none;">→ 去大廳</a>`;
-  document.getElementById('user-pic').style.background = '#a78bfa';
-  document.getElementById('user-pic').textContent = (sess.name||sess.user||'?')[0];
+  try{
+    const data = await buildTodayData(sess);
+    if(!data) throw new Error('飛書連線失敗');
+    renderToday(data, sess);
+  }catch(e){
+    console.error('today error', e);
+    document.querySelector('.main').innerHTML = `
+      <div class="hero">
+        <div class="hero-time">${document.getElementById('hero-time').textContent}</div>
+        <div class="hero-greeting">嗨 <span class="accent">${sess.name}</span></div>
+        <div class="hero-sub">飛書連線暫時失敗 — 請進大廳開始工作</div>
+      </div>
+      <a href="erp-lobby.html" style="display:inline-block;margin-top:20px;padding:14px 28px;background:var(--accent);color:#fff;border-radius:12px;font-weight:700;text-decoration:none;">→ 去大廳</a>`;
+  }
 }
 
 initToday();
