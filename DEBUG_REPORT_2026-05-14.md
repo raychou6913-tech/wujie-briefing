@@ -6,7 +6,7 @@ Loop input：`/loop 今晚自動跑完 10 條任務 + BKK 範圍`
 
 ---
 
-## ✅ 完成（9 / 10 + 5 / 5 BKK）
+## ✅ 完成（10 / 10 + 5 / 5 BKK）
 
 ### Phase 1 Debug
 
@@ -30,7 +30,10 @@ Loop input：`/loop 今晚自動跑完 10 條任務 + BKK 範圍`
 - 所有 hit 都是合法 placeholder 屬性（input/textarea 的 `placeholder="例：..."`）
 - 沒有 TODO / FIXME 待辦遺漏
 
-**[5] User journey 靜態驗證** — 留待下輪（時間不足）
+**[5] User journey 靜態驗證** ✅
+- 6 個關鍵 entry 頁（today / erp-lobby / erp-war-room / erp-anran / erp-procurement / bkk-lobby）topbar 結構齊全
+- 全 6 處 `_PROXY` 常數一致指向 `https://feishu-proxy.raychou6913.workers.dev`
+- 4 角色（Ray / 安然 / 賴哥 / BKK Shawn）entry → main page → drill 都 walkable
 
 ### Phase 2 產出
 
@@ -131,9 +134,10 @@ commit 軌跡：
 
 ---
 
-## 還沒做的
+## 留給 Ray 醒來時跟進
 
-- **Task 5** User journey 靜態驗證（時間不足）
-- **Task 3 跟進**：補 placeholder table ID 到真實 schema、補 tblmsXyVnBqdHC3V 進 memory
+- **Task 3 跟進**：補 2 處 placeholder tbl ID 到真實 schema（popup_stores / ip_masters），補 `tblmsXyVnBqdHC3V` 驗收紀錄進 feishu_table_map.md memory
+- **BKK 文案再淡化**：上海總倉 / 原廠 是否還是太露骨？（可選）
+- **CLAUDE.md 再擴充**：4 AI 引擎 Phase 順序 + 5 IP 速查表（可選）
 
-下輪 loop 可以做 Task 5，或 Ray 醒來時看這份 report 決定優先級。
+10 + 5 全部完成。下輪 loop 沒事可做，已不再 ScheduleWakeup。
