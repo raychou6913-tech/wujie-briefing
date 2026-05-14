@@ -775,6 +775,23 @@ function buildSidebar(){
 
   // System group
   const sysContainer = document.getElementById('sb-system-items');
+  // 集團架構說明（管理層才看得到，知識性查詢頁，不常用）
+  if(['ray','shawn','anran','yuming'].includes(user)){
+    const e = document.createElement('a');
+    e.href = 'erp-entity-structure.html';
+    e.className = 'sb-item';
+    e.innerHTML = '<span class="sb-icon">🏛</span><span class="sb-label">集團架構</span>';
+    sysContainer.appendChild(e);
+  }
+  // Transfer Pricing 設定（管理層 + 財務才看，設一次長期用）
+  if(['ray','shawn','anran','yuming'].includes(user)){
+    const t = document.createElement('a');
+    t.href = 'erp-transfer-pricing.html';
+    t.className = 'sb-item';
+    t.innerHTML = '<span class="sb-icon">🔄</span><span class="sb-label">TP 設定</span>';
+    sysContainer.appendChild(t);
+  }
+  // 系統管理（最高權限）
   if(['ray','shawn'].includes(user)){
     const a = document.createElement('a');
     a.href = 'erp-admin.html';
