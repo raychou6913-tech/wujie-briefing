@@ -7,42 +7,121 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0b0c10;--surface:#111318;--card:#181a22;--card2:#1e2130;
-  --border:#222535;--border-hi:#363b58;
-  --txt-hi:#e8eaf8;--txt-mid:#7880a8;--txt-lo:#3d4268;
-  --accent:#818cf8;--ok:#22c55e;--danger:#ef4444;
+  /* v4 design tokens */
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  --ok:#22c55e;--danger:#ef4444;
+  /* Legacy aliases */
+  --bg:var(--paper);
+  --surface:var(--paper);
+  --card:#fff;
+  --card2:var(--paper-soft);
+  --border:var(--line);
+  --border-hi:var(--ink-faint);
+  --txt-hi:var(--ink);
+  --txt-mid:var(--ink-mid);
+  --txt-lo:var(--ink-lo);
+  --accent:var(--brand);
 }
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01";
+  letter-spacing:-.003em;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:40px 20px;
+}
 .wrap{width:100%;max-width:440px;}
-.logo{text-align:center;margin-bottom:32px;}
-.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);display:inline-block;margin-right:8px;vertical-align:middle;}
-.logo-name{font-size:22px;font-weight:800;}
-.logo-sub{font-size:10px;color:var(--txt-lo);margin-top:6px;letter-spacing:.12em;text-transform:uppercase;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
-.field{margin-bottom:16px;}
-.field label{display:block;font-size:11px;color:var(--txt-mid);font-weight:600;margin-bottom:6px;letter-spacing:.04em;}
-.field input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--txt-hi);outline:none;transition:border-color .2s;}
-.field input::placeholder{color:var(--txt-lo);}
-.field input:focus{border-color:var(--accent);}
-.btn-login{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:opacity .2s;}
-.btn-login:hover{opacity:.88;}
-.err{background:#ef444412;border:1px solid #ef444435;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger);margin-bottom:14px;display:none;}
+.logo{text-align:center;margin-bottom:40px;}
+.logo-row{display:inline-flex;align-items:flex-end;gap:3px;line-height:1;}
+.logo-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--brand);
+  align-self:flex-end;margin-bottom:4px;
+}
+.logo-name{
+  font-family:"Helvetica Neue","Arial Black",sans-serif;
+  font-weight:900;font-size:32px;letter-spacing:-.04em;
+  color:var(--ink);
+}
+.logo-sub{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  margin-top:10px;letter-spacing:.18em;text-transform:uppercase;
+}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px;}
+.field{margin-bottom:18px;}
+.field label{
+  display:block;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  margin-bottom:8px;letter-spacing:.12em;text-transform:uppercase;
+}
+.field input{
+  width:100%;background:var(--paper-soft);
+  border:1px solid var(--line);border-radius:10px;
+  padding:13px 14px;font-size:14px;color:var(--ink);
+  outline:none;transition:border-color .22s var(--ease),background .22s var(--ease);
+  font-family:inherit;
+}
+.field input::placeholder{color:var(--ink-faint);}
+.field input:focus{border-color:var(--brand);background:#fff;}
+.btn-login{
+  width:100%;background:var(--brand);color:#fff;border:none;
+  border-radius:10px;padding:14px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  margin-top:4px;transition:opacity .2s var(--ease);
+  font-family:inherit;letter-spacing:.02em;
+}
+.btn-login:hover{opacity:.85;}
+.err{
+  background:#ef444410;border:1px solid #ef444430;
+  border-radius:8px;padding:10px 12px;
+  font-size:12px;color:var(--danger);margin-bottom:14px;display:none;
+}
 .err.show{display:block;}
-.hint-title{font-size:10px;color:var(--txt-lo);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:24px 0 10px;}
-.acc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
-.acc{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:8px;}
-.acc:hover{border-color:var(--border-hi);}
-.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
-.acc-name{font-size:11px;font-weight:700;}
-.acc-role{font-size:9px;color:var(--txt-lo);}
-.foot{text-align:center;font-size:10px;color:var(--txt-lo);margin-top:18px;}
+.hint-title{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-faint);font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  margin:32px 0 12px;text-align:center;
+}
+.acc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.acc{
+  background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px;cursor:pointer;
+  transition:border-color .22s var(--ease),transform .22s var(--ease);
+  display:flex;align-items:center;gap:10px;
+}
+.acc:hover{border-color:var(--ink-faint);transform:translateX(2px);}
+.av{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:11px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.acc-name{font-size:12px;font-weight:700;color:var(--ink);}
+.acc-role{font-size:10px;color:var(--ink-mid);margin-top:1px;}
+.foot{
+  text-align:center;font-size:10px;color:var(--ink-lo);
+  margin-top:24px;letter-spacing:.04em;
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="logo">
-    <div><span class="logo-dot"></span><span class="logo-name">蕪解 ERP</span></div>
-    <div class="logo-sub">WUJIE CREATIVE · 管理系統 v2.0</div>
+    <div class="logo-row"><span class="logo-name">wujie</span><span class="logo-dot"></span></div>
+    <div class="logo-sub">蕪 解 創 意 · ERP</div>
   </div>
 
   <div class="card">
