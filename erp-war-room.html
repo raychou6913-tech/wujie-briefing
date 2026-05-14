@@ -109,6 +109,51 @@ body{
   letter-spacing:.04em;margin-left:auto;margin-right:10px;
 }
 
+/* ── SUBJECT TAB SWITCHER（多法人 lens） ── */
+.subject-tab{
+  display:flex;gap:8px;
+  padding:14px 0 18px;margin-bottom:24px;
+  border-bottom:1px solid var(--line);
+  overflow-x:auto;
+}
+.subject-tab::-webkit-scrollbar{height:0;}
+.st-btn{
+  background:transparent;border:1px solid var(--line);
+  border-radius:20px;padding:6px 14px;
+  font-size:11px;color:var(--ink-mid);font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  transition:border-color .22s var(--ease),background .22s var(--ease),color .22s var(--ease);
+  font-family:inherit;
+}
+.st-btn:hover{border-color:var(--ink-faint);color:var(--ink);}
+.st-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+/* ── V1/V2/V3 BUDGET SUMMARY ── */
+.budget-summary{
+  background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:24px;margin-bottom:24px;
+}
+.bs-row{
+  display:grid;grid-template-columns:160px 1fr auto;
+  align-items:center;gap:16px;
+  padding-bottom:6px;margin-bottom:14px;
+}
+.bs-row:last-of-type{margin-bottom:4px;}
+.bs-label{font-size:13px;font-weight:700;color:var(--ink);}
+.bs-meta{font-family:"Helvetica Neue",sans-serif;font-size:14px;font-weight:800;color:var(--ink);text-align:right;}
+.bs-pct{font-family:"Helvetica Neue",sans-serif;font-size:10px;color:var(--ink-mid);letter-spacing:.04em;}
+.bs-bar{
+  grid-column:1/-1;
+  background:var(--line);border-radius:4px;
+  height:5px;overflow:hidden;margin-top:4px;
+}
+.bs-bar-fill{height:100%;border-radius:4px;transition:width .6s var(--ease);}
+.bs-note{
+  margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+  font-family:"Noto Serif TC",serif;
+  font-size:11px;color:var(--ink-mid);letter-spacing:.02em;line-height:1.7;
+}
+
 /* ── VAM HERO ── */
 .vam-hero{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;}
 .vam-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
@@ -342,6 +387,16 @@ body{
 
 
 <div class="main">
+
+  <!-- 主體切換 tab（多法人 lens） -->
+  <div class="subject-tab" role="tablist">
+    <button class="st-btn active" onclick="switchSubject(this,'all')">全公司合計</button>
+    <button class="st-btn" onclick="switchSubject(this,'hk-jv')">香港 JV</button>
+    <button class="st-btn" onclick="switchSubject(this,'sz-sub')">深圳子公司</button>
+    <button class="st-btn" onclick="switchSubject(this,'bj-wj')">北京蕪解</button>
+    <button class="st-btn" onclick="switchSubject(this,'tw-hc')">台灣悍草</button>
+    <button class="st-btn" onclick="switchSubject(this,'uj-bkk')">UJ BKK</button>
+  </div>
 
   <!-- ① 年度業績核心指標（合併 VAM + 業績）-->
   <div class="section-title">年度業績 · 核心指標</div>
@@ -594,6 +649,32 @@ body{
         </div>
       </div>
       <div style="font-size:10px;color:var(--txt-lo);">📌 4月 LOG-ON 出貨拉高單月收入，2月農曆年淡季屬正常。月度淨利率趨勢向上，Q2 均值預計可達 30%+。</div>
+    </div>
+  </div>
+
+  <!-- ② V1/V2/V3 預算規劃 vs 實際 -->
+  <div class="section-title">📋 V1 / V2 / V3 預算規劃 vs 實際</div>
+  <div class="budget-summary">
+    <div class="bs-row">
+      <div class="bs-label">V1 · 年初規劃</div>
+      <div class="bs-meta">¥800 萬</div>
+      <div class="bs-pct">100% 鎖定</div>
+      <div class="bs-bar"><div class="bs-bar-fill" style="width:100%;background:var(--ink-faint);"></div></div>
+    </div>
+    <div class="bs-row">
+      <div class="bs-label">V2 · 簽約覆蓋</div>
+      <div class="bs-meta">¥520 萬</div>
+      <div class="bs-pct">65% 已簽</div>
+      <div class="bs-bar"><div class="bs-bar-fill" style="width:65%;background:linear-gradient(90deg,var(--brand-soft),var(--brand));"></div></div>
+    </div>
+    <div class="bs-row">
+      <div class="bs-label">V3 · 實際入帳</div>
+      <div class="bs-meta">¥184 萬</div>
+      <div class="bs-pct">23% 已執行</div>
+      <div class="bs-bar"><div class="bs-bar-fill" style="width:23%;background:linear-gradient(90deg,#b45309,var(--warn));"></div></div>
+    </div>
+    <div class="bs-note">
+      V1 由年初拍板（4 季拆解）/ V2 簽約 + 確認訂單後自動累加 / V3 由 ERP 事件流回灌實際入帳。
     </div>
   </div>
 
@@ -1789,8 +1870,40 @@ function loadSellThruWarRoom(){
   el.innerHTML = html;
 }
 
+/* ── SUBJECT TAB SWITCHER（多法人 lens，demo 階段 hardcoded 數字） ── */
+const SUBJECT_DATA = {
+  'all':    {v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23},
+  'hk-jv':  {v1:480, v2:300, v3:108, v1pct:100, v2pct:62, v3pct:22},
+  'sz-sub': {v1:320, v2:220, v3:76,  v1pct:100, v2pct:69, v3pct:24},
+  'bj-wj':  {v1:120, v2:80,  v3:28,  v1pct:100, v2pct:67, v3pct:23},
+  'tw-hc':  {v1:80,  v2:52,  v3:18,  v1pct:100, v2pct:65, v3pct:23},
+  'uj-bkk': {v1:60,  v2:38,  v3:14,  v1pct:100, v2pct:63, v3pct:23},
+};
+function switchSubject(btn, subject){
+  document.querySelectorAll('.st-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = SUBJECT_DATA[subject];
+  if(!d) return;
+  const rows = document.querySelectorAll('.budget-summary .bs-row');
+  if(rows[0]){
+    rows[0].querySelector('.bs-meta').textContent = `¥${d.v1} 萬`;
+    rows[0].querySelector('.bs-pct').textContent = `${d.v1pct}% 鎖定`;
+    rows[0].querySelector('.bs-bar-fill').style.width = `${d.v1pct}%`;
+  }
+  if(rows[1]){
+    rows[1].querySelector('.bs-meta').textContent = `¥${d.v2} 萬`;
+    rows[1].querySelector('.bs-pct').textContent = `${d.v2pct}% 已簽`;
+    rows[1].querySelector('.bs-bar-fill').style.width = `${d.v2pct}%`;
+  }
+  if(rows[2]){
+    rows[2].querySelector('.bs-meta').textContent = `¥${d.v3} 萬`;
+    rows[2].querySelector('.bs-pct').textContent = `${d.v3pct}% 已執行`;
+    rows[2].querySelector('.bs-bar-fill').style.width = `${d.v3pct}%`;
+  }
+}
+
 /* ── INIT ── */
-// 戰情室收緊定位（2026-05-14 Ray 拍板）：只留 VAM hero（核心高層 lens）+ 計劃覆蓋率 + 法人架構圖。
+// 戰情室收緊定位（2026-05-14 Ray 拍板）：只留 VAM hero（核心高層 lens）+ V1/V2/V3 + 計劃覆蓋率。
 // 其他內容（待批/現金流/JV應付/動銷/流水線）已搬到對應頁面。對應 load 函數定義保留但不呼叫，避免 throw。
 loadVAM();
 loadVamProgress().then(() => loadPipelineCoverage());
