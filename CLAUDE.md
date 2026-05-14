@@ -158,6 +158,46 @@ Ray 親確認的正確流程：
 
 ---
 
+## UI 設計語言 v4（2026-05-13 Ray 拍板）
+
+**核心 4 鐵律**：入口隱藏 / 留白為主 / 單聚焦 / 微互動透出。
+
+**配色**：
+- `--paper: #fafaf8`（米白底，主要）
+- `--brand: #ff6b35`（橘色 accent，唯一彩色）
+- `--ink: #0a0a0a`（純黑文字）
+- 禁用：紫色、漸層、暖米紅、Cormorant Italic、Anton 粗體
+
+**字體**：
+- 中文標題：`Noto Serif TC`（編輯雜誌感，字距 .18em - .3em）
+- 內文：`Inter` / `Helvetica Neue`
+- Logo / 英文大標：`Helvetica Neue Black`（字距 -.04em 緊縮）
+
+**Sidebar 規範**：88px collapsed → 280px hover（`.42s cubic-bezier(0.32, 0.72, 0, 1)` Apple iOS easing）。
+
+**寫新 ERP 頁面前必抄 `mockup-lobby-v4.html`**。詳細規範見 `.cursor/rules/01-design-language.mdc`。
+
+**對外用詞**（永遠遵守）：
+- ❌ 二創 / 二次創作 / Secondary Creation
+- ✅ 主題開發 / 場景再創 / 3D 結構化 / Theme Development
+- 30 天承諾 = **主題企劃 + 3D Mockup**，實體交期另計
+- 詳見 `.cursor/rules/02-terminology.mdc`
+
+---
+
+## Cursor / MJ 雙 AI 分工（2026-05-14）
+
+| 工作 | Cursor（Sonnet 4.6）| MJ（Opus 4.7）|
+|------|---|---|
+| ERP UI 視覺打磨、CSS、單頁 mockup | ✅ 主場 | ❌ |
+| 後端 / API 接點 / 飛書 schema / Worker 部署 | ❌ | ✅ 主場 |
+| 長 prompt 邏輯打磨 | ✅ | ✅ |
+| memory 累積 / 跨 session | ❌ | ✅ |
+
+Cursor 規則在 `.cursor/rules/*.mdc`，自動 always-apply。動骨架（資料模型 / API / 算法）一律先問 MJ。
+
+---
+
 ## 關於 Ray（Owner）
 
 - 目標：ERP 要做到**非常完美**，是三大目標之一
