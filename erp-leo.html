@@ -7,18 +7,42 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
-  --border:#334155;--border-hi:#475569;
-  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
-  --accent:#0284c7;--accent-dim:#0284c718;
+  /* ── v4 design tokens ── */
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-deep:#1a1a1a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
   --ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
+  --radius:12px;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  /* ── Legacy aliases — keep for inline HTML styles + JS var() refs ── */
+  --bg:var(--paper);
+  --surface:var(--paper);
+  --card:#fff;
+  --card2:var(--paper-soft);
+  --border:var(--line);
+  --border-hi:var(--ink-faint);
+  --txt-hi:var(--ink);
+  --txt-mid:var(--ink-mid);
+  --txt-lo:var(--ink-lo);
+  --accent:var(--brand);
+  --accent2:#cc5420;
 }
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:80px;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
-.tb-back{background:none;border:1px solid var(--border);border-radius:8px;color:var(--txt-mid);padding:6px 12px;font-size:12px;cursor:pointer;}
-.tb-back:hover{border-color:var(--border-hi);color:var(--txt-hi);}
+body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01";
+  letter-spacing:-.003em;min-height:100vh;padding-bottom:80px;}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.tb-back{background:none;border:1px solid var(--line);border-radius:8px;color:var(--ink-mid);padding:6px 12px;font-size:12px;cursor:pointer;}
+.tb-back:hover{border-color:var(--ink-faint);color:var(--ink);}
 .tb-title{font-size:14px;font-weight:700;}
 .tb-user{margin-left:auto;font-size:11px;color:var(--txt-mid);}
 
@@ -36,7 +60,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* Section */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:24px;}
-.sec-title{font-size:11px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;}
+.sec-title{font-size:9px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.18em;}
 .sec-link{font-size:11px;color:var(--accent);cursor:pointer;font-weight:700;border:none;background:none;}
 
 /* Payment items */
@@ -77,7 +101,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .nhi-row:last-child{border-bottom:none;}
 .nhi-label{font-size:12px;flex:1;color:var(--txt-mid);}
 .nhi-amt{font-size:13px;font-weight:800;min-width:80px;text-align:right;}
-.nhi-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.nhi-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all .15s var(--ease);}
 .nhi-check.paid{background:var(--ok);border-color:var(--ok);color:#000;}
 .nhi-check:not(.paid):hover{border-color:var(--ok);}
 .nhi-total-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card2);border-top:1px solid var(--border-hi);}
@@ -95,7 +119,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .bank-upd:hover{opacity:.8;}
 
 /* Checklist */
-.check-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
+.check-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s var(--ease);margin-bottom:8px;}
 .check-item:hover{border-color:var(--border-hi);}
 .check-item.done{opacity:.5;}
 .check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
@@ -121,7 +145,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .field select option{background:var(--card2);}
 .modal-footer{display:flex;gap:8px;}
 .btn-full{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
-.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary{background:var(--brand);color:#fff;}
 .btn-cancel{background:var(--card2);color:var(--txt-mid);border:1px solid var(--border);}
 
 /* Toast */
