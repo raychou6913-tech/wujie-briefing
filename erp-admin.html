@@ -77,7 +77,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 .u-name{font-weight:700;color:var(--txt-hi);}
 .u-id{font-size:10px;color:var(--txt-lo);font-family:monospace;}
 .chip{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;display:inline-block;}
-.chip-purple{background:#818cf820;color:var(--accent);}
+.chip-purple{background:#ff6b3520;color:var(--accent);}
 .chip-green{background:var(--ok-dim);color:var(--ok);}
 .chip-yellow{background:var(--warn-dim);color:var(--warn);}
 .chip-blue{background:#0284c720;color:#38bdf8;}
@@ -205,7 +205,7 @@ if(!SESS) throw new Error('redirect');
 
 const ADMIN_USERS = ['ray','shawn'];
 if(!ADMIN_USERS.includes(SESS.user)){
-  document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px;color:#94a3b8;"><div style="font-size:40px">🔒</div><div style="font-size:14px;font-weight:700;">此頁面僅限系統管理員存取</div><a href="erp-lobby.html" style="color:#818cf8;font-size:12px;">← 返回大廳</a></div>';
+  document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:12px;color:#94a3b8;"><div style="font-size:40px">🔒</div><div style="font-size:14px;font-weight:700;">此頁面僅限系統管理員存取</div><a href="erp-lobby.html" style="color:#ff6b35;font-size:12px;">← 返回大廳</a></div>';
   throw new Error('unauthorized');
 }
 
@@ -230,15 +230,15 @@ const ALL_MODS = [
 ];
 
 const ACCOUNTS = [
-  { user:'ray',       name:'Ray',    initials:'Ray', color:'#818cf8', role:'CEO',       team:'管理層', teamColor:'chip-purple', hall:'erp-war-room.html',    defaultMods:['all'] },
+  { user:'ray',       name:'Ray',    initials:'Ray', color:'#ff6b35', role:'CEO',       team:'管理層', teamColor:'chip-purple', hall:'erp-war-room.html',    defaultMods:['all'] },
   { user:'yangzi',    name:'楊子',   initials:'楊',  color:'#22c55e', role:'財務主管',   team:'財務',   teamColor:'chip-green',  hall:'erp-finance.html',     defaultMods:['finance','war-room'] },
   { user:'anran',     name:'安然',   initials:'然',  color:'#f59e0b', role:'北京負責人', team:'北京',   teamColor:'chip-yellow', hall:'erp-anran.html',       defaultMods:['anran','finance','procurement','war-room'] },
-  { user:'shawn',     name:'Shawn',  initials:'S',   color:'#818cf8', role:'COO',        team:'曼谷',   teamColor:'chip-purple', hall:'erp-shawn.html',       defaultMods:['all'] },
+  { user:'shawn',     name:'Shawn',  initials:'S',   color:'#ff6b35', role:'COO',        team:'曼谷',   teamColor:'chip-purple', hall:'erp-shawn.html',       defaultMods:['all'] },
   { user:'laige',     name:'賴哥',   initials:'賴',  color:'#f59e0b', role:'採購主管',   team:'北京',   teamColor:'chip-yellow', hall:'erp-procurement.html', defaultMods:['procurement','logistics'] },
   { user:'muzi',      name:'木子',   initials:'木',  color:'#f59e0b', role:'採購執行',   team:'北京',   teamColor:'chip-yellow', hall:'erp-procurement.html', defaultMods:['procurement'] },
-  { user:'peilin',    name:'珮玲',   initials:'玲',  color:'#a78bfa', role:'設計師',     team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval'] },
-  { user:'shetong',   name:'詩彤',   initials:'彤',  color:'#a78bfa', role:'設計師',     team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval'] },
-  { user:'bevis',     name:'Bevis',  initials:'B',   color:'#a78bfa', role:'設計主管',   team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval','war-room'] },
+  { user:'peilin',    name:'珮玲',   initials:'玲',  color:'#ff6b35', role:'設計師',     team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval'] },
+  { user:'shetong',   name:'詩彤',   initials:'彤',  color:'#ff6b35', role:'設計師',     team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval'] },
+  { user:'bevis',     name:'Bevis',  initials:'B',   color:'#ff6b35', role:'設計主管',   team:'台北',   teamColor:'chip-purple', hall:'erp-pipeline.html',    defaultMods:['pipeline','approval','war-room'] },
   { user:'gaowei',    name:'高維',   initials:'高',  color:'#38bdf8', role:'物流',       team:'曼谷',   teamColor:'chip-blue',   hall:'erp-logistics-quick.html', defaultMods:['logistics','procurement','shawn'] },
   { user:'chunlei',   name:'春雷',   initials:'雷',  color:'#38bdf8', role:'曼谷團隊',   team:'曼谷',   teamColor:'chip-blue',   hall:'erp-shawn.html',       defaultMods:['shawn'] },
   { user:'jiaying',   name:'嘉穎',   initials:'穎',  color:'#38bdf8', role:'曼谷團隊',   team:'曼谷',   teamColor:'chip-blue',   hall:'erp-shawn.html',       defaultMods:['shawn'] },
@@ -246,7 +246,7 @@ const ACCOUNTS = [
   { user:'debao',     name:'德寶',   initials:'寶',  color:'#f59e0b', role:'客戶/代理',  team:'北京',   teamColor:'chip-yellow', hall:'erp-anran.html',       defaultMods:['anran'] },
   { user:'laodong',   name:'老董',   initials:'董',  color:'#f59e0b', role:'客戶/代理',  team:'北京',   teamColor:'chip-yellow', hall:'erp-anran.html',       defaultMods:['anran'] },
   { user:'yuming',    name:'雨明',   initials:'明',  color:'#22c55e', role:'財務',       team:'財務',   teamColor:'chip-green',  hall:'erp-finance.html',     defaultMods:['finance'] },
-  { user:'leo',       name:'Leo',    initials:'L',   color:'#818cf8', role:'業務',       team:'管理層', teamColor:'chip-purple', hall:'erp-war-room.html',    defaultMods:['war-room','crm'] },
+  { user:'leo',       name:'Leo',    initials:'L',   color:'#ff6b35', role:'業務',       team:'管理層', teamColor:'chip-purple', hall:'erp-war-room.html',    defaultMods:['war-room','crm'] },
 ];
 
 /* ── PERMISSIONS (localStorage) ── */

@@ -738,10 +738,11 @@ function buildSidebar(){
   document.getElementById('bnav-hall-link').href = effectiveHall;
 
   // Build hall groups dynamically
+  // ⚠️ Today 群已顯示「我的工作台」連結（line 736），業務群裡跳過 effectiveHall 避免重複
   const SB_GROUP_ORDER = ['業務','財務','開發','快閃店','IP'];
   const container = document.getElementById('sb-hall-groups');
   SB_GROUP_ORDER.forEach(grp => {
-    const halls = HALLS.filter(h => h.sbGroup === grp && h.roles.includes(user));
+    const halls = HALLS.filter(h => h.sbGroup === grp && h.roles.includes(user) && h.href !== effectiveHall);
     if(!halls.length) return;
     const grpDiv = document.createElement('div');
     grpDiv.className = 'sb-group';
@@ -750,7 +751,7 @@ function buildSidebar(){
     titleEl.textContent = grp;
     grpDiv.appendChild(titleEl);
     halls.forEach(h => {
-      const isMine = h.href === effectiveHall;
+      const isMine = false; // 已過濾掉 effectiveHall，這裡不會是 mine
       const a = document.createElement('a');
       a.href = h.href;
       a.className = 'sb-item' + (isMine ? ' mine' : '');

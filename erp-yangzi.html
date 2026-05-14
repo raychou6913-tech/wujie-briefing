@@ -80,7 +80,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 .type-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;}
 .tag-expense{background:#f59e0b20;color:var(--warn);}
 .tag-leave{background:#22c55e20;color:var(--ok);}
-.tag-recruit{background:#818cf820;color:#818cf8;}
+.tag-recruit{background:#ff6b3520;color:#ff6b35;}
 .tag-payroll{background:#7c3aed20;color:var(--accent);}
 .inbox-chevron{color:var(--txt-lo);font-size:12px;}
 .inbox-amount{font-size:12px;font-weight:700;}
@@ -981,7 +981,7 @@ setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
 .exp-main-row{display:flex;gap:8px;margin-bottom:16px;}
 .exp-main-btn{flex:1;padding:11px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid #334155;background:#263349;color:#94a3b8;transition:.15s var(--ease);text-align:center;}
 .exp-main-btn.active-daily{border-color:#10b981;background:#10b98112;color:#10b981;}
-.exp-main-btn.active-proj{border-color:#818cf8;background:#818cf812;color:#818cf8;}
+.exp-main-btn.active-proj{border-color:#ff6b35;background:#ff6b3512;color:#ff6b35;}
 .exp-main-desc{font-size:10px;font-weight:400;margin-top:3px;opacity:.7;}
 /* Sub type (日常費用 tabs) */
 .exp-type-row{display:flex;gap:6px;margin-bottom:14px;}
@@ -1037,7 +1037,7 @@ setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
       項目費用
       <div class="exp-main-desc">供應商請款・快閃・生產</div>
     </button>
-    <button class="exp-main-btn" id="expBtnHR" onclick="setExpMainType('hr')" style="border-color:#a78bfa40;">
+    <button class="exp-main-btn" id="expBtnHR" onclick="setExpMainType('hr')" style="border-color:#ff6b3540;">
       人事行政
       <div class="exp-main-desc">聚餐・招聘・培訓・雜費</div>
     </button>
@@ -1087,7 +1087,7 @@ setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
       </div>
     </div>
     <div class="exp-field"><label>期望付款日</label><input id="expHRDate" type="date"></div>
-    <div style="padding:8px 10px;background:#a78bfa12;border:1px solid #a78bfa30;border-radius:8px;margin-bottom:12px;font-size:11px;color:#a78bfa;line-height:1.6;" id="expHRRoutingNote">
+    <div style="padding:8px 10px;background:#ff6b3512;border:1px solid #ff6b3530;border-radius:8px;margin-bottom:12px;font-size:11px;color:#ff6b35;line-height:1.6;" id="expHRRoutingNote">
       送審路徑：楊子 → <strong>Ray 確認</strong> → 躍明財務付款
     </div>
   </div>
@@ -1113,14 +1113,14 @@ setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
         <div class="exp-budget-row"><span class="lbl">本期預算</span><span class="val" id="bi-budget">—</span></div>
         <div class="exp-budget-row"><span class="lbl">本期已用</span><span class="val" id="bi-used">—</span></div>
         <div class="exp-budget-divider"></div>
-        <div class="exp-budget-row"><span class="lbl">本次申請</span><span class="val" id="bi-this" style="color:#818cf8;">—</span></div>
+        <div class="exp-budget-row"><span class="lbl">本次申請</span><span class="val" id="bi-this" style="color:#ff6b35;">—</span></div>
         <div class="exp-budget-divider"></div>
         <div class="exp-budget-row total"><span class="lbl">核准後剩餘</span><span class="val" id="bi-remaining">—</span></div>
       </div>
     </div>
     <div class="exp-field"><label>金額</label><div class="exp-amt-row"><input id="expProjAmt" type="number" placeholder="0.00" min="0" step="0.01" oninput="updateBudgetRemaining()"><select id="expProjCcy"><option>RMB</option><option>TWD</option><option>HKD</option><option>THB</option><option>USD</option></select></div></div>
     <div class="exp-field"><label>說明 / 費用事由</label><textarea id="expProjDesc" rows="2" placeholder="費用說明、合約條款或 PO 編號..."></textarea></div>
-    <div style="font-size:10px;color:#818cf8;padding:8px 10px;background:#818cf808;border:1px solid #818cf820;border-radius:8px;margin-bottom:12px;">
+    <div style="font-size:10px;color:#ff6b35;padding:8px 10px;background:#ff6b3508;border:1px solid #ff6b3520;border-radius:8px;margin-bottom:12px;">
       送審路徑：<strong>部門主管確認</strong> → <strong>Ray 核准</strong> → <strong>躍明付款</strong>
     </div>
   </div>
@@ -1271,7 +1271,7 @@ function setExpMainType(t){
   document.getElementById('expBtnDaily').className='exp-main-btn'+(!isProj&&!isHR?' active-daily':'');
   document.getElementById('expBtnProj').className='exp-main-btn'+(isProj?' active-proj':'');
   document.getElementById('expBtnHR').className='exp-main-btn'+(isHR?' active-proj':'');
-  if(isHR) document.getElementById('expBtnHR').style.cssText=isHR?'border-color:#a78bfa;background:#a78bfa12;color:#a78bfa;':'border-color:#a78bfa40;';
+  if(isHR) document.getElementById('expBtnHR').style.cssText=isHR?'border-color:#ff6b35;background:#ff6b3512;color:#ff6b35;':'border-color:#ff6b3540;';
   const titles={proj:'項目費用申請',hr:'人事行政申請',daily:'日常費用申請'};
   document.getElementById('expSheetTitle').textContent=titles[t]||'費用申請';
   if(isProj) onProjEntityChange();
