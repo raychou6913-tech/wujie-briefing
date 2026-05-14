@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>erp-snippet-v4 · v4 共用樣板</title>
+<!--
+v4 設計語言起手式（2026-05-14 抽出自 mockup-lobby-v4.html）
+新建 ERP 頁面：複製本檔 → 改 .sb-item active / 內容區。
+鐵律：入口隱藏 / 留白為主 / 單聚焦 / 微互動透出。
+詳：.cursor/rules/01-design-language.mdc + CLAUDE.md「UI 設計語言 v4」
+-->
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --ink:#0a0a0a; --ink-deep:#1a1a1a; --ink-mid:#666; --ink-lo:#999; --ink-faint:#ccc;
+  --paper:#fafaf8; --paper-soft:#f2f2ef; --line:#e8e8e3;
+  --brand:#ff6b35; --brand-soft:#fff4ef;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+}
+html,body{height:100%;}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-.003em; overflow-x:hidden;
+}
+.serif{font-family:"Noto Serif TC",Times,serif;}
+
+/* SIDEBAR — 88px collapsed → 280px hover */
+.sidebar{
+  position:fixed; left:0; top:0; bottom:0; width:88px;
+  background:var(--paper); border-right:1px solid var(--line);
+  transition:width .42s var(--ease);
+  z-index:40; overflow:hidden; display:flex; flex-direction:column;
+}
+.sidebar:hover{ width:280px; }
+.sb-head{ padding:26px 18px 22px; border-bottom:1px solid var(--line); min-height:84px; }
+.sb-logo{
+  font-family:"Helvetica Neue","Arial Black",sans-serif;
+  font-weight:900; font-size:18px; letter-spacing:-.04em; color:var(--ink);
+  display:flex; align-items:center; gap:1px; line-height:1; white-space:nowrap;
+}
+.sb-logo .dot{ width:5px; height:5px; border-radius:50%; background:var(--brand); align-self:flex-end; margin-bottom:3px; margin-left:3px; }
+.sb-logo-cn{
+  font-family:"Noto Serif TC",serif; font-size:10px; color:var(--ink-lo);
+  letter-spacing:.4em; margin-top:8px;
+  opacity:0; transition:opacity .35s .12s var(--ease); white-space:nowrap;
+}
+.sidebar:hover .sb-logo-cn{ opacity:1; }
+
+.sb-content{ flex:1; overflow-y:auto; padding:22px 0 80px; }
+.sb-content::-webkit-scrollbar{ width:0; }
+.sb-group{ margin-bottom:24px; }
+.sb-group-title{
+  padding:10px 28px 8px;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px; font-weight:700; color:var(--ink-faint);
+  letter-spacing:.18em; text-transform:uppercase;
+  opacity:0; transition:opacity .3s .15s var(--ease); white-space:nowrap;
+}
+.sidebar:hover .sb-group-title{ opacity:1; }
+.sb-item{
+  display:flex; align-items:center; gap:16px;
+  padding:10px 28px; cursor:pointer;
+  color:var(--ink-mid); font-size:13px; font-weight:500;
+  letter-spacing:-.005em; position:relative;
+  transition:color .2s, background .2s; text-decoration:none; white-space:nowrap;
+}
+.sb-item:hover{ color:var(--ink); background:var(--paper-soft); }
+.sb-item.active{ color:var(--ink); font-weight:600; }
+.sb-item.active::before{
+  content:''; position:absolute; left:0; top:50%;
+  width:3px; height:18px; background:var(--brand);
+  transform:translateY(-50%); border-radius:0 2px 2px 0;
+}
+.sb-icon{ width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; opacity:.75; }
+.sb-item.active .sb-icon{ opacity:1; }
+.sb-label{ opacity:0; transform:translateX(-4px); transition:opacity .3s .1s var(--ease), transform .3s .1s var(--ease); }
+.sidebar:hover .sb-label{ opacity:1; transform:translateX(0); }
+.sb-badge{
+  margin-left:auto;
+  background:var(--brand); color:#fff;
+  font-size:9px; font-weight:700;
+  font-family:"Helvetica Neue",sans-serif;
+  padding:2px 7px; border-radius:10px;
+  opacity:0; transition:opacity .3s .18s var(--ease);
+}
+.sidebar:hover .sb-badge{ opacity:1; }
+
+.sb-foot{ padding:18px 24px; border-top:1px solid var(--line); display:flex; align-items:center; gap:12px; }
+.sb-avatar{ width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"Helvetica Neue",sans-serif; }
+.sb-foot-info{ opacity:0; transition:opacity .3s .18s var(--ease); white-space:nowrap; }
+.sidebar:hover .sb-foot-info{ opacity:1; }
+.sb-name{ font-size:12px; font-weight:600; }
+.sb-role{ font-size:10px; color:var(--ink-lo); margin-top:2px; }
+
+/* MAIN — 居中、大量留白 */
+.main{
+  margin-left:88px; min-height:100vh;
+  padding:100px 64px;
+  transition:margin-left .42s var(--ease);
+  display:flex; align-items:flex-start; justify-content:center;
+}
+.content{ max-width:680px; width:100%; animation:fadeUp .55s var(--ease); }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:translateY(0); } }
+
+/* 頁面開頭 — 編號 + 大標 + 副標 */
+.page-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px; color:var(--brand); font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:14px;
+}
+.page-title{
+  font-family:"Helvetica Neue","Inter",sans-serif;
+  font-size:42px; font-weight:900; letter-spacing:-.04em;
+  line-height:1.05; color:var(--ink); margin-bottom:14px;
+}
+.page-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:15px; color:var(--ink-mid); line-height:1.7;
+  margin-bottom:48px; letter-spacing:.02em;
+}
+
+/* 漸進揭露 block */
+.block{ border-top:1px solid var(--line); padding:18px 0; cursor:pointer; }
+.block-head{ display:flex; align-items:baseline; gap:14px; }
+.block-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:11px; color:var(--ink-faint); font-weight:700;
+  letter-spacing:.06em; flex-shrink:0;
+}
+.block-title{ font-size:18px; font-weight:600; color:var(--ink); flex:1; letter-spacing:-.01em; }
+.block-meta{ font-family:"Helvetica Neue",sans-serif; font-size:10px; color:var(--ink-lo); letter-spacing:.06em; }
+.block-caret{ font-size:11px; color:var(--ink-faint); transition:transform .3s var(--ease); }
+.block.open .block-caret{ transform:rotate(180deg); }
+.block-body{ max-height:0; overflow:hidden; transition:max-height .3s var(--ease), padding-top .3s var(--ease); padding-top:0; font-size:13px; color:var(--ink-mid); line-height:1.7; }
+.block.open .block-body{ max-height:500px; padding-top:16px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR：分群 7 群（Today / 業務 / 財務 / 開發 / 快閃店 / IP / 系統） -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">wujie<span class="dot"></span></div>
+    <div class="sb-logo-cn">蕪 解 創 意 · ERP</div>
+  </div>
+  <div class="sb-content">
+    <div class="sb-group">
+      <div class="sb-group-title">Today</div>
+      <a class="sb-item active" href="today.html">
+        <span class="sb-icon">⬢</span><span class="sb-label">今日</span>
+        <span class="sb-badge">3</span>
+      </a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-title">業務</div>
+      <a class="sb-item" href="erp-anran.html"><span class="sb-icon">◇</span><span class="sb-label">安然</span></a>
+      <a class="sb-item" href="erp-shawn.html"><span class="sb-icon">◇</span><span class="sb-label">Shawn</span></a>
+      <a class="sb-item" href="erp-crm.html"><span class="sb-icon">◇</span><span class="sb-label">CRM</span></a>
+    </div>
+    <!-- 增加新群：複製 .sb-group 區塊 -->
+  </div>
+  <div class="sb-foot">
+    <div class="sb-avatar" id="sb-avatar">R</div>
+    <div class="sb-foot-info">
+      <div class="sb-name" id="sb-name">Ray</div>
+      <div class="sb-role" id="sb-role">核心股東</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="content">
+
+    <div class="page-num">01 ·</div>
+    <h1 class="page-title">頁面大標</h1>
+    <p class="page-sub">副標用 Noto Serif TC，編輯雜誌感。內文 1-2 行說明本頁定位。</p>
+
+    <!-- block：點才展開 -->
+    <div class="block" onclick="this.classList.toggle('open')">
+      <div class="block-head">
+        <span class="block-num">01</span>
+        <span class="block-title">區塊標題</span>
+        <span class="block-meta">META · 11px</span>
+        <span class="block-caret">▾</span>
+      </div>
+      <div class="block-body">
+        展開的細節內容。預設折疊只露標題 + meta，點才開。
+      </div>
+    </div>
+
+    <div class="block" onclick="this.classList.toggle('open')">
+      <div class="block-head">
+        <span class="block-num">02</span>
+        <span class="block-title">第二個區塊</span>
+        <span class="block-meta">3 項 · 待處理</span>
+        <span class="block-caret">▾</span>
+      </div>
+      <div class="block-body">
+        block-body 預設 max-height:0；.block.open 時展開到 500px。
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// 把當前登入者塞入 sidebar footer（與主系統一致）
+(function(){
+  const s = JSON.parse(localStorage.getItem('erp_sess')||'null');
+  if(!s) return;
+  const initial = (s.name||s.user||'?').slice(0,1).toUpperCase();
+  document.getElementById('sb-avatar').textContent = initial;
+  document.getElementById('sb-name').textContent = s.name||s.user||'';
+  document.getElementById('sb-role').textContent = s.role||'';
+})();
+</script>
+</body>
+</html>
