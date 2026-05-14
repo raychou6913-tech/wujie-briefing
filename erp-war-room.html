@@ -85,6 +85,30 @@ body{
   color:var(--ink-faint);margin-bottom:12px;
 }
 
+/* ── COLLAPSIBLE SECTION（漸進揭露 details）── */
+.war-section{margin-bottom:24px;}
+.war-section > summary{
+  cursor:pointer;list-style:none;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  transition:opacity .22s var(--ease);
+}
+.war-section > summary::-webkit-details-marker{display:none;}
+.war-section > summary::marker{display:none;content:'';}
+.war-section > summary:hover{opacity:.65;}
+.war-section[open] > summary{border-bottom-color:var(--ink-faint);margin-bottom:16px;}
+.war-section .war-caret{
+  font-size:11px;color:var(--ink-faint);
+  transition:transform .3s var(--ease),color .2s var(--ease);
+}
+.war-section[open] .war-caret{transform:rotate(180deg);color:var(--brand);}
+.war-section .war-meta{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--ink-lo);
+  letter-spacing:.04em;margin-left:auto;margin-right:10px;
+}
+
 /* ── VAM HERO ── */
 .vam-hero{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;}
 .vam-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
@@ -856,7 +880,12 @@ body{
   </div>
 
   <!-- 有你共創 JV前應付帳款 -->
-  <div class="section-title">有你共創 · JV 前應付帳款敞口</div>
+  <details class="war-section">
+    <summary>
+      <span class="section-title" style="margin:0">有你共創 · JV 前應付帳款敞口</span>
+      <span class="war-meta">≈ ¥527 萬 · 3 筆</span>
+      <span class="war-caret">▾</span>
+    </summary>
   <div style="background:var(--card);border:1px solid var(--warn);border-radius:10px;padding:16px;margin-bottom:24px;">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:12px;flex-wrap:wrap;">
       <div>
@@ -894,6 +923,7 @@ body{
       ⚠ Muziktiger / 飯糰與梅子 的處理方式（現金歸還 / 股權抵扣 / 其他）尚未與有你共創確認。¥29.8 萬 Mofusand MG 為確認現金應付，JV 啟動後歸還。
     </div>
   </div>
+  </details>
 
   <!-- ④ 重大決策待拍板 -->
   <div class="queue-card">
@@ -1014,22 +1044,27 @@ body{
   </div>
 
   <!-- ⑤ 動銷快覽 -->
-  <div class="queue-card" id="sellthru-warroom-card">
-    <div class="queue-header">
+  <details class="war-section">
+    <summary>
       <span class="section-title" style="margin:0">動銷快覽 · 渠道銷售健康</span>
-      <a href="erp-crm.html" style="font-size:11px;color:var(--accent);text-decoration:none;">CRM 回報 →</a>
-    </div>
+      <span class="war-meta">尚無數據</span>
+      <span class="war-caret">▾</span>
+    </summary>
+  <div class="queue-card" id="sellthru-warroom-card">
     <div id="sellthru-warroom-inner" style="padding-top:4px">
-      <div style="font-size:11px;color:var(--txt-lo);text-align:center;padding:12px 0">尚無動銷數據 · 業務請至 CRM 回報上市後銷售反饋</div>
+      <div style="font-size:11px;color:var(--txt-lo);text-align:center;padding:12px 0">尚無動銷數據 · 業務請至 CRM 回報上市後銷售反饋 · <a href="erp-crm.html" style="color:var(--brand);text-decoration:none;">CRM 回報 →</a></div>
     </div>
   </div>
+  </details>
 
   <!-- ⑥ 產品開發流水線快照 -->
-  <div class="pipeline-card">
-    <div class="queue-header">
+  <details class="war-section">
+    <summary>
       <span class="section-title" style="margin:0">產品開發流水線 · 進行中項目</span>
-      <a href="erp-pipeline.html" style="font-size:11px;color:var(--accent);text-decoration:none;">查看完整流水線廳 →</a>
-    </div>
+      <span class="war-meta"><a href="erp-pipeline.html" style="color:var(--brand);text-decoration:none;font-size:11px;font-weight:600;">完整流水線廳 →</a></span>
+      <span class="war-caret">▾</span>
+    </summary>
+  <div class="pipeline-card">
     <!-- Header labels -->
     <div style="display:flex;align-items:center;gap:12px;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
       <div style="width:70px;font-size:9px;color:var(--txt-lo);">IP / 系列</div>
@@ -1229,6 +1264,7 @@ body{
       <span style="color:var(--txt-lo);">各主體間定價規則由 TP 設定維護</span>
     </div>
   </div>
+  </details>
 
 
 </div><!-- /main -->
