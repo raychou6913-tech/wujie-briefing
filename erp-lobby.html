@@ -22,7 +22,6 @@
   --danger:#ef4444;--danger-dim:#ef444418;
   --radius:12px;
   --ease:cubic-bezier(0.32,0.72,0,1);
-
   /* ── Legacy aliases — keep for inline HTML styles + JS var() refs ── */
   --bg:var(--paper);
   --surface:var(--paper);
@@ -36,108 +35,311 @@
   --accent:var(--brand);
   --accent2:#cc5420;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
 body{
-  background:var(--paper);
-  color:var(--ink);
+  background:var(--paper);color:var(--ink);
   font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
   -webkit-font-smoothing:antialiased;
   font-feature-settings:"ss01";
   letter-spacing:-.003em;
-  min-height:100vh;
-  padding-bottom:80px;
+  overflow-x:hidden;
 }
+.serif{font-family:"Noto Serif TC","Times",serif;}
 
-/* ── TOPBAR ── */
-.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.tb-left{display:flex;align-items:center;gap:10px;}
-.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--brand);box-shadow:none;}
-.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;font-size:14px;font-weight:900;letter-spacing:-.04em;color:var(--ink);}
-.lobby-chip{background:var(--paper-soft);border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:var(--ink-lo);letter-spacing:.06em;}
-.tb-right{display:flex;align-items:center;gap:10px;}
-.user-chip{background:var(--paper-soft);border:1px solid var(--line);border-radius:20px;padding:4px 10px 4px 6px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink);cursor:pointer;}
-.user-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;
+  width:88px;
+  background:var(--paper);
+  border-right:1px solid var(--line);
+  transition:width .42s var(--ease);
+  z-index:40;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.sidebar:hover{width:280px;}
+.sb-head{
+  padding:24px 18px 20px;
+  border-bottom:1px solid var(--line);
+  min-height:80px;flex-shrink:0;
+}
+.sb-logo{
+  font-family:"Helvetica Neue","Arial Black",sans-serif;
+  font-weight:900;font-size:18px;letter-spacing:-.04em;
+  color:var(--ink);display:flex;align-items:center;gap:1px;
+  line-height:1;white-space:nowrap;
+}
+.sb-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--brand);
+  align-self:flex-end;margin-bottom:3px;margin-left:3px;
+  flex-shrink:0;
+}
+.sb-logo-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:10px;color:var(--ink-lo);
+  letter-spacing:.36em;margin-top:8px;
+  opacity:0;transition:opacity .35s .12s var(--ease);
+  white-space:nowrap;
+}
+.sidebar:hover .sb-logo-sub{opacity:1;}
+.sb-content{flex:1;overflow-y:auto;padding:18px 0 80px;}
+.sb-content::-webkit-scrollbar{width:0;}
+.sb-group{margin-bottom:20px;}
+.sb-group-title{
+  padding:8px 28px 6px;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;font-weight:700;
+  color:var(--ink-faint);letter-spacing:.18em;text-transform:uppercase;
+  opacity:0;transition:opacity .3s .15s var(--ease);white-space:nowrap;
+}
+.sidebar:hover .sb-group-title{opacity:1;}
+.sb-item{
+  display:flex;align-items:center;gap:16px;
+  padding:9px 28px;cursor:pointer;
+  color:var(--ink-mid);font-size:13px;font-weight:500;
+  letter-spacing:-.005em;position:relative;
+  transition:color .2s,background .2s;
+  text-decoration:none;white-space:nowrap;
+}
+.sb-item:hover{color:var(--ink);background:var(--paper-soft);}
+.sb-item.active{color:var(--ink);font-weight:600;}
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:50%;
+  width:3px;height:18px;background:var(--brand);
+  transform:translateY(-50%);border-radius:0 2px 2px 0;
+}
+.sb-icon{
+  width:20px;height:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;opacity:.7;
+}
+.sb-item.active .sb-icon,.sb-item:hover .sb-icon{opacity:1;}
+.sb-label{
+  opacity:0;transform:translateX(-4px);
+  transition:opacity .3s .1s var(--ease),transform .3s .1s var(--ease);
+  flex:1;
+}
+.sidebar:hover .sb-label{opacity:1;transform:translateX(0);}
+.sb-badge{
+  margin-left:auto;
+  background:var(--brand);color:#fff;
+  font-size:9px;font-weight:700;
+  font-family:"Helvetica Neue",sans-serif;
+  padding:2px 7px;border-radius:10px;
+  opacity:0;transition:opacity .3s .18s var(--ease);
+  flex-shrink:0;
+}
+.sidebar:hover .sb-badge{opacity:1;}
+.sb-foot{
+  padding:16px 20px;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.sb-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:12px;flex-shrink:0;
+  font-family:"Helvetica Neue",sans-serif;
+}
+.sb-foot-info{
+  opacity:0;transition:opacity .3s .18s var(--ease);white-space:nowrap;
+  display:flex;flex-direction:column;gap:2px;
+}
+.sidebar:hover .sb-foot-info{opacity:1;}
+.sb-name{font-size:12px;font-weight:600;color:var(--ink);}
+.sb-role-text{font-size:10px;color:var(--ink-lo);}
+.sb-logout{
+  font-size:10px;color:var(--ink-lo);text-decoration:none;
+  margin-top:4px;letter-spacing:.04em;
+  transition:color .2s var(--ease);
+}
+.sb-logout:hover{color:var(--danger);}
+
+/* ── HINT ── */
+.hint{
+  position:fixed;left:100px;bottom:36px;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--ink-faint);
+  letter-spacing:.16em;text-transform:uppercase;
+  pointer-events:none;opacity:0;
+  animation:hintFade 5s ease-in-out 1.8s;
+  z-index:30;
+}
+@keyframes hintFade{0%,100%{opacity:0;}20%,80%{opacity:1;}}
 
 /* ── MAIN ── */
-.main{max-width:600px;margin:0 auto;padding:16px 16px;}
+.main{
+  margin-left:88px;min-height:100vh;
+  padding:80px 64px 80px;
+  transition:margin-left .42s var(--ease);
+  display:flex;align-items:flex-start;justify-content:center;
+}
+.content{max-width:680px;width:100%;animation:fadeUp .55s var(--ease);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
-/* ── GREETING ── */
-.greeting-card{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.greet-left{}
-.greet-hi{font-size:18px;font-weight:800;margin-bottom:3px;color:var(--ink);letter-spacing:-.02em;}
-.greet-role{font-size:11px;color:var(--ink-mid);margin-bottom:8px;letter-spacing:.04em;}
-.greet-badges{display:flex;gap:6px;flex-wrap:wrap;}
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
-.badge.urgent{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
-.badge.med{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
-.badge.ok{background:var(--ok-dim);border:1px solid var(--ok);color:var(--ok);}
-.greet-right{flex-shrink:0;}
-.go-hall-btn{display:block;background:var(--brand);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;white-space:nowrap;transition:opacity .2s var(--ease);}
-.go-hall-btn:hover{opacity:.82;}
-.go-hall-btn .hall-sub{font-size:9px;font-weight:400;opacity:.75;display:block;margin-top:1px;}
+/* ── HERO ── */
+.h-time{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--ink-lo);font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:16px;
+}
+.h-greet{
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:56px;font-weight:800;
+  letter-spacing:-.04em;line-height:1.05;
+  margin-bottom:10px;color:var(--ink);
+}
+.h-greet .name{display:inline-flex;align-items:center;gap:4px;}
+.h-greet .name::after{
+  content:'';display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--brand);
+  margin-bottom:6px;align-self:flex-end;
+}
+.h-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:17px;color:var(--ink-mid);
+  font-weight:400;line-height:1.6;
+  margin-bottom:48px;letter-spacing:.02em;
+}
+
+/* ── FOCUS CARD ── */
+.focus{
+  border-top:1px solid var(--ink);
+  padding-top:22px;cursor:pointer;
+  transition:opacity .3s var(--ease);
+  margin-bottom:56px;
+}
+.focus:hover{opacity:.62;}
+.focus-eyebrow{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;font-weight:700;color:var(--brand);
+  letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px;
+}
+.focus-title{
+  font-size:22px;font-weight:700;
+  letter-spacing:-.02em;line-height:1.35;margin-bottom:8px;color:var(--ink);
+}
+.focus-meta{
+  font-family:"Noto Serif TC",serif;
+  font-size:13px;color:var(--ink-mid);
+  margin-bottom:16px;letter-spacing:.02em;
+}
+.focus-meta strong{color:var(--brand);font-family:"Helvetica Neue",sans-serif;font-weight:700;letter-spacing:0;}
+.focus-action{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:11px;font-weight:700;color:var(--ink);
+  letter-spacing:.12em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.focus-action::after{content:'→';transition:transform .3s var(--ease);}
+.focus:hover .focus-action::after{transform:translateX(6px);}
 
 /* ── SECTION HEADER ── */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.sec-title{font-family:"Helvetica Neue",sans-serif;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--ink-faint);text-transform:uppercase;}
-.sec-link{font-size:11px;color:var(--brand);cursor:pointer;font-weight:600;transition:opacity .2s var(--ease);}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.sec-title{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.18em;
+  color:var(--ink-faint);text-transform:uppercase;
+}
+.sec-link{
+  font-size:11px;color:var(--brand);cursor:pointer;font-weight:600;
+  transition:opacity .2s var(--ease);
+}
 .sec-link:hover{opacity:.7;}
 
-/* ── TODO CARDS ── */
-.todo-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
-.todo-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:border-color .22s var(--ease),background .22s var(--ease),transform .22s var(--ease);position:relative;overflow:hidden;}
-.todo-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
-.todo-card.high::before{background:var(--danger);}
-.todo-card.med::before{background:var(--warn);}
-.todo-card.low::before{background:var(--ink-faint);}
-.todo-card:hover{border-color:var(--ink-faint);background:var(--paper-soft);transform:translateX(2px);}
-.todo-card.done{opacity:.38;pointer-events:none;}
-.todo-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
-.todo-body{flex:1;min-width:0;}
-.todo-title{font-size:13px;font-weight:700;margin-bottom:3px;line-height:1.35;color:var(--ink);}
-.todo-sub{font-size:11px;color:var(--ink-mid);}
-.todo-status{flex-shrink:0;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;margin-top:2px;}
-.todo-status.high{background:var(--danger-dim);color:var(--danger);}
-.todo-status.med{background:var(--warn-dim);color:var(--warn);}
-.todo-status.low{background:var(--paper-soft);color:var(--ink-lo);border:1px solid var(--line);}
-.todo-tap-hint{font-family:"Helvetica Neue",sans-serif;font-size:9px;color:var(--ink-lo);margin-top:5px;letter-spacing:.06em;}
+/* ── BLOCKS ── */
+.blocks{display:flex;flex-direction:column;gap:0;margin-bottom:48px;}
+.block{
+  border-top:1px solid var(--line);padding:18px 0;
+  cursor:pointer;position:relative;
+}
+.block:last-child{border-bottom:1px solid var(--line);}
+.block-head{display:flex;align-items:baseline;gap:14px;}
+.block-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;font-weight:700;color:var(--ink-lo);
+  letter-spacing:.12em;min-width:28px;flex-shrink:0;
+}
+.block-title{
+  font-size:16px;font-weight:600;
+  letter-spacing:-.01em;flex:1;color:var(--ink);line-height:1.35;
+}
+.block-meta{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--ink-mid);font-weight:500;flex-shrink:0;
+}
+.block-meta .accent{color:var(--brand);font-weight:700;}
+.block-meta .danger{color:var(--danger);font-weight:700;}
+.block-meta .warn{color:var(--warn);font-weight:700;}
+.block-toggle{
+  font-size:13px;color:var(--ink-lo);flex-shrink:0;
+  transition:transform .3s var(--ease);
+}
+.block.open .block-toggle{transform:rotate(180deg);}
+.block-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .42s var(--ease),padding .35s;
+  padding-top:0;
+}
+.block.open .block-body{max-height:400px;padding-top:14px;}
+.block-body-inner{
+  padding-left:42px;
+  font-family:"Noto Serif TC",serif;
+  font-size:13px;color:var(--ink-mid);line-height:1.8;letter-spacing:.02em;
+}
+.block-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.block-action-btn{
+  padding:8px 16px;border-radius:8px;
+  border:1px solid var(--line);background:var(--paper-soft);
+  color:var(--ink);font-size:12px;font-weight:600;cursor:pointer;
+  transition:border-color .2s var(--ease),background .2s var(--ease);
+  font-family:"Inter","Helvetica Neue",sans-serif;
+}
+.block-action-btn:hover{border-color:var(--ink-faint);background:#fff;}
+.block-action-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;}
+.block-action-btn.primary:hover{opacity:.85;}
+.block.done-block{opacity:.35;pointer-events:none;}
+.block.completing{animation:check-off .4s var(--ease) forwards;}
 
 /* ── PULSE STRIP ── */
-.pulse-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
-.pulse-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .22s var(--ease),background .22s var(--ease);position:relative;}
+.pulse-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:48px;}
+.pulse-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius);padding:14px;cursor:pointer;
+  transition:border-color .22s var(--ease),background .22s var(--ease);
+  position:relative;
+}
 .pulse-card:hover{border-color:var(--ink-faint);background:var(--paper-soft);}
-.pulse-card::after{content:'→';position:absolute;top:10px;right:11px;font-size:11px;color:var(--ink-faint);transition:color .22s var(--ease),right .22s var(--ease);}
+.pulse-card::after{
+  content:'→';position:absolute;top:10px;right:11px;
+  font-size:11px;color:var(--ink-faint);
+  transition:color .22s var(--ease),right .22s var(--ease);
+}
 .pulse-card:hover::after{color:var(--brand);right:9px;}
-.pulse-label{font-family:"Helvetica Neue",sans-serif;font-size:9px;color:var(--ink-lo);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+.pulse-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
+}
 .pulse-val{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
 .pulse-sub{font-size:10px;color:var(--ink-mid);}
 .pulse-bar-track{background:var(--line);border-radius:4px;height:4px;margin-top:8px;overflow:hidden;}
 .pulse-bar-fill{height:100%;border-radius:4px;}
 
-/* ── HALLS ── */
-.halls-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
-.hall-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;text-decoration:none;display:block;transition:border-color .22s var(--ease),transform .22s var(--ease);}
-.hall-card:hover{border-color:var(--ink-faint);transform:translateY(-1px);}
-.hall-card.featured{border-color:var(--brand);background:var(--brand-soft);}
-.hall-icon{font-size:22px;margin-bottom:6px;}
-.hall-name{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;}
-.hall-desc{font-size:10px;color:var(--ink-mid);line-height:1.4;}
-
-/* ── ANNOUNCE ── */
-.announce-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
-.announce-item{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;}
-.ann-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-.ann-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:.06em;}
-.ann-tag.notice{background:#3b82f610;border:1px solid #3b82f630;color:#2563eb;}
-.ann-tag.warn{background:var(--warn-dim);border:1px solid #f59e0b35;color:var(--warn);}
-.ann-tag.ok{background:var(--ok-dim);border:1px solid #22c55e35;color:var(--ok);}
-.ann-date{font-family:"Helvetica Neue",sans-serif;font-size:10px;color:var(--ink-lo);margin-left:auto;letter-spacing:.04em;}
-.ann-title{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--ink);}
-.ann-body{font-size:11px;color:var(--ink-mid);line-height:1.5;}
-
 /* ── BOTTOM SHEET ── */
 .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:200;display:none;animation:fade-in .2s;}
 .sheet-overlay.open{display:block;}
-.bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--paper);border-top:1px solid var(--line);border-radius:20px 20px 0 0;padding:0 0 env(safe-area-inset-bottom,16px);z-index:201;transform:translateY(100%);transition:transform .28s var(--ease);max-width:600px;margin:0 auto;}
+.bottom-sheet{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--paper);border-top:1px solid var(--line);
+  border-radius:20px 20px 0 0;
+  padding:0 0 env(safe-area-inset-bottom,16px);
+  z-index:201;transform:translateY(100%);
+  transition:transform .28s var(--ease);
+  max-width:600px;margin:0 auto;
+}
 .bottom-sheet.open{transform:translateY(0);}
 .sheet-handle{width:36px;height:4px;background:var(--line);border-radius:2px;margin:12px auto 0;}
 .sheet-inner{padding:16px 20px 20px;}
@@ -150,157 +352,257 @@ body{
 .sheet-status-dot.med{background:var(--warn);}
 .sheet-status-label{font-size:11px;color:var(--ink-mid);}
 .sheet-options{display:flex;flex-direction:column;gap:8px;}
-.sheet-btn{width:100%;padding:14px;border-radius:10px;border:1px solid var(--line);background:var(--paper-soft);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer;text-align:left;transition:border-color .22s var(--ease),background .22s var(--ease);}
+.sheet-btn{
+  width:100%;padding:14px;border-radius:10px;
+  border:1px solid var(--line);background:var(--paper-soft);color:var(--ink);
+  font-size:13px;font-weight:700;cursor:pointer;text-align:left;
+  transition:border-color .22s var(--ease),background .22s var(--ease);
+}
 .sheet-btn:hover{border-color:var(--ink-faint);background:#fff;}
 .sheet-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;}
 .sheet-btn.primary:hover{opacity:.84;}
 .sheet-cancel{width:100%;padding:12px;border:none;background:none;color:var(--ink-mid);font-size:13px;cursor:pointer;margin-top:4px;}
 
 /* ── EMPTY STATE ── */
-.empty-state{background:var(--paper-soft);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center;color:var(--ink-mid);font-size:13px;}
+.empty-state{
+  border-top:1px solid var(--line);
+  padding:24px 0;text-align:left;
+  color:var(--ink-mid);font-size:13px;
+  font-family:"Noto Serif TC",serif;
+}
+
+/* ── BOTTOM NAV (mobile only) ── */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--paper);border-top:1px solid var(--line);
+  height:56px;z-index:150;
+  align-items:stretch;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;text-decoration:none;
+  color:var(--ink-lo);position:relative;
+  transition:color .2s var(--ease);
+}
+.bnav-btn.active{color:var(--brand);}
+.bnav-icon{font-size:18px;line-height:1;}
+.bnav-label{font-size:9px;font-family:"Helvetica Neue",sans-serif;letter-spacing:.06em;font-weight:600;}
+.bnav-badge{
+  position:absolute;top:8px;right:calc(50% - 12px);
+  background:var(--danger);color:#fff;
+  font-size:8px;font-weight:700;
+  padding:1px 5px;border-radius:8px;
+  font-family:"Helvetica Neue",sans-serif;
+}
 
 /* ── ANIMATIONS ── */
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
-.todo-card.completing{animation:check-off .4s var(--ease) forwards;}
 @keyframes check-off{0%{opacity:1;transform:translateX(0)}60%{transform:translateX(6px)}100%{opacity:.35;transform:translateX(0)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  .sidebar{width:0;}
+  .sidebar:hover{width:280px;}
+  .hint{display:none;}
+  .main{margin-left:0;padding:40px 20px 80px;}
+  .h-greet{font-size:38px;}
+  .h-sub{font-size:15px;margin-bottom:32px;}
+  .focus{margin-bottom:36px;}
+  .focus-title{font-size:18px;}
+  .content{max-width:100%;}
+  .bottom-nav{display:flex;}
+  body{padding-bottom:72px;}
+}
 </style>
 <script src="mock-data.js"></script>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="tb-left">
-    <div class="brand-dot"></div>
-    <div class="brand-name">蕪解 ERP</div>
-    <div class="lobby-chip">大廳</div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">wujie<span class="sb-dot"></span></div>
+    <div class="sb-logo-sub">蕪 解 創 意 · ERP</div>
   </div>
-  <div class="tb-right">
-    <div style="position:relative;">
-      <div class="user-chip" onclick="toggleLobbyMenu(event)" style="cursor:pointer;">
-        <div class="user-av" id="user-av">?</div>
-        <span id="user-name-chip">—</span>
-        <span style="font-size:9px;color:var(--txt-lo);margin-left:2px;">▾</span>
-      </div>
-      <div id="lobby-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--border-hi);border-radius:10px;min-width:140px;overflow:hidden;z-index:200;box-shadow:0 8px 24px #00000040;">
-        <a id="dropdown-hall-link" href="#" style="display:block;padding:10px 14px;font-size:12px;color:var(--txt-mid);text-decoration:none;border-bottom:1px solid var(--border);transition:background .15s;" onmouseover="this.style.background='var(--card2)'" onmouseout="this.style.background=''">進入工作台</a>
-        <a href="login.html" onclick="localStorage.removeItem('erp_sess');return true;" style="display:block;padding:10px 14px;font-size:12px;color:var(--danger);text-decoration:none;transition:background .15s;" onmouseover="this.style.background='var(--card2)'" onmouseout="this.style.background=''">登出</a>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="main">
-
-  <!-- GREETING -->
-  <div class="greeting-card">
-    <div class="greet-left">
-      <div class="greet-hi" id="greet-hi">早安 👋</div>
-      <div class="greet-role" id="greet-role">—</div>
-      <div class="greet-badges" id="greet-badges"></div>
-    </div>
-    <div class="greet-right">
-      <a id="go-hall-btn" href="#" class="go-hall-btn">
-        進入工作台
-        <span class="hall-sub" id="hall-sub-label">我的大廳</span>
+  <div class="sb-content">
+    <!-- Today group (static) -->
+    <div class="sb-group">
+      <div class="sb-group-title">Today</div>
+      <a class="sb-item active" href="erp-lobby.html">
+        <span class="sb-icon">○</span>
+        <span class="sb-label">大廳</span>
+      </a>
+      <a class="sb-item" href="#todos-section" onclick="document.getElementById('todos-section').scrollIntoView({behavior:'smooth'});return false;">
+        <span class="sb-icon">◇</span>
+        <span class="sb-label">我的待辦</span>
+        <span class="sb-badge" id="sb-todo-badge" style="display:none"></span>
+      </a>
+      <a class="sb-item" id="sb-hall-link" href="#">
+        <span class="sb-icon">→</span>
+        <span class="sb-label" id="sb-hall-label">進入工作台</span>
+      </a>
+      <a class="sb-item" href="erp-project-new.html">
+        <span class="sb-icon">+</span>
+        <span class="sb-label">新增項目</span>
+      </a>
+      <a class="sb-item" href="erp-budget-planner.html">
+        <span class="sb-icon">▣</span>
+        <span class="sb-label">預算規劃器</span>
+      </a>
+      <a class="sb-item" href="erp-war-room.html">
+        <span class="sb-icon">◉</span>
+        <span class="sb-label">戰情室</span>
       </a>
     </div>
-  </div>
 
-  <!-- 快速行動（3 顆按鈕一列）-->
-  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <a href="erp-project-new.html" style="flex:1;min-width:140px;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:700;text-decoration:none;">
-      ＋ 新增項目
-    </a>
-    <a href="erp-budget-planner.html" style="flex:1;min-width:140px;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--card);color:var(--txt-hi);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;text-decoration:none;">
-      📊 預算規劃器
-    </a>
-    <a href="erp-war-room.html" style="flex:1;min-width:140px;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--card);color:var(--txt-hi);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;text-decoration:none;">
-      🎯 戰情室
-    </a>
-  </div>
+    <!-- Dynamic hall groups injected by JS -->
+    <div id="sb-hall-groups"></div>
 
-  <!-- MY TODOS -->
-  <div class="sec-hdr">
-    <div class="sec-title">今天等著你</div>
-    <div class="sec-link" id="toggle-done" onclick="toggleShowDone()" style="display:none">顯示已完成</div>
-  </div>
-  <div class="todo-list" id="todo-list">
-    <div class="empty-state">載入中...</div>
-  </div>
-
-  <!-- COMPANY PULSE -->
-  <div class="sec-hdr">
-    <div class="sec-title">公司脈動</div>
-    <div class="sec-link" id="war-room-link" style="display:none" onclick="window.location='erp-war-room.html'">戰情室 ›</div>
-  </div>
-  <div class="pulse-strip">
-    <div class="pulse-card" id="pulse-c1" onclick="pulseClick('c1')">
-      <div class="pulse-label" id="pulse-c1-label">全年利潤達標率</div>
-      <div class="pulse-val" id="pulse-c1-val" style="color:var(--warn)">35.9%</div>
-      <div class="pulse-sub" id="pulse-c1-sub">⚠ 稍落後進度</div>
-      <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c1-bar" style="width:35.9%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
-    </div>
-    <div class="pulse-card" id="pulse-c2" onclick="pulseClick('c2')">
-      <div class="pulse-label" id="pulse-c2-label">活躍訂單</div>
-      <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">12 筆</div>
-      <div class="pulse-sub" id="pulse-c2-sub">本月執行中</div>
-      <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c2-bar" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
-    </div>
-    <div class="pulse-card" id="pulse-c3" onclick="pulseClick('c3')">
-      <div class="pulse-label" id="pulse-c3-label">IP 開發進行</div>
-      <div class="pulse-val" id="pulse-c3-val" style="color:var(--accent)">4 個</div>
-      <div class="pulse-sub" id="pulse-c3-sub">2 個本月出圖</div>
-      <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c3-bar" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
-    </div>
-    <div class="pulse-card" id="pulse-card-approvals" onclick="pulseClick('c4')">
-      <div class="pulse-label" id="pulse-c4-label">待批核事項</div>
-      <div class="pulse-val" id="pulse-c4-val" style="color:var(--danger)">5 項</div>
-      <div class="pulse-sub" id="pulse-c4-sub">等待 Ray 決定</div>
-      <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c4-bar" style="width:100%;background:linear-gradient(90deg,#b91c1c,var(--danger))"></div></div>
+    <!-- System (always shown) -->
+    <div class="sb-group" id="sb-group-system-static">
+      <div class="sb-group-title">System</div>
+      <div id="sb-system-items"></div>
     </div>
   </div>
 
-  <!-- HALL NAV -->
-  <div class="sec-hdr">
-    <div class="sec-title">各廳入口</div>
+  <div class="sb-foot">
+    <div class="sb-avatar" id="sb-avatar">?</div>
+    <div class="sb-foot-info">
+      <div class="sb-name" id="sb-name">—</div>
+      <div class="sb-role-text" id="sb-role-text">—</div>
+      <a href="login.html" onclick="localStorage.removeItem('erp_sess');return true;" class="sb-logout">登出</a>
+    </div>
   </div>
-  <div class="halls-grid" id="halls-grid"></div>
+</aside>
 
-  <!-- ANNOUNCEMENTS -->
-  <div class="sec-hdr">
-    <div class="sec-title">公告</div>
-    <div class="sec-link">全部 ›</div>
-  </div>
-  <div class="announce-list">
-    <div class="announce-item">
-      <div class="ann-hdr">
-        <span class="ann-tag warn">緊急</span>
-        <span class="ann-date">05/02</span>
+<div class="hint">← Hover sidebar</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="content">
+
+    <!-- HERO -->
+    <div class="h-time" id="h-time"></div>
+    <div class="h-greet" id="h-greet">午安，<span class="name">—</span></div>
+    <div class="h-sub serif" id="h-sub">載入中...</div>
+
+    <!-- TODAY'S FOCUS -->
+    <div class="focus" id="focus-card" style="display:none">
+      <div class="focus-eyebrow">⚡ Today's Focus</div>
+      <div class="focus-title" id="focus-title">—</div>
+      <div class="focus-meta" id="focus-meta"></div>
+      <div class="focus-action">去處理</div>
+    </div>
+
+    <!-- COMPANY PULSE -->
+    <div class="sec-hdr">
+      <div class="sec-title">公司脈動</div>
+      <div class="sec-link" id="war-room-link" style="display:none" onclick="location.href='erp-war-room.html'">戰情室 ›</div>
+    </div>
+    <div class="pulse-strip">
+      <div class="pulse-card" id="pulse-c1" onclick="pulseClick('c1')">
+        <div class="pulse-label" id="pulse-c1-label">全年利潤達標率</div>
+        <div class="pulse-val" id="pulse-c1-val" style="color:var(--warn)">35.9%</div>
+        <div class="pulse-sub" id="pulse-c1-sub">⚠ 稍落後進度</div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c1-bar" style="width:35.9%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
       </div>
-      <div class="ann-title">Q2 採購截止提醒</div>
-      <div class="ann-body">Snoopy 冬季款開模截止 5/10，請賴哥確認廠商時間表。逾期將影響 10月交貨。</div>
-    </div>
-    <div class="announce-item">
-      <div class="ann-hdr">
-        <span class="ann-tag ok">里程碑</span>
-        <span class="ann-date">05/01</span>
+      <div class="pulse-card" id="pulse-c2" onclick="pulseClick('c2')">
+        <div class="pulse-label" id="pulse-c2-label">活躍訂單</div>
+        <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">12 筆</div>
+        <div class="pulse-sub" id="pulse-c2-sub">本月執行中</div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c2-bar" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
       </div>
-      <div class="ann-title">貓福珊迪夏日系列設計完成 🎉</div>
-      <div class="ann-body">Bevis 團隊完成全套設計稿，正式進入打樣審核階段。</div>
-    </div>
-    <div class="announce-item">
-      <div class="ann-hdr">
-        <span class="ann-tag notice">通知</span>
-        <span class="ann-date">04/30</span>
+      <div class="pulse-card" id="pulse-c3" onclick="pulseClick('c3')">
+        <div class="pulse-label" id="pulse-c3-label">IP 開發進行</div>
+        <div class="pulse-val" id="pulse-c3-val" style="color:var(--accent)">4 個</div>
+        <div class="pulse-sub" id="pulse-c3-sub">2 個本月出圖</div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c3-bar" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
       </div>
-      <div class="ann-title">ERP 系統升級完成</div>
-      <div class="ann-body">新增採購台 AI 解析、合約智能查詢功能。如遇問題請聯絡 Shawn。</div>
+      <div class="pulse-card" id="pulse-card-approvals" onclick="pulseClick('c4')">
+        <div class="pulse-label" id="pulse-c4-label">待批核事項</div>
+        <div class="pulse-val" id="pulse-c4-val" style="color:var(--danger)">5 項</div>
+        <div class="pulse-sub" id="pulse-c4-sub">等待 Ray 決定</div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c4-bar" style="width:100%;background:linear-gradient(90deg,#b91c1c,var(--danger))"></div></div>
+      </div>
     </div>
+
+    <!-- MY TODOS -->
+    <div id="todos-section">
+      <div class="sec-hdr">
+        <div class="sec-title">今天等著你</div>
+        <div class="sec-link" id="toggle-done" onclick="toggleShowDone()" style="display:none">顯示已完成</div>
+      </div>
+      <div class="blocks" id="todo-list">
+        <div class="empty-state">載入中...</div>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="sec-hdr">
+      <div class="sec-title">公告</div>
+      <div class="sec-link">全部 ›</div>
+    </div>
+    <div class="blocks" id="announce-blocks">
+      <div class="block" onclick="toggleBlock(this)">
+        <div class="block-head">
+          <div class="block-num">01</div>
+          <div class="block-title">Q2 採購截止提醒</div>
+          <div class="block-meta"><span class="warn">緊急</span> · 05/02</div>
+          <div class="block-toggle">▾</div>
+        </div>
+        <div class="block-body">
+          <div class="block-body-inner">Snoopy 冬季款開模截止 5/10，請賴哥確認廠商時間表。逾期將影響 10 月交貨。</div>
+        </div>
+      </div>
+      <div class="block" onclick="toggleBlock(this)">
+        <div class="block-head">
+          <div class="block-num">02</div>
+          <div class="block-title">貓福珊迪夏日系列設計完成 🎉</div>
+          <div class="block-meta"><span class="accent">里程碑</span> · 05/01</div>
+          <div class="block-toggle">▾</div>
+        </div>
+        <div class="block-body">
+          <div class="block-body-inner">Bevis 團隊完成全套設計稿，正式進入打樣審核階段。</div>
+        </div>
+      </div>
+      <div class="block" onclick="toggleBlock(this)">
+        <div class="block-head">
+          <div class="block-num">03</div>
+          <div class="block-title">ERP 系統升級完成</div>
+          <div class="block-meta">通知 · 04/30</div>
+          <div class="block-toggle">▾</div>
+        </div>
+        <div class="block-body">
+          <div class="block-body-inner">新增採購台 AI 解析、合約智能查詢功能。如遇問題請聯絡 Shawn。</div>
+        </div>
+      </div>
+    </div>
+
   </div>
+</main>
 
-</div>
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottom-nav">
+  <a href="erp-lobby.html" class="bnav-btn active">
+    <span class="bnav-icon">○</span>
+    <span class="bnav-label">大廳</span>
+  </a>
+  <a href="#todos-section" class="bnav-btn" onclick="document.getElementById('todos-section').scrollIntoView({behavior:'smooth'});return false;">
+    <span class="bnav-icon">◇</span>
+    <span class="bnav-label">待辦</span>
+    <span class="bnav-badge" id="bnav-todo-badge" style="display:none"></span>
+  </a>
+  <a id="bnav-hall-link" href="#" class="bnav-btn">
+    <span class="bnav-icon">→</span>
+    <span class="bnav-label">工作台</span>
+  </a>
+</nav>
 
-<!-- BOTTOM SHEET OVERLAY -->
+<!-- BOTTOM SHEET -->
 <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
 <div class="bottom-sheet" id="bottom-sheet">
   <div class="sheet-handle"></div>
@@ -323,30 +625,9 @@ const sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
 if(!sess||Date.now()-sess.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
 const {user, name, role, hall, color} = sess;
 
-// ── Greeting ─────────────────────────────────────────
-const hour = new Date().getHours();
-const greetWord = hour<12 ? '早安' : hour<17 ? '午安' : '晚安';
-document.getElementById('greet-hi').textContent = greetWord + '，' + name + ' 👋';
-document.getElementById('greet-role').textContent = role;
-document.getElementById('user-av').textContent = [...name][0];
-document.getElementById('user-av').style.background = color;
-document.getElementById('user-name-chip').textContent = name;
-
 // 沒有專屬廳的員工 → 送去填報中心
 const NO_HALL_USERS = [];
 const effectiveHall = NO_HALL_USERS.includes(user) ? 'forms/index.html' : hall;
-document.getElementById('go-hall-btn').href = effectiveHall;
-document.getElementById('dropdown-hall-link').href = effectiveHall;
-
-function toggleLobbyMenu(e){
-  e.stopPropagation();
-  const dd = document.getElementById('lobby-dropdown');
-  dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-}
-document.addEventListener('click', ()=>{
-  const dd = document.getElementById('lobby-dropdown');
-  if(dd) dd.style.display = 'none';
-});
 
 const HALL_LABELS = {
   'erp-war-room.html':          '⚡ 戰情室',
@@ -366,7 +647,100 @@ const HALL_LABELS = {
   'erp-leo.html':               '🏦 Leo 工作台',
   'forms/index.html':           '📝 填報中心',
 };
-document.getElementById('hall-sub-label').textContent = HALL_LABELS[effectiveHall] || '工作台';
+
+// ── Hero ─────────────────────────────────────────────
+const now = new Date();
+const hour = now.getHours();
+const greetWord = hour<12 ? '早安' : hour<17 ? '午安' : '晚安';
+const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+document.getElementById('h-time').textContent =
+  days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ' · ' + now.getFullYear();
+document.getElementById('h-greet').innerHTML =
+  greetWord + '，<span class="name">' + name + '</span>';
+
+// ── Sidebar ────────────────────────────────────────────
+function buildSidebar(){
+  const av = document.getElementById('sb-avatar');
+  if(av){ av.textContent = [...name][0]; av.style.background = color; }
+  document.getElementById('sb-name').textContent = name;
+  document.getElementById('sb-role-text').textContent = role;
+  document.getElementById('sb-hall-link').href = effectiveHall;
+  document.getElementById('sb-hall-label').textContent = HALL_LABELS[effectiveHall] || '工作台';
+  document.getElementById('bnav-hall-link').href = effectiveHall;
+
+  // Build hall groups dynamically
+  const SB_GROUP_ORDER = ['業務','財務','開發','快閃店','IP'];
+  const container = document.getElementById('sb-hall-groups');
+  SB_GROUP_ORDER.forEach(grp => {
+    const halls = HALLS.filter(h => h.sbGroup === grp && h.roles.includes(user));
+    if(!halls.length) return;
+    const grpDiv = document.createElement('div');
+    grpDiv.className = 'sb-group';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'sb-group-title';
+    titleEl.textContent = grp;
+    grpDiv.appendChild(titleEl);
+    halls.forEach(h => {
+      const isMine = h.href === effectiveHall;
+      const a = document.createElement('a');
+      a.href = h.href;
+      a.className = 'sb-item' + (isMine ? ' mine' : '');
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'sb-icon';
+      iconSpan.textContent = h.icon;
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'sb-label';
+      labelSpan.textContent = h.name;
+      if(isMine){
+        const myTag = document.createElement('small');
+        myTag.style.cssText = 'color:var(--brand);font-size:9px;margin-left:4px;';
+        myTag.textContent = '我的';
+        labelSpan.appendChild(myTag);
+      }
+      a.appendChild(iconSpan);
+      a.appendChild(labelSpan);
+      grpDiv.appendChild(a);
+    });
+    container.appendChild(grpDiv);
+  });
+
+  // System group
+  const sysContainer = document.getElementById('sb-system-items');
+  if(['ray','shawn'].includes(user)){
+    const a = document.createElement('a');
+    a.href = 'erp-admin.html';
+    a.className = 'sb-item';
+    a.innerHTML = '<span class="sb-icon">⚙</span><span class="sb-label">系統管理</span>';
+    sysContainer.appendChild(a);
+  }
+  // Hide system group if empty
+  if(!sysContainer.children.length){
+    document.getElementById('sb-group-system-static').style.display = 'none';
+  }
+}
+buildSidebar();
+
+// ── Halls (with sbGroup for sidebar routing) ──────────
+const ALL_ROLES = ['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo','yangzi'];
+const HALLS = [
+  {href:'erp-war-room.html',         icon:'⚡', name:'戰情室',       desc:'VAM · 批核 · 財務大盤',           roles:['ray','shawn','anran','yuming'],  sbGroup:'業務'},
+  {href:'erp-shawn.html',            icon:'🌏', name:'Shawn 看板',   desc:'營運 · 訂單 · 預算審核',          roles:['shawn','ray'],                   sbGroup:'業務'},
+  {href:'erp-anran.html',            icon:'🔐', name:'安然中控台',   desc:'合約 · 商務 · AI解析',            roles:['anran','ray','yuming'],          sbGroup:'業務'},
+  {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     desc:'跟進佇列 · 漏斗 · 客戶',          roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
+  {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   desc:'待入帳 · 項目P&L · 損益表',       roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
+  {href:'erp-yangzi.html',           icon:'🗂', name:'楊子工作台',   desc:'審核 · 薪資流程 · 行政表單',      roles:['yangzi','anran','ray'],          sbGroup:'財務'},
+  {href:'erp-leo.html',              icon:'🏦', name:'Leo 工作台',   desc:'台灣出納 · 帳務記錄 · 對帳',      roles:['leo','yuming','ray'],            sbGroup:'財務'},
+  {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   desc:'設計 · 送審 · IP開發',            roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       desc:'報價 · PO · AI解析',              roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-shetong.html',          icon:'🎨', name:'詩彤工作台',   desc:'今日任務 · Brief · 審核回饋',     roles:['shetong','bevis','ray'],         sbGroup:'開發'},
+  {href:'erp-peiling.html',          icon:'🖋', name:'珮玲工作台',   desc:'送審追蹤 · IP版權 · 設計進度',   roles:['peilin','bevis','ray'],          sbGroup:'開發'},
+  {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   desc:'批次管理 · 報關 · 貨代 · 費用',  roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
+  {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     desc:'版權圖 · 設計稿 · 打樣照',       roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     desc:'活動管理 · 庫存 · 協調',          roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
+  {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', desc:'送審進度 · 版權方回覆',           roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
+];
+function goToHall(){ location.href = effectiveHall; }
 
 // ── Todo Data ─────────────────────────────────────────
 const MY_TODOS = {
@@ -451,47 +825,98 @@ const MY_TODOS = {
 const doneSet = new Set(JSON.parse(localStorage.getItem('lobby_done_'+user)||'[]'));
 const todos = MY_TODOS[user] || [];
 
+// ── Render Focus Card ──────────────────────────────────
+function renderFocus(activeTodos){
+  const card = document.getElementById('focus-card');
+  if(!activeTodos.length){ card.style.display='none'; return; }
+  const priority = ['high','med','low'];
+  let focus = null;
+  for(const p of priority){ focus = activeTodos.find(t=>t.urgency===p); if(focus) break; }
+  if(!focus){ card.style.display='none'; return; }
+  card.style.display='block';
+  document.getElementById('focus-title').textContent = focus.title;
+  document.getElementById('focus-meta').innerHTML = focus.sub;
+  card.onclick = ()=>openSheet(focus);
+}
+
+// ── Render Todos (blocks) ──────────────────────────────
 function renderTodos(showDone){
   const list = document.getElementById('todo-list');
-  if(!todos.length){ list.innerHTML='<div class="empty-state">今天沒有待辦 🎉</div>'; return; }
+  if(!todos.length){
+    list.innerHTML='<div class="empty-state">今天沒有待辦 🎉</div>';
+    updateHeroSub(0,0,0);
+    renderFocus([]);
+    return;
+  }
 
   const activeTodos = todos.filter(t=>!doneSet.has(t.id));
-  const doneTodos = todos.filter(t=>doneSet.has(t.id));
+  const doneTodos   = todos.filter(t=>doneSet.has(t.id));
+  const highCount   = activeTodos.filter(t=>t.urgency==='high').length;
+  const medCount    = activeTodos.filter(t=>t.urgency==='med').length;
 
-  // Update greeting badges
-  const highCount = activeTodos.filter(t=>t.urgency==='high').length;
-  const medCount = activeTodos.filter(t=>t.urgency==='med').length;
-  const greetBadges = document.getElementById('greet-badges');
-  greetBadges.innerHTML = '';
-  if(highCount>0) greetBadges.innerHTML += `<span class="badge urgent">🔴 緊急 ${highCount} 項</span>`;
-  if(medCount>0) greetBadges.innerHTML += `<span class="badge med">🟡 待辦 ${medCount} 項</span>`;
-  if(!highCount&&!medCount&&activeTodos.length===0) greetBadges.innerHTML = `<span class="badge ok">✅ 今天全清！</span>`;
+  updateHeroSub(highCount, medCount, activeTodos.length);
+  renderFocus(activeTodos);
+  updateSidebarBadge(activeTodos.length);
 
   list.innerHTML = '';
   const toRender = showDone ? todos : activeTodos;
   if(!toRender.length){
     list.innerHTML='<div class="empty-state">今天待辦全部完成 🎉</div>';
-    return;
-  }
-  toRender.forEach(t=>{
-    const done = doneSet.has(t.id);
-    const el = document.createElement('div');
-    el.className = `todo-card ${t.urgency}${done?' done':''}`;
-    el.id = 'todo-'+t.id;
-    el.innerHTML = `
-      <div class="todo-icon">${done?'✅':t.icon}</div>
-      <div class="todo-body">
-        <div class="todo-title">${done?`<s>${t.title}</s>`:t.title}</div>
-        <div class="todo-sub">${t.sub}</div>
-        ${!done?`<div class="todo-tap-hint">點擊更新狀態 →</div>`:''}
-      </div>
-      <div class="todo-status ${t.urgency}">${done?'已完成':t.status}</div>
-    `;
-    if(!done) el.onclick = ()=>openSheet(t);
-    list.appendChild(el);
-  });
+  } else {
+    toRender.forEach((t, idx) => {
+      const done = doneSet.has(t.id);
+      const el = document.createElement('div');
+      el.className = 'block' + (done ? ' done-block' : '');
+      el.id = 'todo-block-' + t.id;
 
-  // Toggle done button
+      const numStr = String(idx + 1).padStart(2,'0');
+      const metaColor = t.urgency==='high' ? 'danger' : t.urgency==='med' ? 'warn' : '';
+      const metaText  = done ? '已完成' : t.status;
+
+      // head
+      const head = document.createElement('div');
+      head.className = 'block-head';
+      head.innerHTML = `
+        <div class="block-num">${numStr}</div>
+        <div class="block-title">${done?`<s>${t.title}</s>`:t.title}</div>
+        <div class="block-meta"><span class="${metaColor}">${metaText}</span></div>
+        <div class="block-toggle">▾</div>`;
+      head.onclick = () => {
+        if(done) return;
+        if(window.innerWidth < 720){ openSheet(t); }
+        else { toggleBlock(el); }
+      };
+
+      // body
+      const body = document.createElement('div');
+      body.className = 'block-body';
+      const inner = document.createElement('div');
+      inner.className = 'block-body-inner';
+      const subP = document.createElement('p');
+      subP.style.cssText = 'font-family:"Noto Sans TC",sans-serif;font-size:13px;margin-bottom:0;';
+      subP.textContent = t.sub;
+      inner.appendChild(subP);
+
+      if(!done){
+        const actDiv = document.createElement('div');
+        actDiv.className = 'block-actions';
+        t.options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'block-action-btn' + (i===0?' primary':'');
+          btn.textContent = opt;
+          btn.onclick = (e) => { e.stopPropagation(); handleAction(t, opt); };
+          actDiv.appendChild(btn);
+        });
+        inner.appendChild(actDiv);
+      }
+
+      body.appendChild(inner);
+      el.appendChild(head);
+      el.appendChild(body);
+      list.appendChild(el);
+    });
+  }
+
   if(doneTodos.length){
     const tog = document.getElementById('toggle-done');
     tog.style.display='block';
@@ -499,10 +924,40 @@ function renderTodos(showDone){
   }
 }
 
+function updateHeroSub(highCount, medCount, activeCount){
+  const sub = document.getElementById('h-sub');
+  if(activeCount===0){
+    sub.textContent = '今天沒有待辦事項，一切順利。';
+  } else if(highCount>0){
+    sub.textContent = `今天有 ${highCount} 件緊急需要你決定。`;
+  } else if(medCount>0){
+    sub.textContent = `今天有 ${medCount} 件事等著你確認。`;
+  } else {
+    sub.textContent = `今天有 ${activeCount} 件事在進行中。`;
+  }
+}
+
+function updateSidebarBadge(count){
+  const b1 = document.getElementById('sb-todo-badge');
+  const b2 = document.getElementById('bnav-todo-badge');
+  if(count>0){
+    if(b1){ b1.textContent=count; b1.style.display=''; }
+    if(b2){ b2.textContent=count; b2.style.display=''; }
+  } else {
+    if(b1) b1.style.display='none';
+    if(b2) b2.style.display='none';
+  }
+}
+
 let _showDone = false;
 function toggleShowDone(){ _showDone=!_showDone; renderTodos(_showDone); }
 
-// ── Bottom Sheet ────────────────────────────────────────
+// ── Block toggle ───────────────────────────────────────
+function toggleBlock(el){
+  el.classList.toggle('open');
+}
+
+// ── Bottom Sheet ───────────────────────────────────────
 let _curTodo = null;
 function openSheet(todo){
   _curTodo = todo;
@@ -511,7 +966,6 @@ function openSheet(todo){
   document.getElementById('sheet-sub').textContent = todo.sub;
   document.getElementById('sheet-dot').className = `sheet-status-dot ${todo.urgency}`;
   document.getElementById('sheet-status').textContent = todo.status;
-
   const opts = document.getElementById('sheet-options');
   opts.innerHTML = '';
   todo.options.forEach((opt,i)=>{
@@ -521,20 +975,17 @@ function openSheet(todo){
     btn.onclick = ()=>handleAction(todo, opt);
     opts.appendChild(btn);
   });
-
   document.getElementById('overlay').classList.add('open');
   document.getElementById('bottom-sheet').classList.add('open');
 }
-
 function closeSheet(){
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('bottom-sheet').classList.remove('open');
   _curTodo = null;
 }
-
 function handleAction(todo, action){
   closeSheet();
-  const el = document.getElementById('todo-'+todo.id);
+  const el = document.getElementById('todo-block-'+todo.id);
   if(el){
     el.classList.add('completing');
     setTimeout(()=>{
@@ -545,108 +996,57 @@ function handleAction(todo, action){
     }, 350);
   }
 }
-
 function showToast(msg){
   let t = document.getElementById('toast');
   if(!t){ t=document.createElement('div'); t.id='toast';
-    t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;font-size:12px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:300;opacity:0;transition:opacity .2s;white-space:nowrap;';
     document.body.appendChild(t); }
-  t.textContent = msg; t.style.opacity='1';
+  t.textContent=msg; t.style.opacity='1';
   clearTimeout(t._timer);
-  t._timer = setTimeout(()=>t.style.opacity='0', 2000);
+  t._timer=setTimeout(()=>t.style.opacity='0',2000);
 }
-
-// ── Hall Grid ──────────────────────────────────────────
-const HALLS = [
-  {href:'erp-war-room.html',    icon:'⚡', name:'戰情室',      desc:'VAM · 批核 · 財務大盤',   roles:['ray','shawn','anran','yuming']},
-  {href:'erp-shawn.html',       icon:'🌏', name:'Shawn 看板',  desc:'營運 · 訂單 · 預算審核',  roles:['shawn','ray']},
-  {href:'erp-anran.html',       icon:'🔐', name:'安然中控台',  desc:'合約 · 商務 · AI解析',    roles:['anran','ray','yuming']},
-  {href:'erp-finance.html',     icon:'💰', name:'財務工作台',  desc:'待入帳 · 項目P&L · 損益表', roles:['yuming','ray','shawn','yangzi']},
-  {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   desc:'設計 · 送審 · IP開發',     roles:['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo']},
-  {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', desc:'送審進度 · 版權方回覆',     roles:['peilin','bevis','anran','ray','shawn','laige']},
-  {href:'erp-shetong.html',          icon:'🎨', name:'詩彤工作台',  desc:'今日任務 · Brief · 審核回饋', roles:['shetong','bevis','ray']},
-  {href:'erp-peiling.html',          icon:'🖋', name:'珮玲工作台',  desc:'送審追蹤 · IP版權 · 設計進度', roles:['peilin','bevis','ray']},
-  {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       desc:'報價 · PO · AI解析',      roles:['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo']},
-  {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     desc:'版權圖 · 設計稿 · 打樣照',  roles:['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo']},
-  {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   desc:'批次管理 · 報關 · 貨代 · 費用', roles:['gaowei','shawn','ray','anran']},
-  {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     desc:'跟進佇列 · 漏斗 · 客戶',   roles:['laodong','debao','anran','ray','shawn']},
-  {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     desc:'活動管理 · 庫存 · 協調',   roles:['chunlei','jiaying','ray','shawn']},
-  {href:'erp-yangzi.html',           icon:'🗂', name:'楊子工作台',  desc:'審核 · 薪資流程 · 行政表單', roles:['yangzi','anran','ray']},
-  {href:'erp-leo.html',              icon:'🏦', name:'Leo 工作台',   desc:'台灣出納 · 帳務記錄 · 對帳', roles:['leo','yuming','ray']},
-];
-
-const hallsGrid = document.getElementById('halls-grid');
-HALLS.filter(h=>h.roles.includes(user)).forEach(h=>{
-  const isMine = h.href === hall;
-  const el = document.createElement('a');
-  el.href = h.href;
-  el.className = 'hall-card' + (isMine?' featured':'');
-  el.innerHTML = `<div class="hall-icon">${h.icon}</div><div class="hall-name">${h.name}${isMine?' <span style="font-size:9px;color:var(--accent)">我的</span>':''}</div><div class="hall-desc">${h.desc}</div>`;
-  hallsGrid.appendChild(el);
-});
-if(['ray','shawn'].includes(user)){
-  const el = document.createElement('a');
-  el.href = 'erp-admin.html';
-  el.className = 'hall-card';
-  el.style.cssText = 'border-color:var(--accent2);background:var(--card2);';
-  el.innerHTML = `<div class="hall-icon">⚙️</div><div class="hall-name">系統管理 <span style="font-size:9px;color:var(--accent)">管理員</span></div><div class="hall-desc">帳號權限 · 系統完整度 · 矩陣總覽</div>`;
-  hallsGrid.appendChild(el);
-}
-
-function goToHall(){ location.href = effectiveHall; }
 
 // ── Init ──────────────────────────────────────────────
-// Sync pulse KPIs from MOCK_DB if available
 (function syncPulseFromMock(){
   const db = window.MOCK_DB;
   if(!db) return;
-
-  // VAM 進度
   const netRows = (db.budget||[]).filter(r=>String(r.fields["預算科目"]).includes("淨利"));
   const actual  = netRows.reduce((s,r)=>s+(parseFloat(r.fields["實際金額"])||0),0);
   const VAM_YR  = 8000000;
   const vamPct  = Math.round(actual/VAM_YR*100*10)/10;
-  const monthPassed = new Date().getMonth()+1;
-  const expPct  = Math.round(monthPassed/12*100*10)/10;
+  const expPct  = Math.round((now.getMonth()+1)/12*100*10)/10;
   const isAhead = vamPct >= expPct;
-  const el1v = document.getElementById('pulse-c1-val');
-  const el1s = document.getElementById('pulse-c1-sub');
-  const el1b = document.getElementById('pulse-c1-bar');
-  if(el1v){ el1v.textContent = vamPct+'%'; el1v.style.color = isAhead?'var(--ok)':'var(--warn)'; }
-  if(el1s){ el1s.textContent = isAhead?'✅ 超前進度':'⚠ 稍落後進度'; }
-  if(el1b){ el1b.style.cssText = `width:${Math.min(vamPct,100)}%;background:linear-gradient(90deg,${isAhead?'#16a34a,var(--ok)':'#b45309,var(--warn)'})`; }
-
-  // 活躍訂單
-  const activeOrders = (db.sales||[]).filter(r=>r.fields["收款狀態"]!=="全款已收"&&r.fields["收款狀態"]!=="已完結").length;
-  const el2v = document.getElementById('pulse-c2-val');
-  const el2b = document.getElementById('pulse-c2-bar');
-  if(el2v){ el2v.textContent = activeOrders+' 筆'; el2v.style.color='var(--ok)'; }
-  if(el2b){ el2b.style.cssText = `width:${Math.min(activeOrders/15*100,100)}%;background:linear-gradient(90deg,#16a34a,var(--ok))`; }
-
-  // 待批核
-  const pendingAppr = (db.approval||[]).filter(r=>r.fields["審批狀態"]==="待審批").length;
-  const el4v = document.getElementById('pulse-c4-val');
-  const el4s = document.getElementById('pulse-c4-sub');
-  const el4b = document.getElementById('pulse-c4-bar');
-  if(el4v){ el4v.textContent = pendingAppr+' 項'; el4v.style.color = pendingAppr>4?'var(--danger)':'var(--warn)'; }
-  if(el4s){ el4s.textContent = '等待 Ray 決定'; }
-  if(el4b){ el4b.style.cssText = `width:${Math.min(pendingAppr/10*100,100)}%;background:linear-gradient(90deg,#b91c1c,var(--danger))`; }
+  const el1v=document.getElementById('pulse-c1-val');
+  const el1s=document.getElementById('pulse-c1-sub');
+  const el1b=document.getElementById('pulse-c1-bar');
+  if(el1v){ el1v.textContent=vamPct+'%'; el1v.style.color=isAhead?'var(--ok)':'var(--warn)'; }
+  if(el1s){ el1s.textContent=isAhead?'✅ 超前進度':'⚠ 稍落後進度'; }
+  if(el1b){ el1b.style.cssText=`width:${Math.min(vamPct,100)}%;background:linear-gradient(90deg,${isAhead?'#16a34a,var(--ok)':'#b45309,var(--warn)'})`; }
+  const activeOrders=(db.sales||[]).filter(r=>r.fields["收款狀態"]!=="全款已收"&&r.fields["收款狀態"]!=="已完結").length;
+  const el2v=document.getElementById('pulse-c2-val');
+  const el2b=document.getElementById('pulse-c2-bar');
+  if(el2v){ el2v.textContent=activeOrders+' 筆'; el2v.style.color='var(--ok)'; }
+  if(el2b){ el2b.style.cssText=`width:${Math.min(activeOrders/15*100,100)}%;background:linear-gradient(90deg,#16a34a,var(--ok))`; }
+  const pendingAppr=(db.approval||[]).filter(r=>r.fields["審批狀態"]==="待審批").length;
+  const el4v=document.getElementById('pulse-c4-val');
+  const el4s=document.getElementById('pulse-c4-sub');
+  const el4b=document.getElementById('pulse-c4-bar');
+  if(el4v){ el4v.textContent=pendingAppr+' 項'; el4v.style.color=pendingAppr>4?'var(--danger)':'var(--warn)'; }
+  if(el4s){ el4s.textContent='等待 Ray 決定'; }
+  if(el4b){ el4b.style.cssText=`width:${Math.min(pendingAppr/10*100,100)}%;background:linear-gradient(90deg,#b91c1c,var(--danger))`; }
 })();
 
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
 
 /* ── ROLE-SPECIFIC PULSE CONFIGS ──────────────────────────
-   Each entry: [label, val, valColor, sub, barPct, barGradient, href]
-   href is used by pulseClick to navigate                              */
+   Each entry: [label, val, valColor, sub, barPct, barGradient, href]    */
 const PULSE_CONFIGS = {
-  // 物流
   gaowei:[
     ['在途批次',   '3 批', '#0284c7', '海運 2 · 空運 1',    60, '#0369a1,#0284c7', 'erp-gaowei.html'],
     ['本週到港',   '1 批', 'var(--warn)', '預計週四到港',   25, '#b45309,var(--warn)', 'erp-gaowei.html'],
     ['卡關/異常',  '0 件', 'var(--ok)', '一切正常 ✅',       0, '#16a34a,var(--ok)', 'erp-gaowei.html'],
     ['本月完成',   '2 批', 'var(--txt-mid)', '已交付',       40, '#64748b,var(--txt-mid)', 'erp-gaowei.html'],
   ],
-  // 採購
   laige:[
     ['進行中 PO',     '4 張', 'var(--ok)',   '已核准執行中',      57, '#16a34a,var(--ok)',   'erp-procurement.html'],
     ['等廠商回覆',   '2 張', 'var(--warn)', '報價逾期 1 天',     28, '#b45309,var(--warn)', 'erp-procurement.html'],
@@ -659,7 +1059,6 @@ const PULSE_CONFIGS = {
     ['近期交貨批次', '3 批', 'var(--ok)',   '本月交期',           43, '#16a34a,var(--ok)',   'erp-procurement.html'],
     ['本月完成採購', '5 筆', 'var(--txt-mid)','已結案',           71, '#64748b,var(--txt-mid)', 'erp-procurement.html'],
   ],
-  // 設計流水線
   bevis:[
     ['進行中 IP',     '4 個', 'var(--ok)',    '公仔 2 · 非公仔 2', 57, '#16a34a,var(--ok)',           'erp-pipeline.html'],
     ['等版權方回覆',  '1 個', 'var(--danger)','卡關 14 天',        100,'#b91c1c,var(--danger)',        'erp-pipeline.html'],
@@ -678,7 +1077,6 @@ const PULSE_CONFIGS = {
     ['進行中 IP',     '4 個', 'var(--ok)',    '公仔 2 · 非公仔 2', 57, '#16a34a,var(--ok)',   'erp-pipeline.html'],
     ['本月完成稿件',  '3 件', 'var(--txt-mid)','已核准',           43, '#64748b,var(--txt-mid)','erp-shetong.html'],
   ],
-  // 業務/CRM
   laodong:[
     ['本月拜訪',    '8 次', 'var(--ok)',    '較上月 +2',         80, '#16a34a,var(--ok)',           'erp-crm.html'],
     ['跟進中客戶',  '5 家', 'var(--warn)',  '2 家本週到期',       50, '#b45309,var(--warn)',          'erp-crm.html'],
@@ -691,7 +1089,6 @@ const PULSE_CONFIGS = {
     ['本月成交',    '1 筆', 'var(--warn)',  '距目標還差 1 筆',    33, '#b45309,var(--warn)',          'erp-crm.html'],
     ['待報價客戶',  '2 家', 'var(--accent)','等提案',             20, 'var(--accent2),var(--accent)', 'erp-crm.html'],
   ],
-  // 電商
   chunlei:[
     ['本月直播',    '4 場', 'var(--ok)',    '下場：週四 20:00',  57, '#16a34a,var(--ok)',           'erp-ecommerce.html'],
     ['本月抖音訂單','168 筆','var(--ok)',   '較上月 +12%',        80, '#16a34a,var(--ok)',           'erp-ecommerce.html'],
@@ -704,7 +1101,6 @@ const PULSE_CONFIGS = {
     ['待上架',      '3 款', 'var(--warn)', '設計稿已到',          30, '#b45309,var(--warn)',         'erp-ecommerce.html'],
     ['庫存預警',    '2 款', 'var(--danger)','需補貨',             100,'#b91c1c,var(--danger)',       'erp-ecommerce.html'],
   ],
-  // 行政財務
   yangzi:[
     ['待審核費用',  '3 筆', 'var(--warn)',  '金額 NT$21,560',     60, '#b45309,var(--warn)',         'erp-yangzi.html'],
     ['薪資流程',    '進行中','var(--ok)',   '5月核算中',          50, '#16a34a,var(--ok)',           'erp-yangzi.html'],
@@ -721,9 +1117,8 @@ const PULSE_CONFIGS = {
 
 function applyPulseConfig(configs){
   ['c1','c2','c3','c4'].forEach((c,i)=>{
-    const cfg = configs[i];
-    if(!cfg) return;
-    const [label,val,valColor,sub,barPct,barGrad,_href] = cfg;
+    const cfg=configs[i]; if(!cfg) return;
+    const [label,val,valColor,sub,barPct,barGrad,_href]=cfg;
     const elL=document.getElementById('pulse-'+c+'-label');
     const elV=document.getElementById('pulse-'+c+'-val');
     const elS=document.getElementById('pulse-'+c+'-sub');
@@ -735,25 +1130,22 @@ function applyPulseConfig(configs){
   });
 }
 
-// Store href config for pulseClick
-let _pulseHrefs = {c1:null,c2:null,c3:'erp-pipeline.html',c4:null};
-
+let _pulseHrefs={c1:null,c2:null,c3:'erp-pipeline.html',c4:null};
 if(WAR_ROOM_ROLES.includes(user)){
-  document.getElementById('war-room-link').style.display = 'block';
-  _pulseHrefs = {c1:'erp-war-room.html',c2:'erp-war-room.html',c3:'erp-pipeline.html',c4:'erp-war-room.html'};
+  document.getElementById('war-room-link').style.display='block';
+  _pulseHrefs={c1:'erp-war-room.html',c2:'erp-war-room.html',c3:'erp-pipeline.html',c4:'erp-war-room.html'};
 } else if(PULSE_CONFIGS[user]){
-  const cfg = PULSE_CONFIGS[user];
-  applyPulseConfig(cfg);
-  _pulseHrefs = {c1:cfg[0][6],c2:cfg[1][6],c3:cfg[2][6],c4:cfg[3][6]};
+  applyPulseConfig(PULSE_CONFIGS[user]);
+  const cfg=PULSE_CONFIGS[user];
+  _pulseHrefs={c1:cfg[0][6],c2:cfg[1][6],c3:cfg[2][6],c4:cfg[3][6]};
+}
+
+function pulseClick(card){
+  const href=_pulseHrefs[card];
+  if(href) location.href=href;
 }
 
 renderTodos(false);
-
-/* ── PULSE CARD CLICK ── */
-function pulseClick(card){
-  const href = _pulseHrefs[card];
-  if(href) location.href=href;
-}
 </script>
 </body>
 </html>
