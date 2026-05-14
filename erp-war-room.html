@@ -195,6 +195,46 @@ body{
   font-family:"Noto Serif TC",serif;
   font-size:11px;color:var(--ink-mid);margin-top:8px;letter-spacing:.02em;
 }
+.sub-card.clickable{cursor:pointer;}
+.sub-card.clickable .sub-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.sub-caret{
+  font-size:10px;color:var(--ink-faint);
+  transition:transform .3s var(--ease),color .2s var(--ease);
+  flex-shrink:0;margin-left:8px;
+}
+.sub-card.open .sub-caret{transform:rotate(180deg);color:var(--brand);}
+.sub-detail{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s var(--ease),padding-top .35s var(--ease);
+  padding-top:0;
+}
+.sub-card.open .sub-detail{max-height:500px;padding-top:18px;margin-top:14px;border-top:1px solid var(--line);}
+.sub-detail-section{margin-bottom:14px;}
+.sub-detail-section:last-of-type{margin-bottom:0;}
+.sub-detail-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;
+}
+.sub-detail-list{display:flex;flex-direction:column;gap:6px;}
+.sub-detail-list .sd-item{
+  display:flex;align-items:baseline;justify-content:space-between;
+  font-size:12px;color:var(--ink);padding:4px 0;
+  border-bottom:1px dashed var(--line);
+}
+.sub-detail-list .sd-item:last-child{border-bottom:none;}
+.sub-detail-list .sd-name{color:var(--ink-mid);}
+.sub-detail-list .sd-val{
+  font-family:"Helvetica Neue",sans-serif;
+  font-weight:700;color:var(--ink);
+}
+.sub-detail-link{
+  margin-top:14px;padding-top:12px;
+  border-top:1px solid var(--line);
+  font-size:11px;color:var(--ink-lo);
+}
+.sub-detail-link a{color:var(--brand);font-weight:600;text-decoration:none;}
+.sub-detail-link a:hover{text-decoration:underline;}
 .sub-placeholder-body{
   text-align:center;padding:20px 0;
 }
@@ -247,9 +287,28 @@ body{
 
 /* ── PERF GRID ── */
 .perf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:24px;}
-.perf-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;transition:border-color .22s var(--ease),transform .22s var(--ease);}
-.perf-card:hover{border-color:var(--ink-faint);transform:translateX(2px);}
-.perf-card-label{font-size:12px;color:var(--txt-mid);margin-bottom:8px;}
+.perf-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;transition:border-color .22s var(--ease);cursor:pointer;}
+.perf-card:hover{border-color:var(--ink-faint);}
+.perf-card-label{font-size:12px;color:var(--txt-mid);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.perf-caret{font-size:10px;color:var(--ink-faint);transition:transform .3s var(--ease),color .2s var(--ease);}
+.perf-card.open .perf-caret{transform:rotate(180deg);color:var(--brand);}
+.perf-detail{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s var(--ease),padding-top .35s var(--ease);
+  padding-top:0;
+}
+.perf-card.open .perf-detail{max-height:300px;padding-top:14px;margin-top:10px;border-top:1px solid var(--line);}
+.perf-breakdown{display:flex;flex-direction:column;gap:8px;}
+.pb-row{
+  display:grid;grid-template-columns:80px 60px 1fr auto;
+  align-items:center;gap:10px;
+  font-size:11px;color:var(--ink);
+}
+.pb-label{font-weight:700;}
+.pb-bar{background:var(--line);border-radius:4px;height:4px;overflow:hidden;}
+.pb-bar-fill{height:100%;border-radius:4px;}
+.pb-pct{font-family:"Helvetica Neue",sans-serif;font-size:10px;color:var(--ink-lo);letter-spacing:.04em;}
+.pb-val{font-family:"Helvetica Neue",sans-serif;font-weight:700;color:var(--ink-mid);text-align:right;}
 .perf-card-main{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;}
 .perf-actual{font-size:22px;font-weight:800;}
 .perf-budget{font-size:12px;color:var(--txt-mid);}
@@ -590,8 +649,8 @@ body{
     <!-- Panel 2: 業績收入 -->
     <div id="kpi-revenue" class="kpi-panel" style="display:none;">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
-        <div class="perf-card">
-          <div class="perf-card-label">年度總收入</div>
+        <div class="perf-card" onclick="this.classList.toggle('open')">
+          <div class="perf-card-label">年度總收入 <span class="perf-caret">▾</span></div>
           <div class="perf-card-main">
             <span class="perf-actual" style="color:var(--ok)" id="kpi-rev-actual">982 萬</span>
             <span class="perf-budget" id="kpi-rev-budget">/ 2,400 萬</span>
@@ -599,9 +658,17 @@ body{
           </div>
           <div style="font-size:10px;color:var(--txt-mid)">YTD（1–4月）實際 vs 預算 933 萬</div>
           <div class="mini-prog"><div class="mini-prog-fill" style="width:40.9%;background:var(--ok)"></div></div>
+          <div class="perf-detail">
+            <div class="perf-breakdown">
+              <div class="pb-row"><span class="pb-label">批發</span><span class="pb-pct">75%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:75%;background:var(--brand);"></div></div><span class="pb-val">¥737 萬</span></div>
+              <div class="pb-row"><span class="pb-label">快閃店</span><span class="pb-pct">20%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:20%;background:var(--ok);"></div></div><span class="pb-val">¥196 萬</span></div>
+              <div class="pb-row"><span class="pb-label">ODM/OEM</span><span class="pb-pct">4%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:4%;background:var(--warn);"></div></div><span class="pb-val">¥39 萬</span></div>
+              <div class="pb-row"><span class="pb-label">服務類</span><span class="pb-pct">1%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:1%;background:var(--ink-faint);"></div></div><span class="pb-val">¥10 萬</span></div>
+            </div>
+          </div>
         </div>
-        <div class="perf-card">
-          <div class="perf-card-label">年度毛利</div>
+        <div class="perf-card" onclick="this.classList.toggle('open')">
+          <div class="perf-card-label">年度毛利 <span class="perf-caret">▾</span></div>
           <div class="perf-card-main">
             <span class="perf-actual" style="color:var(--ok)">384 萬</span>
             <span class="perf-budget">/ 960 萬</span>
@@ -609,10 +676,15 @@ body{
           </div>
           <div style="font-size:10px;color:var(--txt-mid)">目標毛利率 40%</div>
           <div class="mini-prog"><div class="mini-prog-fill" style="width:40%;background:var(--ok)"></div></div>
+          <div class="perf-detail">
+            <div class="perf-breakdown">
+              <div class="pb-row"><span class="pb-label">批發</span><span class="pb-pct">毛利率 33%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:63%;background:var(--brand);"></div></div><span class="pb-val">¥243 萬</span></div>
+              <div class="pb-row"><span class="pb-label">快閃店</span><span class="pb-pct">毛利率 60%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:31%;background:var(--ok);"></div></div><span class="pb-val">¥118 萬</span></div>
+              <div class="pb-row"><span class="pb-label">ODM/OEM</span><span class="pb-pct">毛利率 38%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:4%;background:var(--warn);"></div></div><span class="pb-val">¥15 萬</span></div>
+              <div class="pb-row"><span class="pb-label">服務類</span><span class="pb-pct">毛利率 80%</span><div class="pb-bar"><div class="pb-bar-fill" style="width:2%;background:var(--ink-faint);"></div></div><span class="pb-val">¥8 萬</span></div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div id="channel-mix-hint" style="margin-top:14px;padding:12px 14px;background:var(--card2);border-radius:8px;font-size:11px;color:var(--txt-mid);">
-        💡 收入來源拆解：載入中…
       </div>
     </div>
 
@@ -810,10 +882,13 @@ body{
   <div class="sub-entity-grid">
 
     <!-- 北京蕪解 -->
-    <div class="sub-card">
+    <div class="sub-card clickable" onclick="this.classList.toggle('open')">
       <div class="sub-card-head">
-        <div class="sub-name">北京蕪解</div>
-        <div class="sub-role">服務商 · 供應鏈發包</div>
+        <div>
+          <div class="sub-name">北京蕪解</div>
+          <div class="sub-role">服務商 · 供應鏈發包</div>
+        </div>
+        <span class="sub-caret">▾</span>
       </div>
       <div class="sub-grid">
         <div class="sub-cell">
@@ -834,13 +909,34 @@ body{
       </div>
       <div class="sub-bar-track"><div class="sub-bar-fill" style="width:68%;background:linear-gradient(90deg,#b45309,var(--warn));"></div></div>
       <div class="sub-bar-note">已覆蓋 68% · 距離自給自足還差 32%</div>
+      <div class="sub-detail">
+        <div class="sub-detail-section">
+          <div class="sub-detail-label">📥 收入細項摘要</div>
+          <div class="sub-detail-list">
+            <div class="sd-item"><span class="sd-name">服務費（JV 旗下發包）</span><span class="sd-val">¥ 35 萬</span></div>
+            <div class="sd-item"><span class="sd-name">分潤 / 採購代收</span><span class="sd-val">¥ 23 萬</span></div>
+          </div>
+        </div>
+        <div class="sub-detail-section">
+          <div class="sub-detail-label">💸 年度費用組成</div>
+          <div class="sub-detail-list">
+            <div class="sd-item"><span class="sd-name">固定管銷（房租 + 行政）</span><span class="sd-val">¥ 40 萬</span></div>
+            <div class="sd-item"><span class="sd-name">薪資（北京 4 人）</span><span class="sd-val">¥ 38 萬</span></div>
+            <div class="sd-item"><span class="sd-name">銀行利息（流動金）</span><span class="sd-val">¥ 7 萬</span></div>
+          </div>
+        </div>
+        <div class="sub-detail-link">看完整費用記錄 → <a href="erp-yangzi.html">楊子工作台</a> · 看銀行還款日程 → <a href="erp-finance.html">財務工作台</a></div>
+      </div>
     </div>
 
     <!-- 台灣悍草 -->
-    <div class="sub-card">
+    <div class="sub-card clickable" onclick="this.classList.toggle('open')">
       <div class="sub-card-head">
-        <div class="sub-name">台灣悍草</div>
-        <div class="sub-role">代運營 · 包銷</div>
+        <div>
+          <div class="sub-name">台灣悍草</div>
+          <div class="sub-role">代運營 · 包銷</div>
+        </div>
+        <span class="sub-caret">▾</span>
       </div>
       <div class="sub-grid">
         <div class="sub-cell">
@@ -861,6 +957,24 @@ body{
       </div>
       <div class="sub-bar-track"><div class="sub-bar-fill" style="width:67%;background:linear-gradient(90deg,#b45309,var(--warn));"></div></div>
       <div class="sub-bar-note">已覆蓋 67% · 距離自給自足還差 33%</div>
+      <div class="sub-detail">
+        <div class="sub-detail-section">
+          <div class="sub-detail-label">📥 收入細項摘要</div>
+          <div class="sub-detail-list">
+            <div class="sd-item"><span class="sd-name">代運營費（包銷）</span><span class="sd-val">NT$ 320 萬</span></div>
+            <div class="sd-item"><span class="sd-name">服務費（IP 落地協助）</span><span class="sd-val">NT$ 160 萬</span></div>
+          </div>
+        </div>
+        <div class="sub-detail-section">
+          <div class="sub-detail-label">💸 年度費用組成</div>
+          <div class="sub-detail-list">
+            <div class="sd-item"><span class="sd-name">固定管銷（台北辦公 + 行政）</span><span class="sd-val">NT$ 280 萬</span></div>
+            <div class="sd-item"><span class="sd-name">薪資（台北 5 人含 Leo / 楊子）</span><span class="sd-val">NT$ 380 萬</span></div>
+            <div class="sd-item"><span class="sd-name">銀行利息（信貸 + 信用卡周轉）</span><span class="sd-val">NT$ 60 萬</span></div>
+          </div>
+        </div>
+        <div class="sub-detail-link">看完整費用記錄 → <a href="erp-yangzi.html">楊子工作台</a> · 看銀行還款日程 → <a href="erp-leo.html">Leo 工作台</a></div>
+      </div>
     </div>
 
     <!-- UJ BKK（placeholder）-->
