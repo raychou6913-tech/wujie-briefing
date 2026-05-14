@@ -659,6 +659,27 @@ document.getElementById('h-time').textContent =
 document.getElementById('h-greet').innerHTML =
   greetWord + '，<span class="name">' + name + '</span>';
 
+// ── Halls (with sbGroup for sidebar routing) ──────────
+const ALL_ROLES = ['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo','yangzi'];
+const HALLS = [
+  {href:'erp-war-room.html',         icon:'⚡', name:'戰情室',       desc:'VAM · 批核 · 財務大盤',           roles:['ray','shawn','anran','yuming'],  sbGroup:'業務'},
+  {href:'erp-shawn.html',            icon:'🌏', name:'Shawn 看板',   desc:'營運 · 訂單 · 預算審核',          roles:['shawn','ray'],                   sbGroup:'業務'},
+  {href:'erp-anran.html',            icon:'🔐', name:'安然中控台',   desc:'合約 · 商務 · AI解析',            roles:['anran','ray','yuming'],          sbGroup:'業務'},
+  {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     desc:'跟進佇列 · 漏斗 · 客戶',          roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
+  {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   desc:'待入帳 · 項目P&L · 損益表',       roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
+  {href:'erp-yangzi.html',           icon:'🗂', name:'楊子工作台',   desc:'審核 · 薪資流程 · 行政表單',      roles:['yangzi','anran','ray'],          sbGroup:'財務'},
+  {href:'erp-leo.html',              icon:'🏦', name:'Leo 工作台',   desc:'台灣出納 · 帳務記錄 · 對帳',      roles:['leo','yuming','ray'],            sbGroup:'財務'},
+  {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   desc:'設計 · 送審 · IP開發',            roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       desc:'報價 · PO · AI解析',              roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-shetong.html',          icon:'🎨', name:'詩彤工作台',   desc:'今日任務 · Brief · 審核回饋',     roles:['shetong','bevis','ray'],         sbGroup:'開發'},
+  {href:'erp-peiling.html',          icon:'🖋', name:'珮玲工作台',   desc:'送審追蹤 · IP版權 · 設計進度',   roles:['peilin','bevis','ray'],          sbGroup:'開發'},
+  {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   desc:'批次管理 · 報關 · 貨代 · 費用',  roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
+  {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     desc:'版權圖 · 設計稿 · 打樣照',       roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     desc:'活動管理 · 庫存 · 協調',          roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
+  {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', desc:'送審進度 · 版權方回覆',           roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
+];
+function goToHall(){ location.href = effectiveHall; }
+
 // ── Sidebar ────────────────────────────────────────────
 function buildSidebar(){
   const av = document.getElementById('sb-avatar');
@@ -720,27 +741,6 @@ function buildSidebar(){
   }
 }
 buildSidebar();
-
-// ── Halls (with sbGroup for sidebar routing) ──────────
-const ALL_ROLES = ['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo','yangzi'];
-const HALLS = [
-  {href:'erp-war-room.html',         icon:'⚡', name:'戰情室',       desc:'VAM · 批核 · 財務大盤',           roles:['ray','shawn','anran','yuming'],  sbGroup:'業務'},
-  {href:'erp-shawn.html',            icon:'🌏', name:'Shawn 看板',   desc:'營運 · 訂單 · 預算審核',          roles:['shawn','ray'],                   sbGroup:'業務'},
-  {href:'erp-anran.html',            icon:'🔐', name:'安然中控台',   desc:'合約 · 商務 · AI解析',            roles:['anran','ray','yuming'],          sbGroup:'業務'},
-  {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     desc:'跟進佇列 · 漏斗 · 客戶',          roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
-  {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   desc:'待入帳 · 項目P&L · 損益表',       roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
-  {href:'erp-yangzi.html',           icon:'🗂', name:'楊子工作台',   desc:'審核 · 薪資流程 · 行政表單',      roles:['yangzi','anran','ray'],          sbGroup:'財務'},
-  {href:'erp-leo.html',              icon:'🏦', name:'Leo 工作台',   desc:'台灣出納 · 帳務記錄 · 對帳',      roles:['leo','yuming','ray'],            sbGroup:'財務'},
-  {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   desc:'設計 · 送審 · IP開發',            roles:ALL_ROLES,                         sbGroup:'開發'},
-  {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       desc:'報價 · PO · AI解析',              roles:ALL_ROLES,                         sbGroup:'開發'},
-  {href:'erp-shetong.html',          icon:'🎨', name:'詩彤工作台',   desc:'今日任務 · Brief · 審核回饋',     roles:['shetong','bevis','ray'],         sbGroup:'開發'},
-  {href:'erp-peiling.html',          icon:'🖋', name:'珮玲工作台',   desc:'送審追蹤 · IP版權 · 設計進度',   roles:['peilin','bevis','ray'],          sbGroup:'開發'},
-  {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   desc:'批次管理 · 報關 · 貨代 · 費用',  roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
-  {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     desc:'版權圖 · 設計稿 · 打樣照',       roles:ALL_ROLES,                         sbGroup:'開發'},
-  {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     desc:'活動管理 · 庫存 · 協調',          roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
-  {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', desc:'送審進度 · 版權方回覆',           roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
-];
-function goToHall(){ location.href = effectiveHall; }
 
 // ── Todo Data ─────────────────────────────────────────
 const MY_TODOS = {
