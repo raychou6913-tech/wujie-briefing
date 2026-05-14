@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ask AI 助理 · v4 mockup</title>
+<!--
+Ask AI 助理對話框 PoC（Layer 1：規則匹配 + 模糊比對，純前端）
+Ray 拍板（2026-05-13）：使用者輸入「我想申請報銷」/「Mofusand 還剩多少 MG」
+AI 用對話氣泡回答 + 帶你去對的頁面。
+
+跟 ⌘K 命令面板的差別：
+- ⌘K：清單 / 命令列思維 → Ray 拒絕
+- Ask AI：對話氣泡 / 像聊天 → Ray 要這個
+
+詳 memory/ask_ai_assistant_feature.md
+-->
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#0a0a0a; --ink-mid:#666; --ink-lo:#999; --ink-faint:#ccc;
+  --paper:#fafaf8; --paper-soft:#f2f2ef; --line:#e8e8e3;
+  --brand:#ff6b35; --brand-soft:#fff4ef;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+}
+body{
+  background:var(--paper); color:var(--ink); min-height:100vh;
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",sans-serif;
+  -webkit-font-smoothing:antialiased; letter-spacing:-.003em;
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:80px 24px 120px;
+}
+.serif{font-family:"Noto Serif TC",Times,serif;}
+
+.wrap{ max-width:640px; width:100%; }
+
+.hero{
+  margin-bottom:36px;
+}
+.hero-eyebrow{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px; color:var(--brand); font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:14px;
+}
+.hero-title{
+  font-family:"Helvetica Neue","Inter",sans-serif;
+  font-size:42px; font-weight:900; letter-spacing:-.04em; line-height:1.05;
+  color:var(--ink); margin-bottom:12px;
+}
+.hero-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:14px; color:var(--ink-mid); line-height:1.7; letter-spacing:.02em;
+}
+
+.ask-box{
+  display:flex; align-items:center; gap:12px;
+  background:#fff; border:1px solid var(--line); border-radius:24px;
+  padding:14px 22px;
+  box-shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -12px rgba(0,0,0,.08);
+  transition:border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.ask-box:focus-within{
+  border-color:var(--brand);
+  box-shadow:0 0 0 4px var(--brand-soft);
+}
+.ask-icon{ width:22px; height:22px; flex-shrink:0; color:var(--ink-lo); }
+.ask-input{
+  flex:1; border:0; outline:none; background:transparent;
+  font:inherit; font-size:15px; color:var(--ink);
+  letter-spacing:-.005em;
+}
+.ask-input::placeholder{ color:var(--ink-faint); }
+.ask-hint{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px; font-weight:700; color:var(--ink-faint);
+  letter-spacing:.12em; text-transform:uppercase;
+  padding:3px 8px; border:1px solid var(--line); border-radius:6px;
+  white-space:nowrap;
+}
+
+.chat{ margin-top:32px; }
+.bubble{
+  background:#fff; border:1px solid var(--line); border-radius:18px;
+  padding:14px 18px; margin-bottom:10px;
+  animation:fadeUp .45s var(--ease);
+  font-size:13px; line-height:1.7; color:var(--ink);
+}
+.bubble.you{
+  background:var(--ink); color:var(--paper);
+  margin-left:auto; max-width:80%; text-align:left;
+}
+.bubble.ai{ max-width:90%; }
+.bubble.ai .b-eyebrow{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px; color:var(--brand); font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  margin-bottom:8px;
+}
+.bubble.ai .b-q{
+  font-size:14px; font-weight:600; color:var(--ink);
+  margin-bottom:10px;
+}
+.bubble.ai .b-list{ display:flex; flex-direction:column; gap:8px; }
+.bubble.ai a.b-link{
+  display:flex; align-items:center; gap:10px;
+  background:var(--paper-soft); border:1px solid transparent;
+  border-radius:12px; padding:10px 14px;
+  font-size:12px; color:var(--ink); text-decoration:none;
+  transition:border-color .2s, background .2s, transform .2s;
+}
+.bubble.ai a.b-link:hover{
+  border-color:var(--brand); background:var(--brand-soft);
+  transform:translateX(2px);
+}
+.b-link .b-link-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px; color:var(--brand); font-weight:700; letter-spacing:.06em;
+  flex-shrink:0;
+}
+.b-link .b-link-title{ flex:1; font-weight:600; }
+.b-link .b-link-meta{ font-size:10px; color:var(--ink-lo); font-family:"Helvetica Neue",sans-serif; }
+.bubble.ai .b-foot{
+  margin-top:12px; padding-top:10px; border-top:1px solid var(--line);
+  font-size:10px; color:var(--ink-lo); font-family:"Helvetica Neue",sans-serif;
+  letter-spacing:.06em;
+}
+.bubble.empty{ color:var(--ink-lo); }
+
+@keyframes fadeUp{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+.examples{
+  margin-top:36px; padding-top:24px; border-top:1px solid var(--line);
+}
+.examples-title{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px; color:var(--ink-lo); font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:14px;
+}
+.example-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  background:var(--paper-soft); border:1px solid var(--line);
+  border-radius:18px; padding:7px 14px;
+  font-size:12px; color:var(--ink-mid); cursor:pointer;
+  transition:border-color .2s, color .2s, background .2s;
+}
+.chip:hover{ border-color:var(--brand); color:var(--ink); background:#fff; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Ask AI · Layer 1</div>
+    <h1 class="hero-title">想做什麼？</h1>
+    <p class="hero-sub">不知道左邊目錄選哪個？直接用自然語言問。AI 會帶你去對的頁面。</p>
+  </div>
+
+  <div class="ask-box">
+    <svg class="ask-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input class="ask-input" id="q" type="text" placeholder="例：我想申請報銷 / Mofusand 還剩多少 MG / 新增快閃店企劃" autofocus>
+    <span class="ask-hint">Enter</span>
+  </div>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="examples">
+    <div class="examples-title">試試這些</div>
+    <div class="example-chips" id="chips"></div>
+  </div>
+
+</div>
+
+<script>
+const PAGES = [
+  {title:'費用申請', url:'erp-yangzi.html', meta:'楊子廳 · HR', keywords:['報銷','費用','報帳','請款','申請費用','零用金','expense']},
+  {title:'驗收登錄', url:'erp-procurement.html', meta:'採購台', keywords:['驗收','收貨','收料','驗品','質檢','PO 完成','inspection']},
+  {title:'合約管理', url:'erp-anran.html', meta:'安然廳', keywords:['合約','contract','法務','條款','簽約','版權合約']},
+  {title:'IP Vault', url:'erp-ip-vault.html', meta:'IP 資產', keywords:['IP','版權','版稅','MG','保底金','royalty','授權','版權方']},
+  {title:'簽約啟動清單', url:'erp-ip-onboarding.html', meta:'IP onboarding', keywords:['onboarding','簽約啟動','新 IP','落地','版權方接洽']},
+  {title:'快閃店場地', url:'bkk-popup.html', meta:'UJ BKK', keywords:['快閃','popup','場地','venue','曼谷','BKK']},
+  {title:'寄售管理 / 倉庫', url:'bkk-warehouse.html', meta:'UJ BKK', keywords:['寄售','倉庫','warehouse','滯銷','折扣','退貨','銷毀']},
+  {title:'CRM 客戶管理', url:'erp-crm.html', meta:'業務', keywords:['客戶','crm','拜訪','跟進','客戶名單','業務日誌']},
+  {title:'產品開發流水線', url:'erp-pipeline.html', meta:'設計開發', keywords:['流水線','pipeline','開發','打樣','3D','送審','設計進度']},
+  {title:'版權送審追蹤', url:'erp-approval-tracker.html', meta:'珮玲廳', keywords:['送審','approval','版權審查','tracker','圖稿審查']},
+  {title:'Ray 戰情室', url:'erp-war-room.html', meta:'總覽', keywords:['戰情','總覽','VAM','overview','war room','看板','KPI']},
+  {title:'預算規劃器', url:'erp-budget-planner.html', meta:'財務', keywords:['預算','budget','OPEX','planner','成本','V1 V2','薪資']},
+  {title:'財務工作台', url:'erp-finance.html', meta:'財務', keywords:['財務','finance','現金流','收付','匯率','結算']},
+  {title:'物流明細台', url:'erp-gaowei.html', meta:'高維台', keywords:['物流','logistics','運輸','跨境','報關','到港','發貨']},
+  {title:'Transfer Pricing 設定', url:'erp-transfer-pricing.html', meta:'跨主體定價', keywords:['TP','transfer pricing','跨主體','內部定價','法人']},
+  {title:'新增項目', url:'erp-project-new.html', meta:'項目管理', keywords:['新項目','新增','開項目','建項目','project new','wholesale','popup','odm']},
+  {title:'Today 起始頁', url:'today.html', meta:'每日起點', keywords:['今天','today','待辦','今日任務','起點','早會']},
+  {title:'Shawn 廳', url:'erp-shawn.html', meta:'營運', keywords:['shawn','曼谷','東南亞','coo','operations']},
+];
+
+function score(q, p){
+  q = q.trim().toLowerCase();
+  if(!q) return 0;
+  let s = 0;
+  // Title match
+  if(p.title.toLowerCase().includes(q)) s += 100;
+  // Keyword match
+  for(const k of p.keywords){
+    const kl = k.toLowerCase();
+    if(kl === q) s += 80;
+    else if(kl.includes(q)) s += 50;
+    else if(q.includes(kl)) s += 30;
+  }
+  // Char-level fuzzy: every char in q appears in title+keywords
+  if(s === 0 && q.length >= 2){
+    const corpus = (p.title + ' ' + p.keywords.join(' ')).toLowerCase();
+    let hit = 0;
+    for(const c of q) if(corpus.includes(c)) hit++;
+    if(hit/q.length > 0.7) s = 10;
+  }
+  return s;
+}
+
+function search(q){
+  return PAGES
+    .map(p => ({p, s: score(q,p)}))
+    .filter(x => x.s > 0)
+    .sort((a,b) => b.s - a.s)
+    .slice(0,3);
+}
+
+function ask(q){
+  const chat = document.getElementById('chat');
+  // user bubble
+  const you = document.createElement('div');
+  you.className = 'bubble you';
+  you.textContent = q;
+  chat.appendChild(you);
+  // AI response
+  const ai = document.createElement('div');
+  ai.className = 'bubble ai';
+  const matches = search(q);
+  if(matches.length === 0){
+    ai.innerHTML = `<div class="b-eyebrow">AI · Layer 1</div>
+      <div class="b-q">沒找到相關頁面 ¯\\_(ツ)_/¯</div>
+      <div style="font-size:12px;color:var(--ink-mid);">試試其他關鍵字，例如「合約」「快閃」「報銷」「VAM」。</div>
+      <div class="b-foot">Layer 1 為規則匹配 · 未來會升級成飛書即時查詢（Layer 2）</div>`;
+  } else {
+    const listHtml = matches.map((m,i) => `
+      <a class="b-link" href="${m.p.url}">
+        <span class="b-link-num">0${i+1}</span>
+        <span class="b-link-title">${m.p.title}</span>
+        <span class="b-link-meta">${m.p.meta}</span>
+      </a>
+    `).join('');
+    ai.innerHTML = `<div class="b-eyebrow">AI · 為你找到 ${matches.length} 個入口</div>
+      <div class="b-list">${listHtml}</div>
+      <div class="b-foot">不是想要的？換個關鍵字再問 · Layer 1 規則匹配</div>`;
+  }
+  chat.appendChild(ai);
+  chat.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+document.getElementById('q').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){
+    const v = e.target.value.trim();
+    if(v){ ask(v); e.target.value=''; }
+  }
+});
+
+const EXAMPLES = ['報銷','合約','Mofusand MG','新增快閃店','VAM 進度','驗收','送審','TP 設定'];
+const chips = document.getElementById('chips');
+EXAMPLES.forEach(e => {
+  const c = document.createElement('span');
+  c.className = 'chip';
+  c.textContent = e;
+  c.onclick = () => { document.getElementById('q').value=e; ask(e); document.getElementById('q').value=''; };
+  chips.appendChild(c);
+});
+</script>
+</body>
+</html>
