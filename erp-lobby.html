@@ -204,38 +204,6 @@ body{
   margin-bottom:48px;letter-spacing:.02em;
 }
 
-/* ── FOCUS CARD ── */
-.focus{
-  border-top:1px solid var(--ink);
-  padding-top:22px;cursor:pointer;
-  transition:opacity .3s var(--ease);
-  margin-bottom:56px;
-}
-.focus:hover{opacity:.62;}
-.focus-eyebrow{
-  font-family:"Helvetica Neue",sans-serif;
-  font-size:10px;font-weight:700;color:var(--brand);
-  letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px;
-}
-.focus-title{
-  font-size:22px;font-weight:700;
-  letter-spacing:-.02em;line-height:1.35;margin-bottom:8px;color:var(--ink);
-}
-.focus-meta{
-  font-family:"Noto Serif TC",serif;
-  font-size:13px;color:var(--ink-mid);
-  margin-bottom:16px;letter-spacing:.02em;
-}
-.focus-meta strong{color:var(--brand);font-family:"Helvetica Neue",sans-serif;font-weight:700;letter-spacing:0;}
-.focus-action{
-  font-family:"Helvetica Neue",sans-serif;
-  font-size:11px;font-weight:700;color:var(--ink);
-  letter-spacing:.12em;text-transform:uppercase;
-  display:inline-flex;align-items:center;gap:8px;
-}
-.focus-action::after{content:'→';transition:transform .3s var(--ease);}
-.focus:hover .focus-action::after{transform:translateX(6px);}
-
 /* ── SECTION HEADER ── */
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
 .sec-title{
@@ -411,8 +379,6 @@ body{
   .main{margin-left:0;padding:40px 20px 80px;}
   .h-greet{font-size:38px;}
   .h-sub{font-size:15px;margin-bottom:32px;}
-  .focus{margin-bottom:36px;}
-  .focus-title{font-size:18px;}
   .content{max-width:100%;}
   .bottom-nav{display:flex;}
   body{padding-bottom:72px;}
@@ -491,14 +457,6 @@ body{
     <div class="h-greet" id="h-greet">午安，<span class="name">—</span></div>
     <div class="h-sub serif" id="h-sub">載入中...</div>
 
-    <!-- TODAY'S FOCUS -->
-    <div class="focus" id="focus-card" style="display:none">
-      <div class="focus-eyebrow">⚡ Today's Focus</div>
-      <div class="focus-title" id="focus-title">—</div>
-      <div class="focus-meta" id="focus-meta"></div>
-      <div class="focus-action">去處理</div>
-    </div>
-
     <!-- COMPANY PULSE -->
     <div class="sec-hdr">
       <div>
@@ -514,22 +472,22 @@ body{
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c1-bar" style="width:35.9%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
       </div>
       <div class="pulse-card" id="pulse-c2">
-        <div class="pulse-label" id="pulse-c2-label">活躍訂單</div>
-        <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">12 筆</div>
-        <div class="pulse-sub" id="pulse-c2-sub">較上月 +3</div>
+        <div class="pulse-label" id="pulse-c2-label">銷售中</div>
+        <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">6 個項目</div>
+        <div class="pulse-sub" id="pulse-c2-sub">Mofusand 上市 14 天 · 達標 38%</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c2-bar" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
       </div>
       <div class="pulse-card" id="pulse-c3">
-        <div class="pulse-label" id="pulse-c3-label">IP 開發中</div>
-        <div class="pulse-val" id="pulse-c3-val" style="color:var(--accent)">4 個</div>
-        <div class="pulse-sub" id="pulse-c3-sub">本季要交付 2 個</div>
+        <div class="pulse-label" id="pulse-c3-label">開發中</div>
+        <div class="pulse-val" id="pulse-c3-val" style="color:var(--accent)">4 個 IP</div>
+        <div class="pulse-sub" id="pulse-c3-sub">Snoopy 冬季 7 月上市 · 超前 3 天</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c3-bar" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
       </div>
-      <div class="pulse-card" id="pulse-card-approvals">
-        <div class="pulse-label" id="pulse-c4-label">公司待批核</div>
-        <div class="pulse-val" id="pulse-c4-val" style="color:var(--danger)">5 項</div>
-        <div class="pulse-sub" id="pulse-c4-sub">平均 2 天回覆</div>
-        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c4-bar" style="width:100%;background:linear-gradient(90deg,#b91c1c,var(--danger))"></div></div>
+      <div class="pulse-card" id="pulse-c4">
+        <div class="pulse-label" id="pulse-c4-label">快閃店進行中</div>
+        <div class="pulse-val" id="pulse-c4-val" style="color:var(--brand)">3 家</div>
+        <div class="pulse-sub" id="pulse-c4-sub">下一家 5/22 開業：Opanchu × Snoopy BKK</div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c4-bar" style="width:60%;background:linear-gradient(90deg,#cc5420,var(--brand))"></div></div>
       </div>
     </div>
 
@@ -834,27 +792,12 @@ const MY_TODOS = {
 const doneSet = new Set(JSON.parse(localStorage.getItem('lobby_done_'+user)||'[]'));
 const todos = MY_TODOS[user] || [];
 
-// ── Render Focus Card ──────────────────────────────────
-function renderFocus(activeTodos){
-  const card = document.getElementById('focus-card');
-  if(!activeTodos.length){ card.style.display='none'; return; }
-  const priority = ['high','med','low'];
-  let focus = null;
-  for(const p of priority){ focus = activeTodos.find(t=>t.urgency===p); if(focus) break; }
-  if(!focus){ card.style.display='none'; return; }
-  card.style.display='block';
-  document.getElementById('focus-title').textContent = focus.title;
-  document.getElementById('focus-meta').innerHTML = focus.sub;
-  card.onclick = ()=>openSheet(focus);
-}
-
 // ── Render Todos (blocks) ──────────────────────────────
 function renderTodos(showDone){
   const list = document.getElementById('todo-list');
   if(!todos.length){
     list.innerHTML='<div class="empty-state">今天沒有待辦 🎉</div>';
     updateHeroSub(0,0,0);
-    renderFocus([]);
     return;
   }
 
@@ -864,7 +807,6 @@ function renderTodos(showDone){
   const medCount    = activeTodos.filter(t=>t.urgency==='med').length;
 
   updateHeroSub(highCount, medCount, activeTodos.length);
-  renderFocus(activeTodos);
   updateSidebarBadge(activeTodos.length);
 
   list.innerHTML = '';
@@ -1032,17 +974,7 @@ function showToast(msg){
   const gap = Math.round((100-vamPct)*10)/10;
   if(el1s){ el1s.textContent=gap<=0?'✅ 已達成全年業績目標！':`距離全年目標還差 ${gap}%`; }
   if(el1b){ el1b.style.cssText=`width:${Math.min(vamPct,100)}%;background:linear-gradient(90deg,${isAhead?'#16a34a,var(--ok)':'#b45309,var(--warn)'})`; }
-  const activeOrders=(db.sales||[]).filter(r=>r.fields["收款狀態"]!=="全款已收"&&r.fields["收款狀態"]!=="已完結").length;
-  const el2v=document.getElementById('pulse-c2-val');
-  const el2b=document.getElementById('pulse-c2-bar');
-  if(el2v){ el2v.textContent=activeOrders+' 筆'; el2v.style.color='var(--ok)'; }
-  if(el2b){ el2b.style.cssText=`width:${Math.min(activeOrders/15*100,100)}%;background:linear-gradient(90deg,#16a34a,var(--ok))`; }
-  const pendingAppr=(db.approval||[]).filter(r=>r.fields["審批狀態"]==="待審批").length;
-  const el4v=document.getElementById('pulse-c4-val');
-  const el4s=document.getElementById('pulse-c4-sub');
-  const el4b=document.getElementById('pulse-c4-bar');
-  if(el4v){ el4v.textContent=pendingAppr+' 項'; el4v.style.color=pendingAppr>4?'var(--danger)':'var(--warn)'; }
-  if(el4b){ el4b.style.cssText=`width:${Math.min(pendingAppr/10*100,100)}%;background:linear-gradient(90deg,#b91c1c,var(--danger))`; }
+  // c2/c3/c4 暫用 HTML 預設 demo 文案；之後接真實資料時再從 db 算
 })();
 
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
