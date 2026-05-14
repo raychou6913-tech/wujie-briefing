@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 集團架構說明</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  --ok:#22c55e;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-.003em;
+  min-height:100vh;padding-bottom:80px;
+}
+.serif{font-family:"Noto Serif TC",Times,serif;}
+
+/* TOPBAR */
+.topbar{
+  background:var(--paper);border-bottom:1px solid var(--line);
+  padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:5px;height:5px;border-radius:50%;background:var(--brand);align-self:flex-end;margin-bottom:3px;}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;font-weight:900;font-size:18px;letter-spacing:-.04em;color:var(--ink);}
+.brand-sub{font-size:11px;color:var(--ink-lo);margin-left:6px;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.btn-sm{
+  font-size:11px;color:var(--ink-mid);text-decoration:none;
+  font-weight:600;padding:5px 12px;
+  border:1px solid var(--line);border-radius:20px;
+  transition:border-color .22s var(--ease);
+}
+.btn-sm:hover{border-color:var(--ink-faint);color:var(--ink);}
+.btn-sm.danger{color:var(--danger);border-color:#ef444430;}
+
+/* MAIN */
+.main{max-width:880px;margin:0 auto;padding:80px 32px;}
+
+.page-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--brand);font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.page-title{
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:42px;font-weight:900;letter-spacing:-.04em;
+  line-height:1.05;color:var(--ink);margin-bottom:14px;
+}
+.page-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:15px;color:var(--ink-mid);line-height:1.7;
+  margin-bottom:56px;letter-spacing:.02em;
+}
+
+.section{margin-bottom:48px;}
+.section-title{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:14px;
+}
+.section-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:24px;
+}
+
+/* VAM 考核說明 */
+.vam-fact{display:flex;flex-direction:column;gap:14px;}
+.vam-row{display:flex;align-items:baseline;gap:10px;font-size:14px;}
+.vam-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-lo);min-width:120px;
+}
+.vam-value{color:var(--ink);font-weight:600;}
+.vam-value strong{color:var(--brand);font-weight:800;}
+.vam-note{
+  margin-top:10px;padding-top:12px;
+  border-top:1px solid var(--line);
+  font-size:12px;color:var(--ink-mid);line-height:1.7;
+}
+
+/* 法人方框圖 */
+.entity-tree{display:grid;grid-template-columns:1fr;gap:18px;}
+.entity-tier{display:flex;justify-content:center;}
+.entity-box{
+  border:1.5px solid var(--line);border-radius:10px;
+  padding:14px 20px;text-align:center;min-width:220px;
+  background:#fff;
+}
+.entity-box.core{border-color:var(--brand);background:var(--brand-soft);min-width:240px;}
+.entity-box .e-tag{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-lo);
+}
+.entity-box.core .e-tag{color:var(--brand);}
+.entity-box .e-name{font-size:15px;font-weight:800;color:var(--ink);margin-top:4px;}
+.entity-box .e-meta{font-size:11px;color:var(--ink-mid);margin-top:2px;}
+.entity-arrow{text-align:center;color:var(--ink-lo);font-size:13px;font-family:"Helvetica Neue",sans-serif;letter-spacing:.08em;}
+.entity-row-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+
+/* 資金流向 */
+.flow-list{display:flex;flex-direction:column;gap:10px;}
+.flow-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--line);
+  font-size:12px;line-height:1.6;
+}
+.flow-row:last-child{border-bottom:none;}
+.flow-dot{
+  width:8px;height:8px;border-radius:50%;
+  margin-top:6px;flex-shrink:0;
+}
+.flow-pair{font-weight:700;color:var(--ink);}
+.flow-note{color:var(--ink-mid);}
+
+/* 稅率表 */
+.tax-table{width:100%;border-collapse:collapse;font-size:13px;}
+.tax-table th{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-lo);text-align:left;
+  padding:10px 12px;border-bottom:1px solid var(--line);
+}
+.tax-table td{padding:14px 12px;border-bottom:1px solid var(--line);color:var(--ink);}
+.tax-table tr:last-child td{border-bottom:none;}
+.tax-rate{font-weight:800;color:var(--brand);font-family:"Helvetica Neue",sans-serif;}
+
+/* TP 設定入口 */
+.tp-link{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--paper-soft);border:1px solid var(--line);
+  border-radius:10px;padding:16px 20px;text-decoration:none;
+  transition:border-color .22s var(--ease),background .22s var(--ease);
+}
+.tp-link:hover{border-color:var(--brand);background:var(--brand-soft);}
+.tp-link-text{}
+.tp-link-title{font-size:14px;font-weight:700;color:var(--ink);}
+.tp-link-sub{font-size:11px;color:var(--ink-mid);margin-top:3px;}
+.tp-link-arrow{color:var(--brand);font-size:14px;font-weight:700;}
+
+@media(max-width:720px){
+  .main{padding:40px 20px;}
+  .page-title{font-size:32px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="brand-dot"></div>
+    <div>
+      <span class="brand-name">蕪解 ERP</span>
+      <span class="brand-sub">集團架構說明</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <a href="erp-lobby.html" class="btn-sm">← 大廳</a>
+    <a href="erp-war-room.html" class="btn-sm">⚡ 戰情室</a>
+    <a href="login.html" class="btn-sm danger" onclick="localStorage.removeItem('erp_sess');return true;">登出</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="page-num">00 · Group Structure</div>
+  <h1 class="page-title">集團架構說明</h1>
+  <p class="page-sub">蕪解集團 5 個法人主體、VAM 對賭規則、跨主體資金流向、稅率對照、Transfer Pricing 設定入口。一次查清楚。</p>
+
+  <!-- VAM 考核主體 -->
+  <div class="section">
+    <div class="section-title">📊 VAM 對賭規則</div>
+    <div class="section-card">
+      <div class="vam-fact">
+        <div class="vam-row">
+          <div class="vam-label">考核主體</div>
+          <div class="vam-value"><strong>香港 JV ＋ 深圳子公司</strong> 合併計算</div>
+        </div>
+        <div class="vam-row">
+          <div class="vam-label">考核基礎</div>
+          <div class="vam-value">稅前淨利（合併）</div>
+        </div>
+        <div class="vam-row">
+          <div class="vam-label">年度目標</div>
+          <div class="vam-value"><strong>¥800 萬 / 年</strong></div>
+        </div>
+        <div class="vam-row">
+          <div class="vam-label">兩年累計</div>
+          <div class="vam-value"><strong>¥1,600 萬</strong>（2 年對賭期）</div>
+        </div>
+      </div>
+      <div class="vam-note">
+        跨主體服務費已透過定價公式（Transfer Pricing）計入成本，VAM 計算不重複排除。<br>
+        所有對賭數字以飛書「預算管理」表為準（不取合約表）。
+      </div>
+    </div>
+  </div>
+
+  <!-- 法人架構圖 -->
+  <div class="section">
+    <div class="section-title">🏛 五法人架構</div>
+    <div class="section-card">
+      <div class="entity-tree">
+        <div class="entity-tier">
+          <div class="entity-box core">
+            <div class="e-tag">🎯 VAM 考核母體</div>
+            <div class="e-name">香港 JV</div>
+            <div class="e-meta">利得稅 8.25%</div>
+          </div>
+        </div>
+        <div class="entity-arrow">↓ 投資 / 包銷</div>
+        <div class="entity-row-4">
+          <div class="entity-box" style="border-color:var(--brand);">
+            <div class="e-tag" style="color:var(--brand);">✓ VAM 子體</div>
+            <div class="e-name">深圳子公司</div>
+            <div class="e-meta">企稅 25%</div>
+          </div>
+          <div class="entity-box">
+            <div class="e-tag">服務商</div>
+            <div class="e-name">北京蕪解</div>
+            <div class="e-meta">企稅 25% · 供應鏈發包</div>
+          </div>
+          <div class="entity-box">
+            <div class="e-tag">代運營</div>
+            <div class="e-name">台灣悍草</div>
+            <div class="e-meta">營利事業稅 20%</div>
+          </div>
+          <div class="entity-box">
+            <div class="e-tag">合資（泰）</div>
+            <div class="e-name">UJ BKK</div>
+            <div class="e-meta">泰國企稅 20%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 跨主體資金流向 -->
+  <div class="section">
+    <div class="section-title">💸 跨主體資金流向口徑</div>
+    <div class="section-card">
+      <div class="flow-list">
+        <div class="flow-row">
+          <div class="flow-dot" style="background:var(--brand);"></div>
+          <div>
+            <div class="flow-pair">深圳子公司 ⟷ 香港 JV</div>
+            <div class="flow-note">分潤 / 投資款 → 計入 VAM 合併淨利</div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-dot" style="background:var(--ok);"></div>
+          <div>
+            <div class="flow-pair">北京蕪解 → 香港 JV</div>
+            <div class="flow-note">供應鏈發包款（北京採購、發包給 JV 旗下供應商）</div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-dot" style="background:var(--warn);"></div>
+          <div>
+            <div class="flow-pair">台灣悍草 → 香港 JV</div>
+            <div class="flow-note">代運營費（包銷 + 服務費）</div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-dot" style="background:var(--danger);"></div>
+          <div>
+            <div class="flow-pair">UJ BKK ⟷ 香港 JV</div>
+            <div class="flow-note">投資按持股比例分潤</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 稅率對照表 -->
+  <div class="section">
+    <div class="section-title">🧾 稅率對照</div>
+    <div class="section-card" style="padding:0;">
+      <table class="tax-table">
+        <thead>
+          <tr>
+            <th style="padding-left:24px;">法人主體</th>
+            <th>角色</th>
+            <th style="text-align:right;padding-right:24px;">稅率</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding-left:24px;"><strong>香港 JV</strong></td>
+            <td>VAM 考核母體</td>
+            <td class="tax-rate" style="text-align:right;padding-right:24px;">8.25%</td>
+          </tr>
+          <tr>
+            <td style="padding-left:24px;"><strong>深圳子公司</strong></td>
+            <td>VAM 考核子體</td>
+            <td class="tax-rate" style="text-align:right;padding-right:24px;">25%</td>
+          </tr>
+          <tr>
+            <td style="padding-left:24px;"><strong>北京蕪解</strong></td>
+            <td>服務商 · 供應鏈發包</td>
+            <td class="tax-rate" style="text-align:right;padding-right:24px;">25%</td>
+          </tr>
+          <tr>
+            <td style="padding-left:24px;"><strong>台灣悍草</strong></td>
+            <td>代運營</td>
+            <td class="tax-rate" style="text-align:right;padding-right:24px;">20%</td>
+          </tr>
+          <tr>
+            <td style="padding-left:24px;"><strong>UJ BKK</strong></td>
+            <td>合資（泰國）· 快閃店主場</td>
+            <td class="tax-rate" style="text-align:right;padding-right:24px;">20%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TP 設定入口 -->
+  <div class="section">
+    <div class="section-title">🔄 Transfer Pricing 設定</div>
+    <a href="erp-transfer-pricing.html" class="tp-link">
+      <div class="tp-link-text">
+        <div class="tp-link-title">跨主體內部定價規則</div>
+        <div class="tp-link-sub">5 法人合併報表用的定價公式 · 財務設定一次、長期套用</div>
+      </div>
+      <div class="tp-link-arrow">→</div>
+    </a>
+  </div>
+
+</div>
+
+<script>
+// Session check + role gate（同戰情室 ROLES）
+const _SESS = JSON.parse(localStorage.getItem('erp_sess')||'null');
+if(!_SESS || Date.now()-_SESS.ts > 7*86400000){
+  localStorage.removeItem('erp_sess');
+  location.replace('login.html');
+}
+const ENTITY_STRUCTURE_ROLES = ['ray','shawn','anran','yuming'];
+if(_SESS && !ENTITY_STRUCTURE_ROLES.includes(_SESS.user)){
+  location.replace('erp-lobby.html');
+}
+</script>
+</body>
+</html>
