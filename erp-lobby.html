@@ -277,7 +277,7 @@ body{
 .block.done-block{opacity:.35;pointer-events:none;}
 .block.completing{animation:check-off .4s var(--ease) forwards;}
 
-/* ── PULSE STRIP（公司心跳板：無 card、純資訊 banner）── */
+/* ── PULSE STRIP（公司心跳板：無 card、漸進揭露）── */
 .pulse-strip{
   display:grid;grid-template-columns:repeat(2,1fr);
   gap:28px 48px;
@@ -286,16 +286,63 @@ body{
   border-top:1px solid var(--line);
   border-bottom:1px solid var(--line);
 }
-.pulse-card{padding:0;cursor:default;background:transparent;border:none;}
+.pulse-card{
+  padding:0;cursor:pointer;background:transparent;border:none;
+  transition:opacity .2s var(--ease);
+}
+.pulse-card:hover{opacity:.78;}
 .pulse-label{
   font-family:"Helvetica Neue",sans-serif;
   font-size:9px;color:var(--ink-lo);font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
 }
 .pulse-val{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;}
-.pulse-sub{font-size:10px;color:var(--ink-mid);}
+.pulse-sub{font-size:10px;color:var(--ink-mid);display:flex;align-items:center;gap:6px;}
+.pulse-caret{
+  margin-left:auto;color:var(--ink-faint);
+  transition:transform .3s var(--ease),color .2s var(--ease);
+  font-size:9px;
+}
+.pulse-card.open .pulse-caret{transform:rotate(180deg);color:var(--brand);}
 .pulse-bar-track{background:var(--line);border-radius:4px;height:2px;margin-top:10px;overflow:hidden;}
 .pulse-bar-fill{height:100%;border-radius:4px;}
+
+.pulse-detail{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s var(--ease),padding-top .35s var(--ease);
+  padding-top:0;
+}
+.pulse-card.open .pulse-detail{max-height:600px;padding-top:18px;}
+.pdi{
+  display:flex;align-items:baseline;gap:10px;
+  padding:8px 0;border-bottom:1px solid var(--line);
+  font-size:11px;
+}
+.pdi:last-child{border-bottom:none;}
+.pdi-name{flex:1;color:var(--ink);font-weight:600;font-size:12px;}
+.pdi-meta{color:var(--ink-mid);font-size:10px;}
+.pdi-pct{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;font-weight:700;color:var(--ink-lo);
+  letter-spacing:.04em;
+}
+.pdi-tag{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:8px;font-weight:700;color:var(--brand);
+  letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--brand);
+  padding:2px 5px;border-radius:8px;
+}
+.pdi-bar{
+  background:var(--line);border-radius:4px;height:3px;
+  margin:4px 0 10px;overflow:hidden;
+}
+.pdi-bar-fill{height:100%;border-radius:4px;}
+.pdi-note{
+  font-family:"Noto Serif TC",serif;
+  font-size:11px;color:var(--ink-mid);
+  margin-top:10px;letter-spacing:.02em;
+}
 
 /* ── BOTTOM SHEET ── */
 .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:200;display:none;animation:fade-in .2s;}
@@ -465,30 +512,63 @@ body{
       </div>
     </div>
     <div class="pulse-strip">
-      <div class="pulse-card" id="pulse-c1">
-        <div class="pulse-label" id="pulse-c1-label">今年業績進度</div>
-        <div class="pulse-val" id="pulse-c1-val" style="color:var(--warn)">35.9%</div>
-        <div class="pulse-sub" id="pulse-c1-sub">距離全年目標還差 64.1%</div>
-        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c1-bar" style="width:35.9%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
+
+      <div class="pulse-card" id="pulse-c1" onclick="togglePulse(this)">
+        <div class="pulse-label">本季業績進度</div>
+        <div class="pulse-val" style="color:var(--warn)">23%</div>
+        <div class="pulse-sub">本季目標達成 23% · 已規劃覆蓋 65%<span class="pulse-caret">▾</span></div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:23%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
+        <div class="pulse-detail">
+          <div class="pdi"><span class="pdi-name">🎯 本季目標</span><span class="pdi-meta">¥400 萬</span><span class="pdi-pct">100%</span></div>
+          <div class="pdi-bar"><div class="pdi-bar-fill" style="width:100%;background:var(--ink-faint)"></div></div>
+          <div class="pdi"><span class="pdi-name">📋 已規劃覆蓋</span><span class="pdi-meta">¥260 萬</span><span class="pdi-pct">65%</span></div>
+          <div class="pdi-bar"><div class="pdi-bar-fill" style="width:65%;background:linear-gradient(90deg,var(--brand-soft),var(--brand))"></div></div>
+          <div class="pdi"><span class="pdi-name">✅ 實際入帳</span><span class="pdi-meta">¥130 萬</span><span class="pdi-pct">23%</span></div>
+          <div class="pdi-bar"><div class="pdi-bar-fill" style="width:23%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
+          <div class="pdi-note">剩 1.5 個月，距離本季目標還差 ¥270 萬（77%）</div>
+        </div>
       </div>
-      <div class="pulse-card" id="pulse-c2">
-        <div class="pulse-label" id="pulse-c2-label">銷售中</div>
-        <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">6 個項目</div>
-        <div class="pulse-sub" id="pulse-c2-sub">Mofusand 上市 14 天 · 達標 38%</div>
-        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c2-bar" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
+
+      <div class="pulse-card" id="pulse-c2" onclick="togglePulse(this)">
+        <div class="pulse-label">銷售中</div>
+        <div class="pulse-val" style="color:var(--ok)">6 個項目</div>
+        <div class="pulse-sub">Mofusand 上市 14 天 · 達標 38%<span class="pulse-caret">▾</span></div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
+        <div class="pulse-detail">
+          <div class="pdi"><span class="pdi-name">Mofusand</span><span class="pdi-meta">上市 14 天 · 達標 38%</span><span class="pdi-tag">最緊急</span></div>
+          <div class="pdi"><span class="pdi-name">Snoopy 春季</span><span class="pdi-meta">上市 8 天 · 達標 22%</span></div>
+          <div class="pdi"><span class="pdi-name">Opanchu 文具</span><span class="pdi-meta">上市 5 天 · 達標 15%</span></div>
+          <div class="pdi"><span class="pdi-name">飯糰梅子</span><span class="pdi-meta">上市 3 天 · 達標 12%</span></div>
+          <div class="pdi"><span class="pdi-name">Muziktiger</span><span class="pdi-meta">上市 25 天 · 達標 67%</span></div>
+          <div class="pdi"><span class="pdi-name">Mofusand 抱枕</span><span class="pdi-meta">上市 2 天 · 達標 8%</span></div>
+        </div>
       </div>
-      <div class="pulse-card" id="pulse-c3">
-        <div class="pulse-label" id="pulse-c3-label">開發中</div>
-        <div class="pulse-val" id="pulse-c3-val" style="color:var(--accent)">4 個 IP</div>
-        <div class="pulse-sub" id="pulse-c3-sub">Snoopy 冬季 7 月上市 · 超前 3 天</div>
-        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c3-bar" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
+
+      <div class="pulse-card" id="pulse-c3" onclick="togglePulse(this)">
+        <div class="pulse-label">開發中</div>
+        <div class="pulse-val" style="color:var(--accent)">4 個 IP</div>
+        <div class="pulse-sub">Snoopy 冬季 7 月上市 · 超前 3 天<span class="pulse-caret">▾</span></div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
+        <div class="pulse-detail">
+          <div class="pdi"><span class="pdi-name">Snoopy 冬季公仔</span><span class="pdi-meta">7 月上市 · 超前 3 天</span><span class="pdi-tag">最快</span></div>
+          <div class="pdi"><span class="pdi-name">Mofusand 春季</span><span class="pdi-meta">8 月上市 · 落後 14 天</span></div>
+          <div class="pdi"><span class="pdi-name">Opanchu 文具</span><span class="pdi-meta">9 月上市 · 正常進度</span></div>
+          <div class="pdi"><span class="pdi-name">Muziktiger 新品</span><span class="pdi-meta">10 月上市 · 設計中</span></div>
+        </div>
       </div>
-      <div class="pulse-card" id="pulse-c4">
-        <div class="pulse-label" id="pulse-c4-label">快閃店進行中</div>
-        <div class="pulse-val" id="pulse-c4-val" style="color:var(--brand)">3 家</div>
-        <div class="pulse-sub" id="pulse-c4-sub">下一家 5/22 開業：Opanchu × Snoopy BKK</div>
-        <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c4-bar" style="width:60%;background:linear-gradient(90deg,#cc5420,var(--brand))"></div></div>
+
+      <div class="pulse-card" id="pulse-c4" onclick="togglePulse(this)">
+        <div class="pulse-label">快閃店進行中</div>
+        <div class="pulse-val" style="color:var(--brand)">3 家</div>
+        <div class="pulse-sub">下一家 5/22 開業：Opanchu × Snoopy BKK<span class="pulse-caret">▾</span></div>
+        <div class="pulse-bar-track"><div class="pulse-bar-fill" style="width:60%;background:linear-gradient(90deg,#cc5420,var(--brand))"></div></div>
+        <div class="pulse-detail">
+          <div class="pdi"><span class="pdi-name">Mofusand BKK Iconsiam</span><span class="pdi-meta">營業中 · 累計 14 天</span></div>
+          <div class="pdi"><span class="pdi-name">Opanchu × Snoopy BKK</span><span class="pdi-meta">裝修中 · 5/22 開業</span><span class="pdi-tag">下一家</span></div>
+          <div class="pdi"><span class="pdi-name">JJK 北京三里屯</span><span class="pdi-meta">提案中 · 預計 7 月開幕</span></div>
+        </div>
       </div>
+
     </div>
 
     <!-- MY TODOS -->
@@ -958,24 +1038,10 @@ function showToast(msg){
 }
 
 // ── Init ──────────────────────────────────────────────
-(function syncPulseFromMock(){
-  const db = window.MOCK_DB;
-  if(!db) return;
-  const netRows = (db.budget||[]).filter(r=>String(r.fields["預算科目"]).includes("淨利"));
-  const actual  = netRows.reduce((s,r)=>s+(parseFloat(r.fields["實際金額"])||0),0);
-  const VAM_YR  = 8000000;
-  const vamPct  = Math.round(actual/VAM_YR*100*10)/10;
-  const expPct  = Math.round((now.getMonth()+1)/12*100*10)/10;
-  const isAhead = vamPct >= expPct;
-  const el1v=document.getElementById('pulse-c1-val');
-  const el1s=document.getElementById('pulse-c1-sub');
-  const el1b=document.getElementById('pulse-c1-bar');
-  if(el1v){ el1v.textContent=vamPct+'%'; el1v.style.color=isAhead?'var(--ok)':'var(--warn)'; }
-  const gap = Math.round((100-vamPct)*10)/10;
-  if(el1s){ el1s.textContent=gap<=0?'✅ 已達成全年業績目標！':`距離全年目標還差 ${gap}%`; }
-  if(el1b){ el1b.style.cssText=`width:${Math.min(vamPct,100)}%;background:linear-gradient(90deg,${isAhead?'#16a34a,var(--ok)':'#b45309,var(--warn)'})`; }
-  // c2/c3/c4 暫用 HTML 預設 demo 文案；之後接真實資料時再從 db 算
-})();
+// Pulse 4 格全部 hardcoded demo 數據（員工視角，毛利+季度尺度）；之後接飛書時改 sync。
+function togglePulse(card){
+  card.classList.toggle('open');
+}
 
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
 
