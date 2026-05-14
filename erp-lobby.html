@@ -312,24 +312,15 @@ body{
 /* ── PULSE STRIP ── */
 .pulse-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:48px;}
 .pulse-card{
-  background:#fff;border:1px solid var(--line);
-  border-radius:var(--radius);padding:14px;cursor:pointer;
-  transition:border-color .22s var(--ease),background .22s var(--ease);
-  position:relative;
+  background:var(--paper-soft);
+  border-radius:var(--radius);padding:14px;cursor:default;
 }
-.pulse-card:hover{border-color:var(--ink-faint);background:var(--paper-soft);}
-.pulse-card::after{
-  content:'→';position:absolute;top:10px;right:11px;
-  font-size:11px;color:var(--ink-faint);
-  transition:color .22s var(--ease),right .22s var(--ease);
-}
-.pulse-card:hover::after{color:var(--brand);right:9px;}
 .pulse-label{
   font-family:"Helvetica Neue",sans-serif;
   font-size:9px;color:var(--ink-lo);font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
 }
-.pulse-val{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
+.pulse-val{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;}
 .pulse-sub{font-size:10px;color:var(--ink-mid);}
 .pulse-bar-track{background:var(--line);border-radius:4px;height:4px;margin-top:8px;overflow:hidden;}
 .pulse-bar-fill{height:100%;border-radius:4px;}
@@ -513,28 +504,28 @@ body{
       <div class="sec-link" id="war-room-link" style="display:none" onclick="location.href='erp-war-room.html'">戰情室 ›</div>
     </div>
     <div class="pulse-strip">
-      <div class="pulse-card" id="pulse-c1" onclick="pulseClick('c1')">
-        <div class="pulse-label" id="pulse-c1-label">全年利潤達標率</div>
+      <div class="pulse-card" id="pulse-c1">
+        <div class="pulse-label" id="pulse-c1-label">今年業績進度</div>
         <div class="pulse-val" id="pulse-c1-val" style="color:var(--warn)">35.9%</div>
-        <div class="pulse-sub" id="pulse-c1-sub">⚠ 稍落後進度</div>
+        <div class="pulse-sub" id="pulse-c1-sub">距離全年目標還差 64.1%</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c1-bar" style="width:35.9%;background:linear-gradient(90deg,#b45309,var(--warn))"></div></div>
       </div>
-      <div class="pulse-card" id="pulse-c2" onclick="pulseClick('c2')">
+      <div class="pulse-card" id="pulse-c2">
         <div class="pulse-label" id="pulse-c2-label">活躍訂單</div>
         <div class="pulse-val" id="pulse-c2-val" style="color:var(--ok)">12 筆</div>
-        <div class="pulse-sub" id="pulse-c2-sub">本月執行中</div>
+        <div class="pulse-sub" id="pulse-c2-sub">較上月 +3</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c2-bar" style="width:72%;background:linear-gradient(90deg,#16a34a,var(--ok))"></div></div>
       </div>
-      <div class="pulse-card" id="pulse-c3" onclick="pulseClick('c3')">
-        <div class="pulse-label" id="pulse-c3-label">IP 開發進行</div>
+      <div class="pulse-card" id="pulse-c3">
+        <div class="pulse-label" id="pulse-c3-label">IP 開發中</div>
         <div class="pulse-val" id="pulse-c3-val" style="color:var(--accent)">4 個</div>
-        <div class="pulse-sub" id="pulse-c3-sub">2 個本月出圖</div>
+        <div class="pulse-sub" id="pulse-c3-sub">本季要交付 2 個</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c3-bar" style="width:60%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>
       </div>
-      <div class="pulse-card" id="pulse-card-approvals" onclick="pulseClick('c4')">
-        <div class="pulse-label" id="pulse-c4-label">待批核事項</div>
+      <div class="pulse-card" id="pulse-card-approvals">
+        <div class="pulse-label" id="pulse-c4-label">公司待批核</div>
         <div class="pulse-val" id="pulse-c4-val" style="color:var(--danger)">5 項</div>
-        <div class="pulse-sub" id="pulse-c4-sub">等待 Ray 決定</div>
+        <div class="pulse-sub" id="pulse-c4-sub">平均 2 天回覆</div>
         <div class="pulse-bar-track"><div class="pulse-bar-fill" id="pulse-c4-bar" style="width:100%;background:linear-gradient(90deg,#b91c1c,var(--danger))"></div></div>
       </div>
     </div>
@@ -1035,7 +1026,8 @@ function showToast(msg){
   const el1s=document.getElementById('pulse-c1-sub');
   const el1b=document.getElementById('pulse-c1-bar');
   if(el1v){ el1v.textContent=vamPct+'%'; el1v.style.color=isAhead?'var(--ok)':'var(--warn)'; }
-  if(el1s){ el1s.textContent=isAhead?'✅ 超前進度':'⚠ 稍落後進度'; }
+  const gap = Math.round((100-vamPct)*10)/10;
+  if(el1s){ el1s.textContent=gap<=0?'✅ 已達成全年業績目標！':`距離全年目標還差 ${gap}%`; }
   if(el1b){ el1b.style.cssText=`width:${Math.min(vamPct,100)}%;background:linear-gradient(90deg,${isAhead?'#16a34a,var(--ok)':'#b45309,var(--warn)'})`; }
   const activeOrders=(db.sales||[]).filter(r=>r.fields["收款狀態"]!=="全款已收"&&r.fields["收款狀態"]!=="已完結").length;
   const el2v=document.getElementById('pulse-c2-val');
@@ -1052,112 +1044,8 @@ function showToast(msg){
 })();
 
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
-
-/* ── ROLE-SPECIFIC PULSE CONFIGS ──────────────────────────
-   Each entry: [label, val, valColor, sub, barPct, barGradient, href]    */
-const PULSE_CONFIGS = {
-  gaowei:[
-    ['在途批次',   '3 批', '#0284c7', '海運 2 · 空運 1',    60, '#0369a1,#0284c7', 'erp-gaowei.html'],
-    ['本週到港',   '1 批', 'var(--warn)', '預計週四到港',   25, '#b45309,var(--warn)', 'erp-gaowei.html'],
-    ['卡關/異常',  '0 件', 'var(--ok)', '一切正常 ✅',       0, '#16a34a,var(--ok)', 'erp-gaowei.html'],
-    ['本月完成',   '2 批', 'var(--txt-mid)', '已交付',       40, '#64748b,var(--txt-mid)', 'erp-gaowei.html'],
-  ],
-  laige:[
-    ['進行中 PO',     '4 張', 'var(--ok)',   '已核准執行中',      57, '#16a34a,var(--ok)',   'erp-procurement.html'],
-    ['等廠商回覆',   '2 張', 'var(--warn)', '報價逾期 1 天',     28, '#b45309,var(--warn)', 'erp-procurement.html'],
-    ['本月付款待批', '1 筆', 'var(--danger)','¥42,000 等 Ray 核准',100,'#b91c1c,var(--danger)','erp-procurement.html'],
-    ['近期交貨批次', '3 批', 'var(--accent)','本月交期',          43, 'var(--accent2),var(--accent)', 'erp-procurement.html'],
-  ],
-  muzi:[
-    ['待核對 PO',    '2 張', 'var(--warn)', '廠端備貨中',        40, '#b45309,var(--warn)', 'erp-procurement.html'],
-    ['待填報申請',   '1 筆', 'var(--danger)','付款申請待送審',    100,'#b91c1c,var(--danger)','erp-procurement.html'],
-    ['近期交貨批次', '3 批', 'var(--ok)',   '本月交期',           43, '#16a34a,var(--ok)',   'erp-procurement.html'],
-    ['本月完成採購', '5 筆', 'var(--txt-mid)','已結案',           71, '#64748b,var(--txt-mid)', 'erp-procurement.html'],
-  ],
-  bevis:[
-    ['進行中 IP',     '4 個', 'var(--ok)',    '公仔 2 · 非公仔 2', 57, '#16a34a,var(--ok)',           'erp-pipeline.html'],
-    ['等版權方回覆',  '1 個', 'var(--danger)','卡關 14 天',        100,'#b91c1c,var(--danger)',        'erp-pipeline.html'],
-    ['本月送審截止',  '2 個', 'var(--warn)',  '5/08 · 5/12',       40, '#b45309,var(--warn)',          'erp-pipeline.html'],
-    ['本季目標出圖',  '2 款', 'var(--accent)','Q3 預計上市',       50, 'var(--accent2),var(--accent)', 'erp-pipeline.html'],
-  ],
-  peilin:[
-    ['進行中 IP',     '4 個', 'var(--ok)',    '公仔 2 · 非公仔 2', 57, '#16a34a,var(--ok)',           'erp-pipeline.html'],
-    ['等版權方回覆',  '1 個', 'var(--danger)','Muziktiger 卡關 14天',100,'#b91c1c,var(--danger)',     'erp-approval-tracker.html'],
-    ['本月送審截止',  '2 件', 'var(--warn)',  '最近：5/08 Opanchu', 40, '#b45309,var(--warn)',         'erp-approval-tracker.html'],
-    ['本季計劃出圖',  '2 款', 'var(--accent)','Q3 上市目標',        50, 'var(--accent2),var(--accent)','erp-pipeline.html'],
-  ],
-  shetong:[
-    ['我的設計任務',  '2 件', 'var(--warn)',  '進行中',            60, '#b45309,var(--warn)', 'erp-shetong.html'],
-    ['等 Bevis 審核', '1 件', 'var(--danger)','等待 2 天',         100,'#b91c1c,var(--danger)','erp-shetong.html'],
-    ['進行中 IP',     '4 個', 'var(--ok)',    '公仔 2 · 非公仔 2', 57, '#16a34a,var(--ok)',   'erp-pipeline.html'],
-    ['本月完成稿件',  '3 件', 'var(--txt-mid)','已核准',           43, '#64748b,var(--txt-mid)','erp-shetong.html'],
-  ],
-  laodong:[
-    ['本月拜訪',    '8 次', 'var(--ok)',    '較上月 +2',         80, '#16a34a,var(--ok)',           'erp-crm.html'],
-    ['跟進中客戶',  '5 家', 'var(--warn)',  '2 家本週到期',       50, '#b45309,var(--warn)',          'erp-crm.html'],
-    ['本月成交',    '2 筆', 'var(--ok)',    '✅ 達標',             67, '#16a34a,var(--ok)',            'erp-crm.html'],
-    ['待報價客戶',  '3 家', 'var(--accent)','等提案',             30, 'var(--accent2),var(--accent)', 'erp-crm.html'],
-  ],
-  debao:[
-    ['本月拜訪',    '6 次', 'var(--ok)',    '北京區域',          75, '#16a34a,var(--ok)',           'erp-crm.html'],
-    ['跟進中客戶',  '4 家', 'var(--warn)',  '1 家本週到期',       40, '#b45309,var(--warn)',          'erp-crm.html'],
-    ['本月成交',    '1 筆', 'var(--warn)',  '距目標還差 1 筆',    33, '#b45309,var(--warn)',          'erp-crm.html'],
-    ['待報價客戶',  '2 家', 'var(--accent)','等提案',             20, 'var(--accent2),var(--accent)', 'erp-crm.html'],
-  ],
-  chunlei:[
-    ['本月直播',    '4 場', 'var(--ok)',    '下場：週四 20:00',  57, '#16a34a,var(--ok)',           'erp-ecommerce.html'],
-    ['本月抖音訂單','168 筆','var(--ok)',   '較上月 +12%',        80, '#16a34a,var(--ok)',           'erp-ecommerce.html'],
-    ['庫存預警',    '1 款', 'var(--danger)','Snoopy 盲盒偏低',   100,'#b91c1c,var(--danger)',       'erp-ecommerce.html'],
-    ['待確認備貨',  '1 筆', 'var(--warn)', '直播備貨待核對',     30, '#b45309,var(--warn)',         'erp-ecommerce.html'],
-  ],
-  jiaying:[
-    ['在架商品',    '24 款','var(--ok)',   '淘寶/天貓',           80, '#16a34a,var(--ok)',           'erp-ecommerce.html'],
-    ['本月電商訂單','312 筆','var(--ok)',  '較上月 +8%',          75, '#16a34a,var(--ok)',           'erp-ecommerce.html'],
-    ['待上架',      '3 款', 'var(--warn)', '設計稿已到',          30, '#b45309,var(--warn)',         'erp-ecommerce.html'],
-    ['庫存預警',    '2 款', 'var(--danger)','需補貨',             100,'#b91c1c,var(--danger)',       'erp-ecommerce.html'],
-  ],
-  yangzi:[
-    ['待審核費用',  '3 筆', 'var(--warn)',  '金額 NT$21,560',     60, '#b45309,var(--warn)',         'erp-yangzi.html'],
-    ['薪資流程',    '進行中','var(--ok)',   '5月核算中',          50, '#16a34a,var(--ok)',           'erp-yangzi.html'],
-    ['待簽署文件',  '1 份', 'var(--danger)','實習生入職資料',     100,'#b91c1c,var(--danger)',       'erp-yangzi.html'],
-    ['本月完成',    '8 項', 'var(--txt-mid)','行政任務',          80, '#64748b,var(--txt-mid)',      'erp-yangzi.html'],
-  ],
-  leo:[
-    ['台灣本月支出','NT$48萬','var(--warn)', '房租+薪資+水電',    75, '#b45309,var(--warn)',         'erp-leo.html'],
-    ['待入帳項目',  '2 筆', 'var(--danger)','等收據確認',         100,'#b91c1c,var(--danger)',       'erp-leo.html'],
-    ['對帳進度',    '80%',  'var(--ok)',    '4月帳務核對中',       80, '#16a34a,var(--ok)',           'erp-leo.html'],
-    ['本月完成',    '6 筆', 'var(--txt-mid)','已入帳',             60, '#64748b,var(--txt-mid)',      'erp-leo.html'],
-  ],
-};
-
-function applyPulseConfig(configs){
-  ['c1','c2','c3','c4'].forEach((c,i)=>{
-    const cfg=configs[i]; if(!cfg) return;
-    const [label,val,valColor,sub,barPct,barGrad,_href]=cfg;
-    const elL=document.getElementById('pulse-'+c+'-label');
-    const elV=document.getElementById('pulse-'+c+'-val');
-    const elS=document.getElementById('pulse-'+c+'-sub');
-    const elB=document.getElementById('pulse-'+c+'-bar');
-    if(elL) elL.textContent=label;
-    if(elV){ elV.textContent=val; elV.style.color=valColor; }
-    if(elS) elS.textContent=sub;
-    if(elB) elB.style.cssText=`width:${barPct}%;background:linear-gradient(90deg,${barGrad})`;
-  });
-}
-
-let _pulseHrefs={c1:null,c2:null,c3:'erp-pipeline.html',c4:null};
 if(WAR_ROOM_ROLES.includes(user)){
   document.getElementById('war-room-link').style.display='block';
-  _pulseHrefs={c1:'erp-war-room.html',c2:'erp-war-room.html',c3:'erp-pipeline.html',c4:'erp-war-room.html'};
-} else if(PULSE_CONFIGS[user]){
-  applyPulseConfig(PULSE_CONFIGS[user]);
-  const cfg=PULSE_CONFIGS[user];
-  _pulseHrefs={c1:cfg[0][6],c2:cfg[1][6],c3:cfg[2][6],c4:cfg[3][6]};
-}
-
-function pulseClick(card){
-  const href=_pulseHrefs[card];
-  if(href) location.href=href;
 }
 
 renderTodos(false);
