@@ -154,6 +154,64 @@ body{
   font-size:11px;color:var(--ink-mid);letter-spacing:.02em;line-height:1.7;
 }
 
+/* ── 子主體健康度（北京/台灣/UJ BKK 費用達標監控） ── */
+.sub-entity-grid{
+  display:grid;grid-template-columns:1fr;gap:14px;
+  margin-bottom:48px;
+}
+.sub-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:20px 24px;
+  transition:border-color .22s var(--ease);
+}
+.sub-card:hover{border-color:var(--ink-faint);}
+.sub-card-placeholder{background:var(--paper-soft);border-style:dashed;}
+.sub-card-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  margin-bottom:18px;padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+.sub-name{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em;}
+.sub-role{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.sub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:14px;}
+.sub-cell{}
+.sub-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
+}
+.sub-val{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin-bottom:3px;}
+.sub-val.ok{color:var(--ok);}
+.sub-val.warn{color:var(--warn);}
+.sub-val.danger{color:var(--danger);}
+.sub-sub{font-size:10px;color:var(--ink-mid);}
+.sub-bar-track{background:var(--line);border-radius:4px;height:4px;margin-top:14px;overflow:hidden;}
+.sub-bar-fill{height:100%;border-radius:4px;}
+.sub-bar-note{
+  font-family:"Noto Serif TC",serif;
+  font-size:11px;color:var(--ink-mid);margin-top:8px;letter-spacing:.02em;
+}
+.sub-placeholder-body{
+  text-align:center;padding:20px 0;
+}
+.sub-placeholder-icon{font-size:24px;margin-bottom:10px;opacity:.6;}
+.sub-placeholder-text{
+  font-family:"Noto Serif TC",serif;
+  font-size:13px;color:var(--ink-mid);line-height:1.6;margin-bottom:12px;
+}
+.sub-placeholder-link{
+  font-size:11px;color:var(--brand);text-decoration:none;font-weight:600;
+}
+.sub-placeholder-link:hover{text-decoration:underline;}
+
+@media(min-width:768px){
+  .sub-entity-grid{grid-template-columns:1fr 1fr;}
+}
+
 /* ── VAM HERO ── */
 .vam-hero{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;}
 .vam-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
@@ -388,30 +446,14 @@ body{
 
 <div class="main">
 
-  <!-- 主體切換 tab（多法人 lens） -->
+  <!-- VAM 主體切換 tab（3 個對賭主體） -->
   <div class="subject-tab" role="tablist">
     <button class="st-btn active" onclick="switchSubject(this,'jv-combined')">JV 合計（HK+SZ）</button>
     <button class="st-btn" onclick="switchSubject(this,'hk-jv')">香港 JV</button>
     <button class="st-btn" onclick="switchSubject(this,'sz-sub')">深圳子公司</button>
-    <button class="st-btn" onclick="switchSubject(this,'bj-wj')">北京蕪解</button>
-    <button class="st-btn" onclick="switchSubject(this,'tw-hc')">台灣悍草</button>
-    <button class="st-btn" onclick="switchSubject(this,'uj-bkk')">UJ BKK</button>
   </div>
 
-  <!-- 非 VAM 主體面板（北京/台灣/UJ BKK 切換時顯示）-->
-  <div id="non-vam-content" style="display:none;">
-    <div class="section-title">📍 主體業績摘要</div>
-    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:40px 32px;text-align:center;margin-bottom:48px;">
-      <div id="nv-label" style="font-family:'Helvetica Neue',sans-serif;font-size:10px;color:var(--ink-lo);font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:18px;">— 主體</div>
-      <div id="nv-note" style="font-family:'Noto Serif TC',serif;font-size:20px;color:var(--ink);line-height:1.5;margin-bottom:12px;letter-spacing:.02em;">非 VAM 對賭範圍</div>
-      <div id="nv-desc" style="font-size:13px;color:var(--ink-mid);line-height:1.8;max-width:540px;margin:0 auto;">該主體不單獨計算預算，於 JV 合計範圍中以跨主體服務費 / 包銷費 / 分潤形式計入。</div>
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-lo);">
-        看主體營運細節 → <a id="nv-link" href="#" style="color:var(--brand);font-weight:600;text-decoration:none;">該主體工作台 →</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- VAM 主體區塊（JV 合計 / 香港 JV / 深圳子公司 切換時顯示）-->
+  <!-- VAM 主體區塊（JV 合計 / 香港 JV / 深圳子公司）-->
   <div id="vam-content">
 
   <!-- ① 年度業績核心指標（合併 VAM + 業績）-->
@@ -762,6 +804,79 @@ body{
   </div>
 
   </div><!-- /vam-content -->
+
+  <!-- 📍 子主體健康度（北京/台灣/UJ BKK 費用 vs 收入監控，永遠可見） -->
+  <div class="section-title">📍 子主體健康度 · 費用達標監控</div>
+  <div class="sub-entity-grid">
+
+    <!-- 北京蕪解 -->
+    <div class="sub-card">
+      <div class="sub-card-head">
+        <div class="sub-name">北京蕪解</div>
+        <div class="sub-role">服務商 · 供應鏈發包</div>
+      </div>
+      <div class="sub-grid">
+        <div class="sub-cell">
+          <div class="sub-label">年度費用目標</div>
+          <div class="sub-val">¥ 85 萬</div>
+          <div class="sub-sub">固定管銷 + 銀行利息</div>
+        </div>
+        <div class="sub-cell">
+          <div class="sub-label">已知收入</div>
+          <div class="sub-val ok">¥ 58 萬</div>
+          <div class="sub-sub">服務費已簽 + 已收</div>
+        </div>
+        <div class="sub-cell">
+          <div class="sub-label">缺口</div>
+          <div class="sub-val warn">¥ 27 萬</div>
+          <div class="sub-sub">需在剩 7 個月內補</div>
+        </div>
+      </div>
+      <div class="sub-bar-track"><div class="sub-bar-fill" style="width:68%;background:linear-gradient(90deg,#b45309,var(--warn));"></div></div>
+      <div class="sub-bar-note">已覆蓋 68% · 距離自給自足還差 32%</div>
+    </div>
+
+    <!-- 台灣悍草 -->
+    <div class="sub-card">
+      <div class="sub-card-head">
+        <div class="sub-name">台灣悍草</div>
+        <div class="sub-role">代運營 · 包銷</div>
+      </div>
+      <div class="sub-grid">
+        <div class="sub-cell">
+          <div class="sub-label">年度費用目標</div>
+          <div class="sub-val">NT$ 720 萬</div>
+          <div class="sub-sub">固定管銷 + 銀行利息</div>
+        </div>
+        <div class="sub-cell">
+          <div class="sub-label">已知收入</div>
+          <div class="sub-val ok">NT$ 480 萬</div>
+          <div class="sub-sub">代運營費已簽 + 已收</div>
+        </div>
+        <div class="sub-cell">
+          <div class="sub-label">缺口</div>
+          <div class="sub-val warn">NT$ 240 萬</div>
+          <div class="sub-sub">需在剩 7 個月內補</div>
+        </div>
+      </div>
+      <div class="sub-bar-track"><div class="sub-bar-fill" style="width:67%;background:linear-gradient(90deg,#b45309,var(--warn));"></div></div>
+      <div class="sub-bar-note">已覆蓋 67% · 距離自給自足還差 33%</div>
+    </div>
+
+    <!-- UJ BKK（placeholder）-->
+    <div class="sub-card sub-card-placeholder">
+      <div class="sub-card-head">
+        <div class="sub-name">UJ BKK</div>
+        <div class="sub-role">合資（泰）· 快閃店主場</div>
+      </div>
+      <div class="sub-placeholder-body">
+        <div class="sub-placeholder-icon">⏳</div>
+        <div class="sub-placeholder-text">等 UJ BKK ERP 完整後串接費用 / 收入資料</div>
+        <a href="bkk-lobby.html" class="sub-placeholder-link">UJ BKK Lobby →</a>
+      </div>
+    </div>
+
+  </div>
 
 </div><!-- /main -->
 
@@ -1885,18 +2000,12 @@ function loadSellThruWarRoom(){
   el.innerHTML = html;
 }
 
-/* ── SUBJECT TAB SWITCHER（多法人 lens，demo 階段 hardcoded 數字） ── */
-// VAM 對賭主體：JV 合計 / 香港 JV / 深圳子公司
-// 非 VAM 主體：北京 / 台灣 / UJ BKK（不單獨做預算，於 JV 合計中以服務費 / 包銷 / 分潤計入）
-const VAM_SUBJECTS = new Set(['jv-combined','hk-jv','sz-sub']);
+/* ── SUBJECT TAB SWITCHER（3 個 VAM 對賭主體 lens，demo 階段 hardcoded） ── */
+// 北京 / 台灣 / UJ BKK 不在 tab 上，改成下方獨立「子主體健康度」永遠可見區塊
 const SUBJECT_DATA = {
-  'jv-combined': {label:'JV 合計（HK+SZ）',v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23},
-  'hk-jv':       {label:'香港 JV',         v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23, note:'香港 JV 為 VAM 母體，數字呈現 JV 合計版本'},
-  'sz-sub':      {label:'深圳子公司',       v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23, note:'深圳子公司為 VAM 子體，數字呈現 JV 合計版本'},
-  // 非 VAM 主體
-  'bj-wj':  {label:'北京蕪解', notInVam:true, role:'服務商', desc:'北京蕪解作為供應鏈發包服務商，於 JV 合計範圍中以服務費形式計入成本。不單獨計算預算 / 對賭。', link:'erp-anran.html', linkLabel:'安然中控台'},
-  'tw-hc':  {label:'台灣悍草', notInVam:true, role:'代運營',  desc:'台灣悍草作為代運營主體，於 JV 合計範圍中以包銷 + 服務費形式計入。不單獨計算預算 / 對賭。', link:'erp-leo.html',   linkLabel:'Leo 工作台'},
-  'uj-bkk': {label:'UJ BKK',  notInVam:true, role:'合資（泰）', desc:'UJ BKK 為泰國合資公司，主業快閃店。投資按持股比例分潤，不單獨計算預算 / 對賭。', link:'bkk-lobby.html', linkLabel:'UJ BKK Lobby'},
+  'jv-combined': {v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23},
+  'hk-jv':       {v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23},
+  'sz-sub':      {v1:800, v2:520, v3:184, v1pct:100, v2pct:65, v3pct:23},
 };
 
 function switchSubject(btn, subject){
@@ -1904,43 +2013,21 @@ function switchSubject(btn, subject){
   btn.classList.add('active');
   const d = SUBJECT_DATA[subject];
   if(!d) return;
-
-  const vamWrap = document.getElementById('vam-content');
-  const nonVamWrap = document.getElementById('non-vam-content');
-
-  if(VAM_SUBJECTS.has(subject)){
-    // VAM 主體：顯示完整對賭 + 預算 + 計劃覆蓋率
-    if(vamWrap) vamWrap.style.display = '';
-    if(nonVamWrap) nonVamWrap.style.display = 'none';
-    // 更新 V1/V2/V3
-    const rows = document.querySelectorAll('.budget-summary .bs-row');
-    if(rows[0]){
-      rows[0].querySelector('.bs-meta').textContent = `¥${d.v1} 萬`;
-      rows[0].querySelector('.bs-pct').textContent = `${d.v1pct}% 鎖定`;
-      rows[0].querySelector('.bs-bar-fill').style.width = `${d.v1pct}%`;
-    }
-    if(rows[1]){
-      rows[1].querySelector('.bs-meta').textContent = `¥${d.v2} 萬`;
-      rows[1].querySelector('.bs-pct').textContent = `${d.v2pct}% 已簽`;
-      rows[1].querySelector('.bs-bar-fill').style.width = `${d.v2pct}%`;
-    }
-    if(rows[2]){
-      rows[2].querySelector('.bs-meta').textContent = `¥${d.v3} 萬`;
-      rows[2].querySelector('.bs-pct').textContent = `${d.v3pct}% 已執行`;
-      rows[2].querySelector('.bs-bar-fill').style.width = `${d.v3pct}%`;
-    }
-  } else {
-    // 非 VAM 主體：隱藏 VAM 區塊，顯示「不適用」說明
-    if(vamWrap) vamWrap.style.display = 'none';
-    if(nonVamWrap) nonVamWrap.style.display = '';
-    document.getElementById('nv-label').textContent = `${d.label} · ${d.role}`;
-    document.getElementById('nv-note').textContent = '非 VAM 對賭範圍';
-    document.getElementById('nv-desc').textContent = d.desc;
-    const link = document.getElementById('nv-link');
-    if(link){
-      link.href = d.link;
-      link.textContent = d.linkLabel + ' →';
-    }
+  const rows = document.querySelectorAll('.budget-summary .bs-row');
+  if(rows[0]){
+    rows[0].querySelector('.bs-meta').textContent = `¥${d.v1} 萬`;
+    rows[0].querySelector('.bs-pct').textContent = `${d.v1pct}% 鎖定`;
+    rows[0].querySelector('.bs-bar-fill').style.width = `${d.v1pct}%`;
+  }
+  if(rows[1]){
+    rows[1].querySelector('.bs-meta').textContent = `¥${d.v2} 萬`;
+    rows[1].querySelector('.bs-pct').textContent = `${d.v2pct}% 已簽`;
+    rows[1].querySelector('.bs-bar-fill').style.width = `${d.v2pct}%`;
+  }
+  if(rows[2]){
+    rows[2].querySelector('.bs-meta').textContent = `¥${d.v3} 萬`;
+    rows[2].querySelector('.bs-pct').textContent = `${d.v3pct}% 已執行`;
+    rows[2].querySelector('.bs-bar-fill').style.width = `${d.v3pct}%`;
   }
 }
 
