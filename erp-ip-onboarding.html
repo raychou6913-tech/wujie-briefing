@@ -7,17 +7,42 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
-  --border:#334155;--border-hi:#475569;
-  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
-  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  /* ── v4 design tokens ── */
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-deep:#1a1a1a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
+  --radius:12px;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  /* ── Legacy aliases — keep for inline HTML styles + JS var() refs ── */
+  --bg:var(--paper);
+  --surface:var(--paper);
+  --card:#fff;
+  --card2:var(--paper-soft);
+  --border:var(--line);
+  --border-hi:var(--ink-faint);
+  --txt-hi:var(--ink);
+  --txt-mid:var(--ink-mid);
+  --txt-lo:var(--ink-lo);
+  --accent:var(--brand);
+  --accent2:#cc5420;
 }
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;font-size:13px;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:8px;}
-.brand-name{font-size:13px;font-weight:700;}
+body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01";
+  letter-spacing:-.003em;min-height:100vh;padding-bottom:60px;font-size:13px;}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.brand-dot{width:5px;height:5px;border-radius:50%;background:var(--brand);margin-right:8px;}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;letter-spacing:-.04em;font-size:18px;font-weight:900;}
 .brand-sub{font-size:11px;color:var(--txt-mid);margin-left:8px;}
 .btn-sm{font-size:11px;color:var(--txt-mid);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:6px;}
 
@@ -34,7 +59,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .ip-progress strong{color:var(--ok);}
 
 .ck-list{display:flex;flex-direction:column;gap:8px;}
-.ck-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--card);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:.15s;}
+.ck-row{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--card);border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:.15s var(--ease);}
 .ck-row:hover{border-color:var(--border-hi);}
 .ck-row.done{opacity:.55;background:var(--card2);}
 .ck-row.done .ck-label{text-decoration:line-through;color:var(--txt-mid);}
