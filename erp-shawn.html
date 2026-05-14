@@ -133,6 +133,121 @@ body{
 .flash-item{padding:12px 16px;border-bottom:1px solid var(--border);}
 .flash-item:last-child{border-bottom:none;}
 .flash-top{display:flex;align-items:flex-start;gap:10px;}
+
+/* ── 進行中快閃店卡片（打平 + 日均業績）── */
+.popup-card{padding:18px 20px;}
+.popup-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;}
+.popup-icon{font-size:24px;flex-shrink:0;}
+.popup-info{flex:1;}
+.popup-name{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em;margin-bottom:3px;}
+.popup-meta{font-size:11px;color:var(--ink-mid);line-height:1.5;}
+
+.popup-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:14px;}
+.popup-kpi-cell{}
+.popup-kpi-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;
+}
+.popup-kpi-val{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin-bottom:3px;}
+.popup-kpi-val.ok{color:var(--ok);}
+.popup-kpi-val.warn{color:var(--warn);}
+.popup-kpi-sub{font-size:10px;color:var(--ink-mid);}
+
+.popup-bar-track{background:var(--line);border-radius:4px;height:4px;overflow:hidden;margin-bottom:6px;}
+.popup-bar-fill{height:100%;border-radius:4px;}
+.popup-bar-note{
+  font-family:"Noto Serif TC",serif;
+  font-size:11px;color:var(--ink-mid);letter-spacing:.02em;margin-bottom:14px;
+}
+
+.popup-detail{margin-bottom:14px;}
+.popup-detail-summary{
+  cursor:pointer;list-style:none;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  transition:opacity .2s var(--ease);
+}
+.popup-detail-summary::-webkit-details-marker{display:none;}
+.popup-detail-summary:hover{opacity:.7;}
+.popup-detail[open] .popup-detail-summary{border-bottom-color:var(--ink-faint);}
+.popup-detail-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--ink);font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.popup-detail-caret{font-size:11px;color:var(--ink-faint);transition:transform .3s var(--ease);}
+.popup-detail[open] .popup-detail-caret{transform:rotate(180deg);color:var(--brand);}
+.popup-detail-body{padding-top:14px;}
+.popup-daily-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:12px;}
+.popup-daily-cell{}
+.popup-daily-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;
+}
+.popup-daily-val{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:2px;letter-spacing:-.01em;}
+.popup-daily-val.ok{color:var(--ok);}
+.popup-daily-sub{font-size:9px;color:var(--ink-lo);}
+.popup-detail-note{
+  font-family:"Noto Serif TC",serif;
+  font-size:11px;color:var(--ink-mid);line-height:1.7;letter-spacing:.02em;
+  padding:10px 14px;background:var(--paper-soft);border-radius:8px;
+}
+
+.popup-footer{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding-top:14px;border-top:1px solid var(--line);
+}
+
+/* ── 庫存狀態 KPI 卡片（可展開摘要）── */
+.stock-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stock-kpi-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:14px 16px;
+  cursor:pointer;transition:border-color .22s var(--ease);
+}
+.stock-kpi-card:hover{border-color:var(--ink-faint);}
+.stock-kpi-card.stock-no-expand{cursor:default;}
+.stock-kpi-card.stock-no-expand:hover{border-color:var(--line);}
+.stock-kpi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.stock-kpi-label{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-lo);font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.stock-caret{font-size:10px;color:var(--ink-faint);transition:transform .3s var(--ease),color .2s var(--ease);}
+.stock-kpi-card.open .stock-caret{transform:rotate(180deg);color:var(--brand);}
+.stock-kpi-val{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+.stock-kpi-val.ok{color:var(--ok);}
+.stock-kpi-val.warn{color:var(--warn);}
+.stock-kpi-val.accent{color:var(--brand);}
+.stock-kpi-sub{font-size:10px;color:var(--ink-mid);margin-top:3px;}
+.stock-detail{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s var(--ease),padding-top .35s var(--ease);
+  padding-top:0;
+}
+.stock-kpi-card.open .stock-detail{max-height:240px;padding-top:12px;margin-top:10px;border-top:1px solid var(--line);}
+.stock-item{
+  display:grid;grid-template-columns:1fr auto auto;
+  align-items:baseline;gap:10px;
+  padding:6px 0;border-bottom:1px dashed var(--line);
+  font-size:11px;
+}
+.stock-item:last-child{border-bottom:none;}
+.si-name{color:var(--ink);font-weight:600;}
+.si-meta{font-size:10px;color:var(--ink-lo);}
+.si-val{
+  font-family:"Helvetica Neue",sans-serif;
+  font-weight:700;color:var(--ink-mid);
+}
+
+@media(max-width:720px){
+  .stock-kpi-grid{grid-template-columns:1fr;}
+  .popup-kpi-grid{grid-template-columns:1fr;}
+  .popup-daily-grid{grid-template-columns:1fr 1fr;}
+}
 .flash-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .flash-body{flex:1;min-width:0;}
 .flash-name{font-size:12px;font-weight:700;margin-bottom:2px;}
@@ -518,7 +633,80 @@ body{
 
     <!-- 銷售中 -->
     <div id="flash-active">
-      <div style="padding:24px;text-align:center;font-size:11px;color:var(--txt-lo);">目前無進行中快閃店 · Q3 泰國快閃店籌備中（見「計劃中」）</div>
+      <div class="popup-card">
+        <div class="popup-head">
+          <div class="popup-icon">🏪</div>
+          <div class="popup-info">
+            <div class="popup-name">Mofusand × Iconsiam · 曼谷</div>
+            <div class="popup-meta">2026-05-01 ~ 05-30 · 已開賣 14 天 · 還剩 16 天 · Den 負責場地</div>
+          </div>
+          <span class="chip chip-ok">營業中</span>
+        </div>
+
+        <!-- 打平 + 累計 + 進度 3 格 -->
+        <div class="popup-kpi-grid">
+          <div class="popup-kpi-cell">
+            <div class="popup-kpi-label">🎯 打平目標</div>
+            <div class="popup-kpi-val">฿ 38 萬</div>
+            <div class="popup-kpi-sub">成本 ฿ 30 萬 + 場地 ฿ 8 萬</div>
+          </div>
+          <div class="popup-kpi-cell">
+            <div class="popup-kpi-label">💰 累計營業額</div>
+            <div class="popup-kpi-val ok">฿ 22.4 萬</div>
+            <div class="popup-kpi-sub">59% 達成</div>
+          </div>
+          <div class="popup-kpi-cell">
+            <div class="popup-kpi-label">📅 距打平還差</div>
+            <div class="popup-kpi-val warn">฿ 15.6 萬</div>
+            <div class="popup-kpi-sub">剩 16 天 · 需 ฿ 0.98 萬/天</div>
+          </div>
+        </div>
+
+        <!-- 打平進度條 -->
+        <div class="popup-bar-track">
+          <div class="popup-bar-fill" style="width:59%;background:linear-gradient(90deg,#b45309,var(--warn));"></div>
+        </div>
+        <div class="popup-bar-note">打平進度 59% · 距離打平還差 41%</div>
+
+        <!-- 日均業績拆分（漸進揭露）-->
+        <details class="popup-detail">
+          <summary class="popup-detail-summary">
+            <span class="popup-detail-label">📊 日均業績拆分</span>
+            <span class="popup-detail-caret">▾</span>
+          </summary>
+          <div class="popup-detail-body">
+            <div class="popup-daily-grid">
+              <div class="popup-daily-cell">
+                <div class="popup-daily-label">平日均</div>
+                <div class="popup-daily-val">฿ 0.9 萬</div>
+                <div class="popup-daily-sub">/ 天 (週一至四)</div>
+              </div>
+              <div class="popup-daily-cell">
+                <div class="popup-daily-label">週末均</div>
+                <div class="popup-daily-val ok">฿ 2.1 萬</div>
+                <div class="popup-daily-sub">/ 天 (週五至日)</div>
+              </div>
+              <div class="popup-daily-cell">
+                <div class="popup-daily-label">最高單日</div>
+                <div class="popup-daily-val ok">฿ 2.8 萬</div>
+                <div class="popup-daily-sub">週六 5/11</div>
+              </div>
+              <div class="popup-daily-cell">
+                <div class="popup-daily-label">本週累計</div>
+                <div class="popup-daily-val">฿ 8.3 萬</div>
+                <div class="popup-daily-sub">5/5 - 5/11</div>
+              </div>
+            </div>
+            <div class="popup-detail-note">💡 週末單日營業額是平日的 2.3 倍 · 剩 16 天約含 5 個週末 + 11 個平日 · 估算達標需週末再衝 ฿ 2.4 萬/天</div>
+          </div>
+        </details>
+
+        <div class="popup-footer">
+          <span style="font-size:9px;padding:2px 7px;background:#22c55e22;color:#22c55e;border-radius:10px;font-weight:700;border:1px solid #22c55e44;">JV 持項目 · 淨利計 VAM</span>
+          <span style="font-size:9px;padding:2px 7px;background:#94a3b822;color:#94a3b8;border-radius:10px;font-weight:600;border:1px solid #94a3b844;">UJ BKK 代運營 · 收服務費</span>
+          <span style="font-size:9px;color:var(--txt-lo);margin-left:auto;">幣別：THB</span>
+        </div>
+      </div>
     </div>
 
     <!-- 計劃中 -->
@@ -649,48 +837,53 @@ body{
     </div>
   </div>
 
-  <!-- ⑤ 庫存狀態（Shawn COO 視角） -->
+  <!-- ⑤ 庫存狀態（Shawn COO 視角：3 卡片摘要可展開，明細去高維） -->
   <div style="margin-bottom:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <span style="font-size:10px;font-weight:700;color:var(--txt-mid);text-transform:uppercase;letter-spacing:.08em;">庫存狀態</span>
-      <a href="erp-gaowei.html" style="font-size:11px;color:var(--accent);font-weight:700;text-decoration:none;">高維明細 →</a>
+      <a href="erp-gaowei.html" style="font-size:11px;color:var(--brand);font-weight:700;text-decoration:none;">完整明細 → 高維物流台</a>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;">
-        <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">批發庫存貨值</div>
-        <div style="font-size:18px;font-weight:800;color:var(--warn);">¥68.4萬</div>
-        <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;">成本 · 3 款產品</div>
+    <div class="stock-kpi-grid">
+
+      <!-- 批發庫存 -->
+      <div class="stock-kpi-card" onclick="this.classList.toggle('open')">
+        <div class="stock-kpi-head">
+          <div class="stock-kpi-label">批發庫存貨值</div>
+          <span class="stock-caret">▾</span>
+        </div>
+        <div class="stock-kpi-val warn">¥ 68.4 萬</div>
+        <div class="stock-kpi-sub">成本 · 3 款產品</div>
+        <div class="stock-detail">
+          <div class="stock-item"><span class="si-name">Snoopy 夏季公仔</span><span class="si-meta">1,800 件</span><span class="si-val">¥ 32.4 萬</span></div>
+          <div class="stock-item"><span class="si-name">Mofusand 抱枕</span><span class="si-meta">920 件</span><span class="si-val">¥ 21.2 萬</span></div>
+          <div class="stock-item"><span class="si-name">Opanchu 文具組</span><span class="si-meta">2,400 套</span><span class="si-val">¥ 14.8 萬</span></div>
+        </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;">
-        <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">快閃庫存貨值</div>
-        <div style="font-size:18px;font-weight:800;color:var(--accent);">¥38.2萬</div>
-        <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;">成本 · BKK 備貨</div>
+
+      <!-- 快閃庫存 -->
+      <div class="stock-kpi-card" onclick="this.classList.toggle('open')">
+        <div class="stock-kpi-head">
+          <div class="stock-kpi-label">快閃庫存貨值</div>
+          <span class="stock-caret">▾</span>
+        </div>
+        <div class="stock-kpi-val accent">¥ 38.2 萬</div>
+        <div class="stock-kpi-sub">成本 · BKK 倉備貨</div>
+        <div class="stock-detail">
+          <div class="stock-item"><span class="si-name">Mofusand 限定（Iconsiam 用）</span><span class="si-meta">營業中</span><span class="si-val">¥ 18.6 萬</span></div>
+          <div class="stock-item"><span class="si-name">Muziktiger Q3 備貨</span><span class="si-meta">待出貨</span><span class="si-val">¥ 11.4 萬</span></div>
+          <div class="stock-item"><span class="si-name">Opanchu × Snoopy（5/22 開業）</span><span class="si-meta">已到倉</span><span class="si-val">¥ 8.2 萬</span></div>
+        </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border-hi);border-radius:12px;padding:13px 14px;">
-        <div style="font-size:10px;color:var(--txt-lo);margin-bottom:6px;">潛在收入（售完）</div>
-        <div style="font-size:18px;font-weight:800;color:var(--ok);">¥152萬</div>
-        <div style="font-size:10px;color:var(--txt-lo);margin-top:3px;">批發 + 快閃合計</div>
+
+      <!-- 潛在收入 -->
+      <div class="stock-kpi-card stock-no-expand">
+        <div class="stock-kpi-head">
+          <div class="stock-kpi-label">潛在收入（售完）</div>
+        </div>
+        <div class="stock-kpi-val ok">¥ 152 萬</div>
+        <div class="stock-kpi-sub">批發 + 快閃合計</div>
       </div>
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:7px 12px;background:var(--card2);border-bottom:1px solid var(--border);">
-        <span style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;">快閃活動</span>
-        <span style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">備貨（件）</span>
-        <span style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">已售</span>
-        <span style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">剩餘</span>
-      </div>
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;">
-        <div><div style="font-size:12px;font-weight:700;">Central World · JJK</div><div style="font-size:10px;color:var(--txt-lo);">曼谷 · 進行中</div></div>
-        <span style="font-size:12px;text-align:right;">3,200</span>
-        <span style="font-size:12px;font-weight:700;color:var(--ok);text-align:right;">2,180</span>
-        <span style="font-size:12px;font-weight:700;color:var(--warn);text-align:right;">1,020</span>
-      </div>
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:9px 12px;align-items:center;">
-        <div><div style="font-size:12px;font-weight:700;">Samyan · Muziktiger</div><div style="font-size:10px;color:var(--txt-lo);">曼谷 · 備貨中</div></div>
-        <span style="font-size:12px;text-align:right;">2,400</span>
-        <span style="font-size:12px;color:var(--txt-lo);text-align:right;">—</span>
-        <span style="font-size:12px;font-weight:700;text-align:right;">2,400</span>
-      </div>
+
     </div>
   </div>
 
