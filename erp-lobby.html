@@ -309,12 +309,16 @@ body{
 .block.done-block{opacity:.35;pointer-events:none;}
 .block.completing{animation:check-off .4s var(--ease) forwards;}
 
-/* ── PULSE STRIP ── */
-.pulse-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:48px;}
-.pulse-card{
-  background:var(--paper-soft);
-  border-radius:var(--radius);padding:14px;cursor:default;
+/* ── PULSE STRIP（公司心跳板：無 card、純資訊 banner）── */
+.pulse-strip{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:28px 48px;
+  padding:28px 0;
+  margin-bottom:48px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
 }
+.pulse-card{padding:0;cursor:default;background:transparent;border:none;}
 .pulse-label{
   font-family:"Helvetica Neue",sans-serif;
   font-size:9px;color:var(--ink-lo);font-weight:700;
@@ -322,7 +326,7 @@ body{
 }
 .pulse-val{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;}
 .pulse-sub{font-size:10px;color:var(--ink-mid);}
-.pulse-bar-track{background:var(--line);border-radius:4px;height:4px;margin-top:8px;overflow:hidden;}
+.pulse-bar-track{background:var(--line);border-radius:4px;height:2px;margin-top:10px;overflow:hidden;}
 .pulse-bar-fill{height:100%;border-radius:4px;}
 
 /* ── BOTTOM SHEET ── */
@@ -501,7 +505,6 @@ body{
         <div class="sec-title">📊 公司脈動</div>
         <div class="sec-hint">Pulse · 看 · 公司即時數字</div>
       </div>
-      <div class="sec-link" id="war-room-link" style="display:none" onclick="location.href='erp-war-room.html'">戰情室 ›</div>
     </div>
     <div class="pulse-strip">
       <div class="pulse-card" id="pulse-c1">
@@ -1039,14 +1042,10 @@ function showToast(msg){
   const el4s=document.getElementById('pulse-c4-sub');
   const el4b=document.getElementById('pulse-c4-bar');
   if(el4v){ el4v.textContent=pendingAppr+' 項'; el4v.style.color=pendingAppr>4?'var(--danger)':'var(--warn)'; }
-  if(el4s){ el4s.textContent='等待 Ray 決定'; }
   if(el4b){ el4b.style.cssText=`width:${Math.min(pendingAppr/10*100,100)}%;background:linear-gradient(90deg,#b91c1c,var(--danger))`; }
 })();
 
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
-if(WAR_ROOM_ROLES.includes(user)){
-  document.getElementById('war-room-link').style.display='block';
-}
 
 renderTodos(false);
 </script>
