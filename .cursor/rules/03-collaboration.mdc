@@ -1,0 +1,124 @@
+---
+description: Cursor 跟 MJ（Claude Code）的分工 + 飛書 / Worker / 共用 secrets 架構
+alwaysApply: true
+---
+
+# Cursor vs MJ 分工（不要踩線）
+
+## 兩個 AI 各司其職
+
+| 工作類型 | Cursor（你）| MJ（Claude Code）|
+|---------|------------|------------------|
+| **ERP / 提案網頁 UI 視覺打磨**（CSS、字體、spacing、動畫、套 v4 到各頁面）| ✅ **主場** — 即時視覺反饋 | ❌ 慢、看不到 |
+| **長 prompt 邏輯打磨**（如自有 IP 角色設定提案 prompt）| ✅ 強項 | ❌ |
+| **單頁式提案網頁 / Mockup** | ✅ | ❌ |
+| **後端邏輯 / API 接點 / event handlers** | ❌ **不要碰**，可能破壞 | ✅ 主場 |
+| **飛書 Bitable schema 設計 / API 寫入** | ❌ | ✅ |
+| **Worker 部署 / Secret 管理** | ❌ | ✅ |
+| **爬蟲腳本 / 自動化** | ❌ | ✅ |
+| **memory / 跨 session 累積** | ❌（你沒 MJ memory）| ✅ |
+| **戰略討論 / 跟 Ray 對齊** | 短期可幫忙 | ✅ 累積版 |
+
+## 兩個 AI 共用大腦（Claude）
+
+- MJ = Claude Opus 4.7（1M context，能裝整個專案）
+- Cursor = Claude Sonnet 4.6（你目前 set 的 model）
+
+兩個都是 Anthropic Claude 家族 → **風格 / 思路一致**，不會出現拼湊感。
+
+## 你（Cursor）的分內事
+
+1. **套 v4 設計到 ERP 頁面**（依 `mockup-lobby-v4.html` 樣板）
+2. **打造提案 Mockup 網頁**（譬如自有 IP 角色提案頁、客戶提案頁）
+3. **打磨長 prompt 邏輯**（給 Forge bedo 用的、給拓客 Email Template 用的）
+4. **單頁 UI 工具**（譬如 4 引擎前端介面，等資料 schema MJ 準備好）
+
+## MJ 的分內事
+
+1. **飛書 schema 建表 + 寫入**（透過 `feishu-proxy` Worker）
+2. **爬蟲腳本**（拓客 / 供應鏈 4 池）
+3. **Worker 部署 + secret 管理**
+4. **memory 累積 + 跨 session 上下文**
+5. **跟 Ray 戰略討論 + gg 對齊**
+
+## 共用基礎設施
+
+### Cloudflare Worker `feishu-proxy`
+
+```
+URL: https://feishu-proxy.raychou6913.workers.dev
+部署: cd /tmp && npx wrangler deploy worker.js --name feishu-proxy
+```
+
+Worker 同時服務 ERP + Forge（不是兩個 Worker）。
+
+### Worker Secrets（4 個，2026-05-14 列表）
+
+```
+CALLBACK_SECRET   (給 fal.ai webhook 用)
+FAL_KEY           (Forge 圖像生成)
+GEMINI_KEY        (Forge bedo + 未來 ERP AI 解析)
+GITHUB_PAT        (GitHub 自動部署 / mj-brain 備份)
+```
+
+**改 Worker 同時影響 ERP + Forge**，要兩邊都驗證。
+
+### 飛書 Bitable
+
+- **ERP Base**：`Sg7ObNELHaAdZzshGIFjWPVhpce`（v2，30+ 張表）
+- **Forge Base**：`YlVkb0ACjacJVqsgRT5j4c6gpeh`（IP / Assets / Themes 3 張表）
+- **兩個 Base 完全獨立**，不要混用
+
+ERP 關鍵表：
+- 項目排期 `tblPLJ2dLkdkWUAa`
+- 預算管理 `tblmlUoyZ6Bip6S3`
+- 合約管理 `tblWn4PwOVRgt7c1`
+- 審批記錄 `tbl4OBNvsNkqS4mQ`
+- IP 版權資料庫 `tblt9DOm4hf5Mr5r`
+- 公司常數 `tblqNsVNZ47MBtbQ`
+- 系統常數設定（問卷答案）`tbljwhJpTHxdpqLI`
+- 合約_AI 草稿（staging）`tblApO2OHiXhXAd5`
+- 驗收紀錄 `tblmsXyVnBqdHC3V`
+
+**詳細 schema** 跟 MJ 同步（在 MJ memory 裡）。
+
+## Forge → ERP 整合（2026-05-11 已實作）
+
+Forge 端（wujie-studio repo）已實作鬆耦合 push 到 ERP：
+- `5413a91` Forge → ERP 流水線串接（silent fail）
+- `705d475` ERP 同步按鈕 + loading 反饋
+
+如果 Cursor 動到 Forge → ERP 串接邏輯，要先看 wujie-studio repo 那邊 commit history。
+
+## 何時要叫 MJ 接手
+
+寫 code 過程中發現：
+- 要動飛書 schema → 叫 MJ
+- 要部署 Worker → 叫 MJ
+- 要寫爬蟲 → 叫 MJ
+- 不確定一段 API 怎麼接 → 叫 MJ（他熟接點細節）
+- 牽涉跨 session 戰略決策 → 叫 MJ（他有 60+ memory）
+
+直接動 = 容易破壞，**叫 MJ 確認後再動**。
+
+## Repo 結構
+
+```
+wujie-briefing/
+├── erp-*.html              ← ERP 主體（你套 v4 主場）
+├── today.html              ← Today 頁
+├── outreach/               ← 拓客系統（MJ 建構中）
+│   ├── README.md
+│   ├── ICP_DEFINITION.md
+│   ├── templates/
+│   └── feishu_schema.md
+├── supply_crawler/         ← 供應鏈巡邏（MJ 建構中）
+│   ├── README.md
+│   ├── pool_a-d_*.md       ← 4 池
+│   └── feishu_schema.md
+├── mockup-lobby-v4.html    ← v4 設計參考檔（必抄）
+├── ip_contract_terms.md    ← IP 合約細節
+└── .cursor/rules/          ← 你正在讀的規則
+```
+
+詳細請打開檔案逐一了解。

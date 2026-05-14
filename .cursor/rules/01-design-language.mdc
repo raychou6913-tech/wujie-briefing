@@ -1,0 +1,138 @@
+---
+description: ERP UI 設計語言 v4 — 米白底 + 橘色 accent + Helvetica/Noto Serif + 漸進揭露
+globs: *.html, *.css
+---
+
+# ERP UI 設計語言 v4（Ray 2026-05-13 拍板）
+
+## 核心哲學（4 條鐵律）
+
+1. **入口隱藏** — sidebar collapsed 88px 細條，hover 才展開到 280px
+2. **留白為主** — 沒打開就空著，不要塞滿
+3. **單聚焦** — 點什麼看什麼，其他不顯示
+4. **重要提示透過微互動透出** — 簡潔不能犧牲功能（hover 提示、徽章 fade in、警示色點）
+
+## 參考檔案（必抄）
+
+**寫任何新 ERP 頁面之前，先打開 `mockup-lobby-v4.html` 抄樣板**。不要從零自己 CSS。
+
+## 配色（CSS Variables）
+
+```css
+:root {
+  /* 文字 */
+  --ink: #0a0a0a;          /* 純黑文字 */
+  --ink-deep: #1a1a1a;
+  --ink-mid: #666;
+  --ink-lo: #999;
+  --ink-faint: #ccc;
+
+  /* 底色 */
+  --paper: #fafaf8;        /* 米白底（主要）*/
+  --paper-soft: #f2f2ef;
+  --line: #e8e8e3;
+
+  /* Brand accent — 唯一彩色 */
+  --brand: #ff6b35;        /* 橘色點綴 */
+  --brand-soft: #fff4ef;
+
+  /* Easing */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);  /* Apple iOS 同款 */
+}
+```
+
+**絕對不要用**：
+- 紫色（之前 dashboard 風，已棄用）
+- 漸層彩色（除非是 logo）
+- 暖米紅 / 正紅 / Cormorant Italic / Anton 粗體（Ray 雷區）
+
+## 字體
+
+```css
+.serif { font-family: "Noto Serif TC", Times, serif; }      /* 中文標題 */
+body { font-family: "Inter", "Helvetica Neue", "PingFang TC", sans-serif; }  /* 內文 */
+
+/* Logo / 英文大標題 */
+.logo { font-family: "Helvetica Neue", "Arial Black", sans-serif; font-weight: 900; }
+```
+
+## 字距
+
+- 英文大標題：`letter-spacing: -.04em`（緊縮，潮流感）
+- 中文標題：`letter-spacing: .18em - .3em`（寬鬆，編輯雜誌感）
+- 副標 uppercase 英文：`letter-spacing: .12em - .18em`
+
+## Sidebar 規範
+
+```css
+.sidebar {
+  width: 88px;                              /* collapsed：完整顯示 logo */
+  transition: width .42s var(--ease);
+}
+.sidebar:hover { width: 280px; }            /* expanded */
+```
+
+- Logo header：「wujie ·」(Helvetica Black 18px + 橘色圓點 5×5)
+- hover 後下方 fade in 副標「蕪 解 創 意 · ERP」（Noto Serif + .4em 字距）
+- 分群清單：分 7 群（Today / 業務 / 財務 / 開發 / 快閃店 / IP / 系統）
+- active 項目：左側 3px 橘色發光指示條
+- 待辦徽章：hover 才 fade in
+
+## 主畫面規範
+
+- `max-width: 680px` 居中
+- `padding: 100px 64px`（大量留白）
+- 頁面開頭：`page-num` 編號標記「01·」「02·」... + `page-title` 42-56px 大字 + `page-sub` 副標
+- 內容用 `.blocks` 漸進揭露結構：
+  - 每 block 預設只顯示 編號 + 標題 + 簡短 meta + ▾
+  - 點 block 才展開細節
+  - `.block.open .block-body { max-height: 500px; padding-top: 16px; }`
+
+## 字級層級（hierarchy）
+
+| 用途 | 字級 |
+|------|------|
+| Hero 主標題 | 56-64px Helvetica Black |
+| Page title | 42px Helvetica Black |
+| Section title / focus title | 22-24px |
+| Block title | 18px |
+| Body 內文 | 13-14px |
+| Caption / meta | 11px Helvetica + 字距 |
+| Eyebrow / overline | 9-10px Helvetica Bold + .16em 字距 |
+
+## 動畫節奏
+
+- sidebar 展開：`.42s var(--ease)`
+- hover 反應：`.3s var(--ease)`
+- fade-in / out：`.25s var(--ease)`
+- 切換頁面：`fadeUp .55s var(--ease)`
+
+## Logo 規範
+
+「**wujie**」（小寫 Helvetica Black）+ 橘色圓點：
+
+- collapsed sidebar：18px 字 + 5px dot
+- 大頁面 hero / cover：可放大到 22-280px
+- 必加 `white-space: nowrap` 防換行
+- 中文副標「蕪解創意」只在 hover 或大區塊時 fade in
+
+## 微互動規範（功能性提示）
+
+「ERP 該有的重要提示要顯現出來，在保有簡潔的情況下」：
+
+- **重要徽章**（待辦數字、警示）→ collapsed 時隱藏，hover 才 fade in
+- 滑鼠移到 todo 卡片 → 浮起 + 「→」箭頭右移
+- 緊急項目 → 左邊用紅色 3px 細條（不是大塊紅色填充）
+- 數字變化 → 平滑 transition，不閃跳
+- 「今天最重要 1 件事」永遠在主畫面 hero 下方
+
+## 套用順序（你套用 v4 到各頁面時的優先級）
+
+1. erp-lobby.html（最頻繁用）
+2. today.html
+3. erp-war-room.html（戰情室）
+4. erp-budget-planner.html（**注意**：邏輯複雜，先別大改，只動 UI 殼）
+5. 各廳：anran / shawn / procurement / crm / finance / yangzi / leo
+6. 其他輔助頁
+
+詳見 `04-dont-touch.mdc`。

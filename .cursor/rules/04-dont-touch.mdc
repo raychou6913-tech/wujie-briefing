@@ -1,0 +1,99 @@
+---
+description: 哪些檔案 / 邏輯 Cursor 不要亂動 — 動了會破壞核心功能
+alwaysApply: true
+---
+
+# 不要動的清單
+
+## 完全不要動
+
+### 1. `.claude/` 資料夾
+- MJ（Claude Code）的設定 + permission allowlist
+- **不要動**，動了 MJ 的工具權限會壞
+
+### 2. `.cursor/rules/*.mdc`
+- 你正在讀的規則（除非 Ray 明確要你改）
+
+### 3. `outreach/` + `supply_crawler/` 的 schema 文件
+- MJ 正在建構 4 引擎，schema 是設計討論結果
+- 動 UI 預覽可以，**動 schema 設計要先問 MJ**
+
+### 4. 飛書 Worker 程式碼
+- Worker 程式碼在 `/tmp/worker.js`（不在 repo 內）
+- 部署透過 MJ 跑 `wrangler deploy`
+- **Cursor 不要試圖改 Worker**
+
+### 5. CLAUDE.md
+- 是 MJ 的工作說明書
+- 動了 MJ 開工會讀錯
+
+---
+
+## 注意動的（先問 MJ）
+
+### 1. `erp-budget-planner.html` 的計算邏輯
+
+複雜邏輯：
+- `IP_MASTER` 物件（5 個 IP 的版稅 / MG / 結算規則）
+- `COMPANY_CONSTANTS`（防偽標 / 雲倉費等公司級常數）
+- `_pkgUnit() / _logUnit()` 變動成本算法
+- `unitEcon()` 單件損益試算
+- `loadProjectsForLink()` 拓客系統 helper
+- `IP_COLOR_MAP` 顏色對照
+
+**只動 UI 殼（CSS / 排版）、不動算法 + 不動 `prods` 資料模型**。
+
+### 2. `erp-war-room.html` 的飛書接點
+
+- `loadApprovals()` → 接 `tbl4OBNvsNkqS4mQ` 審批記錄
+- `loadVAM()` → 接 `tblmlUoyZ6Bip6S3` 預算管理，算 VAM 進度
+- `loadCashflow()`, `loadPipeline()`, `loadBudgetKPI()` 等 async 函式
+
+**這些 fetch 邏輯不要動**，只改 UI 殼。
+
+### 3. `today.html` 的 `buildTodayData()`
+
+從飛書 3 張表（審批 / 項目 / 設計送審）組裝 todo / rels / waiting / numbers。
+動了會破壞 today 頁的真實資料 render。
+
+### 4. 各廳的「費用申請」FAB modal
+
+`erp-anran / erp-yangzi / erp-crm / erp-shetong / erp-gaowei` 都有費用申請 modal，含必選「對應項目」+ 寫入飛書「審批記錄」邏輯。
+
+**不要動 modal 表單欄位 + 不要動 `_writeApproval()` 寫入邏輯**。
+
+### 5. `erp-procurement.html` 的驗收登錄 modal
+
+寫入飛書「驗收紀錄」`tblmsXyVnBqdHC3V` 邏輯。
+
+### 6. `erp-project-new.html` 的 4 種 type 分流
+
+URL `?type=wholesale/popup/odm/service` 切換 step 2 表單 + `confirmAdd()` 寫入飛書「項目排期」邏輯。
+
+---
+
+## 一律先問 MJ 才動
+
+任何時候你打算：
+1. 改飛書 schema（加 / 改 / 刪欄位）
+2. 加新表 / 新 Base / 新 Worker endpoint
+3. 改現有 fetch / 寫入邏輯
+4. 動 `outreach/` 或 `supply_crawler/` 的 schema 設計
+5. 動 IP / 合約 / VAM / 法人架構相關計算
+6. 動 `_PROXY` 或 `_AT` 等核心常數
+
+→ **先在 chat 問 Ray**：「我打算改 X，這會影響到 MJ 的後端嗎？」
+
+---
+
+## 安全可動的清單
+
+- 純 CSS / spacing / 字體 / 顏色（如不違反 v4 設計語言）
+- 新建獨立檔案（不依賴現有邏輯）
+- 文案修改（依 `02-terminology.mdc` 規範）
+- 新增 Mockup 頁面
+- 新增 outreach Email Template 草稿（不動 schema）
+
+---
+
+**核心原則**：能改 UI 殼，不要動骨架（資料模型 / API 接點 / 算法）。骨架歸 MJ 管。
