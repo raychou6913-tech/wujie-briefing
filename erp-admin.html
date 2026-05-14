@@ -6,20 +6,45 @@
 <title>蕪解 ERP · 系統管理</title>
 <style>
 :root{
-  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
-  --border:#334155;--border-hi:#475569;
-  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
-  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  /* ── v4 design tokens ── */
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-deep:#1a1a1a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
+  --radius:12px;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  /* ── Legacy aliases — keep for inline HTML styles + JS var() refs ── */
+  --bg:var(--paper);
+  --surface:var(--paper);
+  --card:#fff;
+  --card2:var(--paper-soft);
+  --border:var(--line);
+  --border-hi:var(--ink-faint);
+  --txt-hi:var(--ink);
+  --txt-mid:var(--ink-mid);
+  --txt-lo:var(--ink-lo);
+  --accent:var(--brand);
+  --accent2:#cc5420;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01";
+  letter-spacing:-.003em;min-height:100vh;padding-bottom:60px;}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .brand{display:flex;align-items:center;gap:10px;}
-.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
-.brand-name{font-size:14px;font-weight:700;}
+.brand-dot{width:5px;height:5px;border-radius:50%;background:var(--brand);}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;letter-spacing:-.04em;font-size:18px;font-weight:900;}
 .brand-sub{font-size:10px;color:var(--txt-mid);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .sess-info{font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:6px;}
@@ -32,14 +57,14 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* TABS */
 .tab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;}
-.tab{font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px 8px 0 0;cursor:pointer;color:var(--txt-mid);border:1px solid transparent;border-bottom:none;margin-bottom:-1px;transition:all .15s;}
+.tab{font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px 8px 0 0;cursor:pointer;color:var(--txt-mid);border:1px solid transparent;border-bottom:none;margin-bottom:-1px;transition:all .15s var(--ease);}
 .tab.active{background:var(--card);border-color:var(--border);border-bottom-color:var(--card);color:var(--txt-hi);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
 /* SECTION */
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-title{font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--ink-faint);text-transform:uppercase;}
 
 /* USER TABLE */
 .user-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
@@ -59,7 +84,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .chip-grey{background:var(--card2);color:var(--txt-mid);}
 
 /* MODULE TOGGLES */
-.mod-toggle{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none;}
+.mod-toggle{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s var(--ease);user-select:none;}
 .mod-toggle.on{background:var(--ok-dim);border-color:#22c55e40;color:var(--ok);}
 .mod-toggle.off{background:transparent;color:var(--txt-lo);}
 .mod-toggle:hover{border-color:var(--border-hi);}
