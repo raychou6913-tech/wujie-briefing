@@ -6,20 +6,44 @@
 <title>蕪解 ERP · 物流更新</title>
 <style>
 :root{
-  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
-  --border:#334155;--border-hi:#475569;
-  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
+  /* ── v4 design tokens ── */
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-deep:#1a1a1a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
   --ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
-  --accent:#818cf8;
+  --radius:12px;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  /* ── Legacy aliases — keep for inline HTML styles + JS var() refs ── */
+  --bg:var(--paper);
+  --surface:var(--paper);
+  --card:#fff;
+  --card2:var(--paper-soft);
+  --border:var(--line);
+  --border-hi:var(--ink-faint);
+  --txt-hi:var(--ink);
+  --txt-mid:var(--ink-mid);
+  --txt-lo:var(--ink-lo);
+  --accent:var(--brand);
+  --accent2:#cc5420;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;}
+body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01";
+  letter-spacing:-.003em;min-height:100vh;}
 
 /* TOPBAR */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;}
-.brand-name{font-size:14px;font-weight:700;}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;letter-spacing:-.04em;font-size:18px;font-weight:900;}
 .topbar-right{display:flex;gap:8px;align-items:center;}
 .btn-sm{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);text-decoration:none;cursor:pointer;}
 .btn-sm:hover{color:var(--txt-hi);border-color:var(--border-hi);}
@@ -29,7 +53,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .selector{padding:16px;}
 .sel-label{font-size:10px;font-weight:700;color:var(--txt-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
 .sel-list{display:flex;flex-direction:column;gap:6px;}
-.sel-item{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:12px;}
+.sel-item{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s var(--ease);display:flex;align-items:center;gap:12px;}
 .sel-item:active{background:var(--card2);}
 .sel-item.selected{border-color:var(--ok);}
 .sel-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
@@ -82,7 +106,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .confirm-title{font-size:16px;font-weight:800;text-align:center;margin-bottom:6px;}
 .confirm-sub{font-size:12px;color:var(--txt-mid);text-align:center;margin-bottom:20px;line-height:1.5;}
 .confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.cbtn{padding:14px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s;}
+.cbtn{padding:14px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s var(--ease);}
 .cbtn:active{opacity:.8;}
 .cbtn-ok{background:var(--ok);color:#fff;}
 .cbtn-cancel{background:var(--card2);color:var(--txt-mid);}
