@@ -6,21 +6,46 @@
 <title>蕪解 ERP · 採購台</title>
 <style>
 :root{
-  --bg:#0f172a;--surface:#1e293b;--card:#263349;--card2:#2d3a52;
-  --border:#334155;--border-hi:#475569;
-  --txt-hi:#f1f5f9;--txt-mid:#94a3b8;--txt-lo:#64748b;
-  --accent:#818cf8;--ok:#22c55e;--ok-dim:#22c55e18;
+  /* ── v4 design tokens ── */
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-deep:#1a1a1a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ok:#22c55e;--ok-dim:#22c55e18;
   --warn:#f59e0b;--warn-dim:#f59e0b18;
   --danger:#ef4444;--danger-dim:#ef444418;
+  --radius:12px;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  /* ── Legacy aliases — keep for inline HTML styles + JS var() refs ── */
+  --bg:var(--paper);
+  --surface:var(--paper);
+  --card:#fff;
+  --card2:var(--paper-soft);
+  --border:var(--line);
+  --border-hi:var(--ink-faint);
+  --txt-hi:var(--ink);
+  --txt-mid:var(--ink-mid);
+  --txt-lo:var(--ink-lo);
+  --accent:var(--brand);
+  --accent2:#cc5420;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px;}
+body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01";
+  letter-spacing:-.003em;min-height:100vh;padding-bottom:60px;}
 
 /* TOPBAR */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar{background:var(--paper);border-bottom:1px solid var(--line);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .brand{display:flex;align-items:center;gap:10px;}
-.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);box-shadow:0 0 6px var(--warn);}
-.brand-name{font-size:14px;font-weight:700;}
+.brand-dot{width:5px;height:5px;border-radius:50%;background:var(--brand);}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;letter-spacing:-.04em;font-size:18px;font-weight:900;}
 .brand-sub{font-size:10px;color:var(--txt-mid);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .sess-info{font-size:11px;color:var(--txt-mid);display:flex;align-items:center;gap:6px;}
@@ -37,12 +62,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 /* SECTION HEADER */
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 10px;}
 .sec-head:first-child{margin-top:0;}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt-mid);text-transform:uppercase;}
+.sec-title{font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--ink-faint);text-transform:uppercase;}
 .sec-link{font-size:10px;color:var(--accent);text-decoration:none;}
 
 /* KPI GRID */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
-.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.kpi-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
 .kpi-label{font-size:9px;color:var(--txt-mid);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
 .kpi-val{font-size:30px;font-weight:800;line-height:1;margin-bottom:4px;}
 .kpi-sub{font-size:10px;color:var(--txt-lo);}
@@ -57,7 +82,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .chip-done{background:var(--ok-dim);color:var(--ok);}
 
 /* PROCUREMENT LIST */
-.po-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
+.po-card{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s;}
 .po-card:hover{border-color:var(--border-hi);}
 .po-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;}
 .po-star{font-size:14px;flex-shrink:0;}
@@ -67,7 +92,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .po-right{text-align:right;flex-shrink:0;}
 .po-amt{font-size:15px;font-weight:800;margin-bottom:3px;}
 .po-person{font-size:9px;color:var(--txt-lo);}
-.po-toggle{font-size:11px;color:var(--accent);padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border-hi);margin-left:8px;flex-shrink:0;font-weight:700;cursor:pointer;transition:color .15s,border-color .15s;}
+.po-toggle{font-size:11px;color:var(--accent);padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border-hi);margin-left:8px;flex-shrink:0;font-weight:700;cursor:pointer;transition:color .15s,border-color .15s var(--ease);}
 .po-toggle:hover{color:var(--txt-hi);border-color:var(--accent);}
 .po-toggle.open{color:var(--txt-mid);}
 
@@ -134,7 +159,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .ai-panel-title{font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;}
 .ai-badge{background:#818cf820;border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
 .ai-panel-body{padding:16px;}
-.upload-zone{border:2px dashed var(--border-hi);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:.15s;}
+.upload-zone{border:2px dashed var(--border-hi);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:.15s var(--ease);}
 .upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--card2);}
 .upload-icon{font-size:36px;margin-bottom:8px;}
 .upload-title{font-size:14px;font-weight:700;margin-bottom:5px;}
@@ -173,7 +198,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* PO FILTER */
 .po-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.po-filter-tab{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;transition:all .15s;}
+.po-filter-tab{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--txt-mid);cursor:pointer;transition:all .15s var(--ease);}
 .po-filter-tab:hover{border-color:var(--border-hi);color:var(--txt-hi);}
 .po-filter-tab.active{background:var(--card2);color:var(--txt-hi);border-color:var(--border-hi);}
 .po-filter-tab.danger-tab.active{background:var(--danger-dim);color:var(--danger);border-color:var(--danger);}
@@ -202,12 +227,12 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 .qform-field{display:flex;flex-direction:column;gap:4px;}
 .qform-label{font-size:9px;font-weight:700;color:var(--txt-mid);letter-spacing:.05em;}
 .qform-label .req{color:var(--danger);}
-.qform-input,.qform-select,.qform-textarea{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);font-size:12px;padding:8px 10px;outline:none;font-family:inherit;transition:border-color .15s;}
+.qform-input,.qform-select,.qform-textarea{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--txt-hi);font-size:12px;padding:8px 10px;outline:none;font-family:inherit;transition:border-color .15s var(--ease);}
 .qform-input:focus,.qform-select:focus,.qform-textarea:focus{border-color:var(--accent);}
 .qform-input.filled{border-color:#22c55e30;background:#22c55e06;}
 .qform-textarea{resize:vertical;min-height:60px;}
 .qform-footer{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
-.btn-qsave{flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.btn-qsave{flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s var(--ease);}
 .btn-qsave:hover{opacity:.88;}
 .btn-qcancel{background:var(--card);color:var(--txt-mid);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;}
 .ai-source-banner{background:#818cf812;border:1px solid #818cf828;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:10px;color:var(--txt-mid);display:flex;align-items:flex-start;gap:7px;}
@@ -215,7 +240,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:-apple-system,BlinkMac
 
 /* QUOTES LIST */
 .quotes-list{margin-top:16px;}
-.quote-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;transition:border-color .15s;}
+.quote-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;transition:border-color .15s var(--ease);}
 .quote-item:hover{border-color:var(--border-hi);}
 .quote-item-body{flex:1;min-width:0;}
 .quote-item-name{font-size:12px;font-weight:700;margin-bottom:3px;}
