@@ -190,7 +190,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 
   <!-- Greeting -->
   <div class="greet">
-    <div class="greet-hi" id="greet-hi">楊子，今天有 — 件事要處理</div>
+    <div class="greet-hi" id="greet-hi">—</div>
     <div class="greet-sub" id="greet-sub"></div>
     <div class="greet-badges" id="greet-badges"></div>
   </div>
@@ -827,9 +827,10 @@ function render(){
   // Greeting
   const pending = inbox.length;
   const urgent = inbox.filter(i=>i.urgency==='high').length;
+  const _greetName = SESS ? SESS.name : '';
   document.getElementById('greet-hi').textContent = pending===0
-    ? '楊子，今天沒有待審核的申請 ✨'
-    : `楊子，你有 ${pending} 件申請待審核`;
+    ? `${_greetName}，今天沒有待審核的申請 ✨`
+    : `${_greetName}，你有 ${pending} 件申請待審核`;
   document.getElementById('greet-sub').textContent = urgent>0
     ? `其中 ${urgent} 件需要優先處理`
     : '目前進度順暢';

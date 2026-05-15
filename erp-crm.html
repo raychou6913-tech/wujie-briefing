@@ -565,80 +565,8 @@ function fmtDate(str){
   return {label:`${d.getMonth()+1}/${d.getDate()}`, cls:'soon'};
 }
 
-// ── 渲染 ──
-function renderLists(){
-  const clients = loadClients();
-  const today = todayStr();
-  const myUser = SESS ? SESS.user : null;
-
-  // 過濾：業務只看自己的，管理層看全部
-  const MGMT = ['ray','shawn','anran','yuming'];
-  const mine = (myUser && !MGMT.includes(myUser))
-    ? clients.filter(c => c.owner === myUser)
-    : clients;
-
-  const todayItems = mine.filter(c => c.remind <= today);
-  const upcoming = mine.filter(c => c.remind > today).sort((a,b)=>a.remind.localeCompare(b.remind));
-
-  document.getElementById('today-count').textContent = todayItems.length;
-  document.getElementById('upcoming-count').textContent = upcoming.length;
-
-  // TODAY SUB TEXT
-  const name = SESS ? SESS.name : '—';
-  const d = new Date();
-  const weekdays = ['日','一','二','三','四','五','六'];
-  document.getElementById('today-date').textContent = `${d.getMonth()+1}月${d.getDate()}日 星期${weekdays[d.getDay()]}`;
-  document.getElementById('today-greeting').textContent = `${name}，你今天有 ${todayItems.length} 個客戶要跟進`;
-  document.getElementById('today-sub').textContent = todayItems.length
-    ? todayItems.map(c=>c.name.split('（')[0]).join('、')
-    : '今天暫無跟進，可以新增拜訪記錄或安排下一步';
-
-  renderCards(todayItems, 'today-list', true);
-  renderCards(upcoming, 'upcoming-list', false);
-}
-
-function renderCards(list, containerId, isUrgent){
-  const el = document.getElementById(containerId);
-  if(!list.length){
-    el.innerHTML = `<div style="font-size:12px;color:var(--txt-lo);padding:12px 0">${isUrgent?'今天沒有待跟進項目 ✅':'—'}</div>`;
-    return;
-  }
-  el.innerHTML = list.map(c => {
-    const when = fmtDate(c.remind);
-    const histHtml = (c.history||[]).slice(0,3).map(h=>`
-      <div class="fu-hist-item">
-        <div class="fh-dot" style="background:var(--accent)"></div>
-        <div class="fh-text">${h.type}：${h.text}</div>
-        <div class="fh-date">${h.date}</div>
-      </div>`).join('');
-    const urgentClass = when.cls==='overdue'?'urgent':when.cls==='today'?'today':'';
-    return `
-    <div class="fu-card ${urgentClass}">
-      <div class="fu-header" onclick="toggleCard(this)">
-        <div class="fu-urgency" style="background:${when.cls==='overdue'?'var(--danger)':when.cls==='today'?'var(--warn)':'var(--ok)'}"></div>
-        <div class="fu-av" style="background:${c.color}">${[...c.name][0]}</div>
-        <div class="fu-body">
-          <div class="fu-name">${c.name} <span class="chip ${intentChip(c.intent)}">${c.intent}</span></div>
-          <div class="fu-action">${c.nextAction||'—'}</div>
-        </div>
-        <div class="fu-right">
-          <div class="fu-when ${when.cls}">${when.label}</div>
-          <div class="fu-handler">${ownerName(c.owner)}</div>
-        </div>
-      </div>
-      <div class="fu-detail">
-        <div class="fu-notes">${c.notes||'—'}</div>
-        ${histHtml ? `<div style="font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">過往記錄</div><div class="fu-hist">${histHtml}</div>` : ''}
-        <div class="fu-actions">
-          <button class="fa-btn fa-ok" onclick="markDone(${c.id})">✓ 已跟進，更新記錄</button>
-          <button class="fa-btn fa-crm" onclick="openLogModalFor('${c.name}')">+ 記錄本次拜訪</button>
-          ${c.owner==='laodong'||c.owner==='debao' ? `<button class="fa-btn fa-warn" onclick="notifyAnran('${c.name}')">→ 通知安然</button>` : ''}
-          <button class="fa-btn fa-grey" onclick="openLogModalFor('${c.name}')">改提醒日期</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
+// renderLists() / renderCards() 已拿掉
+// 「今天要跟進 / 即將到期」是個人化內容，已搬大廳「我的客戶」section
 
 function intentChip(intent){
   const map = {'初接觸':'chip-grey','有意向':'chip-info','報價中':'chip-warn','即將成交':'chip-crm','已成交':'chip-ok','暫不考慮':'chip-danger'};
@@ -718,7 +646,6 @@ function saveLog(){
   }
   saveClients(clients);
   closeModal('log-modal');
-  renderLists();
   showToast(notify ? `✅ 記錄已存 · 已通知${notify}` : '✅ 記錄已存');
 }
 
@@ -742,7 +669,6 @@ function saveNewClient(){
   });
   saveClients(clients);
   closeModal('add-modal');
-  renderLists();
   showToast('✅ 客戶已建立');
 }
 
@@ -890,7 +816,7 @@ function submitSellThru(){
   document.getElementById('st-sold').value='';
   document.getElementById('st-notes').value='';
   renderSellThruLog();
-  showToast(`✅ 已回報 ${client.split('（')[0]} · ${product} → 安然可見`);
+  showToast(`✅ 已回報 ${client.split('（')[0]} · ${product}`);
 }
 
 function renderSellThruLog(){
@@ -913,10 +839,8 @@ function renderSellThruLog(){
 }
 
 // Init
-renderLists();
 renderMyKPI();
 renderMyProductOrders();
-renderSellThruLog();
 </script>
 
 <!-- ── EXPENSE FAB (removed) ── -->
