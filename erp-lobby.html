@@ -636,7 +636,18 @@ body{
       </div>
     </div>
 
-    <!-- MY WORK (非業務角色的個人動作 quick actions) -->
+    <!-- YUMING INBOX (躍明專屬：待入帳 / 跨境結算 / 跨實體核銷)-->
+    <div id="ym-inbox-section" style="display:none">
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">📋 我的待入帳</div>
+          <div class="sec-hint">My Pending · 做 · 楊子/Leo 送來的款項確認入帳</div>
+        </div>
+      </div>
+      <div id="ym-inbox-list" class="blocks"></div>
+    </div>
+
+    <!-- MY WORK (其他非業務角色的個人動作 quick actions) -->
     <div id="my-work-section" style="display:none">
       <div class="sec-hdr">
         <div>
@@ -930,11 +941,12 @@ function buildSidebar(){
   }
 
   // Build hall groups dynamically
-  // ⚠️ Today 群已顯示「我的工作台」連結（line 736），業務群裡跳過 effectiveHall 避免重複
+  // 「我的工作台」連結已拿掉（大廳就是工作台），不再 exclude effectiveHall
+  // 否則躍明在大廳會看不到「財務中心」入口（被 filter 掉自己 hall）
   const SB_GROUP_ORDER = ['業務','財務','開發','快閃店','IP'];
   const container = document.getElementById('sb-hall-groups');
   SB_GROUP_ORDER.forEach(grp => {
-    const halls = HALLS.filter(h => h.sbGroup === grp && h.roles.includes(user) && h.href !== effectiveHall);
+    const halls = HALLS.filter(h => h.sbGroup === grp && h.roles.includes(user));
     if(!halls.length) return;
     const grpDiv = document.createElement('div');
     grpDiv.className = 'sb-group';
@@ -1114,11 +1126,7 @@ const MY_WORK = {
     {icon:'🏦', title:'銀行對帳', sub:'國泰 / 台新 / 玉山餘額更新',           href:'erp-yangzi.html?entity=tw#bank'},
     {icon:'💰', title:'薪資發放', sub:'台灣團隊薪資',                         href:'erp-yangzi.html?entity=tw#payroll'},
   ],
-  yuming: [
-    {icon:'＋', title:'錄入帳',   sub:'楊子/Leo 送來的款項入帳',              href:'erp-finance.html#tab-pending'},
-    {icon:'📊', title:'月結核對', sub:'損益表 / 跨境結算 / 帳款對齊',         href:'erp-finance.html#tab-pl'},
-    {icon:'💸', title:'跨境結算', sub:'北京→香港 / 北京→台灣 月度結算',       href:'erp-finance.html#tab-cash'},
-  ],
+  // yuming 不走 MY_WORK quick action grid（用下方 ym-inbox-section inline 處理）
   anran: [
     {icon:'📜', title:'合約待批', sub:'授權續簽 / 新合約審查',                href:'erp-anran.html#contracts'},
     {icon:'💸', title:'跨境款項', sub:'北京 → 香港 / 北京 → 台灣 確認',       href:'erp-anran.html#xborder'},
@@ -1178,6 +1186,56 @@ if(myWork && myWork.length){
       </a>
     `).join('');
   }
+}
+
+// ── 躍明的待入帳 inbox（個人動作在大廳完成，不跳財務中心）──
+if(user === 'yuming'){
+  const sec = document.getElementById('ym-inbox-section');
+  const list = document.getElementById('ym-inbox-list');
+  if(sec && list){
+    sec.style.display = '';
+    // 讀 yuming_pending_v1 localStorage（楊子/Leo 確認付款後寫進來）+ demo data
+    const arr = JSON.parse(localStorage.getItem('yuming_pending_v1')||'[]');
+    const DEMO = [
+      {id:'d1', title:'安然廳 · 北京倉儲費', from:'安然', date:'2026-05-01', approver:'Ray', ccy:'CNY', amount:8500,  note:'4月北京倉儲+物流費用'},
+      {id:'d2', title:'採購台 · 吉依卡哇打樣費（第二批）', from:'賴哥', date:'2026-04-28', approver:'Ray', ccy:'CNY', amount:12000, note:'第二批打樣，含盲袋模具修改'},
+      {id:'d3', title:'CRM · 廣州展展位費', from:'老董', date:'2026-04-25', approver:'Ray', ccy:'HKD', amount:6800,  note:'2026 廣州展位訂金'},
+      {id:'d4', title:'Shawn 廳 · 曼谷快閃場地費（5月）', from:'Shawn', date:'2026-04-30', approver:'Ray', ccy:'THB', amount:85000, note:'Siam Paragon 5月場地費'},
+    ];
+    const all = arr.length ? arr : DEMO;
+    if(!all.length){
+      list.innerHTML = '<div class="empty-state" style="padding:14px;color:var(--ink-lo);font-size:12px;">目前沒有待入帳款項 ✨</div>';
+    } else {
+      const ccySym = {CNY:'¥', HKD:'HK$', THB:'฿', TWD:'NT$', USD:'$'};
+      list.innerHTML = all.map((r,i) => {
+        const numStr = String(i+1).padStart(2,'0');
+        const amt = (ccySym[r.ccy]||r.ccy)+' '+Number(r.amount||0).toLocaleString();
+        return `<div class="block" onclick="toggleBlock(this)">
+          <div class="block-head">
+            <div class="block-num">${numStr}</div>
+            <div class="block-title">${r.title}</div>
+            <div class="block-meta"><span style="color:var(--brand);font-weight:700;">${amt}</span> · ${r.from} · ${r.date}</div>
+            <div class="block-toggle">▾</div>
+          </div>
+          <div class="block-body">
+            <div class="block-body-inner">
+              <div style="margin-bottom:8px;">${r.note||'—'}</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button onclick="event.stopPropagation();ymConfirm('${r.id||''}','${r.title.replace(/'/g,"")}')" style="padding:8px 14px;border-radius:8px;background:var(--brand);color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 確認入帳</button>
+                <button onclick="event.stopPropagation();ymReject('${r.id||''}')" style="padding:8px 14px;border-radius:8px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">退回</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+function ymConfirm(id, title){
+  showQaToast(`✓ 已入帳：${title}`);
+}
+function ymReject(id){
+  showQaToast(`已退回，請補單據`);
 }
 
 const myCustomers = MY_CUSTOMERS[user];
