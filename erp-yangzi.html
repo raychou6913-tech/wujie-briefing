@@ -230,9 +230,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
   </div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;">
     <div class="ent-tabs" style="padding:12px 12px 10px;" id="opex-ent-tabs">
-      <button class="ent-tab active" onclick="setOpexEnt('北京蕪解',this)">北京蕪解</button>
-      <button class="ent-tab" onclick="setOpexEnt('台灣悍草',this)">台灣悍草</button>
-      <button class="ent-tab" onclick="setOpexEnt('UJ BKK',this)">UJ BKK</button>
+      <button class="ent-tab" data-ent="北京蕪解" onclick="setOpexEnt('北京蕪解',this)">北京蕪解</button>
+      <button class="ent-tab" data-ent="台灣悍草" onclick="setOpexEnt('台灣悍草',this)">台灣悍草</button>
+      <button class="ent-tab" data-ent="UJ BKK" onclick="setOpexEnt('UJ BKK',this)">UJ BKK</button>
     </div>
     <div class="opex-wrap"><table class="opex-table" id="opex-table"></table></div>
   </div>
@@ -641,7 +641,9 @@ const PAYROLL_KEY_DETAIL = 'yangzi_payroll_detail_v1';
 function loadPayrollDetail(){ return JSON.parse(localStorage.getItem(PAYROLL_KEY_DETAIL)||'null'); }
 function savePayrollDetail(d){ localStorage.setItem(PAYROLL_KEY_DETAIL, JSON.stringify(d)); }
 
-let currentOpexEntity = '北京蕪解';
+// 入口 entity：?entity=tw → 台灣悍草（Leo 視角，5/14 Leo 廳合併進 yangzi）
+const ENTRY_ENTITY = (new URLSearchParams(location.search).get('entity')==='tw') ? '台灣悍草' : '北京蕪解';
+let currentOpexEntity = ENTRY_ENTITY;
 const opexOpenRows = new Set();
 
 function setOpexEnt(ent, btn){
@@ -957,6 +959,17 @@ function showToast(msg){
   const el=document.getElementById('toast');
   el.textContent=msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// entity tab 初始 active：依 ?entity= 套對應 button
+document.querySelectorAll('#opex-ent-tabs .ent-tab').forEach(b=>{
+  b.classList.toggle('active', b.dataset.ent === ENTRY_ENTITY);
+});
+// Leo 視角：topbar 標示
+if(ENTRY_ENTITY === '台灣悍草'){
+  const tbTitle = document.querySelector('.tb-title');
+  if(tbTitle) tbTitle.textContent = '🏦 HR · 出納（台灣）';
+  document.title = '蕪解 ERP · HR · 出納（台灣）';
 }
 
 render();

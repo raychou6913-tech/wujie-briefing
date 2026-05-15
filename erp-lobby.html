@@ -585,6 +585,18 @@ body{
       </div>
     </div>
 
+    <!-- MY CUSTOMERS (業務角色才顯示) -->
+    <div id="my-customers-section" style="display:none">
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">🎯 我的客戶</div>
+          <div class="sec-hint">My Customers · 看 · 我負責的訂單</div>
+        </div>
+        <a href="erp-crm.html" class="sec-link" style="text-decoration:none;">業務中心 ›</a>
+      </div>
+      <div class="blocks" id="my-customers-list"></div>
+    </div>
+
     <!-- ANNOUNCEMENTS -->
     <div class="sec-hdr">
       <div>
@@ -888,6 +900,49 @@ const MY_TODOS = {
 
 const doneSet = new Set(JSON.parse(localStorage.getItem('lobby_done_'+user)||'[]'));
 const todos = MY_TODOS[user] || [];
+
+// ── My Customers (個人化客戶 view) ─────────────────────
+const MY_CUSTOMERS = {
+  laodong: [
+    {client:'廣州名創優品',  product:'Snoopy 夏季',  amt:'¥ 42 萬',  status:'全款已收 ✓', tone:'ok'},
+    {client:'北京華糖',      product:'Snoopy 夏季',  amt:'¥ 65 萬',  status:'全款已收 ✓', tone:'ok'},
+    {client:'首爾 SMTOWN',  product:'Snoopy 夏季',  amt:'待報價',   status:'樣品確認中',  tone:'grey'},
+  ],
+  debao: [
+    {client:'上海萌趣文化',  product:'Mofusand',     amt:'¥ 17.6 萬', status:'訂金已收，待尾款', tone:'warn'},
+    {client:'深圳 LOG-ON',  product:'Opanchu',      amt:'¥ 18 萬',   status:'⚠ 尾款逾期 3 天',  tone:'danger'},
+  ],
+  anran: [
+    {client:'深圳 LOG-ON',  product:'Snoopy 夏季',  amt:'¥ 199 萬', status:'30% 訂金已收',     tone:'warn'},
+    {client:'泡泡瑪特華東', product:'Snoopy 夏季',  amt:'¥ 21 萬',  status:'全款已收 ✓',       tone:'ok'},
+  ],
+  peilin: [
+    {client:'台北誠品',      product:'Mofusand',     amt:'—',         status:'授權確認中',       tone:'grey'},
+  ],
+};
+const myCustomers = MY_CUSTOMERS[user];
+if(myCustomers && myCustomers.length){
+  const sec = document.getElementById('my-customers-section');
+  const list = document.getElementById('my-customers-list');
+  if(sec && list){
+    sec.style.display = '';
+    const toneColor = {ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)', grey:'var(--ink-lo)'};
+    list.innerHTML = myCustomers.map((c, i) => {
+      const numStr = String(i+1).padStart(2,'0');
+      return `<div class="block" onclick="toggleBlock(this)">
+        <div class="block-head">
+          <div class="block-num">${numStr}</div>
+          <div class="block-title">${c.client} · <span style="color:var(--ink-mid);font-weight:500;">${c.product}</span></div>
+          <div class="block-meta"><span style="color:${toneColor[c.tone]||'var(--ink-mid)'};font-weight:700;">${c.status}</span> · ${c.amt}</div>
+          <div class="block-toggle">▾</div>
+        </div>
+        <div class="block-body">
+          <div class="block-body-inner">完整訂單明細與付款記錄請至業務中心查看。</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
 
 // ── Render Todos (blocks) ──────────────────────────────
 function renderTodos(showDone){
