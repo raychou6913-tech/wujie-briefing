@@ -349,13 +349,13 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
     </div>
   </div>
 
-  <!-- 上市後銷售反饋 -->
+  <!-- 上市後動銷情況 -->
   <div class="sec-hdr" style="margin-top:28px">
-    <div class="sec-title">上市後銷售反饋</div>
+    <div class="sec-title">上市後動銷情況</div>
     <span style="font-size:9px;color:var(--ok)">安然即時看到</span>
   </div>
   <div class="intent-form">
-    <div class="if-title">📊 回報渠道端真實銷售狀況</div>
+    <div class="if-title">📊 回報渠道端真實動銷狀況</div>
     <div class="if-row">
       <div class="if-field">
         <label>產品</label>
@@ -944,7 +944,7 @@ function renderMyProductOrders(){
   }
 }
 
-/* ── 上市後銷售反饋 ── */
+/* ── 上市後動銷情況 ── */
 const RATE_COLOR = {'暢銷>80%':'var(--ok)','良好60-80%':'var(--ok)','一般40-60%':'var(--warn)','偏慢20-40%':'var(--warn)','滯銷<20%':'var(--danger)'};
 const STOCK_COLOR = {'正常':'var(--txt-mid)','快要缺貨-建議補':'var(--warn)','已缺貨-緊急補':'var(--danger)','滯銷-需處理':'var(--danger)'};
 
@@ -968,7 +968,7 @@ function submitSellThru(){
   // 通知安然
   const q = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   q.unshift({ ts: Date.now(), from: SESS?.name||'CRM', to:'anran',
-    msg:`銷售反饋：${client.split('（')[0]} · ${product} · 動銷${rate} · ${stock}` });
+    msg:`動銷回報：${client.split('（')[0]} · ${product} · 動銷${rate} · ${stock}` });
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(q));
 
   document.getElementById('st-client').value='';
