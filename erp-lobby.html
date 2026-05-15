@@ -747,6 +747,134 @@ body{
   </div>
 </div>
 
+<!-- 通用簡易 list MODAL（4 個 V2 角色動作共用容器）-->
+<div class="qa-modal-bg" id="generic-list-modal" onclick="if(event.target===this)closeGenericListModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title" id="gl-title">—</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;" id="gl-sub">—</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeGenericListModal()">✕</button>
+    </div>
+    <div id="gl-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 高維：運費登錄 MODAL (form) -->
+<div class="qa-modal-bg" id="freight-log-modal" onclick="if(event.target===this)closeFreightLogModal()">
+  <div class="qa-modal">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📋 運費登錄</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">貨代帳單 vs 實際運費 · 月底結算用</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeFreightLogModal()">✕</button>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>貨代</label><select id="fl-vendor">
+        <option>順豐國際</option><option>德邦物流</option><option>京東物流</option><option>DHL</option><option>FedEx</option><option>其他</option>
+      </select></div>
+      <div class="qa-field"><label>運單號</label><input id="fl-no" placeholder="例：SF1234567890"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>路線</label><input id="fl-route" placeholder="例：北京 → 深圳 LOG-ON"></div>
+      <div class="qa-field"><label>對應訂單</label><input id="fl-order" placeholder="例：#BKK240"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>金額（人民幣）</label><input id="fl-amount" type="number" placeholder="例：3800"></div>
+      <div class="qa-field"><label>日期</label><input id="fl-date" type="date"></div>
+    </div>
+    <div class="qa-field"><label>備註</label><textarea id="fl-notes" rows="2" placeholder="特殊收費 / 異常 / 附加費"></textarea></div>
+    <button class="qa-submit" onclick="submitFreightLog()">送出 → 寫入物流費用</button>
+  </div>
+</div>
+
+<!-- Bevis：bedo 輸出核准 MODAL -->
+<div class="qa-modal-bg" id="bedo-modal" onclick="if(event.target===this)closeBedoModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">✨ bedo 輸出待確認</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">Forge bedo 輸出的設計變體 · 核准後進圖庫</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeBedoModal()">✕</button>
+    </div>
+    <div id="bedo-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 珮玲：主題企劃 MODAL -->
+<div class="qa-modal-bg" id="theme-plan-modal" onclick="if(event.target===this)closeThemePlanModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🖼 主題企劃</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">Q3 / Q4 主題開發提案 · 跟設計團隊協作</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeThemePlanModal()">✕</button>
+    </div>
+    <div id="theme-plan-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 春雷：直播排期 MODAL -->
+<div class="qa-modal-bg" id="live-schedule-modal" onclick="if(event.target===this)closeLiveScheduleModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📱 直播排期</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">本週抖音 / 小紅書直播 · 腳本 + 備貨</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeLiveScheduleModal()">✕</button>
+    </div>
+    <div id="live-schedule-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 佳音：淘寶上架 MODAL -->
+<div class="qa-modal-bg" id="taobao-modal" onclick="if(event.target===this)closeTaobaoModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🛒 淘寶上架</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">新款上架 / 活動排期</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeTaobaoModal()">✕</button>
+    </div>
+    <div id="taobao-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 電商共用：數據月報 MODAL (form) -->
+<div class="qa-modal-bg" id="monthly-data-modal" onclick="if(event.target===this)closeMonthlyDataModal()">
+  <div class="qa-modal">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📊 數據月報</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">月度銷售數據 · 送 Shawn 月報整理</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeMonthlyDataModal()">✕</button>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>平台</label><select id="md-platform">
+        <option>抖音</option><option>小紅書</option><option>淘寶</option><option>京東</option>
+      </select></div>
+      <div class="qa-field"><label>月份</label><input id="md-month" type="month"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>總營業額（人民幣）</label><input id="md-revenue" type="number" placeholder="例：485000"></div>
+      <div class="qa-field"><label>訂單數</label><input id="md-orders" type="number" placeholder="例：1240"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>主推 SKU</label><input id="md-top-sku" placeholder="例：Snoopy 夏季盲盒"></div>
+      <div class="qa-field"><label>客單價</label><input id="md-aov" type="number" placeholder="例：391"></div>
+    </div>
+    <div class="qa-field"><label>重點觀察 / 異常</label><textarea id="md-notes" rows="2" placeholder="銷售亮點、滯銷品、客戶反饋..."></textarea></div>
+    <button class="qa-submit" onclick="submitMonthlyData()">送出 → 通知 Shawn</button>
+  </div>
+</div>
+
 <!-- Shawn：批發核准 MODAL -->
 <div class="qa-modal-bg" id="wholesale-modal" onclick="if(event.target===this)closeWholesaleModal()">
   <div class="qa-modal" style="max-width:580px;">
@@ -1704,6 +1832,249 @@ function markCurrentTodoDone(){
   _currentTodoId = null;
 }
 
+// ── 通用簡易 list modal helper（給後 4 個低頻動作用）──
+const GENERIC_DATA = {
+  'monthend': {
+    title:'📊 月結任務', sub:'月結 / 損益表 / 跨境對齊',
+    items:[
+      {id:'me1', title:'4 月損益表整理', sub:'北京蕪解 + 深圳子公司 + 香港 JV 合併', action:'完成'},
+      {id:'me2', title:'跨境結算對帳', sub:'北京→香港 ¥850k / 北京→台灣 ¥120k', action:'已對齊'},
+      {id:'me3', title:'費用入帳核對', sub:'楊子+Leo 本月送來 12 筆，待核對', action:'已核對'},
+    ],
+  },
+  'bank-recon': {
+    title:'🏦 銀行對帳', sub:'台灣國泰 / 台新 / 玉山月度餘額更新',
+    items:[
+      {id:'b1', title:'國泰世華 — 台灣悍草', sub:'5 月餘額 NT$ 2,485,000', action:'已對帳'},
+      {id:'b2', title:'台新 — 台灣悍草', sub:'5 月餘額 NT$ 680,000', action:'已對帳'},
+      {id:'b3', title:'玉山 — Ray 個人', sub:'5 月餘額 NT$ 1,200,000', action:'已對帳'},
+    ],
+  },
+  'my-quote': {
+    title:'🔍 我的詢比價', sub:'新供應商 / 新材料報價追蹤',
+    items:[
+      {id:'q1', title:'壓克力掛件 — 3 家報價', sub:'Bevis Q3 需求 · 已收 2 家報價，待第 3 家', action:'催第 3 家'},
+      {id:'q2', title:'盲袋包裝新供應商', sub:'東莞達豐目前獨家，需備援 · 已詢 1 家', action:'再詢 2 家'},
+    ],
+  },
+  'sampling-track': {
+    title:'🏭 打樣追蹤', sub:'5 家工廠的打樣進度',
+    items:[
+      {id:'s1', title:'永盛玩具 — Snoopy 冬季公仔', sub:'第 3 輪打樣 · 預計 5/22 收到', action:'已收到'},
+      {id:'s2', title:'東莞達豐 — Mofusand 盲袋', sub:'包裝模具修改中 · 5/25 樣品截止', action:'已收到樣品'},
+      {id:'s3', title:'深圳壓克力廠 — 掛件', sub:'首次合作 · 等首樣 5/30', action:'已收到樣品'},
+    ],
+  },
+};
+function openGenericListModal(key){
+  const cfg = GENERIC_DATA[key];
+  if(!cfg){ showQaToast('動作未配置'); return; }
+  document.getElementById('gl-title').textContent = cfg.title;
+  document.getElementById('gl-sub').textContent = cfg.sub;
+  const storageKey = 'generic_'+key+'_v1';
+  const items = _seedKey(storageKey, cfg.items);
+  _genericListRender(document.getElementById('gl-list'), items, i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.title}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.sub}</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doGenericDone('${storageKey}','${i.id}','${i.action}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ ${i.action}</button>
+    </div>
+  </div>`, '✨ 沒有待處理項目');
+  document.getElementById('generic-list-modal').classList.add('show');
+}
+function closeGenericListModal(){ document.getElementById('generic-list-modal').classList.remove('show'); }
+function doGenericDone(key, id, action){
+  const item = _genericDone(key, id, '');
+  // re-render same modal
+  const cfgKey = key.replace('generic_','').replace('_v1','');
+  openGenericListModal(cfgKey);
+  showQaToast(`✓ ${item ? item.title : id} · ${action}`);
+}
+
+// ── Batch 7: 7 個 placeholder modal 完整實作 ──
+
+// 高維：運費登錄
+function openFreightLogModal(){
+  ['fl-no','fl-route','fl-order','fl-amount','fl-notes'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('fl-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('freight-log-modal').classList.add('show');
+}
+function closeFreightLogModal(){ document.getElementById('freight-log-modal').classList.remove('show'); }
+function submitFreightLog(){
+  const amount = document.getElementById('fl-amount').value.trim();
+  if(!amount){ alert('請填寫運費金額'); return; }
+  const rec = {
+    vendor:document.getElementById('fl-vendor').value,
+    no:document.getElementById('fl-no').value.trim(),
+    route:document.getElementById('fl-route').value.trim(),
+    order:document.getElementById('fl-order').value.trim(),
+    amount:Number(amount),
+    date:document.getElementById('fl-date').value,
+    notes:document.getElementById('fl-notes').value.trim(),
+    by:name, ts:Date.now(),
+  };
+  const arr = JSON.parse(localStorage.getItem('gaowei_freight_v1')||'[]');
+  arr.unshift(rec);
+  localStorage.setItem('gaowei_freight_v1', JSON.stringify(arr));
+  closeFreightLogModal();
+  markCurrentTodoDone();
+  showQaToast(`✓ 運費 ¥${amount} 已登錄（${rec.vendor}）`);
+}
+
+// Bevis：bedo 輸出
+const BEDO_SEED = [
+  {id:'bd1', name:'Snoopy 城市系列 bedo 8 方向', count:8, urgency:'med', detail:'Forge 由「紐約主稿」生成 8 個變體（街景 / 地標 / 季節）。'},
+  {id:'bd2', name:'Mofusand 夏日 bedo 跨 IP', count:6, urgency:'low', detail:'貓福珊迪夏日主題 → 變體成 Opanchu + Snoopy 跨 IP 提案。'},
+];
+function openBedoModal(){
+  const items = _seedKey('bevis_bedo_v1', BEDO_SEED);
+  _genericListRender(document.getElementById('bedo-list'), items, b => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${b.name}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${b.count} 個變體待核准</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${b.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doBedoAction('${b.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 全部核准 · 進圖庫</button>
+      <button onclick="doBedoAction('${b.id}','partial')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">部分核准</button>
+    </div>
+  </div>`, '✨ 沒有待核准 bedo 輸出');
+  document.getElementById('bedo-modal').classList.add('show');
+}
+function closeBedoModal(){ document.getElementById('bedo-modal').classList.remove('show'); }
+function doBedoAction(id, action){
+  const item = _genericDone('bevis_bedo_v1', id, '');
+  openBedoModal();
+  showQaToast(`✓ ${item ? item.name : id} · ${action==='approved'?'已全部核准進圖庫':'已部分核准'}`);
+}
+
+// 珮玲：主題企劃
+const THEME_PLAN_SEED = [
+  {id:'tp1', name:'Q3 主題：Snoopy × 校園回憶', stage:'草案', urgency:'high', detail:'9 月開學季主題；參考過去吉依卡哇校園系列；需 Bevis 設計團隊評估。'},
+  {id:'tp2', name:'Q4 主題：Mofusand 萬聖節', stage:'初步發想', urgency:'med', detail:'貓福珊迪萬聖節限定；需 IP 方授權確認 + 設計提案。'},
+  {id:'tp3', name:'2027 春節 IP 組合提案', stage:'資料收集', urgency:'low', detail:'IP 組合：Snoopy 賀年 + Opanchu 紅包封；早期構想。'},
+];
+function openThemePlanModal(){
+  const items = _seedKey('peilin_theme_v1', THEME_PLAN_SEED);
+  _genericListRender(document.getElementById('theme-plan-list'), items, t => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${t.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${t.name}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">階段：${t.stage}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${t.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doThemeAction('${t.id}','to-bevis')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 轉 Bevis 設計</button>
+      <button onclick="doThemeAction('${t.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">繼續調整</button>
+    </div>
+  </div>`, '✨ 沒有進行中主題企劃');
+  document.getElementById('theme-plan-modal').classList.add('show');
+}
+function closeThemePlanModal(){ document.getElementById('theme-plan-modal').classList.remove('show'); }
+function doThemeAction(id, action){
+  const item = _genericDone('peilin_theme_v1', id, '');
+  if(action === 'to-bevis'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`珮玲轉 Bevis：${item ? item.name : id} · 進設計階段`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openThemePlanModal();
+  showQaToast(`✓ ${item ? item.name : id} · ${action==='to-bevis'?'已轉 Bevis':'已標記繼續調整'}`);
+}
+
+// 春雷：直播排期 + 備貨確認共用
+const LIVE_SEED = [
+  {id:'lv1', date:'2026-05-18 週四 20:00', platform:'抖音', urgency:'high', script:'腳本待定稿', stock:'Snoopy 盲盒 200 件 · 待高維確認', detail:'本週直播主題：夏日盲盒新品開箱。'},
+  {id:'lv2', date:'2026-05-22 週一 20:00', platform:'小紅書', urgency:'med', script:'腳本已備好', stock:'Mofusand × 50 件 · OK', detail:'貓福珊迪夏日海邊主題；目標流量 50k+。'},
+];
+function openLiveScheduleModal(){
+  const items = _seedKey('chunlei_live_v1', LIVE_SEED);
+  _genericListRender(document.getElementById('live-schedule-list'), items, l => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${l.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${l.platform} · ${l.date}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">腳本：${l.script}</div>
+      <div style="font-size:11px;color:var(--ink-mid);">備貨：${l.stock}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${l.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doLiveAction('${l.id}','ready')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 準備就緒</button>
+      <button onclick="doLiveAction('${l.id}','chase-stock')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">催高維</button>
+    </div>
+  </div>`, '✨ 本週直播全部就緒');
+  document.getElementById('live-schedule-modal').classList.add('show');
+}
+function closeLiveScheduleModal(){ document.getElementById('live-schedule-modal').classList.remove('show'); }
+function doLiveAction(id, action){
+  const item = _genericDone('chunlei_live_v1', id, '');
+  if(action === 'chase-stock'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'gaowei', msg:`春雷催備貨：${item ? item.platform+' '+item.date : id} · 直播前確認 ${item ? item.stock : ''}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openLiveScheduleModal();
+  showQaToast(`✓ ${item ? item.platform+' '+item.date : id} · ${action==='ready'?'已標記準備就緒':'已催高維備貨'}`);
+}
+
+// 佳音：淘寶上架
+const TAOBAO_SEED = [
+  {id:'tb1', sku:'貓福珊迪夏日盲盒', stage:'設計稿已到，待上架', urgency:'high', detail:'夏日海邊主題；6 種角色；定價 ¥39.9/件 · 168/盒。'},
+  {id:'tb2', sku:'Snoopy × 城市紐約限定', stage:'圖稿確認中', urgency:'med', detail:'10 城市系列首發；待 Bevis 圖稿核准後上架。'},
+];
+function openTaobaoModal(){
+  const items = _seedKey('jiaying_taobao_v1', TAOBAO_SEED);
+  _genericListRender(document.getElementById('taobao-list'), items, t => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${t.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${t.sku}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${t.stage}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${t.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doTaobaoAction('${t.id}','listed')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已上架</button>
+      <button onclick="doTaobaoAction('${t.id}','wait-design')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">等設計稿</button>
+    </div>
+  </div>`, '✨ 沒有待上架款');
+  document.getElementById('taobao-modal').classList.add('show');
+}
+function closeTaobaoModal(){ document.getElementById('taobao-modal').classList.remove('show'); }
+function doTaobaoAction(id, action){
+  const item = _genericDone('jiaying_taobao_v1', id, '');
+  openTaobaoModal();
+  showQaToast(`✓ ${item ? item.sku : id} · ${action==='listed'?'已上架淘寶':'等設計稿中'}`);
+}
+
+// 電商共用：數據月報
+function openMonthlyDataModal(){
+  ['md-revenue','md-orders','md-top-sku','md-aov','md-notes'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const d = new Date(); d.setMonth(d.getMonth()-1);
+  document.getElementById('md-month').value = d.toISOString().slice(0,7);
+  document.getElementById('monthly-data-modal').classList.add('show');
+}
+function closeMonthlyDataModal(){ document.getElementById('monthly-data-modal').classList.remove('show'); }
+function submitMonthlyData(){
+  const revenue = document.getElementById('md-revenue').value.trim();
+  if(!revenue){ alert('請填寫總營業額'); return; }
+  const rec = {
+    platform:document.getElementById('md-platform').value,
+    month:document.getElementById('md-month').value,
+    revenue:Number(revenue),
+    orders:Number(document.getElementById('md-orders').value)||0,
+    topSku:document.getElementById('md-top-sku').value.trim(),
+    aov:Number(document.getElementById('md-aov').value)||0,
+    notes:document.getElementById('md-notes').value.trim(),
+    by:name, ts:Date.now(),
+  };
+  const arr = JSON.parse(localStorage.getItem('ecom_monthly_data_v1')||'[]');
+  arr.unshift(rec);
+  localStorage.setItem('ecom_monthly_data_v1', JSON.stringify(arr));
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'shawn', msg:`${rec.platform} ${rec.month} 數據：¥${revenue.toLocaleString()} · ${rec.orders} 單`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  closeMonthlyDataModal();
+  markCurrentTodoDone();
+  showQaToast(`✓ ${rec.platform} ${rec.month} 數據已送 Shawn`);
+}
+
 // ── Shawn × 3 / Ray × 1 / visit-log（業務員+Shawn 共用）──
 const WHOLESALE_SEED = [
   {id:'w1', client:'深圳 LOG-ON', sales:'安然', product:'Snoopy 夏季盲盒', qty:'860 箱', amount:'¥199 萬', urgency:'high', detail:'客戶要求 5/30 前到貨，需確認工廠 capacity；30/70 分期付款。'},
@@ -2656,27 +3027,27 @@ function triggerAction(action){
     case 'xborder-confirm':   openXborderModal(); break;
     case 'ip-reminders':      openIpRemindersModal(); break;
     case 'my-pending':        openSimpleListModal('my-pending'); break;
-    case 'monthend':          showQaToast('📊 月結任務 modal 開發中（V2）'); break;
+    case 'monthend':          openGenericListModal('monthend'); break;
     case 'my-approval':       openApprovalInboxModal(); break;
     case 'payroll-task':      openPayrollModal(); break;
     case 'opex-budget':       openOpexBudgetModal(); break;
-    case 'bank-recon':        showQaToast('🏦 銀行對帳 modal 開發中（V2）'); break;
+    case 'bank-recon':        openGenericListModal('bank-recon'); break;
     case 'design-approve':    openDesignApproveModal(); break;
-    case 'bedo-approve':      showQaToast('✨ bedo 輸出 modal 開發中（V2）'); break;
+    case 'bedo-approve':      openBedoModal(); break;
     case 'my-approval-tracker': openApprovalTrackModal(); break;
-    case 'theme-plan':        showQaToast('🖼 主題企劃 modal 開發中（V2）'); break;
+    case 'theme-plan':        openThemePlanModal(); break;
     case 'my-design-task':    openDesignTaskModal(); break;
-    case 'my-quote':          showQaToast('🔍 詢比價 modal 開發中（V2）'); break;
+    case 'my-quote':          openGenericListModal('my-quote'); break;
     case 'my-po':             openMyPoModal(); break;
-    case 'sampling-track':    showQaToast('🏭 打樣追蹤 modal 開發中（V2）'); break;
+    case 'sampling-track':    openGenericListModal('sampling-track'); break;
     case 'stock-check':       openStockCheckModal(); break;
     case 'payment-request':   openPaymentReqModal(); break;
     case 'logistics-batch':   openLogisticsModal(); break;
-    case 'freight-log':       showQaToast('📋 運費登錄 modal 開發中（V2）'); break;
-    case 'live-schedule':     showQaToast('📱 直播排期 modal 開發中（V2）'); break;
-    case 'live-stock':        showQaToast('📦 備貨確認 modal 開發中（V2）'); break;
-    case 'taobao-listing':    showQaToast('🛒 淘寶上架 modal 開發中（V2）'); break;
-    case 'monthly-data':      showQaToast('📊 數據月報 modal 開發中（V2）'); break;
+    case 'freight-log':       openFreightLogModal(); break;
+    case 'live-schedule':     openLiveScheduleModal(); break;
+    case 'live-stock':        openLiveScheduleModal(); break;  // 共用同 modal（直播 row 中已含備貨欄）
+    case 'taobao-listing':    openTaobaoModal(); break;
+    case 'monthly-data':      openMonthlyDataModal(); break;
     case 'wholesale-approve': openWholesaleModal(); break;
     case 'shawn-chase':       openChaseModal(); break;
     case 'ray-approval':      openRayApprovalModal(); break;
