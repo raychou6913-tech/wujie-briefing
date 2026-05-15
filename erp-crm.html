@@ -281,7 +281,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
       <div class="prod-block-body">
         <table class="ord-tbl">
           <thead><tr>
-            <th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
+            <th>負責人</th><th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
           </tr></thead>
           <tbody id="pb-snoopy-rows">
             <!-- Filled by JS based on session user -->
@@ -302,14 +302,14 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
       <div class="prod-block-body">
         <table class="ord-tbl">
           <thead><tr>
-            <th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
+            <th>負責人</th><th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
           </tr></thead>
           <tbody id="pb-mofu-rows"></tbody>
         </table>
       </div>
     </div>
-    <!-- Opanchu (德寶 only) -->
-    <div class="prod-block" id="pb-opanchu" style="display:none">
+    <!-- Opanchu -->
+    <div class="prod-block" id="pb-opanchu">
       <div class="prod-block-hd" onclick="this.closest('.prod-block').classList.toggle('open')">
         <div class="prod-block-icon" style="background:var(--danger-dim)">🐰</div>
         <div class="prod-block-info">
@@ -321,17 +321,9 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
       <div class="prod-block-body">
         <table class="ord-tbl">
           <thead><tr>
-            <th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
+            <th>負責人</th><th>客戶</th><th>數量</th><th>金額</th><th>收款狀態</th><th>累計</th>
           </tr></thead>
-          <tbody>
-            <tr>
-              <td style="font-weight:700;color:var(--danger)">深圳 LOG-ON</td>
-              <td>80 箱</td>
-              <td style="color:var(--danger);font-weight:700">¥ 18 萬</td>
-              <td><span class="chip chip-danger">尾款逾期 3天</span></td>
-              <td><span class="ord-nth">第 2 筆</span></td>
-            </tr>
-          </tbody>
+          <tbody id="pb-opanchu-rows"></tbody>
         </table>
       </div>
     </div>
@@ -883,45 +875,41 @@ function renderMyKPI(){
   document.getElementById('my-ar-sub').textContent = d.arSub;
 }
 
-/* ── 在售產品訂單（按業務過濾）── */
+/* ── 在售產品訂單（集體版：全公司各客戶訂單，標註負責人）── */
 function renderMyProductOrders(){
-  if(!SESS) return;
-  const myUser = SESS.user;
-
-  const ORDERS = {
-    laodong: {
-      snoopy: [
-        { id:'mc', client:'廣州名創優品', qty:'180 箱', amt:'¥ 42 萬', cs:'全款已收', nth:'第 3 筆', cs_cls:'chip-ok',
-          disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'全額預付' },
-        { id:'ht', client:'北京華糖',     qty:'300 箱', amt:'¥ 65 萬', cs:'全款已收', nth:'第 5 筆', cs_cls:'chip-ok',
-          disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'30%訂金，出貨前付清' },
-        { id:'sm', client:'首爾 SMTOWN', qty:'樣品中',  amt:'待報價',  cs:'樣品確認中', nth:'首次詢盤', cs_cls:'chip-grey',
-          disc:'報價中（參考46折）', srp:'¥ 79.9（韓市場待確認）', ws_unit:'待定', box_pcs:'240件/箱', box_amt:'待定', royalty:'待定', gm:'—', pay:'待談' },
-      ],
-      mofu: [
-        { id:'mofu-peilin', client:'（台北誠品由珮玲負責）', qty:'—', amt:'—', cs:'—', nth:'—', cs_cls:'chip-grey', disc:'—' },
-      ],
-    },
-    debao: {
-      snoopy: [],
-      mofu: [
-        { id:'db-mofu', client:'上海萌趣文化', qty:'80 箱', amt:'¥ 17.6 萬', cs:'訂金已收', nth:'第 1 筆', cs_cls:'chip-warn',
-          disc:'47折', srp:'¥ 79.9/件', ws_unit:'¥ 37.6/件', box_pcs:'240件/箱', box_amt:'¥ 9,016/箱', royalty:'¥ 1,262/箱', gm:'≈ 31%', pay:'30%訂金已收，待出貨付尾款' },
-      ],
-      opanchu: true,
-    },
+  // 集合三位業務（老董/德寶/安然）+ 珮玲負責的台北誠品
+  const ALL_ORDERS = {
+    snoopy: [
+      { owner:'老董', client:'廣州名創優品', qty:'180 箱', amt:'¥ 42 萬',  cs:'全款已收',    nth:'第 3 筆',   cs_cls:'chip-ok',
+        disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'全額預付' },
+      { owner:'老董', client:'北京華糖',     qty:'300 箱', amt:'¥ 65 萬',  cs:'全款已收',    nth:'第 5 筆',   cs_cls:'chip-ok',
+        disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'30%訂金，出貨前付清' },
+      { owner:'安然', client:'深圳 LOG-ON',  qty:'860 箱', amt:'¥ 199 萬', cs:'30% 訂金已收', nth:'第 2 筆',   cs_cls:'chip-warn',
+        disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'30/70 分期，出貨前付清' },
+      { owner:'安然', client:'泡泡瑪特華東', qty:'90 箱',  amt:'¥ 21 萬',  cs:'全款已收',    nth:'第 1 筆',   cs_cls:'chip-ok',
+        disc:'46折', srp:'¥ 79.9/件', ws_unit:'¥ 36.8/件', box_pcs:'240件/箱', box_amt:'¥ 8,832/箱', royalty:'¥ 1,237/箱', gm:'≈ 32%', pay:'全額預付' },
+      { owner:'老董', client:'首爾 SMTOWN', qty:'樣品中', amt:'待報價',   cs:'樣品確認中',  nth:'首次詢盤', cs_cls:'chip-grey',
+        disc:'報價中（參考46折）', srp:'¥ 79.9（韓市場待確認）', ws_unit:'待定', box_pcs:'240件/箱', box_amt:'待定', royalty:'待定', gm:'—', pay:'待談' },
+    ],
+    mofu: [
+      { owner:'德寶', client:'上海萌趣文化', qty:'80 箱', amt:'¥ 17.6 萬', cs:'訂金已收',  nth:'第 1 筆',  cs_cls:'chip-warn',
+        disc:'47折', srp:'¥ 79.9/件', ws_unit:'¥ 37.6/件', box_pcs:'240件/箱', box_amt:'¥ 9,016/箱', royalty:'¥ 1,262/箱', gm:'≈ 31%', pay:'30%訂金已收，待出貨付尾款' },
+      { owner:'珮玲', client:'台北誠品（協作中）', qty:'—', amt:'—', cs:'授權確認中', nth:'—', cs_cls:'chip-grey', disc:'—' },
+    ],
+    opanchu: [
+      { owner:'德寶', client:'深圳 LOG-ON', qty:'80 箱', amt:'¥ 18 萬', cs:'尾款逾期 3天', nth:'第 2 筆', cs_cls:'chip-danger',
+        disc:'47折', srp:'¥ 79.9/件', ws_unit:'¥ 37.6/件', box_pcs:'240件/箱', box_amt:'¥ 9,016/箱', royalty:'¥ 1,262/箱', gm:'≈ 31%', pay:'30%訂金已收，尾款逾期催收中' },
+    ],
   };
 
-  const d = ORDERS[myUser];
-  if(!d) return;
-
   function buildRows(rows, prod){
-    if(!rows||!rows.length) return '<tr><td colspan="5" style="color:var(--txt-lo);text-align:center;padding:12px">無我的訂單</td></tr>';
+    if(!rows||!rows.length) return '<tr><td colspan="6" style="color:var(--txt-lo);text-align:center;padding:12px">無訂單</td></tr>';
     return rows.map((r,i)=>{
       const hasDetail = r.disc && r.disc !== '—';
       const did = `crm-odr-${prod}-${i}`;
       const aid = `crm-oa-${prod}-${i}`;
       const mainRow = `<tr style="${hasDetail?'cursor:pointer;':''}" onclick="${hasDetail?`toggleCrmOdr('${did}','${aid}')`:''}" >
+        <td style="color:var(--txt-mid);font-size:11px;">${r.owner}</td>
         <td style="font-weight:700">${r.client}${hasDetail?` <span id="${aid}" style="font-size:9px;color:var(--txt-lo);">▼</span>`:''}</td>
         <td>${r.qty}</td>
         <td style="font-weight:700">${r.amt}</td>
@@ -929,7 +917,7 @@ function renderMyProductOrders(){
         <td><span class="ord-nth${r.nth==='首次詢盤'?' first':''}">${r.nth}</span></td>
       </tr>`;
       const detailRow = hasDetail ? `<tr id="${did}" style="display:none;background:var(--card2);">
-        <td colspan="5" style="padding:10px 12px;font-size:11px;color:var(--txt-mid);">
+        <td colspan="6" style="padding:10px 12px;font-size:11px;color:var(--txt-mid);">
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px 12px;line-height:1.8;">
             <div>折扣：<strong style="color:var(--txt-hi);">${r.disc}</strong></div>
             <div>零售建議價：<strong style="color:var(--txt-hi);">${r.srp}</strong></div>
@@ -947,21 +935,20 @@ function renderMyProductOrders(){
   }
 
   const snRows = document.getElementById('pb-snoopy-rows');
-  if(snRows) snRows.innerHTML = buildRows(d.snoopy, 'sn');
+  if(snRows) snRows.innerHTML = buildRows(ALL_ORDERS.snoopy, 'sn');
 
   const mfRows = document.getElementById('pb-mofu-rows');
-  if(mfRows) mfRows.innerHTML = buildRows(d.mofu, 'mf');
+  if(mfRows) mfRows.innerHTML = buildRows(ALL_ORDERS.mofu, 'mf');
 
-  // Opanchu block: only show for debao
-  const opBlock = document.getElementById('pb-opanchu');
-  if(opBlock) opBlock.style.display = d.opanchu ? '' : 'none';
+  // Opanchu 改集體版：永遠顯示
+  const opRows = document.getElementById('pb-opanchu-rows');
+  if(opRows) opRows.innerHTML = buildRows(ALL_ORDERS.opanchu, 'op');
 
-  // Update totals
+  // Snoopy 公司合計 (老董 278 + 安然 220 = ¥498 萬)
   const snTotal = document.getElementById('pb-snoopy-total');
-  if(snTotal){
-    if(myUser==='laodong'){ snTotal.textContent='¥ 278 萬'; snTotal.style.color='var(--ok)'; }
-    else { snTotal.textContent='—'; snTotal.style.color='var(--txt-lo)'; }
-  }
+  if(snTotal){ snTotal.textContent='¥ 498 萬'; snTotal.style.color='var(--ok)'; }
+  const mfTotal = document.getElementById('pb-mofu-total');
+  if(mfTotal){ mfTotal.textContent='¥ 17.6 萬'; }
 }
 
 /* ── 上市後動銷情況 ── */
