@@ -144,7 +144,7 @@
     {href:'erp-shetong.html',          icon:'🎨', name:'設計任務板',   roles:['shetong','bevis','peilin','ray'],sbGroup:'開發'},
     {href:'erp-peiling.html',          icon:'🖋', name:'送審工作板',   roles:['peilin','bevis','shetong','ray'],sbGroup:'開發'},
     {href:'erp-gaowei.html',           icon:'🚢', name:'物流中心',     roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
-    {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','chunlei','jiaying'], sbGroup:'開發'},
+    {href:'erp-library.html',          icon:'🖼️', name:'圖庫',         roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
     {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
   ];
