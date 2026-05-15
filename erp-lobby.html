@@ -747,6 +747,31 @@ body{
   </div>
 </div>
 
+<!-- OPEX 預算規劃 MODAL（楊子 / Leo）-->
+<div class="qa-modal-bg" id="opex-budget-modal" onclick="if(event.target===this)closeOpexBudgetModal()">
+  <div class="qa-modal" style="max-width:780px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📋 OPEX 預算規劃</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">每月各科目預估支出 · 錄完後 HR 費用中心會用這個對比實際支出</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeOpexBudgetModal()">✕</button>
+    </div>
+    <div id="opex-budget-ent-tabs" style="display:flex;gap:6px;margin-bottom:14px;padding:4px;background:var(--paper-soft);border-radius:10px;">
+      <button class="ob-ent-tab active" data-ent="北京蕪解" onclick="switchOpexBudgetEnt('北京蕪解')" style="flex:1;padding:8px 12px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);">北京蕪解</button>
+      <button class="ob-ent-tab" data-ent="台灣悍草" onclick="switchOpexBudgetEnt('台灣悍草')" style="flex:1;padding:8px 12px;border:none;background:transparent;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink-mid);">台灣悍草</button>
+    </div>
+    <div style="overflow-x:auto;border:1px solid var(--line);border-radius:10px;">
+      <table id="opex-budget-table" style="width:100%;border-collapse:collapse;font-size:12px;font-family:inherit;"></table>
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:var(--paper-soft);border-radius:8px;font-size:12px;color:var(--ink-mid);display:flex;justify-content:space-between;">
+      <span>年度合計</span>
+      <strong id="opex-budget-total" style="color:var(--ink);">¥ 0</strong>
+    </div>
+    <button class="qa-submit" onclick="submitOpexBudget()">儲存預算 → HR 費用中心會即時更新</button>
+  </div>
+</div>
+
 <!-- 薪資錄入 MODAL（楊子 / Leo / Ray）-->
 <div class="qa-modal-bg" id="payroll-modal" onclick="if(event.target===this)closePayrollModal()">
   <div class="qa-modal" style="max-width:600px;">
@@ -993,8 +1018,8 @@ function buildSidebar(){
     debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
     anran:    [{icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
     yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
-    yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}],
-    leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
+    yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}],
+    leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
     bevis:    [{icon:'🎨', label:'設計核准', action:'design-approve'}, {icon:'✨', label:'bedo 輸出待確認', action:'bedo-approve'}],
     peilin:   [{icon:'🖋', label:'送審追蹤', action:'my-approval-tracker'}, {icon:'🖼', label:'主題企劃', action:'theme-plan'}],
     shetong:  [{icon:'📤', label:'我的設計任務', action:'my-design-task'}],
@@ -1436,6 +1461,103 @@ function markCurrentTodoDone(){
   _currentTodoId = null;
 }
 
+// ── OPEX 預算規劃 modal（楊子 / Leo）──
+const OPEX_BUDGET_DEFAULT = {
+  '北京蕪解': {
+    ccy:'CNY',
+    rows:[
+      {cat:'薪資人事', monthly:[85000,85000,85000,85000,85000,90000,90000,90000,90000,90000,90000,90000]},
+      {cat:'辦公費用', monthly:[8200,7800,8200,7600,6800,8000,8000,8000,8000,8000,8000,8000]},
+      {cat:'倉儲物流', monthly:[12400,11800,12400,15200,8500,12000,12000,12000,12000,12000,12000,12000]},
+      {cat:'差旅費',   monthly:[3200,2800,3200,4800,1200,4000,4000,4000,4000,4000,4000,4000]},
+      {cat:'雜支',     monthly:[2500,2200,2500,2800,1500,2500,2500,2500,2500,2500,2500,2500]},
+    ],
+  },
+  '台灣悍草': {
+    ccy:'TWD',
+    rows:[
+      {cat:'薪資人事', monthly:[350000,350000,350000,350000,350000,350000,350000,350000,350000,350000,350000,350000]},
+      {cat:'辦公費用', monthly:[18000,17500,18000,16800,15000,18000,18000,18000,18000,18000,18000,18000]},
+      {cat:'倉儲物流', monthly:[22000,20000,22000,28000,15000,22000,22000,22000,22000,22000,22000,22000]},
+      {cat:'差旅費',   monthly:[8000,6500,8000,12000,3000,8000,8000,8000,8000,8000,8000,8000]},
+      {cat:'雜支',     monthly:[5000,4500,5000,5800,3000,5000,5000,5000,5000,5000,5000,5000]},
+    ],
+  },
+};
+const MONTHS_TC = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+let _currentOpexBudgetEnt = '北京蕪解';
+function openOpexBudgetModal(){
+  _currentOpexBudgetEnt = (user === 'leo') ? '台灣悍草' : '北京蕪解';
+  document.querySelectorAll('.ob-ent-tab').forEach(b=>{
+    const active = b.dataset.ent === _currentOpexBudgetEnt;
+    b.classList.toggle('active', active);
+    b.style.background = active ? '#fff' : 'transparent';
+    b.style.color = active ? 'var(--ink)' : 'var(--ink-mid)';
+  });
+  renderOpexBudgetTable();
+  document.getElementById('opex-budget-modal').classList.add('show');
+}
+function closeOpexBudgetModal(){
+  document.getElementById('opex-budget-modal').classList.remove('show');
+}
+function switchOpexBudgetEnt(ent){
+  _currentOpexBudgetEnt = ent;
+  document.querySelectorAll('.ob-ent-tab').forEach(b=>{
+    const active = b.dataset.ent === ent;
+    b.classList.toggle('active', active);
+    b.style.background = active ? '#fff' : 'transparent';
+    b.style.color = active ? 'var(--ink)' : 'var(--ink-mid)';
+  });
+  renderOpexBudgetTable();
+}
+function renderOpexBudgetTable(){
+  const data = OPEX_BUDGET_DEFAULT[_currentOpexBudgetEnt];
+  const ovr = (JSON.parse(localStorage.getItem('opex_budget_override_v1')||'{}'))[_currentOpexBudgetEnt] || {};
+  const sym = data.ccy === 'TWD' ? 'NT$' : '¥';
+
+  // header
+  let html = '<thead><tr><th style="padding:8px 10px;background:var(--paper-soft);text-align:left;font-size:10px;color:var(--ink-lo);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;position:sticky;left:0;z-index:2;">科目</th>';
+  MONTHS_TC.forEach(m => {
+    html += `<th style="padding:8px 6px;background:var(--paper-soft);font-size:10px;color:var(--ink-lo);font-weight:700;text-align:right;white-space:nowrap;">${m}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  data.rows.forEach((r, ri) => {
+    html += `<tr><td style="padding:8px 10px;font-weight:700;color:var(--ink);font-size:11px;border-top:1px solid var(--line);background:#fff;position:sticky;left:0;z-index:1;white-space:nowrap;">${r.cat}</td>`;
+    r.monthly.forEach((v, mi) => {
+      const val = (ovr[r.cat] && ovr[r.cat][mi] != null) ? ovr[r.cat][mi] : v;
+      html += `<td style="padding:4px 4px;border-top:1px solid var(--line);"><input type="number" data-cat="${r.cat}" data-month="${mi}" value="${val}" oninput="updateOpexBudgetTotal()" style="width:70px;font-size:11px;text-align:right;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-family:inherit;background:var(--paper-soft);color:var(--ink);font-variant-numeric:tabular-nums;"></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+
+  document.getElementById('opex-budget-table').innerHTML = html;
+  updateOpexBudgetTotal();
+}
+function updateOpexBudgetTotal(){
+  const inputs = document.querySelectorAll('#opex-budget-table input[data-cat]');
+  let total = 0;
+  inputs.forEach(i => total += Number(i.value)||0);
+  const sym = _currentOpexBudgetEnt === '台灣悍草' ? 'NT$' : '¥';
+  document.getElementById('opex-budget-total').textContent = sym + ' ' + total.toLocaleString();
+}
+function submitOpexBudget(){
+  const inputs = document.querySelectorAll('#opex-budget-table input[data-cat]');
+  const ovr = JSON.parse(localStorage.getItem('opex_budget_override_v1')||'{}');
+  if(!ovr[_currentOpexBudgetEnt]) ovr[_currentOpexBudgetEnt] = {};
+  inputs.forEach(i => {
+    const cat = i.dataset.cat;
+    const mi = parseInt(i.dataset.month);
+    if(!ovr[_currentOpexBudgetEnt][cat]) ovr[_currentOpexBudgetEnt][cat] = [];
+    ovr[_currentOpexBudgetEnt][cat][mi] = Number(i.value)||0;
+  });
+  localStorage.setItem('opex_budget_override_v1', JSON.stringify(ovr));
+  closeOpexBudgetModal();
+  markCurrentTodoDone();
+  showQaToast(`✓ ${_currentOpexBudgetEnt} OPEX 預算已儲存 · HR 費用中心已更新`);
+}
+
 // ── 薪資錄入 modal（楊子 / Leo / Ray）──
 const PAYROLL_DATA = {
   '北京蕪解': [
@@ -1618,6 +1740,7 @@ function triggerAction(action){
     case 'monthend':          showQaToast('📊 月結任務 modal 開發中（V2）'); break;
     case 'my-approval':       showQaToast('✓ 待審 modal 開發中（V2）— 內容會從 yangzi inbox 搬過來'); break;
     case 'payroll-task':      openPayrollModal(); break;
+    case 'opex-budget':       openOpexBudgetModal(); break;
     case 'bank-recon':        showQaToast('🏦 銀行對帳 modal 開發中（V2）'); break;
     case 'design-approve':    showQaToast('🎨 設計核准 modal 開發中（V2）'); break;
     case 'bedo-approve':      showQaToast('✨ bedo 輸出 modal 開發中（V2）'); break;

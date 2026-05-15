@@ -665,10 +665,15 @@ function renderOpexTable(){
     return `<th style="text-align:right;${isCur?'color:var(--txt-hi);':''}${!isActual?'opacity:.5;':''}">${m}${!isActual?'<br><span style="font-size:8px;color:var(--indigo);">預算</span>':isCur?'<br><span style="font-size:8px;color:var(--ok);">已錄</span>':''}</th>`;
   }).join('');
 
+  // 讀 lobby 的 OPEX 預算 override（楊子/Leo 在大廳規劃的預算）
+  const budgetOvr = (JSON.parse(localStorage.getItem('opex_budget_override_v1')||'{}'))[currentOpexEntity] || {};
+
   // helper: get value with override support
+  // 優先順序：本月實際 override > lobby 預算 override > demo data vals
   const getVal=(r,mi)=>{
     const isCur=mi===curMoIdx;
     if(isCur && ovr[r.cat]!==undefined) return ovr[r.cat];
+    if(budgetOvr[r.cat] && budgetOvr[r.cat][mi] != null) return budgetOvr[r.cat][mi];
     return r.vals[mi]||0;
   };
 
