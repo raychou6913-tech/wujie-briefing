@@ -925,6 +925,14 @@ if(ENTRY_ENTITY === '台灣悍草'){
 render();
 renderOpexTable();
 // loadPaymentList / renderAdhoc 已拿掉（待付款 / 行政申請 section 搬個人大廳）
+
+// 從大廳 quick action 跳來：URL hash 自動 trigger 對應動作
+window.addEventListener('load',()=>{
+  const h = location.hash;
+  if(h==='#record-opex' && typeof openExpModal==='function'){
+    setTimeout(()=>openExpModal('opex'),120);
+  }
+});
 </script>
 
 <!-- ── EXPENSE FAB ── -->

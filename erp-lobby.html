@@ -636,6 +636,17 @@ body{
       </div>
     </div>
 
+    <!-- MY WORK (非業務角色的個人動作 quick actions) -->
+    <div id="my-work-section" style="display:none">
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">⚡ 我的工作</div>
+          <div class="sec-hint">My Work · 做 · 我的核心動作</div>
+        </div>
+      </div>
+      <div class="qa-grid" id="my-work-list"></div>
+    </div>
+
     <!-- MY CUSTOMERS (業務角色才顯示) -->
     <div id="my-customers-section" style="display:none">
       <div class="sec-hdr">
@@ -1090,6 +1101,85 @@ const MY_CUSTOMERS = {
     {client:'台北誠品',      product:'Mofusand',     amt:'—',         status:'授權確認中',       tone:'grey'},
   ],
 };
+// ── My Work：各角色的個人 quick actions ──────────────────
+// 動作 link：yangzi#record-opex 等 hash 會在 yangzi.html 自動 trigger 對應 modal
+const MY_WORK = {
+  yangzi: [
+    {icon:'＋', title:'錄入費用', sub:'公司 OPEX · 房租 / 水電 / 倉儲 / 雜費', href:'erp-yangzi.html#record-opex'},
+    {icon:'✓', title:'審申請',   sub:'費用報銷 / 請假 / 招募申請',           href:'erp-yangzi.html#inbox'},
+    {icon:'💰', title:'薪資任務', sub:'本月薪資發放流程',                     href:'erp-yangzi.html#payroll'},
+  ],
+  leo: [
+    {icon:'＋', title:'錄入費用', sub:'台灣 OPEX · 悍草日常開銷',             href:'erp-yangzi.html?entity=tw#record-opex'},
+    {icon:'🏦', title:'銀行對帳', sub:'國泰 / 台新 / 玉山餘額更新',           href:'erp-yangzi.html?entity=tw#bank'},
+    {icon:'💰', title:'薪資發放', sub:'台灣團隊薪資',                         href:'erp-yangzi.html?entity=tw#payroll'},
+  ],
+  yuming: [
+    {icon:'＋', title:'錄入帳',   sub:'楊子/Leo 送來的款項入帳',              href:'erp-finance.html#tab-pending'},
+    {icon:'📊', title:'月結核對', sub:'損益表 / 跨境結算 / 帳款對齊',         href:'erp-finance.html#tab-pl'},
+    {icon:'💸', title:'跨境結算', sub:'北京→香港 / 北京→台灣 月度結算',       href:'erp-finance.html#tab-cash'},
+  ],
+  anran: [
+    {icon:'📜', title:'合約待批', sub:'授權續簽 / 新合約審查',                href:'erp-anran.html#contracts'},
+    {icon:'💸', title:'跨境款項', sub:'北京 → 香港 / 北京 → 台灣 確認',       href:'erp-anran.html#xborder'},
+    {icon:'🔐', title:'IP 授權',  sub:'PNUTS / Sanrio / Mofusand 維護',       href:'erp-anran.html#ip'},
+  ],
+  laige: [
+    {icon:'＋', title:'新 PO',    sub:'發單給工廠 / 三家比價',                href:'erp-procurement.html#new-po'},
+    {icon:'🏭', title:'打樣追蹤', sub:'5 家工廠的打樣進度',                   href:'erp-procurement.html#sampling'},
+    {icon:'✓', title:'驗收登錄', sub:'廠端到貨數量核對',                     href:'erp-procurement.html#receive'},
+  ],
+  muzi: [
+    {icon:'📦', title:'備貨核對', sub:'PO 數量 vs 廠端實收',                  href:'erp-procurement.html#receive'},
+    {icon:'📝', title:'付款申請', sub:'供應商頭款 / 尾款請款',                href:'erp-procurement.html#payment'},
+    {icon:'🔍', title:'詢比價',   sub:'新供應商 / 新材料報價',                href:'erp-procurement.html#quote'},
+  ],
+  gaowei: [
+    {icon:'🚚', title:'物流批次', sub:'批次出貨 · 報關 · 運費登錄',           href:'erp-gaowei.html#batches'},
+    {icon:'📋', title:'運費核對', sub:'貨代帳單 vs 實際運費',                 href:'erp-gaowei.html#freight'},
+    {icon:'✓', title:'到貨確認', sub:'客戶端到貨 / 倉端入庫',                href:'erp-gaowei.html#arrival'},
+  ],
+  bevis: [
+    {icon:'🎨', title:'設計核准', sub:'外包設計師交件審核',                   href:'erp-pipeline.html#approve'},
+    {icon:'✨', title:'bedo 輸出', sub:'Forge 圖庫 bedo 核准',                 href:'erp-pipeline.html#bedo'},
+    {icon:'📋', title:'流水線審', sub:'各 IP 階段 review',                    href:'erp-pipeline.html'},
+  ],
+  peilin: [
+    {icon:'📋', title:'送審追蹤', sub:'版權方回覆 · 修改要求',                href:'erp-approval-tracker.html'},
+    {icon:'🖋', title:'主題企劃', sub:'Q3 主題開發提案',                      href:'erp-peiling.html#themes'},
+    {icon:'📜', title:'版權年費', sub:'授權到期提醒追蹤',                     href:'erp-peiling.html#royalty'},
+  ],
+  shetong: [
+    {icon:'🎨', title:'設計任務', sub:'Bevis 派發的執行任務',                 href:'erp-shetong.html#tasks'},
+    {icon:'📤', title:'交件',     sub:'本週要交給 Bevis 的稿件',              href:'erp-shetong.html#deliver'},
+  ],
+  chunlei: [
+    {icon:'📱', title:'直播排期', sub:'抖音 / 小紅書本週直播',                href:'erp-ecommerce.html#schedule'},
+    {icon:'📦', title:'備貨確認', sub:'直播庫存 vs 高維倉端',                 href:'erp-ecommerce.html#stock'},
+  ],
+  jiaying: [
+    {icon:'🛒', title:'淘寶上架', sub:'新款上架 / 活動排期',                  href:'erp-ecommerce.html#listing'},
+    {icon:'📊', title:'數據月報', sub:'淘寶月度銷售數據',                     href:'erp-ecommerce.html#metrics'},
+  ],
+};
+const myWork = MY_WORK[user];
+if(myWork && myWork.length){
+  const sec = document.getElementById('my-work-section');
+  const list = document.getElementById('my-work-list');
+  if(sec && list){
+    sec.style.display = '';
+    list.innerHTML = myWork.map(w => `
+      <a class="qa-btn" href="${w.href}" style="text-decoration:none;color:inherit;">
+        <span class="qa-icon">${w.icon}</span>
+        <div>
+          <div class="qa-title">${w.title}</div>
+          <div class="qa-sub">${w.sub}</div>
+        </div>
+      </a>
+    `).join('');
+  }
+}
+
 const myCustomers = MY_CUSTOMERS[user];
 const SALES_ROLES = ['laodong','debao','anran','peilin'];
 if(SALES_ROLES.includes(user)){
