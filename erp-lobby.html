@@ -747,6 +747,62 @@ body{
   </div>
 </div>
 
+<!-- 高維：物流批次 MODAL -->
+<div class="qa-modal-bg" id="logistics-modal" onclick="if(event.target===this)closeLogisticsModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🚚 物流批次</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">批次出貨追蹤 · 填入物流單號 → 自動通知業務員 / 客戶</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeLogisticsModal()">✕</button>
+    </div>
+    <div id="logistics-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- Bevis：設計核准 MODAL -->
+<div class="qa-modal-bg" id="design-approve-modal" onclick="if(event.target===this)closeDesignApproveModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🎨 設計核准</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">外包設計師交件審核 · 通過後進打樣或進送審</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeDesignApproveModal()">✕</button>
+    </div>
+    <div id="design-approve-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 珮玲：送審追蹤 MODAL -->
+<div class="qa-modal-bg" id="approval-track-modal" onclick="if(event.target===this)closeApprovalTrackModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🖋 送審追蹤</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">已送版權方等回覆 · 一鍵記錄回覆結果</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeApprovalTrackModal()">✕</button>
+    </div>
+    <div id="approval-track-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 詩彤：我的設計任務 MODAL -->
+<div class="qa-modal-bg" id="design-task-modal" onclick="if(event.target===this)closeDesignTaskModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📤 我的設計任務</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">Bevis 派發的執行任務 · 交件 deadline 追蹤</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeDesignTaskModal()">✕</button>
+    </div>
+    <div id="design-task-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- 賴哥：我的 PO MODAL -->
 <div class="qa-modal-bg" id="my-po-modal" onclick="if(event.target===this)closeMyPoModal()">
   <div class="qa-modal" style="max-width:580px;">
@@ -1269,7 +1325,7 @@ const MY_TODOS = {
     {id:'m2',icon:'📝',title:'供應商付款申請：東莞廠頭款',sub:'¥42,000 · 立即填單送賴哥審核',urgency:'high',status:'待填報',action:'payment-request'},
   ],
   bevis:[
-    {id:'b1',icon:'🎨',title:'貓福珊迪夏日系列 — 3D稿第3輪審核',sub:'外包設計師 · 等待 2 天',urgency:'high',status:'待審核',options:['核准，進打樣 ✓','退回修改','需開會討論']},
+    {id:'b1',icon:'🎨',title:'貓福珊迪夏日系列 — 3D稿第3輪審核',sub:'外包設計師 · 等待 2 天 · 立即審核',urgency:'high',status:'待審核',action:'design-approve'},
     {id:'b2',icon:'🖼️',title:'Snoopy × 城市系列 設計 Brief',sub:'已延遲 2 天 · 採購在等',urgency:'high',status:'進行中',options:['今天完成 ✓','明天完成','需安然補IP資料']},
     {id:'b3',icon:'✨',title:'本週 bedo 輸出核准 — 3 張待確認',sub:'Forge 圖庫',urgency:'med',status:'待確認',options:['已全部核准 ✓','部分核准，附備註']},
   ],
@@ -1278,7 +1334,7 @@ const MY_TODOS = {
     {id:'p2',icon:'📜',title:'Miffy 版權費計算確認',sub:'配合安然跟進續簽',urgency:'med',status:'待確認',options:['確認無誤 ✓','有疑問，需討論']},
   ],
   shetong:[
-    {id:'st1',icon:'🎨',title:'Snoopy 城市系列插畫初稿',sub:'Bevis Review · 今天下午',urgency:'high',status:'進行中',options:['已提交給 Bevis ✓','今天完成','需延期']},
+    {id:'st1',icon:'🎨',title:'Snoopy 城市系列插畫初稿',sub:'Bevis Review · 今天下午 · 立即查看我的任務',urgency:'high',status:'進行中',action:'my-design-task'},
     {id:'st2',icon:'🖼️',title:'貓福珊迪文創包裝 — 第2輪修改',sub:'依 Bevis 意見改版',urgency:'med',status:'待提交',options:['已提交 ✓','今天完成','明天']},
   ],
   yuming:[
@@ -1304,7 +1360,7 @@ const MY_TODOS = {
     {id:'ja2',icon:'📊',title:'4月淘寶銷售數據',sub:'月末報表，Shawn 需要',urgency:'med',status:'進行中',options:['今天提交 ✓','明天提交']},
   ],
   gaowei:[
-    {id:'gw1',icon:'🚚',title:'填入物流單號 — 訂單 #BKK240',sub:'已出貨，填好系統自動通知安然+老董',urgency:'high',status:'待填寫',options:['已填入 ✓','等快遞單','確認中']},
+    {id:'gw1',icon:'🚚',title:'填入物流單號 — 訂單 #BKK240',sub:'已出貨，立即填單號通知安然+業務',urgency:'high',status:'待填寫',action:'logistics-batch'},
     {id:'gw2',icon:'📦',title:'PO#320 廠端備貨核對 — Miffy 文具',sub:'廠端確認 · 核對實收數量',urgency:'high',status:'待確認',options:['數量吻合，已記錄 ✓','有差異，需跟廠商','廠端尚未備妥']},
     {id:'gw3',icon:'📋',title:'向工廠確認備貨：Snoopy 現貨',sub:'老董下單前需確認廠端庫存',urgency:'med',status:'待確認',options:['已確認，數量已更新 ✓','今天完成','需安排時間']},
   ],
@@ -1578,6 +1634,166 @@ function markCurrentTodoDone(){
   localStorage.setItem('lobby_done_'+user, JSON.stringify([...doneSet]));
   renderTodos(_showDone);
   _currentTodoId = null;
+}
+
+// ── 高維 / Bevis / 珮玲 / 詩彤 modal × 4 ──
+// 通用 list-modal helper：render demo list with action buttons
+function _genericListRender(listEl, items, renderItem, emptyMsg){
+  const arr = items.filter(i => !i.done);
+  if(!arr.length){
+    listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">${emptyMsg||'✨ 沒有待處理項目'}</div>`;
+    return;
+  }
+  listEl.innerHTML = arr.map(renderItem).join('');
+}
+function _genericDone(key, id, toastMsg){
+  const arr = JSON.parse(localStorage.getItem(key)||'[]');
+  const item = arr.find(x => x.id === id);
+  if(item){ item.done = true; localStorage.setItem(key, JSON.stringify(arr)); }
+  showQaToast(toastMsg || '✓ 已完成');
+  return item;
+}
+
+// 高維：物流批次
+const LOGISTICS_SEED = [
+  {id:'lg1', order:'#BKK240 曼谷倉 → Central Department', urgency:'high', stage:'今日預計出貨', detail:'JJK 盲盒 × 80 箱；曼谷倉備齊，待物流公司提貨。'},
+  {id:'lg2', order:'#BKK241 廠端 → LOG-ON 深圳', urgency:'med', stage:'廠端已備齊，待提貨', detail:'貓福珊迪盲盒 × 500 pcs；木子已確認備齊，可安排出貨。'},
+  {id:'lg3', order:'#BKK242 永盛 → 名創優品', urgency:'med', stage:'生產中', detail:'Snoopy 大貨 180 箱；預計下週備齊。'},
+];
+function _seedKey(key, seed){
+  if(!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(seed));
+  return JSON.parse(localStorage.getItem(key));
+}
+function openLogisticsModal(){
+  const items = _seedKey('gaowei_logistics_v1', LOGISTICS_SEED);
+  _genericListRender(document.getElementById('logistics-list'), items, l => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${l.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${l.order}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${l.stage}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${l.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <input id="lg-track-${l.id}" placeholder="填入快遞單號" style="flex:1;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-family:inherit;">
+      <button onclick="doLogisticsShip('${l.id}')" style="padding:8px 14px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已出貨</button>
+    </div>
+  </div>`, '✨ 所有訂單已出貨');
+  document.getElementById('logistics-modal').classList.add('show');
+}
+function closeLogisticsModal(){ document.getElementById('logistics-modal').classList.remove('show'); }
+function doLogisticsShip(id){
+  const trackInp = document.getElementById('lg-track-'+id);
+  const track = trackInp ? trackInp.value.trim() : '';
+  const item = _genericDone('gaowei_logistics_v1', id, '');
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'anran',
+    msg:`${item ? item.order : id} 已出貨${track?' · 單號 '+track:''}`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  openLogisticsModal();  // re-render
+  showQaToast(`✓ ${item ? item.order : id} 已出貨 · 通知安然 / 業務`);
+}
+
+// Bevis：設計核准
+const DESIGN_APPROVE_SEED = [
+  {id:'da1', name:'貓福珊迪夏日系列 3D 稿', designer:'外包 · 老周', round:'第 3 輪', urgency:'high', detail:'夏日海邊主題；3 個角色姿勢；已調整 IP 方意見；建議進打樣。'},
+  {id:'da2', name:'Snoopy × 城市系列 Brief', designer:'內部 · 詩彤', round:'初稿', urgency:'high', detail:'10 城市主題；已延遲 2 天；採購在等開模時程。'},
+  {id:'da3', name:'Opanchu 文創包裝', designer:'外包 · 小李', round:'第 2 輪修改', urgency:'med', detail:'依 Bevis 上輪意見修；色調 / 字體已調整。'},
+];
+function openDesignApproveModal(){
+  const items = _seedKey('bevis_design_approve_v1', DESIGN_APPROVE_SEED);
+  _genericListRender(document.getElementById('design-approve-list'), items, d => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${d.urgency==='high'?'border-color:var(--danger);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${d.name}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${d.designer} · ${d.round}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${d.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doDesignAction('${d.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准 · 進打樣</button>
+      <button onclick="doDesignAction('${d.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回修改</button>
+      <button onclick="doDesignAction('${d.id}','meeting')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需開會</button>
+    </div>
+  </div>`, '✨ 沒有待核准設計稿');
+  document.getElementById('design-approve-modal').classList.add('show');
+}
+function closeDesignApproveModal(){ document.getElementById('design-approve-modal').classList.remove('show'); }
+function doDesignAction(id, action){
+  const item = _genericDone('bevis_design_approve_v1', id, '');
+  const labels = {approved:'已核准 · 通知賴哥準備打樣', revise:'已退回設計師修改', meeting:'已安排會議'};
+  if(action === 'approved'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`Bevis 核准設計：${item ? item.name : id} · 可準備打樣`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openDesignApproveModal();
+  showQaToast(`✓ ${item ? item.name : id} · ${labels[action]}`);
+}
+
+// 珮玲：送審追蹤
+const APPROVAL_TRACK_SEED = [
+  {id:'at1', ip:'Snoopy 秋冬運動款', sent:'2026-04-28', counterparty:'Peanuts Worldwide', urgency:'high', detail:'已送 IP 方 18 天，正常 14 天回覆；今天應主動追問。'},
+  {id:'at2', ip:'Mofusand 夏日海邊主題', sent:'2026-05-08', counterparty:'貓福珊迪 IP 方', urgency:'med', detail:'第 1 輪意見：請調整背景色彩；設計師已修，本週送第 2 輪。'},
+  {id:'at3', ip:'吉依卡哇 12 城市系列', sent:'2026-05-12', counterparty:'吉依卡哇 IP 方', urgency:'low', detail:'剛送出 3 天，正常等候期。'},
+];
+function openApprovalTrackModal(){
+  const items = _seedKey('peilin_approval_track_v1', APPROVAL_TRACK_SEED);
+  _genericListRender(document.getElementById('approval-track-list'), items, a => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${a.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${a.ip}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">已送 ${a.counterparty} · ${a.sent}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${a.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doApprovalTrack('${a.id}','pass')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 通過</button>
+      <button onclick="doApprovalTrack('${a.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需修改</button>
+      <button onclick="doApprovalTrack('${a.id}','chase')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">主動追問</button>
+    </div>
+  </div>`, '✨ 沒有送審待追蹤');
+  document.getElementById('approval-track-modal').classList.add('show');
+}
+function closeApprovalTrackModal(){ document.getElementById('approval-track-modal').classList.remove('show'); }
+function doApprovalTrack(id, action){
+  const item = _genericDone('peilin_approval_track_v1', id, '');
+  const labels = {pass:'已通過 · 通知 Bevis 進下一階段', revise:'已記錄修改意見', chase:'已發信追問'};
+  if(action === 'pass'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`版權方通過：${item ? item.ip : id} · 可進下一階段`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openApprovalTrackModal();
+  showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
+}
+
+// 詩彤：我的設計任務
+const DESIGN_TASK_SEED = [
+  {id:'dt1', task:'Snoopy 城市系列 — 紐約 / 巴黎 主稿', assignedBy:'Bevis', deadline:'今天 18:00', urgency:'high', detail:'10 城市系列前 2 城；下午要交 Bevis Review。'},
+  {id:'dt2', task:'貓福珊迪文創包裝 第 2 輪修改', assignedBy:'Bevis', deadline:'明天', urgency:'med', detail:'依 Bevis 意見調整色調 + 字體。'},
+  {id:'dt3', task:'Opanchu 公仔配色提案 × 3', assignedBy:'Bevis', deadline:'本週五', urgency:'low', detail:'發想新配色組合，給 Bevis 選。'},
+];
+function openDesignTaskModal(){
+  const items = _seedKey('shetong_design_task_v1', DESIGN_TASK_SEED);
+  _genericListRender(document.getElementById('design-task-list'), items, t => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${t.urgency==='high'?'border-color:var(--danger);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${t.task}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${t.assignedBy} 派發 · 截止 ${t.deadline}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${t.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doDesignTask('${t.id}','submitted')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已交給 Bevis</button>
+      <button onclick="doDesignTask('${t.id}','delay')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需延期</button>
+    </div>
+  </div>`, '✨ 任務全部完成');
+  document.getElementById('design-task-modal').classList.add('show');
+}
+function closeDesignTaskModal(){ document.getElementById('design-task-modal').classList.remove('show'); }
+function doDesignTask(id, action){
+  const item = _genericDone('shetong_design_task_v1', id, '');
+  const labels = {submitted:'已交 Bevis · 等審', delay:'已標記延期'};
+  if(action === 'submitted'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`詩彤交件：${item ? item.task : id}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openDesignTaskModal();
+  showQaToast(`✓ ${item ? item.task : id} · ${labels[action]}`);
 }
 
 // ── 賴哥 / 木子 採購 modal × 3：我的 PO / 備貨核對 / 付款申請 ──
@@ -2244,17 +2460,17 @@ function triggerAction(action){
     case 'payroll-task':      openPayrollModal(); break;
     case 'opex-budget':       openOpexBudgetModal(); break;
     case 'bank-recon':        showQaToast('🏦 銀行對帳 modal 開發中（V2）'); break;
-    case 'design-approve':    showQaToast('🎨 設計核准 modal 開發中（V2）'); break;
+    case 'design-approve':    openDesignApproveModal(); break;
     case 'bedo-approve':      showQaToast('✨ bedo 輸出 modal 開發中（V2）'); break;
-    case 'my-approval-tracker': showQaToast('🖋 送審追蹤 modal 開發中（V2）'); break;
+    case 'my-approval-tracker': openApprovalTrackModal(); break;
     case 'theme-plan':        showQaToast('🖼 主題企劃 modal 開發中（V2）'); break;
-    case 'my-design-task':    showQaToast('📤 設計任務 modal 開發中（V2）'); break;
+    case 'my-design-task':    openDesignTaskModal(); break;
     case 'my-quote':          showQaToast('🔍 詢比價 modal 開發中（V2）'); break;
     case 'my-po':             openMyPoModal(); break;
     case 'sampling-track':    showQaToast('🏭 打樣追蹤 modal 開發中（V2）'); break;
     case 'stock-check':       openStockCheckModal(); break;
     case 'payment-request':   openPaymentReqModal(); break;
-    case 'logistics-batch':   showQaToast('🚚 物流批次 modal 開發中（V2）'); break;
+    case 'logistics-batch':   openLogisticsModal(); break;
     case 'freight-log':       showQaToast('📋 運費登錄 modal 開發中（V2）'); break;
     case 'live-schedule':     showQaToast('📱 直播排期 modal 開發中（V2）'); break;
     case 'live-stock':        showQaToast('📦 備貨確認 modal 開發中（V2）'); break;
