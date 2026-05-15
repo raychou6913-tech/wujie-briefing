@@ -1490,7 +1490,8 @@ function buildSidebar(){
     document.getElementById('sb-group-system-static').style.display = 'none';
   }
 }
-buildSidebar();
+// buildSidebar() call 移到 ACTION_COUNT_SOURCES + getActionCount declared 之後
+// （避免 TDZ：buildSidebar 內部 call getActionCount，需要 ACTION_COUNT_SOURCES 已 initialized）
 
 // ── Todo Data ─────────────────────────────────────────
 const MY_TODOS = {
@@ -1859,7 +1860,6 @@ function getActionCount(action){
   if(!src) return null;  // 無 inbox（new-order / expense / form 類）不顯示 badge
   const raw = localStorage.getItem(src.key);
   if(!raw){
-    // 沒 seed 過：看是否預設有 demo 筆數
     return src.demo != null ? src.demo : (src.demoLen != null ? src.demoLen : 0);
   }
   try {
@@ -1867,6 +1867,7 @@ function getActionCount(action){
     return arr.filter(src.filter).length;
   } catch(e){ return 0; }
 }
+buildSidebar();  // 移到此處（ACTION_COUNT_SOURCES + getActionCount 已 ready）
 
 // 從 todo trigger action 時記錄 todoId — modal 送出時用來 mark done
 let _currentTodoId = null;
