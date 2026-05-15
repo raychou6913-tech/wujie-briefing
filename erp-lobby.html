@@ -1828,6 +1828,54 @@ function showQaToast(msg){
   t._t = setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
+// ── Phase 2: 逾期偵測 (STALE_DETECTOR) — Shawn 待催辦 dynamic 化 ──
+// SLA per inbox：normal vs high urgency 各自天數（依 WORKFLOW_ARCHITECTURE Part 4.2）
+const STALE_SLA = {
+  'yangzi_inbox_v1':         {filter:i=>i.status==='pending', sla:{high:1,normal:3}, source:'楊子待審', who:'楊子', domain:'anran'},
+  'anran_contract_inbox_v1': {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然合約待批', who:'安然', domain:'anran'},
+  'anran_xborder_inbox_v1':  {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然跨境', who:'安然', domain:'anran'},
+  'anran_ip_reminders_v1':   {filter:i=>!i.cleared, sla:{high:1,normal:7}, source:'IP 維護', who:'安然', domain:'anran'},
+  'shawn_wholesale_v1':      {filter:i=>!i.done, sla:{high:1,normal:3}, source:'批發核准', who:'安然', domain:'anran'},
+  'ray_approval_v1':         {filter:i=>!i.done, sla:{high:1,normal:2}, source:'Ray 待批核', who:'Ray', domain:'ray'},
+  'bevis_design_approve_v1': {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計核准', who:'Bevis', domain:'bevis'},
+  'bevis_bedo_v1':           {filter:i=>!i.done, sla:{high:1,normal:5}, source:'bedo 輸出', who:'Bevis', domain:'bevis'},
+  'peilin_approval_track_v1':{filter:i=>!i.done, sla:{high:7,normal:14}, source:'送審追蹤', who:'珮玲', domain:'bevis'},
+  'peilin_theme_v1':         {filter:i=>!i.done, sla:{high:3,normal:7}, source:'主題企劃', who:'珮玲', domain:'bevis'},
+  'shetong_design_task_v1':  {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計任務', who:'詩彤', domain:'bevis'},
+  'laige_po_v1':             {filter:i=>!i.archived, sla:{high:3,normal:7}, source:'PO 進度', who:'賴哥', domain:'anran'},
+  'muzi_stock_check_v1':     {filter:i=>!i.confirmed, sla:{high:1,normal:2}, source:'備貨核對', who:'木子', domain:'anran'},
+  'gaowei_logistics_v1':     {filter:i=>!i.done, sla:{high:1,normal:2}, source:'物流批次', who:'高維', domain:'shawn'},
+  'chunlei_live_v1':         {filter:i=>!i.done, sla:{high:1,normal:3}, source:'直播排期', who:'春雷/佳音', domain:'shawn'},
+  'jiaying_taobao_v1':       {filter:i=>!i.done, sla:{high:1,normal:3}, source:'淘寶上架', who:'佳音', domain:'shawn'},
+};
+
+function detectStaleItems(){
+  const stale = [];
+  const _hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
+  Object.entries(STALE_SLA).forEach(([key, cfg]) => {
+    let arr;
+    try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return; }
+    if(!Array.isArray(arr)) return;
+    arr.filter(cfg.filter).forEach(item => {
+      // 沒 submittedAt 的舊 seed：預設 5 天前（讓 demo 看得到效果）
+      const submittedAt = item.submittedAt || (Date.now() - 5*86400000);
+      const ageDays = (Date.now() - submittedAt) / 86400000;
+      const slaDays = cfg.sla[item.urgency === 'high' ? 'high' : 'normal'];
+      if(ageDays <= slaDays) return;
+      // 暫掛 24 hr 內的跳過
+      const hideKey = key + ':' + item.id;
+      if(_hidden[hideKey] && Date.now() < _hidden[hideKey]) return;
+      stale.push({
+        key, item, source: cfg.source, who: cfg.who, domain: cfg.domain,
+        daysLate: Math.floor(ageDays - slaDays),
+        age: Math.floor(ageDays),
+        urgency: item.urgency || 'normal',
+      });
+    });
+  });
+  return stale.sort((a, b) => b.daysLate - a.daysLate);
+}
+
 // ── Sidebar 動作的待處理數量 helper ──
 // 讀對應 localStorage + filter 未完成項目算 count
 const ACTION_COUNT_SOURCES = {
@@ -2168,37 +2216,114 @@ function doWholesale(id, action){
   showQaToast(`✓ ${item ? item.client : id} · ${labels[action]}`);
 }
 
-const CHASE_SEED = [
-  {id:'ch1', target:'賴哥', task:'PO#320 出貨進度更新', delay:'延遲 3 天', urgency:'high', detail:'Miffy 文具，深圳廠應本週出貨，賴哥沒回報。需 push。'},
-  {id:'ch2', target:'珮玲', task:'Snoopy 秋冬版權方追問', delay:'延遲 4 天', urgency:'high', detail:'已送 IP 方 18 天，超出正常 14 天等候期。'},
-  {id:'ch3', target:'老董', task:'本週拜訪記錄', delay:'延遲 1 天', urgency:'med', detail:'廣州美陳昨天拜訪，記錄未填寫。'},
-];
+// 待催辦改 dynamic — 從所有 inbox 跑 STALE_DETECTOR
 function openChaseModal(){
-  const items = _seedKey('shawn_chase_v1', CHASE_SEED);
-  _genericListRender(document.getElementById('chase-list'), items, c => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${c.urgency==='high'?'border-color:var(--warn);':''}">
-    <div style="margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:700;color:var(--ink);">${c.target} · ${c.task}</span>
-      <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ ${c.delay}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${c.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doChase('${c.id}','push')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 飛書催促</button>
-      <button onclick="doChase('${c.id}','later')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">明天再催</button>
-    </div>
-  </div>`, '✨ 全公司任務都準時，沒有需要催的');
+  const stale = detectStaleItems();
+  const list = document.getElementById('chase-list');
+  if(!stale.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 全公司任務都準時，沒有需要催的</div>';
+  } else {
+    const DOMAIN_LABEL = {anran:'安然 domain · 知會安然', bevis:'Bevis domain · 知會 Bevis', shawn:'我的 domain · 可直接決策', ray:'Ray 直屬 · 只能催'};
+    list.innerHTML = stale.map((s, idx) => {
+      const itemTitle = s.item.name || s.item.title || s.item.task || s.item.ip || s.item.po || s.item.client || s.item.order || '(unnamed)';
+      const detail = s.item.detail || s.item.meta || '';
+      const isAnran = s.domain === 'anran';
+      const isBevis = s.domain === 'bevis';
+      const escalateBtn = (s.domain === 'shawn')
+        ? `<button onclick="doChaseEscalate('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">⬆️ 升級 Ray</button>`
+        : (isAnran || isBevis)
+          ? `<button onclick="doChaseKnow('${s.key}','${s.item.id}','${s.domain}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">💬 知會${s.domain==='anran'?'安然':'Bevis'}</button>`
+          : '';
+      return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--paper-soft);color:var(--ink-mid);margin-right:6px;">${s.source}</span>
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.who} · ${itemTitle}</span>
+          <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ 延遲 ${s.daysLate} 天（送來已 ${s.age} 天 · SLA 超過）</div>
+          <div style="font-size:9px;color:var(--ink-lo);margin-top:2px;">${DOMAIN_LABEL[s.domain]||''}</div>
+        </div>
+        ${detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${detail}</div>` : ''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doChasePush('${s.key}','${s.item.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 飛書催 ${s.who}</button>
+          ${escalateBtn}
+          <button onclick="doChaseHide('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫掛 24h</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
   document.getElementById('chase-modal').classList.add('show');
 }
 function closeChaseModal(){ document.getElementById('chase-modal').classList.remove('show'); }
-function doChase(id, action){
-  const item = _genericDone('shawn_chase_v1', id, '');
-  if(action === 'push'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-    notif.unshift({ts:Date.now(), from:name, to:item.target, msg:`🔔 Shawn 催：${item ? item.task : id}（${item.delay}）`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  }
-  openChaseModal();
-  showQaToast(action==='push' ? `✓ 已飛書催 ${item ? item.target : id}` : '已標記明天再催');
+function _findStaleItem(key, id){
+  const arr = JSON.parse(localStorage.getItem(key)||'[]');
+  return arr.find(x => x.id === id);
 }
+function doChasePush(key, id){
+  const cfg = STALE_SLA[key];
+  const item = _findStaleItem(key, id);
+  if(!item || !cfg) return;
+  const itemTitle = item.name || item.title || item.task || item.ip || item.po || item.client || item.order || '(unnamed)';
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  // who 是中文名，要 reverse map 到 user id
+  const NAME_TO_USER = {'楊子':'yangzi','Leo':'leo','安然':'anran','賴哥':'laige','木子':'muzi','Bevis':'bevis','珮玲':'peilin','詩彤':'shetong','高維':'gaowei','春雷':'chunlei','佳音':'jiaying','Ray':'ray'};
+  const targetUser = NAME_TO_USER[cfg.who] || cfg.who;
+  notif.unshift({ts:Date.now(), from:'Shawn', to:targetUser, msg:`🔔 Shawn 催：${itemTitle}（已延遲）`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  openChaseModal();
+  showQaToast(`🔔 已飛書催 ${cfg.who}`);
+}
+function doChaseKnow(key, id, domain){
+  const cfg = STALE_SLA[key];
+  const item = _findStaleItem(key, id);
+  if(!item || !cfg) return;
+  const itemTitle = item.name || item.title || item.task || item.ip || item.po || item.client || item.order || '(unnamed)';
+  const target = domain === 'anran' ? 'anran' : 'bevis';
+  const targetName = domain === 'anran' ? '安然' : 'Bevis';
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:'Shawn', to:target, msg:`💬 Shawn 知會：${cfg.who} ${itemTitle} 已延遲，請處理`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  // 同時暫掛 24h 避免重複看到
+  const hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
+  hidden[key+':'+id] = Date.now() + 86400000;
+  localStorage.setItem('shawn_chase_hidden_v1', JSON.stringify(hidden));
+  openChaseModal();
+  showQaToast(`💬 已知會 ${targetName} · 24h 不重提`);
+}
+function doChaseHide(key, id){
+  const hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
+  hidden[key+':'+id] = Date.now() + 86400000;
+  localStorage.setItem('shawn_chase_hidden_v1', JSON.stringify(hidden));
+  openChaseModal();
+  showQaToast('✓ 暫掛 24 小時');
+}
+// 升級 Ray — 加 UI 摩擦（必填理由 modal，gg 拍板）
+function doChaseEscalate(key, id){
+  const cfg = STALE_SLA[key];
+  const item = _findStaleItem(key, id);
+  if(!item || !cfg) return;
+  const reason = prompt(`升級給 Ray — 請簡述原因（必填）：\n\n項目：${cfg.who} · ${item.name || item.title || item.task || item.order || ''}\n延遲狀態：已超 SLA`);
+  if(!reason || !reason.trim()){ showQaToast('已取消（必填原因）'); return; }
+  // 寫進 ray_approval_v1
+  const itemTitle = item.name || item.title || item.task || item.po || item.order || '(escalated)';
+  const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
+  rayArr.unshift({
+    id:'esc-' + Date.now(), type:'escalation',
+    title:`[Shawn 升級] ${itemTitle}`, from:'Shawn', urgency:'high',
+    detail:`Shawn 升級原因：${reason.trim()}\n原 source：${cfg.source} · ${cfg.who}`,
+    submittedAt: Date.now(),
+  });
+  localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:'Shawn', to:'ray', msg:`⬆️ Shawn 升級：${itemTitle} · ${reason.trim()}`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  // 同時暫掛
+  const hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
+  hidden[key+':'+id] = Date.now() + 86400000;
+  localStorage.setItem('shawn_chase_hidden_v1', JSON.stringify(hidden));
+  openChaseModal();
+  showQaToast(`⬆️ 已升級給 Ray`);
+}
+
+// 舊 doChase 函數已拿掉（hardcoded CHASE_SEED 已停用，改 dynamic STALE_DETECTOR）
 
 const RAY_APPROVAL_SEED = [
   {id:'r1', type:'pricing', title:'Snoopy LOG-ON 訂單定價', from:'Shawn', urgency:'high', detail:'860 箱 / ¥199 萬 / 客戶要 5/30 前到貨；Shawn 已確認可執行，請拍板定價。'},
