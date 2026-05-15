@@ -747,6 +747,29 @@ body{
   </div>
 </div>
 
+<!-- 薪資錄入 MODAL（楊子 / Leo / Ray）-->
+<div class="qa-modal-bg" id="payroll-modal" onclick="if(event.target===this)closePayrollModal()">
+  <div class="qa-modal" style="max-width:600px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">💰 薪資錄入</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">填入各員工本月薪資後送出 → 寫入 HR 費用中心 + 通知躍明入帳</div>
+      </div>
+      <button class="qa-modal-close" onclick="closePayrollModal()">✕</button>
+    </div>
+    <div id="payroll-entity-tabs" style="display:flex;gap:6px;margin-bottom:14px;padding:4px;background:var(--paper-soft);border-radius:10px;">
+      <button class="pr-ent-tab active" data-ent="北京蕪解" onclick="switchPayrollEnt('北京蕪解')" style="flex:1;padding:8px 12px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);">北京蕪解</button>
+      <button class="pr-ent-tab" data-ent="台灣悍草" onclick="switchPayrollEnt('台灣悍草')" style="flex:1;padding:8px 12px;border:none;background:transparent;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink-mid);">台灣悍草</button>
+    </div>
+    <div id="payroll-rows-list" style="max-height:50vh;overflow-y:auto;border:1px solid var(--line);border-radius:10px;"></div>
+    <div id="payroll-total" style="margin-top:12px;padding:10px 14px;background:var(--paper-soft);border-radius:8px;font-size:12px;color:var(--ink-mid);display:flex;justify-content:space-between;">
+      <span>合計</span>
+      <strong id="payroll-total-val" style="color:var(--ink);">¥ 0</strong>
+    </div>
+    <button class="qa-submit" onclick="submitPayroll()">送出 → 通知躍明入帳</button>
+  </div>
+</div>
+
 <!-- 錄費用 MODAL（每人都有，3 類：個人報銷 / 業務相關 / 公司 OPEX [僅楊子/Leo/Ray]） -->
 <div class="qa-modal-bg" id="expense-modal" onclick="if(event.target===this)closeExpenseModal()">
   <div class="qa-modal">
@@ -1142,12 +1165,12 @@ const MY_TODOS = {
     {id:'gw3',icon:'📋',title:'向工廠確認備貨：Snoopy 現貨',sub:'老董下單前需確認廠端庫存',urgency:'med',status:'待確認',options:['已確認，數量已更新 ✓','今天完成','需安排時間']},
   ],
   yangzi:[
-    {id:'yz1',icon:'💰',title:'5月薪資核算整理',sub:'截止本週五，送安然複核',urgency:'high',status:'進行中',options:['今天完成 ✓','明天完成','需延期']},
+    {id:'yz1',icon:'💰',title:'5月薪資核算整理',sub:'截止本週五，送躍明入帳',urgency:'high',status:'進行中',action:'payroll-task'},
     {id:'yz2',icon:'📝',title:'費用報銷審核 — 詩彤台高出差',sub:'NT$8,560，等待確認',urgency:'med',status:'待審核',options:['核准，送安然 ✓','退回修改','需補單據']},
     {id:'yz3',icon:'👥',title:'新設計師實習生入職資料',sub:'5月到職，資料未完整',urgency:'low',status:'進行中',options:['今天完成 ✓','本週完成']},
   ],
   leo:[
-    {id:'le1',icon:'💳',title:'5月台灣固定費用支出',sub:'房租+水電+薪資，需同步躍明',urgency:'high',status:'進行中',options:['今天完成，已通知躍明 ✓','明天完成']},
+    {id:'le1',icon:'💳',title:'5月台灣固定費用支出',sub:'房租 / 水電 / 薪資 — 立即錄入並通知躍明',urgency:'high',status:'進行中',action:'expense'},
     {id:'le2',icon:'📊',title:'台灣 Q1 費用明細整理',sub:'配合躍明月結報表',urgency:'med',status:'進行中',options:['已整理完畢 ✓','本週完成']},
   ],
 };
@@ -1353,6 +1376,7 @@ function submitNewOrder(){
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
 
   closeNewOrderModal();
+  markCurrentTodoDone();
   showQaToast(`✓ 訂單已通報 · 安然 / 賴哥 / 高維 / 躍明 收到`);
 }
 
@@ -1389,6 +1413,7 @@ function submitSellThru(){
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
 
   closeSellThruModal();
+  markCurrentTodoDone();
   showQaToast(`✓ 動銷已回報 · ${client.split('（')[0]} · ${product}`);
 }
 
@@ -1399,6 +1424,116 @@ function showQaToast(msg){
   t.classList.add('show');
   clearTimeout(t._t);
   t._t = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// 從 todo trigger action 時記錄 todoId — modal 送出時用來 mark done
+let _currentTodoId = null;
+function markCurrentTodoDone(){
+  if(!_currentTodoId) return;
+  doneSet.add(_currentTodoId);
+  localStorage.setItem('lobby_done_'+user, JSON.stringify([...doneSet]));
+  renderTodos(_showDone);
+  _currentTodoId = null;
+}
+
+// ── 薪資錄入 modal（楊子 / Leo / Ray）──
+const PAYROLL_DATA = {
+  '北京蕪解': [
+    {name:'安然',  role:'北京負責人 · 全球商務', amount:25000},
+    {name:'賴哥',  role:'採購主管',             amount:18000},
+    {name:'木子',  role:'採購執行',             amount:12000},
+    {name:'老董',  role:'業務',                 amount:15000},
+    {name:'德寶',  role:'業務',                 amount:10000},
+    {name:'高維',  role:'物流',                 amount:8000},
+    {name:'春雷',  role:'電商',                 amount:9000},
+    {name:'佳音',  role:'電商',                 amount:8000},
+    {name:'楊子',  role:'HR · 出納 · 行政',     amount:10000},
+    {name:'躍明',  role:'財務',                 amount:12000},
+  ],
+  '台灣悍草': [
+    {name:'Ray',     role:'CEO',           amount:120000},
+    {name:'Bevis',   role:'設計主管',      amount:75000},
+    {name:'珮玲',    role:'企劃·版權',     amount:55000},
+    {name:'詩彤',    role:'設計師',        amount:48000},
+    {name:'Leo',     role:'出納·台灣',     amount:50000},
+  ],
+};
+let _currentPayrollEnt = '北京蕪解';
+function openPayrollModal(){
+  const isLeo = user === 'leo';
+  _currentPayrollEnt = isLeo ? '台灣悍草' : '北京蕪解';
+  document.querySelectorAll('.pr-ent-tab').forEach(b=>{
+    const active = b.dataset.ent === _currentPayrollEnt;
+    b.classList.toggle('active', active);
+    b.style.background = active ? '#fff' : 'transparent';
+    b.style.color = active ? 'var(--ink)' : 'var(--ink-mid)';
+  });
+  renderPayrollRows();
+  document.getElementById('payroll-modal').classList.add('show');
+}
+function closePayrollModal(){
+  document.getElementById('payroll-modal').classList.remove('show');
+}
+function switchPayrollEnt(ent){
+  _currentPayrollEnt = ent;
+  document.querySelectorAll('.pr-ent-tab').forEach(b=>{
+    const active = b.dataset.ent === ent;
+    b.classList.toggle('active', active);
+    b.style.background = active ? '#fff' : 'transparent';
+    b.style.color = active ? 'var(--ink)' : 'var(--ink-mid)';
+  });
+  renderPayrollRows();
+}
+function renderPayrollRows(){
+  const list = document.getElementById('payroll-rows-list');
+  const data = PAYROLL_DATA[_currentPayrollEnt] || [];
+  const sym = _currentPayrollEnt === '台灣悍草' ? 'NT$' : '¥';
+  // 讀 localStorage override
+  const ovr = JSON.parse(localStorage.getItem('payroll_override_v1')||'{}')[_currentPayrollEnt] || {};
+  list.innerHTML = data.map((p, i) => {
+    const val = ovr[p.name] != null ? ovr[p.name] : p.amount;
+    return `<div style="display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);${i===data.length-1?'border-bottom:none;':''}">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);">${p.name}</div>
+        <div style="font-size:10px;color:var(--ink-lo);">${p.role}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:var(--ink-lo);">${sym}</span>
+        <input type="number" data-name="${p.name}" value="${val}" oninput="updatePayrollTotal()" style="width:90px;text-align:right;font-size:13px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;background:var(--paper-soft);color:var(--ink);">
+      </div>
+    </div>`;
+  }).join('');
+  updatePayrollTotal();
+}
+function updatePayrollTotal(){
+  const inputs = document.querySelectorAll('#payroll-rows-list input[data-name]');
+  let total = 0;
+  inputs.forEach(i => total += Number(i.value)||0);
+  const sym = _currentPayrollEnt === '台灣悍草' ? 'NT$' : '¥';
+  document.getElementById('payroll-total-val').textContent = sym + ' ' + total.toLocaleString();
+}
+function submitPayroll(){
+  const inputs = document.querySelectorAll('#payroll-rows-list input[data-name]');
+  const ovr = JSON.parse(localStorage.getItem('payroll_override_v1')||'{}');
+  if(!ovr[_currentPayrollEnt]) ovr[_currentPayrollEnt] = {};
+  let total = 0;
+  inputs.forEach(i => {
+    const v = Number(i.value)||0;
+    ovr[_currentPayrollEnt][i.dataset.name] = v;
+    total += v;
+  });
+  localStorage.setItem('payroll_override_v1', JSON.stringify(ovr));
+
+  // 通知躍明入帳
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  const sym = _currentPayrollEnt === '台灣悍草' ? 'NT$' : '¥';
+  notif.unshift({ts:Date.now(), from:name, to:'yuming',
+    msg:`${_currentPayrollEnt} 本月薪資已錄：${sym} ${total.toLocaleString()}（${name} 提交）`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+
+  closePayrollModal();
+  markCurrentTodoDone();
+  showQaToast(`✓ ${_currentPayrollEnt} 薪資已送躍明確認 · ${sym} ${total.toLocaleString()}`);
 }
 
 // ── 錄費用 modal（每人都有，3 類，OPEX role-based）──
@@ -1460,6 +1595,7 @@ function submitExpense(){
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
 
   closeExpenseModal();
+  markCurrentTodoDone();
   const routeText = type==='opex' ? '已寫入 HR 費用中心' :
                     type==='business' ? '已送 → 直屬主管 → 安然' : '已送 → 直屬主管';
   showQaToast(`✓ 費用已記錄 · ${routeText}`);
@@ -1481,7 +1617,7 @@ function triggerAction(action){
     case 'my-pending':        openSimpleListModal('my-pending'); break;
     case 'monthend':          showQaToast('📊 月結任務 modal 開發中（V2）'); break;
     case 'my-approval':       showQaToast('✓ 待審 modal 開發中（V2）— 內容會從 yangzi inbox 搬過來'); break;
-    case 'payroll-task':      showQaToast('💰 薪資任務 modal 開發中（V2）'); break;
+    case 'payroll-task':      openPayrollModal(); break;
     case 'bank-recon':        showQaToast('🏦 銀行對帳 modal 開發中（V2）'); break;
     case 'design-approve':    showQaToast('🎨 設計核准 modal 開發中（V2）'); break;
     case 'bedo-approve':      showQaToast('✨ bedo 輸出 modal 開發中（V2）'); break;
@@ -1585,13 +1721,44 @@ function renderTodos(showDone){
       if(!done){
         const actDiv = document.createElement('div');
         actDiv.className = 'block-actions';
-        t.options.forEach((opt, i) => {
-          const btn = document.createElement('button');
-          btn.className = 'block-action-btn' + (i===0?' primary':'');
-          btn.textContent = opt;
-          btn.onclick = (e) => { e.stopPropagation(); handleAction(t, opt); };
-          actDiv.appendChild(btn);
-        });
+
+        if(t.action){
+          // Actionable todo：主按鈕「立即執行」trigger modal，延後選項收進 ▾
+          const mainBtn = document.createElement('button');
+          mainBtn.className = 'block-action-btn primary';
+          mainBtn.innerHTML = '⚡ 立即執行 →';
+          mainBtn.onclick = (e) => {
+            e.stopPropagation();
+            _currentTodoId = t.id;  // modal 送出時 mark done
+            triggerAction(t.action);
+          };
+          actDiv.appendChild(mainBtn);
+
+          // 延後 ▾（被催時才用，預設收起）
+          const laterBtn = document.createElement('button');
+          laterBtn.className = 'block-action-btn';
+          laterBtn.style.cssText = 'background:transparent;color:var(--ink-lo);border:1px solid var(--line);';
+          laterBtn.innerHTML = '延後 ▾';
+          laterBtn.onclick = (e) => {
+            e.stopPropagation();
+            const choice = prompt('延後處理（輸入數字選擇）：\n1. 延到明天\n2. 延期 3 天\n3. 已交付他人\n4. 取消');
+            if(choice){
+              const labels = {'1':'延到明天','2':'延期 3 天','3':'已交付他人','4':'已取消'};
+              const lbl = labels[choice];
+              if(lbl) handleAction(t, lbl);
+            }
+          };
+          actDiv.appendChild(laterBtn);
+        } else if(t.options) {
+          // Delegation / info todo：保留 options（多人狀態回報用）
+          t.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'block-action-btn' + (i===0?' primary':'');
+            btn.textContent = opt;
+            btn.onclick = (e) => { e.stopPropagation(); handleAction(t, opt); };
+            actDiv.appendChild(btn);
+          });
+        }
         inner.appendChild(actDiv);
       }
 
