@@ -86,6 +86,19 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 .prod-info{flex:1;min-width:0;}
 .prod-name{font-size:13px;font-weight:700;margin-bottom:2px;}
 .prod-meta{font-size:10px;color:var(--txt-mid);}
+.prod-stock{
+  font-size:11px;color:var(--ink-mid);margin-top:5px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  font-family:"Helvetica Neue",sans-serif;letter-spacing:.02em;
+}
+.prod-stock-chip{
+  font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;
+  letter-spacing:.04em;
+}
+.prod-stock-chip.ok{background:var(--ok-dim);color:var(--ok);}
+.prod-stock-chip.warn{background:var(--warn-dim);color:var(--warn);}
+.prod-stock-chip.danger{background:var(--danger-dim);color:var(--danger);}
+.prod-stock-chip.old{background:#fff4ef;color:var(--brand);border:1px solid #ff6b3540;}
 .prod-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .prod-total{font-size:15px;font-weight:800;}
 .prod-chevron{font-size:11px;color:var(--txt-lo);transition:transform .2s;}
@@ -380,6 +393,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
       <div class="prod-info">
         <div class="prod-name">Snoopy 夏季盲盒</div>
         <div class="prod-meta">大貨銷售中 · 老董負責主線 · 5,000 件出貨</div>
+        <div class="prod-stock">📦 現貨 2,400 件 · 在途 2,600 件 · 生產 42 天<span class="prod-stock-chip ok">充足</span></div>
       </div>
       <div class="prod-right">
         <span class="chip chip-ok">銷售中</span>
@@ -475,6 +489,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
       <div class="prod-info">
         <div class="prod-name">Mofusand 貓福珊迪（持續銷售）</div>
         <div class="prod-meta">持續銷售 · 珮玲負責台灣 / 老董負責大陸</div>
+        <div class="prod-stock">📦 現貨 1,800 件 · 在途 800 件 · 生產 30 天<span class="prod-stock-chip ok">充足</span></div>
       </div>
       <div class="prod-right">
         <span class="chip chip-info">持續在售</span>
@@ -521,6 +536,7 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
       <div class="prod-info">
         <div class="prod-name">Opanchu 褲褲兔（大貨追加中）</div>
         <div class="prod-meta">大貨追加中 · 德寶負責 · ⚠ 有尾款逾期</div>
+        <div class="prod-stock">📦 現貨 1,200 件 · 在途 4,200 件 · 生產 85 天<span class="prod-stock-chip old">建議加速清倉</span></div>
       </div>
       <div class="prod-right">
         <span class="chip chip-danger">有尾款逾期</span>
@@ -552,42 +568,10 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
     </div>
   </div>
 
-  <!-- 批發可接單庫存快查 -->
+  <!-- ② 渠道動銷情況（庫存資訊已整合進「在售產品 × 收單動態」內每產品的 prod-stock 行）-->
   <div class="sec-head" style="margin-top:20px;">
-    <span class="sec-title">批發庫存快查</span>
-    <a href="erp-gaowei.html" style="font-size:11px;color:var(--accent);font-weight:700;text-decoration:none;">物流明細 →</a>
-  </div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);">
-      <div style="padding:7px 12px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;">產品</div>
-      <div style="padding:7px 10px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">現貨（件）</div>
-      <div style="padding:7px 10px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">在途（件）</div>
-      <div style="padding:7px 10px;font-size:9px;font-weight:700;color:var(--txt-lo);text-transform:uppercase;text-align:right;">庫存狀態</div>
-    </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);">
-      <div style="padding:9px 12px;font-size:12px;font-weight:700;">Snoopy 夏季盲盒</div>
-      <div style="padding:9px 10px;font-size:12px;font-weight:700;color:var(--ok);text-align:right;">2,400</div>
-      <div style="padding:9px 10px;font-size:12px;text-align:right;color:var(--txt-mid);">2,600</div>
-      <div style="padding:9px 10px;text-align:right;"><span style="font-size:9px;font-weight:700;background:var(--ok-dim);color:var(--ok);padding:2px 7px;border-radius:5px;">充足</span></div>
-    </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);">
-      <div style="padding:9px 12px;font-size:12px;font-weight:700;">Muziktiger 公仔</div>
-      <div style="padding:9px 10px;font-size:12px;font-weight:700;color:var(--warn);text-align:right;">480</div>
-      <div style="padding:9px 10px;font-size:12px;text-align:right;color:var(--txt-mid);">1,200</div>
-      <div style="padding:9px 10px;text-align:right;"><span style="font-size:9px;font-weight:700;background:var(--warn-dim);color:var(--warn);padding:2px 7px;border-radius:5px;">偏低</span></div>
-    </div>
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;">
-      <div style="padding:9px 12px;font-size:12px;font-weight:700;">Opanchu 抱枕</div>
-      <div style="padding:9px 10px;font-size:12px;font-weight:700;color:var(--ok);text-align:right;">1,200</div>
-      <div style="padding:9px 10px;font-size:12px;text-align:right;color:var(--txt-mid);">—</div>
-      <div style="padding:9px 10px;text-align:right;"><span style="font-size:9px;font-weight:700;background:var(--ok-dim);color:var(--ok);padding:2px 7px;border-radius:5px;">充足</span></div>
-    </div>
-  </div>
-
-  <!-- ② 渠道銷售反饋 -->
-  <div class="sec-head" style="margin-top:20px;">
-    <span class="sec-title">渠道銷售反饋</span>
-    <span style="font-size:10px;color:var(--txt-lo)">業務回報 · 即時更新</span>
+    <span class="sec-title">渠道動銷情況</span>
+    <span style="font-size:10px;color:var(--txt-lo)">業務回報 · 月動銷率 · 即時更新</span>
   </div>
   <div id="sellthru-panel" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
     <div id="sellthru-anran-list"><div style="font-size:11px;color:var(--txt-lo);text-align:center;padding:10px 0">尚無銷售反饋 · 業務請至 CRM 頁面回報</div></div>
