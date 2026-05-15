@@ -747,6 +747,69 @@ body{
   </div>
 </div>
 
+<!-- 賴哥：我的 PO MODAL -->
+<div class="qa-modal-bg" id="my-po-modal" onclick="if(event.target===this)closeMyPoModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📦 我的 PO</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">已下單 PO 進度追蹤 + 新增 PO</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeMyPoModal()">✕</button>
+    </div>
+    <div id="my-po-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 木子：備貨核對 MODAL -->
+<div class="qa-modal-bg" id="stock-check-modal" onclick="if(event.target===this)closeStockCheckModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📦 備貨核對</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">PO 數量 vs 廠端實收 · 一鍵確認入庫</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeStockCheckModal()">✕</button>
+    </div>
+    <div id="stock-check-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 木子：付款申請 MODAL -->
+<div class="qa-modal-bg" id="payment-req-modal" onclick="if(event.target===this)closePaymentReqModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📝 供應商付款申請</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">送賴哥審核 → Ray 核准 → 躍明付款</div>
+      </div>
+      <button class="qa-modal-close" onclick="closePaymentReqModal()">✕</button>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>供應商</label><select id="pr-supplier">
+        <option>東莞達豐玩具</option>
+        <option>永盛玩具廠</option>
+        <option>深圳壓克力廠</option>
+        <option>其他（請備註）</option>
+      </select></div>
+      <div class="qa-field"><label>類型</label><select id="pr-type">
+        <option>頭款 30%</option>
+        <option>進度款 40%</option>
+        <option>尾款 30%</option>
+        <option>樣品費</option>
+        <option>模具費</option>
+      </select></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>金額（人民幣）</label><input id="pr-amount" type="number" placeholder="例：42000"></div>
+      <div class="qa-field"><label>付款期限</label><input id="pr-deadline" type="date"></div>
+    </div>
+    <div class="qa-field"><label>對應 PO 或項目</label><input id="pr-po" placeholder="例：PO#320 Snoopy 大貨 / 吉依卡哇 模具"></div>
+    <div class="qa-field"><label>備註</label><textarea id="pr-notes" rows="2" placeholder="廠商開票資訊 / 付款方式 / 特殊要求"></textarea></div>
+    <button class="qa-submit" onclick="submitPaymentReq()">送出 → 賴哥審核</button>
+  </div>
+</div>
+
 <!-- 安然：合約待批 MODAL -->
 <div class="qa-modal-bg" id="contract-modal" onclick="if(event.target===this)closeContractModal()">
   <div class="qa-modal" style="max-width:580px;">
@@ -1198,12 +1261,12 @@ const MY_TODOS = {
   ],
   laige:[
     {id:'l1',icon:'🏭',title:'報價確認：東莞廠 Snoopy × 5000pcs',sub:'截止今日 EOD · 版本#3',urgency:'high',status:'待回覆',options:['已回覆廠商 ✓','追催中','考慮換廠']},
-    {id:'l2',icon:'📦',title:'PO#320 出貨進度 — Miffy 文具',sub:'深圳廠直發 → 北京客戶 · 預計本週',urgency:'high',status:'待更新',options:['已出貨 ✓','生產中，延1週','延誤，需通知安然']},
+    {id:'l2',icon:'📦',title:'PO#320 出貨進度 — Miffy 文具',sub:'深圳廠直發 → 北京客戶 · 立即查看 PO list 更新進度',urgency:'high',status:'待更新',action:'my-po'},
     {id:'l3',icon:'🔍',title:'壓克力掛件新供應商詢比價',sub:'Bevis Q3需求 · 需3家報價',urgency:'med',status:'進行中',options:['已取得3家報價 ✓','取得1-2家，繼續','需更多規格資訊']},
   ],
   muzi:[
-    {id:'m1',icon:'📦',title:'PO#318 備貨核對 — 貓福珊迪公仔',sub:'廠端確認 · 應收 1200pcs',urgency:'high',status:'待確認',options:['數量吻合 ✓','有差異，已記錄','尚未備妥']},
-    {id:'m2',icon:'📝',title:'供應商付款申請：東莞廠頭款',sub:'¥42,000 · 需賴哥審核',urgency:'high',status:'待填報',options:['已填報送審 ✓','暫緩','轉交賴哥處理']},
+    {id:'m1',icon:'📦',title:'PO#318 備貨核對 — 貓福珊迪公仔',sub:'廠端確認 · 應收 1200pcs · 立即核對',urgency:'high',status:'待確認',action:'stock-check'},
+    {id:'m2',icon:'📝',title:'供應商付款申請：東莞廠頭款',sub:'¥42,000 · 立即填單送賴哥審核',urgency:'high',status:'待填報',action:'payment-request'},
   ],
   bevis:[
     {id:'b1',icon:'🎨',title:'貓福珊迪夏日系列 — 3D稿第3輪審核',sub:'外包設計師 · 等待 2 天',urgency:'high',status:'待審核',options:['核准，進打樣 ✓','退回修改','需開會討論']},
@@ -1515,6 +1578,143 @@ function markCurrentTodoDone(){
   localStorage.setItem('lobby_done_'+user, JSON.stringify([...doneSet]));
   renderTodos(_showDone);
   _currentTodoId = null;
+}
+
+// ── 賴哥 / 木子 採購 modal × 3：我的 PO / 備貨核對 / 付款申請 ──
+const MY_PO_SEED = [
+  {id:'po1', name:'PO#320 Snoopy 大貨', supplier:'永盛玩具', stage:'生產中 · 60%', deadline:'2026-06-10 交貨', amount:'¥ 78 萬', detail:'第 2 批大貨；20% 訂金已付；尾款待出貨前付。'},
+  {id:'po2', name:'PO#321 Mofusand 盲袋', supplier:'東莞達豐', stage:'打樣 · 第 3 輪', deadline:'2026-05-25 樣品截止', amount:'¥ 32 萬', detail:'盲袋包裝模具修改中，等廠端確認樣品後正式下單。'},
+  {id:'po3', name:'PO#322 Opanchu 公仔', supplier:'永盛玩具', stage:'已發貨', deadline:'2026-05-20 到貨', amount:'¥ 18 萬', detail:'追加 80 箱滿足 LOG-ON 補單；快遞單號已給高維。'},
+];
+function loadMyPo(){
+  const stored = localStorage.getItem('laige_po_v1');
+  if(stored) return JSON.parse(stored);
+  localStorage.setItem('laige_po_v1', JSON.stringify(MY_PO_SEED));
+  return MY_PO_SEED;
+}
+function openMyPoModal(){ renderMyPo(); document.getElementById('my-po-modal').classList.add('show'); }
+function closeMyPoModal(){ document.getElementById('my-po-modal').classList.remove('show'); }
+function renderMyPo(){
+  const list = document.getElementById('my-po-list');
+  const arr = loadMyPo().filter(p => !p.archived);
+  list.innerHTML = arr.map(p => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="flex:1;">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${p.name}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${p.supplier} · ${p.stage} · ${p.deadline}</div>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${p.amount}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${p.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="showQaToast('${p.name} 進度更新 modal · V2 開發中')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">更新進度</button>
+      <button onclick="doPoArchive('${p.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">已完成歸檔</button>
+    </div>
+  </div>`).join('') + `<div style="text-align:center;padding:12px;"><button onclick="showQaToast('+ 新增 PO modal · V2 開發中')" style="padding:10px 22px;background:transparent;color:var(--brand);border:1.5px dashed var(--brand);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">+ 新 PO</button></div>`;
+}
+function doPoArchive(id){
+  const arr = loadMyPo();
+  const p = arr.find(x => x.id === id);
+  if(p){ p.archived = true; localStorage.setItem('laige_po_v1', JSON.stringify(arr)); }
+  renderMyPo();
+  showQaToast(`✓ ${p ? p.name : id} 已歸檔`);
+}
+
+const STOCK_CHECK_SEED = [
+  {id:'s1', po:'PO#318 Mofusand 公仔', supplier:'東莞達豐', expected:1200, received:null, urgency:'high', detail:'廠端通知今日備齊，預期 1200 pcs。'},
+  {id:'s2', po:'PO#320 Snoopy 大貨第二批', supplier:'永盛玩具', expected:9600, received:null, urgency:'med', detail:'分 3 批出，第 1 批 9600 pcs 預期下週備齊。'},
+  {id:'s3', po:'PO#322 Opanchu 補單', supplier:'永盛玩具', expected:80, received:80, urgency:'low', detail:'廠端已確認 80 箱備齊，待木子核對後發貨。', confirmed:false},
+];
+function loadStockCheck(){
+  const stored = localStorage.getItem('muzi_stock_check_v1');
+  if(stored) return JSON.parse(stored);
+  localStorage.setItem('muzi_stock_check_v1', JSON.stringify(STOCK_CHECK_SEED));
+  return STOCK_CHECK_SEED;
+}
+function openStockCheckModal(){ renderStockCheck(); document.getElementById('stock-check-modal').classList.add('show'); }
+function closeStockCheckModal(){ document.getElementById('stock-check-modal').classList.remove('show'); }
+function renderStockCheck(){
+  const list = document.getElementById('stock-check-list');
+  const arr = loadStockCheck().filter(s => !s.confirmed);
+  if(!arr.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 所有 PO 已核對完成</div>';
+    return;
+  }
+  list.innerHTML = arr.map(s => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="flex:1;">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.po}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${s.supplier} · 應收 ${s.expected.toLocaleString()} pcs</div>
+      </div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${s.detail}</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <span style="font-size:11px;color:var(--ink-lo);">實收：</span>
+      <input id="sc-input-${s.id}" type="number" value="${s.received||''}" placeholder="${s.expected}" style="width:90px;text-align:right;font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;">
+      <button onclick="doStockMatch('${s.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 數量吻合</button>
+      <button onclick="doStockDiff('${s.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">有差異</button>
+    </div>
+  </div>`).join('');
+}
+function doStockMatch(id){
+  const arr = loadStockCheck();
+  const s = arr.find(x => x.id === id);
+  const inp = document.getElementById('sc-input-'+id);
+  if(s){
+    s.received = Number(inp.value) || s.expected;
+    s.confirmed = true;
+    localStorage.setItem('muzi_stock_check_v1', JSON.stringify(arr));
+  }
+  // 通知賴哥 + 高維
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子核對：${s.po} 數量吻合 ✓`});
+  notif.unshift({ts:Date.now(), from:name, to:'gaowei', msg:`${s.po} 廠端備齊，可安排出貨`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  renderStockCheck();
+  showQaToast(`✓ ${s ? s.po : id} 已核對 · 通知賴哥+高維`);
+}
+function doStockDiff(id){
+  const arr = loadStockCheck();
+  const s = arr.find(x => x.id === id);
+  const inp = document.getElementById('sc-input-'+id);
+  if(s){
+    s.received = Number(inp.value) || 0;
+    s.confirmed = true;
+    localStorage.setItem('muzi_stock_check_v1', JSON.stringify(arr));
+  }
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子核對：${s.po} ⚠ 應收 ${s.expected} 實收 ${s.received}，需跟廠商確認`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  renderStockCheck();
+  showQaToast(`⚠ ${s ? s.po : id} 有差異 · 已通知賴哥`);
+}
+
+function openPaymentReqModal(){
+  document.getElementById('pr-amount').value = '';
+  document.getElementById('pr-deadline').value = '';
+  document.getElementById('pr-po').value = '';
+  document.getElementById('pr-notes').value = '';
+  document.getElementById('payment-req-modal').classList.add('show');
+}
+function closePaymentReqModal(){ document.getElementById('payment-req-modal').classList.remove('show'); }
+function submitPaymentReq(){
+  const supplier = document.getElementById('pr-supplier').value;
+  const type = document.getElementById('pr-type').value;
+  const amount = document.getElementById('pr-amount').value.trim();
+  const deadline = document.getElementById('pr-deadline').value;
+  const po = document.getElementById('pr-po').value.trim();
+  const notes = document.getElementById('pr-notes').value.trim();
+  if(!amount){ alert('請填寫金額'); return; }
+  const rec = {supplier, type, amount:Number(amount), deadline, po, notes, submitter:name, ts:Date.now(), status:'pending-laige'};
+  const arr = JSON.parse(localStorage.getItem('muzi_payment_req_v1')||'[]');
+  arr.unshift(rec);
+  localStorage.setItem('muzi_payment_req_v1', JSON.stringify(arr));
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子付款申請：${supplier} · ${type} · ¥${amount}${po?' · '+po:''}`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  closePaymentReqModal();
+  markCurrentTodoDone();
+  showQaToast(`✓ 付款申請已送 → 賴哥審核`);
 }
 
 // ── 安然 modal × 3：合約待批 / 跨境款項 / IP 維護 ──
@@ -2050,10 +2250,10 @@ function triggerAction(action){
     case 'theme-plan':        showQaToast('🖼 主題企劃 modal 開發中（V2）'); break;
     case 'my-design-task':    showQaToast('📤 設計任務 modal 開發中（V2）'); break;
     case 'my-quote':          showQaToast('🔍 詢比價 modal 開發中（V2）'); break;
-    case 'my-po':             showQaToast('📦 我的 PO modal 開發中（V2）'); break;
+    case 'my-po':             openMyPoModal(); break;
     case 'sampling-track':    showQaToast('🏭 打樣追蹤 modal 開發中（V2）'); break;
-    case 'stock-check':       showQaToast('📦 備貨核對 modal 開發中（V2）'); break;
-    case 'payment-request':   showQaToast('📝 付款申請 modal 開發中（V2）'); break;
+    case 'stock-check':       openStockCheckModal(); break;
+    case 'payment-request':   openPaymentReqModal(); break;
     case 'logistics-batch':   showQaToast('🚚 物流批次 modal 開發中（V2）'); break;
     case 'freight-log':       showQaToast('📋 運費登錄 modal 開發中（V2）'); break;
     case 'live-schedule':     showQaToast('📱 直播排期 modal 開發中（V2）'); break;
