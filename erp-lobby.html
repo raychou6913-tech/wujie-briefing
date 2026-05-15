@@ -414,6 +414,72 @@ body{
   font-family:"Helvetica Neue",sans-serif;
 }
 
+/* ── QUICK ACTIONS (業務員) ── */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
+.qa-btn{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:12px;
+  transition:border-color .22s var(--ease),transform .22s var(--ease);
+  font-family:inherit;
+}
+.qa-btn:hover{border-color:var(--brand);transform:translateY(-1px);}
+.qa-icon{
+  width:36px;height:36px;border-radius:50%;background:var(--paper-soft);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.qa-title{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
+.qa-sub{font-size:10px;color:var(--ink-lo);margin-top:2px;line-height:1.4;}
+@media(max-width:720px){ .qa-grid{grid-template-columns:1fr;} }
+
+/* ── MODAL (新訂單 / 動銷回報) ── */
+.qa-modal-bg{
+  position:fixed;inset:0;background:rgba(10,10,10,.45);
+  display:none;align-items:center;justify-content:center;
+  z-index:300;animation:fade-in .2s var(--ease);
+}
+.qa-modal-bg.show{display:flex;}
+.qa-modal{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  width:min(520px,calc(100% - 32px));max-height:calc(100vh - 48px);overflow-y:auto;
+  padding:24px 26px;
+}
+.qa-modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.qa-modal-title{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.02em;}
+.qa-modal-close{background:none;border:none;font-size:18px;color:var(--ink-lo);cursor:pointer;padding:4px;}
+.qa-modal-close:hover{color:var(--ink);}
+.qa-field{margin-bottom:12px;}
+.qa-field label{
+  display:block;font-size:9px;font-weight:700;color:var(--ink-lo);
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;
+}
+.qa-field input,.qa-field select,.qa-field textarea{
+  width:100%;background:var(--paper-soft);border:1px solid var(--line);
+  border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink);
+  outline:none;font-family:inherit;
+  transition:border-color .15s var(--ease),background .15s var(--ease);
+}
+.qa-field input:focus,.qa-field select:focus,.qa-field textarea:focus{
+  border-color:var(--brand);background:#fff;
+}
+.qa-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.qa-submit{
+  width:100%;background:var(--brand);color:#fff;border:none;
+  border-radius:10px;padding:12px;font-size:13px;font-weight:700;
+  cursor:pointer;margin-top:8px;font-family:inherit;letter-spacing:.02em;
+  transition:opacity .2s var(--ease);
+}
+.qa-submit:hover{opacity:.85;}
+.qa-toast{
+  position:fixed;bottom:88px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;font-size:12px;font-weight:600;
+  padding:10px 18px;border-radius:20px;z-index:400;
+  opacity:0;transition:opacity .25s var(--ease);pointer-events:none;
+  white-space:nowrap;
+}
+.qa-toast.show{opacity:1;}
+
 /* ── ANIMATIONS ── */
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
 @keyframes check-off{0%{opacity:1;transform:translateX(0)}60%{transform:translateX(6px)}100%{opacity:.35;transform:translateX(0)}}
@@ -459,18 +525,7 @@ body{
         <span class="sb-icon">→</span>
         <span class="sb-label" id="sb-hall-label">進入工作台</span>
       </a>
-      <a class="sb-item" href="erp-project-new.html">
-        <span class="sb-icon">+</span>
-        <span class="sb-label">新增項目</span>
-      </a>
-      <a class="sb-item" href="erp-budget-planner.html">
-        <span class="sb-icon">▣</span>
-        <span class="sb-label">預算規劃器</span>
-      </a>
-      <a class="sb-item" href="erp-war-room.html">
-        <span class="sb-icon">◉</span>
-        <span class="sb-label">戰情室</span>
-      </a>
+      <div id="sb-today-extras"></div>
     </div>
 
     <!-- Dynamic hall groups injected by JS -->
@@ -595,6 +650,30 @@ body{
         <a href="erp-crm.html" class="sec-link" style="text-decoration:none;">業務中心 ›</a>
       </div>
       <div class="blocks" id="my-customers-list"></div>
+
+      <!-- 業務員快速動作 -->
+      <div class="sec-hdr" style="margin-top:24px;">
+        <div>
+          <div class="sec-title">⚡ 快速回報</div>
+          <div class="sec-hint">Quick Report · 做 · 業務員核心動作</div>
+        </div>
+      </div>
+      <div class="qa-grid" id="my-quick-actions">
+        <button class="qa-btn" onclick="openNewOrderModal()">
+          <span class="qa-icon">＋</span>
+          <div>
+            <div class="qa-title">新訂單</div>
+            <div class="qa-sub">客戶下單 · 通報安然 / 賴哥 / 高維 / 躍明</div>
+          </div>
+        </button>
+        <button class="qa-btn" onclick="openSellThruModal()">
+          <span class="qa-icon">📊</span>
+          <div>
+            <div class="qa-title">回報動銷</div>
+            <div class="qa-sub">拜訪客戶後 · 回報渠道真實賣得怎樣</div>
+          </div>
+        </button>
+      </div>
     </div>
 
     <!-- ANNOUNCEMENTS -->
@@ -643,6 +722,86 @@ body{
 
   </div>
 </main>
+
+<!-- 新訂單 MODAL -->
+<div class="qa-modal-bg" id="new-order-modal" onclick="if(event.target===this)closeNewOrderModal()">
+  <div class="qa-modal">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">＋ 新訂單通報</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">送出後自動通知 安然 · 賴哥 · 高維 · 躍明</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeNewOrderModal()">✕</button>
+    </div>
+    <div class="qa-field"><label>客戶名稱</label><input id="no-client" placeholder="例：廣州名創優品 / 北京華糖"></div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>產品</label><select id="no-product">
+        <option value="Snoopy 夏季盲盒">Snoopy 夏季盲盒</option>
+        <option value="Mofusand 貓福珊迪">Mofusand 貓福珊迪</option>
+        <option value="Opanchu 褲褲兔">Opanchu 褲褲兔</option>
+        <option value="Snoopy 冬季款（開發中）">Snoopy 冬季款（開發中）</option>
+        <option value="其他">其他（備註說明）</option>
+      </select></div>
+      <div class="qa-field"><label>數量（箱）</label><input id="no-qty" type="number" placeholder="例：120"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>金額（人民幣 萬）</label><input id="no-amt" type="number" step="0.1" placeholder="例：18.5"></div>
+      <div class="qa-field"><label>預期出貨日</label><input id="no-date" type="date"></div>
+    </div>
+    <div class="qa-field"><label>備註（IP 授權注意 / 付款條件 / 特殊要求）</label><textarea id="no-notes" rows="2" placeholder="例：客戶要求 30%訂金、出貨前付清。需確認 PNUTS 授權範圍涵蓋華南。"></textarea></div>
+    <button class="qa-submit" onclick="submitNewOrder()">送出 → 通知相關部門</button>
+  </div>
+</div>
+
+<!-- 動銷回報 MODAL -->
+<div class="qa-modal-bg" id="sellthru-modal" onclick="if(event.target===this)closeSellThruModal()">
+  <div class="qa-modal">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📊 動銷回報</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">拜訪客戶後 30 秒回報，安然立刻看到</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeSellThruModal()">✕</button>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>產品</label><select id="st-product">
+        <option value="Snoopy 夏季盲盒">Snoopy 夏季盲盒</option>
+        <option value="Mofusand 貓福珊迪">Mofusand 貓福珊迪</option>
+        <option value="Opanchu 褲褲兔">Opanchu 褲褲兔</option>
+      </select></div>
+      <div class="qa-field"><label>客戶 / 渠道</label><input id="st-client" placeholder="例：廣州名創優品"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>本期銷售量</label><input id="st-sold" placeholder="例：48 箱 / 240 件"></div>
+      <div class="qa-field"><label>動銷率（估算）</label><select id="st-rate">
+        <option value="暢銷>80%">暢銷 >80%</option>
+        <option value="良好60-80%">良好 60–80%</option>
+        <option value="一般40-60%" selected>一般 40–60%</option>
+        <option value="偏慢20-40%">偏慢 20–40%</option>
+        <option value="滯銷<20%">滯銷 &lt;20%</option>
+      </select></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>庫存信號</label><select id="st-stock">
+        <option value="正常">庫存正常</option>
+        <option value="快要缺貨">快要缺貨，建議補</option>
+        <option value="已缺貨">已缺貨，緊急補</option>
+        <option value="滯銷">滯銷，需要處理</option>
+      </select></div>
+      <div class="qa-field"><label>陳列位置</label><select id="st-display">
+        <option value="主推位">主推位 / 顯眼位置</option>
+        <option value="一般陳列">一般陳列</option>
+        <option value="角落">角落 / 邊角位置</option>
+        <option value="待陳列">尚未陳列</option>
+      </select></div>
+    </div>
+    <div class="qa-field"><label>備註（客戶反饋、特殊狀況）</label><textarea id="st-notes" rows="2" placeholder="例：年輕女生很喜歡但男生少買、週末動銷比平日好、客戶想追加..."></textarea></div>
+    <button class="qa-submit" onclick="submitSellThru()">送出回報</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="qa-toast" id="qa-toast"></div>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="bottom-nav" id="bottom-nav">
@@ -727,12 +886,12 @@ const HALLS = [
   {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     desc:'公司業績 · 各業務員 · 客戶',     roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
   {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   desc:'待入帳 · 項目P&L · 損益表',       roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
   {href:'erp-yangzi.html',           icon:'🗂', name:'HR · 出納',    desc:'審核 · 薪資 · 行政 · 北京/台灣',  roles:['yangzi','leo','yuming','anran','ray'], sbGroup:'財務'},
-  {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   desc:'按 IP 階段看公司開發進度',         roles:ALL_ROLES,                         sbGroup:'開發'},
-  {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       desc:'供應商 · PO · 比價 · 驗收',       roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   desc:'按 IP 階段看公司開發進度',         roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying'], sbGroup:'開發'},
+  {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       desc:'供應商 · PO · 比價 · 驗收',       roles:['ray','shawn','anran','laige','muzi','bevis','peilin','gaowei'], sbGroup:'開發'},
   {href:'erp-shetong.html',          icon:'🎨', name:'設計任務板',   desc:'設計執行任務分派 · 詩彤主場',     roles:['shetong','bevis','peilin','ray'],sbGroup:'開發'},
   {href:'erp-peiling.html',          icon:'🖋', name:'送審工作板',   desc:'送審狀態 · 主題創意 · 珮玲主場', roles:['peilin','bevis','shetong','ray'],sbGroup:'開發'},
   {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   desc:'批次管理 · 報關 · 貨代 · 費用',  roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
-  {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     desc:'版權圖 · 設計稿 · 打樣照',       roles:ALL_ROLES,                         sbGroup:'開發'},
+  {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     desc:'版權圖 · 設計稿 · 打樣照',       roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','chunlei','jiaying'], sbGroup:'開發'},
   {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     desc:'活動管理 · 庫存 · 協調',          roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
   {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', desc:'送審進度 · 版權方回覆',           roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
 ];
@@ -747,6 +906,22 @@ function buildSidebar(){
   document.getElementById('sb-hall-link').href = effectiveHall;
   document.getElementById('sb-hall-label').textContent = HALL_LABELS[effectiveHall] || '工作台';
   document.getElementById('bnav-hall-link').href = effectiveHall;
+
+  // Today 群 extras（依角色加，不再 hardcoded）
+  const extras = document.getElementById('sb-today-extras');
+  if(extras){
+    const items = [];
+    if(['ray','shawn','anran','yuming','bevis','peilin'].includes(user)){
+      items.push({href:'erp-project-new.html', icon:'+', label:'新增項目'});
+    }
+    if(['ray','shawn','anran','yuming'].includes(user)){
+      items.push({href:'erp-budget-planner.html', icon:'▣', label:'預算規劃器'});
+      items.push({href:'erp-war-room.html', icon:'◉', label:'戰情室'});
+    }
+    extras.innerHTML = items.map(i =>
+      `<a class="sb-item" href="${i.href}"><span class="sb-icon">${i.icon}</span><span class="sb-label">${i.label}</span></a>`
+    ).join('');
+  }
 
   // Build hall groups dynamically
   // ⚠️ Today 群已顯示「我的工作台」連結（line 736），業務群裡跳過 effectiveHall 避免重複
@@ -921,27 +1096,121 @@ const MY_CUSTOMERS = {
   ],
 };
 const myCustomers = MY_CUSTOMERS[user];
-if(myCustomers && myCustomers.length){
+const SALES_ROLES = ['laodong','debao','anran','peilin'];
+if(SALES_ROLES.includes(user)){
+  // 業務角色：顯示「我的客戶」+「快速回報」
   const sec = document.getElementById('my-customers-section');
   const list = document.getElementById('my-customers-list');
   if(sec && list){
     sec.style.display = '';
-    const toneColor = {ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)', grey:'var(--ink-lo)'};
-    list.innerHTML = myCustomers.map((c, i) => {
-      const numStr = String(i+1).padStart(2,'0');
-      return `<div class="block" onclick="toggleBlock(this)">
-        <div class="block-head">
-          <div class="block-num">${numStr}</div>
-          <div class="block-title">${c.client} · <span style="color:var(--ink-mid);font-weight:500;">${c.product}</span></div>
-          <div class="block-meta"><span style="color:${toneColor[c.tone]||'var(--ink-mid)'};font-weight:700;">${c.status}</span> · ${c.amt}</div>
-          <div class="block-toggle">▾</div>
-        </div>
-        <div class="block-body">
-          <div class="block-body-inner">完整訂單明細與付款記錄請至業務中心查看。</div>
-        </div>
-      </div>`;
-    }).join('');
+    if(myCustomers && myCustomers.length){
+      const toneColor = {ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)', grey:'var(--ink-lo)'};
+      list.innerHTML = myCustomers.map((c, i) => {
+        const numStr = String(i+1).padStart(2,'0');
+        return `<div class="block" onclick="toggleBlock(this)">
+          <div class="block-head">
+            <div class="block-num">${numStr}</div>
+            <div class="block-title">${c.client} · <span style="color:var(--ink-mid);font-weight:500;">${c.product}</span></div>
+            <div class="block-meta"><span style="color:${toneColor[c.tone]||'var(--ink-mid)'};font-weight:700;">${c.status}</span> · ${c.amt}</div>
+            <div class="block-toggle">▾</div>
+          </div>
+          <div class="block-body">
+            <div class="block-body-inner">完整訂單明細與付款記錄請至業務中心查看。</div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      list.innerHTML = '<div class="empty-state" style="padding:14px;color:var(--ink-lo);font-size:12px;">尚無進行中的客戶訂單，點下方「+ 新訂單」開單。</div>';
+    }
   }
+}
+
+// ── Quick Actions: 新訂單 + 動銷回報（業務員） ────────────
+function openNewOrderModal(){
+  document.getElementById('no-client').value = '';
+  document.getElementById('no-qty').value = '';
+  document.getElementById('no-amt').value = '';
+  document.getElementById('no-date').value = '';
+  document.getElementById('no-notes').value = '';
+  document.getElementById('new-order-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('no-client').focus(),50);
+}
+function closeNewOrderModal(){
+  document.getElementById('new-order-modal').classList.remove('show');
+}
+function submitNewOrder(){
+  const client = document.getElementById('no-client').value.trim();
+  const product = document.getElementById('no-product').value;
+  const qty = document.getElementById('no-qty').value.trim();
+  const amt = document.getElementById('no-amt').value.trim();
+  const date = document.getElementById('no-date').value;
+  const notes = document.getElementById('no-notes').value.trim();
+  if(!client){ alert('請填寫客戶名稱'); return; }
+  if(!qty || !amt){ alert('請填寫數量與金額'); return; }
+
+  const order = {
+    client, product, qty:qty+' 箱', amt:'¥ '+amt+' 萬', shipDate:date, notes,
+    owner:name, ownerUser:user, ts:Date.now(),
+  };
+  const orders = JSON.parse(localStorage.getItem('erp_new_orders_v1')||'[]');
+  orders.unshift(order);
+  localStorage.setItem('erp_new_orders_v1', JSON.stringify(orders));
+
+  // 通知 4 個部門
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  const msg = `新訂單：${client} · ${product} × ${qty} 箱 · ¥${amt} 萬（${name} 開單）`;
+  ['anran','laige','gaowei','yuming'].forEach(to => {
+    notif.unshift({ts:Date.now(), from:name, to, msg});
+  });
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+
+  closeNewOrderModal();
+  showQaToast(`✓ 訂單已通報 · 安然 / 賴哥 / 高維 / 躍明 收到`);
+}
+
+function openSellThruModal(){
+  document.getElementById('st-client').value = '';
+  document.getElementById('st-sold').value = '';
+  document.getElementById('st-notes').value = '';
+  document.getElementById('sellthru-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('st-client').focus(),50);
+}
+function closeSellThruModal(){
+  document.getElementById('sellthru-modal').classList.remove('show');
+}
+function submitSellThru(){
+  const product = document.getElementById('st-product').value;
+  const client = document.getElementById('st-client').value.trim();
+  const sold = document.getElementById('st-sold').value.trim();
+  const rate = document.getElementById('st-rate').value;
+  const stock = document.getElementById('st-stock').value;
+  const display = document.getElementById('st-display').value;
+  const notes = document.getElementById('st-notes').value.trim();
+  if(!client){ alert('請填寫客戶 / 渠道'); return; }
+
+  const rec = { product, client, sold, rate, stock, display, notes,
+    sales:name, salesUser:user, ts:Date.now() };
+  const arr = JSON.parse(localStorage.getItem('crm_sellthru_v1')||'[]');
+  const idx = arr.findIndex(x=>x.product===product && x.client===client);
+  if(idx>=0) arr[idx]=rec; else arr.unshift(rec);
+  localStorage.setItem('crm_sellthru_v1', JSON.stringify(arr));
+
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'anran',
+    msg:`動銷回報：${client.split('（')[0]} · ${product} · ${rate} · ${stock}`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+
+  closeSellThruModal();
+  showQaToast(`✓ 動銷已回報 · ${client.split('（')[0]} · ${product}`);
+}
+
+function showQaToast(msg){
+  const t = document.getElementById('qa-toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
 // ── Render Todos (blocks) ──────────────────────────────

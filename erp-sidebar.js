@@ -131,8 +131,7 @@
   }
   const {user, name, role, hall, color} = sess;
 
-  // 3) 廳定義（同 lobby）
-  const ALL_ROLES = ['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo','yangzi'];
+  // 3) 廳定義（roles 收緊：業務員只看跟銷售相關的廳，不再 ALL_ROLES 全開）
   const HALLS = [
     {href:'erp-war-room.html',         icon:'⚡', name:'戰情室',       roles:['ray','shawn','anran','yuming'],  sbGroup:'業務'},
     {href:'erp-shawn.html',            icon:'🌏', name:'營運看板',     roles:['shawn','ray'],                   sbGroup:'業務'},
@@ -140,12 +139,12 @@
     {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
     {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
     {href:'erp-yangzi.html',           icon:'🗂', name:'HR · 出納',    roles:['yangzi','leo','yuming','anran','ray'], sbGroup:'財務'},
-    {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   roles:ALL_ROLES,                         sbGroup:'開發'},
-    {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       roles:ALL_ROLES,                         sbGroup:'開發'},
+    {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying'], sbGroup:'開發'},
+    {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       roles:['ray','shawn','anran','laige','muzi','bevis','peilin','gaowei'], sbGroup:'開發'},
     {href:'erp-shetong.html',          icon:'🎨', name:'設計任務板',   roles:['shetong','bevis','peilin','ray'],sbGroup:'開發'},
     {href:'erp-peiling.html',          icon:'🖋', name:'送審工作板',   roles:['peilin','bevis','shetong','ray'],sbGroup:'開發'},
     {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
-    {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     roles:ALL_ROLES,                         sbGroup:'開發'},
+    {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
     {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
   ];
@@ -185,14 +184,20 @@
   // 5) 填 sidebar content
   const content = document.getElementById('erp-sb-content');
 
-  // Today 群（固定）
+  // Today 群（依角色決定）
   const todayItems = [
     {href:'erp-lobby.html', icon:'○', label:'大廳'},
     {href:effectiveHall,    icon:'→', label:'我的工作台'},
-    {href:'erp-project-new.html', icon:'+', label:'新增項目'},
-    {href:'erp-budget-planner.html', icon:'▣', label:'預算規劃器'},
   ];
-  // 戰情室僅管理層
+  // 新增項目：管理層 + 安然 + Bevis（會發起新 IP/新項目）+ 珮玲（送審企劃發起）
+  if(['ray','shawn','anran','yuming','bevis','peilin'].includes(user)){
+    todayItems.push({href:'erp-project-new.html', icon:'+', label:'新增項目'});
+  }
+  // 預算規劃器：管理層才用（業務員/設計/採購不負責預算）
+  if(['ray','shawn','anran','yuming'].includes(user)){
+    todayItems.push({href:'erp-budget-planner.html', icon:'▣', label:'預算規劃器'});
+  }
+  // 戰情室：管理層才看
   if(['ray','shawn','anran','yuming'].includes(user)){
     todayItems.push({href:'erp-war-room.html', icon:'◉', label:'戰情室'});
   }
