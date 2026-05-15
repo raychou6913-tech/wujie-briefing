@@ -137,13 +137,13 @@
     {href:'erp-shawn.html',            icon:'🌏', name:'營運看板',     roles:['shawn','ray'],                   sbGroup:'業務'},
     {href:'erp-anran.html',            icon:'🔐', name:'商務中心',     roles:['anran','ray','shawn'],            sbGroup:'業務'},
     {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
-    {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   roles:['yuming','ray','shawn'],           sbGroup:'財務'},
-    {href:'erp-yangzi.html',           icon:'🗂', name:'HR · 出納',    roles:['yangzi','leo','ray'],             sbGroup:'財務'},
+    {href:'erp-finance.html',          icon:'💰', name:'財務中心',     roles:['yuming','ray','shawn'],           sbGroup:'財務'},
+    {href:'erp-yangzi.html',           icon:'🗂', name:'HR 費用中心',  roles:['yangzi','leo','ray','shawn'],     sbGroup:'財務'},
     {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       roles:['ray','shawn','anran','laige','muzi','gaowei'], sbGroup:'開發'},
     {href:'erp-shetong.html',          icon:'🎨', name:'設計任務板',   roles:['shetong','bevis','peilin','ray'],sbGroup:'開發'},
     {href:'erp-peiling.html',          icon:'🖋', name:'送審工作板',   roles:['peilin','bevis','shetong','ray'],sbGroup:'開發'},
-    {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
+    {href:'erp-gaowei.html',           icon:'🚢', name:'物流中心',     roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
     {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
     {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
@@ -184,10 +184,9 @@
   // 5) 填 sidebar content
   const content = document.getElementById('erp-sb-content');
 
-  // Today 群（依角色決定）
+  // Today 群（大廳就是個人工作台，拿掉「我的工作台」這個重複入口）
   const todayItems = [
     {href:'erp-lobby.html', icon:'○', label:'大廳'},
-    {href:effectiveHall,    icon:'→', label:'我的工作台'},
   ];
   // 新增項目：會發起新 IP / 新項目的角色（躍明是會計不發起，拿掉）
   if(['ray','shawn','anran','bevis','peilin'].includes(user)){

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>蕪解 ERP · HR · 出納</title>
+<title>蕪解 ERP · HR 費用中心</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -205,51 +205,27 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 
 <div class="topbar">
   <button class="tb-back" onclick="location.href='erp-lobby.html'">← 大廳</button>
-  <span class="tb-title">🗂 HR · 出納</span>
+  <span class="tb-title">🗂 HR 費用中心</span>
   <span class="tb-user" id="tb-user"></span>
   <button class="tb-back" onclick="logout()" style="margin-left:8px;">登出</button>
 </div>
 
 <div class="main">
 
-  <!-- Greeting -->
-  <div class="greet">
-    <div class="greet-hi" id="greet-hi">—</div>
-    <div class="greet-sub" id="greet-sub"></div>
-    <div class="greet-badges" id="greet-badges"></div>
+  <!-- 公共資料中心介紹 banner -->
+  <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+    <div style="font-size:22px;flex-shrink:0;">🗂</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--txt-hi);margin-bottom:2px;">公司管銷費用總覽</div>
+      <div style="font-size:11px;color:var(--txt-mid);line-height:1.5;">楊子（北京）/ Leo（台灣）每月維護實際支出。Ray / Shawn 上來查資料；錄費用、審申請、發薪資的動作在個人大廳完成。</div>
+    </div>
   </div>
 
-  <!-- 主動作（取代右下角 FAB）-->
-  <div class="yz-actions">
-    <button class="yz-act primary" onclick="openExpModal('opex')">
-      <span class="yz-act-icon">＋</span>
-      <div>
-        <div class="yz-act-title">錄入費用</div>
-        <div class="yz-act-sub">公司日常 OPEX · 房租 / 水電 / 倉儲 / 雜費</div>
-      </div>
-    </button>
-    <button class="yz-act" onclick="document.getElementById('sec-inbox').scrollIntoView({behavior:'smooth'})">
-      <span class="yz-act-icon">✓</span>
-      <div>
-        <div class="yz-act-title">審申請</div>
-        <div class="yz-act-sub" id="yz-act-inbox-sub">同事的費用申請</div>
-      </div>
-    </button>
-    <button class="yz-act" onclick="document.getElementById('sec-payroll').scrollIntoView({behavior:'smooth'})">
-      <span class="yz-act-icon">💰</span>
-      <div>
-        <div class="yz-act-title">發薪資</div>
-        <div class="yz-act-sub" id="yz-act-payroll-sub">本月薪資流程</div>
-      </div>
-    </button>
-  </div>
-
-  <!-- 費用管銷總覽（上移到第一順位 — 楊子核心工作）-->
+  <!-- 📊 預算 vs 實際（核心：北京 / 台灣 / UJ BKK 三個 entity）-->
   <div class="sec-hd">
-    <span class="sec-title">📊 預算 vs 實際</span>
-    <span class="sec-link" style="color:var(--txt-mid);font-weight:600;" onclick="openOpexEditModal()">編輯本月實際 →</span>
+    <span class="sec-title">📊 預算 vs 實際（每月）</span>
   </div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px;">
     <div class="ent-tabs" style="padding:12px 12px 10px;" id="opex-ent-tabs">
       <button class="ent-tab" data-ent="北京蕪解" onclick="setOpexEnt('北京蕪解',this)">北京蕪解</button>
       <button class="ent-tab" data-ent="台灣悍草" onclick="setOpexEnt('台灣悍草',this)">台灣悍草</button>
@@ -258,46 +234,14 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
     <div class="opex-wrap"><table class="opex-table" id="opex-table"></table></div>
   </div>
 
-  <!-- Pending inbox -->
-  <div class="sec-hd" id="sec-inbox">
-    <span class="sec-title" id="inbox-title">待審核申請</span>
-  </div>
-  <div class="inbox-list" id="inbox-list"></div>
-
-  <!-- 已批准・待付款 -->
-  <div class="sec-hd" style="margin-top:16px;">
-    <span class="sec-title" id="payment-title">已批准・待付款</span>
-    <span class="sec-link" onclick="loadPaymentList()">刷新</span>
-  </div>
-  <div id="payment-list">
-    <div style="padding:12px;text-align:center;color:var(--txt-lo);font-size:12px;">載入中…</div>
-  </div>
-
-  <!-- Payroll tracker -->
-  <div class="sec-hd" id="sec-payroll"><span class="sec-title">薪資發放流程</span></div>
+  <!-- 💰 薪資發放流程（純展示，動作在個人大廳）-->
+  <div class="sec-hd"><span class="sec-title">💰 薪資發放流程</span></div>
   <div class="payroll-card">
     <div class="payroll-head">
       <span class="payroll-month">2026 年 5 月薪資</span>
       <span class="payroll-status status-progress" id="payroll-status">進行中</span>
     </div>
     <div class="payroll-rows" id="payroll-rows"></div>
-  </div>
-
-  <!-- 人事行政直接申請 -->
-  <div class="sec-hd">
-    <span class="sec-title" id="adhoc-title">人事行政直接申請</span>
-    <span class="sec-link" onclick="openExpModal('hr')">+ 發起申請</span>
-  </div>
-  <div id="adhoc-list"></div>
-
-  <!-- 行政採購 -->
-  <div class="sec-hd"><span class="sec-title">行政採購</span></div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-    <div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:3px;">辦公室耗材 / 設備 / 雜費採購</div>
-      <div style="font-size:11px;color:var(--txt-mid);">楊子整合需求 → 安然批准 → 轉採購台執行</div>
-    </div>
-    <button style="padding:9px 16px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:12px;white-space:nowrap;" onclick="openProcureModal()">填寫申請 →</button>
   </div>
 
 </div>
@@ -868,97 +812,30 @@ let currentApprovalId = null;
 let currentFormId = null;
 
 function render(){
-  const inbox = loadInbox().filter(i=>i.status==='pending');
+  // HR 費用中心 = 公共資料區，只渲染薪資流程展示
+  // 待審 / 待付款 / 行政申請 等動作已搬到楊子/Leo 的個人大廳
 
-  // Greeting — 核心訊息：本月已錄費用 / 預算 / 待審件數
-  const pending = inbox.length;
-  const urgent = inbox.filter(i=>i.urgency==='high').length;
-  const _greetName = SESS ? SESS.name : '';
-
-  // 算本月實際 + 預算（用 currentOpexEntity 的 5 月份）
-  let _actualWan = '—', _budgetWan = '—', _diffWan = '—';
-  try {
-    const d = OPEX_DATA[currentOpexEntity];
-    if(d){
-      const monthIdx = 4; // 5 月 (0-indexed)
-      const ovr = (loadOpexOverrides()||{})[currentOpexEntity]||{};
-      const sym = d.ccy==='TWD'?'NT$':d.ccy==='THB'?'฿':'¥';
-      // 本月實際 = 各 cat 的 vals[monthIdx] (含 override) 加總
-      let actual = 0, budget = 0;
-      d.rows.forEach(r => {
-        const a = (ovr[r.cat] && ovr[r.cat][monthIdx] != null) ? ovr[r.cat][monthIdx] : r.vals[monthIdx];
-        actual += a;
-        budget += r.vals[monthIdx]; // 原始預算
-      });
-      const toWan = v => d.ccy==='CNY' ? (v/10000).toFixed(1)+' 萬' : v.toLocaleString();
-      _actualWan = sym + ' ' + toWan(actual);
-      _budgetWan = sym + ' ' + toWan(budget);
-      const diff = budget - actual;
-      _diffWan = (diff>=0?'剩 ':'超支 ') + sym + ' ' + toWan(Math.abs(diff));
-    }
-  } catch(e){}
-
-  document.getElementById('greet-hi').textContent =
-    `${_greetName}，本月已錄 ${_actualWan} / 預算 ${_budgetWan}`;
-  document.getElementById('greet-sub').textContent =
-    _diffWan === '—' ? '—' : `${_diffWan} · 待審 ${pending} 件${urgent>0?`（${urgent} 件緊急）`:''}`;
-
-  const badges = document.getElementById('greet-badges');
-  badges.innerHTML='';
-  if(urgent>0) badges.innerHTML+=`<span class="badge badge-danger">⚠ ${urgent} 件緊急</span>`;
-  if(pending>urgent) badges.innerHTML+=`<span class="badge badge-warn">${pending-urgent} 件一般</span>`;
-
-  // 動作卡 sub 文字
-  const inboxSub = document.getElementById('yz-act-inbox-sub');
-  if(inboxSub) inboxSub.textContent = pending===0 ? '目前沒有待審' : `${pending} 件待審${urgent>0?'，'+urgent+' 件緊急':''}`;
-
-  // Inbox
-  const TYPE_TAG = {expense:'tag-expense',leave:'tag-leave',recruit:'tag-recruit',payroll:'tag-payroll'};
-  const TYPE_LABEL = {expense:'費用報銷',leave:'請假',recruit:'招募',payroll:'薪資'};
-  document.getElementById('inbox-title').textContent = `待審核申請（${pending}）`;
-  const inboxEl = document.getElementById('inbox-list');
-  if(!pending){
-    inboxEl.innerHTML='<div style="padding:16px;text-align:center;color:var(--txt-lo);font-size:13px;">目前沒有待審核申請</div>';
-  } else {
-    inboxEl.innerHTML = inbox.map(i=>`
-      <div class="inbox-item ${i.urgency==='high'?'urgent':''}" onclick="openApproval('${i.id}')">
-        <div class="inbox-dot dot-${i.urgency==='high'?'danger':i.urgency==='med'?'warn':'lo'}"></div>
-        <div class="inbox-info">
-          <div class="inbox-name">${i.name}</div>
-          <div class="inbox-meta">${i.meta}</div>
-        </div>
-        <div class="inbox-right">
-          <span class="type-tag ${TYPE_TAG[i.type]||''}">${TYPE_LABEL[i.type]||i.type}</span>
-          <span class="inbox-amount">${i.amount}</span>
-          <span class="inbox-chevron">›</span>
-        </div>
-      </div>`).join('');
-  }
-
-  // Payroll
+  // Payroll 流程展示（純資料 view）
   const payroll = loadPayroll();
   const rows = document.getElementById('payroll-rows');
+  if(!rows) return;
   rows.innerHTML = PAYROLL_STEPS.map((step,i)=>{
     const done = payroll.done.includes(step.id);
     const activeIdx = PAYROLL_STEPS.findIndex(s=>!payroll.done.includes(s.id));
     const isActive = i===activeIdx;
     const stepClass = done?'step-done':isActive?'step-active':'step-todo';
     const labelClass = done?'done':isActive?'active':'';
-    const action = !done&&isActive
-      ? step.id==='p2'
-        ? `<button class="pr-action" onclick="openPayrollModal()">錄入薪資 →</button>`
-        : `<button class="pr-action" onclick="markPayrollDone('${step.id}')">完成 →</button>`
-      : '';
     return `<div class="payroll-row">
       <div class="pr-step ${stepClass}">${done?'✓':i+1}</div>
       <div class="pr-label ${labelClass}">${step.label}</div>
-      ${action}
     </div>`;
   }).join('');
   const allDone = PAYROLL_STEPS.every(s=>payroll.done.includes(s.id));
-  document.getElementById('payroll-status').textContent = allDone ? '✓ 已完成' : '進行中';
-  document.getElementById('payroll-status').className = 'payroll-status ' + (allDone?'status-done':'status-progress');
-
+  const stEl = document.getElementById('payroll-status');
+  if(stEl){
+    stEl.textContent = allDone ? '✓ 已完成' : '進行中';
+    stEl.className = 'payroll-status ' + (allDone?'status-done':'status-progress');
+  }
 }
 
 function renderOpexOnce(){
@@ -1041,17 +918,13 @@ document.querySelectorAll('#opex-ent-tabs .ent-tab').forEach(b=>{
 });
 // Leo 視角：topbar 標示
 if(ENTRY_ENTITY === '台灣悍草'){
-  const tbTitle = document.querySelector('.tb-title');
-  if(tbTitle) tbTitle.textContent = '🏦 HR · 出納（台灣）';
-  document.title = '蕪解 ERP · HR · 出納（台灣）';
+  // Leo 進來預設切到台灣 entity tab — 但中心名稱保持「HR 費用中心」（公共資料區）
+  // 不再依進入者改 title，因為這是公共頁，不歸屬特定人
 }
 
 render();
 renderOpexTable();
-loadPaymentList();
-// renderAdhoc + openOpexEditModal are defined in the FAB script block below — call after parse
-window.addEventListener('DOMContentLoaded',()=>{if(typeof renderAdhoc==='function')renderAdhoc();},false);
-setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
+// loadPaymentList / renderAdhoc 已拿掉（待付款 / 行政申請 section 搬個人大廳）
 </script>
 
 <!-- ── EXPENSE FAB ── -->
