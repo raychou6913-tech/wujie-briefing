@@ -78,7 +78,7 @@ body{
 .ef-formula{font-size:10px;color:var(--warn);margin-top:6px;font-weight:600;}
 
 /* ── LAYOUT ── */
-.main{max-width:1280px;margin:0 auto;padding:24px 20px;}
+.main{max-width:1280px;margin:0 auto;padding:24px 20px;margin-left:88px;}
 .section-title{
   font-family:"Helvetica Neue",sans-serif;
   font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
@@ -426,7 +426,7 @@ body{
 
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
-  .main{padding:16px 12px;}
+  .main{padding:16px 12px;margin-left:88px;}
   .vam-numbers{grid-template-columns:1fr 1fr;}
   .perf-grid{grid-template-columns:1fr 1fr;}
   .abc-grid{grid-template-columns:1fr;}
@@ -476,23 +476,106 @@ body{
 .cstage-wait{background:var(--card2);color:var(--txt-lo);}
 .cadence-status{font-size:12px;font-weight:700;margin-left:auto;white-space:nowrap;flex-shrink:0;}
 .cadence-group-label{font-size:9px;color:var(--txt-lo);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:8px;margin-bottom:2px;}
+
+/* ── SIDEBAR (v4) ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;
+  width:88px;
+  background:var(--paper);
+  border-right:1px solid var(--line);
+  transition:width .42s var(--ease);
+  z-index:140;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.sidebar:hover{width:280px;}
+.sb-head{padding:24px 18px 20px;border-bottom:1px solid var(--line);min-height:80px;flex-shrink:0;}
+.sb-logo{
+  font-family:"Helvetica Neue","Arial Black",sans-serif;
+  font-weight:900;font-size:18px;letter-spacing:-.04em;
+  color:var(--ink);display:flex;align-items:center;gap:1px;
+  line-height:1;white-space:nowrap;
+}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:var(--brand);align-self:flex-end;margin-bottom:3px;margin-left:3px;flex-shrink:0;}
+.sb-logo-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:10px;color:var(--ink-lo);
+  letter-spacing:.36em;margin-top:8px;
+  opacity:0;transition:opacity .35s .12s var(--ease);white-space:nowrap;
+}
+.sidebar:hover .sb-logo-sub{opacity:1;}
+.sb-content{flex:1;overflow-y:auto;padding:18px 0 80px;}
+.sb-content::-webkit-scrollbar{width:0;}
+.sb-group{margin-bottom:20px;}
+.sb-group-title{
+  padding:8px 28px 6px;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;font-weight:700;
+  color:var(--ink-faint);letter-spacing:.18em;text-transform:uppercase;
+  opacity:0;transition:opacity .3s .15s var(--ease);white-space:nowrap;
+}
+.sidebar:hover .sb-group-title{opacity:1;}
+.sb-item{
+  display:flex;align-items:center;gap:16px;
+  padding:9px 28px;cursor:pointer;
+  color:var(--ink-mid);font-size:13px;font-weight:500;
+  letter-spacing:-.005em;position:relative;
+  transition:color .2s,background .2s;
+  text-decoration:none;white-space:nowrap;
+}
+.sb-item:hover{color:var(--ink);background:var(--paper-soft);}
+.sb-item.active{color:var(--ink);font-weight:600;}
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:50%;
+  width:3px;height:18px;background:var(--brand);
+  transform:translateY(-50%);border-radius:0 2px 2px 0;
+}
+.sb-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;opacity:.7;}
+.sb-item.active .sb-icon,.sb-item:hover .sb-icon{opacity:1;}
+.sb-label{opacity:0;transform:translateX(-4px);transition:opacity .3s .1s var(--ease),transform .3s .1s var(--ease);flex:1;}
+.sidebar:hover .sb-label{opacity:1;transform:translateX(0);}
+.sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:9px;font-weight:700;font-family:"Helvetica Neue",sans-serif;padding:2px 7px;border-radius:10px;opacity:0;transition:opacity .3s .18s var(--ease);flex-shrink:0;}
+.sidebar:hover .sb-badge{opacity:1;}
+.sb-foot{padding:16px 20px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;font-family:"Helvetica Neue",sans-serif;}
+.sb-foot-info{opacity:0;transition:opacity .3s .18s var(--ease);white-space:nowrap;display:flex;flex-direction:column;gap:2px;}
+.sidebar:hover .sb-foot-info{opacity:1;}
+.sb-name{font-size:12px;font-weight:600;color:var(--ink);}
+.sb-role-text{font-size:10px;color:var(--ink-lo);}
+.sb-logout{font-size:10px;color:var(--ink-lo);text-decoration:none;margin-top:4px;letter-spacing:.04em;transition:color .2s var(--ease);}
+.sb-logout:hover{color:var(--danger);}
+/* ── HINT ── */
+.erp-hint{position:fixed;left:100px;bottom:36px;font-family:"Helvetica Neue",sans-serif;font-size:10px;color:var(--ink-faint);letter-spacing:.16em;text-transform:uppercase;pointer-events:none;opacity:0;animation:hintFade 5s ease-in-out 1.8s;z-index:30;}
+@keyframes hintFade{0%,100%{opacity:0;}20%,80%{opacity:1;}}
+/* ── BOTTOM NAV (mobile only) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--paper);border-top:1px solid var(--line);height:56px;z-index:150;align-items:stretch;padding-bottom:env(safe-area-inset-bottom,0);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;color:var(--ink-lo);position:relative;transition:color .2s var(--ease);}
+.bnav-btn.active{color:var(--brand);}
+.bnav-icon{font-size:18px;line-height:1;}
+.bnav-label{font-size:9px;font-family:"Helvetica Neue",sans-serif;letter-spacing:.06em;font-weight:600;}
+
+/* ── SIDEBAR RESPONSIVE ── */
+@media(max-width:720px){
+  .sidebar{width:0 !important;}
+  .sidebar:hover{width:280px !important;}
+  .erp-hint{display:none;}
+  .bottom-nav{display:flex;}
+  body{padding-bottom:72px;}
+}
 </style>
 <script src="mock-data.js"></script>
 <script src="demo-eoy2026.js"></script>
 </head>
 <body>
-
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="topbar-brand">
-    <div class="brand-dot"></div>
-    <div>
-      <span class="brand-name">蕪解 ERP</span>
-      <span class="brand-sub">戰情室</span>
-    </div>
+<!-- SIDEBAR (v4) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">wujie<span class="sb-dot"></span></div>
+    <div class="sb-logo-sub">蕪 解 創 意 · ERP</div>
   </div>
-  <div class="topbar-right">
-    <a href="erp-lobby.html" style="font-size:11px;color:var(--txt-mid);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid var(--border);border-radius:20px;">← 大廳</a>
+  <div class="sb-content">
+    <div class="sb-group">
+      <div class="sb-group-title">Today</div>
+      
     <span class="date-badge" id="wr-date"></span>
     <div class="user-chip" id="wr-user-chip">
       <div class="user-av" id="wr-av">R</div>
@@ -2194,6 +2277,112 @@ function handleQueryParam(){
   const latest=banks.reduce((a,b)=>a.updated>b.updated?a:b);
   if(dt) dt.textContent='Leo '+latest.updated+' 更新';
 })();
+
+// ── v4 Sidebar ──────────────────────────────────────────────────────────────
+(function initSidebar(){
+  const _sb = JSON.parse(localStorage.getItem('erp_sess')||localStorage.getItem('wujie_session')||'null');
+  if(!_sb) return;
+  const user = _sb.user||'', name = _sb.name||'', role = _sb.role||'', hall = _sb.hall||'erp-lobby.html', color = _sb.color||'#ff6b35';
+  const effectiveHall = hall;
+  const ALL_ROLES = ['ray','shawn','anran','yuming','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying','leo','yangzi'];
+  const HALL_LABELS = {
+    'erp-war-room.html':'⚡ 戰情室','erp-shawn.html':'🌏 Shawn 看板',
+    'erp-anran.html':'🔐 商務中心','erp-pipeline.html':'🎨 產品流水線',
+    'erp-procurement.html':'🏭 採購台','erp-crm.html':'🎯 業務中心',
+    'erp-logistics-quick.html':'🚢 物流更新','erp-gaowei.html':'🚢 物流作業台',
+    'erp-finance.html':'💰 財務工作台','erp-approval-tracker.html':'📋 版權送審追蹤',
+    'erp-ecommerce.html':'🛒 電商中心','erp-shetong.html':'🎨 設計任務板',
+    'erp-peiling.html':'🖋 送審工作板','erp-yangzi.html':'🗂 HR · 出納',
+    'erp-leo.html':'🏦 HR · 出納（台灣）','forms/index.html':'📝 填報中心',
+  };
+  const HALLS = [
+    {href:'erp-war-room.html',         icon:'⚡', name:'戰情室',       roles:['ray','shawn','anran','yuming'],  sbGroup:'業務'},
+    {href:'erp-shawn.html',            icon:'🌏', name:'營運看板',     roles:['shawn','ray'],                   sbGroup:'業務'},
+    {href:'erp-anran.html',            icon:'🔐', name:'商務中心',     roles:['anran','ray','yuming'],          sbGroup:'業務'},
+    {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
+    {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
+    {href:'erp-yangzi.html',           icon:'🗂', name:'HR · 出納',    roles:['yangzi','leo','yuming','anran','ray'], sbGroup:'財務'},
+    {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   roles:ALL_ROLES,                         sbGroup:'開發'},
+    {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       roles:ALL_ROLES,                         sbGroup:'開發'},
+    {href:'erp-shetong.html',          icon:'🎨', name:'設計任務板',   roles:['shetong','bevis','peilin','ray'],sbGroup:'開發'},
+    {href:'erp-peiling.html',          icon:'🖋', name:'送審工作板',   roles:['peilin','bevis','shetong','ray'],sbGroup:'開發'},
+    {href:'erp-gaowei.html',           icon:'🚢', name:'物流作業台',   roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
+    {href:'erp-library.html',          icon:'🖼️', name:'圖庫管理',     roles:ALL_ROLES,                         sbGroup:'開發'},
+    {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
+    {href:'erp-approval-tracker.html', icon:'📋', name:'版權送審追蹤', roles:['peilin','bevis','anran','ray','shawn','laige'], sbGroup:'IP'},
+  ];
+  const curPage = location.pathname.split('/').pop()||'';
+  // Avatar + footer
+  const av = document.getElementById('sb-avatar');
+  if(av){ av.textContent = [...name][0]||'?'; av.style.background = color; }
+  const sbName = document.getElementById('sb-name');
+  const sbRole = document.getElementById('sb-role-text');
+  if(sbName) sbName.textContent = name;
+  if(sbRole) sbRole.textContent = role;
+  // Hall link
+  const sbHallLink = document.getElementById('sb-hall-link');
+  const sbHallLabel = document.getElementById('sb-hall-label');
+  const bnavHallLink = document.getElementById('bnav-hall-link');
+  if(sbHallLink) sbHallLink.href = effectiveHall;
+  if(sbHallLabel) sbHallLabel.textContent = HALL_LABELS[effectiveHall]||'工作台';
+  if(bnavHallLink) bnavHallLink.href = effectiveHall;
+  // Dynamic hall groups
+  const SB_GROUP_ORDER = ['業務','財務','開發','快閃店','IP'];
+  const container = document.getElementById('sb-hall-groups');
+  if(container){
+    SB_GROUP_ORDER.forEach(grp => {
+      const halls = HALLS.filter(h => h.sbGroup===grp && h.roles.includes(user) && h.href!==curPage);
+      if(!halls.length) return;
+      const grpDiv = document.createElement('div');
+      grpDiv.className = 'sb-group';
+      const titleEl = document.createElement('div');
+      titleEl.className = 'sb-group-title';
+      titleEl.textContent = grp;
+      grpDiv.appendChild(titleEl);
+      halls.forEach(h => {
+        const a = document.createElement('a');
+        a.href = h.href;
+        a.className = 'sb-item';
+        a.innerHTML = '<span class="sb-icon">'+h.icon+'</span><span class="sb-label">'+h.name+'</span>';
+        grpDiv.appendChild(a);
+      });
+      container.appendChild(grpDiv);
+    });
+  }
+  // System group
+  const sysContainer = document.getElementById('sb-system-items');
+  if(sysContainer){
+    if(['ray','shawn','anran','yuming'].includes(user)){
+      const e = document.createElement('a'); e.href='erp-entity-structure.html'; e.className='sb-item';
+      e.innerHTML='<span class="sb-icon">🏛</span><span class="sb-label">集團架構</span>'; sysContainer.appendChild(e);
+    }
+    if(['ray','shawn','anran','yuming'].includes(user)){
+      const t = document.createElement('a'); t.href='erp-transfer-pricing.html'; t.className='sb-item';
+      t.innerHTML='<span class="sb-icon">🔄</span><span class="sb-label">TP 設定</span>'; sysContainer.appendChild(t);
+    }
+    if(['ray','shawn'].includes(user)){
+      const a = document.createElement('a'); a.href='erp-admin.html'; a.className='sb-item';
+      a.innerHTML='<span class="sb-icon">⚙</span><span class="sb-label">系統管理</span>'; sysContainer.appendChild(a);
+    }
+    if(!sysContainer.children.length){
+      const sg = document.getElementById('sb-group-system-static');
+      if(sg) sg.style.display='none';
+    }
+  }
+  // Mark current page active
+  document.querySelectorAll('.sidebar .sb-item').forEach(a => {
+    if(a.getAttribute('href')===curPage) a.classList.add('active');
+  });
+})();
 </script>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottom-nav">
+  
+  <a id="bnav-hall-link" href="#" class="bnav-btn">
+    <span class="bnav-icon">→</span>
+    <span class="bnav-label">工作台</span>
+  </a>
+</nav>
 </body>
 </html>
