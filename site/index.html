@@ -1203,12 +1203,104 @@ body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
   border: 1px solid rgba(255,255,255,0.1);
   background: linear-gradient(135deg, rgba(255,45,143,0.08) 0%, rgba(0,229,255,0.04) 100%);
   padding: 32px 26px 28px;
-  min-height: 240px;
+  min-height: 300px;                /* 320 → 300，給照片更多空間 */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.3s;
   overflow: hidden;
+  cursor: pointer;                  /* 暗示可點 */
+}
+.modal-case-tile[data-case]::after {
+  content: '↗';
+  position: absolute;
+  top: 18px; right: 22px;
+  font-size: 18px;
+  color: rgba(255,255,255,0.4);
+  z-index: 2;
+  transition: all 0.3s;
+}
+.modal-case-tile[data-case]:hover::after {
+  color: var(--red);
+  transform: translate(3px, -3px);
+}
+
+/* V44 · Case detail drill-down sub-modal */
+.case-detail {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 8, 0.98);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 200;
+  display: none;
+  overflow-y: auto;
+}
+.case-detail.open { display: block; }
+.case-detail-close {
+  position: fixed;
+  top: 32px; right: 32px;
+  z-index: 202;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: var(--paper);
+  cursor: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.case-detail-back {
+  position: fixed;
+  top: 32px; left: 32px;
+  z-index: 202;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: var(--paper);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  cursor: none;
+  text-transform: uppercase;
+}
+.case-detail-back:hover, .case-detail-close:hover {
+  background: var(--red);
+  border-color: var(--red);
+}
+.case-detail-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 110px 56px 80px;
+  position: relative;
+  z-index: 201;
+}
+.case-detail-head { margin-bottom: 48px; padding-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.case-detail-meta { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.4em; color: var(--cyan); margin-bottom: 16px; text-transform: uppercase; }
+.case-detail-zh { font-family: "Shippori Mincho", serif; font-weight: 700; font-size: clamp(40px, 5vw, 72px); line-height: 1.1; color: var(--paper); margin-bottom: 12px; }
+.case-detail-en { font-family: "DM Sans", sans-serif; font-weight: 600; font-size: 17px; color: rgba(255,255,255,0.65); letter-spacing: -0.005em; margin-bottom: 18px; }
+.case-detail-stats { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 20px; }
+.case-detail-stat { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.2em; color: rgba(255,255,255,0.6); }
+.case-detail-stat strong { font-family: "DM Sans"; font-weight: 800; font-size: 22px; color: var(--paper); letter-spacing: -0.02em; }
+.case-detail-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+}
+.case-detail-photo {
+  width: 100%;
+  display: block;
+  border-radius: 4px;
+  background: var(--bg-soft);
+}
+@media (max-width: 768px) {
+  .case-detail-inner { padding: 80px 20px 60px; }
+  .case-detail-back { top: 16px; left: 16px; padding: 8px 14px; font-size: 10px; }
+  .case-detail-close { top: 16px; right: 16px; width: 40px; height: 40px; }
+  .case-detail-gallery { grid-template-columns: 1fr; }
 }
 /* V43+ · 有實照的 case 用 BG 圖 + 漸層 overlay */
 .modal-case-tile.has-photo {
@@ -2968,7 +3060,7 @@ body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
 </head>
 <body>
 
-<div class="note">V43 · Hero 線稿→上色 crossfade 從 1.4s 加速到 0.7s</div>
+<div class="note">V44 · Case 點進去看完整照片集 + IP 改成 Products（現行 + 過往）</div>
 
 <!-- Cursor 跟隨 -->
 <div class="cursor-dot" id="cursor-dot"></div>
@@ -3135,14 +3227,14 @@ body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
   </div>
 </section>
 
-<!-- ═══ 03 · IP PORTFOLIO ═══ -->
+<!-- ═══ 03 · PRODUCTS（現行 + 過往）═══ -->
 <section class="reveal-section" data-modal="ip">
   <div class="reveal-head">
-    <div class="reveal-num">03 / 06 — IP PORTFOLIO</div>
-    <div class="reveal-zh">7 個現行授權，跳過中間代理</div>
-    <h2 class="reveal-en">7 Active IPs</h2>
-    <div class="reveal-tag">Direct deals · Japan · Korea · US · zero middlemen</div>
-    <button class="reveal-cta" type="button" data-cta-modal="ip">See All IPs · 看完整 IP 名單</button>
+    <div class="reveal-num">03 / 06 — PRODUCTS</div>
+    <div class="reveal-zh">現行 7 個產品線，過往 30+ 個 IP 作品</div>
+    <h2 class="reveal-en">Our Products</h2>
+    <div class="reveal-tag">What we make now · What we've made over 15 years</div>
+    <button class="reveal-cta" type="button" data-cta-modal="ip">See the Catalogue · 看產品作品集</button>
   </div>
   <div class="reveal-preview">
     <div class="preview-pills">
@@ -3290,6 +3382,21 @@ body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
   </div>
 </div>
 
+<!-- ═══ V44 · CASE DETAIL DRILL-DOWN（case modal 內點 tile 開啟）═══ -->
+<div class="case-detail" id="caseDetail">
+  <button class="case-detail-back" onclick="closeCaseDetail()">← Back to cases</button>
+  <button class="case-detail-close" onclick="closeCaseDetail()">✕</button>
+  <div class="case-detail-inner">
+    <div class="case-detail-head">
+      <div class="case-detail-meta" id="cd-meta"></div>
+      <h2 class="case-detail-zh" id="cd-zh"></h2>
+      <div class="case-detail-en" id="cd-en"></div>
+      <div class="case-detail-stats" id="cd-stats"></div>
+    </div>
+    <div class="case-detail-gallery" id="cd-gallery"></div>
+  </div>
+</div>
+
 <script>
 // Cursor 跟隨
 const cursorDot = document.getElementById('cursor-dot');
@@ -3352,23 +3459,46 @@ const SECTION_DATA = {
       </div>`
   },
   ip: {
-    num: '03 / 06 — IP PORTFOLIO',
-    zh: '7 個現行授權，<span class="red">跳過中間代理</span>。',
-    en: 'Direct deals with Japanese, Korean &amp; Western rights holders. Zero middlemen, zero markup.',
+    num: '03 / 06 — PRODUCTS',
+    zh: '我們做的<span class="red">產品作品</span>。',
+    en: 'What we make now — and what we&rsquo;ve made over 15 years.',
     bodyHTML: `
+      <div class="modal-extra-label" style="margin-bottom:18px;">— Active Products · 現行產品線（7）</div>
       <div class="modal-ip-grid">
-        <div class="modal-ip-item"><div class="num">01 / 07 — Active</div><div class="name">史努比 · PEANUTS</div><div class="en">Snoopy</div><div class="desc">大中華區 · 商品開發 / 快閃 / 電商 全鏈條授權。深圳子公司主體簽約。</div><div class="tier">— Anchor Partner</div></div>
-        <div class="modal-ip-item has-photo" style="background-image:url('assets/case_photos/ip_mofusand.webp')"><div class="num">02 / 07</div><div class="name">貓福珊迪</div><div class="en">Mofusand</div><div class="desc">大中華區 · 商品 / 快閃 / 主題展。日本直簽，MG ¥304K。</div><div class="tier">— Tier 1 / JP</div></div>
+        <div class="modal-ip-item"><div class="num">01 / 07 — Active</div><div class="name">史努比 · PEANUTS</div><div class="en">Snoopy</div><div class="desc">大中華區 · 商品開發 / 快閃 / 電商 全鏈條。深圳子公司主體簽約。</div><div class="tier">— Anchor Partner</div></div>
+        <div class="modal-ip-item has-photo" style="background-image:url('assets/case_photos/ip_mofusand.webp')"><div class="num">02 / 07</div><div class="name">貓福珊迪</div><div class="en">Mofusand</div><div class="desc">大中華區 · 商品 / 快閃 / 主題展。MG ¥304K，14% 批發版稅。</div><div class="tier">— Tier 1 / JP</div></div>
         <div class="modal-ip-item has-photo" style="background-image:url('assets/case_photos/ip_chiikawa.webp')"><div class="num">03 / 07</div><div class="name">吉伊卡哇</div><div class="en">Chiikawa</div><div class="desc">大中華區批發 / 流通 · 46 折正常均值。盲袋、毛絨、文具全品類。</div><div class="tier">— Tier 1 / JP</div></div>
         <div class="modal-ip-item"><div class="num">04 / 07</div><div class="name">屁桃君</div><div class="en">Opanchu Usagi</div><div class="desc">亞太區 · 商品 / 快閃。日本直簽，MG USD 65K。</div><div class="tier">— Tier 1 / JP</div></div>
-        <div class="modal-ip-item"><div class="num">05 / 07</div><div class="name">飯糰與梅子</div><div class="en">Onigiri &amp; Umeboshi</div><div class="desc">大中華區 · 商品授權。日本直簽，按實際生產量計算版稅。</div><div class="tier">— Tier 2 / JP</div></div>
+        <div class="modal-ip-item"><div class="num">05 / 07</div><div class="name">飯糰與梅子</div><div class="en">Onigiri &amp; Umeboshi</div><div class="desc">大中華區 · 商品授權。按實際生產量計算版稅。</div><div class="tier">— Tier 2 / JP</div></div>
         <div class="modal-ip-item"><div class="num">06 / 07</div><div class="name">Maniani</div><div class="en">Maniani</div><div class="desc">亞太區 · 商品 / 周邊。韓系新興 IP，年輕族群滲透中。</div><div class="tier">— Tier 2 / KR</div></div>
         <div class="modal-ip-item"><div class="num">07 / 07</div><div class="name">Muzik Tiger</div><div class="en">Muzik Tiger</div><div class="desc">大中華區 · 商品 / 快閃。韓系生活風格 IP。</div><div class="tier">— Tier 2 / KR</div></div>
         <div class="modal-ip-item"><div class="num">+ / NDA</div><div class="name">2026 H2 洽談中</div><div class="en">In Negotiation</div><div class="desc">2 個全球 Tier-1 IP 洽談中，預計 Q3 公佈。</div><div class="tier">— Coming Soon</div></div>
       </div>
-      <div class="modal-extra">
-        <div class="modal-extra-label">— Past Collaborations 過往代表合作</div>
-        <div class="modal-extra-list">排球少年<span class="sep">·</span>咒術迴戰<span class="sep">·</span>進擊巨人<span class="sep">·</span>Disney TSUM<span class="sep">·</span>Pixar<span class="sep">·</span>三麗鷗<span class="sep">·</span>卡娜赫拉<span class="sep">·</span>蛋黃哥<span class="sep">·</span>角落生物<span class="sep">·</span>蠟筆小新<span class="sep">·</span>哆啦 A 夢<span class="sep">·</span>+12 more</div>
+
+      <div class="modal-extra-label" style="margin-top:48px;margin-bottom:18px;">— Past Products · 過往作品（30+ IPs over 15 years）</div>
+      <div class="modal-ip-grid">
+        <div class="modal-ip-item"><div class="num">JP / Anime</div><div class="name">排球少年!!</div><div class="en">Haikyuu!!</div><div class="desc">北京朝陽大悅城 ¥346 萬 · 商品 + 快閃。</div><div class="tier">— 2024</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Anime</div><div class="name">咒術迴戰</div><div class="en">Jujutsu Kaisen</div><div class="desc">中曼雙城聯動 · 商品 + 主題展。</div><div class="tier">— 2024</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Anime</div><div class="name">進擊的巨人</div><div class="en">Attack on Titan</div><div class="desc">10 週年紀念 · 曼谷站。</div><div class="tier">— 2023</div></div>
+        <div class="modal-ip-item"><div class="num">US / Disney</div><div class="name">Disney TSUM TSUM</div><div class="en">TSUM TSUM 裝可愛</div><div class="desc">全國 10 城巡迴 · UNIPOP 跨 IP 模型。</div><div class="tier">— Multi-year</div></div>
+        <div class="modal-ip-item"><div class="num">US / Pixar</div><div class="name">Pixar 動畫盛宴</div><div class="en">Pixar Animation Fest</div><div class="desc">全國 5 城巡迴 · 商品 + 主題展。</div><div class="tier">— Multi-year</div></div>
+        <div class="modal-ip-item has-photo" style="background-image:url('assets/case_photos/case_godzilla.webp')"><div class="num">US / WB</div><div class="name">GODZILLA × KONG</div><div class="en">Warner Bros</div><div class="desc">形象再創作 · 主題展執行。</div><div class="tier">— Recent</div></div>
+        <div class="modal-ip-item has-photo" style="background-image:url('assets/case_photos/case_linefriends.webp')"><div class="num">KR / Naver</div><div class="name">LINE FRIENDS</div><div class="en">LINE FRIENDS</div><div class="desc">主題創作 · 跨界商品。</div><div class="tier">— Recent</div></div>
+        <div class="modal-ip-item has-photo" style="background-image:url('assets/case_photos/ip_shinchan.webp')"><div class="num">JP / Anime</div><div class="name">蠟筆小新</div><div class="en">Crayon Shin-chan</div><div class="desc">電影院大進擊主題店 · 商品開發。</div><div class="tier">— Multiple</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Sanrio</div><div class="name">三麗鷗家族</div><div class="en">Sanrio Family</div><div class="desc">Hello Kitty / Cinnamoroll / Pompompurin 等。</div><div class="tier">— Multi-IP</div></div>
+        <div class="modal-ip-item"><div class="num">JP / 卡哇拉</div><div class="name">卡娜赫拉的小動物</div><div class="en">Kanahei&rsquo;s Small Animals</div><div class="desc">商品 + 快閃 · 大中華區。</div><div class="tier">— Long-term</div></div>
+        <div class="modal-ip-item"><div class="num">JP / SE</div><div class="name">蛋黃哥</div><div class="en">Gudetama</div><div class="desc">商品開發 + 主題店執行。</div><div class="tier">— Mature</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Sanrio</div><div class="name">角落生物</div><div class="en">Sumikko Gurashi</div><div class="desc">主題展 + 周邊商品。</div><div class="tier">— Mature</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Anime</div><div class="name">哆啦 A 夢</div><div class="en">Doraemon</div><div class="desc">主題策展 + 商品開發。</div><div class="tier">— Classic</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Anime</div><div class="name">鬼滅之刃</div><div class="en">Demon Slayer</div><div class="desc">商品 + 沉浸體驗。</div><div class="tier">— Recent</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Anime</div><div class="name">鏈鋸人</div><div class="en">Chainsaw Man</div><div class="desc">商品 + 主題店。</div><div class="tier">— Recent</div></div>
+        <div class="modal-ip-item"><div class="num">KR / Kakao</div><div class="name">Kakao Friends</div><div class="en">Kakao Friends</div><div class="desc">UNIPOP 裝可愛系列 · 跨 IP 主題店。</div><div class="tier">— Recent</div></div>
+        <div class="modal-ip-item"><div class="num">JP / Bandai</div><div class="name">寶可夢</div><div class="en">Pokémon</div><div class="desc">早期商品 + 主題活動執行。</div><div class="tier">— Legacy</div></div>
+        <div class="modal-ip-item"><div class="num">US / Disney</div><div class="name">Duffy &amp; Friends</div><div class="en">Duffy &amp; Friends</div><div class="desc">主題展 + 跨界商品。</div><div class="tier">— Recent</div></div>
+      </div>
+      <div class="modal-extra" style="margin-top:32px;">
+        <div class="modal-extra-label">— Plus 12+ more（按合作年代列）</div>
+        <div class="modal-extra-list" style="font-size:15px;">藍色監獄<span class="sep">·</span>怪獸 8 號<span class="sep">·</span>時光代理人<span class="sep">·</span>WITCH WATCH<span class="sep">·</span>SPONGEBOB<span class="sep">·</span>POP MART<span class="sep">·</span>Snoopy 全球巡迴<span class="sep">·</span>再睡 5 分鐘 NAP TEA<span class="sep">·</span>不定義玩無界<span class="sep">·</span>新北耶誕城（連續 3 年）</div>
       </div>`
   },
   cases: {
@@ -3377,13 +3507,13 @@ const SECTION_DATA = {
     en: 'From single-location pop-ups to nationwide tours — turning IP moments into city-wide cultural events.',
     bodyHTML: `
       <div class="modal-cases">
-        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/haikyuu_beijing.webp')"><div class="modal-case-stat">¥346<small style="font-size:0.5em">萬</small></div><div><div class="modal-case-zh">排球少年!! 朝陽大悅城</div><div class="modal-case-en">Haikyuu!! @ Beijing Chaoyang Joy City</div><div class="modal-case-tag">— Beijing · 2024 · 40 天 · 首 3 日 ¥135 萬</div></div></div>
-        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/jjk_twincity.webp')"><div class="modal-case-stat">$499<small style="font-size:0.5em">K</small></div><div><div class="modal-case-zh">咒術迴戰 S2 中曼雙城</div><div class="modal-case-en">JJK Season 2 · Beijing + Bangkok</div><div class="modal-case-tag">— Twin city · 中國 USD$499K · 曼谷 USD$187K</div></div></div>
-        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/tsum_10city.webp')"><div class="modal-case-stat">10<small style="font-size:0.5em">城</small></div><div><div class="modal-case-zh">Disney TSUM TSUM 裝可愛</div><div class="modal-case-en">Disney TSUM TSUM · 10-city Tour</div><div class="modal-case-tag">— 全國巡迴 · 小紅書話題破萬 · 瀏覽 1300 萬+</div></div></div>
-        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/aot_10anniv.webp')"><div class="modal-case-stat">10<small style="font-size:0.5em">週年</small></div><div><div class="modal-case-zh">進擊的巨人 十週年</div><div class="modal-case-en">Attack on Titan · 10th Anniversary</div><div class="modal-case-tag">— Anniversary special · 曼谷站</div></div></div>
-        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/pixar_5city.webp')"><div class="modal-case-stat">5<small style="font-size:0.5em">城</small></div><div><div class="modal-case-zh">Pixar 動畫盛宴</div><div class="modal-case-en">Pixar Animation Fest</div><div class="modal-case-tag">— 5-city tour 全國巡回</div></div></div>
+        <div class="modal-case-tile has-photo" data-case="haikyuu" style="background-image:url('assets/case_photos/haikyuu_beijing.webp')"><div class="modal-case-stat">¥346<small style="font-size:0.5em">萬</small></div><div><div class="modal-case-zh">排球少年!! 朝陽大悅城</div><div class="modal-case-en">Haikyuu!! @ Beijing Chaoyang Joy City</div><div class="modal-case-tag">— Beijing · 2024 · 40 天 · 首 3 日 ¥135 萬</div></div></div>
+        <div class="modal-case-tile has-photo" data-case="jjk" style="background-image:url('assets/case_photos/jjk_twincity.webp')"><div class="modal-case-stat">$499<small style="font-size:0.5em">K</small></div><div><div class="modal-case-zh">咒術迴戰 S2 中曼雙城</div><div class="modal-case-en">JJK Season 2 · Beijing + Bangkok</div><div class="modal-case-tag">— Twin city · 中國 USD$499K · 曼谷 USD$187K</div></div></div>
+        <div class="modal-case-tile has-photo" data-case="tsum" style="background-image:url('assets/case_photos/tsum_10city.webp')"><div class="modal-case-stat">10<small style="font-size:0.5em">城</small></div><div><div class="modal-case-zh">Disney TSUM TSUM 裝可愛</div><div class="modal-case-en">Disney TSUM TSUM · 10-city Tour</div><div class="modal-case-tag">— 全國巡迴 · 小紅書話題破萬 · 瀏覽 1300 萬+</div></div></div>
+        <div class="modal-case-tile has-photo" data-case="aot" style="background-image:url('assets/case_photos/aot_10anniv.webp')"><div class="modal-case-stat">10<small style="font-size:0.5em">週年</small></div><div><div class="modal-case-zh">進擊的巨人 十週年</div><div class="modal-case-en">Attack on Titan · 10th Anniversary</div><div class="modal-case-tag">— Anniversary special · 曼谷站</div></div></div>
+        <div class="modal-case-tile has-photo" data-case="pixar" style="background-image:url('assets/case_photos/pixar_5city.webp')"><div class="modal-case-stat">5<small style="font-size:0.5em">城</small></div><div><div class="modal-case-zh">Pixar 動畫盛宴</div><div class="modal-case-en">Pixar Animation Fest</div><div class="modal-case-tag">— 5-city tour 全國巡回</div></div></div>
         <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/xmas_xinbei.webp')"><div class="modal-case-stat">3<small style="font-size:0.5em">年</small></div><div><div class="modal-case-zh">新北耶誕城</div><div class="modal-case-en">Christmasland in New Taipei City</div><div class="modal-case-tag">— 政府合作 · 連續 3 年</div></div></div>
-        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/mofusand_chubby.webp')"><div class="modal-case-stat">¥304<small style="font-size:0.5em">K MG</small></div><div><div class="modal-case-zh">貓福珊迪 胖胖系列</div><div class="modal-case-en">Mofusand Chubby Collection</div><div class="modal-case-tag">— 主題展 · 商品 · 2025.11 結案</div></div></div>
+        <div class="modal-case-tile has-photo" data-case="mofusand" style="background-image:url('assets/case_photos/mofusand_chubby.webp')"><div class="modal-case-stat">¥304<small style="font-size:0.5em">K MG</small></div><div><div class="modal-case-zh">貓福珊迪 胖胖系列</div><div class="modal-case-en">Mofusand Chubby Collection</div><div class="modal-case-tag">— 主題展 · 商品 · 2025.11 結案</div></div></div>
         <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/case_giant_blindbox.webp')"><div class="modal-case-stat">∞</div><div><div class="modal-case-zh">不定義 · 玩無界</div><div class="modal-case-en">巨型盲盒概念主題展</div><div class="modal-case-tag">— 概念創新 · 沉浸體驗</div></div></div>
         <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/case_linefriends.webp')"><div class="modal-case-stat">LINE</div><div><div class="modal-case-zh">LINE FRIENDS 全新主題</div><div class="modal-case-en">LINE FRIENDS Themed Creation</div><div class="modal-case-tag">— 展覽策劃 · 主題創作</div></div></div>
         <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/case_godzilla.webp')"><div class="modal-case-stat">GVK</div><div><div class="modal-case-zh">GODZILLA × KONG</div><div class="modal-case-en">深入創意核心 · 形象創作</div><div class="modal-case-tag">— Warner Bros · 形象再創作</div></div></div>
@@ -3479,7 +3609,114 @@ document.querySelectorAll('.reveal-cta[data-cta-modal]').forEach(btn => {
 })();
 
 sectionModal.addEventListener('click', e => { if (e.target === sectionModal) closeSectionModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSectionModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCaseDetail(); closeSectionModal(); } });
+
+// ═══ V44 · CASE DETAIL DRILL-DOWN ═══
+const CASE_DATA = {
+  haikyuu: {
+    meta: 'Beijing · 2024 · 40 days',
+    zh: '排球少年!! 朝陽大悅城',
+    en: 'Haikyuu!! @ Beijing Chaoyang Joy City',
+    stats: [
+      { label: 'Total Revenue', value: '¥346萬' },
+      { label: 'First 3 Days', value: '¥135萬' },
+      { label: 'Duration', value: '40 天' },
+      { label: 'Location', value: '朝陽大悅城 L4' }
+    ],
+    folder: 'haikyuu',
+    photos: ['01','02','04','05','06']
+  },
+  jjk: {
+    meta: 'Beijing + Bangkok · 2024',
+    zh: '咒術迴戰 S2 中曼雙城',
+    en: 'JJK Season 2 · Twin City Tour',
+    stats: [
+      { label: 'China Revenue', value: 'USD$499K' },
+      { label: 'Bangkok Revenue', value: 'USD$187K' },
+      { label: 'Cities', value: '北京 · 曼谷' },
+      { label: 'Format', value: 'Twin city sync' }
+    ],
+    folder: 'jjk',
+    photos: ['01','02','03','04','05','06','07']
+  },
+  tsum: {
+    meta: 'National · 10 cities · UNIPOP series',
+    zh: 'Disney TSUM TSUM 裝可愛',
+    en: 'Disney TSUM TSUM · 10-city Tour',
+    stats: [
+      { label: 'Cities', value: '10 城' },
+      { label: 'Social Reach', value: '1300萬+ 瀏覽' },
+      { label: 'Topics', value: '小紅書破萬' },
+      { label: 'Format', value: 'UNIPOP 跨 IP' }
+    ],
+    folder: 'tsum',
+    photos: ['01','02','03','04','05','06','07','08']
+  },
+  aot: {
+    meta: 'Bangkok · Anniversary Special',
+    zh: '進擊的巨人 十週年',
+    en: 'Attack on Titan · 10th Anniversary',
+    stats: [
+      { label: 'Milestone', value: '10 週年' },
+      { label: 'City', value: 'Bangkok' },
+      { label: 'Format', value: 'Anniversary exhibition' }
+    ],
+    folder: 'aot',
+    photos: ['01','02','03','04']
+  },
+  pixar: {
+    meta: 'National · 5-city tour',
+    zh: 'Pixar 動畫盛宴',
+    en: 'Pixar Animation Fest',
+    stats: [
+      { label: 'Cities', value: '5 城' },
+      { label: 'Partner', value: 'Disney Pixar' },
+      { label: 'Format', value: '全國巡迴' }
+    ],
+    folder: 'pixar',
+    photos: ['01','02','03','04','05','06','07','08','09','10','11']
+  },
+  mofusand: {
+    meta: 'Themed exhibition + Products · 2025',
+    zh: '貓福珊迪 胖胖系列',
+    en: 'Mofusand Chubby Collection',
+    stats: [
+      { label: 'MG', value: '¥304K' },
+      { label: 'Royalty', value: '14% wholesale' },
+      { label: 'Format', value: '主題展 + 商品' },
+      { label: 'Closing', value: '2025.11' }
+    ],
+    folder: 'mofusand',
+    photos: ['01','02','03','04','05','06','07']
+  }
+};
+const caseDetail = document.getElementById('caseDetail');
+function openCaseDetail(key) {
+  const d = CASE_DATA[key];
+  if (!d) return;
+  document.getElementById('cd-meta').textContent = d.meta;
+  document.getElementById('cd-zh').textContent = d.zh;
+  document.getElementById('cd-en').textContent = d.en;
+  document.getElementById('cd-stats').innerHTML = d.stats.map(s =>
+    `<div class="case-detail-stat">${s.label}<br><strong>${s.value}</strong></div>`
+  ).join('');
+  document.getElementById('cd-gallery').innerHTML = d.photos.map(n =>
+    `<img class="case-detail-photo" src="assets/case_photos/${d.folder}/${n}.webp" alt="${d.en} ${n}" loading="lazy">`
+  ).join('');
+  caseDetail.classList.add('open');
+  caseDetail.scrollTop = 0;
+}
+function closeCaseDetail() {
+  caseDetail.classList.remove('open');
+}
+// Delegate clicks on case tiles with data-case
+document.addEventListener('click', e => {
+  const tile = e.target.closest('.modal-case-tile[data-case]');
+  if (tile) {
+    e.stopPropagation();
+    openCaseDetail(tile.dataset.case);
+  }
+});
 
 // ═══ V23 · Scroll 漸變交給 CSS animation-timeline: view() ═══
 // 不再需要 JS scroll listener — CSS 原生即時跟著滾動位置渲染。
