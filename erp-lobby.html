@@ -747,6 +747,48 @@ body{
   </div>
 </div>
 
+<!-- 安然：合約待批 MODAL -->
+<div class="qa-modal-bg" id="contract-modal" onclick="if(event.target===this)closeContractModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📜 合約待批</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">IP 授權續簽 / 新合約審查 / 供應商 NDA</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeContractModal()">✕</button>
+    </div>
+    <div id="contract-inbox-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 安然：跨境款項確認 MODAL -->
+<div class="qa-modal-bg" id="xborder-modal" onclick="if(event.target===this)closeXborderModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">💸 跨境款項確認</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">北京 → 香港 / 北京 → 台灣 / 台灣 → 泰國 結算</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeXborderModal()">✕</button>
+    </div>
+    <div id="xborder-inbox-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 安然：IP 維護提醒 MODAL -->
+<div class="qa-modal-bg" id="ip-reminders-modal" onclick="if(event.target===this)closeIpRemindersModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🔐 IP 維護提醒</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">IP 授權到期 / 年費 / MG 進度追蹤</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeIpRemindersModal()">✕</button>
+    </div>
+    <div id="ip-reminders-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- 我的待審 inbox MODAL（楊子 / Leo / Ray）-->
 <div class="qa-modal-bg" id="approval-inbox-modal" onclick="if(event.target===this)closeApprovalInboxModal()">
   <div class="qa-modal" style="max-width:560px;">
@@ -1150,9 +1192,9 @@ const MY_TODOS = {
     {id:'s4',icon:'💬',title:'春雷確認 Q3電商計畫',sub:'抖音/小紅書 Q3排期，需本週確認',urgency:'low',status:'進行中',options:['已確認 ✓','等待對方回覆']},
   ],
   anran:[
-    {id:'an1',icon:'📜',title:'Snoopy 北京代理合約 — 續簽啟動',sub:'PNUTS · 版權費截止 2026-06-30，需提前 3 個月',urgency:'high',status:'待處理',options:['已發起續簽流程 ✓','再等 2 週','需 Ray 批准後處理']},
-    {id:'an2',icon:'💸',title:'北京→香港跨境打款記錄',sub:'¥850,000 貨款 · 飛書待填',urgency:'high',status:'待記錄',options:['已記錄入 ERP ✓','確認金額中','需等帳號確認']},
-    {id:'an3',icon:'📋',title:'Miffy 授權年費提醒追蹤',sub:'8月到期，應在 5月啟動',urgency:'med',status:'待確認',options:['已啟動跟進 ✓','標記下週提醒','轉交珮玲']},
+    {id:'an1',icon:'📜',title:'Snoopy 北京代理合約 — 續簽啟動',sub:'PNUTS · 版權費截止 2026-06-30，立即進入續簽談判',urgency:'high',status:'待處理',action:'contract-approve'},
+    {id:'an2',icon:'💸',title:'北京→香港跨境打款記錄',sub:'¥850,000 貨款 · 立即確認入帳',urgency:'high',status:'待記錄',action:'xborder-confirm'},
+    {id:'an3',icon:'📋',title:'Miffy 授權年費提醒追蹤',sub:'8月到期，立即處理避免逾期',urgency:'med',status:'待確認',action:'ip-reminders'},
   ],
   laige:[
     {id:'l1',icon:'🏭',title:'報價確認：東莞廠 Snoopy × 5000pcs',sub:'截止今日 EOD · 版本#3',urgency:'high',status:'待回覆',options:['已回覆廠商 ✓','追催中','考慮換廠']},
@@ -1473,6 +1515,163 @@ function markCurrentTodoDone(){
   localStorage.setItem('lobby_done_'+user, JSON.stringify([...doneSet]));
   renderTodos(_showDone);
   _currentTodoId = null;
+}
+
+// ── 安然 modal × 3：合約待批 / 跨境款項 / IP 維護 ──
+const CONTRACT_INBOX_SEED = [
+  {id:'c1', title:'PNUTS Snoopy 北京代理 — 續簽', urgency:'high',
+   counterparty:'Peanuts Worldwide', amount:'USD $65,000 MG', deadline:'2026-06-30 到期',
+   detail:'前約 2024-2026，續簽 2 年；保底金 USD 65k；版稅 13%；首批 200k pcs 起。'},
+  {id:'c2', title:'Mofusand 年度合約 — 簽署確認', urgency:'med',
+   counterparty:'貓福珊迪 IP 方', amount:'¥304,000 MG', deadline:'2026-05-25',
+   detail:'年度授權；MG ¥304k；版稅 14% 批發；首批已備貨。'},
+  {id:'c3', title:'東莞達豐 NDA — 新供應商', urgency:'low',
+   counterparty:'東莞達豐玩具', amount:'—', deadline:'本週確認',
+   detail:'新合作供應商保密協議；採購已開始打樣。'},
+];
+function loadContractInbox(){
+  const stored = localStorage.getItem('anran_contract_inbox_v1');
+  if(stored) return JSON.parse(stored);
+  localStorage.setItem('anran_contract_inbox_v1', JSON.stringify(CONTRACT_INBOX_SEED));
+  return CONTRACT_INBOX_SEED;
+}
+function openContractModal(){
+  renderContractInbox();
+  document.getElementById('contract-modal').classList.add('show');
+}
+function closeContractModal(){ document.getElementById('contract-modal').classList.remove('show'); }
+function renderContractInbox(){
+  const list = document.getElementById('contract-inbox-list');
+  const arr = loadContractInbox().filter(i => !i.status);
+  if(!arr.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待批合約</div>';
+    return;
+  }
+  list.innerHTML = arr.map(i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);':''}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="flex:1;">
+        ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;margin-right:6px;">⚠ 急</span>':''}
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.title}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.counterparty} · ${i.deadline}</div>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${i.amount}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doContractAction('${i.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准</button>
+      <button onclick="doContractAction('${i.id}','need-ray')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">需 Ray 親簽</button>
+      <button onclick="doContractAction('${i.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回</button>
+    </div>
+  </div>`).join('');
+}
+function doContractAction(id, action){
+  const arr = loadContractInbox();
+  const item = arr.find(x => x.id === id);
+  if(item){ item.status = action; localStorage.setItem('anran_contract_inbox_v1', JSON.stringify(arr)); }
+  const labels = {approved:'已核准 · 走簽署流程', 'need-ray':'已轉 Ray 親簽', revise:'已退回 · 待修改'};
+  renderContractInbox();
+  showQaToast(`✓ ${item ? item.title : id} · ${labels[action]}`);
+}
+
+const XBORDER_INBOX_SEED = [
+  {id:'x1', from:'北京蕪解', to:'香港 JV', ccy:'CNY→HKD', amount:'¥ 850,000 (≈HK$ 935,000)',
+   purpose:'Q2 貨款結算', urgency:'high', detail:'4 月份批發 LOG-ON 訂單貨款撥付，已上 SWIFT，待躍明入帳記錄。'},
+  {id:'x2', from:'北京蕪解', to:'台灣悍草', ccy:'CNY→TWD', amount:'¥ 120,000 (≈NT$ 528,000)',
+   purpose:'服務費 Q1', urgency:'med', detail:'悍草為北京蕪解提供設計 / 行政服務的 Q1 結算。'},
+  {id:'x3', from:'台灣悍草', to:'UJ BKK', ccy:'TWD→THB', amount:'NT$ 100,000 (≈฿ 109,000)',
+   purpose:'曼谷展場費代墊', urgency:'low', detail:'JJK 曼谷快閃場地費悍草代墊，BKK 月結補回。'},
+];
+function loadXborderInbox(){
+  const stored = localStorage.getItem('anran_xborder_inbox_v1');
+  if(stored) return JSON.parse(stored);
+  localStorage.setItem('anran_xborder_inbox_v1', JSON.stringify(XBORDER_INBOX_SEED));
+  return XBORDER_INBOX_SEED;
+}
+function openXborderModal(){ renderXborderInbox(); document.getElementById('xborder-modal').classList.add('show'); }
+function closeXborderModal(){ document.getElementById('xborder-modal').classList.remove('show'); }
+function renderXborderInbox(){
+  const list = document.getElementById('xborder-inbox-list');
+  const arr = loadXborderInbox().filter(i => !i.status);
+  if(!arr.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待確認跨境款項</div>';
+    return;
+  }
+  list.innerHTML = arr.map(i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="flex:1;">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.from} → ${i.to}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.purpose} · ${i.ccy}</div>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${i.amount}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doXborderAction('${i.id}','confirmed')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 確認 · 送躍明入帳</button>
+      <button onclick="doXborderAction('${i.id}','hold')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">擱置</button>
+    </div>
+  </div>`).join('');
+}
+function doXborderAction(id, action){
+  const arr = loadXborderInbox();
+  const item = arr.find(x => x.id === id);
+  if(item){ item.status = action; localStorage.setItem('anran_xborder_inbox_v1', JSON.stringify(arr)); }
+  if(action === 'confirmed'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'yuming',
+      msg:`安然確認跨境：${item ? item.from+' → '+item.to+' · '+item.amount : id} · 入帳`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  renderXborderInbox();
+  showQaToast(action === 'confirmed' ? '✓ 已送躍明入帳' : '已擱置');
+}
+
+const IP_REMINDERS_SEED = [
+  {id:'r1', ip:'PNUTS Snoopy 北京代理', deadline:'2026-06-30 到期 · 距 46 天',
+   urgency:'high', fee:'USD $65,000 MG', status:'待續簽', detail:'年度合約到期，需提前 3 個月啟動續簽談判（已晚）。'},
+  {id:'r2', ip:'Mofusand 年度授權', deadline:'2026-06-15 年費',
+   urgency:'med', fee:'¥ 304,000', status:'待付款', detail:'年度授權金，需提前 1 個月付清。'},
+  {id:'r3', ip:'吉依卡哇授權', deadline:'已過期 12 天',
+   urgency:'high', fee:'¥ 180,000', status:'⚠ 逾期', detail:'已停止新訂單收單，需立即處理避免影響採購。'},
+];
+function loadIpReminders(){
+  const stored = localStorage.getItem('anran_ip_reminders_v1');
+  if(stored) return JSON.parse(stored);
+  localStorage.setItem('anran_ip_reminders_v1', JSON.stringify(IP_REMINDERS_SEED));
+  return IP_REMINDERS_SEED;
+}
+function openIpRemindersModal(){ renderIpReminders(); document.getElementById('ip-reminders-modal').classList.add('show'); }
+function closeIpRemindersModal(){ document.getElementById('ip-reminders-modal').classList.remove('show'); }
+function renderIpReminders(){
+  const list = document.getElementById('ip-reminders-list');
+  const arr = loadIpReminders().filter(i => !i.cleared);
+  if(!arr.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有 IP 維護提醒</div>';
+    return;
+  }
+  list.innerHTML = arr.map(i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);':''}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="flex:1;">
+        ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;margin-right:6px;">⚠</span>':''}
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.ip}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.deadline} · ${i.status}</div>
+      </div>
+      <div style="font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${i.fee}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doIpReminderAction('${i.id}','started')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已啟動處理</button>
+      <button onclick="doIpReminderAction('${i.id}','to-peilin')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">轉珮玲</button>
+      <button onclick="doIpReminderAction('${i.id}','to-ray')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">Ray 親談</button>
+    </div>
+  </div>`).join('');
+}
+function doIpReminderAction(id, action){
+  const arr = loadIpReminders();
+  const item = arr.find(x => x.id === id);
+  if(item){ item.cleared = true; localStorage.setItem('anran_ip_reminders_v1', JSON.stringify(arr)); }
+  const labels = {started:'已啟動處理', 'to-peilin':'已轉珮玲跟進', 'to-ray':'已轉 Ray 親談'};
+  renderIpReminders();
+  showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
 }
 
 // ── 待審 inbox modal（楊子 / Leo / Ray）共用 yangzi_inbox_v1 localStorage ──
@@ -1836,9 +2035,9 @@ function triggerAction(action){
     case 'sellthru':          openSellThruModal(); break;
     case 'my-customers':      openSimpleListModal('my-customers'); break;
     case 'visit-log':         showQaToast('📞 拜訪記錄 modal 開發中（V2）'); break;
-    case 'contract-approve':  showQaToast('📜 合約待批 modal 開發中（V2）'); break;
-    case 'xborder-confirm':   showQaToast('💸 跨境款項確認 modal 開發中（V2）'); break;
-    case 'ip-reminders':      showQaToast('🔐 IP 維護提醒 modal 開發中（V2）'); break;
+    case 'contract-approve':  openContractModal(); break;
+    case 'xborder-confirm':   openXborderModal(); break;
+    case 'ip-reminders':      openIpRemindersModal(); break;
     case 'my-pending':        openSimpleListModal('my-pending'); break;
     case 'monthend':          showQaToast('📊 月結任務 modal 開發中（V2）'); break;
     case 'my-approval':       openApprovalInboxModal(); break;
