@@ -2150,12 +2150,20 @@ function openWholesaleModal(){
 function closeWholesaleModal(){ document.getElementById('wholesale-modal').classList.remove('show'); }
 function doWholesale(id, action){
   const item = _genericDone('shawn_wholesale_v1', id, '');
-  const labels = {'can-do':'已轉 Ray 確認', 'need-info':'已通知業務補資訊', 'reject':'已通知業務不接'};
+  const labels = {'can-do':'已轉 Ray 確認', 'need-info':'已通知業務補資訊', 'reject':'已通知業務不接 · 請告知客戶'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   if(action === 'can-do'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
     notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`${name} 確認可執行：${item ? item.client+' · '+item.product+' · '+item.amount : id}`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  } else if(action === 'need-info'){
+    // 需資訊 → 通知業務員補（Phase 1 補洞）
+    const salesUser = item && item.sales ? {'老董':'laodong','德寶':'debao','安然':'anran'}[item.sales] : 'laodong';
+    notif.unshift({ts:Date.now(), from:name, to:salesUser, msg:`⚠ ${name} 需更多資訊：${item ? item.client : id} · 請補`});
+  } else if(action === 'reject'){
+    // 不接 → 通知業務員告知客戶（Phase 1 補洞）
+    const salesUser = item && item.sales ? {'老董':'laodong','德寶':'debao','安然':'anran'}[item.sales] : 'laodong';
+    notif.unshift({ts:Date.now(), from:name, to:salesUser, msg:`❌ ${name} 不接此單：${item ? item.client : id} · 請告知客戶`});
   }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   openWholesaleModal();
   showQaToast(`✓ ${item ? item.client : id} · ${labels[action]}`);
 }
@@ -2217,12 +2225,20 @@ function openRayApprovalModal(){
 function closeRayApprovalModal(){ document.getElementById('ray-approval-modal').classList.remove('show'); }
 function doRayApproval(id, action){
   const item = _genericDone('ray_approval_v1', id, '');
-  const labels = {approved:'已批准 · 通知執行', revise:'已退回修改', hold:'已暫緩'};
+  const labels = {approved:'已批准 · 通知執行', revise:'已退回 · 通知送出者修改', hold:'已暫緩 · 通知送出者等待'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  const FROM_USER = {'Shawn':'shawn','安然':'anran','楊子':'yangzi','賴哥':'laige','躍明':'yuming','Bevis':'bevis','珮玲':'peilin'};
+  const toUser = item && item.from ? (FROM_USER[item.from] || 'anran') : 'anran';
   if(action === 'approved'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-    notif.unshift({ts:Date.now(), from:'Ray', to:item.from, msg:`✓ Ray 批准：${item ? item.title : id}`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`✓ Ray 批准：${item ? item.title : id}`});
+  } else if(action === 'revise'){
+    // 退回 → 通知送出者修改（Phase 1 補洞）
+    notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`⚠ Ray 退回需修改：${item ? item.title : id}`});
+  } else if(action === 'hold'){
+    // 暫緩 → 通知送出者（Phase 1 補洞）
+    notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`⏸ Ray 暫緩：${item ? item.title : id} · 暫時不批`});
   }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   openRayApprovalModal();
   showQaToast(`✓ ${item ? item.title : id} · ${labels[action]}`);
 }
@@ -2337,12 +2353,20 @@ function openDesignApproveModal(){
 function closeDesignApproveModal(){ document.getElementById('design-approve-modal').classList.remove('show'); }
 function doDesignAction(id, action){
   const item = _genericDone('bevis_design_approve_v1', id, '');
-  const labels = {approved:'已核准 · 通知賴哥準備打樣', revise:'已退回設計師修改', meeting:'已安排會議'};
+  const labels = {approved:'已核准 · 通知賴哥準備打樣', revise:'已退回設計師修改', meeting:'已安排會議 · 通知設計師'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   if(action === 'approved'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
     notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`Bevis 核准設計：${item ? item.name : id} · 可準備打樣`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  } else if(action === 'revise'){
+    // 退回 → 通知設計師重做（Phase 1 補洞）
+    const designer = item && item.designer ? item.designer : 'shetong';
+    const to = designer.includes('外包') ? 'shetong' : (designer === '內部 · 詩彤' ? 'shetong' : 'shetong');
+    notif.unshift({ts:Date.now(), from:name, to, msg:`⚠ Bevis 退回需修改：${item ? item.name : id}`});
+  } else if(action === 'meeting'){
+    // 開會 → 通知設計師排會議（Phase 1 補洞）
+    notif.unshift({ts:Date.now(), from:name, to:'shetong', msg:`📅 Bevis 安排會議討論：${item ? item.name : id}`});
   }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   openDesignApproveModal();
   showQaToast(`✓ ${item ? item.name : id} · ${labels[action]}`);
 }
@@ -2372,12 +2396,18 @@ function openApprovalTrackModal(){
 function closeApprovalTrackModal(){ document.getElementById('approval-track-modal').classList.remove('show'); }
 function doApprovalTrack(id, action){
   const item = _genericDone('peilin_approval_track_v1', id, '');
-  const labels = {pass:'已通過 · 通知 Bevis 進下一階段', revise:'已記錄修改意見', chase:'已發信追問'};
+  const labels = {pass:'已通過 · 通知 Bevis 進下一階段', revise:'已記錄修改意見 · 通知 Bevis 改設計', chase:'已發信追問版權方'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   if(action === 'pass'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
     notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`版權方通過：${item ? item.ip : id} · 可進下一階段`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  } else if(action === 'revise'){
+    // 需修改 → 通知 Bevis 改設計（Phase 1 補洞）
+    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`⚠ 版權方需修改：${item ? item.ip : id} · 請 Bevis 改設計`});
+  } else if(action === 'chase'){
+    // 主動追問 → 自動排下次追問（Phase 1 補洞，V2 接飛書真的發信）
+    notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`珮玲追問版權方：${item ? item.ip : id} · 已超期`});
   }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   openApprovalTrackModal();
   showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
 }
@@ -2406,12 +2436,15 @@ function openDesignTaskModal(){
 function closeDesignTaskModal(){ document.getElementById('design-task-modal').classList.remove('show'); }
 function doDesignTask(id, action){
   const item = _genericDone('shetong_design_task_v1', id, '');
-  const labels = {submitted:'已交 Bevis · 等審', delay:'已標記延期'};
+  const labels = {submitted:'已交 Bevis · 等審', delay:'已標記延期 · 通知 Bevis'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   if(action === 'submitted'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
     notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`詩彤交件：${item ? item.task : id}`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  } else if(action === 'delay'){
+    // 延期 → 通知 Bevis 知道（Phase 1 補洞）
+    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`⚠ 詩彤需延期：${item ? item.task : id}`});
   }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   openDesignTaskModal();
   showQaToast(`✓ ${item ? item.task : id} · ${labels[action]}`);
 }
@@ -2607,8 +2640,25 @@ function doContractAction(id, action){
   const arr = loadContractInbox();
   const item = arr.find(x => x.id === id);
   if(item){ item.status = action; localStorage.setItem('anran_contract_inbox_v1', JSON.stringify(arr)); }
-  const labels = {approved:'已核准 · 走簽署流程', 'need-ray':'已轉 Ray 親簽', revise:'已退回 · 待修改'};
+  const labels = {approved:'已核准 · 走簽署流程', 'need-ray':'已寫進 Ray 待批核 · 等親簽', revise:'已退回 · 待修改重送'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  if(action === 'need-ray' && item){
+    // 轉 Ray 親簽 → 寫進 ray_approval_v1（Phase 1 補洞）
+    const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
+    rayArr.unshift({
+      id:'ra-' + Date.now(), type:'contract',
+      title:item.title, from:'安然', urgency:item.urgency,
+      detail:item.detail + ' · 對象：' + item.counterparty + ' · 金額：' + item.amount,
+      submittedAt: Date.now(),
+    });
+    localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
+    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`📜 安然轉 Ray 親簽：${item.title}`});
+  } else if(action === 'revise' && item){
+    notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`⚠ 安然退回合約：${item.title} · 待修改`});
+  }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   renderContractInbox();
+  markCurrentTodoDone();
   showQaToast(`✓ ${item ? item.title : id} · ${labels[action]}`);
 }
 
@@ -2654,14 +2704,19 @@ function doXborderAction(id, action){
   const arr = loadXborderInbox();
   const item = arr.find(x => x.id === id);
   if(item){ item.status = action; localStorage.setItem('anran_xborder_inbox_v1', JSON.stringify(arr)); }
-  if(action === 'confirmed'){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  if(action === 'confirmed' && item){
     notif.unshift({ts:Date.now(), from:name, to:'yuming',
-      msg:`安然確認跨境：${item ? item.from+' → '+item.to+' · '+item.amount : id} · 入帳`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+      msg:`安然確認跨境：${item.from+' → '+item.to+' · '+item.amount} · 入帳`});
+  } else if(action === 'hold' && item){
+    // 擱置 → 通知申請人（Phase 1 補洞，預設通知躍明知道暫不入帳）
+    notif.unshift({ts:Date.now(), from:name, to:'yuming',
+      msg:`⏸ 安然擱置跨境：${item.from+' → '+item.to} · 暫不入帳，等通知`});
   }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   renderXborderInbox();
-  showQaToast(action === 'confirmed' ? '✓ 已送躍明入帳' : '已擱置');
+  markCurrentTodoDone();
+  showQaToast(action === 'confirmed' ? '✓ 已送躍明入帳' : '已擱置 · 通知躍明');
 }
 
 const IP_REMINDERS_SEED = [
@@ -2708,8 +2763,35 @@ function doIpReminderAction(id, action){
   const arr = loadIpReminders();
   const item = arr.find(x => x.id === id);
   if(item){ item.cleared = true; localStorage.setItem('anran_ip_reminders_v1', JSON.stringify(arr)); }
-  const labels = {started:'已啟動處理', 'to-peilin':'已轉珮玲跟進', 'to-ray':'已轉 Ray 親談'};
+  const labels = {started:'已啟動處理', 'to-peilin':'已寫進珮玲送審追蹤 list', 'to-ray':'已寫進 Ray 待批核 list'};
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  if(action === 'to-peilin' && item){
+    // 轉珮玲 → 寫進 peilin_approval_track_v1（Phase 1 補洞）
+    const ptArr = JSON.parse(localStorage.getItem('peilin_approval_track_v1')||'[]');
+    ptArr.unshift({
+      id:'pt-' + Date.now(),
+      ip:item.ip, sent: new Date().toISOString().slice(0,10),
+      counterparty:'安然轉介', urgency:item.urgency,
+      detail:'安然轉珮玲處理 IP 維護 · ' + item.detail,
+      submittedAt: Date.now(),
+    });
+    localStorage.setItem('peilin_approval_track_v1', JSON.stringify(ptArr));
+    notif.unshift({ts:Date.now(), from:name, to:'peilin', msg:`🖋 安然轉你處理：${item.ip}`});
+  } else if(action === 'to-ray' && item){
+    // 轉 Ray 親談 → 寫進 ray_approval_v1（Phase 1 補洞）
+    const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
+    rayArr.unshift({
+      id:'ra-' + Date.now(), type:'contract',
+      title:'IP 親談：' + item.ip, from:'安然', urgency:item.urgency,
+      detail:item.detail + ' · 金額：' + item.fee,
+      submittedAt: Date.now(),
+    });
+    localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
+    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`🔐 安然轉你親談：${item.ip}`});
+  }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   renderIpReminders();
+  markCurrentTodoDone();
   showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
 }
 
@@ -2798,9 +2880,16 @@ function doInboxReject(id){
   const arr = loadInboxLobby();
   const item = arr.find(x => x.id === id);
   if(item){ item.status = 'rejected'; saveInboxLobby(arr); }
+  // 通知申請人補單據（Phase 1 補洞）
+  if(item){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'applicant',
+      msg:`⚠ 你的申請被退回：${item.name} · 請補單據後重送`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
   renderApprovalInbox();
   markCurrentTodoDone();
-  showQaToast(`已退回，需補單據`);
+  showQaToast(`已退回 · 通知申請人補單據`);
 }
 
 // ── OPEX 預算規劃 modal（楊子 / Leo）──
