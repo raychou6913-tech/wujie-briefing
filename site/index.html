@@ -800,12 +800,12 @@ body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
   cursor: none;
-  pointer-events: none;   /* 默認不接 click */
+  pointer-events: auto;   /* V45.3 · 所有 CTA 永遠可點（拿掉 active-only 限制）*/
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   text-decoration: none;
 }
 .reveal-section.active .reveal-cta {
-  pointer-events: auto;   /* 只有最接近視窗中心的段，CTA 才可點 */
+  /* visual 還是會配合 .active 強化，但 click 不再受限 */
 }
 .reveal-cta:hover {
   background: var(--red);
@@ -3060,7 +3060,7 @@ body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
 </head>
 <body>
 
-<div class="note">V45.2 · 修 JS syntax error（Int\'l → Intl）→ 紅光圈 follower 恢復、CTA 跟 case drill-down 都可點</div>
+<div class="note">V45.3 · reveal-cta pointer-events:auto，所有 5 個 CTA 永遠可點（不再受 .active 限制）</div>
 
 <!-- Cursor 跟隨 -->
 <div class="cursor-dot" id="cursor-dot"></div>
