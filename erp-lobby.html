@@ -642,6 +642,17 @@ body{
       </div>
     </div>
 
+    <!-- MY SENT (反向視角：我送出的還沒回覆) -->
+    <div id="my-sent-section" class="collapsed-section" style="display:none">
+      <div class="sec-hdr" onclick="toggleCollapsedSection('my-sent-section')" style="cursor:pointer;">
+        <div>
+          <div class="sec-title">📤 我送出的（等別人回覆）<span id="my-sent-count" style="color:var(--ink-mid);font-weight:500;"></span> <span class="collapse-caret" style="color:var(--ink-lo);font-size:10px;">▾</span></div>
+          <div class="sec-hint">點開看我送出後還在等對方處理的事項</div>
+        </div>
+      </div>
+      <div id="my-sent-list" class="blocks collapsible-body" style="display:none"></div>
+    </div>
+
     <!-- YUMING INBOX (躍明專屬：待入帳)-->
     <div id="ym-inbox-section" class="collapsed-section" style="display:none">
       <div class="sec-hdr" onclick="toggleCollapsedSection('ym-inbox-section')" style="cursor:pointer;">
@@ -1653,6 +1664,81 @@ const MY_WORK = {
   ],
 };
 // MY_WORK render 已拿掉 — 個人動作改放 sidebar「我的動作」群
+
+// ── Phase 3: 我送出的反向視角（每個申請人都能看自己卡哪、等誰）──
+function buildMySent(){
+  const items = [];
+  const now = Date.now();
+  const ago = (ts) => Math.floor((now - (ts || now)) / 86400000);
+  // 新訂單（業務員）
+  try {
+    JSON.parse(localStorage.getItem('erp_new_orders_v1')||'[]').forEach(o => {
+      if(o.ownerUser === user){
+        items.push({title:`新訂單：${o.client} · ${o.product}`, amt:o.amt, waiting:'安然 / Ray', days:ago(o.ts)});
+      }
+    });
+  } catch(e){}
+  // 費用申請（所有員工）
+  try {
+    JSON.parse(localStorage.getItem('erp_expense_v1')||'[]').forEach(e => {
+      if(e.submitterUser === user && e.status !== 'posted'){
+        const waitingMap = {personal:'直屬主管 → 躍明', business:'直屬主管 → 安然 → 躍明'};
+        items.push({title:`費用申請：${e.cat} · ¥${e.amt}`, amt:'', waiting:waitingMap[e.type] || '審核中', days:ago(e.ts)});
+      }
+    });
+  } catch(e){}
+  // 木子付款申請
+  try {
+    JSON.parse(localStorage.getItem('muzi_payment_req_v1')||'[]').forEach(p => {
+      if(user === 'muzi'){
+        items.push({title:`付款申請：${p.supplier} · ${p.type}`, amt:`¥${p.amount}`, waiting:'賴哥 → Ray → 躍明', days:ago(p.ts)});
+      }
+    });
+  } catch(e){}
+  // 拜訪記錄（業務員）— 寫入後算「已交付」不算等回覆，跳過
+
+  // demo data for 業務員（首次登入顯示）
+  if((user === 'laodong' || user === 'debao') && !items.length){
+    items.push(
+      {title:'新訂單：廣州博騰 · Mofusand 120 箱', amt:'¥ 18 萬', waiting:'安然 / Ray', days:2, demo:true},
+      {title:'動銷回報：上海萌趣 · 動銷 60-80%', amt:'', waiting:'安然', days:1, demo:true},
+    );
+  }
+  // demo for 楊子
+  if((user === 'yangzi' || user === 'leo') && !items.length){
+    items.push(
+      {title:'5月薪資已錄入', amt:'¥ 38 萬', waiting:'躍明入帳', days:3, demo:true},
+      {title:'OPEX 預算（5月）', amt:'¥ 28 萬', waiting:'已寫入 HR 費用中心', days:5, demo:true},
+    );
+  }
+
+  const sec = document.getElementById('my-sent-section');
+  const list = document.getElementById('my-sent-list');
+  const cnt = document.getElementById('my-sent-count');
+  if(!sec || !list) return;
+  if(!items.length){
+    sec.style.display = 'none';
+    return;
+  }
+  sec.style.display = '';
+  if(cnt) cnt.textContent = `(${items.length} 筆)`;
+  list.innerHTML = items.map((it, i) => {
+    const numStr = String(i+1).padStart(2,'0');
+    const waitColor = it.days > 3 ? 'var(--danger)' : it.days > 1 ? 'var(--warn)' : 'var(--ink-mid)';
+    return `<div class="block" onclick="toggleBlock(this)">
+      <div class="block-head">
+        <div class="block-num">${numStr}</div>
+        <div class="block-title">${it.title}</div>
+        <div class="block-meta"><span style="color:${waitColor};font-weight:700;">等 ${it.waiting} · ${it.days} 天</span>${it.amt?' · '+it.amt:''}</div>
+        <div class="block-toggle">▾</div>
+      </div>
+      <div class="block-body">
+        <div class="block-body-inner">送出 ${it.days} 天，目前等對方處理。${it.days > 3 ? '⚠ 已超 SLA，Shawn 應該看到。' : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+buildMySent();
 
 // ── 躍明的待入帳 inbox（個人動作在大廳完成，不跳財務中心）──
 if(user === 'yuming'){
