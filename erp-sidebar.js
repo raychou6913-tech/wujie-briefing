@@ -137,7 +137,7 @@
     {href:'erp-shawn.html',            icon:'🌏', name:'營運看板',     roles:['shawn','ray'],                   sbGroup:'業務'},
     {href:'erp-anran.html',            icon:'🔐', name:'商務中心',     roles:['anran','ray','yuming'],          sbGroup:'業務'},
     {href:'erp-crm.html',              icon:'🎯', name:'業務中心',     roles:['laodong','debao','anran','ray','shawn'], sbGroup:'業務'},
-    {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   roles:['yuming','ray','shawn','yangzi'], sbGroup:'財務'},
+    {href:'erp-finance.html',          icon:'💰', name:'財務工作台',   roles:['yuming','ray','shawn'], sbGroup:'財務'},
     {href:'erp-yangzi.html',           icon:'🗂', name:'HR · 出納',    roles:['yangzi','leo','yuming','anran','ray'], sbGroup:'財務'},
     {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       roles:['ray','shawn','anran','laige','muzi','bevis','peilin','gaowei'], sbGroup:'開發'},

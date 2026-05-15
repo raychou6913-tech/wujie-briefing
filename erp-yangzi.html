@@ -53,6 +53,30 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 .greet-hi{font-size:18px;font-weight:800;margin-bottom:4px;}
 .greet-sub{font-size:12px;color:var(--txt-mid);}
 .greet-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+
+/* ── 主動作卡（拿掉 FAB 後改顯眼大入口） ── */
+.yz-actions{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;margin-bottom:20px;}
+.yz-act{
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  padding:14px 16px;cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:12px;
+  font-family:inherit;
+  transition:border-color .2s var(--ease),transform .2s var(--ease);
+}
+.yz-act:hover{border-color:var(--accent);transform:translateY(-1px);}
+.yz-act.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.yz-act.primary:hover{opacity:.92;}
+.yz-act-icon{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--card2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.yz-act.primary .yz-act-icon{background:rgba(255,255,255,.18);color:#fff;}
+.yz-act-title{font-size:13px;font-weight:700;letter-spacing:-.01em;}
+.yz-act-sub{font-size:10px;color:var(--txt-mid);margin-top:2px;line-height:1.4;}
+.yz-act.primary .yz-act-sub{color:rgba(255,255,255,.78);}
+@media(max-width:720px){ .yz-actions{grid-template-columns:1fr;} }
 .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
 .badge-danger{background:var(--danger-dim);border:1px solid var(--danger);color:var(--danger);}
 .badge-warn{background:var(--warn-dim);border:1px solid var(--warn);color:var(--warn);}
@@ -195,8 +219,47 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
     <div class="greet-badges" id="greet-badges"></div>
   </div>
 
-  <!-- Pending inbox -->
+  <!-- 主動作（取代右下角 FAB）-->
+  <div class="yz-actions">
+    <button class="yz-act primary" onclick="openExpModal('opex')">
+      <span class="yz-act-icon">＋</span>
+      <div>
+        <div class="yz-act-title">錄入費用</div>
+        <div class="yz-act-sub">公司日常 OPEX · 房租 / 水電 / 倉儲 / 雜費</div>
+      </div>
+    </button>
+    <button class="yz-act" onclick="document.getElementById('sec-inbox').scrollIntoView({behavior:'smooth'})">
+      <span class="yz-act-icon">✓</span>
+      <div>
+        <div class="yz-act-title">審申請</div>
+        <div class="yz-act-sub" id="yz-act-inbox-sub">同事的費用申請</div>
+      </div>
+    </button>
+    <button class="yz-act" onclick="document.getElementById('sec-payroll').scrollIntoView({behavior:'smooth'})">
+      <span class="yz-act-icon">💰</span>
+      <div>
+        <div class="yz-act-title">發薪資</div>
+        <div class="yz-act-sub" id="yz-act-payroll-sub">本月薪資流程</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- 費用管銷總覽（上移到第一順位 — 楊子核心工作）-->
   <div class="sec-hd">
+    <span class="sec-title">📊 預算 vs 實際</span>
+    <span class="sec-link" style="color:var(--txt-mid);font-weight:600;" onclick="openOpexEditModal()">編輯本月實際 →</span>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;">
+    <div class="ent-tabs" style="padding:12px 12px 10px;" id="opex-ent-tabs">
+      <button class="ent-tab" data-ent="北京蕪解" onclick="setOpexEnt('北京蕪解',this)">北京蕪解</button>
+      <button class="ent-tab" data-ent="台灣悍草" onclick="setOpexEnt('台灣悍草',this)">台灣悍草</button>
+      <button class="ent-tab" data-ent="UJ BKK" onclick="setOpexEnt('UJ BKK',this)">UJ BKK</button>
+    </div>
+    <div class="opex-wrap"><table class="opex-table" id="opex-table"></table></div>
+  </div>
+
+  <!-- Pending inbox -->
+  <div class="sec-hd" id="sec-inbox">
     <span class="sec-title" id="inbox-title">待審核申請</span>
   </div>
   <div class="inbox-list" id="inbox-list"></div>
@@ -211,30 +274,13 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
   </div>
 
   <!-- Payroll tracker -->
-  <div class="sec-hd"><span class="sec-title">薪資發放流程</span></div>
+  <div class="sec-hd" id="sec-payroll"><span class="sec-title">薪資發放流程</span></div>
   <div class="payroll-card">
     <div class="payroll-head">
       <span class="payroll-month">2026 年 5 月薪資</span>
       <span class="payroll-status status-progress" id="payroll-status">進行中</span>
     </div>
     <div class="payroll-rows" id="payroll-rows"></div>
-  </div>
-
-  <!-- 費用管銷總覽 -->
-  <div class="sec-hd">
-    <span class="sec-title">費用管銷總覽</span>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <span class="sec-link" style="color:var(--txt-mid);font-weight:600;" onclick="openOpexEditModal()">編輯本月實際 →</span>
-      <span class="sec-link" onclick="openExpModal('opex')">+ 錄入費用</span>
-    </div>
-  </div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px;">
-    <div class="ent-tabs" style="padding:12px 12px 10px;" id="opex-ent-tabs">
-      <button class="ent-tab" data-ent="北京蕪解" onclick="setOpexEnt('北京蕪解',this)">北京蕪解</button>
-      <button class="ent-tab" data-ent="台灣悍草" onclick="setOpexEnt('台灣悍草',this)">台灣悍草</button>
-      <button class="ent-tab" data-ent="UJ BKK" onclick="setOpexEnt('UJ BKK',this)">UJ BKK</button>
-    </div>
-    <div class="opex-wrap"><table class="opex-table" id="opex-table"></table></div>
   </div>
 
   <!-- 人事行政直接申請 -->
@@ -824,20 +870,47 @@ let currentFormId = null;
 function render(){
   const inbox = loadInbox().filter(i=>i.status==='pending');
 
-  // Greeting
+  // Greeting — 核心訊息：本月已錄費用 / 預算 / 待審件數
   const pending = inbox.length;
   const urgent = inbox.filter(i=>i.urgency==='high').length;
   const _greetName = SESS ? SESS.name : '';
-  document.getElementById('greet-hi').textContent = pending===0
-    ? `${_greetName}，今天沒有待審核的申請 ✨`
-    : `${_greetName}，你有 ${pending} 件申請待審核`;
-  document.getElementById('greet-sub').textContent = urgent>0
-    ? `其中 ${urgent} 件需要優先處理`
-    : '目前進度順暢';
+
+  // 算本月實際 + 預算（用 currentOpexEntity 的 5 月份）
+  let _actualWan = '—', _budgetWan = '—', _diffWan = '—';
+  try {
+    const d = OPEX_DATA[currentOpexEntity];
+    if(d){
+      const monthIdx = 4; // 5 月 (0-indexed)
+      const ovr = (loadOpexOverrides()||{})[currentOpexEntity]||{};
+      const sym = d.ccy==='TWD'?'NT$':d.ccy==='THB'?'฿':'¥';
+      // 本月實際 = 各 cat 的 vals[monthIdx] (含 override) 加總
+      let actual = 0, budget = 0;
+      d.rows.forEach(r => {
+        const a = (ovr[r.cat] && ovr[r.cat][monthIdx] != null) ? ovr[r.cat][monthIdx] : r.vals[monthIdx];
+        actual += a;
+        budget += r.vals[monthIdx]; // 原始預算
+      });
+      const toWan = v => d.ccy==='CNY' ? (v/10000).toFixed(1)+' 萬' : v.toLocaleString();
+      _actualWan = sym + ' ' + toWan(actual);
+      _budgetWan = sym + ' ' + toWan(budget);
+      const diff = budget - actual;
+      _diffWan = (diff>=0?'剩 ':'超支 ') + sym + ' ' + toWan(Math.abs(diff));
+    }
+  } catch(e){}
+
+  document.getElementById('greet-hi').textContent =
+    `${_greetName}，本月已錄 ${_actualWan} / 預算 ${_budgetWan}`;
+  document.getElementById('greet-sub').textContent =
+    _diffWan === '—' ? '—' : `${_diffWan} · 待審 ${pending} 件${urgent>0?`（${urgent} 件緊急）`:''}`;
+
   const badges = document.getElementById('greet-badges');
   badges.innerHTML='';
   if(urgent>0) badges.innerHTML+=`<span class="badge badge-danger">⚠ ${urgent} 件緊急</span>`;
   if(pending>urgent) badges.innerHTML+=`<span class="badge badge-warn">${pending-urgent} 件一般</span>`;
+
+  // 動作卡 sub 文字
+  const inboxSub = document.getElementById('yz-act-inbox-sub');
+  if(inboxSub) inboxSub.textContent = pending===0 ? '目前沒有待審' : `${pending} 件待審${urgent>0?'，'+urgent+' 件緊急':''}`;
 
   // Inbox
   const TYPE_TAG = {expense:'tag-expense',leave:'tag-leave',recruit:'tag-recruit',payroll:'tag-payroll'};
@@ -1024,7 +1097,9 @@ setTimeout(()=>{if(typeof renderAdhoc==='function')renderAdhoc();},50);
 .exp-submit{width:100%;padding:12px;background:var(--brand);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
 .exp-submit:active{opacity:.85;}
 </style>
-<button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button>
+<!-- FAB 已拿掉，「錄費用」改放主畫面 yz-actions 大按鈕 -->
+<!-- <button class="exp-fab" onclick="openExpModal()" title="費用申請">💰</button> -->
+<style>.exp-fab{display:none!important;}</style>
 <div class="exp-overlay" id="expOverlay" onclick="if(event.target===this)closeExpModal()">
 <div class="exp-sheet">
   <div class="exp-header">
