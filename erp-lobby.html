@@ -879,7 +879,7 @@ body{
     <div class="qa-modal-hd">
       <div>
         <div class="qa-modal-title">✓ 批發訂單核准</div>
-        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">業務員上報的訂單可行性確認 · 通過後 Ray 定價</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">業務員上報的訂單可行性確認 · 安然把關 → 通過後轉 Ray 確認</div>
       </div>
       <button class="qa-modal-close" onclick="closeWholesaleModal()">✕</button>
     </div>
@@ -1384,7 +1384,7 @@ function buildSidebar(){
     all:      [{icon:'＋', label:'錄費用', action:'expense'}],
     laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
     debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
-    anran:    [{icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
+    anran:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
     yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
     yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}],
     leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
@@ -1396,7 +1396,7 @@ function buildSidebar(){
     gaowei:   [{icon:'🚚', label:'物流批次', action:'logistics-batch'}, {icon:'📋', label:'運費登錄', action:'freight-log'}],
     chunlei:  [{icon:'📱', label:'直播排期', action:'live-schedule'}, {icon:'📦', label:'備貨確認', action:'live-stock'}],
     jiaying:  [{icon:'🛒', label:'淘寶上架', action:'taobao-listing'}, {icon:'📊', label:'數據月報', action:'monthly-data'}],
-    shawn:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}, {icon:'🔥', label:'待催辦', action:'shawn-chase'}],
+    shawn:    [{icon:'🔥', label:'待催辦', action:'shawn-chase'}],
     ray:      [{icon:'✓', label:'我的待批核', action:'ray-approval'}],
   };
   const userActs = (MY_ACTIONS[user] || []).concat(MY_ACTIONS.all);  // 通用「+錄費用」永遠在
@@ -2094,7 +2094,7 @@ function openWholesaleModal(){
     </div>
     <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${w.detail}</div>
     <div style="display:flex;gap:6px;">
-      <button onclick="doWholesale('${w.id}','can-do')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 可執行 · 轉 Ray 定價</button>
+      <button onclick="doWholesale('${w.id}','can-do')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 可執行 · 轉 Ray 確認</button>
       <button onclick="doWholesale('${w.id}','need-info')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需更多資訊</button>
       <button onclick="doWholesale('${w.id}','reject')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">不接</button>
     </div>
@@ -2104,10 +2104,10 @@ function openWholesaleModal(){
 function closeWholesaleModal(){ document.getElementById('wholesale-modal').classList.remove('show'); }
 function doWholesale(id, action){
   const item = _genericDone('shawn_wholesale_v1', id, '');
-  const labels = {'can-do':'已轉 Ray 定價', 'need-info':'已通知業務補資訊', 'reject':'已通知業務不接'};
+  const labels = {'can-do':'已轉 Ray 確認', 'need-info':'已通知業務補資訊', 'reject':'已通知業務不接'};
   if(action === 'can-do'){
     const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`Shawn 確認可執行：${item ? item.client+' · '+item.product+' · '+item.amount : id}`});
+    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`${name} 確認可執行：${item ? item.client+' · '+item.product+' · '+item.amount : id}`});
     localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   }
   openWholesaleModal();
