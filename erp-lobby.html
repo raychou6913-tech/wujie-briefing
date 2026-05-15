@@ -747,6 +747,20 @@ body{
   </div>
 </div>
 
+<!-- 我的待審 inbox MODAL（楊子 / Leo / Ray）-->
+<div class="qa-modal-bg" id="approval-inbox-modal" onclick="if(event.target===this)closeApprovalInboxModal()">
+  <div class="qa-modal" style="max-width:560px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">✓ 我的待審申請</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">同事提交的費用 / 請假 / 招募申請 · 一鍵核准或退回</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeApprovalInboxModal()">✕</button>
+    </div>
+    <div id="approval-inbox-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- OPEX 預算規劃 MODAL（楊子 / Leo）-->
 <div class="qa-modal-bg" id="opex-budget-modal" onclick="if(event.target===this)closeOpexBudgetModal()">
   <div class="qa-modal" style="max-width:780px;">
@@ -1191,7 +1205,7 @@ const MY_TODOS = {
   ],
   yangzi:[
     {id:'yz1',icon:'💰',title:'5月薪資核算整理',sub:'截止本週五，送躍明入帳',urgency:'high',status:'進行中',action:'payroll-task'},
-    {id:'yz2',icon:'📝',title:'費用報銷審核 — 詩彤台高出差',sub:'NT$8,560，等待確認',urgency:'med',status:'待審核',options:['核准，送安然 ✓','退回修改','需補單據']},
+    {id:'yz2',icon:'📝',title:'費用報銷審核 — 詩彤台高出差',sub:'NT$8,560，立即審核或退回補單據',urgency:'med',status:'待審核',action:'my-approval'},
     {id:'yz3',icon:'👥',title:'新設計師實習生入職資料',sub:'5月到職，資料未完整',urgency:'low',status:'進行中',options:['今天完成 ✓','本週完成']},
   ],
   leo:[
@@ -1459,6 +1473,95 @@ function markCurrentTodoDone(){
   localStorage.setItem('lobby_done_'+user, JSON.stringify([...doneSet]));
   renderTodos(_showDone);
   _currentTodoId = null;
+}
+
+// ── 待審 inbox modal（楊子 / Leo / Ray）共用 yangzi_inbox_v1 localStorage ──
+const INBOX_SEED = [
+  {id:'i1', type:'expense', urgency:'high', name:'詩彤 出差費用報銷',
+   meta:'台北→高雄出差 · 2026-04-28', amount:'NT$8,560', status:'pending',
+   details:[
+     {label:'申請人',val:'詩彤'},
+     {label:'事由',val:'客戶簡報出差（台北→高雄）'},
+     {label:'金額',val:'NT$8,560 — 高鐵 1,490 + 飯店 4,800 + 餐費 2,270'},
+     {label:'單據',val:'✓ 已上傳'},
+   ]},
+  {id:'i2', type:'leave', urgency:'med', name:'木子 請假申請',
+   meta:'事假 2 天 · 2026-05-05～05-06', amount:'2 天', status:'pending',
+   details:[
+     {label:'假別',val:'事假'},
+     {label:'代理人',val:'賴哥'},
+     {label:'原因',val:'家庭事務'},
+   ]},
+  {id:'i3', type:'expense', urgency:'med', name:'高維 油資/車資報銷',
+   meta:'北京送貨車資 · 2026-04-30', amount:'¥340', status:'pending',
+   details:[
+     {label:'事由',val:'廠端提貨·送貨車資'},
+     {label:'單據',val:'✓ 已上傳'},
+   ]},
+];
+const TYPE_LABEL = {expense:'費用報銷',leave:'請假',recruit:'招募',payroll:'薪資'};
+const TYPE_COLOR = {expense:'var(--brand)',leave:'#0891b2',recruit:'#7c3aed',payroll:'#f59e0b'};
+function loadInboxLobby(){
+  const stored = localStorage.getItem('yangzi_inbox_v1');
+  if(stored) return JSON.parse(stored);
+  localStorage.setItem('yangzi_inbox_v1', JSON.stringify(INBOX_SEED));
+  return INBOX_SEED;
+}
+function saveInboxLobby(arr){ localStorage.setItem('yangzi_inbox_v1', JSON.stringify(arr)); }
+function openApprovalInboxModal(){
+  renderApprovalInbox();
+  document.getElementById('approval-inbox-modal').classList.add('show');
+}
+function closeApprovalInboxModal(){
+  document.getElementById('approval-inbox-modal').classList.remove('show');
+}
+function renderApprovalInbox(){
+  const list = document.getElementById('approval-inbox-list');
+  const pending = loadInboxLobby().filter(i => i.status === 'pending');
+  if(!pending.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待審申請</div>';
+    return;
+  }
+  list.innerHTML = pending.map(i => {
+    const detailsHtml = i.details.map(d => `<div style="display:flex;gap:8px;font-size:11px;line-height:1.6;"><span style="color:var(--ink-lo);min-width:50px;">${d.label}</span><span style="color:var(--ink);">${d.val}</span></div>`).join('');
+    return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);background:#fef2f2;':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:${TYPE_COLOR[i.type]||'var(--ink-lo)'}22;color:${TYPE_COLOR[i.type]||'var(--ink-lo)'};">${TYPE_LABEL[i.type]||i.type}</span>
+            ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;">⚠ 緊急</span>':''}
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--ink);">${i.name}</div>
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:2px;">${i.meta}</div>
+        </div>
+        <div style="font-size:14px;font-weight:800;color:var(--ink);text-align:right;white-space:nowrap;margin-left:12px;">${i.amount}</div>
+      </div>
+      <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;margin-bottom:10px;">${detailsHtml}</div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="doInboxApprove('${i.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准</button>
+        <button onclick="doInboxReject('${i.id}')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">退回</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function doInboxApprove(id){
+  const arr = loadInboxLobby();
+  const item = arr.find(x => x.id === id);
+  if(item){ item.status = 'approved'; saveInboxLobby(arr); }
+  // 通知躍明
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  notif.unshift({ts:Date.now(), from:name, to:'yuming',
+    msg:`${name} 已核准：${item ? item.name : id} · 送躍明入帳`});
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  renderApprovalInbox();
+  showQaToast(`✓ 已核准 · 送躍明入帳`);
+}
+function doInboxReject(id){
+  const arr = loadInboxLobby();
+  const item = arr.find(x => x.id === id);
+  if(item){ item.status = 'rejected'; saveInboxLobby(arr); }
+  renderApprovalInbox();
+  showQaToast(`已退回，需補單據`);
 }
 
 // ── OPEX 預算規劃 modal（楊子 / Leo）──
@@ -1738,7 +1841,7 @@ function triggerAction(action){
     case 'ip-reminders':      showQaToast('🔐 IP 維護提醒 modal 開發中（V2）'); break;
     case 'my-pending':        openSimpleListModal('my-pending'); break;
     case 'monthend':          showQaToast('📊 月結任務 modal 開發中（V2）'); break;
-    case 'my-approval':       showQaToast('✓ 待審 modal 開發中（V2）— 內容會從 yangzi inbox 搬過來'); break;
+    case 'my-approval':       openApprovalInboxModal(); break;
     case 'payroll-task':      openPayrollModal(); break;
     case 'opex-budget':       openOpexBudgetModal(); break;
     case 'bank-recon':        showQaToast('🏦 銀行對帳 modal 開發中（V2）'); break;
