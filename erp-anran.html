@@ -185,6 +185,25 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
 .ai-banner-sub{font-size:11px;color:var(--txt-mid);}
 .ai-banner-arrow{font-size:18px;color:var(--accent);flex-shrink:0;}
 
+/* ── 漸進揭露 section（次要 section 預設折疊） ── */
+.coll-sec{margin-bottom:16px;}
+.coll-sec > summary{
+  cursor:pointer;list-style:none;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 0;border-bottom:1px solid var(--line);
+  transition:opacity .22s var(--ease);
+}
+.coll-sec > summary::-webkit-details-marker{display:none;}
+.coll-sec > summary::marker{display:none;content:'';}
+.coll-sec > summary:hover{opacity:.65;}
+.coll-sec[open] > summary{border-bottom-color:var(--ink-faint);margin-bottom:14px;}
+.coll-sec-caret{
+  font-size:11px;color:var(--ink-faint);
+  transition:transform .3s var(--ease),color .2s var(--ease);
+  flex-shrink:0;
+}
+.coll-sec[open] .coll-sec-caret{transform:rotate(180deg);color:var(--brand);}
+
 @media(max-width:1000px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:640px){
   .main{padding:14px;}
@@ -882,11 +901,15 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
     </div>
   </div>
 
-  <!-- ⑤ IP 授權合約快覽 -->
-  <div class="sec-head" id="ip-contracts">
-    <span class="sec-title">IP 授權合約快覽</span>
-    <a class="sec-link" href="erp-ip-vault.html">管理合約庫 →</a>
-  </div>
+  <!-- ⑤ IP 授權合約快覽（次要 section，IP Vault 已有完整版）-->
+  <details class="coll-sec" id="ip-contracts">
+    <summary>
+      <span class="sec-title" style="margin:0">IP 授權合約快覽</span>
+      <span style="display:flex;align-items:center;gap:10px;">
+        <a class="sec-link" href="erp-ip-vault.html" onclick="event.stopPropagation()">管理合約庫 →</a>
+        <span class="coll-sec-caret">▾</span>
+      </span>
+    </summary>
 
   <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
     <div id="contract-list">
@@ -1035,6 +1058,8 @@ body{background:var(--bg);color:var(--txt-hi);font-family:"Inter","Helvetica Neu
     </div>
     <div class="ai-banner-arrow">→</div>
   </div>
+
+  </details>
 
 </div><!-- /main -->
 
