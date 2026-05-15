@@ -642,16 +642,7 @@ body{
       </div>
     </div>
 
-    <!-- MY SENT (反向視角：我送出的還沒回覆) -->
-    <div id="my-sent-section" class="collapsed-section" style="display:none">
-      <div class="sec-hdr" onclick="toggleCollapsedSection('my-sent-section')" style="cursor:pointer;">
-        <div>
-          <div class="sec-title">📤 我送出的（等別人回覆）<span id="my-sent-count" style="color:var(--ink-mid);font-weight:500;"></span> <span class="collapse-caret" style="color:var(--ink-lo);font-size:10px;">▾</span></div>
-          <div class="sec-hint">點開看我送出後還在等對方處理的事項</div>
-        </div>
-      </div>
-      <div id="my-sent-list" class="blocks collapsible-body" style="display:none"></div>
-    </div>
+    <!-- 「我送出的」已搬到 sidebar「我送出的 (N)」入口 + modal -->
 
     <!-- YUMING INBOX (躍明專屬：待入帳)-->
     <div id="ym-inbox-section" class="collapsed-section" style="display:none">
@@ -753,6 +744,20 @@ body{
     </div>
     <div class="qa-field"><label>備註（IP 授權注意 / 付款條件 / 特殊要求）</label><textarea id="no-notes" rows="2" placeholder="例：客戶要求 30%訂金、出貨前付清。需確認 PNUTS 授權範圍涵蓋華南。"></textarea></div>
     <button class="qa-submit" onclick="submitNewOrder()">送出 → 通知相關部門</button>
+  </div>
+</div>
+
+<!-- 我送出的（反向視角）MODAL -->
+<div class="qa-modal-bg" id="my-sent-modal" onclick="if(event.target===this)closeMySentModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📤 我送出的（等別人回覆）</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">看自己送出的東西卡在誰那邊，超 3 天會自動進 Shawn 待催辦</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeMySentModal()">✕</button>
+    </div>
+    <div id="my-sent-modal-list" style="max-height:60vh;overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -1392,7 +1397,7 @@ function buildSidebar(){
 
   // 我的動作群（個人動作 modal trigger，依角色顯示）
   const MY_ACTIONS = {
-    all:      [{icon:'＋', label:'錄費用', action:'expense'}],
+    all:      [{icon:'＋', label:'錄費用', action:'expense'}, {icon:'📤', label:'我送出的', action:'my-sent'}],
     laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
     debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
     anran:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
@@ -1665,12 +1670,11 @@ const MY_WORK = {
 };
 // MY_WORK render 已拿掉 — 個人動作改放 sidebar「我的動作」群
 
-// ── Phase 3: 我送出的反向視角（每個申請人都能看自己卡哪、等誰）──
-function buildMySent(){
+// ── Phase 3: 「我送出的」反向視角 modal（從 sidebar 點開）──
+function _collectMySent(){
   const items = [];
   const now = Date.now();
   const ago = (ts) => Math.floor((now - (ts || now)) / 86400000);
-  // 新訂單（業務員）
   try {
     JSON.parse(localStorage.getItem('erp_new_orders_v1')||'[]').forEach(o => {
       if(o.ownerUser === user){
@@ -1678,7 +1682,6 @@ function buildMySent(){
       }
     });
   } catch(e){}
-  // 費用申請（所有員工）
   try {
     JSON.parse(localStorage.getItem('erp_expense_v1')||'[]').forEach(e => {
       if(e.submitterUser === user && e.status !== 'posted'){
@@ -1687,7 +1690,6 @@ function buildMySent(){
       }
     });
   } catch(e){}
-  // 木子付款申請
   try {
     JSON.parse(localStorage.getItem('muzi_payment_req_v1')||'[]').forEach(p => {
       if(user === 'muzi'){
@@ -1695,50 +1697,53 @@ function buildMySent(){
       }
     });
   } catch(e){}
-  // 拜訪記錄（業務員）— 寫入後算「已交付」不算等回覆，跳過
-
-  // demo data for 業務員（首次登入顯示）
-  if((user === 'laodong' || user === 'debao') && !items.length){
-    items.push(
-      {title:'新訂單：廣州博騰 · Mofusand 120 箱', amt:'¥ 18 萬', waiting:'安然 / Ray', days:2, demo:true},
-      {title:'動銷回報：上海萌趣 · 動銷 60-80%', amt:'', waiting:'安然', days:1, demo:true},
-    );
-  }
-  // demo for 楊子
-  if((user === 'yangzi' || user === 'leo') && !items.length){
-    items.push(
-      {title:'5月薪資已錄入', amt:'¥ 38 萬', waiting:'躍明入帳', days:3, demo:true},
-      {title:'OPEX 預算（5月）', amt:'¥ 28 萬', waiting:'已寫入 HR 費用中心', days:5, demo:true},
-    );
-  }
-
-  const sec = document.getElementById('my-sent-section');
-  const list = document.getElementById('my-sent-list');
-  const cnt = document.getElementById('my-sent-count');
-  if(!sec || !list) return;
+  // demo data — 沒真實資料時用
   if(!items.length){
-    sec.style.display = 'none';
-    return;
+    if(user === 'laodong' || user === 'debao'){
+      items.push(
+        {title:'新訂單：廣州博騰 · Mofusand 120 箱', amt:'¥ 18 萬', waiting:'安然 / Ray', days:2},
+        {title:'動銷回報：上海萌趣 · 動銷 60-80%', amt:'', waiting:'安然', days:1},
+      );
+    } else if(user === 'yangzi' || user === 'leo'){
+      items.push(
+        {title:'5月薪資已送躍明', amt:'¥ 38 萬', waiting:'躍明入帳', days:3},
+        {title:'OPEX 預算（5月）', amt:'¥ 28 萬', waiting:'已寫入 HR 費用中心 ✓', days:5},
+      );
+    } else if(user === 'muzi'){
+      items.push(
+        {title:'付款申請：東莞達豐頭款', amt:'¥ 42,000', waiting:'賴哥 → Ray → 躍明', days:2},
+      );
+    } else if(user === 'shetong'){
+      items.push(
+        {title:'設計交件：Snoopy 紐約稿', amt:'', waiting:'Bevis 審', days:1},
+      );
+    }
   }
-  sec.style.display = '';
-  if(cnt) cnt.textContent = `(${items.length} 筆)`;
-  list.innerHTML = items.map((it, i) => {
-    const numStr = String(i+1).padStart(2,'0');
-    const waitColor = it.days > 3 ? 'var(--danger)' : it.days > 1 ? 'var(--warn)' : 'var(--ink-mid)';
-    return `<div class="block" onclick="toggleBlock(this)">
-      <div class="block-head">
-        <div class="block-num">${numStr}</div>
-        <div class="block-title">${it.title}</div>
-        <div class="block-meta"><span style="color:${waitColor};font-weight:700;">等 ${it.waiting} · ${it.days} 天</span>${it.amt?' · '+it.amt:''}</div>
-        <div class="block-toggle">▾</div>
-      </div>
-      <div class="block-body">
-        <div class="block-body-inner">送出 ${it.days} 天，目前等對方處理。${it.days > 3 ? '⚠ 已超 SLA，Shawn 應該看到。' : ''}</div>
-      </div>
-    </div>`;
-  }).join('');
+  return items;
 }
-buildMySent();
+function getMySentCount(){
+  return _collectMySent().length;
+}
+function openMySentModal(){
+  const items = _collectMySent();
+  const list = document.getElementById('my-sent-modal-list');
+  if(!items.length){
+    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 你目前沒有送出待回覆的事項</div>';
+  } else {
+    list.innerHTML = items.map(it => {
+      const waitColor = it.days > 3 ? 'var(--danger)' : it.days > 1 ? 'var(--warn)' : 'var(--ink-mid)';
+      return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${it.days>3?'border-color:var(--danger);':''}">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${it.title}</span>
+          ${it.amt ? `<span style="font-size:12px;font-weight:800;color:var(--ink);margin-left:8px;">${it.amt}</span>` : ''}
+        </div>
+        <div style="font-size:11px;color:${waitColor};font-weight:700;">等 ${it.waiting} · 已送 ${it.days} 天${it.days>3?' · ⚠ Shawn 應該看到了':''}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('my-sent-modal').classList.add('show');
+}
+function closeMySentModal(){ document.getElementById('my-sent-modal').classList.remove('show'); }
 
 // ── 躍明的待入帳 inbox（個人動作在大廳完成，不跳財務中心）──
 if(user === 'yuming'){
@@ -1916,24 +1921,27 @@ function showQaToast(msg){
 
 // ── Phase 2: 逾期偵測 (STALE_DETECTOR) — Shawn 待催辦 dynamic 化 ──
 // SLA per inbox：normal vs high urgency 各自天數（依 WORKFLOW_ARCHITECTURE Part 4.2）
+// whoUser = 當事者 user id, domainOwner = domain 老大 user id
+// 當 whoUser === domainOwner，按鈕只有「催 + 暫掛」（自己是頂沒人知會）
 const STALE_SLA = {
-  'yangzi_inbox_v1':         {filter:i=>i.status==='pending', sla:{high:1,normal:3}, source:'楊子待審', who:'楊子', domain:'anran'},
-  'anran_contract_inbox_v1': {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然合約待批', who:'安然', domain:'anran'},
-  'anran_xborder_inbox_v1':  {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然跨境', who:'安然', domain:'anran'},
-  'anran_ip_reminders_v1':   {filter:i=>!i.cleared, sla:{high:1,normal:7}, source:'IP 維護', who:'安然', domain:'anran'},
-  'shawn_wholesale_v1':      {filter:i=>!i.done, sla:{high:1,normal:3}, source:'批發核准', who:'安然', domain:'anran'},
-  'ray_approval_v1':         {filter:i=>!i.done, sla:{high:1,normal:2}, source:'Ray 待批核', who:'Ray', domain:'ray'},
-  'bevis_design_approve_v1': {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計核准', who:'Bevis', domain:'bevis'},
-  'bevis_bedo_v1':           {filter:i=>!i.done, sla:{high:1,normal:5}, source:'bedo 輸出', who:'Bevis', domain:'bevis'},
-  'peilin_approval_track_v1':{filter:i=>!i.done, sla:{high:7,normal:14}, source:'送審追蹤', who:'珮玲', domain:'bevis'},
-  'peilin_theme_v1':         {filter:i=>!i.done, sla:{high:3,normal:7}, source:'主題企劃', who:'珮玲', domain:'bevis'},
-  'shetong_design_task_v1':  {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計任務', who:'詩彤', domain:'bevis'},
-  'laige_po_v1':             {filter:i=>!i.archived, sla:{high:3,normal:7}, source:'PO 進度', who:'賴哥', domain:'anran'},
-  'muzi_stock_check_v1':     {filter:i=>!i.confirmed, sla:{high:1,normal:2}, source:'備貨核對', who:'木子', domain:'anran'},
-  'gaowei_logistics_v1':     {filter:i=>!i.done, sla:{high:1,normal:2}, source:'物流批次', who:'高維', domain:'shawn'},
-  'chunlei_live_v1':         {filter:i=>!i.done, sla:{high:1,normal:3}, source:'直播排期', who:'春雷/佳音', domain:'shawn'},
-  'jiaying_taobao_v1':       {filter:i=>!i.done, sla:{high:1,normal:3}, source:'淘寶上架', who:'佳音', domain:'shawn'},
+  'yangzi_inbox_v1':         {filter:i=>i.status==='pending', sla:{high:1,normal:3}, source:'楊子待審', who:'楊子', whoUser:'yangzi', domain:'anran', domainOwner:'anran'},
+  'anran_contract_inbox_v1': {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然合約待批', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
+  'anran_xborder_inbox_v1':  {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然跨境', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
+  'anran_ip_reminders_v1':   {filter:i=>!i.cleared, sla:{high:1,normal:7}, source:'IP 維護', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
+  'shawn_wholesale_v1':      {filter:i=>!i.done, sla:{high:1,normal:3}, source:'批發核准', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
+  'ray_approval_v1':         {filter:i=>!i.done, sla:{high:1,normal:2}, source:'Ray 待批核', who:'Ray', whoUser:'ray', domain:'ray', domainOwner:'ray'},
+  'bevis_design_approve_v1': {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計核准', who:'Bevis', whoUser:'bevis', domain:'bevis', domainOwner:'bevis'},
+  'bevis_bedo_v1':           {filter:i=>!i.done, sla:{high:1,normal:5}, source:'bedo 輸出', who:'Bevis', whoUser:'bevis', domain:'bevis', domainOwner:'bevis'},
+  'peilin_approval_track_v1':{filter:i=>!i.done, sla:{high:7,normal:14}, source:'送審追蹤', who:'珮玲', whoUser:'peilin', domain:'bevis', domainOwner:'bevis'},
+  'peilin_theme_v1':         {filter:i=>!i.done, sla:{high:3,normal:7}, source:'主題企劃', who:'珮玲', whoUser:'peilin', domain:'bevis', domainOwner:'bevis'},
+  'shetong_design_task_v1':  {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計任務', who:'詩彤', whoUser:'shetong', domain:'bevis', domainOwner:'bevis'},
+  'laige_po_v1':             {filter:i=>!i.archived, sla:{high:3,normal:7}, source:'PO 進度', who:'賴哥', whoUser:'laige', domain:'anran', domainOwner:'anran'},
+  'muzi_stock_check_v1':     {filter:i=>!i.confirmed, sla:{high:1,normal:2}, source:'備貨核對', who:'木子', whoUser:'muzi', domain:'anran', domainOwner:'anran'},
+  'gaowei_logistics_v1':     {filter:i=>!i.done, sla:{high:1,normal:2}, source:'物流批次', who:'高維', whoUser:'gaowei', domain:'shawn', domainOwner:'shawn'},
+  'chunlei_live_v1':         {filter:i=>!i.done, sla:{high:1,normal:3}, source:'直播排期', who:'春雷', whoUser:'chunlei', domain:'shawn', domainOwner:'shawn'},
+  'jiaying_taobao_v1':       {filter:i=>!i.done, sla:{high:1,normal:3}, source:'淘寶上架', who:'佳音', whoUser:'jiaying', domain:'shawn', domainOwner:'shawn'},
 };
+const DOMAIN_OWNER_NAME = {anran:'安然', bevis:'Bevis', shawn:'Shawn', ray:'Ray'};
 
 function detectStaleItems(){
   const stale = [];
@@ -1952,7 +1960,10 @@ function detectStaleItems(){
       const hideKey = key + ':' + item.id;
       if(_hidden[hideKey] && Date.now() < _hidden[hideKey]) return;
       stale.push({
-        key, item, source: cfg.source, who: cfg.who, domain: cfg.domain,
+        key, item,
+        source: cfg.source,
+        who: cfg.who, whoUser: cfg.whoUser,
+        domain: cfg.domain, domainOwner: cfg.domainOwner,
         daysLate: Math.floor(ageDays - slaDays),
         age: Math.floor(ageDays),
         urgency: item.urgency || 'normal',
@@ -1990,6 +2001,7 @@ const ACTION_COUNT_SOURCES = {
   'sampling-track':      {key:'generic_sampling-track_v1', filter:i=>!i.done, demoLen:3},
 };
 function getActionCount(action){
+  if(action === 'my-sent') return typeof getMySentCount === 'function' ? getMySentCount() : 0;
   const src = ACTION_COUNT_SOURCES[action];
   if(!src) return null;  // 無 inbox（new-order / expense / form 類）不顯示 badge
   const raw = localStorage.getItem(src.key);
@@ -2309,28 +2321,39 @@ function openChaseModal(){
   if(!stale.length){
     list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 全公司任務都準時，沒有需要催的</div>';
   } else {
-    const DOMAIN_LABEL = {anran:'安然 domain · 知會安然', bevis:'Bevis domain · 知會 Bevis', shawn:'我的 domain · 可直接決策', ray:'Ray 直屬 · 只能催'};
     list.innerHTML = stale.map((s, idx) => {
       const itemTitle = s.item.name || s.item.title || s.item.task || s.item.ip || s.item.po || s.item.client || s.item.order || '(unnamed)';
       const detail = s.item.detail || s.item.meta || '';
-      const isAnran = s.domain === 'anran';
-      const isBevis = s.domain === 'bevis';
-      const escalateBtn = (s.domain === 'shawn')
-        ? `<button onclick="doChaseEscalate('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">⬆️ 升級 Ray</button>`
-        : (isAnran || isBevis)
-          ? `<button onclick="doChaseKnow('${s.key}','${s.item.id}','${s.domain}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">💬 知會${s.domain==='anran'?'安然':'Bevis'}</button>`
-          : '';
+
+      // 第二顆按鈕邏輯（gg 拍板 + Ray 邏輯：當事者 == domain owner 不重複知會自己）
+      const whoIsOwner = s.whoUser === s.domainOwner;
+      let secondBtn = '', tagText = '';
+      if(whoIsOwner){
+        // 安然自己卡 / Bevis 自己卡 / Ray 自己卡 — 只能催本人，沒人可知會升級
+        secondBtn = '';
+        tagText = `${s.who} 本人卡住 · 只能催不能跨級`;
+      } else if(s.domain === 'shawn'){
+        // Shawn 自己 domain（高維/春雷/佳音）→ 可升 Ray
+        secondBtn = `<button onclick="doChaseEscalate('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">⬆️ 升級 Ray</button>`;
+        tagText = `Shawn 自己 domain · 可決策升級`;
+      } else {
+        // 跨人 domain（楊子→安然 / 賴哥→安然 / 詩彤→Bevis 等）
+        const ownerName = DOMAIN_OWNER_NAME[s.domain];
+        secondBtn = `<button onclick="doChaseKnow('${s.key}','${s.item.id}','${s.domain}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">💬 知會 ${ownerName}</button>`;
+        tagText = `催 ${s.who}（${s.who} 主管：${ownerName}）`;
+      }
+
       return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
         <div style="margin-bottom:6px;">
           <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--paper-soft);color:var(--ink-mid);margin-right:6px;">${s.source}</span>
           <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.who} · ${itemTitle}</span>
-          <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ 延遲 ${s.daysLate} 天（送來已 ${s.age} 天 · SLA 超過）</div>
-          <div style="font-size:9px;color:var(--ink-lo);margin-top:2px;">${DOMAIN_LABEL[s.domain]||''}</div>
+          <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ 延遲 ${s.daysLate} 天（送來已 ${s.age} 天）</div>
+          <div style="font-size:9px;color:var(--ink-lo);margin-top:2px;">${tagText}</div>
         </div>
         ${detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${detail}</div>` : ''}
         <div style="display:flex;gap:6px;">
           <button onclick="doChasePush('${s.key}','${s.item.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 飛書催 ${s.who}</button>
-          ${escalateBtn}
+          ${secondBtn}
           <button onclick="doChaseHide('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫掛 24h</button>
         </div>
       </div>`;
@@ -3414,6 +3437,7 @@ function triggerAction(action){
     case 'my-quote':          openGenericListModal('my-quote'); break;
     case 'my-po':             openMyPoModal(); break;
     case 'sampling-track':    openGenericListModal('sampling-track'); break;
+    case 'my-sent':           openMySentModal(); break;
     case 'stock-check':       openStockCheckModal(); break;
     case 'payment-request':   openPaymentReqModal(); break;
     case 'logistics-batch':   openLogisticsModal(); break;
