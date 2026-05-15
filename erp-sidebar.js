@@ -267,7 +267,7 @@
       dataAction: a.action,
       badge: getActionCount(a.action),
     }));
-    content.appendChild(mkGroup('我的動作', actionItems));
+    content.appendChild(mkGroup('我的待辦', actionItems));
   }
 
   // 角色廳群
