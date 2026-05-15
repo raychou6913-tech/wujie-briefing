@@ -1403,11 +1403,15 @@ function buildSidebar(){
   if(userActs.length){
     document.getElementById('sb-my-actions-group').style.display = '';
     const listEl = document.getElementById('sb-my-actions-list');
-    listEl.innerHTML = userActs.map(a =>
-      `<a class="sb-item" href="#action-${a.action}" data-action="${a.action}">
-        <span class="sb-icon">${a.icon}</span><span class="sb-label">${a.label}</span>
-      </a>`
-    ).join('');
+    listEl.innerHTML = userActs.map(a => {
+      const count = getActionCount(a.action);
+      const badge = (count && count > 0)
+        ? `<span class="sb-badge" style="opacity:1;background:var(--brand);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto;">${count}</span>`
+        : '';
+      return `<a class="sb-item" href="#action-${a.action}" data-action="${a.action}">
+        <span class="sb-icon">${a.icon}</span><span class="sb-label">${a.label}</span>${badge}
+      </a>`;
+    }).join('');
     // 點擊 → trigger action（preventDefault 避免跳轉）
     listEl.querySelectorAll('a[data-action]').forEach(a => {
       a.addEventListener('click', e => {
@@ -1821,6 +1825,47 @@ function showQaToast(msg){
   t.classList.add('show');
   clearTimeout(t._t);
   t._t = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ── Sidebar 動作的待處理數量 helper ──
+// 讀對應 localStorage + filter 未完成項目算 count
+const ACTION_COUNT_SOURCES = {
+  'my-approval':         {key:'yangzi_inbox_v1',          filter:i=>i.status==='pending'},
+  'my-pending':          {key:'yuming_pending_v1',         filter:()=>true, demo:4},
+  'contract-approve':    {key:'anran_contract_inbox_v1',   filter:i=>!i.status},
+  'xborder-confirm':     {key:'anran_xborder_inbox_v1',    filter:i=>!i.status},
+  'ip-reminders':        {key:'anran_ip_reminders_v1',     filter:i=>!i.cleared},
+  'my-po':               {key:'laige_po_v1',               filter:i=>!i.archived},
+  'stock-check':         {key:'muzi_stock_check_v1',       filter:i=>!i.confirmed},
+  'shawn-chase':         {key:'shawn_chase_v1',            filter:i=>!i.done},
+  'ray-approval':        {key:'ray_approval_v1',           filter:i=>!i.done},
+  'design-approve':      {key:'bevis_design_approve_v1',   filter:i=>!i.done},
+  'my-approval-tracker': {key:'peilin_approval_track_v1',  filter:i=>!i.done},
+  'my-design-task':      {key:'shetong_design_task_v1',    filter:i=>!i.done},
+  'logistics-batch':     {key:'gaowei_logistics_v1',       filter:i=>!i.done},
+  'wholesale-approve':   {key:'shawn_wholesale_v1',        filter:i=>!i.done},
+  'bedo-approve':        {key:'bevis_bedo_v1',             filter:i=>!i.done},
+  'theme-plan':          {key:'peilin_theme_v1',           filter:i=>!i.done},
+  'live-schedule':       {key:'chunlei_live_v1',           filter:i=>!i.done},
+  'live-stock':          {key:'chunlei_live_v1',           filter:i=>!i.done},
+  'taobao-listing':      {key:'jiaying_taobao_v1',         filter:i=>!i.done},
+  'monthend':            {key:'generic_monthend_v1',       filter:i=>!i.done, demoLen:3},
+  'bank-recon':          {key:'generic_bank-recon_v1',     filter:i=>!i.done, demoLen:3},
+  'my-quote':            {key:'generic_my-quote_v1',       filter:i=>!i.done, demoLen:2},
+  'sampling-track':      {key:'generic_sampling-track_v1', filter:i=>!i.done, demoLen:3},
+};
+function getActionCount(action){
+  const src = ACTION_COUNT_SOURCES[action];
+  if(!src) return null;  // 無 inbox（new-order / expense / form 類）不顯示 badge
+  const raw = localStorage.getItem(src.key);
+  if(!raw){
+    // 沒 seed 過：看是否預設有 demo 筆數
+    return src.demo != null ? src.demo : (src.demoLen != null ? src.demoLen : 0);
+  }
+  try {
+    const arr = JSON.parse(raw);
+    return arr.filter(src.filter).length;
+  } catch(e){ return 0; }
 }
 
 // 從 todo trigger action 時記錄 todoId — modal 送出時用來 mark done

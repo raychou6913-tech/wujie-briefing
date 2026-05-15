@@ -205,14 +205,13 @@
   // ── 我的動作群（每人個人化，點 → 大廳開 modal）──
   // data-action 屬性給 lobby 識別，sidebar 在非 lobby 頁點 = 跳回 lobby 並帶 hash trigger
   const MY_ACTIONS = {
-    // 通用：所有員工都可以錄費用（個人報銷 / 業務相關）
     all:      [{icon:'＋', label:'錄費用', action:'expense'}],
-    laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
-    debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
-    anran:    [{icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
+    laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    anran:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
     yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
-    yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}],
-    leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
+    yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}],
+    leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
     bevis:    [{icon:'🎨', label:'設計核准', action:'design-approve'}, {icon:'✨', label:'bedo 輸出待確認', action:'bedo-approve'}],
     peilin:   [{icon:'🖋', label:'送審追蹤', action:'my-approval-tracker'}, {icon:'🖼', label:'主題企劃', action:'theme-plan'}],
     shetong:  [{icon:'📤', label:'我的設計任務', action:'my-design-task'}],
@@ -221,17 +220,52 @@
     gaowei:   [{icon:'🚚', label:'物流批次', action:'logistics-batch'}, {icon:'📋', label:'運費登錄', action:'freight-log'}],
     chunlei:  [{icon:'📱', label:'直播排期', action:'live-schedule'}, {icon:'📦', label:'備貨確認', action:'live-stock'}],
     jiaying:  [{icon:'🛒', label:'淘寶上架', action:'taobao-listing'}, {icon:'📊', label:'數據月報', action:'monthly-data'}],
-    shawn:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}, {icon:'🔥', label:'待催辦', action:'shawn-chase'}],
+    shawn:    [{icon:'🔥', label:'待催辦', action:'shawn-chase'}],
     ray:      [{icon:'✓', label:'我的待批核', action:'ray-approval'}],
   };
+  // 待處理數量 helper（badge 用）
+  const ACTION_COUNT_SOURCES = {
+    'my-approval':{key:'yangzi_inbox_v1',filter:i=>i.status==='pending'},
+    'my-pending':{key:'yuming_pending_v1',filter:()=>true,demo:4},
+    'contract-approve':{key:'anran_contract_inbox_v1',filter:i=>!i.status,demoLen:3},
+    'xborder-confirm':{key:'anran_xborder_inbox_v1',filter:i=>!i.status,demoLen:3},
+    'ip-reminders':{key:'anran_ip_reminders_v1',filter:i=>!i.cleared,demoLen:3},
+    'my-po':{key:'laige_po_v1',filter:i=>!i.archived,demoLen:3},
+    'stock-check':{key:'muzi_stock_check_v1',filter:i=>!i.confirmed,demoLen:2},
+    'shawn-chase':{key:'shawn_chase_v1',filter:i=>!i.done,demoLen:3},
+    'ray-approval':{key:'ray_approval_v1',filter:i=>!i.done,demoLen:3},
+    'design-approve':{key:'bevis_design_approve_v1',filter:i=>!i.done,demoLen:3},
+    'my-approval-tracker':{key:'peilin_approval_track_v1',filter:i=>!i.done,demoLen:3},
+    'my-design-task':{key:'shetong_design_task_v1',filter:i=>!i.done,demoLen:3},
+    'logistics-batch':{key:'gaowei_logistics_v1',filter:i=>!i.done,demoLen:3},
+    'wholesale-approve':{key:'shawn_wholesale_v1',filter:i=>!i.done,demoLen:3},
+    'bedo-approve':{key:'bevis_bedo_v1',filter:i=>!i.done,demoLen:2},
+    'theme-plan':{key:'peilin_theme_v1',filter:i=>!i.done,demoLen:3},
+    'live-schedule':{key:'chunlei_live_v1',filter:i=>!i.done,demoLen:2},
+    'live-stock':{key:'chunlei_live_v1',filter:i=>!i.done,demoLen:2},
+    'taobao-listing':{key:'jiaying_taobao_v1',filter:i=>!i.done,demoLen:2},
+    'monthend':{key:'generic_monthend_v1',filter:i=>!i.done,demoLen:3},
+    'bank-recon':{key:'generic_bank-recon_v1',filter:i=>!i.done,demoLen:3},
+    'my-quote':{key:'generic_my-quote_v1',filter:i=>!i.done,demoLen:2},
+    'sampling-track':{key:'generic_sampling-track_v1',filter:i=>!i.done,demoLen:3},
+  };
+  function getActionCount(action){
+    const src = ACTION_COUNT_SOURCES[action];
+    if(!src) return null;
+    const raw = localStorage.getItem(src.key);
+    if(!raw) return src.demo != null ? src.demo : (src.demoLen != null ? src.demoLen : 0);
+    try { return JSON.parse(raw).filter(src.filter).length; } catch(e){ return 0; }
+  }
+
   const userActions = MY_ACTIONS[user] || [];
-  const allActions = userActions.concat(MY_ACTIONS.all);  // 通用「+錄費用」放最後
+  const allActions = userActions.concat(MY_ACTIONS.all);
   if(allActions.length){
     const actionItems = allActions.map(a => ({
-      href: currentPage === 'erp-lobby.html' ? '#' : ('erp-lobby.html#action-' + a.action),
+      href: 'erp-lobby.html#action-' + a.action,
       icon: a.icon,
       label: a.label,
       dataAction: a.action,
+      badge: getActionCount(a.action),
     }));
     content.appendChild(mkGroup('我的動作', actionItems));
   }
@@ -275,7 +309,10 @@
       a.href = i.href;
       a.className = 'erp-sb-item' + (i.href === currentPage ? ' active' : '');
       if(i.dataAction) a.dataset.action = i.dataAction;
-      a.innerHTML = `<span class="erp-sb-icon">${i.icon}</span><span class="erp-sb-label">${i.label}</span>`;
+      const badge = (i.badge && i.badge > 0)
+        ? `<span style="margin-left:auto;background:var(--brand,#ff6b35);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;font-family:'Helvetica Neue',sans-serif;">${i.badge}</span>`
+        : '';
+      a.innerHTML = `<span class="erp-sb-icon">${i.icon}</span><span class="erp-sb-label">${i.label}</span>${badge}`;
       g.appendChild(a);
     });
     return g;
