@@ -642,32 +642,30 @@ body{
       </div>
     </div>
 
-    <!-- YUMING INBOX (躍明專屬：待入帳 / 跨境結算 / 跨實體核銷)-->
-    <div id="ym-inbox-section" style="display:none">
-      <div class="sec-hdr">
+    <!-- YUMING INBOX (躍明專屬：待入帳)-->
+    <div id="ym-inbox-section" class="collapsed-section" style="display:none">
+      <div class="sec-hdr" onclick="toggleCollapsedSection('ym-inbox-section')" style="cursor:pointer;">
         <div>
-          <div class="sec-title">📋 我的待入帳</div>
-          <div class="sec-hint">My Pending · 做 · 楊子/Leo 送來的款項確認入帳</div>
+          <div class="sec-title">📋 我的待入帳 <span id="ym-inbox-count" style="color:var(--ink-mid);font-weight:500;"></span> <span class="collapse-caret" style="color:var(--ink-lo);font-size:10px;">▾</span></div>
+          <div class="sec-hint">點開看楊子/Leo 送來的款項清單</div>
         </div>
       </div>
-      <div id="ym-inbox-list" class="blocks"></div>
+      <div id="ym-inbox-list" class="blocks collapsible-body" style="display:none"></div>
     </div>
 
     <!-- my-work-section 已拿掉，個人動作全部搬到 sidebar 「我的動作」群 -->
     <div id="my-work-section" style="display:none"></div>
 
     <!-- MY CUSTOMERS (業務角色才顯示) -->
-    <div id="my-customers-section" style="display:none">
-      <div class="sec-hdr">
+    <div id="my-customers-section" class="collapsed-section" style="display:none">
+      <div class="sec-hdr" onclick="toggleCollapsedSection('my-customers-section')" style="cursor:pointer;">
         <div>
-          <div class="sec-title">🎯 我的客戶</div>
-          <div class="sec-hint">My Customers · 看 · 我負責的訂單</div>
+          <div class="sec-title">🎯 我的客戶 <span id="my-customers-count" style="color:var(--ink-mid);font-weight:500;"></span> <span class="collapse-caret" style="color:var(--ink-lo);font-size:10px;">▾</span></div>
+          <div class="sec-hint">點開看我負責的訂單清單</div>
         </div>
-        <a href="erp-crm.html" class="sec-link" style="text-decoration:none;">業務中心 ›</a>
+        <a href="erp-crm.html" class="sec-link" style="text-decoration:none;" onclick="event.stopPropagation();">業務中心 ›</a>
       </div>
-      <div class="blocks" id="my-customers-list"></div>
-
-      <!-- 業務員快速動作已搬到 sidebar 「我的動作」群 -->
+      <div class="blocks collapsible-body" id="my-customers-list" style="display:none"></div>
     </div>
 
     <!-- ANNOUNCEMENTS -->
@@ -1385,8 +1383,8 @@ function buildSidebar(){
   // 我的動作群（個人動作 modal trigger，依角色顯示）
   const MY_ACTIONS = {
     all:      [{icon:'＋', label:'錄費用', action:'expense'}],
-    laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
-    debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
     anran:    [{icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
     yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
     yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}],
@@ -1667,6 +1665,8 @@ if(user === 'yuming'){
       {id:'d4', title:'Shawn 廳 · 曼谷快閃場地費（5月）', from:'Shawn', date:'2026-04-30', approver:'Ray', ccy:'THB', amount:85000, note:'Siam Paragon 5月場地費'},
     ];
     const all = arr.length ? arr : DEMO;
+    const cnt = document.getElementById('ym-inbox-count');
+    if(cnt) cnt.textContent = `(${all.length} 筆)`;
     if(!all.length){
       list.innerHTML = '<div class="empty-state" style="padding:14px;color:var(--ink-lo);font-size:12px;">目前沒有待入帳款項 ✨</div>';
     } else {
@@ -1705,11 +1705,13 @@ function ymReject(id){
 const myCustomers = MY_CUSTOMERS[user];
 const SALES_ROLES = ['laodong','debao','anran','peilin'];
 if(SALES_ROLES.includes(user)){
-  // 業務角色：顯示「我的客戶」+「快速回報」
+  // 業務角色：顯示「我的客戶」（預設摺疊）
   const sec = document.getElementById('my-customers-section');
   const list = document.getElementById('my-customers-list');
   if(sec && list){
     sec.style.display = '';
+    const cnt = document.getElementById('my-customers-count');
+    if(cnt && myCustomers) cnt.textContent = `(${myCustomers.length} 筆)`;
     if(myCustomers && myCustomers.length){
       const toneColor = {ok:'var(--ok)', warn:'var(--warn)', danger:'var(--danger)', grey:'var(--ink-lo)'};
       list.innerHTML = myCustomers.map((c, i) => {
@@ -2222,7 +2224,8 @@ function _genericDone(key, id, toastMsg){
   const arr = JSON.parse(localStorage.getItem(key)||'[]');
   const item = arr.find(x => x.id === id);
   if(item){ item.done = true; localStorage.setItem(key, JSON.stringify(arr)); }
-  showQaToast(toastMsg || '✓ 已完成');
+  markCurrentTodoDone();  // 處理任一筆 → 對應大廳 todo 消失
+  if(toastMsg) showQaToast(toastMsg);
   return item;
 }
 
@@ -2405,6 +2408,7 @@ function doPoArchive(id){
   const p = arr.find(x => x.id === id);
   if(p){ p.archived = true; localStorage.setItem('laige_po_v1', JSON.stringify(arr)); }
   renderMyPo();
+  markCurrentTodoDone();
   showQaToast(`✓ ${p ? p.name : id} 已歸檔`);
 }
 
@@ -2459,6 +2463,7 @@ function doStockMatch(id){
   notif.unshift({ts:Date.now(), from:name, to:'gaowei', msg:`${s.po} 廠端備齊，可安排出貨`});
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   renderStockCheck();
+  markCurrentTodoDone();
   showQaToast(`✓ ${s ? s.po : id} 已核對 · 通知賴哥+高維`);
 }
 function doStockDiff(id){
@@ -2474,6 +2479,7 @@ function doStockDiff(id){
   notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子核對：${s.po} ⚠ 應收 ${s.expected} 實收 ${s.received}，需跟廠商確認`});
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   renderStockCheck();
+  markCurrentTodoDone();
   showQaToast(`⚠ ${s ? s.po : id} 有差異 · 已通知賴哥`);
 }
 
@@ -2735,12 +2741,12 @@ function doInboxApprove(id){
   const arr = loadInboxLobby();
   const item = arr.find(x => x.id === id);
   if(item){ item.status = 'approved'; saveInboxLobby(arr); }
-  // 通知躍明
   const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   notif.unshift({ts:Date.now(), from:name, to:'yuming',
     msg:`${name} 已核准：${item ? item.name : id} · 送躍明入帳`});
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   renderApprovalInbox();
+  markCurrentTodoDone();
   showQaToast(`✓ 已核准 · 送躍明入帳`);
 }
 function doInboxReject(id){
@@ -2748,6 +2754,7 @@ function doInboxReject(id){
   const item = arr.find(x => x.id === id);
   if(item){ item.status = 'rejected'; saveInboxLobby(arr); }
   renderApprovalInbox();
+  markCurrentTodoDone();
   showQaToast(`已退回，需補單據`);
 }
 
@@ -2948,6 +2955,22 @@ function submitPayroll(){
   showQaToast(`✓ ${_currentPayrollEnt} 薪資已送躍明確認 · ${sym} ${total.toLocaleString()}`);
 }
 
+// 費用送審 router（按角色分流，全 modal 共用）
+const MGR_ROUTER_MAP = {
+  laige:'ray', muzi:'laige',
+  bevis:'ray', shetong:'bevis', peilin:'bevis',
+  laodong:'anran', debao:'anran',
+  gaowei:'shawn', chunlei:'shawn', jiaying:'shawn',
+  yangzi:'anran', leo:'ray',
+  anran:'ray', shawn:'ray', yuming:'ray',
+};
+const BIZ_ROUTER_MAP = {
+  laige:'laige', muzi:'laige',
+  bevis:'bevis', shetong:'bevis', peilin:'bevis',
+  laodong:'anran', debao:'anran',
+  gaowei:'shawn', chunlei:'shawn', jiaying:'shawn',
+};
+
 // ── 錄費用 modal（每人都有，3 類，OPEX role-based）──
 const _expRoute = {
   personal: '直屬主管 → 躍明入帳',
@@ -2996,21 +3019,27 @@ function submitExpense(){
   arr.unshift(rec);
   localStorage.setItem('erp_expense_v1', JSON.stringify(arr));
 
-  // 通知佇列依類型
+  // 通知佇列依類型 + 角色分流
   const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
   const msg = `費用申請：${name} · ${cat} · ¥${amt}${proj?' · '+proj:''}`;
+  // 直屬主管（個人報銷）路由
+  const mgr = MGR_ROUTER_MAP[user] || 'ray';
+  // 業務相關費用路由（採購→賴哥 / 設計→Bevis / 業務→安然 / 物流電商→Shawn）
+  const reviewer = BIZ_ROUTER_MAP[user] || 'anran';
   if(type==='personal'){
-    notif.unshift({ts:Date.now(), from:name, to:'manager', msg});
+    notif.unshift({ts:Date.now(), from:name, to:mgr, msg:msg+' [個人報銷]'});
   } else if(type==='business'){
-    notif.unshift({ts:Date.now(), from:name, to:'anran', msg});
+    notif.unshift({ts:Date.now(), from:name, to:reviewer, msg:msg+' [業務相關]'});
   }
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
 
   closeExpenseModal();
   markCurrentTodoDone();
-  const routeText = type==='opex' ? '已寫入 HR 費用中心' :
-                    type==='business' ? '已送 → 直屬主管 → 安然' : '已送 → 直屬主管';
-  showQaToast(`✓ 費用已記錄 · ${routeText}`);
+  const ROLE_NAME = {ray:'Ray',shawn:'Shawn',anran:'安然',yuming:'躍明',bevis:'Bevis',peilin:'珮玲',shetong:'詩彤',laige:'賴哥',muzi:'木子',laodong:'老董',debao:'德寶',chunlei:'春雷',jiaying:'佳音',gaowei:'高維',yangzi:'楊子',leo:'Leo'};
+  const reviewerName = type==='opex' ? '已寫入 HR 費用中心' :
+                       type==='business' ? `已送 → ${ROLE_NAME[BIZ_ROUTER_MAP[user]]||'安然'}` :
+                       `已送 → ${ROLE_NAME[MGR_ROUTER_MAP[user]]||'直屬主管'}`;
+  showQaToast(`✓ 費用已記錄 · ${reviewerName}`);
 }
 
 // ── Sidebar 個人動作 trigger ──
@@ -3055,14 +3084,36 @@ function triggerAction(action){
   }
 }
 
-// 簡單 list modal（暫用，V2 改成完整 modal）
+// 摺疊 section 切換（漸進揭露）
+function toggleCollapsedSection(secId){
+  const sec = document.getElementById(secId);
+  if(!sec) return;
+  const body = sec.querySelector('.collapsible-body');
+  const caret = sec.querySelector('.collapse-caret');
+  const open = body && body.style.display !== 'none';
+  if(body) body.style.display = open ? 'none' : '';
+  if(caret) caret.textContent = open ? '▾' : '▴';
+}
+
+// 簡單 list modal（暫用：點 sidebar action 滑到並展開常駐 section）
 function openSimpleListModal(kind){
   if(kind === 'my-customers'){
     const sec = document.getElementById('my-customers-section');
-    if(sec){ sec.style.display=''; sec.scrollIntoView({behavior:'smooth'}); }
+    if(sec){
+      sec.style.display='';
+      // 展開（如果是收起的）
+      const body = sec.querySelector('.collapsible-body');
+      if(body && body.style.display === 'none') toggleCollapsedSection('my-customers-section');
+      sec.scrollIntoView({behavior:'smooth'});
+    }
   } else if(kind === 'my-pending'){
     const sec = document.getElementById('ym-inbox-section');
-    if(sec){ sec.style.display=''; sec.scrollIntoView({behavior:'smooth'}); }
+    if(sec){
+      sec.style.display='';
+      const body = sec.querySelector('.collapsible-body');
+      if(body && body.style.display === 'none') toggleCollapsedSection('ym-inbox-section');
+      sec.scrollIntoView({behavior:'smooth'});
+    }
   }
 }
 
