@@ -1,0 +1,3504 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>蕪．解 | WUJIE GROUP</title>
+<!-- V20 City Pop 字體：DM Sans（圓潤暖度）+ Shippori Mincho（日式明朝）+ Inter / Noto Sans TC 內文 -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..900&family=Shippori+Mincho:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- V32 · preload 12 張角色圖（修「刷新時顏色不顯示」bug）-->
+<link rel="preload" as="image" href="assets/six_chars/char_01_lumi_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_02_mochi_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_03_gizmo_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_04_peachy_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_05_haru_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_06_owly_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_01_lumi_color_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_02_mochi_color_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_03_gizmo_color_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_04_peachy_color_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_05_haru_color_alpha.webp" type="image/webp">
+<link rel="preload" as="image" href="assets/six_chars/char_06_owly_color_alpha.webp" type="image/webp">
+
+<!-- V32 · disable browser scroll restoration（修「看完一次後 capabilities 不再出現」bug）-->
+<script>
+if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+window.addEventListener('load', () => window.scrollTo(0, 0));
+</script>
+<style>
+:root {
+  /* ═══ V22 真 · 1980s-90s Japan City Pop（Plastic Love 飽和等級）═══ */
+  --bg: #1A1428;             /* 暮光紫黑（藍底加深）*/
+  --bg-soft: #241B36;
+  --bg-card: #2c2241;
+  --paper: #FFF8E7;          /* 真奶白 */
+  --paper-deep: #efe4d3;
+  --ink: #1A1428;
+  --ink-mid: #6a5e75;
+  --ink-lo: #a59cae;
+  --ghost-dark: rgba(255,248,231,0.06);
+  --ghost-light: rgba(26,20,40,0.06);
+
+  /* ── 暖軸 · 落日（飽和正色）── */
+  --red: #FF4A75;            /* 飽和粉紅 — Plastic Love 那種正粉 */
+  --red-glow: rgba(255,74,117,0.55);
+  --red-mid: rgba(255,74,117,0.3);
+  --peach: #FF8B5C;          /* 飽和橘紅 — Hiroshi Nagai 夕陽 */
+  --peach-glow: rgba(255,139,92,0.55);
+  --sun-gold: #FFC542;       /* 夕陽金（更黃更鮮）*/
+
+  /* ── 冷軸 · 暮色海（飽和正色）── */
+  --cyan: #2E8BC9;           /* 飽和 Mariya 藍 — 深、純、正 */
+  --cyan-glow: rgba(46,139,201,0.6);
+  --steel: #6A8FB5;          /* 鋼藍 chrome */
+  --steel-glow: rgba(106,143,181,0.45);
+  --twilight: #5946A3;       /* 暮光紫藍 — 更飽和 */
+  --twilight-glow: rgba(89,70,163,0.5);
+  --purple: #5946A3;
+  --purple-glow: rgba(89,70,163,0.5);
+
+  --ivory: #FFFFFF;          /* chrome 中段純白用 */
+
+  --line: #3a2e4f;
+  --line-paper: #e0d4c4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; cursor: none; }
+body {
+  background: var(--bg);
+  color: var(--paper);
+  font-family: "Inter", "Noto Sans TC", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  overflow-x: hidden;
+  font-weight: 400;
+  cursor: none;
+}
+a, button, .chain-block, .nav-pill { cursor: none; }
+::selection { background: var(--cyan); color: var(--ink); }
+
+/* ═══════════════════════════════════════ */
+/* CURSOR FOLLOWER — 「簽名動作」紅光圈      */
+/* ═══════════════════════════════════════ */
+.cursor-dot {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 10px; height: 10px;
+  background: radial-gradient(circle, var(--red) 0%, var(--purple) 100%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease-out, width 0.3s, height 0.3s, background 0.3s;
+  box-shadow: 0 0 16px var(--red-glow), 0 0 28px var(--purple-glow);
+}
+.cursor-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  width: 40px; height: 40px;
+  border: 1px solid var(--red);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s, height 0.3s, border-color 0.3s;
+  opacity: 0.6;
+}
+body.hover-cyan .cursor-dot { background: var(--cyan); box-shadow: 0 0 16px var(--cyan-glow), 0 0 32px var(--cyan-glow); }
+body.hover-cyan .cursor-ring { border-color: var(--cyan); }
+body.hover-big .cursor-ring { width: 80px; height: 80px; opacity: 0.4; }
+
+/* ═══════════════════════════════════════ */
+/* VERTICAL SIDE TAG — 左側永久標籤           */
+/* ═══════════════════════════════════════ */
+.side-tag {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: left center;
+  z-index: 90;
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 0.7;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.side-tag .red { color: var(--red); }
+.side-tag .cyan { color: var(--cyan); }
+
+/* ═══════════════════════════════════════ */
+/* NAV pill                                  */
+/* ═══════════════════════════════════════ */
+.nav-pill {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-feature-settings: "ss01";
+  background: rgba(10,10,12,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 100px;
+  padding: 10px 28px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--paper);
+  cursor: none;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-pill:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+.nav-pill .dot {
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--red-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* ═══════════════════════════════════════ */
+/* HERO — 破版 + 紅點脫離                   */
+/* ═══════════════════════════════════════ */
+.hero {
+  height: 100vh;
+  min-height: 760px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+/* V18 移除 80s perspective grid（太雜） */
+.hero { 
+  background-image:
+    radial-gradient(ellipse 80% 60% at 15% 85%, rgba(255,45,143,0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 85% 15%, rgba(0,229,255,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(176,38,255,0.08) 0%, transparent 60%);
+}
+
+/* ─── V18 HERO — 極簡留白 ─── */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  cursor: none;
+}
+/* V21 City Pop hero 光暈 — 暖+冷雙軸（落日 + 海）*/
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    /* 中央偏右下 · 珊瑚粉夕陽 */
+    radial-gradient(ellipse 70% 55% at 60% 65%, rgba(242,92,126,0.08) 0%, transparent 65%),
+    /* 左上 · Mariya 暮色藍海 */
+    radial-gradient(ellipse 65% 55% at 20% 25%, rgba(74,143,201,0.08) 0%, transparent 65%),
+    /* 微微桃橘溫度補底 */
+    radial-gradient(ellipse 50% 40% at 75% 20%, rgba(255,180,137,0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 中央極簡標題 block */
+.hero-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  text-align: center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+.hero-zh-mark {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: 0.18em;
+  color: var(--red);
+  margin-bottom: 18px;
+  opacity: 0.9;
+}
+.hero-en-mark {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 7vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  color: var(--paper);
+  margin: 0;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 45%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-tag {
+  margin-top: 22px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+/* 底部極小提示，cursor 動了就淡出 */
+.hero-hint {
+  position: absolute;
+  bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  transition: opacity 0.6s ease;
+}
+
+/* ═══════════════════════════════════════════════ */
+/* V27 · HERO ANTHEM — 6 角色 SPARK→CREATE→PROVE   */
+/* 15 秒 loop，自動播放                              */
+/* ═══════════════════════════════════════════════ */
+.hero-anthem {
+  cursor: default;
+  view-timeline-name: --hero-tl;
+  view-timeline-axis: block;
+}
+/* V34 · scroll past hero → 整體 fade out，避免角色 leak 到下方換頁時 */
+@supports (animation-timeline: view()) {
+  @keyframes hero-fade-on-exit {
+    0%, 70%   { opacity: 1; }
+    95%, 100% { opacity: 0; }
+  }
+  .hero-anthem {
+    animation: hero-fade-on-exit linear both;
+    animation-timeline: --hero-tl;
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+/* ─── Scene 0 · SPARK 光點 ─── */
+.anthem-spark {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 16px; height: 16px;
+  margin-left: -8px; margin-top: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--paper) 0%, var(--red) 40%, transparent 70%);
+  box-shadow:
+    0 0 60px var(--red-glow),
+    0 0 120px var(--peach-glow),
+    0 0 200px rgba(46,139,201,0.3);
+  z-index: 6;
+  opacity: 0;
+  animation: anthem-spark 14s ease-in-out infinite;
+}
+@keyframes anthem-spark {
+  0%   { opacity: 0; transform: scale(0); }
+  3%   { opacity: 1; transform: scale(1); }
+  8%   { opacity: 0; transform: scale(8); }
+  100% { opacity: 0; transform: scale(8); }
+}
+
+/* ─── Scene 1+2 · 6 角色 wrapper + 雙層 skin（sketch + color crossfade）─── */
+/* V29 narrative (20s loop):
+   0-2s    SPARK
+   2-7s    CREATE — sketches stagger in
+   7-10s   HOLD   — 6 sketches visible
+   10-12s  DEVELOP — crossfade sketches → colored versions
+   12-15s  HOLD   — 6 colored visible
+   15-17s  PROVE entry — logo emerges, color fades to 30%
+   17-19s  PROVE hold
+   19-20s  全 fade → loop
+*/
+.anthem-char {
+  position: absolute;
+  z-index: 4;
+  will-change: transform;
+  filter: drop-shadow(0 18px 36px rgba(0,0,0,0.5));
+}
+.anthem-skin {
+  position: absolute; inset: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* 6 角色佈局（散落 mood-board）*/
+.anthem-char--lumi   { top:  8%;  left:  9%;  width: 240px; height: 240px; transform: rotate(-7deg); }
+.anthem-char--mochi  { top:  5%;  left: 42%;  width: 240px; height: 240px; transform: rotate(5deg);  }
+.anthem-char--gizmo  { top: 46%;  left:  3%;  width: 220px; height: 220px; transform: rotate(-3deg); }
+.anthem-char--peachy { top: 28%;  right:  4%; width: 260px; height: 260px; transform: rotate(8deg);  }
+.anthem-char--haru   { bottom: 8%; left: 22%; width: 230px; height: 230px; transform: rotate(-10deg);}
+.anthem-char--owly   { bottom: 5%; right: 24%; width: 270px; height: 270px; transform: rotate(4deg); }
+@media (max-width: 1280px) {
+  .anthem-char--lumi   { width: 180px; height: 180px; }
+  .anthem-char--mochi  { width: 210px; height: 210px; }
+  .anthem-char--gizmo  { width: 165px; height: 165px; }
+  .anthem-char--peachy { width: 195px; height: 195px; }
+  .anthem-char--haru   { width: 170px; height: 170px; }
+  .anthem-char--owly   { width: 200px; height: 200px; }
+}
+
+/* sketch 共用 keyframe — 各角色只變 stagger 起始時間 */
+@keyframes skin-sketch {
+  /* sketch 用 var(--in) 控制各角色進場時機 */
+  0%, 11%  { opacity: 0; transform: scale(0.7) translateY(40px); }
+  17%, 50% { opacity: 1; transform: scale(1)   translateY(0); }
+  60%, 100% { opacity: 0; transform: scale(1)   translateY(0); }
+}
+@keyframes skin-color {
+  /* V43 · crossfade 加速 60→55%（0.7s 完成）*/
+  0%, 50%   { opacity: 0; }
+  55%, 65%  { opacity: 1; }       /* 55→65% = 1.4s 完全 full */
+  72%, 93%  { opacity: 0.3; }     /* dim 到 30% 讓 logo 突出 */
+  100%      { opacity: 0; }
+}
+
+/* 各角色 skin animation 帶 stagger delay 模擬不同進場時機（用 animation-delay 不行因為會錯位 loop，所以每角色獨立 keyframe）*/
+@keyframes skin-sketch-lumi   { 0%,11%{opacity:0}17%,50%{opacity:1} 55%,100%{opacity:0} }
+@keyframes skin-sketch-mochi  { 0%,15%{opacity:0}21%,50%{opacity:1} 55%,100%{opacity:0} }
+@keyframes skin-sketch-gizmo  { 0%,19%{opacity:0}25%,50%{opacity:1} 55%,100%{opacity:0} }
+@keyframes skin-sketch-peachy { 0%,23%{opacity:0}29%,50%{opacity:1} 55%,100%{opacity:0} }
+@keyframes skin-sketch-haru   { 0%,27%{opacity:0}33%,50%{opacity:1} 55%,100%{opacity:0} }
+@keyframes skin-sketch-owly   { 0%,31%{opacity:0}37%,50%{opacity:1} 55%,100%{opacity:0} }
+
+.anthem-char--lumi   .anthem-skin--sketch { animation: skin-sketch-lumi   14s ease-in-out infinite; }
+.anthem-char--mochi  .anthem-skin--sketch { animation: skin-sketch-mochi  14s ease-in-out infinite; }
+.anthem-char--gizmo  .anthem-skin--sketch { animation: skin-sketch-gizmo  14s ease-in-out infinite; }
+.anthem-char--peachy .anthem-skin--sketch { animation: skin-sketch-peachy 14s ease-in-out infinite; }
+.anthem-char--haru   .anthem-skin--sketch { animation: skin-sketch-haru   14s ease-in-out infinite; }
+.anthem-char--owly   .anthem-skin--sketch { animation: skin-sketch-owly   14s ease-in-out infinite; }
+/* 彩色版全部同時 crossfade（DEVELOP magical moment）*/
+.anthem-skin--color  { animation: skin-color 14s ease-in-out infinite; }
+
+/* wrapper 進場 scale-in 跟著對應 sketch stagger */
+@keyframes wrap-in-lumi   { 0%,11%{transform:rotate(-7deg) scale(0.7)}17%,100%{transform:rotate(-7deg) scale(1)} }
+@keyframes wrap-in-mochi  { 0%,15%{transform:rotate(5deg)  scale(0.7)}21%,100%{transform:rotate(5deg)  scale(1)} }
+@keyframes wrap-in-gizmo  { 0%,19%{transform:rotate(-3deg) scale(0.7)}25%,100%{transform:rotate(-3deg) scale(1)} }
+@keyframes wrap-in-peachy { 0%,23%{transform:rotate(8deg)  scale(0.7)}29%,100%{transform:rotate(8deg)  scale(1)} }
+@keyframes wrap-in-haru   { 0%,27%{transform:rotate(-10deg) scale(0.7)}33%,100%{transform:rotate(-10deg) scale(1)} }
+@keyframes wrap-in-owly   { 0%,31%{transform:rotate(4deg)  scale(0.7)}37%,100%{transform:rotate(4deg)  scale(1)} }
+.anthem-char--lumi   { animation: wrap-in-lumi   14s ease-out infinite; }
+.anthem-char--mochi  { animation: wrap-in-mochi  14s ease-out infinite; }
+.anthem-char--gizmo  { animation: wrap-in-gizmo  14s ease-out infinite; }
+.anthem-char--peachy { animation: wrap-in-peachy 14s ease-out infinite; }
+.anthem-char--haru   { animation: wrap-in-haru   14s ease-out infinite; }
+.anthem-char--owly   { animation: wrap-in-owly   14s ease-out infinite; }
+
+/* ─── Scene 6 · PROVE 中央 logo，後半段才出現 ─── */
+.anthem-logo {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 7;
+  text-align: center;
+  opacity: 0;
+  animation: anthem-logo-in 14s ease-in-out infinite;
+}
+@keyframes anthem-logo-in {
+  /* V42 · logo 提早出現：55% (7.7s) 開始 → 65% (9.1s) 完全顯示 → 95% (13.3s) 開始淡 */
+  0%, 55%   { opacity: 0; transform: translate(-50%, -45%) scale(0.96); }
+  65%, 95%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100%      { opacity: 0; transform: translate(-50%, -55%) scale(0.96); }
+}
+.anthem-logo-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: 0.18em;
+  color: var(--red);
+  margin-bottom: 16px;
+}
+.anthem-logo-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 7vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  margin: 0;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 45%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.anthem-logo-tag {
+  margin-top: 22px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ─── 底部 metadata 條（永遠在）─── */
+.anthem-meta {
+  position: absolute;
+  bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: 90%; max-width: 1400px;
+  display: flex; justify-content: space-between;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ═══════════════════════════════════════════════ */
+/* V31 · CAPABILITIES REEL — 6 句能力宣言依序大字     */
+/* fixed-position crossfade，scroll 1px 跟手          */
+/* ═══════════════════════════════════════════════ */
+.capabilities-reel {
+  position: relative;
+  background: var(--bg);
+  padding: 90px 0 70px;        /* V38: 收緊上下 padding */
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+
+/* V39 · 6 句宣言 wallpaper pattern（重複鋪滿背景，多列、輕微旋轉、暖冷交替色）*/
+.caps-pattern {
+  position: absolute;
+  inset: -10%;             /* 多出邊緣讓旋轉/scale 不留白 */
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  transform: rotate(-4deg);
+  white-space: nowrap;
+}
+.cap-pattern-row {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 7vw, 110px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: rgba(255,255,255,0.035);
+  text-transform: uppercase;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+  will-change: transform;
+}
+/* 各行不同 offset + 暖冷交替色，製造 pattern 感 */
+.cap-pattern-row:nth-child(2n)  { color: rgba(255,74,117,0.05); }
+.cap-pattern-row:nth-child(3n)  { color: rgba(46,139,201,0.05); }
+.cap-pattern-row:nth-child(5n)  { color: rgba(255,139,92,0.04); }
+
+/* V40 · 水平 drift 動畫 — 各行不同速度/方向，wallpaper alive 感 */
+@keyframes pattern-drift-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-15%); }
+}
+@keyframes pattern-drift-right {
+  0%   { transform: translateX(-15%); }
+  100% { transform: translateX(0); }
+}
+.cap-pattern-row:nth-child(1) { animation: pattern-drift-left  60s linear infinite; }
+.cap-pattern-row:nth-child(2) { animation: pattern-drift-right 75s linear infinite; margin-left: -8vw; }
+.cap-pattern-row:nth-child(3) { animation: pattern-drift-left  90s linear infinite; margin-left: -16vw; }
+.cap-pattern-row:nth-child(4) { animation: pattern-drift-right 50s linear infinite; margin-left: -4vw; }
+.cap-pattern-row:nth-child(5) { animation: pattern-drift-left  85s linear infinite; margin-left: -12vw; }
+.cap-pattern-row:nth-child(6) { animation: pattern-drift-right 65s linear infinite; }
+.cap-pattern-row:nth-child(7) { animation: pattern-drift-left  70s linear infinite; margin-left: -10vw; }
+.cap-pattern-row:nth-child(8) { animation: pattern-drift-right 80s linear infinite; margin-left: -6vw; }
+
+/* V36 · 微微 City Pop 光暈當底 */
+.capabilities-reel::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 25% 30%, rgba(255,74,117,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 75% 70%, rgba(46,139,201,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+.capabilities-reel::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 70%, rgba(255,74,117,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 30%, rgba(46,139,201,0.08) 0%, transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+}
+@supports (animation-timeline: view()) {
+  @keyframes cap-glow { 0%,100%{opacity:0} 50%{opacity:1} }
+  .capabilities-reel::before {
+    animation: cap-glow linear both;
+    animation-timeline: --cap-tl;
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+/* V37 · 6 列不對稱 zigzag、無分隔線、編輯雜誌 vibe */
+.caps-intro {
+  max-width: 1200px;
+  margin: 0 auto 64px;
+  padding: 0 80px;
+  position: relative; z-index: 2;
+}
+.caps-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: var(--red);
+  text-shadow: 0 0 12px var(--red-glow);
+  margin-bottom: 18px;
+}
+.caps-headline {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(32px, 3.8vw, 56px);
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  color: var(--paper);
+  margin: 0;
+}
+.caps-headline .hi {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 45%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 6 列容器 — V41 字大 + 黏密 + 跨度小 */
+.cap-row {
+  max-width: 820px;          /* V42: 720 → 820（再給更大字空間）*/
+  margin: 0 80px;
+  padding: 0;                /* V41: 4 → 0 */
+  display: flex;
+  flex-direction: column;
+  gap: 0;                    /* V41: 2 → 0 */
+  position: relative; z-index: 2;
+}
+.cap-row--cool {
+  margin-left: auto;
+  margin-right: 80px;
+  text-align: right;
+}
+
+.cap-row-num {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: var(--red);
+  text-shadow: 0 0 8px var(--red-glow);
+  margin: 0;
+}
+.cap-row--cool .cap-row-num {
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan-glow);
+}
+
+.cap-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;                    /* V41: 2 → 0 */
+}
+.cap-row-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: clamp(72px, 8vw, 124px);     /* V42: 92 → 124 max（再大）*/
+  line-height: 0.85;                      /* V42: 0.88 → 0.85（更緊）*/
+  letter-spacing: -0.035em;
+  color: var(--paper);
+  margin: 0;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 60%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cap-row--cool .cap-row-en {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 60%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cap-row-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 600;
+  font-size: clamp(16px, 1.4vw, 20px);    /* V42: 平衡放大 */
+  letter-spacing: 0.08em;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.55);
+  margin-top: 4px;                        /* V42: 6 → 4 */
+}
+.cap-row-zh .hi { color: var(--red); font-weight: 700; }
+.cap-row--cool .cap-row-zh .hi { color: var(--cyan); }
+
+/* 滾入 viewport 微 fade（自然就好）*/
+@supports (animation-timeline: view()) {
+  @keyframes cap-row-emerge {
+    0%   { opacity: 0; transform: translateY(24px); }
+    40%, 100% { opacity: 1; transform: translateY(0); }
+  }
+  .cap-row {
+    animation: cap-row-emerge linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+}
+
+@media (max-width: 900px) {
+  .cap-row { max-width: 100%; margin: 0 24px; padding: 16px 0; }
+  .cap-row--cool { margin: 0 24px; text-align: left; }
+  .caps-intro { padding: 0 24px; }
+}
+.cap-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: var(--red);
+  text-shadow: 0 0 12px var(--red-glow);
+  margin-bottom: 32px;
+}
+.cap-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(64px, 9vw, 160px);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--paper);
+  margin: 0 0 28px;
+  text-transform: uppercase;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 45%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cap-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(22px, 2.2vw, 32px);
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.7);
+}
+.cap-zh .hi { color: var(--red); }
+
+/* V36 · 舊 cap-line / cap-meta CSS 已移除，靜態 cap-row 接手 */
+
+
+/* ═══════════════════════════════════════════════ */
+/* V19 · 統一 reveal-section pattern               */
+/*  默認只顯示極簡標題 → hover 內容浮現 → click 開 modal */
+/* ═══════════════════════════════════════════════ */
+/* V25 · Apple iPhone-style scroll storytelling */
+/* 思維：標題 fixed 堆在視窗正中央，opacity 跟段捲動位置消長 */
+.reveal-section {
+  position: relative;
+  min-height: 160vh;                  /* V26: 軸距拉長，標題重疊範圍縮小 */
+  background: var(--bg);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  view-timeline-name: --section-timeline;
+  view-timeline-axis: block;
+}
+/* 背景光暈 — 隨段在視窗的位置改變強度（scroll-driven）*/
+.reveal-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 45% at 20% 80%, rgba(255,74,117,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 80% 25%, rgba(255,139,92,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 70% 70%, rgba(89,70,163,0.07) 0%, transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+}
+@supports (animation-timeline: view()) {
+  @keyframes bg-glow-fade {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 1; }
+  }
+  .reveal-section::before {
+    animation: bg-glow-fade linear both;
+    animation-timeline: --section-timeline;
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+/* ─── 標題 fixed 在視窗正中央，每段一份，靠 opacity 切換 ─── */
+.reveal-head {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 40px;
+  text-align: center;
+  z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  will-change: opacity, transform;
+}
+@supports (animation-timeline: view()) {
+  /* V34 · head 收尾改 70%，徹底避免 section 06 vs footer 重疊 */
+  @keyframes head-crossfade {
+    0%   { opacity: 0; transform: translate(-50%, -20%); }
+    45%  { opacity: 1; transform: translate(-50%, -50%); }
+    70%, 100% { opacity: 0; transform: translate(-50%, -80%); }
+  }
+  .reveal-head {
+    animation: head-crossfade linear both;
+    animation-timeline: --section-timeline;
+    animation-range: cover 0% cover 100%;
+  }
+  /* 子層 parallax 多一點層次 */
+  @keyframes layer-deep {
+    0%   { transform: translateY(80px); }
+    50%  { transform: translateY(0); }
+    100% { transform: translateY(-80px); }
+  }
+  .reveal-num, .reveal-tag {
+    animation: layer-deep linear both;
+    animation-timeline: --section-timeline;
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+/* ─── 明確的 CTA 按鈕（唯一能點的） ─── */
+.reveal-cta {
+  display: inline-block;
+  margin-top: 48px;
+  padding: 16px 40px;
+  border: 1.5px solid var(--red);
+  border-radius: 100px;
+  background: rgba(255,74,117,0.08);
+  color: var(--paper);
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: none;
+  pointer-events: none;   /* 默認不接 click */
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  text-decoration: none;
+}
+.reveal-section.active .reveal-cta {
+  pointer-events: auto;   /* 只有最接近視窗中心的段，CTA 才可點 */
+}
+.reveal-cta:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--paper);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(255,74,117,0.4);
+}
+.reveal-cta::after {
+  content: '  →';
+  display: inline-block;
+  transition: transform 0.3s;
+}
+.reveal-cta:hover::after { transform: translateX(4px); }
+/* 冷軸 section 的 CTA 用藍 */
+.reveal-section.alt .reveal-cta {
+  border-color: var(--cyan);
+  background: rgba(46,139,201,0.08);
+}
+.reveal-section.alt .reveal-cta:hover {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 12px 32px rgba(46,139,201,0.4);
+}
+.reveal-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  color: var(--red);
+  margin-bottom: 32px;
+  text-shadow: 0 0 12px var(--red-glow);
+}
+.reveal-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 800;
+  font-size: clamp(20px, 2vw, 30px);
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 18px;
+}
+.reveal-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 8vw, 144px);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  color: var(--paper);
+  margin: 0 0 32px;
+  text-transform: uppercase;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 45%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.reveal-tag {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 56px;
+}
+.reveal-explore {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  transition: color 0.4s;
+}
+.reveal-section:hover .reveal-explore { color: var(--cyan); }
+
+/* ─── Preview（hover 才出現） ─── */
+.reveal-preview {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 60px;
+  opacity: 0;
+  transform: translateY(40px);
+  pointer-events: none;
+  transition: opacity 0.7s 0.05s ease, transform 0.7s 0.05s ease;
+  z-index: 4;
+}
+.reveal-section .reveal-preview { display: none; }  /* V25 不再用 preview，CTA 按鈕替代 */
+.reveal-section:hover .reveal-preview {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* preview 內常用樣式 — pills（IP 名稱、城市名）*/
+.preview-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  max-width: 1000px;
+}
+.preview-pill {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(14px, 1.4vw, 19px);
+  letter-spacing: 0.02em;
+  padding: 10px 22px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 100px;
+  color: var(--paper);
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.02);
+}
+.preview-pill:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 24px rgba(0,229,255,0.2);
+}
+.preview-pill .zh { color: var(--paper); }
+.preview-pill .en {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+
+/* preview big numbers — Cases/Global 用 */
+.preview-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 40px;
+  max-width: 1100px;
+  text-align: center;
+}
+.preview-stat-num {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: clamp(48px, 6vw, 88px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.preview-stat-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-top: 10px;
+}
+
+/* preview quote — Intro / Closing 用 */
+.preview-quote {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(36px, 5vw, 88px);
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-align: center;
+  color: var(--paper);
+  max-width: 1200px;
+}
+.preview-quote .red { color: var(--red); }
+.preview-quote .cyan-bg {
+  background: var(--cyan);
+  color: var(--ink);
+  padding: 0 12px;
+}
+
+/* V21 冷軸 section（偶數段：2/4/6）— 暮色海主導 */
+.reveal-section.alt { background: linear-gradient(180deg, var(--bg) 0%, #16131F 100%); }
+.reveal-section.alt::before {
+  background:
+    /* Mariya 藍主導 + 鋼藍 + 一點珊瑚溫度平衡 */
+    radial-gradient(ellipse 60% 45% at 25% 75%, rgba(74,143,201,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 75% 30%, rgba(91,82,152,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 65% 80%, rgba(242,92,126,0.05) 0%, transparent 60%);
+}
+.reveal-section.alt:hover {
+  background: linear-gradient(180deg, var(--bg) 0%, #131120 100%);
+}
+/* 冷軸 section 的標題色票 — 大字 chrome 漸層走藍 */
+.reveal-section.alt .reveal-en {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--ivory) 45%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.reveal-section.alt .reveal-num {
+  color: var(--cyan);
+  text-shadow: 0 0 12px var(--cyan-glow);
+}
+.reveal-section.alt .reveal-explore { /* hover 時切到 sun-gold */ }
+.reveal-section.alt:hover .reveal-explore { color: var(--peach); }
+/* 冷軸 pills hover */
+.reveal-section.alt .preview-pill:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 24px rgba(74,143,201,0.25);
+}
+
+/* ═══════════════════════════════════════════════ */
+/* V19 · Modal — 重新設計，支援 6 個 section 切換   */
+/* ═══════════════════════════════════════════════ */
+.section-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 8, 0.96);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 100;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  overflow-y: auto;
+}
+.section-modal.open { display: block; opacity: 1; }
+.section-modal-close {
+  position: fixed;
+  top: 32px; right: 32px;
+  z-index: 102;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: var(--paper);
+  cursor: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.section-modal-close:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--paper);
+  transform: rotate(90deg);
+}
+.section-modal-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 100px 56px 80px;
+  position: relative;
+  z-index: 101;
+}
+.section-modal-head {
+  margin-bottom: 56px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.section-modal-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: var(--cyan);
+  margin-bottom: 16px;
+  text-shadow: 0 0 12px var(--cyan-glow);
+}
+.section-modal-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(36px, 4vw, 64px);
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  color: var(--paper);
+  margin-bottom: 14px;
+}
+.section-modal-zh .red { color: var(--red); }
+.section-modal-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(15px, 1.4vw, 19px);
+  color: rgba(255,255,255,0.6);
+  letter-spacing: -0.005em;
+  max-width: 760px;
+}
+.section-modal-body {
+  display: grid;
+  gap: 16px;
+}
+/* IP grid 在 modal 內 */
+.modal-ip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.modal-ip-item {
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.02);
+  padding: 22px 24px;
+  transition: all 0.3s;
+}
+.modal-ip-item:hover {
+  border-color: var(--cyan);
+  background: rgba(0,229,255,0.05);
+  transform: translateY(-2px);
+}
+.modal-ip-item .num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  margin-bottom: 14px;
+}
+.modal-ip-item .name {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--paper);
+  margin-bottom: 4px;
+}
+.modal-ip-item .en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 14px;
+}
+.modal-ip-item .desc {
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: 12px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 14px;
+}
+.modal-ip-item .tier {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.modal-extra {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.modal-extra-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 16px;
+}
+.modal-extra-list {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(16px, 1.6vw, 22px);
+  line-height: 1.6;
+  color: var(--paper);
+  letter-spacing: -0.005em;
+}
+.modal-extra-list .sep { color: var(--red); margin: 0 10px; }
+
+/* Cases carousel 在 modal 內 */
+.modal-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+.modal-case-tile {
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(135deg, rgba(255,45,143,0.08) 0%, rgba(0,229,255,0.04) 100%);
+  padding: 32px 26px 28px;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+/* V43+ · 有實照的 case 用 BG 圖 + 漸層 overlay */
+.modal-case-tile.has-photo {
+  background-size: cover;
+  background-position: center;
+}
+.modal-case-tile.has-photo::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(26,20,40,0.4) 0%, rgba(26,20,40,0.92) 100%);
+  pointer-events: none;
+}
+.modal-case-tile.has-photo > * { position: relative; z-index: 1; }
+.modal-case-tile:hover {
+  border-color: var(--red);
+  background: linear-gradient(135deg, rgba(255,45,143,0.15) 0%, rgba(0,229,255,0.08) 100%);
+}
+.modal-case-stat {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 30px;
+}
+.modal-case-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--paper);
+  margin-bottom: 6px;
+}
+.modal-case-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.6);
+}
+.modal-case-tag {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Global cities in modal */
+.modal-cities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.modal-city {
+  padding: 28px 20px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.modal-city:last-child { border-right: none; }
+.modal-city-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  margin-bottom: 22px;
+}
+.modal-city-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--paper);
+}
+.modal-city-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+  margin-bottom: 18px;
+}
+.modal-city-role {
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--cyan);
+  margin-bottom: 8px;
+}
+.modal-city-body {
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: 11px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.55);
+}
+
+/* Contact form in modal */
+.modal-contact {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 56px;
+}
+.modal-contact-channels { display: grid; gap: 18px; }
+.modal-contact-channel {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 16px;
+  align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.modal-contact-label {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.modal-contact-value {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--paper);
+}
+.modal-contact-value a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s;
+}
+.modal-contact-value a:hover {
+  color: var(--cyan);
+  border-bottom-color: var(--cyan);
+}
+.modal-form { display: grid; gap: 18px; }
+.modal-form-field { display: grid; gap: 6px; }
+.modal-form-field label {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.modal-form-field input,
+.modal-form-field textarea,
+.modal-form-field select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding: 10px 0;
+  color: var(--paper);
+  font-family: "Inter", "Noto Sans TC", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: none;
+  transition: border-color 0.3s;
+}
+.modal-form-field input:focus,
+.modal-form-field textarea:focus,
+.modal-form-field select:focus {
+  outline: none;
+  border-bottom-color: var(--cyan);
+}
+.modal-form-field input::placeholder,
+.modal-form-field textarea::placeholder { color: rgba(255,255,255,0.3); }
+.modal-form-field select option { background: var(--bg); color: var(--paper); }
+.modal-form-field textarea { resize: none; min-height: 80px; }
+.modal-submit {
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--paper) 50%, var(--red) 100%);
+  color: var(--ink);
+  border: none;
+  padding: 16px 28px;
+  border-radius: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: none;
+  transition: all 0.3s;
+}
+.modal-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px var(--cyan-glow);
+}
+@media (max-width: 900px) {
+  .modal-contact { grid-template-columns: 1fr; }
+}
+
+/* 紅點變主角 — 浮在中央偏左 */
+.hero-redpoint {
+  position: absolute;
+  left: 47%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  z-index: 3;
+  /* 多層漸層做出 3D chrome 能量球質感 */
+  background:
+    /* 頂部白色高光（最亮）*/
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 6%, transparent 18%),
+    /* 副高光 */
+    radial-gradient(circle at 45% 35%, rgba(255,255,255,0.25) 0%, transparent 30%),
+    /* 底部青色反射（chrome 折射感）*/
+    radial-gradient(circle at 75% 88%, rgba(0,229,255,0.55) 0%, transparent 32%),
+    /* 紫色側邊光 */
+    radial-gradient(circle at 88% 50%, rgba(176,38,255,0.4) 0%, transparent 30%),
+    /* 主漸層：粉 → 紫 → 黑紫（深度） */
+    radial-gradient(circle at 50% 55%, var(--red) 0%, var(--purple) 60%, #1a0028 100%);
+  box-shadow:
+    /* 內部：底部深紫（球體下沉）+ 頂部白光（球體上凸）*/
+    inset -8px -16px 40px rgba(20,0,50,0.7),
+    inset 4px 6px 20px rgba(255,255,255,0.18),
+    /* 外部 glow：粉 + 紫 + 青三層 */
+    0 0 50px var(--red-glow),
+    0 0 100px var(--purple-glow),
+    0 0 160px rgba(0,229,255,0.2),
+    0 0 240px rgba(255,45,143,0.12);
+  animation: redpulse 3s ease-in-out infinite;
+}
+/* 球體上方一道高光環 — chrome reflection */
+.hero-redpoint::before {
+  content: '';
+  position: absolute;
+  top: 8%; left: 18%;
+  width: 50%; height: 28%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 100%);
+  border-radius: 50%;
+  filter: blur(4px);
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+@keyframes redpulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+/* 中央 logo wrap — 破版偏左下 */
+.hero-logo-block {
+  position: absolute;
+  z-index: 5;
+  left: 48px;
+  bottom: 140px;
+  right: 380px;
+  max-width: 1100px;
+}
+.hero-logo-mark {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: clamp(96px, 11.5vw, 180px);
+  line-height: 0.85;
+  letter-spacing: -0.025em;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+  /* Chrome 漸層字 — 跟能量球同色系呼應 */
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #ffffff 35%,
+    #ffd2ea 50%,
+    #ff8fc7 65%,
+    #b026ff 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 4px 32px rgba(255,45,143,0.25));
+}
+.hero-logo-mark .gap {
+  -webkit-text-fill-color: initial;
+  color: initial;
+  background: radial-gradient(circle, var(--red) 0%, var(--purple) 100%);
+}
+.hero-logo-mark .gap {
+  display: inline-block;
+  width: clamp(8px, 1vw, 14px);
+  height: clamp(8px, 1vw, 14px);
+  background: var(--red);
+  border-radius: 50%;
+  margin: 0 6px;
+  box-shadow: 0 0 16px var(--red-glow);
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  max-width: 720px;
+}
+.hero-meta-zh {
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.85);
+  flex: 1;
+}
+.hero-meta-zh em {
+  font-style: normal;
+  color: var(--red);
+  font-weight: 700;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--paper) 50%, var(--red) 100%);
+  color: var(--ink);
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: all 0.3s;
+  white-space: nowrap;
+  box-shadow: 0 0 24px var(--cyan-glow);
+}
+.hero-cta:hover {
+  background: var(--paper);
+  box-shadow: 0 0 32px rgba(255,255,255,0.4);
+  transform: translateY(-2px);
+}
+.hero-cta::after { content: '↗'; font-size: 15px; }
+
+/* 右上角 metadata */
+.hero-corner-tr {
+  position: absolute;
+  top: 90px; right: 40px;
+  z-index: 6;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--paper);
+  text-align: right;
+  line-height: 1.7;
+}
+.hero-corner-tr .red { color: var(--red); font-weight: 700; }
+.hero-corner-tr .cyan { color: var(--cyan); font-weight: 700; }
+.hero-corner-tr .zh {
+  display: block;
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+/* 右下角 stats card */
+.hero-stats {
+  position: absolute;
+  right: 40px; bottom: 130px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  text-align: right;
+}
+.hero-stat {
+  border-right: 2px solid var(--cyan);
+  padding-right: 16px;
+  box-shadow: 4px 0 16px var(--cyan-glow) inset;
+}
+.hero-stat-num {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #ffffff 0%, #ffd2ea 60%, #b026ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+}
+.hero-stat-num .red { color: var(--red); }
+.hero-stat-label {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════ */
+/* MARQUEE — 簽名動作底部跑馬燈              */
+/* ═══════════════════════════════════════ */
+.marquee {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 64px;
+  background: linear-gradient(90deg, var(--red) 0%, var(--purple) 100%);
+  color: var(--paper);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  z-index: 7;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+.marquee-track {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 28s linear infinite;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+.marquee-track span {
+  padding: 0 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+}
+.marquee-track .star {
+  color: var(--cyan);
+  font-size: 18px;
+  transform: rotate(45deg);
+  display: inline-block;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════ */
+/* INTRO — 紙白底                            */
+/* ═══════════════════════════════════════ */
+.intro {
+  min-height: 100vh;
+  padding: 140px 40px 100px;
+  background: var(--paper);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.intro-ghost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+  z-index: 1;
+}
+.intro-ghost-text {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 900;
+  font-size: 44vw;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--ghost-light);
+  white-space: nowrap;
+  font-style: italic;
+  transform: translateX(15%);
+  font-variation-settings: "opsz" 144;
+}
+.intro-content {
+  position: relative;
+  z-index: 5;
+  max-width: 1500px;
+}
+.intro-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 56px;
+}
+.intro-meta::before { content: '01 — '; color: var(--ink-mid); }
+.intro-quote {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(56px, 7vw, 104px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 40px;
+}
+.intro-quote .red { color: var(--red); }
+.intro-quote .cyan-bg { background: var(--cyan); padding: 0 14px; }
+.intro-en {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 600;
+  font-size: clamp(24px, 2.4vw, 36px);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  border-top: 1px solid var(--line-paper);
+  padding-top: 24px;
+  max-width: 1300px;
+  font-variation-settings: "opsz" 144;
+}
+.intro-en em { font-style: italic; color: var(--red); }
+
+/* ═══════════════════════════════════════ */
+/* CHAIN — 黑底 grid                         */
+/* ═══════════════════════════════════════ */
+.chain-section {
+  min-height: 100vh;
+  padding: 120px 40px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,229,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 20%, rgba(255,45,143,0.04) 0%, transparent 60%);
+}
+.chain-ghost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: none;
+  z-index: 1;
+}
+.chain-ghost-text {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 900;
+  font-size: 42vw;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: rgba(255,255,255,0.035);
+  white-space: nowrap;
+  transform: translateX(-12%);
+  font-variation-settings: "opsz" 144;
+}
+.chain-head {
+  position: relative;
+  z-index: 5;
+  max-width: 1700px;
+  margin-bottom: 64px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 80px;
+  align-items: end;
+}
+.chain-head-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 32px;
+  text-shadow: 0 0 12px var(--cyan-glow);
+}
+.chain-head-meta::before { content: '02 — '; color: rgba(255,255,255,0.45); }
+.chain-head-title {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(48px, 5.5vw, 80px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  max-width: 1400px;
+}
+.chain-head-title .red { color: var(--red); }
+.chain-head-en {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 600;
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 22px);
+  color: rgba(255,255,255,0.55);
+  letter-spacing: -0.01em;
+  max-width: 320px;
+  text-align: right;
+  font-variation-settings: "opsz" 144;
+}
+.chain-grid {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.chain-block {
+  aspect-ratio: 4 / 3;
+  padding: 32px 28px;
+  position: relative;
+  cursor: none;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.chain-block::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0;
+  background: var(--red);
+  transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+.chain-block:hover::before { height: 100%; }
+.chain-block:hover {
+  border-color: var(--red);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 50px var(--red-glow);
+}
+.chain-block[data-chain="02"]::before,
+.chain-block[data-chain="04"]::before,
+.chain-block[data-chain="06"]::before { background: var(--cyan); }
+.chain-block[data-chain="02"]:hover,
+.chain-block[data-chain="04"]:hover,
+.chain-block[data-chain="06"]:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 16px 50px var(--cyan-glow);
+  color: var(--ink);
+}
+.chain-block[data-chain="02"]:hover .cb-zh,
+.chain-block[data-chain="04"]:hover .cb-zh,
+.chain-block[data-chain="06"]:hover .cb-zh,
+.chain-block[data-chain="02"]:hover .cb-zh .red,
+.chain-block[data-chain="04"]:hover .cb-zh .red,
+.chain-block[data-chain="06"]:hover .cb-zh .red,
+.chain-block[data-chain="02"]:hover .cb-num,
+.chain-block[data-chain="04"]:hover .cb-num,
+.chain-block[data-chain="06"]:hover .cb-num,
+.chain-block[data-chain="02"]:hover .cb-num .red,
+.chain-block[data-chain="04"]:hover .cb-num .red,
+.chain-block[data-chain="06"]:hover .cb-num .red,
+.chain-block[data-chain="02"]:hover .cb-en,
+.chain-block[data-chain="04"]:hover .cb-en,
+.chain-block[data-chain="06"]:hover .cb-en,
+.chain-block[data-chain="02"]:hover .cb-cta,
+.chain-block[data-chain="04"]:hover .cb-cta,
+.chain-block[data-chain="06"]:hover .cb-cta { color: var(--ink); }
+.chain-block > * { position: relative; z-index: 2; }
+.cb-bignum {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 240px;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: var(--paper);
+  opacity: 0.07;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  font-variation-settings: "opsz" 96, "wdth" 100;
+}
+.chain-block:hover .cb-bignum { opacity: 0.22; font-size: 280px; }
+.cb-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+.cb-num {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.cb-num .red { color: var(--red); font-weight: 800; }
+.chain-block:hover .cb-num,
+.chain-block:hover .cb-num .red { color: var(--paper); }
+.cb-content { margin-top: auto; }
+.cb-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(36px, 3.5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: 0.05em;
+  color: var(--paper);
+  margin-bottom: 8px;
+}
+.cb-zh .red { color: var(--red); }
+.chain-block:hover .cb-zh,
+.chain-block:hover .cb-zh .red { color: var(--paper); }
+.cb-en {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 600;
+  font-style: italic;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 24px;
+  font-variation-settings: "opsz" 144;
+}
+.chain-block:hover .cb-en { color: var(--paper); }
+.cb-cta {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+.cb-cta::after { content: ' ↗'; font-size: 14px; transition: transform 0.3s; }
+.chain-block:hover .cb-cta { opacity: 1; transform: translateY(0); color: var(--paper); }
+.chain-block:hover .cb-cta::after { transform: translate(4px, -4px); }
+
+/* ═══════════════════════════════════════ */
+/* IP PORTFOLIO — 紙白底                    */
+/* ═══════════════════════════════════════ */
+.ip-section {
+  min-height: 100vh;
+  padding: 140px 40px 120px;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+.ip-ghost {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: flex-start;
+  pointer-events: none; z-index: 1;
+}
+.ip-ghost-text {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 42vw;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--ghost-light);
+  white-space: nowrap;
+  transform: translateX(-15%);
+  font-variation-settings: "opsz" 96, "wdth" 100;
+}
+.ip-head {
+  position: relative; z-index: 5;
+  max-width: 1700px;
+  margin-bottom: 64px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 80px;
+}
+.ip-head-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 32px;
+}
+.ip-head-meta::before { content: '03 — '; color: var(--ink-mid); }
+.ip-head-title {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(48px, 5.5vw, 80px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.ip-head-title .red { color: var(--red); }
+.ip-head-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px, 1.6vw, 22px);
+  color: var(--ink-mid);
+  text-align: right;
+  max-width: 320px;
+  line-height: 1.55;
+  font-variation-settings: "opsz" 96;
+}
+
+.ip-grid {
+  position: relative; z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.ip-card {
+  border: 1px solid var(--line-paper);
+  padding: 28px 24px;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: none;
+}
+.ip-card:hover {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translateY(-4px);
+  border-color: var(--ink);
+}
+.ip-card.featured {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.ip-card-num {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--ink-mid);
+  margin-bottom: 24px;
+  font-variation-settings: "opsz" 14;
+}
+.ip-card.featured .ip-card-num,
+.ip-card:hover .ip-card-num { color: rgba(255,255,255,0.5); }
+.ip-card-num .red { color: var(--red); font-weight: 800; }
+
+.ip-card-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.ip-card-zh .red { color: var(--red); }
+.ip-card-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  margin-bottom: 18px;
+  font-variation-settings: "opsz" 14;
+}
+.ip-card.featured .ip-card-en,
+.ip-card:hover .ip-card-en { color: var(--cyan); }
+.ip-card-region {
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink-mid);
+  margin-bottom: 18px;
+  flex: 1;
+}
+.ip-card.featured .ip-card-region,
+.ip-card:hover .ip-card-region { color: rgba(255,255,255,0.65); }
+.ip-card-tier {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  padding-top: 14px;
+  border-top: 1px solid var(--line-paper);
+  font-variation-settings: "opsz" 12;
+}
+.ip-card.featured .ip-card-tier,
+.ip-card:hover .ip-card-tier {
+  color: var(--cyan);
+  border-top-color: rgba(255,255,255,0.15);
+}
+
+.ip-past {
+  position: relative; z-index: 5;
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid var(--line-paper);
+}
+.ip-past-label {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  margin-bottom: 20px;
+}
+.ip-past-label::before { content: '— '; color: var(--red); }
+.ip-past-list {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  font-variation-settings: "opsz" 96;
+}
+.ip-past-list .sep { color: var(--red); margin: 0 12px; }
+
+/* ═══════════════════════════════════════ */
+/* CASES — 黑底案例                          */
+/* ═══════════════════════════════════════ */
+.cases-section {
+  min-height: 100vh;
+  padding: 140px 40px 120px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.cases-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(255,45,143,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(0,229,255,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cases-ghost {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: flex-end;
+  pointer-events: none; z-index: 1;
+}
+.cases-ghost-text {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 42vw;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: rgba(255,255,255,0.03);
+  white-space: nowrap;
+  transform: translateX(12%);
+  font-variation-settings: "opsz" 96, "wdth" 100;
+}
+.cases-head {
+  position: relative; z-index: 5;
+  max-width: 1700px;
+  margin-bottom: 64px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 80px;
+}
+.cases-head-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 32px;
+  text-shadow: 0 0 12px var(--cyan-glow);
+}
+.cases-head-meta::before { content: '04 — '; color: rgba(255,255,255,0.45); }
+.cases-head-title {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(48px, 5.5vw, 80px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+}
+.cases-head-title .red { color: var(--red); }
+
+.cases-grid {
+  position: relative; z-index: 5;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  height: 720px;
+}
+.case-tile {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-soft);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: none;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.case-tile.featured {
+  grid-row: span 2;
+}
+.case-tile-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(0.3) brightness(0.5);
+  transition: all 0.5s;
+}
+.case-tile:hover .case-tile-img {
+  filter: grayscale(0) brightness(0.65);
+  transform: scale(1.04);
+}
+.case-tile-body {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 28px;
+  background: linear-gradient(180deg, transparent 0%, rgba(10,10,12,0.92) 100%);
+}
+.case-tile-tag {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px var(--cyan-glow);
+}
+.case-tile.featured .case-tile-tag { color: var(--red); text-shadow: 0 0 8px var(--red-glow); }
+.case-tile-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  margin-bottom: 4px;
+}
+.case-tile.featured .case-tile-zh {
+  font-size: 42px;
+}
+.case-tile-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.65);
+  font-variation-settings: "opsz" 14;
+}
+.case-tile.featured .case-tile-en {
+  font-size: 16px;
+}
+.case-tile-stat {
+  position: absolute;
+  top: 28px; right: 28px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-variation-settings: "opsz" 48;
+}
+.case-tile.featured .case-tile-stat { font-size: 48px; }
+
+/* ═══════════════════════════════════════ */
+/* GLOBAL PRESENCE — 紙白底                  */
+/* ═══════════════════════════════════════ */
+.global-section {
+  min-height: 100vh;
+  padding: 140px 40px 120px;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+}
+.global-ghost {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 1;
+}
+.global-ghost-text {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 38vw;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--ghost-light);
+  white-space: nowrap;
+  font-variation-settings: "opsz" 96;
+}
+.global-head {
+  position: relative; z-index: 5;
+  max-width: 1700px;
+  margin-bottom: 64px;
+}
+.global-head-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 32px;
+}
+.global-head-meta::before { content: '05 — '; color: var(--ink-mid); }
+.global-head-title {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(48px, 5.5vw, 80px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 16px;
+  max-width: 1300px;
+}
+.global-head-title .red { color: var(--red); }
+.global-head-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px, 1.8vw, 24px);
+  color: var(--ink-mid);
+  letter-spacing: -0.01em;
+  font-variation-settings: "opsz" 96;
+}
+
+.global-grid {
+  position: relative; z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ink);
+}
+.global-city {
+  padding: 36px 24px 32px 0;
+  border-right: 1px solid var(--line-paper);
+  position: relative;
+  transition: background 0.3s;
+}
+.global-city:last-child { border-right: none; }
+.global-city:hover { background: rgba(0,229,255,0.04); }
+.global-city-num {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  color: var(--red);
+  margin-bottom: 32px;
+  font-variation-settings: "opsz" 14;
+}
+.global-city-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.global-city-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  margin-bottom: 24px;
+  font-variation-settings: "opsz" 14;
+}
+.global-city-role {
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--red);
+  margin-bottom: 12px;
+}
+.global-city-body {
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink-mid);
+}
+
+/* ═══════════════════════════════════════ */
+/* CONTACT — 黑底 form                       */
+/* ═══════════════════════════════════════ */
+.contact-section {
+  min-height: 100vh;
+  padding: 140px 40px 120px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.contact-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 75%, rgba(255,45,143,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 75% 25%, rgba(0,229,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.contact-ghost {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: flex-start;
+  pointer-events: none; z-index: 1;
+}
+.contact-ghost-text {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 40vw;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: rgba(255,255,255,0.03);
+  white-space: nowrap;
+  transform: translateX(-18%);
+  font-variation-settings: "opsz" 96;
+}
+.contact-grid {
+  position: relative; z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  max-width: 1700px;
+}
+.contact-left-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 32px;
+  text-shadow: 0 0 12px var(--cyan-glow);
+}
+.contact-left-meta::before { content: '06 — '; color: rgba(255,255,255,0.45); }
+.contact-left-title {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(56px, 6vw, 96px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  margin-bottom: 28px;
+}
+.contact-left-title .red { color: var(--red); }
+.contact-left-en {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: clamp(20px, 1.8vw, 26px);
+  color: rgba(255,255,255,0.65);
+  letter-spacing: -0.01em;
+  margin-bottom: 40px;
+  font-variation-settings: "opsz" 96;
+}
+.contact-channels {
+  border-top: 1px solid rgba(255,255,255,0.12);
+  padding-top: 28px;
+  display: grid;
+  gap: 18px;
+}
+.contact-channel {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 24px;
+  align-items: baseline;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.contact-channel-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.contact-channel-value {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+  font-variation-settings: "opsz" 24;
+}
+.contact-channel-value a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s;
+}
+.contact-channel-value a:hover {
+  color: var(--cyan);
+  border-bottom-color: var(--cyan);
+}
+
+.contact-form {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 48px 40px;
+  display: grid;
+  gap: 24px;
+}
+.contact-form-title {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  margin-bottom: 8px;
+  font-variation-settings: "opsz" 32;
+}
+.contact-form-sub {
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 16px;
+}
+.form-field { display: grid; gap: 6px; }
+.form-field label {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.form-field input,
+.form-field textarea,
+.form-field select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding: 12px 0;
+  color: var(--paper);
+  font-family: "Inter", "Noto Sans TC", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: none;
+  transition: border-color 0.3s;
+}
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-bottom-color: var(--cyan);
+}
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+.form-field select option { background: var(--bg); color: var(--paper); }
+.form-field textarea { resize: none; min-height: 80px; }
+.contact-submit {
+  margin-top: 8px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--paper) 50%, var(--red) 100%);
+  color: var(--ink);
+  border: none;
+  padding: 18px 32px;
+  border-radius: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: none;
+  transition: all 0.3s;
+}
+.contact-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--cyan-glow); }
+
+/* ═══════════════════════════════════════ */
+/* FOOTER                                   */
+/* ═══════════════════════════════════════ */
+.footer {
+  background: var(--bg);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 60px 40px 28px;
+  position: relative;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 60px;
+  max-width: 1700px;
+  margin-bottom: 48px;
+}
+.footer-brand-mark {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 900;
+  font-size: 48px;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  margin-bottom: 16px;
+}
+.footer-brand-mark .red { color: var(--red); }
+.footer-brand-tag {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: -0.005em;
+  font-variation-settings: "opsz" 14;
+}
+.footer-col-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 18px;
+}
+.footer-col ul {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+.footer-col ul a {
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.footer-col ul a:hover { color: var(--cyan); }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+}
+.footer-bottom .red { color: var(--red); }
+
+/* ═══════════════════════════════════════ */
+/* CLOSING                                  */
+/* ═══════════════════════════════════════ */
+.closing {
+  min-height: 100vh;
+  padding: 120px 40px;
+  background: var(--paper);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.closing-ghost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.closing-ghost-text {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 900;
+  font-size: 42vw;
+  line-height: 0.85;
+  letter-spacing: 0.04em;
+  color: var(--ghost-light);
+  white-space: nowrap;
+}
+.closing-content {
+  position: relative; z-index: 5;
+  max-width: 1700px;
+}
+.closing-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 56px;
+}
+.closing-quote {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: clamp(56px, 7vw, 104px);
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 40px;
+}
+.closing-quote .red { color: var(--red); }
+.closing-quote .cyan-bg { background: var(--cyan); padding: 0 14px; }
+.closing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 20px 40px;
+  border-radius: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  margin-top: 24px;
+}
+.closing-cta:hover {
+  background: var(--cyan);
+  color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px var(--cyan-glow);
+}
+.closing-cta::after { content: '↗'; font-size: 19px; }
+
+/* ═══════════════════════════════════════ */
+/* MODAL                                    */
+/* ═══════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,10,12,0.97);
+  z-index: 200;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal-overlay.open { display: block; opacity: 1; }
+.modal-content {
+  position: fixed;
+  inset: 56px;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: none;
+  grid-template-columns: 1fr 1.4fr;
+  z-index: 201;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.modal-overlay.open .modal-content { display: grid; opacity: 1; transform: translateY(0); }
+.modal-left {
+  padding: 80px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+.modal-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.modal-num {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 320px;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--paper);
+  opacity: 0.06;
+  position: absolute;
+  bottom: 60px; right: 56px;
+  z-index: 1;
+  font-variation-settings: "opsz" 144;
+}
+.modal-zh {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-weight: 700;
+  font-size: 88px;
+  line-height: 1.05;
+  letter-spacing: 0.05em;
+  color: var(--paper);
+  margin-bottom: 14px;
+  position: relative; z-index: 2;
+}
+.modal-zh .red { color: var(--red); }
+.modal-en {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 40px;
+  position: relative; z-index: 2;
+  font-variation-settings: "opsz" 144;
+}
+.modal-body {
+  font-family: "Shippori Mincho", "Noto Serif TC", serif;
+  font-size: 15px;
+  line-height: 1.95;
+  color: rgba(255,255,255,0.85);
+  max-width: 480px;
+  position: relative; z-index: 2;
+}
+.modal-stats {
+  margin-top: 40px;
+  display: flex;
+  gap: 56px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  position: relative; z-index: 2;
+}
+.modal-stat-num {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, var(--red), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-variation-settings: "opsz" 96;
+}
+.modal-stat-label {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-top: 8px;
+}
+.modal-right {
+  padding: 80px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  overflow-y: auto;
+}
+.modal-right-label {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 14px;
+}
+.modal-photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.modal-photo {
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.modal-close {
+  position: fixed;
+  top: 24px; right: 80px;
+  background: rgba(10,10,12,0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 100px;
+  padding: 10px 24px;
+  color: var(--paper);
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: none;
+  z-index: 202;
+  transition: all 0.3s;
+}
+.modal-close:hover { background: var(--cyan); color: var(--ink); }
+
+.note {
+  position: fixed; bottom: 16px; left: 60px;
+  background: linear-gradient(135deg, var(--red), var(--purple));
+  color: var(--paper);
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  z-index: 1000;
+  font-family: "Inter", sans-serif;
+  border-radius: 100px;
+  box-shadow: 0 0 16px var(--red-glow);
+}
+
+/* ═══════════════════════════════════════════════ */
+/* V43+ · Mobile responsive 全面適配（768px 以下手機）*/
+/* ═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Hero 角色縮小 + 重新排佈避免擠 */
+  .anthem-char--lumi   { top: 6%;  left: 5%;   width: 130px; height: 130px; }
+  .anthem-char--mochi  { top: 5%;  left: 50%;  width: 140px; height: 140px; transform: translateX(-50%) rotate(5deg); }
+  .anthem-char--gizmo  { top: 32%; left: 3%;   width: 120px; height: 120px; }
+  .anthem-char--peachy { top: 32%; right: 3%;  width: 130px; height: 130px; }
+  .anthem-char--haru   { bottom: 12%; left: 8%;  width: 125px; height: 125px; }
+  .anthem-char--owly   { bottom: 8%; right: 5%;  width: 140px; height: 140px; }
+  /* Hero 中央文字縮小 */
+  .anthem-logo-en   { font-size: clamp(40px, 11vw, 56px); }
+  .anthem-logo-zh   { font-size: 22px; }
+  .anthem-logo-tag  { font-size: 9px; letter-spacing: 0.32em; }
+  .anthem-meta      { font-size: 8px; bottom: 18px; padding: 0 10px; }
+
+  /* Capabilities reel 收窄 */
+  .caps-intro      { padding: 0 28px; margin-bottom: 36px; }
+  .caps-headline   { font-size: 30px; }
+  .cap-row         { margin: 0 28px; max-width: 100%; }
+  .cap-row--cool   { margin: 0 28px; text-align: left; }
+  .cap-row-en      { font-size: clamp(44px, 13vw, 64px); }
+  .cap-row-zh      { font-size: 15px; }
+  .cap-pattern-row { font-size: clamp(48px, 14vw, 80px); }
+  .caps-pattern    { transform: rotate(-3deg); }
+
+  /* Reveal-section 標題 */
+  .reveal-en       { font-size: clamp(48px, 14vw, 72px); }
+  .reveal-zh       { font-size: 18px; }
+  .reveal-tag      { font-size: 10px; letter-spacing: 0.25em; }
+  .reveal-num      { font-size: 10px; }
+  .reveal-cta      { padding: 13px 28px; font-size: 11px; letter-spacing: 0.15em; }
+
+  /* Modal 內部收窄 */
+  .section-modal-inner { padding: 70px 28px 60px; }
+  .section-modal-zh    { font-size: 28px; }
+  .section-modal-en    { font-size: 14px; }
+  .modal-ip-grid       { grid-template-columns: 1fr; }
+  .modal-cases         { grid-template-columns: 1fr; }
+  .modal-cities        { grid-template-columns: 1fr 1fr; }
+  .modal-contact       { grid-template-columns: 1fr; gap: 40px; }
+  .section-modal-close { top: 16px; right: 16px; width: 40px; height: 40px; }
+
+  /* Cursor follower 手機隱藏 */
+  .cursor-dot, .cursor-ring { display: none !important; }
+  html, body { cursor: auto !important; }
+
+  /* Footer 收窄 */
+  .footer-grid       { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-brand-mark { font-size: 36px; }
+  .footer-bottom     { flex-direction: column; gap: 14px; text-align: center; }
+}
+
+/* 平板（768-1024）介於中間，最少必要修正 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cap-row, .cap-row--cool { margin-left: 48px; margin-right: 48px; }
+  .modal-ip-grid           { grid-template-columns: repeat(2, 1fr); }
+  .modal-cases             { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="note">V43 · Hero 線稿→上色 crossfade 從 1.4s 加速到 0.7s</div>
+
+<!-- Cursor 跟隨 -->
+<div class="cursor-dot" id="cursor-dot"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- Nav pill（保留，極簡） -->
+<button class="nav-pill" data-cyan onclick="document.querySelector('#intro').scrollIntoView({behavior:'smooth'})">
+  <span class="dot"></span> Menu
+</button>
+
+<!-- ═══ HERO — V27 · 6 角色 anthem（15 秒 loop） ═══ -->
+<section class="hero hero-anthem" id="hero">
+
+  <!-- Scene 0 · SPARK 光點 -->
+  <div class="anthem-spark"></div>
+
+  <!-- Scene 1+2 · CREATE sketches → DEVELOP crossfade to color -->
+  <div class="anthem-char anthem-char--lumi">
+    <div class="anthem-skin anthem-skin--sketch" style="background-image:url('assets/six_chars/char_01_lumi_alpha.webp')"></div>
+    <div class="anthem-skin anthem-skin--color"  style="background-image:url('assets/six_chars/char_01_lumi_color_alpha.webp')"></div>
+  </div>
+  <div class="anthem-char anthem-char--mochi">
+    <div class="anthem-skin anthem-skin--sketch" style="background-image:url('assets/six_chars/char_02_mochi_alpha.webp')"></div>
+    <div class="anthem-skin anthem-skin--color"  style="background-image:url('assets/six_chars/char_02_mochi_color_alpha.webp')"></div>
+  </div>
+  <div class="anthem-char anthem-char--gizmo">
+    <div class="anthem-skin anthem-skin--sketch" style="background-image:url('assets/six_chars/char_03_gizmo_alpha.webp')"></div>
+    <div class="anthem-skin anthem-skin--color"  style="background-image:url('assets/six_chars/char_03_gizmo_color_alpha.webp')"></div>
+  </div>
+  <div class="anthem-char anthem-char--peachy">
+    <div class="anthem-skin anthem-skin--sketch" style="background-image:url('assets/six_chars/char_04_peachy_alpha.webp')"></div>
+    <div class="anthem-skin anthem-skin--color"  style="background-image:url('assets/six_chars/char_04_peachy_color_alpha.webp')"></div>
+  </div>
+  <div class="anthem-char anthem-char--haru">
+    <div class="anthem-skin anthem-skin--sketch" style="background-image:url('assets/six_chars/char_05_haru_alpha.webp')"></div>
+    <div class="anthem-skin anthem-skin--color"  style="background-image:url('assets/six_chars/char_05_haru_color_alpha.webp')"></div>
+  </div>
+  <div class="anthem-char anthem-char--owly">
+    <div class="anthem-skin anthem-skin--sketch" style="background-image:url('assets/six_chars/char_06_owly_alpha.webp')"></div>
+    <div class="anthem-skin anthem-skin--color"  style="background-image:url('assets/six_chars/char_06_owly_color_alpha.webp')"></div>
+  </div>
+
+  <!-- Scene 6 · PROVE 中央 logo -->
+  <div class="anthem-logo">
+    <div class="anthem-logo-zh">蕪解</div>
+    <h1 class="anthem-logo-en">WUJIE GROUP</h1>
+    <div class="anthem-logo-tag">ONE TEAM · SIX LINKS · WORLDWIDE</div>
+  </div>
+
+  <!-- 底部 metadata 條 -->
+  <div class="anthem-meta">
+    <span class="anthem-meta-l">A NEW KIND OF IP STUDIO · EST. 2011</span>
+    <span class="anthem-meta-r">↓ SCROLL TO EXPLORE</span>
+  </div>
+
+</section>
+
+<!-- ═══ CAPABILITIES REEL · 6 句能力宣言（取代 PRODUCTS pill 場景）═══ -->
+<section class="capabilities-reel" id="capabilities">
+
+  <!-- V39 · 6 句宣言 wallpaper pattern（重複鋪滿背景）-->
+  <div class="caps-pattern" aria-hidden="true">
+    <div class="cap-pattern-row">We Partner · We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop</div>
+    <div class="cap-pattern-row">We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop · We Stage</div>
+    <div class="cap-pattern-row">We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop · We Stage · We Deliver</div>
+    <div class="cap-pattern-row">We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner</div>
+    <div class="cap-pattern-row">We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify</div>
+    <div class="cap-pattern-row">We Deliver · We Partner · We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create</div>
+    <div class="cap-pattern-row">We Partner · We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop</div>
+    <div class="cap-pattern-row">We Amplify · We Create · We Develop · We Stage · We Deliver · We Partner · We Amplify · We Create · We Develop · We Stage</div>
+  </div>
+
+  <!-- V37 · 不對稱 zigzag 排版（無分隔線） -->
+  <div class="caps-intro">
+    <div class="caps-meta">OUR CAPABILITIES · 我們的能力</div>
+    <h2 class="caps-headline">六件事，<span class="hi">我們都做得到</span></h2>
+  </div>
+
+  <div class="cap-row">
+    <div class="cap-row-num">01 / 06</div>
+    <div class="cap-row-body">
+      <h3 class="cap-row-en">We Partner.</h3>
+      <div class="cap-row-zh">日本 · 歐美 · 韓國 IP 版權方的<span class="hi">全鏈條夥伴</span></div>
+    </div>
+  </div>
+
+  <div class="cap-row cap-row--cool">
+    <div class="cap-row-num">02 / 06</div>
+    <div class="cap-row-body">
+      <h3 class="cap-row-en">We Amplify.</h3>
+      <div class="cap-row-zh">我們讓他們的 IP 在亞洲市場<span class="hi">放大價值</span></div>
+    </div>
+  </div>
+
+  <div class="cap-row">
+    <div class="cap-row-num">03 / 06</div>
+    <div class="cap-row-body">
+      <h3 class="cap-row-en">We Create.</h3>
+      <div class="cap-row-zh">從零原創角色 · 也建整個<span class="hi">IP 世界觀</span></div>
+    </div>
+  </div>
+
+  <div class="cap-row cap-row--cool">
+    <div class="cap-row-num">04 / 06</div>
+    <div class="cap-row-body">
+      <h3 class="cap-row-en">We Develop.</h3>
+      <div class="cap-row-zh">一個角色延伸成<span class="hi">300+ 商品</span></div>
+    </div>
+  </div>
+
+  <div class="cap-row">
+    <div class="cap-row-num">05 / 06</div>
+    <div class="cap-row-body">
+      <h3 class="cap-row-en">We Stage.</h3>
+      <div class="cap-row-zh">辦<span class="hi">城市級快閃</span> · 把單檔做成事件</div>
+    </div>
+  </div>
+
+  <div class="cap-row cap-row--cool">
+    <div class="cap-row-num">06 / 06</div>
+    <div class="cap-row-body">
+      <h3 class="cap-row-en">We Deliver.</h3>
+      <div class="cap-row-zh">推到<span class="hi">12+ 市場</span> · 一家就夠 · 全鏈打通</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══ 01 · INTRO ═══ -->
+<section class="reveal-section" id="intro" data-modal="intro">
+  <div class="reveal-head">
+    <div class="reveal-num">01 / 06 — WHAT WE DO</div>
+    <div class="reveal-zh">經營整條 IP 產業鏈</div>
+    <h2 class="reveal-en">Full Chain</h2>
+    <div class="reveal-tag">From licensing to last mile · One team, six links</div>
+    <button class="reveal-cta" type="button" data-cta-modal="intro">Read the Story · 了解全鏈</button>
+  </div>
+  <div class="reveal-preview">
+    <h3 class="preview-quote">
+      別人賣商品。<br>
+      我們經營<span class="red">整條 IP 產業鏈</span>。
+    </h3>
+  </div>
+</section>
+
+<!-- ═══ 02 · CAPABILITIES ═══ -->
+<section class="reveal-section alt" id="chain" data-modal="chain">
+  <div class="reveal-head">
+    <div class="reveal-num">02 / 06 — CAPABILITIES</div>
+    <div class="reveal-zh">六大環節，全鏈條打通</div>
+    <h2 class="reveal-en">Six Links</h2>
+    <div class="reveal-tag">Licensing · Product · Distribution · Pop-up · City Tour · Digital</div>
+    <button class="reveal-cta" type="button" data-cta-modal="chain">See the Six Links · 看 6 個環節</button>
+  </div>
+  <div class="reveal-preview">
+    <div class="preview-pills">
+      <span class="preview-pill"><span class="zh">IP 授權</span><span class="en">Licensing</span></span>
+      <span class="preview-pill"><span class="zh">商品開發</span><span class="en">Product Dev</span></span>
+      <span class="preview-pill"><span class="zh">全渠道分銷</span><span class="en">Distribution</span></span>
+      <span class="preview-pill"><span class="zh">沉浸體驗</span><span class="en">Pop-up Retail</span></span>
+      <span class="preview-pill"><span class="zh">城市策展</span><span class="en">City Tour</span></span>
+      <span class="preview-pill"><span class="zh">線上電商</span><span class="en">Digital Commerce</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 03 · IP PORTFOLIO ═══ -->
+<section class="reveal-section" data-modal="ip">
+  <div class="reveal-head">
+    <div class="reveal-num">03 / 06 — IP PORTFOLIO</div>
+    <div class="reveal-zh">7 個現行授權，跳過中間代理</div>
+    <h2 class="reveal-en">7 Active IPs</h2>
+    <div class="reveal-tag">Direct deals · Japan · Korea · US · zero middlemen</div>
+    <button class="reveal-cta" type="button" data-cta-modal="ip">See All IPs · 看完整 IP 名單</button>
+  </div>
+  <div class="reveal-preview">
+    <div class="preview-pills">
+      <span class="preview-pill"><span class="zh">史努比</span><span class="en">Snoopy / Peanuts</span></span>
+      <span class="preview-pill"><span class="zh">貓福珊迪</span><span class="en">Mofusand</span></span>
+      <span class="preview-pill"><span class="zh">吉伊卡哇</span><span class="en">Chiikawa</span></span>
+      <span class="preview-pill"><span class="zh">屁桃君</span><span class="en">Opanchu Usagi</span></span>
+      <span class="preview-pill"><span class="zh">飯糰與梅子</span><span class="en">Onigiri &amp; Ume</span></span>
+      <span class="preview-pill"><span class="zh">Maniani</span><span class="en">Maniani</span></span>
+      <span class="preview-pill"><span class="zh">Muzik Tiger</span><span class="en">Muzik Tiger</span></span>
+      <span class="preview-pill"><span class="zh">+ 2 NDA</span><span class="en">Coming 2026 Q3</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 04 · SELECTED WORK ═══ -->
+<section class="reveal-section alt" data-modal="cases">
+  <div class="reveal-head">
+    <div class="reveal-num">04 / 06 — SELECTED WORK</div>
+    <div class="reveal-zh">30+ 場快閃店，城市級事件</div>
+    <h2 class="reveal-en">Cases</h2>
+    <div class="reveal-tag">Haikyuu · JJK · TSUM · Attack on Titan · Pixar · and more</div>
+    <button class="reveal-cta" type="button" data-cta-modal="cases">View Case Studies · 看代表案例</button>
+  </div>
+  <div class="reveal-preview">
+    <div class="preview-stats">
+      <div>
+        <div class="preview-stat-num">¥346<small style="font-size:0.45em;">萬</small></div>
+        <div class="preview-stat-label">Haikyuu Beijing</div>
+      </div>
+      <div>
+        <div class="preview-stat-num">$499<small style="font-size:0.45em;">K</small></div>
+        <div class="preview-stat-label">JJK Twin City</div>
+      </div>
+      <div>
+        <div class="preview-stat-num">10<small style="font-size:0.45em;">城</small></div>
+        <div class="preview-stat-label">TSUM National</div>
+      </div>
+      <div>
+        <div class="preview-stat-num">10<small style="font-size:0.45em;">週年</small></div>
+        <div class="preview-stat-label">AOT Anniversary</div>
+      </div>
+      <div>
+        <div class="preview-stat-num">5<small style="font-size:0.45em;">城</small></div>
+        <div class="preview-stat-label">Pixar Fest</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 · GLOBAL PRESENCE ═══ -->
+<section class="reveal-section" data-modal="global">
+  <div class="reveal-head">
+    <div class="reveal-num">05 / 06 — GLOBAL PRESENCE</div>
+    <div class="reveal-zh">五地共生，創意在台北</div>
+    <h2 class="reveal-en">Five Cities</h2>
+    <div class="reveal-tag">Taipei thinks · Beijing sources · Bangkok activates · Hong Kong settles · Shenzhen signs</div>
+    <button class="reveal-cta" type="button" data-cta-modal="global">Explore the Map · 看 5 城分工</button>
+  </div>
+  <div class="reveal-preview">
+    <div class="preview-pills">
+      <span class="preview-pill"><span class="zh">台北</span><span class="en">Taipei · Creative HQ</span></span>
+      <span class="preview-pill"><span class="zh">北京</span><span class="en">Beijing · Sourcing</span></span>
+      <span class="preview-pill"><span class="zh">曼谷</span><span class="en">Bangkok · SEA Ops</span></span>
+      <span class="preview-pill"><span class="zh">香港</span><span class="en">HK · Group HQ</span></span>
+      <span class="preview-pill"><span class="zh">深圳</span><span class="en">Shenzhen · CN Entity</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 06 · CONTACT ═══ -->
+<section class="reveal-section alt" id="contact" data-modal="contact">
+  <div class="reveal-head">
+    <div class="reveal-num">06 / 06 — GET IN TOUCH</div>
+    <div class="reveal-zh">合作從一句話開始</div>
+    <h2 class="reveal-en">Let's Talk</h2>
+    <div class="reveal-tag">One IP · One brief · One reply in 48 hours</div>
+    <button class="reveal-cta" type="button" data-cta-modal="contact">Get in Touch · 寫信給我們</button>
+  </div>
+  <div class="reveal-preview">
+    <div class="preview-pills">
+      <span class="preview-pill"><span class="zh">Email</span><span class="en">bd@wj-g.com</span></span>
+      <span class="preview-pill"><span class="zh">WeChat</span><span class="en">wujie_bd_2026</span></span>
+      <span class="preview-pill"><span class="zh">LINE</span><span class="en">@wujie</span></span>
+      <span class="preview-pill"><span class="zh">Phone</span><span class="en">+886 2 2700 — XXXX</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-brand-mark">蕪<span class="red">解</span></div>
+      <div class="footer-brand-tag">WUJIE GROUP — 全鏈條 IP 商品 × 體驗策展。Taipei · Beijing · Bangkok · Hong Kong · Shenzhen.</div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-label">— Capabilities</div>
+      <ul>
+        <li><a href="#">IP 授權</a></li>
+        <li><a href="#">商品開發</a></li>
+        <li><a href="#">全渠道分銷</a></li>
+        <li><a href="#">快閃店</a></li>
+        <li><a href="#">城市策展</a></li>
+        <li><a href="#">線上電商</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-label">— Reach</div>
+      <ul>
+        <li><a href="mailto:bd@wj-g.com">bd@wj-g.com</a></li>
+        <li><a href="#contact">合作洽談</a></li>
+        <li><a href="#contact">採購供應</a></li>
+        <li><a href="#contact">求職 / Careers</a></li>
+        <li><a href="#contact">媒體 / Press</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-label">— Follow</div>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">小紅書 RED</a></li>
+        <li><a href="#">微博 Weibo</a></li>
+        <li><a href="#">抖音 Douyin</a></li>
+        <li><a href="#">LinkedIn</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 WUJIE GROUP · 蕪解創意股份有限公司 · All rights reserved.</div>
+    <div><span class="red">●</span> 一家就夠 — One stop, one team.</div>
+  </div>
+</footer>
+
+<!-- ═══ V19 SECTION MODAL（data-driven，6 個 section 共用）═══ -->
+<div class="section-modal" id="sectionModal">
+  <button class="section-modal-close" onclick="closeSectionModal()">✕</button>
+  <div class="section-modal-inner">
+    <div class="section-modal-head">
+      <div class="section-modal-num" id="sm-num"></div>
+      <h2 class="section-modal-zh" id="sm-zh"></h2>
+      <div class="section-modal-en" id="sm-en"></div>
+    </div>
+    <div class="section-modal-body" id="sm-body"></div>
+  </div>
+</div>
+
+<script>
+// Cursor 跟隨
+const cursorDot = document.getElementById('cursor-dot');
+const cursorRing = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursorDot.style.left = mx + 'px';
+  cursorDot.style.top = my + 'px';
+});
+function animateCursor() {
+  rx += (mx - rx) * 0.18;
+  ry += (my - ry) * 0.18;
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// hover 元素變色 / 變大
+document.querySelectorAll('a, button, .chain-block').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    document.body.classList.add('hover-big');
+    if (el.hasAttribute('data-cyan')) document.body.classList.add('hover-cyan');
+  });
+  el.addEventListener('mouseleave', () => {
+    document.body.classList.remove('hover-big');
+    document.body.classList.remove('hover-cyan');
+  });
+});
+
+// V27: hero anthem 純 CSS 動畫，不需要 JS。LUMI cursor 召喚已移除。
+
+// ═══ V19 SECTION MODAL — 6 個 section 共用 ═══
+const SECTION_DATA = {
+  intro: {
+    num: '01 / 06 — WHAT WE DO',
+    zh: '別人賣商品，<span class="red">我們經營整條 IP 產業鏈</span>。',
+    en: 'Others sell products. We operate the whole chain — from licensing all the way to last-mile retail.',
+    bodyHTML: `
+      <div class="modal-extra"><div class="modal-extra-label">— Our six links</div>
+        <div class="modal-extra-list">IP 授權<span class="sep">·</span>商品開發<span class="sep">·</span>全渠道分銷<span class="sep">·</span>沉浸體驗<span class="sep">·</span>城市策展<span class="sep">·</span>線上電商</div>
+      </div>
+      <div class="modal-extra"><div class="modal-extra-label">— Why one team, not six agencies</div>
+        <div class="modal-extra-list" style="font-size: 16px;">傳統做法：客戶找 6 家代理，每家對應一個環節，溝通成本高、責任分散、跨環節資訊斷層。<br><br>蕪解做法：一家統籌全鏈條，台北創意 × 北京採購 × 曼谷快閃 × 香港結算 × 深圳簽約——15 年磨出來的整合能力。</div>
+      </div>`
+  },
+  chain: {
+    num: '02 / 06 — SIX LINKS',
+    zh: '六大環節，<span class="red">全鏈條打通</span>。',
+    en: 'From IP rights to physical product, from retail to digital — six capabilities operated by one integrated team.',
+    bodyHTML: `
+      <div class="modal-ip-grid">
+        <div class="modal-ip-item"><div class="num">01 / 06</div><div class="name">IP 授權</div><div class="en">Licensing &amp; Rights</div><div class="desc">直接對接日本、韓國、歐美版權方，跳過中間代理。深圳子公司主體簽約，香港 JV 結算。</div><div class="tier">— Direct deals</div></div>
+        <div class="modal-ip-item"><div class="num">02 / 06</div><div class="name">商品開發</div><div class="en">Product Development</div><div class="desc">Style Guide 解讀 → 3D 建模 → 打樣 → 量產。台北創意 × 北京採購 × 廣東工廠群。300+ SKU 累積。</div><div class="tier">— 300+ SKUs · 5 factories</div></div>
+        <div class="modal-ip-item"><div class="num">03 / 06</div><div class="name">全渠道分銷</div><div class="en">Distribution</div><div class="desc">KA 連鎖、品牌商、流通批發、東南亞市場——四軌並進。跨境物流不轉包，工廠直發 KA 倉。</div><div class="tier">— 4 channels · 12+ markets</div></div>
+        <div class="modal-ip-item"><div class="num">04 / 06</div><div class="name">沉浸體驗</div><div class="en">Pop-up Retail</div><div class="desc">30+ 場快閃店、12+ 主題展。北京排球少年 ¥346 萬、JJK 中曼雙城、進擊 10 週年。</div><div class="tier">— 30+ pop-ups</div></div>
+        <div class="modal-ip-item"><div class="num">05 / 06</div><div class="name">城市策展</div><div class="en">City Tour</div><div class="desc">Disney TSUM 全國 10 城、Pixar 5 城、新北耶誕城連續 3 年——把單一檔期升級成「整城同時發生的事件」。</div><div class="tier">— 15+ cities</div></div>
+        <div class="modal-ip-item"><div class="num">06 / 06</div><div class="name">線上電商</div><div class="en">Digital Commerce</div><div class="desc">抖音、小紅書、淘寶、IP 商城——粉絲在哪我們就在哪。30 萬+ 真實粉絲社群跟線下打通。</div><div class="tier">— 4 platforms · 300K+ fans</div></div>
+      </div>`
+  },
+  ip: {
+    num: '03 / 06 — IP PORTFOLIO',
+    zh: '7 個現行授權，<span class="red">跳過中間代理</span>。',
+    en: 'Direct deals with Japanese, Korean &amp; Western rights holders. Zero middlemen, zero markup.',
+    bodyHTML: `
+      <div class="modal-ip-grid">
+        <div class="modal-ip-item"><div class="num">01 / 07 — Active</div><div class="name">史努比 · PEANUTS</div><div class="en">Snoopy</div><div class="desc">大中華區 · 商品開發 / 快閃 / 電商 全鏈條授權。深圳子公司主體簽約。</div><div class="tier">— Anchor Partner</div></div>
+        <div class="modal-ip-item"><div class="num">02 / 07</div><div class="name">貓福珊迪</div><div class="en">Mofusand</div><div class="desc">大中華區 · 商品 / 快閃 / 主題展。日本直簽，MG ¥304K。</div><div class="tier">— Tier 1 / JP</div></div>
+        <div class="modal-ip-item"><div class="num">03 / 07</div><div class="name">吉伊卡哇</div><div class="en">Chiikawa</div><div class="desc">大中華區批發 / 流通 · 46 折正常均值。盲袋、毛絨、文具全品類。</div><div class="tier">— Tier 1 / JP</div></div>
+        <div class="modal-ip-item"><div class="num">04 / 07</div><div class="name">屁桃君</div><div class="en">Opanchu Usagi</div><div class="desc">亞太區 · 商品 / 快閃。日本直簽，MG USD 65K。</div><div class="tier">— Tier 1 / JP</div></div>
+        <div class="modal-ip-item"><div class="num">05 / 07</div><div class="name">飯糰與梅子</div><div class="en">Onigiri &amp; Umeboshi</div><div class="desc">大中華區 · 商品授權。日本直簽，按實際生產量計算版稅。</div><div class="tier">— Tier 2 / JP</div></div>
+        <div class="modal-ip-item"><div class="num">06 / 07</div><div class="name">Maniani</div><div class="en">Maniani</div><div class="desc">亞太區 · 商品 / 周邊。韓系新興 IP，年輕族群滲透中。</div><div class="tier">— Tier 2 / KR</div></div>
+        <div class="modal-ip-item"><div class="num">07 / 07</div><div class="name">Muzik Tiger</div><div class="en">Muzik Tiger</div><div class="desc">大中華區 · 商品 / 快閃。韓系生活風格 IP。</div><div class="tier">— Tier 2 / KR</div></div>
+        <div class="modal-ip-item"><div class="num">+ / NDA</div><div class="name">2026 H2 洽談中</div><div class="en">In Negotiation</div><div class="desc">2 個全球 Tier-1 IP 洽談中，預計 Q3 公佈。</div><div class="tier">— Coming Soon</div></div>
+      </div>
+      <div class="modal-extra">
+        <div class="modal-extra-label">— Past Collaborations 過往代表合作</div>
+        <div class="modal-extra-list">排球少年<span class="sep">·</span>咒術迴戰<span class="sep">·</span>進擊巨人<span class="sep">·</span>Disney TSUM<span class="sep">·</span>Pixar<span class="sep">·</span>三麗鷗<span class="sep">·</span>卡娜赫拉<span class="sep">·</span>蛋黃哥<span class="sep">·</span>角落生物<span class="sep">·</span>蠟筆小新<span class="sep">·</span>哆啦 A 夢<span class="sep">·</span>+12 more</div>
+      </div>`
+  },
+  cases: {
+    num: '04 / 06 — SELECTED WORK',
+    zh: '30+ 場快閃店，<span class="red">城市級事件</span>。',
+    en: 'From single-location pop-ups to nationwide tours — turning IP moments into city-wide cultural events.',
+    bodyHTML: `
+      <div class="modal-cases">
+        <div class="modal-case-tile"><div class="modal-case-stat">¥346<small style="font-size:0.5em">萬</small></div><div><div class="modal-case-zh">排球少年!! 朝陽大悅城</div><div class="modal-case-en">Haikyuu!! @ Beijing Chaoyang Joy City</div><div class="modal-case-tag">— Beijing · 2024 · 40 天 · 首 3 日 ¥135 萬</div></div></div>
+        <div class="modal-case-tile"><div class="modal-case-stat">$499<small style="font-size:0.5em">K</small></div><div><div class="modal-case-zh">咒術迴戰 S2 中曼雙城</div><div class="modal-case-en">JJK Season 2 · Beijing + Bangkok</div><div class="modal-case-tag">— Twin city · 中國 USD$499K · 曼谷 USD$187K</div></div></div>
+        <div class="modal-case-tile"><div class="modal-case-stat">10<small style="font-size:0.5em">城</small></div><div><div class="modal-case-zh">Disney TSUM TSUM 裝可愛</div><div class="modal-case-en">Disney TSUM TSUM · 10-city Tour</div><div class="modal-case-tag">— 全國巡迴 · 小紅書話題破萬 · 瀏覽 1300 萬+</div></div></div>
+        <div class="modal-case-tile"><div class="modal-case-stat">10<small style="font-size:0.5em">週年</small></div><div><div class="modal-case-zh">進擊的巨人 十週年</div><div class="modal-case-en">Attack on Titan · 10th Anniversary</div><div class="modal-case-tag">— Anniversary special · 曼谷站</div></div></div>
+        <div class="modal-case-tile"><div class="modal-case-stat">5<small style="font-size:0.5em">城</small></div><div><div class="modal-case-zh">Pixar 動畫盛宴</div><div class="modal-case-en">Pixar Animation Fest</div><div class="modal-case-tag">— 5-city tour</div></div></div>
+        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/xmas_xinbei.webp')"><div class="modal-case-stat">3<small style="font-size:0.5em">年</small></div><div><div class="modal-case-zh">新北耶誕城</div><div class="modal-case-en">Christmasland in New Taipei City</div><div class="modal-case-tag">— 政府合作 · 連續 3 年</div></div></div>
+        <div class="modal-case-tile has-photo" style="background-image:url('assets/case_photos/mofusand_chubby.webp')"><div class="modal-case-stat">¥304<small style="font-size:0.5em">K MG</small></div><div><div class="modal-case-zh">貓福珊迪 胖胖系列</div><div class="modal-case-en">Mofusand Chubby Collection</div><div class="modal-case-tag">— 主題展 · 商品 · 2025.11 結案</div></div></div>
+      </div>
+      <div class="modal-extra">
+        <div class="modal-extra-label">— Plus 25+ more（截至 2026 Q2）</div>
+        <div class="modal-extra-list" style="font-size: 16px;">蠟筆小新電影院大進擊 / Kakao Friends / Mofusand 快閃 / 鬼滅之刃 / 鏈鋸人 / 藍色監獄 / Snoopy 全球巡迴企劃...</div>
+      </div>`
+  },
+  global: {
+    num: '05 / 06 — GLOBAL PRESENCE',
+    zh: '五地共生：<span class="red">創意在台北，執行在亞洲</span>。',
+    en: 'Taipei thinks. Beijing sources. Bangkok activates. Hong Kong settles. Shenzhen signs.',
+    bodyHTML: `
+      <div class="modal-cities">
+        <div class="modal-city"><div class="modal-city-num">01 / 05</div><div class="modal-city-zh">台北</div><div class="modal-city-en">Taipei</div><div class="modal-city-role">創意總部</div><div class="modal-city-body">設計開發 · IP 策展 · 品牌策略。蕪解的腦袋。</div></div>
+        <div class="modal-city"><div class="modal-city-num">02 / 05</div><div class="modal-city-zh">北京</div><div class="modal-city-en">Beijing</div><div class="modal-city-role">採購樞紐</div><div class="modal-city-body">工廠群對接 · 打樣 / 品控 · 內地批發。15 年沒斷過的供應鏈。</div></div>
+        <div class="modal-city"><div class="modal-city-num">03 / 05</div><div class="modal-city-zh">曼谷</div><div class="modal-city-en">Bangkok</div><div class="modal-city-role">東南亞營運</div><div class="modal-city-body">快閃店執行 · 區域分銷 · 跨境物流。UJ BKK 獨立法人。</div></div>
+        <div class="modal-city"><div class="modal-city-num">04 / 05</div><div class="modal-city-zh">香港</div><div class="modal-city-en">Hong Kong</div><div class="modal-city-role">集團母公司</div><div class="modal-city-body">JV 結構 · 跨境結算 · 國際 IP 簽約主體。</div></div>
+        <div class="modal-city"><div class="modal-city-num">05 / 05</div><div class="modal-city-zh">深圳</div><div class="modal-city-en">Shenzhen</div><div class="modal-city-role">內地子公司</div><div class="modal-city-body">內地版權方簽約主體 · 電商運營 · 跨境收款。</div></div>
+      </div>`
+  },
+  contact: {
+    num: '06 / 06 — GET IN TOUCH',
+    zh: '合作從<span class="red">一句話</span>開始。',
+    en: 'One IP. One brief. One reply within 48 hours.',
+    bodyHTML: `
+      <div class="modal-contact">
+        <div class="modal-contact-channels">
+          <div class="modal-contact-channel"><div class="modal-contact-label">Email</div><div class="modal-contact-value"><a href="mailto:bd@wj-g.com">bd@wj-g.com</a></div></div>
+          <div class="modal-contact-channel"><div class="modal-contact-label">Phone</div><div class="modal-contact-value">+886 2 2700 — XXXX</div></div>
+          <div class="modal-contact-channel"><div class="modal-contact-label">WeChat</div><div class="modal-contact-value">wujie_bd_2026</div></div>
+          <div class="modal-contact-channel"><div class="modal-contact-label">LINE</div><div class="modal-contact-value">@wujie</div></div>
+          <div class="modal-contact-channel"><div class="modal-contact-label">HQ</div><div class="modal-contact-value">台北 · 北京 · 曼谷 · 香港 · 深圳</div></div>
+        </div>
+        <form class="modal-form" onsubmit="event.preventDefault(); alert('感謝！我們會在 48 小時內回覆。');">
+          <div class="modal-form-field"><label>Name · 您的稱呼</label><input type="text" required></div>
+          <div class="modal-form-field"><label>Company · 公司</label><input type="text"></div>
+          <div class="modal-form-field"><label>Email</label><input type="email" required></div>
+          <div class="modal-form-field"><label>Looking for</label><select><option>IP 商品開發</option><option>快閃店</option><option>城市策展</option><option>全渠道分銷</option><option>線上電商</option><option>其他</option></select></div>
+          <div class="modal-form-field"><label>Brief · 簡單說一下</label><textarea placeholder="IP / 規模 / 時程"></textarea></div>
+          <button type="submit" class="modal-submit" data-cyan>Send · 寄出 ↗</button>
+        </form>
+      </div>`
+  }
+};
+
+const sectionModal = document.getElementById('sectionModal');
+function openSectionModal(key) {
+  const d = SECTION_DATA[key];
+  if (!d) return;
+  document.getElementById('sm-num').textContent = d.num;
+  document.getElementById('sm-zh').innerHTML = d.zh;
+  document.getElementById('sm-en').innerHTML = d.en;
+  document.getElementById('sm-body').innerHTML = d.bodyHTML;
+  sectionModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  sectionModal.scrollTop = 0;
+}
+function closeSectionModal() {
+  sectionModal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+// V25: CTA button → 開 modal（取代「點 section 任何地方」）
+document.querySelectorAll('.reveal-cta[data-cta-modal]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    openSectionModal(btn.dataset.ctaModal);
+  });
+});
+
+// V25: 找出「最接近視窗中心的段」加 .active class，只有它的 CTA 可點
+(() => {
+  const sections = Array.from(document.querySelectorAll('.reveal-section'));
+  if (!sections.length) return;
+  let ticking = false;
+  function update() {
+    const wh = window.innerHeight;
+    let best = null, bestDist = Infinity;
+    sections.forEach(s => {
+      const r = s.getBoundingClientRect();
+      const d = Math.abs(r.top + r.height / 2 - wh / 2);
+      if (d < bestDist) { bestDist = d; best = s; }
+    });
+    sections.forEach(s => s.classList.toggle('active', s === best));
+    ticking = false;
+  }
+  function onScroll() { if (!ticking) { requestAnimationFrame(update); ticking = true; } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+})();
+
+sectionModal.addEventListener('click', e => { if (e.target === sectionModal) closeSectionModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSectionModal(); });
+
+// ═══ V23 · Scroll 漸變交給 CSS animation-timeline: view() ═══
+// 不再需要 JS scroll listener — CSS 原生即時跟著滾動位置渲染。
+// 如果瀏覽器不支援（Safari < 26 / Chrome < 115），fallback 是「標題永遠 opacity 1」。
+(() => {
+  if (CSS.supports('animation-timeline: view()')) {
+    document.documentElement.dataset.scrollAnim = 'native';
+    return;  // 交給 CSS
+  }
+  // ── Fallback：舊瀏覽器用 JS 模擬 ──
+  document.documentElement.dataset.scrollAnim = 'fallback';
+  const sections = Array.from(document.querySelectorAll('.reveal-section'));
+  if (!sections.length) return;
+  const heads = sections.map(s => s.querySelector('.reveal-head'));
+  let ticking = false;
+  function update() {
+    const wh = window.innerHeight;
+    sections.forEach((s, i) => {
+      const r = s.getBoundingClientRect();
+      const centerOffset = (r.top + r.height / 2 - wh / 2) / wh;
+      const proximity = Math.max(0, Math.min(1, 1 - Math.abs(centerOffset) * 1.2));
+      const eased = proximity * proximity * (3 - 2 * proximity);
+      const head = heads[i];
+      if (head && !s.matches(':hover')) {
+        head.style.opacity = eased.toFixed(3);
+        head.style.transform = `translateY(${centerOffset * 80}px)`;
+      }
+    });
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+})();
+</script>
+
+</body>
+</html>
