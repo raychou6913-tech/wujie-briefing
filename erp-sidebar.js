@@ -141,8 +141,7 @@
     {href:'erp-yangzi.html',           icon:'🗂', name:'HR 費用中心',  roles:['yangzi','leo','ray','shawn'],     sbGroup:'財務'},
     {href:'erp-pipeline.html',         icon:'🎨', name:'產品流水線',   roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','gaowei','laodong','debao','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-procurement.html',      icon:'🏭', name:'採購台',       roles:['ray','shawn','anran','laige','muzi','gaowei'], sbGroup:'開發'},
-    {href:'erp-shetong.html',          icon:'🎨', name:'設計任務板',   roles:['shetong','bevis','peilin','ray'],sbGroup:'開發'},
-    {href:'erp-peiling.html',          icon:'🖋', name:'送審工作板',   roles:['peilin','bevis','shetong','ray'],sbGroup:'開發'},
+    // erp-shetong / erp-peiling 廳已拿掉（內容是個人 todo 偽裝成公共頁）
     {href:'erp-gaowei.html',           icon:'🚢', name:'物流中心',     roles:['gaowei','shawn','ray','anran'],  sbGroup:'開發'},
     {href:'erp-library.html',          icon:'🖼️', name:'圖庫',         roles:['ray','shawn','anran','bevis','peilin','shetong','laige','muzi','chunlei','jiaying'], sbGroup:'開發'},
     {href:'erp-ecommerce.html',        icon:'🛒', name:'電商中心',     roles:['chunlei','jiaying','ray','shawn'], sbGroup:'快閃店'},
