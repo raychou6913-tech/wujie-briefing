@@ -2082,7 +2082,7 @@ function loadSellThruWarRoom(){
   const reorder = data.filter(r=> r.stock==='需要補貨'||r.stock==='已缺貨');
   const slow = data.filter(r=> r.rate==='滯銷<20%'||r.rate==='偏慢20-40%');
 
-  const RATE_CLR = {'暢銷>80%':'#10b981','良好60-80%':'#6ee7b7','普通40-60%':'#facc15','偏慢20-40%':'#f97316','滯銷<20%':'#ef4444'};
+  const RATE_CLR = {'暢銷>80%':'var(--ok)','良好60-80%':'#6ee7b7','普通40-60%':'#facc15','偏慢20-40%':'#f97316','滯銷<20%':'#ef4444'};
   const mkRow = (r,clr)=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;">
     <span style="font-size:9px;font-weight:700;color:${clr};background:${clr}18;padding:1px 6px;border-radius:4px;min-width:62px;text-align:center">${r.rate||'—'}</span>
     <span style="font-size:12px;color:var(--txt-hi);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.product||'—'}</span>
@@ -2093,7 +2093,7 @@ function loadSellThruWarRoom(){
 
   html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">`;
   // Top movers
-  html += `<div><div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;margin-bottom:4px">TOP 動銷</div>${top3.map(r=>mkRow(r,RATE_CLR[r.rate]||'#10b981')).join('')}</div>`;
+  html += `<div><div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;margin-bottom:4px">TOP 動銷</div>${top3.map(r=>mkRow(r,RATE_CLR[r.rate]||'var(--ok)')).join('')}</div>`;
   // Bottom movers
   html += `<div><div style="font-size:9px;font-weight:700;color:var(--txt-lo);letter-spacing:.06em;margin-bottom:4px">待關注</div>${bottom3.map(r=>mkRow(r,RATE_CLR[r.rate]||'#ef4444')).join('')}</div>`;
   html += `</div>`;

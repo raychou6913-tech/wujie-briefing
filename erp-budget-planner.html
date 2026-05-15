@@ -1239,7 +1239,7 @@ function renderBody(){
         const tip=`批發收入¥${(cell.rev/10000).toFixed(1)}万\n版稅¥${(cell.roy/10000).toFixed(1)}万\n毛利¥${(cell.gross/10000).toFixed(1)}万`;
         return `<td class="${vcls(val)}${i===12?' y2s':''}" title="${tip}">${fv(val)}</td>`;
       }).join('');
-      const entityBadge = p.entity ? `<span style="font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:4px;background:${['香港JV','深圳子公司'].includes(p.entity)?'#22c55e20':'#94a3b820'};color:${['香港JV','深圳子公司'].includes(p.entity)?'var(--ok)':'var(--txt-mid)'}">${p.entity}</span>` : '';
+      const entityBadge = p.entity ? `<span style="font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:4px;background:${['香港JV','深圳子公司'].includes(p.entity)?'#22c55e20':'var(--ink-mid)20'};color:${['香港JV','深圳子公司'].includes(p.entity)?'var(--ok)':'var(--txt-mid)'}">${p.entity}</span>` : '';
       const coopBadge = p.coopMode ? `<span style="font-size:8px;padding:1px 4px;border-radius:3px;margin-left:2px;background:var(--warn-dim);color:var(--warn)">${p.coopMode}</span>` : '';
       html+=`<tr class="prod-row"><td class="sc" title="${p.name} ${p.entity||''}">${p.name}${entityBadge}${coopBadge}</td>${cells}</tr>`;
     });
@@ -1551,7 +1551,7 @@ function _findIpMaster(ipName){
   }
   return null;
 }
-const NEW_IP_COLOR_POOL = ['#ff6b35','#22c55e','#f43f5e','#10b981','#06b6d4','#eab308'];
+const NEW_IP_COLOR_POOL = ['#ff6b35','#22c55e','#f43f5e','var(--ok)','#06b6d4','#eab308'];
 function _autoIpColor(ipName){
   if(IP_COLOR_MAP[ipName]) return IP_COLOR_MAP[ipName];
   // Hash-based pick from pool

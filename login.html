@@ -113,8 +113,26 @@ body{
 .acc-role{font-size:10px;color:var(--ink-mid);margin-top:1px;}
 .foot{
   text-align:center;font-size:10px;color:var(--ink-lo);
-  margin-top:24px;letter-spacing:.04em;
+  margin-top:16px;letter-spacing:.04em;
 }
+.acc-details{margin-top:24px;}
+.acc-details > summary{
+  cursor:pointer;list-style:none;
+  text-align:center;
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:9px;color:var(--ink-faint);font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  padding:8px;
+  transition:color .22s var(--ease);
+}
+.acc-details > summary::-webkit-details-marker{display:none;}
+.acc-details > summary:hover{color:var(--ink-lo);}
+.acc-caret{
+  display:inline-block;margin-left:6px;
+  transition:transform .3s var(--ease);
+}
+.acc-details[open] > summary .acc-caret{transform:rotate(180deg);color:var(--brand);}
+.acc-details[open] > summary{color:var(--ink-lo);margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -131,9 +149,11 @@ body{
     <button class="btn-login" onclick="doLogin()">登入</button>
   </div>
 
-  <div class="hint-title">快速切換帳號（測試用）</div>
-  <div class="acc-grid" id="acc-grid"></div>
-  <div class="foot">所有帳號密碼：wujie2026</div>
+  <details class="acc-details">
+    <summary>測試切換帳號<span class="acc-caret">▾</span></summary>
+    <div class="acc-grid" id="acc-grid"></div>
+    <div class="foot">所有帳號密碼：wujie2026</div>
+  </details>
 </div>
 
 <script>
