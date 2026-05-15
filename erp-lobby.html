@@ -747,6 +747,74 @@ body{
   </div>
 </div>
 
+<!-- Shawn：批發核准 MODAL -->
+<div class="qa-modal-bg" id="wholesale-modal" onclick="if(event.target===this)closeWholesaleModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">✓ 批發訂單核准</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">業務員上報的訂單可行性確認 · 通過後 Ray 定價</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeWholesaleModal()">✕</button>
+    </div>
+    <div id="wholesale-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- Shawn：待催辦 MODAL -->
+<div class="qa-modal-bg" id="chase-modal" onclick="if(event.target===this)closeChaseModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">🔥 待催辦</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">系統自動偵測延遲任務 · 一鍵推送飛書催促</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeChaseModal()">✕</button>
+    </div>
+    <div id="chase-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- Ray：待批核 MODAL -->
+<div class="qa-modal-bg" id="ray-approval-modal" onclick="if(event.target===this)closeRayApprovalModal()">
+  <div class="qa-modal" style="max-width:580px;">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">✓ 待批核（Ray 親決）</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">主管級費用 / 合約 / 跨境 / 高優先級採購</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeRayApprovalModal()">✕</button>
+    </div>
+    <div id="ray-approval-list" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 業務員 / Shawn：拜訪記錄 MODAL（form）-->
+<div class="qa-modal-bg" id="visit-log-modal" onclick="if(event.target===this)closeVisitLogModal()">
+  <div class="qa-modal">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">📞 拜訪記錄</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">30 秒記錄拜訪 / 通話 · 不靠記憶</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeVisitLogModal()">✕</button>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>客戶 / 對象</label><input id="vl-client" placeholder="例：廣州名創優品買手"></div>
+      <div class="qa-field"><label>類型</label><select id="vl-type">
+        <option>面訪</option><option>電話</option><option>微信 / Line</option><option>視訊會議</option><option>展會接觸</option>
+      </select></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>日期</label><input id="vl-date" type="date"></div>
+      <div class="qa-field"><label>下次跟進</label><input id="vl-next-date" type="date"></div>
+    </div>
+    <div class="qa-field"><label>重點記錄</label><textarea id="vl-notes" rows="3" placeholder="客戶反饋 / 報價討論 / 下次行動..."></textarea></div>
+    <div class="qa-field"><label>下一步動作</label><input id="vl-next-action" placeholder="例：5/20 寄樣品；5/25 報價回覆"></div>
+    <button class="qa-submit" onclick="submitVisitLog()">送出 → 寫入 CRM</button>
+  </div>
+</div>
+
 <!-- 高維：物流批次 MODAL -->
 <div class="qa-modal-bg" id="logistics-modal" onclick="if(event.target===this)closeLogisticsModal()">
   <div class="qa-modal" style="max-width:580px;">
@@ -1298,16 +1366,16 @@ buildSidebar();
 // ── Todo Data ─────────────────────────────────────────
 const MY_TODOS = {
   ray:[
-    {id:'a1',icon:'✅',title:'採購台送審：Snoopy冬季公仔 × 2000pcs',sub:'賴哥送出 · 報價 $18.5/件 · 截止今日',urgency:'high',status:'待批核',options:['批准 ✓','退回修改','暫緩']},
-    {id:'a2',icon:'✅',title:'合約送審：泰國場地 MOU',sub:'Shawn · 曼谷 Gateway Mall',urgency:'high',status:'待批核',options:['批准 ✓','退回修改','需更多資訊']},
-    {id:'a3',icon:'💰',title:'財務確認：北京→台灣跨境結算',sub:'安然 · HKD 50萬貨款',urgency:'med',status:'待確認',options:['確認 ✓','擱置','退回']},
+    {id:'a1',icon:'✅',title:'採購台送審：Snoopy冬季公仔 × 2000pcs',sub:'賴哥送出 · 立即查看待批核 list',urgency:'high',status:'待批核',action:'ray-approval'},
+    {id:'a2',icon:'✅',title:'合約送審：泰國場地 MOU',sub:'Shawn · 曼谷 Gateway Mall · 立即批核',urgency:'high',status:'待批核',action:'ray-approval'},
+    {id:'a3',icon:'💰',title:'財務確認：北京→台灣跨境結算',sub:'安然 · HKD 50萬貨款 · 立即批核',urgency:'med',status:'待確認',action:'ray-approval'},
     {id:'a4',icon:'📋',title:'IP開發確認：貓福珊迪夏日系列進入打樣',sub:'Bevis · 設計第3輪完成',urgency:'med',status:'待確認',options:['確認啟動打樣 ✓','暫緩','退回修改']},
     {id:'a5',icon:'📊',title:'Q2 財務報告 Review',sub:'逾期 1 天',urgency:'low',status:'排程中',options:['已完成閱覽 ✓','安排明天']},
   ],
   shawn:[
     {id:'s1',icon:'🚚',title:'訂單 #BKK240 出貨狀態更新',sub:'曼谷倉 → 客戶 Central · 今日預計出',urgency:'high',status:'待更新',options:['已出貨 ✓','備貨中','延誤，已通知客戶']},
     {id:'s2',icon:'🚚',title:'訂單 #BKK241 到貨確認',sub:'貓福珊迪盲盒 × 500pcs',urgency:'high',status:'待確認',options:['已到貨，數量正確 ✓','部分到貨','尚未到貨']},
-    {id:'s3',icon:'🤝',title:'拜訪記錄：Central World 買手',sub:'下午 14:00 已完成',urgency:'med',status:'待填寫',options:['填完記錄 ✓','取消拜訪','改期']},
+    {id:'s3',icon:'🤝',title:'拜訪記錄：Central World 買手',sub:'下午 14:00 已完成 · 立即填單',urgency:'med',status:'待填寫',action:'visit-log'},
     {id:'s4',icon:'💬',title:'春雷確認 Q3電商計畫',sub:'抖音/小紅書 Q3排期，需本週確認',urgency:'low',status:'進行中',options:['已確認 ✓','等待對方回覆']},
   ],
   anran:[
@@ -1343,12 +1411,12 @@ const MY_TODOS = {
   ],
   laodong:[
     {id:'ld1',icon:'📞',title:'跟進華糖 Q3 補貨意向',sub:'上週電話有意向，未確認數量',urgency:'high',status:'待跟進',options:['已跟進，填入系統 ✓','今天致電','下週再跟']},
-    {id:'ld2',icon:'🤝',title:'拜訪記錄：廣州美陳',sub:'昨天拜訪，尚未填報',urgency:'high',status:'待填寫',options:['立即填報 ✓','今天填','明天填']},
+    {id:'ld2',icon:'🤝',title:'拜訪記錄：廣州美陳',sub:'昨天拜訪，立即填寫不要靠記憶',urgency:'high',status:'待填寫',action:'visit-log'},
     {id:'ld3',icon:'💼',title:'新客戶 LOG-ON 深圳 — 報價追蹤',sub:'已報價 3 天，等待回覆',urgency:'med',status:'進行中',options:['對方已回覆，更新 ✓','繼續等待','催單']},
   ],
   debao:[
     {id:'db1',icon:'📞',title:'跟進成都 IP 買手 Q3 預購',sub:'月初見面，說本月確認',urgency:'high',status:'待跟進',options:['已跟進 ✓','今天電話','下週再試']},
-    {id:'db2',icon:'🤝',title:'拜訪記錄：北京三里屯客戶',sub:'昨天見面，尚未填報',urgency:'med',status:'待填寫',options:['立即填報 ✓','今天填']},
+    {id:'db2',icon:'🤝',title:'拜訪記錄：北京三里屯客戶',sub:'昨天見面，立即填寫',urgency:'med',status:'待填寫',action:'visit-log'},
   ],
   chunlei:[
     {id:'cl1',icon:'📱',title:'抖音本週直播腳本確認',sub:'週四晚 20:00 直播，腳本待定稿',urgency:'high',status:'待確認',options:['腳本已定稿 ✓','今天完成','需延期']},
@@ -1634,6 +1702,139 @@ function markCurrentTodoDone(){
   localStorage.setItem('lobby_done_'+user, JSON.stringify([...doneSet]));
   renderTodos(_showDone);
   _currentTodoId = null;
+}
+
+// ── Shawn × 3 / Ray × 1 / visit-log（業務員+Shawn 共用）──
+const WHOLESALE_SEED = [
+  {id:'w1', client:'深圳 LOG-ON', sales:'安然', product:'Snoopy 夏季盲盒', qty:'860 箱', amount:'¥199 萬', urgency:'high', detail:'客戶要求 5/30 前到貨，需確認工廠 capacity；30/70 分期付款。'},
+  {id:'w2', client:'廣州博騰', sales:'老董', product:'Mofusand', qty:'120 箱', amount:'¥18 萬', urgency:'med', detail:'新客戶第 1 筆，需先確認 IP 授權範圍 + 客戶資質。'},
+  {id:'w3', client:'首爾 SMTOWN COEX', sales:'老董', product:'Snoopy 夏季 + 限定組合', qty:'樣品中', amount:'待報價', urgency:'med', detail:'韓市場首次，先報價 + 樣品確認，需 Ray 拍板定價策略。'},
+];
+function openWholesaleModal(){
+  const items = _seedKey('shawn_wholesale_v1', WHOLESALE_SEED);
+  _genericListRender(document.getElementById('wholesale-list'), items, w => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${w.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <div style="flex:1;">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${w.client}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${w.sales} · ${w.product} · ${w.qty}</div>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${w.amount}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${w.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doWholesale('${w.id}','can-do')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 可執行 · 轉 Ray 定價</button>
+      <button onclick="doWholesale('${w.id}','need-info')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需更多資訊</button>
+      <button onclick="doWholesale('${w.id}','reject')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">不接</button>
+    </div>
+  </div>`, '✨ 沒有待核可批發訂單');
+  document.getElementById('wholesale-modal').classList.add('show');
+}
+function closeWholesaleModal(){ document.getElementById('wholesale-modal').classList.remove('show'); }
+function doWholesale(id, action){
+  const item = _genericDone('shawn_wholesale_v1', id, '');
+  const labels = {'can-do':'已轉 Ray 定價', 'need-info':'已通知業務補資訊', 'reject':'已通知業務不接'};
+  if(action === 'can-do'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`Shawn 確認可執行：${item ? item.client+' · '+item.product+' · '+item.amount : id}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openWholesaleModal();
+  showQaToast(`✓ ${item ? item.client : id} · ${labels[action]}`);
+}
+
+const CHASE_SEED = [
+  {id:'ch1', target:'賴哥', task:'PO#320 出貨進度更新', delay:'延遲 3 天', urgency:'high', detail:'Miffy 文具，深圳廠應本週出貨，賴哥沒回報。需 push。'},
+  {id:'ch2', target:'珮玲', task:'Snoopy 秋冬版權方追問', delay:'延遲 4 天', urgency:'high', detail:'已送 IP 方 18 天，超出正常 14 天等候期。'},
+  {id:'ch3', target:'老董', task:'本週拜訪記錄', delay:'延遲 1 天', urgency:'med', detail:'廣州美陳昨天拜訪，記錄未填寫。'},
+];
+function openChaseModal(){
+  const items = _seedKey('shawn_chase_v1', CHASE_SEED);
+  _genericListRender(document.getElementById('chase-list'), items, c => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${c.urgency==='high'?'border-color:var(--warn);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${c.target} · ${c.task}</span>
+      <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ ${c.delay}</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${c.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doChase('${c.id}','push')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 飛書催促</button>
+      <button onclick="doChase('${c.id}','later')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">明天再催</button>
+    </div>
+  </div>`, '✨ 全公司任務都準時，沒有需要催的');
+  document.getElementById('chase-modal').classList.add('show');
+}
+function closeChaseModal(){ document.getElementById('chase-modal').classList.remove('show'); }
+function doChase(id, action){
+  const item = _genericDone('shawn_chase_v1', id, '');
+  if(action === 'push'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:name, to:item.target, msg:`🔔 Shawn 催：${item ? item.task : id}（${item.delay}）`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openChaseModal();
+  showQaToast(action==='push' ? `✓ 已飛書催 ${item ? item.target : id}` : '已標記明天再催');
+}
+
+const RAY_APPROVAL_SEED = [
+  {id:'r1', type:'pricing', title:'Snoopy LOG-ON 訂單定價', from:'Shawn', urgency:'high', detail:'860 箱 / ¥199 萬 / 客戶要 5/30 前到貨；Shawn 已確認可執行，請拍板定價。'},
+  {id:'r2', type:'contract', title:'PNUTS Snoopy 北京代理 — 續簽', from:'安然', urgency:'high', detail:'USD $65k MG / 6/30 到期；安然轉來，需 Ray 親自核准續簽條款。'},
+  {id:'r3', type:'expense', title:'Shawn 5月差旅', from:'楊子', urgency:'med', detail:'NT$ 145,000 — 曼谷快閃 + 雅加達展會考察；主管級費用直達 Ray。'},
+];
+function openRayApprovalModal(){
+  const items = _seedKey('ray_approval_v1', RAY_APPROVAL_SEED);
+  _genericListRender(document.getElementById('ray-approval-list'), items, r => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${r.urgency==='high'?'border-color:var(--danger);':''}">
+    <div style="margin-bottom:6px;">
+      <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--brand)22;color:var(--brand);margin-right:6px;">${({pricing:'定價',contract:'合約',expense:'費用'})[r.type]||r.type}</span>
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${r.title}</span>
+      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${r.from} 送來</div>
+    </div>
+    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${r.detail}</div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="doRayApproval('${r.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 批准</button>
+      <button onclick="doRayApproval('${r.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回修改</button>
+      <button onclick="doRayApproval('${r.id}','hold')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫緩</button>
+    </div>
+  </div>`, '✨ 沒有待批核項目');
+  document.getElementById('ray-approval-modal').classList.add('show');
+}
+function closeRayApprovalModal(){ document.getElementById('ray-approval-modal').classList.remove('show'); }
+function doRayApproval(id, action){
+  const item = _genericDone('ray_approval_v1', id, '');
+  const labels = {approved:'已批准 · 通知執行', revise:'已退回修改', hold:'已暫緩'};
+  if(action === 'approved'){
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    notif.unshift({ts:Date.now(), from:'Ray', to:item.from, msg:`✓ Ray 批准：${item ? item.title : id}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+  }
+  openRayApprovalModal();
+  showQaToast(`✓ ${item ? item.title : id} · ${labels[action]}`);
+}
+
+function openVisitLogModal(){
+  document.getElementById('vl-client').value = '';
+  document.getElementById('vl-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('vl-next-date').value = '';
+  document.getElementById('vl-notes').value = '';
+  document.getElementById('vl-next-action').value = '';
+  document.getElementById('visit-log-modal').classList.add('show');
+}
+function closeVisitLogModal(){ document.getElementById('visit-log-modal').classList.remove('show'); }
+function submitVisitLog(){
+  const client = document.getElementById('vl-client').value.trim();
+  if(!client){ alert('請填寫客戶 / 對象'); return; }
+  const rec = {
+    client, type:document.getElementById('vl-type').value,
+    date:document.getElementById('vl-date').value,
+    nextDate:document.getElementById('vl-next-date').value,
+    notes:document.getElementById('vl-notes').value.trim(),
+    nextAction:document.getElementById('vl-next-action').value.trim(),
+    by:name, byUser:user, ts:Date.now(),
+  };
+  const arr = JSON.parse(localStorage.getItem('crm_visit_log_v1')||'[]');
+  arr.unshift(rec);
+  localStorage.setItem('crm_visit_log_v1', JSON.stringify(arr));
+  closeVisitLogModal();
+  markCurrentTodoDone();
+  showQaToast(`✓ ${client} 拜訪記錄已寫入 CRM`);
 }
 
 // ── 高維 / Bevis / 珮玲 / 詩彤 modal × 4 ──
@@ -2450,7 +2651,7 @@ function triggerAction(action){
     case 'new-order':         openNewOrderModal(); break;
     case 'sellthru':          openSellThruModal(); break;
     case 'my-customers':      openSimpleListModal('my-customers'); break;
-    case 'visit-log':         showQaToast('📞 拜訪記錄 modal 開發中（V2）'); break;
+    case 'visit-log':         openVisitLogModal(); break;
     case 'contract-approve':  openContractModal(); break;
     case 'xborder-confirm':   openXborderModal(); break;
     case 'ip-reminders':      openIpRemindersModal(); break;
@@ -2476,9 +2677,9 @@ function triggerAction(action){
     case 'live-stock':        showQaToast('📦 備貨確認 modal 開發中（V2）'); break;
     case 'taobao-listing':    showQaToast('🛒 淘寶上架 modal 開發中（V2）'); break;
     case 'monthly-data':      showQaToast('📊 數據月報 modal 開發中（V2）'); break;
-    case 'wholesale-approve': showQaToast('✓ 批發核准 modal 開發中（V2）'); break;
-    case 'shawn-chase':       showQaToast('🔥 待催辦 modal 開發中（V2）'); break;
-    case 'ray-approval':      showQaToast('✓ 待批核 modal 開發中（V2）'); break;
+    case 'wholesale-approve': openWholesaleModal(); break;
+    case 'shawn-chase':       openChaseModal(); break;
+    case 'ray-approval':      openRayApprovalModal(); break;
     default:                  showQaToast('動作 ' + action + ' 未實作');
   }
 }
