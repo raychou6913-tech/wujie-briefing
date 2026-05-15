@@ -524,6 +524,12 @@ body{
       <div id="sb-today-extras"></div>
     </div>
 
+    <!-- 我的動作群（個人動作 modal trigger，依角色 conditional render）-->
+    <div class="sb-group" id="sb-my-actions-group" style="display:none">
+      <div class="sb-group-title">我的動作</div>
+      <div id="sb-my-actions-list"></div>
+    </div>
+
     <!-- Dynamic hall groups injected by JS -->
     <div id="sb-hall-groups"></div>
 
@@ -647,16 +653,8 @@ body{
       <div id="ym-inbox-list" class="blocks"></div>
     </div>
 
-    <!-- MY WORK (其他非業務角色的個人動作 quick actions) -->
-    <div id="my-work-section" style="display:none">
-      <div class="sec-hdr">
-        <div>
-          <div class="sec-title">⚡ 我的工作</div>
-          <div class="sec-hint">My Work · 做 · 我的核心動作</div>
-        </div>
-      </div>
-      <div class="qa-grid" id="my-work-list"></div>
-    </div>
+    <!-- my-work-section 已拿掉，個人動作全部搬到 sidebar 「我的動作」群 -->
+    <div id="my-work-section" style="display:none"></div>
 
     <!-- MY CUSTOMERS (業務角色才顯示) -->
     <div id="my-customers-section" style="display:none">
@@ -669,29 +667,7 @@ body{
       </div>
       <div class="blocks" id="my-customers-list"></div>
 
-      <!-- 業務員快速動作 -->
-      <div class="sec-hdr" style="margin-top:24px;">
-        <div>
-          <div class="sec-title">⚡ 快速回報</div>
-          <div class="sec-hint">Quick Report · 做 · 業務員核心動作</div>
-        </div>
-      </div>
-      <div class="qa-grid" id="my-quick-actions">
-        <button class="qa-btn" onclick="openNewOrderModal()">
-          <span class="qa-icon">＋</span>
-          <div>
-            <div class="qa-title">新訂單</div>
-            <div class="qa-sub">客戶下單 · 通報安然 / 賴哥 / 高維 / 躍明</div>
-          </div>
-        </button>
-        <button class="qa-btn" onclick="openSellThruModal()">
-          <span class="qa-icon">📊</span>
-          <div>
-            <div class="qa-title">回報動銷</div>
-            <div class="qa-sub">拜訪客戶後 · 回報渠道真實賣得怎樣</div>
-          </div>
-        </button>
-      </div>
+      <!-- 業務員快速動作已搬到 sidebar 「我的動作」群 -->
     </div>
 
     <!-- ANNOUNCEMENTS -->
@@ -768,6 +744,53 @@ body{
     </div>
     <div class="qa-field"><label>備註（IP 授權注意 / 付款條件 / 特殊要求）</label><textarea id="no-notes" rows="2" placeholder="例：客戶要求 30%訂金、出貨前付清。需確認 PNUTS 授權範圍涵蓋華南。"></textarea></div>
     <button class="qa-submit" onclick="submitNewOrder()">送出 → 通知相關部門</button>
+  </div>
+</div>
+
+<!-- 錄費用 MODAL（每人都有，3 類：個人報銷 / 業務相關 / 公司 OPEX [僅楊子/Leo/Ray]） -->
+<div class="qa-modal-bg" id="expense-modal" onclick="if(event.target===this)closeExpenseModal()">
+  <div class="qa-modal">
+    <div class="qa-modal-hd">
+      <div>
+        <div class="qa-modal-title">＋ 錄費用</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">先選類型，再填單。送出後依路由通知對應審核人。</div>
+      </div>
+      <button class="qa-modal-close" onclick="closeExpenseModal()">✕</button>
+    </div>
+    <!-- Step 1: 選類型 tab -->
+    <div id="exp-tabs" style="display:flex;gap:6px;margin-bottom:16px;padding:4px;background:var(--paper-soft);border-radius:10px;">
+      <button class="exp-tab active" data-type="personal" onclick="switchExpTab('personal')" style="flex:1;padding:9px 12px;border:none;background:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);">個人報銷</button>
+      <button class="exp-tab" data-type="business" onclick="switchExpTab('business')" style="flex:1;padding:9px 12px;border:none;background:transparent;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink-mid);">業務相關</button>
+      <button class="exp-tab" data-type="opex" onclick="switchExpTab('opex')" style="flex:1;padding:9px 12px;border:none;background:transparent;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink-mid);display:none">公司 OPEX</button>
+    </div>
+    <!-- Step 2: 填單 -->
+    <div class="qa-field-row">
+      <div class="qa-field"><label>類別</label><select id="exp-cat">
+        <option>出差 · 交通</option>
+        <option>出差 · 住宿</option>
+        <option>餐費</option>
+        <option>通勤</option>
+        <option>設備購置</option>
+        <option>客戶招待</option>
+        <option>樣品費</option>
+        <option>場地租賃</option>
+        <option>展位費</option>
+        <option>物流附加</option>
+        <option>房租</option>
+        <option>水電</option>
+        <option>倉儲</option>
+        <option>行政耗材</option>
+        <option>其他</option>
+      </select></div>
+      <div class="qa-field"><label>金額（人民幣 元）</label><input id="exp-amt" type="number" placeholder="例：1200"></div>
+    </div>
+    <div class="qa-field-row">
+      <div class="qa-field"><label>發生日期</label><input id="exp-date" type="date"></div>
+      <div class="qa-field"><label>項目（選填）</label><input id="exp-proj" placeholder="例：Snoopy 夏季 / 曼谷快閃"></div>
+    </div>
+    <div class="qa-field"><label>說明</label><textarea id="exp-notes" rows="2" placeholder="例：5/15 北京出差打車費，客戶拜訪 LOG-ON。附發票 3 張。"></textarea></div>
+    <div id="exp-routing" style="font-size:10px;color:var(--ink-lo);background:var(--paper-soft);padding:8px 12px;border-radius:8px;margin-bottom:12px;letter-spacing:.04em;">送審路徑：直屬主管 → 躍明入帳</div>
+    <button class="qa-submit" onclick="submitExpense()">送出</button>
   </div>
 </div>
 
@@ -938,6 +961,44 @@ function buildSidebar(){
     extras.innerHTML = items.map(i =>
       `<a class="sb-item" href="${i.href}"><span class="sb-icon">${i.icon}</span><span class="sb-label">${i.label}</span></a>`
     ).join('');
+  }
+
+  // 我的動作群（個人動作 modal trigger，依角色顯示）
+  const MY_ACTIONS = {
+    all:      [{icon:'＋', label:'錄費用', action:'expense'}],
+    laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    anran:    [{icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
+    yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
+    yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}],
+    leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
+    bevis:    [{icon:'🎨', label:'設計核准', action:'design-approve'}, {icon:'✨', label:'bedo 輸出待確認', action:'bedo-approve'}],
+    peilin:   [{icon:'🖋', label:'送審追蹤', action:'my-approval-tracker'}, {icon:'🖼', label:'主題企劃', action:'theme-plan'}],
+    shetong:  [{icon:'📤', label:'我的設計任務', action:'my-design-task'}],
+    laige:    [{icon:'🔍', label:'我的詢比價', action:'my-quote'}, {icon:'📦', label:'我的 PO', action:'my-po'}, {icon:'🏭', label:'打樣追蹤', action:'sampling-track'}],
+    muzi:     [{icon:'📦', label:'備貨核對', action:'stock-check'}, {icon:'📝', label:'付款申請', action:'payment-request'}],
+    gaowei:   [{icon:'🚚', label:'物流批次', action:'logistics-batch'}, {icon:'📋', label:'運費登錄', action:'freight-log'}],
+    chunlei:  [{icon:'📱', label:'直播排期', action:'live-schedule'}, {icon:'📦', label:'備貨確認', action:'live-stock'}],
+    jiaying:  [{icon:'🛒', label:'淘寶上架', action:'taobao-listing'}, {icon:'📊', label:'數據月報', action:'monthly-data'}],
+    shawn:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}, {icon:'🔥', label:'待催辦', action:'shawn-chase'}],
+    ray:      [{icon:'✓', label:'我的待批核', action:'ray-approval'}],
+  };
+  const userActs = (MY_ACTIONS[user] || []).concat(MY_ACTIONS.all);  // 通用「+錄費用」永遠在
+  if(userActs.length){
+    document.getElementById('sb-my-actions-group').style.display = '';
+    const listEl = document.getElementById('sb-my-actions-list');
+    listEl.innerHTML = userActs.map(a =>
+      `<a class="sb-item" href="#action-${a.action}" data-action="${a.action}">
+        <span class="sb-icon">${a.icon}</span><span class="sb-label">${a.label}</span>
+      </a>`
+    ).join('');
+    // 點擊 → trigger action（preventDefault 避免跳轉）
+    listEl.querySelectorAll('a[data-action]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        triggerAction(a.dataset.action);
+      });
+    });
   }
 
   // Build hall groups dynamically
@@ -1170,23 +1231,7 @@ const MY_WORK = {
     {icon:'📊', title:'數據月報', sub:'淘寶月度銷售數據',                     href:'erp-ecommerce.html#metrics'},
   ],
 };
-const myWork = MY_WORK[user];
-if(myWork && myWork.length){
-  const sec = document.getElementById('my-work-section');
-  const list = document.getElementById('my-work-list');
-  if(sec && list){
-    sec.style.display = '';
-    list.innerHTML = myWork.map(w => `
-      <a class="qa-btn" href="${w.href}" style="text-decoration:none;color:inherit;">
-        <span class="qa-icon">${w.icon}</span>
-        <div>
-          <div class="qa-title">${w.title}</div>
-          <div class="qa-sub">${w.sub}</div>
-        </div>
-      </a>
-    `).join('');
-  }
-}
+// MY_WORK render 已拿掉 — 個人動作改放 sidebar「我的動作」群
 
 // ── 躍明的待入帳 inbox（個人動作在大廳完成，不跳財務中心）──
 if(user === 'yuming'){
@@ -1355,6 +1400,131 @@ function showQaToast(msg){
   clearTimeout(t._t);
   t._t = setTimeout(()=>t.classList.remove('show'), 2800);
 }
+
+// ── 錄費用 modal（每人都有，3 類，OPEX role-based）──
+const _expRoute = {
+  personal: '直屬主管 → 躍明入帳',
+  business: '直屬主管 → 安然 → 躍明入帳',
+  opex:     '直接寫入 HR 費用中心（無需審）',
+};
+function openExpenseModal(){
+  // OPEX tab 只給楊子 / Leo / Ray 看
+  const opexBtn = document.querySelector('.exp-tab[data-type="opex"]');
+  if(opexBtn) opexBtn.style.display = ['yangzi','leo','ray'].includes(user) ? '' : 'none';
+  // 重置欄位
+  document.getElementById('exp-amt').value = '';
+  document.getElementById('exp-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('exp-proj').value = '';
+  document.getElementById('exp-notes').value = '';
+  // 預設選個人報銷
+  switchExpTab('personal');
+  document.getElementById('expense-modal').classList.add('show');
+}
+function closeExpenseModal(){
+  document.getElementById('expense-modal').classList.remove('show');
+}
+function switchExpTab(type){
+  document.querySelectorAll('.exp-tab').forEach(b=>{
+    const active = b.dataset.type === type;
+    b.classList.toggle('active', active);
+    b.style.background = active ? '#fff' : 'transparent';
+    b.style.color = active ? 'var(--ink)' : 'var(--ink-mid)';
+  });
+  document.getElementById('exp-routing').textContent = '送審路徑：' + (_expRoute[type] || '—');
+  document.getElementById('exp-routing').dataset.type = type;
+}
+function submitExpense(){
+  const type   = document.getElementById('exp-routing').dataset.type || 'personal';
+  const cat    = document.getElementById('exp-cat').value;
+  const amt    = document.getElementById('exp-amt').value.trim();
+  const date   = document.getElementById('exp-date').value;
+  const proj   = document.getElementById('exp-proj').value.trim();
+  const notes  = document.getElementById('exp-notes').value.trim();
+  if(!amt){ alert('請填寫金額'); return; }
+
+  const rec = { type, cat, amt:Number(amt), date, proj, notes,
+    submitter:name, submitterUser:user, ts:Date.now(),
+    status: type==='opex' ? 'posted' : 'pending' };
+  const arr = JSON.parse(localStorage.getItem('erp_expense_v1')||'[]');
+  arr.unshift(rec);
+  localStorage.setItem('erp_expense_v1', JSON.stringify(arr));
+
+  // 通知佇列依類型
+  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+  const msg = `費用申請：${name} · ${cat} · ¥${amt}${proj?' · '+proj:''}`;
+  if(type==='personal'){
+    notif.unshift({ts:Date.now(), from:name, to:'manager', msg});
+  } else if(type==='business'){
+    notif.unshift({ts:Date.now(), from:name, to:'anran', msg});
+  }
+  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+
+  closeExpenseModal();
+  const routeText = type==='opex' ? '已寫入 HR 費用中心' :
+                    type==='business' ? '已送 → 直屬主管 → 安然' : '已送 → 直屬主管';
+  showQaToast(`✓ 費用已記錄 · ${routeText}`);
+}
+
+// ── Sidebar 個人動作 trigger ──
+// 點 sidebar「我的動作」群任一項 → 開對應 modal（在大廳完成，不跳走）
+// 從其他廳 sidebar 跳來：URL hash #action-xxx 自動 trigger
+function triggerAction(action){
+  switch(action){
+    case 'expense':           openExpenseModal(); break;
+    case 'new-order':         openNewOrderModal(); break;
+    case 'sellthru':          openSellThruModal(); break;
+    case 'my-customers':      openSimpleListModal('my-customers'); break;
+    case 'visit-log':         showQaToast('📞 拜訪記錄 modal 開發中（V2）'); break;
+    case 'contract-approve':  showQaToast('📜 合約待批 modal 開發中（V2）'); break;
+    case 'xborder-confirm':   showQaToast('💸 跨境款項確認 modal 開發中（V2）'); break;
+    case 'ip-reminders':      showQaToast('🔐 IP 維護提醒 modal 開發中（V2）'); break;
+    case 'my-pending':        openSimpleListModal('my-pending'); break;
+    case 'monthend':          showQaToast('📊 月結任務 modal 開發中（V2）'); break;
+    case 'my-approval':       showQaToast('✓ 待審 modal 開發中（V2）— 內容會從 yangzi inbox 搬過來'); break;
+    case 'payroll-task':      showQaToast('💰 薪資任務 modal 開發中（V2）'); break;
+    case 'bank-recon':        showQaToast('🏦 銀行對帳 modal 開發中（V2）'); break;
+    case 'design-approve':    showQaToast('🎨 設計核准 modal 開發中（V2）'); break;
+    case 'bedo-approve':      showQaToast('✨ bedo 輸出 modal 開發中（V2）'); break;
+    case 'my-approval-tracker': showQaToast('🖋 送審追蹤 modal 開發中（V2）'); break;
+    case 'theme-plan':        showQaToast('🖼 主題企劃 modal 開發中（V2）'); break;
+    case 'my-design-task':    showQaToast('📤 設計任務 modal 開發中（V2）'); break;
+    case 'my-quote':          showQaToast('🔍 詢比價 modal 開發中（V2）'); break;
+    case 'my-po':             showQaToast('📦 我的 PO modal 開發中（V2）'); break;
+    case 'sampling-track':    showQaToast('🏭 打樣追蹤 modal 開發中（V2）'); break;
+    case 'stock-check':       showQaToast('📦 備貨核對 modal 開發中（V2）'); break;
+    case 'payment-request':   showQaToast('📝 付款申請 modal 開發中（V2）'); break;
+    case 'logistics-batch':   showQaToast('🚚 物流批次 modal 開發中（V2）'); break;
+    case 'freight-log':       showQaToast('📋 運費登錄 modal 開發中（V2）'); break;
+    case 'live-schedule':     showQaToast('📱 直播排期 modal 開發中（V2）'); break;
+    case 'live-stock':        showQaToast('📦 備貨確認 modal 開發中（V2）'); break;
+    case 'taobao-listing':    showQaToast('🛒 淘寶上架 modal 開發中（V2）'); break;
+    case 'monthly-data':      showQaToast('📊 數據月報 modal 開發中（V2）'); break;
+    case 'wholesale-approve': showQaToast('✓ 批發核准 modal 開發中（V2）'); break;
+    case 'shawn-chase':       showQaToast('🔥 待催辦 modal 開發中（V2）'); break;
+    case 'ray-approval':      showQaToast('✓ 待批核 modal 開發中（V2）'); break;
+    default:                  showQaToast('動作 ' + action + ' 未實作');
+  }
+}
+
+// 簡單 list modal（暫用，V2 改成完整 modal）
+function openSimpleListModal(kind){
+  if(kind === 'my-customers'){
+    const sec = document.getElementById('my-customers-section');
+    if(sec){ sec.style.display=''; sec.scrollIntoView({behavior:'smooth'}); }
+  } else if(kind === 'my-pending'){
+    const sec = document.getElementById('ym-inbox-section');
+    if(sec){ sec.style.display=''; sec.scrollIntoView({behavior:'smooth'}); }
+  }
+}
+
+// 入口：URL hash #action-xxx 自動 trigger（從其他廳 sidebar 跳來時）
+window.addEventListener('load',()=>{
+  const m = location.hash.match(/^#action-(.+)$/);
+  if(m){
+    setTimeout(()=>triggerAction(m[1]),200);
+    history.replaceState(null,'','erp-lobby.html');  // 清 hash 避免 reload 又 trigger
+  }
+});
 
 // ── Render Todos (blocks) ──────────────────────────────
 function renderTodos(showDone){

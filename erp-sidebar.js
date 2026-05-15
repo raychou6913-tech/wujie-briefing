@@ -203,6 +203,40 @@
   const todayGroup = mkGroup('Today', todayItems.filter(i => i.href !== currentPage));
   content.appendChild(todayGroup);
 
+  // ── 我的動作群（每人個人化，點 → 大廳開 modal）──
+  // data-action 屬性給 lobby 識別，sidebar 在非 lobby 頁點 = 跳回 lobby 並帶 hash trigger
+  const MY_ACTIONS = {
+    // 通用：所有員工都可以錄費用（個人報銷 / 業務相關）
+    all:      [{icon:'＋', label:'錄費用', action:'expense'}],
+    laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'🎯', label:'我的客戶', action:'my-customers'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
+    anran:    [{icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
+    yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
+    yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}],
+    leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
+    bevis:    [{icon:'🎨', label:'設計核准', action:'design-approve'}, {icon:'✨', label:'bedo 輸出待確認', action:'bedo-approve'}],
+    peilin:   [{icon:'🖋', label:'送審追蹤', action:'my-approval-tracker'}, {icon:'🖼', label:'主題企劃', action:'theme-plan'}],
+    shetong:  [{icon:'📤', label:'我的設計任務', action:'my-design-task'}],
+    laige:    [{icon:'🔍', label:'我的詢比價', action:'my-quote'}, {icon:'📦', label:'我的 PO', action:'my-po'}, {icon:'🏭', label:'打樣追蹤', action:'sampling-track'}],
+    muzi:     [{icon:'📦', label:'備貨核對', action:'stock-check'}, {icon:'📝', label:'付款申請', action:'payment-request'}],
+    gaowei:   [{icon:'🚚', label:'物流批次', action:'logistics-batch'}, {icon:'📋', label:'運費登錄', action:'freight-log'}],
+    chunlei:  [{icon:'📱', label:'直播排期', action:'live-schedule'}, {icon:'📦', label:'備貨確認', action:'live-stock'}],
+    jiaying:  [{icon:'🛒', label:'淘寶上架', action:'taobao-listing'}, {icon:'📊', label:'數據月報', action:'monthly-data'}],
+    shawn:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}, {icon:'🔥', label:'待催辦', action:'shawn-chase'}],
+    ray:      [{icon:'✓', label:'我的待批核', action:'ray-approval'}],
+  };
+  const userActions = MY_ACTIONS[user] || [];
+  const allActions = userActions.concat(MY_ACTIONS.all);  // 通用「+錄費用」放最後
+  if(allActions.length){
+    const actionItems = allActions.map(a => ({
+      href: currentPage === 'erp-lobby.html' ? '#' : ('erp-lobby.html#action-' + a.action),
+      icon: a.icon,
+      label: a.label,
+      dataAction: a.action,
+    }));
+    content.appendChild(mkGroup('我的動作', actionItems));
+  }
+
   // 角色廳群
   const SB_GROUP_ORDER = ['業務','財務','開發','快閃店','IP'];
   SB_GROUP_ORDER.forEach(grp => {
@@ -241,6 +275,7 @@
       const a = document.createElement('a');
       a.href = i.href;
       a.className = 'erp-sb-item' + (i.href === currentPage ? ' active' : '');
+      if(i.dataAction) a.dataset.action = i.dataAction;
       a.innerHTML = `<span class="erp-sb-icon">${i.icon}</span><span class="erp-sb-label">${i.label}</span>`;
       g.appendChild(a);
     });
