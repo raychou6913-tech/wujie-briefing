@@ -739,7 +739,25 @@ const OPEX_ITEM_DEFAULTS = [
   {key:'mktg',   label:'行銷推廣（產品拍照／KOL／廣告投放）', val:10000,  locked:false},
   {key:'misc',   label:'雜支',                   val:5000,   locked:false},
 ];
-let opexItems = OPEX_ITEM_DEFAULTS.map(o=>({...o}));
+// 從楊子大廳 OPEX 預算 override 同步（楊子是唯一編輯入口；budget-planner read-only 顯示）
+function _loadOpexFromYangzi(){
+  const ovr = (JSON.parse(localStorage.getItem('opex_budget_override_v1')||'{}'))['北京蕪解'];
+  if(!ovr) return null;
+  const monthIdx = new Date().getMonth();
+  // 將楊子 OPEX 5 科目對應到 budget-planner 6 科目（key mapping + 取當月值）
+  const map = { '薪資人事':'salary', '辦公費用':'rent', '倉儲物流':'tools', '差旅費':'travel', '雜支':'misc' };
+  const result = {};
+  Object.entries(map).forEach(([yzCat, bpKey]) => {
+    if(ovr[yzCat] && ovr[yzCat][monthIdx] != null){
+      result[bpKey] = ovr[yzCat][monthIdx];
+    }
+  });
+  return result;
+}
+let opexItems = OPEX_ITEM_DEFAULTS.map(o => {
+  const yzVal = _loadOpexFromYangzi();
+  return yzVal && yzVal[o.key] != null ? {...o, val: yzVal[o.key]} : {...o};
+});
 let opexScenarioHC = 0;   // what-if headcount delta: extra people × avg salary
 let opexPanelOpen = false;
 
