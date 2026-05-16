@@ -317,3 +317,45 @@ Ray 策略：**「項目啟動者 + 行政人事」兩端切入**
 - 員工知道「所有對話是公司資產」
 - AI 識別「emotional venting」不轉發管理層
 - 預設工作模式，無需切換
+
+---
+
+## ⭐ Ray 5/16 晚最終拍板 — 試用 = 真實環境
+
+**核心決策**：試用期直接接飛書，不要 localStorage demo。
+- 試用期 = 真實環境，才能看到真問題
+- 試用差 → 清飛書資料重來
+- 試用 OK → 直接過渡正式啟用
+
+### 新工程時程（2-3 週）
+
+```
+週 1-2: MJ 接飛書 26 modal（10-13 天，跟流程無關）
+        Ray 同時改工作流地圖（平行不衝突）
+週 3:   MJ AI prototype（2-3 天）
+        Ray 拍板工作流地圖最終版
+週 3 末: 用最終地圖注入路由表 + AI system prompt（1 天）
+週 4:   5 人試用真實環境 → OK 直接過渡 16 人
+```
+
+### 工程技術指南
+
+| 項目 | 重點 |
+|---|---|
+| **Schema 先定** | 每表加 `owner / created_at / updated_at / version`；樂觀鎖用 version 防並發覆蓋 |
+| **Backup 策略** | 試用前 snapshot 飛書 raw data，方便 revert |
+| **分批啟用** | Week 1 楊子 → Week 2 安然賴哥 → Week 3 全部，局部出包不影響其他 |
+| **過渡規劃** | 試用 OK 通知全公司「明天正式啟用」+ 第一週 Shawn 待催辦密集監控 |
+| **核心架構** | 26 modal + AI tool 用同一個 Worker endpoint（AI 跟人類用一樣後端）|
+
+### Ray 同時可做的事
+
+1. 跟安然 / Shawn 三人實際走過工作流地圖確認細節
+2. 跟員工問「實際工作是不是這樣」撈 edge case
+3. 在地圖節點標 💡「未來需要新工具」note → MJ 看到優化方向
+
+### 工作流地圖併行不互擋
+
+- **90% 工程跟流程無關**（form / schema / panel / tool / API）
+- **10% 相關**集中 const 表（MGR_ROUTER / BIZ_ROUTER / STALE_SLA / AI prompt），改一處全動
+- 80% 確定的地圖就可開工，細節最後 1 公里注入
