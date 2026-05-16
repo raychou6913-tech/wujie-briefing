@@ -289,6 +289,10 @@
     sysItems.push({href:'erp-entity-structure.html', icon:'🏛', label:'集團架構'});
     sysItems.push({href:'erp-transfer-pricing.html', icon:'🔄', label:'TP 設定'});
   }
+  // 工作流地圖（Ray / Shawn / 安然 — 戰情桌）
+  if(['ray','shawn','anran'].includes(user)){
+    sysItems.push({href:'erp-workflow-map.html', icon:'🗺', label:'工作流地圖'});
+  }
   if(['ray','shawn'].includes(user)){
     sysItems.push({href:'erp-admin.html', icon:'⚙', label:'系統管理'});
   }

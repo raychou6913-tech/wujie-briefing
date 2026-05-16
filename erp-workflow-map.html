@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 工作流地圖</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  --ok:#22c55e;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --info:#0891b2;
+}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-.003em;
+  min-height:100vh;
+}
+.topbar{
+  background:var(--paper);border-bottom:1px solid var(--line);
+  padding:0 28px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.tb-back{
+  background:none;border:1px solid var(--line);border-radius:8px;
+  padding:6px 14px;font-size:12px;color:var(--ink-mid);
+  cursor:pointer;font-family:inherit;
+  transition:border-color .2s var(--ease);
+}
+.tb-back:hover{border-color:var(--ink-faint);}
+.tb-title{font-size:15px;font-weight:800;letter-spacing:-.01em;}
+.tb-sub{font-size:10px;color:var(--ink-lo);margin-left:6px;letter-spacing:.06em;}
+.tb-right{display:flex;align-items:center;gap:12px;}
+
+.main{display:flex;height:calc(100vh - 56px);}
+.canvas-wrap{
+  flex:1;background:var(--paper-soft);position:relative;overflow:auto;
+}
+.flow-tabs{
+  position:sticky;top:0;background:var(--paper);
+  border-bottom:1px solid var(--line);
+  padding:10px 20px;display:flex;gap:6px;flex-wrap:wrap;
+  z-index:10;
+}
+.flow-tab{
+  background:transparent;border:1px solid var(--line);border-radius:18px;
+  padding:6px 14px;font-size:11px;font-weight:600;
+  color:var(--ink-mid);cursor:pointer;font-family:inherit;
+  transition:all .2s var(--ease);white-space:nowrap;
+}
+.flow-tab:hover{border-color:var(--ink-faint);color:var(--ink);}
+.flow-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+#canvas{
+  display:block;margin:24px auto;background:#fff;
+  border:1px solid var(--line);border-radius:14px;
+}
+
+.detail-panel{
+  width:340px;background:#fff;border-left:1px solid var(--line);
+  padding:24px 22px;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.detail-empty{
+  color:var(--ink-lo);font-size:13px;text-align:center;
+  margin-top:80px;line-height:1.7;
+}
+.detail-empty-emoji{font-size:32px;display:block;margin-bottom:12px;}
+.detail-section{margin-bottom:18px;}
+.detail-label{
+  font-size:9px;font-weight:700;color:var(--ink-lo);
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;
+}
+.detail-value{font-size:13px;line-height:1.6;color:var(--ink);}
+.detail-title{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+.detail-owner{
+  display:inline-block;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:12px;
+  background:var(--brand-soft);color:var(--brand);
+  margin-right:6px;
+}
+.detail-sla{
+  display:inline-block;font-size:11px;color:var(--ink-mid);
+  padding:3px 10px;border-radius:12px;background:var(--paper-soft);
+}
+.detail-stale{
+  display:inline-block;font-size:11px;color:var(--warn);font-weight:700;
+  padding:3px 10px;border-radius:12px;background:#f59e0b14;
+  margin-left:6px;
+}
+.detail-desc{
+  font-size:13px;color:var(--ink-mid);line-height:1.7;
+  background:var(--paper-soft);padding:12px 14px;border-radius:10px;
+}
+.detail-action{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;background:var(--paper-soft);border-radius:10px;
+  font-size:12px;cursor:pointer;
+  transition:background .15s var(--ease);
+  text-decoration:none;color:var(--ink);
+  margin-bottom:6px;
+}
+.detail-action:hover{background:var(--line);}
+.detail-action-icon{font-size:14px;}
+.detail-action-arrow{margin-left:auto;color:var(--ink-lo);}
+
+.optimize-box{
+  margin-top:auto;padding-top:18px;border-top:1px solid var(--line);
+}
+.optimize-textarea{
+  width:100%;background:var(--paper-soft);border:1px solid var(--line);
+  border-radius:8px;padding:10px;font-size:12px;
+  font-family:inherit;color:var(--ink);resize:vertical;
+  min-height:60px;outline:none;
+}
+.optimize-textarea:focus{border-color:var(--brand);background:#fff;}
+.optimize-btn{
+  width:100%;background:var(--brand);color:#fff;
+  border:none;border-radius:8px;padding:9px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  margin-top:8px;font-family:inherit;
+  transition:opacity .2s var(--ease);
+}
+.optimize-btn:hover{opacity:.85;}
+
+.notes-list{margin-top:12px;}
+.note-item{
+  background:var(--paper-soft);border-radius:8px;
+  padding:8px 10px;margin-bottom:6px;font-size:11px;
+  color:var(--ink-mid);line-height:1.6;position:relative;
+}
+.note-meta{font-size:9px;color:var(--ink-lo);margin-bottom:3px;letter-spacing:.04em;}
+.note-del{
+  position:absolute;top:6px;right:8px;background:none;border:none;
+  color:var(--ink-faint);font-size:11px;cursor:pointer;
+}
+.note-del:hover{color:var(--danger);}
+
+/* SVG node styles */
+.node{cursor:pointer;}
+.node-rect{
+  fill:#fff;stroke:var(--ink-faint);stroke-width:1.5;
+  transition:all .18s var(--ease);
+}
+.node:hover .node-rect{stroke:var(--brand);}
+.node.selected .node-rect{stroke:var(--brand);stroke-width:2.5;fill:var(--brand-soft);}
+.node.stale .node-rect{stroke:var(--warn);}
+.node-title{
+  font-size:13px;font-weight:700;fill:var(--ink);
+  pointer-events:none;
+}
+.node-owner{
+  font-size:10px;fill:var(--brand);font-weight:700;
+  pointer-events:none;
+}
+.node-sla{
+  font-size:10px;fill:var(--ink-lo);
+  pointer-events:none;
+}
+.node-actor-tag{
+  font-size:9px;fill:var(--ink-mid);font-weight:600;
+  pointer-events:none;
+}
+
+.edge{
+  fill:none;stroke:var(--ink-faint);stroke-width:1.5;
+}
+.edge.alt{stroke:var(--danger);stroke-dasharray:5,3;stroke-width:1;}
+.edge-label{
+  font-size:10px;fill:var(--ink-mid);
+  pointer-events:none;
+}
+.edge-label.alt{fill:var(--danger);}
+
+.empty-flow{
+  text-align:center;color:var(--ink-lo);font-size:13px;
+  padding:60px 20px;line-height:1.8;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="tb-back" onclick="location.href='erp-lobby.html'">← 大廳</button>
+    <span class="tb-title">🗺 工作流地圖</span>
+    <span class="tb-sub">全公司業務流程 · 點節點看細節 · 標記要優化的環節</span>
+  </div>
+  <div class="tb-right">
+    <span style="font-size:10px;color:var(--ink-lo);" id="optimize-count-display">0 個優化建議</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="canvas-wrap">
+    <div class="flow-tabs" id="flow-tabs"></div>
+    <div id="canvas-area"></div>
+  </div>
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-empty">
+      <span class="detail-empty-emoji">👈</span>
+      點左邊任一節點看細節<br>
+      <span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Session check ──
+const _sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
+if(!_sess || Date.now()-_sess.ts > 7*86400000){ location.href='login.html'; }
+const user = _sess ? _sess.user : '';
+const name = _sess ? _sess.name : '';
+// 工作流地圖管理層才看（Ray / Shawn / 安然）
+if(_sess && !['ray','shawn','anran'].includes(user)){
+  location.href = 'erp-lobby.html';
+}
+
+// ── 10 個工作流 data ──
+// 每節點 {id, title, owner, sla, x, y, desc, action?, stale?, comment?}
+// 每邊 {from, to, label?, alt?(退回流程用 dashed red)}
+const WORKFLOWS = {
+  wholesale: {
+    title:'1. 批發訂單流程',
+    sub:'最高頻 · 從客戶詢盤到躍明入帳，11 棒接力',
+    width:1100, height:480,
+    nodes:[
+      {id:'a1', title:'客戶詢盤', owner:'業務員', sla:'立即', x:30, y:60, desc:'客戶（KA / 品牌方 / 流通渠道）詢問 IP 商品。'},
+      {id:'a2', title:'填新訂單', owner:'業務員', sla:'當天', x:230, y:60, desc:'lobby「+新訂單」填客戶 / 產品 / 數量 / 金額 / 出貨日 → 自動通知 安然+賴哥+高維+躍明。', action:'new-order'},
+      {id:'a3', title:'安然把關', owner:'安然', sla:'24 hr', x:430, y:60, desc:'IP 授權範圍 / 客戶資質 / 工廠 capacity 三項確認。退回或不接會通知業務員。', action:'wholesale-approve'},
+      {id:'a4', title:'Ray 拍板', owner:'Ray', sla:'24 hr', x:630, y:60, desc:'定價 + 是否做。安然推上來的事 Ray 直接決策。', action:'ray-approval'},
+      {id:'a5', title:'業務員報價', owner:'業務員', sla:'當天', x:830, y:60, desc:'業務員把 Ray 拍板的價回給客戶。'},
+      {id:'a6', title:'客戶下訂金', owner:'客戶', sla:'3-7 天', x:30, y:200, desc:'30% 訂金到帳（楊子/Leo 確認收款）。'},
+      {id:'a7', title:'賴哥開 PO', owner:'賴哥', sla:'3 天內', x:230, y:200, desc:'發單給工廠生產。新供應商先比價。', action:'my-po'},
+      {id:'a8', title:'工廠生產', owner:'工廠', sla:'30-100 天', x:430, y:200, desc:'依品類：盲袋 30 天 / 公仔 60-100 天。木子盯進度。'},
+      {id:'a9', title:'木子備貨核對', owner:'木子', sla:'到貨當天', x:630, y:200, desc:'PO 數量 vs 廠端實收。吻合 → 通知賴哥+高維；有差異 → 通知賴哥跟廠商確認。', action:'stock-check'},
+      {id:'a10', title:'高維出貨', owner:'高維', sla:'2 天', x:830, y:200, desc:'安排物流 / 填單號 → 自動通知安然+業務員。', action:'logistics-batch'},
+      {id:'a11', title:'客戶付尾款', owner:'客戶', sla:'-', x:30, y:340, desc:'收到貨後付 70% 尾款。'},
+      {id:'a12', title:'楊子確認收款', owner:'楊子/Leo', sla:'當天', x:230, y:340, desc:'銀行入款核對後送躍明。', action:'my-approval'},
+      {id:'a13', title:'躍明入帳', owner:'躍明', sla:'3 天', x:430, y:340, desc:'寫進財務 + VAM 計入。', action:'my-pending'},
+    ],
+    edges:[
+      {from:'a1', to:'a2'}, {from:'a2', to:'a3'},
+      {from:'a3', to:'a4', label:'可執行'},
+      {from:'a3', to:'a2', label:'退回', alt:true},
+      {from:'a4', to:'a5', label:'批准'},
+      {from:'a4', to:'a3', label:'退回', alt:true},
+      {from:'a5', to:'a6'},
+      {from:'a6', to:'a7'}, {from:'a7', to:'a8'}, {from:'a8', to:'a9'},
+      {from:'a9', to:'a10', label:'吻合'},
+      {from:'a9', to:'a8', label:'有差異', alt:true},
+      {from:'a10', to:'a11'}, {from:'a11', to:'a12'}, {from:'a12', to:'a13'},
+    ],
+  },
+
+  expense:{
+    title:'2. 員工費用報銷',
+    sub:'每人都會用 · 3 類分流（個人 / 業務 / OPEX）',
+    width:900, height:380,
+    nodes:[
+      {id:'b1', title:'員工填單', owner:'員工', sla:'發生當天', x:30, y:60, desc:'lobby「+ 錄費用」選類型（個人報銷 / 業務相關 / OPEX）', action:'expense'},
+      {id:'b2', title:'個人報銷', owner:'-', sla:'-', x:230, y:30, desc:'出差 / 餐費 / 通勤 / 設備購置'},
+      {id:'b3', title:'業務相關', owner:'-', sla:'-', x:230, y:130, desc:'客戶招待 / 樣品費 / 場地 / 展位費'},
+      {id:'b4', title:'公司 OPEX', owner:'楊子/Leo', sla:'-', x:230, y:230, desc:'房租 / 水電 / 倉儲 / 行政耗材（楊子 / Leo 自錄）'},
+      {id:'b5', title:'直屬主管', owner:'按角色', sla:'48 hr', x:430, y:60, desc:'採購→賴哥 / 設計→Bevis / 業務→安然 / 物流電商→Shawn'},
+      {id:'b6', title:'安然複核', owner:'安然', sla:'48 hr', x:430, y:130, desc:'業務相關費用安然把關（合理性 / IP 對應）'},
+      {id:'b7', title:'楊子/Leo', owner:'楊子/Leo', sla:'3 天', x:630, y:90, desc:'初審入帳前對齊 OPEX 預算 + 票據檢查', action:'my-approval'},
+      {id:'b8', title:'躍明入帳', owner:'躍明', sla:'5 天', x:830, y:90, desc:'寫進財務 + 月結對齊', action:'my-pending'},
+      {id:'b9', title:'寫入 HR 中心', owner:'-', sla:'即時', x:430, y:230, desc:'OPEX 直接寫入「預算 vs 實際」對照表，不需審核。'},
+    ],
+    edges:[
+      {from:'b1', to:'b2', label:'個人'},
+      {from:'b1', to:'b3', label:'業務'},
+      {from:'b1', to:'b4', label:'OPEX'},
+      {from:'b2', to:'b5'}, {from:'b5', to:'b7'},
+      {from:'b3', to:'b5'}, {from:'b5', to:'b6'}, {from:'b6', to:'b7'},
+      {from:'b7', to:'b8'},
+      {from:'b4', to:'b9'},
+    ],
+  },
+
+  procurement:{
+    title:'3. 供應商 PO 採購',
+    sub:'從 Ray 批准到付尾款',
+    width:1000, height:380,
+    nodes:[
+      {id:'c1', title:'Ray 批准訂單', owner:'Ray', sla:'-', x:30, y:60, desc:'批發訂單流程進到這一棒'},
+      {id:'c2', title:'賴哥詢比價', owner:'賴哥', sla:'-', x:230, y:60, desc:'新供應商三家比價；既有供應商直接發單', action:'my-quote'},
+      {id:'c3', title:'發 PO', owner:'賴哥', sla:'3 天', x:430, y:60, desc:'PO 發給工廠 + 30% 訂金', action:'my-po'},
+      {id:'c4', title:'打樣', owner:'工廠', sla:'14 天', x:630, y:60, desc:'小批量打樣', action:'sampling-track'},
+      {id:'c5', title:'賴哥核樣', owner:'賴哥', sla:'3 天', x:830, y:60, desc:'樣品確認 / 給 Bevis 看品質', action:'sampling-track'},
+      {id:'c6', title:'大貨生產', owner:'工廠', sla:'30-100 天', x:30, y:230, desc:'木子每週 check 廠端進度'},
+      {id:'c7', title:'木子核對備貨', owner:'木子', sla:'到貨當天', x:230, y:230, desc:'數量核對 → 賴哥+高維', action:'stock-check'},
+      {id:'c8', title:'付工廠尾款', owner:'木子', sla:'出貨後 3 天', x:430, y:230, desc:'付款申請 → 賴哥審 → Ray 核准 → 躍明付', action:'payment-request'},
+      {id:'c9', title:'Ray 核准付款', owner:'Ray', sla:'24 hr', x:630, y:230, desc:'大額需 Ray 拍板', action:'ray-approval'},
+      {id:'c10', title:'躍明付款', owner:'躍明', sla:'2 天', x:830, y:230, desc:'銀行轉帳給工廠', action:'my-pending'},
+    ],
+    edges:[
+      {from:'c1', to:'c2'}, {from:'c2', to:'c3'}, {from:'c3', to:'c4'},
+      {from:'c4', to:'c5'}, {from:'c5', to:'c6', label:'核准'},
+      {from:'c5', to:'c4', label:'退回', alt:true},
+      {from:'c6', to:'c7'}, {from:'c7', to:'c8'}, {from:'c8', to:'c9'}, {from:'c9', to:'c10'},
+    ],
+  },
+
+  design:{
+    title:'4. 設計流程（brief 到打樣）',
+    sub:'Bevis 主場',
+    width:900, height:300,
+    nodes:[
+      {id:'d1', title:'IP 主題 brief', owner:'Ray/安然/珮玲', sla:'-', x:30, y:60, desc:'新 IP 主題提案進入設計階段'},
+      {id:'d2', title:'Bevis 派任務', owner:'Bevis', sla:'1 天', x:230, y:60, desc:'指派詩彤（內部）或外包設計師'},
+      {id:'d3', title:'設計師作稿', owner:'詩彤/外包', sla:'3-7 天', x:430, y:60, desc:'依 brief 設計', action:'my-design-task'},
+      {id:'d4', title:'交件 Bevis', owner:'詩彤/外包', sla:'1 天', x:630, y:60, desc:'交件給 Bevis review', action:'my-design-task'},
+      {id:'d5', title:'Bevis 核准', owner:'Bevis', sla:'3 天', x:830, y:60, desc:'核准 / 退回修改 / 需開會', action:'design-approve'},
+      {id:'d6', title:'通知賴哥打樣', owner:'-', sla:'即時', x:230, y:200, desc:'Bevis 核准後自動通知賴哥 + 珮玲'},
+      {id:'d7', title:'珮玲送 IP 方', owner:'珮玲', sla:'1 週', x:430, y:200, desc:'同時送版權方審', action:'my-approval-tracker'},
+    ],
+    edges:[
+      {from:'d1', to:'d2'}, {from:'d2', to:'d3'}, {from:'d3', to:'d4'}, {from:'d4', to:'d5'},
+      {from:'d5', to:'d6', label:'核准'},
+      {from:'d5', to:'d3', label:'退回修改', alt:true},
+      {from:'d6', to:'d7'},
+    ],
+  },
+
+  ip_approval:{
+    title:'5. IP 版權送審',
+    sub:'珮玲送日本/版權方審',
+    width:900, height:300,
+    nodes:[
+      {id:'e1', title:'Bevis 核准設計', owner:'Bevis', sla:'-', x:30, y:60, desc:'設計通過 Bevis review'},
+      {id:'e2', title:'珮玲送 IP 方', owner:'珮玲', sla:'1 週', x:230, y:60, desc:'送 PNUTS / 貓福珊迪 / Sanrio 等', action:'my-approval-tracker'},
+      {id:'e3', title:'等 IP 方回覆', owner:'IP 方', sla:'14 天', x:430, y:60, desc:'日本版權方節奏，通常 14 天'},
+      {id:'e4', title:'珮玲記錄結果', owner:'珮玲', sla:'回覆當天', x:630, y:60, desc:'通過 / 需修改 / 不通過', action:'my-approval-tracker'},
+      {id:'e5', title:'進大貨', owner:'賴哥', sla:'-', x:830, y:60, desc:'通過 → 賴哥開大貨 PO'},
+      {id:'e6', title:'7 天沒回 → 追問', owner:'珮玲', sla:'7 天', x:230, y:200, desc:'IP 方超期，珮玲主動追'},
+      {id:'e7', title:'回設計修改', owner:'Bevis', sla:'-', x:630, y:200, desc:'需修改 → 回 Bevis 重設計'},
+    ],
+    edges:[
+      {from:'e1', to:'e2'}, {from:'e2', to:'e3'}, {from:'e3', to:'e4'},
+      {from:'e4', to:'e5', label:'通過'},
+      {from:'e4', to:'e7', label:'需修改', alt:true},
+      {from:'e3', to:'e6', label:'7 天沒回', alt:true},
+      {from:'e6', to:'e2'},
+    ],
+  },
+
+  contract_renew:{
+    title:'6. IP 合約續簽',
+    sub:'安然提早 6 個月啟動',
+    width:900, height:240,
+    nodes:[
+      {id:'f1', title:'系統提醒', owner:'-', sla:'到期前 6 月', x:30, y:60, desc:'安然 IP 維護 modal 自動提醒'},
+      {id:'f2', title:'安然啟動談判', owner:'安然', sla:'1 個月', x:230, y:60, desc:'跟 IP 方談條款', action:'ip-reminders'},
+      {id:'f3', title:'條款談妥', owner:'安然', sla:'-', x:430, y:60, desc:'MG / 版稅 / 範圍 全部對齊'},
+      {id:'f4', title:'Ray 親簽', owner:'Ray', sla:'1 週', x:630, y:60, desc:'大合約 Ray 親簽', action:'ray-approval'},
+      {id:'f5', title:'躍明付 MG', owner:'躍明', sla:'7 天', x:830, y:60, desc:'依合約付保底金'},
+    ],
+    edges:[
+      {from:'f1', to:'f2'}, {from:'f2', to:'f3'}, {from:'f3', to:'f4'}, {from:'f4', to:'f5'},
+    ],
+  },
+
+  popup:{
+    title:'7. 快閃店流程',
+    sub:'Shawn 主場 · 3 個月備戰',
+    width:1000, height:300,
+    nodes:[
+      {id:'g1', title:'場地 + IP 確定', owner:'Shawn/安然', sla:'-', x:30, y:60, desc:'場地談妥 + IP 主題定'},
+      {id:'g2', title:'Shawn 立項', owner:'Shawn', sla:'1 週', x:230, y:60, desc:'進入 3 個月備戰'},
+      {id:'g3', title:'採購備貨', owner:'賴哥', sla:'2 個月', x:430, y:60, desc:'量產快閃用商品', action:'my-po'},
+      {id:'g4', title:'設計道具', owner:'Bevis', sla:'1 個月', x:630, y:60, desc:'店面 / 道具 / DM', action:'design-approve'},
+      {id:'g5', title:'版權確認', owner:'珮玲', sla:'2 週', x:830, y:60, desc:'店面 / 道具版權方確認', action:'my-approval-tracker'},
+      {id:'g6', title:'物流規劃', owner:'高維', sla:'2 週', x:30, y:200, desc:'貨從哪 → 哪倉 → 店面', action:'logistics-batch'},
+      {id:'g7', title:'開店', owner:'Shawn', sla:'-', x:230, y:200, desc:'啟動 + Shawn 每週 check 業績'},
+      {id:'g8', title:'營運監控', owner:'Shawn', sla:'每週', x:430, y:200, desc:'日均業績 / 打平進度 / 庫存'},
+      {id:'g9', title:'結束清倉', owner:'高維/躍明', sla:'閉店後 1 週', x:630, y:200, desc:'剩貨回倉 + 結算'},
+    ],
+    edges:[
+      {from:'g1', to:'g2'}, {from:'g2', to:'g3'}, {from:'g2', to:'g4'}, {from:'g2', to:'g5'},
+      {from:'g3', to:'g6'}, {from:'g4', to:'g6'}, {from:'g5', to:'g6'},
+      {from:'g6', to:'g7'}, {from:'g7', to:'g8'}, {from:'g8', to:'g9'},
+    ],
+  },
+
+  visit:{
+    title:'8. 拜訪客戶記錄',
+    sub:'業務員每日動作',
+    width:800, height:240,
+    nodes:[
+      {id:'h1', title:'業務員拜訪', owner:'業務員/Shawn', sla:'-', x:30, y:60, desc:'面訪 / 電話 / 微信 / 視訊'},
+      {id:'h2', title:'當天 lobby 填單', owner:'業務員', sla:'當天', x:230, y:60, desc:'30 秒填客戶/類型/重點/下次跟進', action:'visit-log'},
+      {id:'h3', title:'寫入 CRM', owner:'-', sla:'即時', x:430, y:60, desc:'公共業務中心可看'},
+      {id:'h4', title:'安然監督', owner:'安然', sla:'-', x:630, y:60, desc:'看業務員拜訪頻次 + 重點客戶進度'},
+      {id:'h5', title:'3 天沒填', owner:'-', sla:'3 天', x:230, y:200, desc:'Shawn 待催辦看到', action:'shawn-chase'},
+    ],
+    edges:[
+      {from:'h1', to:'h2'}, {from:'h2', to:'h3'}, {from:'h3', to:'h4'},
+      {from:'h1', to:'h5', label:'沒填', alt:true},
+    ],
+  },
+
+  xborder:{
+    title:'9. 跨境結算',
+    sub:'安然 → 躍明',
+    width:800, height:240,
+    nodes:[
+      {id:'i1', title:'跨境款項發生', owner:'-', sla:'-', x:30, y:60, desc:'北京→香港 / 北京→台灣 / 台灣→泰國'},
+      {id:'i2', title:'安然收到通知', owner:'安然', sla:'-', x:230, y:60, desc:'modal 自動列入', action:'xborder-confirm'},
+      {id:'i3', title:'安然確認', owner:'安然', sla:'3 天', x:430, y:60, desc:'核對金額 + 用途', action:'xborder-confirm'},
+      {id:'i4', title:'通知躍明', owner:'-', sla:'即時', x:630, y:60, desc:'進躍明待入帳'},
+      {id:'i5', title:'躍明入帳', owner:'躍明', sla:'5 天', x:230, y:200, desc:'月結對齊', action:'my-pending'},
+    ],
+    edges:[
+      {from:'i1', to:'i2'}, {from:'i2', to:'i3'}, {from:'i3', to:'i4'}, {from:'i4', to:'i5'},
+    ],
+  },
+
+  monthend:{
+    title:'10. 月結流程',
+    sub:'躍明每月 1-5 日',
+    width:800, height:240,
+    nodes:[
+      {id:'j1', title:'楊子 OPEX 確認', owner:'楊子/Leo', sla:'月初 1-2 日', x:30, y:60, desc:'上月實際 vs 預算'},
+      {id:'j2', title:'安然跨境對齊', owner:'安然', sla:'月初 1-2 日', x:230, y:60, desc:'所有跨境款項對齊'},
+      {id:'j3', title:'躍明月結', owner:'躍明', sla:'月初 3-5 日', x:430, y:60, desc:'整理損益表 / 現金流預測 / 帳款核對', action:'monthend'},
+      {id:'j4', title:'報 Ray + Shawn', owner:'躍明', sla:'5 日前', x:630, y:60, desc:'月度報告'},
+      {id:'j5', title:'VAM 計入', owner:'躍明', sla:'月底', x:430, y:200, desc:'淨利歸入香港 JV + 深圳子公司'},
+    ],
+    edges:[
+      {from:'j1', to:'j3'}, {from:'j2', to:'j3'}, {from:'j3', to:'j4'}, {from:'j3', to:'j5'},
+    ],
+  },
+};
+
+// ── State ──
+let currentFlow = 'wholesale';
+let selectedNodeId = null;
+
+// ── Render flow tabs ──
+function renderTabs(){
+  const tabs = document.getElementById('flow-tabs');
+  tabs.innerHTML = Object.entries(WORKFLOWS).map(([key, flow]) =>
+    `<button class="flow-tab ${key===currentFlow?'active':''}" onclick="switchFlow('${key}')">${flow.title}</button>`
+  ).join('');
+}
+
+function switchFlow(key){
+  currentFlow = key;
+  selectedNodeId = null;
+  renderTabs();
+  renderCanvas();
+  renderDetail();
+}
+
+// ── Render SVG canvas ──
+function renderCanvas(){
+  const flow = WORKFLOWS[currentFlow];
+  if(!flow){ document.getElementById('canvas-area').innerHTML = '<div class="empty-flow">這個流程還沒畫</div>'; return; }
+  const W = flow.width, H = flow.height;
+  // Build SVG
+  let svg = `<svg id="canvas" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  // arrow markers
+  svg += `<defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/>
+    </marker>
+    <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+    </marker>
+  </defs>`;
+  // 流程標題 + 副標
+  svg += `<text x="20" y="30" font-size="15" font-weight="800" fill="#0a0a0a" letter-spacing="-0.02em">${flow.title}</text>`;
+  svg += `<text x="20" y="48" font-size="11" fill="#999">${flow.sub}</text>`;
+  // Edges first (so nodes overlay)
+  flow.edges.forEach(e => {
+    const fromN = flow.nodes.find(n => n.id === e.from);
+    const toN = flow.nodes.find(n => n.id === e.to);
+    if(!fromN || !toN) return;
+    const NW = 160, NH = 80;
+    const fx = fromN.x + NW/2;
+    const fy = fromN.y + NH/2;
+    const tx = toN.x + NW/2;
+    const ty = toN.y + NH/2;
+    // edge from box edge to box edge (simple approximation)
+    let x1, y1, x2, y2;
+    const dx = tx - fx, dy = ty - fy;
+    if(Math.abs(dx) > Math.abs(dy)){
+      // horizontal
+      x1 = fx + (dx > 0 ? NW/2 : -NW/2);
+      y1 = fy;
+      x2 = tx + (dx > 0 ? -NW/2 : NW/2);
+      y2 = ty;
+    } else {
+      // vertical or diagonal
+      x1 = fx;
+      y1 = fy + (dy > 0 ? NH/2 : -NH/2);
+      x2 = tx;
+      y2 = ty + (dy > 0 ? -NH/2 : NH/2);
+    }
+    const markerId = e.alt ? 'arrow-alt' : 'arrow';
+    svg += `<line class="edge ${e.alt?'alt':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#${markerId})"/>`;
+    if(e.label){
+      const mx = (x1+x2)/2, my = (y1+y2)/2 - 4;
+      svg += `<text class="edge-label ${e.alt?'alt':''}" x="${mx}" y="${my}" text-anchor="middle">${e.label}</text>`;
+    }
+  });
+  // Nodes
+  const notes = loadNotes();
+  flow.nodes.forEach(n => {
+    const NW = 160, NH = 80;
+    const hasNote = notes.filter(no => no.flow === currentFlow && no.nodeId === n.id).length > 0;
+    const isSelected = n.id === selectedNodeId;
+    svg += `<g class="node ${isSelected?'selected':''}" data-id="${n.id}" onclick="selectNode('${n.id}')">`;
+    svg += `<rect class="node-rect" x="${n.x}" y="${n.y}" width="${NW}" height="${NH}" rx="10"/>`;
+    svg += `<text class="node-title" x="${n.x+NW/2}" y="${n.y+24}" text-anchor="middle">${n.title}</text>`;
+    svg += `<text class="node-owner" x="${n.x+NW/2}" y="${n.y+44}" text-anchor="middle">${n.owner}</text>`;
+    svg += `<text class="node-sla" x="${n.x+NW/2}" y="${n.y+60}" text-anchor="middle">SLA: ${n.sla}</text>`;
+    if(hasNote){
+      svg += `<text x="${n.x+NW-12}" y="${n.y+16}" text-anchor="middle" font-size="13">💡</text>`;
+    }
+    if(n.action){
+      svg += `<text x="${n.x+12}" y="${n.y+16}" font-size="10" fill="#ff6b35" font-weight="700">⚡</text>`;
+    }
+    svg += `</g>`;
+  });
+  svg += `</svg>`;
+  document.getElementById('canvas-area').innerHTML = svg;
+}
+
+// ── Select node ──
+function selectNode(id){
+  selectedNodeId = id;
+  renderCanvas();
+  renderDetail();
+}
+
+// ── Render detail panel ──
+function renderDetail(){
+  const panel = document.getElementById('detail-panel');
+  if(!selectedNodeId){
+    panel.innerHTML = `<div class="detail-empty"><span class="detail-empty-emoji">👈</span>點左邊任一節點看細節<br><span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span></div>`;
+    return;
+  }
+  const flow = WORKFLOWS[currentFlow];
+  const n = flow.nodes.find(x => x.id === selectedNodeId);
+  if(!n) return;
+  const notes = loadNotes().filter(no => no.flow === currentFlow && no.nodeId === selectedNodeId);
+  panel.innerHTML = `
+    <div class="detail-section">
+      <div class="detail-label">流程環節</div>
+      <div class="detail-title">${n.title}</div>
+      <div>
+        <span class="detail-owner">${n.owner}</span>
+        <span class="detail-sla">⏱ SLA ${n.sla}</span>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">細節說明</div>
+      <div class="detail-desc">${n.desc}</div>
+    </div>
+    ${n.action ? `
+    <div class="detail-section">
+      <div class="detail-label">對應 ERP 動作</div>
+      <a class="detail-action" href="erp-lobby.html#action-${n.action}">
+        <span class="detail-action-icon">⚡</span>
+        <span>跳到大廳 · 開「${n.action}」modal</span>
+        <span class="detail-action-arrow">→</span>
+      </a>
+    </div>
+    ` : ''}
+    <div class="optimize-box">
+      <div class="detail-label">💡 我覺得這環節要優化</div>
+      <textarea class="optimize-textarea" id="opt-input" placeholder="例：這環節等太久 / 該開發新工具 / 簡化流程..."></textarea>
+      <button class="optimize-btn" onclick="addNote()">記下這個優化想法</button>
+      <div class="notes-list" id="notes-list">
+        ${notes.length === 0 ? '<div style="font-size:11px;color:var(--ink-lo);text-align:center;padding:14px;">尚無優化想法</div>' : notes.map(no => `
+          <div class="note-item">
+            <button class="note-del" onclick="delNote(${no.ts})">✕</button>
+            <div class="note-meta">${no.by} · ${new Date(no.ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+            <div>${no.text.replace(/</g,'&lt;')}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── Notes management ──
+function loadNotes(){
+  try { return JSON.parse(localStorage.getItem('workflow_notes_v1') || '[]'); } catch(e){ return []; }
+}
+function saveNotes(arr){
+  localStorage.setItem('workflow_notes_v1', JSON.stringify(arr));
+  updateOptCount();
+}
+function addNote(){
+  const text = document.getElementById('opt-input').value.trim();
+  if(!text) return;
+  const notes = loadNotes();
+  notes.push({flow:currentFlow, nodeId:selectedNodeId, text, by:name, ts:Date.now()});
+  saveNotes(notes);
+  document.getElementById('opt-input').value = '';
+  renderCanvas();
+  renderDetail();
+}
+function delNote(ts){
+  const notes = loadNotes().filter(no => no.ts !== ts);
+  saveNotes(notes);
+  renderCanvas();
+  renderDetail();
+}
+function updateOptCount(){
+  const cnt = loadNotes().length;
+  document.getElementById('optimize-count-display').textContent = `${cnt} 個優化建議`;
+}
+
+// ── Init ──
+renderTabs();
+renderCanvas();
+renderDetail();
+updateOptCount();
+</script>
+<script src="erp-sidebar.js"></script>
+</body>
+</html>
