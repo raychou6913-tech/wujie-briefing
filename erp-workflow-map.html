@@ -74,7 +74,29 @@ body{
   width:340px;background:#fff;border-left:1px solid var(--line);
   padding:24px 22px;overflow-y:auto;
   display:flex;flex-direction:column;
+  position:relative;transition:width .25s var(--ease);
 }
+.detail-panel.collapsed{width:36px;padding:24px 4px;overflow:hidden;}
+.detail-panel.collapsed .detail-content{display:none;}
+.panel-toggle{
+  position:absolute;top:14px;left:8px;
+  background:var(--paper-soft);border:1px solid var(--line);
+  border-radius:6px;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:11px;color:var(--ink-mid);
+  transition:background .15s var(--ease);
+  z-index:2;
+}
+.panel-toggle:hover{background:var(--line);}
+.detail-panel.collapsed .panel-toggle{left:6px;}
+.detail-panel.collapsed .panel-toggle-icon::before{content:'◀';}
+.panel-toggle-icon::before{content:'▶';}
+/* drag handle for free resize */
+.panel-resize{
+  position:absolute;top:0;left:-3px;width:6px;height:100%;
+  cursor:col-resize;z-index:3;
+}
+.detail-panel.collapsed .panel-resize{display:none;}
 .detail-empty{
   color:var(--ink-lo);font-size:13px;text-align:center;
   margin-top:80px;line-height:1.7;
@@ -211,10 +233,14 @@ body{
     <div id="canvas-area"></div>
   </div>
   <div class="detail-panel" id="detail-panel">
-    <div class="detail-empty">
-      <span class="detail-empty-emoji">👈</span>
-      點左邊任一節點看細節<br>
-      <span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span>
+    <div class="panel-resize" id="panel-resize"></div>
+    <button class="panel-toggle" onclick="togglePanel()" title="收合 / 展開"><span class="panel-toggle-icon"></span></button>
+    <div class="detail-content" id="detail-content">
+      <div class="detail-empty">
+        <span class="detail-empty-emoji">👈</span>
+        點左邊任一節點看細節<br>
+        <span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span>
+      </div>
     </div>
   </div>
 </div>
@@ -550,9 +576,41 @@ function selectNode(id){
   renderDetail();
 }
 
+// ── Toggle / resize panel ──
+function togglePanel(){
+  document.getElementById('detail-panel').classList.toggle('collapsed');
+}
+// Drag-to-resize
+(function(){
+  const handle = document.getElementById('panel-resize');
+  const panel = document.getElementById('detail-panel');
+  if(!handle || !panel) return;
+  let startX = 0, startW = 0, dragging = false;
+  handle.addEventListener('mousedown', e => {
+    if(panel.classList.contains('collapsed')) return;
+    dragging = true;
+    startX = e.clientX;
+    startW = panel.offsetWidth;
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const newW = Math.max(220, Math.min(640, startW + (startX - e.clientX)));
+    panel.style.width = newW + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if(dragging){
+      dragging = false;
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    }
+  });
+})();
+
 // ── Render detail panel ──
 function renderDetail(){
-  const panel = document.getElementById('detail-panel');
+  const panel = document.getElementById('detail-content');
   if(!selectedNodeId){
     panel.innerHTML = `<div class="detail-empty"><span class="detail-empty-emoji">👈</span>點左邊任一節點看細節<br><span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span></div>`;
     return;
