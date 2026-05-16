@@ -24,8 +24,19 @@ const COMMON_FIELDS = [
   },
 ];
 
+// 沒有現成 SingleSelect 狀態欄位的表，加 inbox_state（用於 yangzi/leo/yuming 等費用流）
+const INBOX_STATE_FIELD = {
+  field_name: 'inbox_state',
+  type: 3,
+  ui_type: 'SingleSelect',
+  property: { options: [{ name: 'pending' }, { name: 'approved' }, { name: 'rejected' }, { name: 'paid' }] },
+};
+
+// 旗標：要不要也加 inbox_state（預設 false，依 table 列表決定）
+const TABLES_NEED_INBOX_STATE = new Set(['tblvGsQpXPHtkp1C']); // 費用實報
+
 const DEFAULT_TABLES = [
-  'tblSgCcB2aFcsPaw', // 設計送審 — Bevis 設計核准 / 珮玲 送審追蹤
+  'tblSgCcB2aFcsPaw', // 設計送審 — Bevis / 珮玲 / 詩彤
 ];
 
 async function getToken() {
@@ -77,8 +88,9 @@ async function tableName(token, tableId) {
     console.log(`[${tbl}] ${name}`);
     const existing = await listFields(token, tbl);
     const names = new Set(existing.map((f) => f.field_name));
+    const fieldsToAdd = TABLES_NEED_INBOX_STATE.has(tbl) ? [...COMMON_FIELDS, INBOX_STATE_FIELD] : COMMON_FIELDS;
 
-    for (const def of COMMON_FIELDS) {
+    for (const def of fieldsToAdd) {
       if (names.has(def.field_name)) {
         console.log(`  skip  ${def.field_name}`);
         skipped++;

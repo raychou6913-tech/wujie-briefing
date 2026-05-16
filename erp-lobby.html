@@ -3196,102 +3196,91 @@ function doIpReminderAction(id, action){
   showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
 }
 
-// ── 待審 inbox modal（楊子 / Leo / Ray）共用 yangzi_inbox_v1 localStorage ──
-const INBOX_SEED = [
-  {id:'i1', type:'expense', urgency:'high', name:'詩彤 出差費用報銷',
-   meta:'台北→高雄出差 · 2026-04-28', amount:'NT$8,560', status:'pending',
-   details:[
-     {label:'申請人',val:'詩彤'},
-     {label:'事由',val:'客戶簡報出差（台北→高雄）'},
-     {label:'金額',val:'NT$8,560 — 高鐵 1,490 + 飯店 4,800 + 餐費 2,270'},
-     {label:'單據',val:'✓ 已上傳'},
-   ]},
-  {id:'i2', type:'leave', urgency:'med', name:'木子 請假申請',
-   meta:'事假 2 天 · 2026-05-05～05-06', amount:'2 天', status:'pending',
-   details:[
-     {label:'假別',val:'事假'},
-     {label:'代理人',val:'賴哥'},
-     {label:'原因',val:'家庭事務'},
-   ]},
-  {id:'i3', type:'expense', urgency:'med', name:'高維 油資/車資報銷',
-   meta:'北京送貨車資 · 2026-04-30', amount:'¥340', status:'pending',
-   details:[
-     {label:'事由',val:'廠端提貨·送貨車資'},
-     {label:'單據',val:'✓ 已上傳'},
-   ]},
-];
-const TYPE_LABEL = {expense:'費用報銷',leave:'請假',recruit:'招募',payroll:'薪資'};
-const TYPE_COLOR = {expense:'var(--brand)',leave:'#0891b2',recruit:'#7c3aed',payroll:'#f59e0b'};
-function loadInboxLobby(){
-  const stored = localStorage.getItem('yangzi_inbox_v1');
-  if(stored) return JSON.parse(stored);
-  localStorage.setItem('yangzi_inbox_v1', JSON.stringify(INBOX_SEED));
-  return INBOX_SEED;
+// ── 待審 inbox modal（楊子 / Leo 共用）— 飛書直連 2026-05-17 ──
+// 楊子用 yangzi-approve（北京），Leo 用 leo-approve（台灣）
+window._approvalInboxCache = [];
+const TYPE_COLOR_MAP = {'生產製造':'var(--brand)','薪資發放':'#f59e0b','差旅':'#0891b2','辦公室租金':'#9333ea','水電雜費':'#475569','其他':'var(--ink-lo)'};
+function _fmtAmount(amount, ccy){
+  if(amount === null || amount === undefined) return '';
+  const sym = ccy === 'TWD' ? 'NT$' : ccy === 'CNY' || ccy === 'RMB' ? '¥' : ccy === 'USD' ? '$' : ccy === 'HKD' ? 'HK$' : ccy === 'THB' ? '฿' : '';
+  return sym + Number(amount).toLocaleString();
 }
-function saveInboxLobby(arr){ localStorage.setItem('yangzi_inbox_v1', JSON.stringify(arr)); }
-function openApprovalInboxModal(){
-  renderApprovalInbox();
-  document.getElementById('approval-inbox-modal').classList.add('show');
-}
-function closeApprovalInboxModal(){
-  document.getElementById('approval-inbox-modal').classList.remove('show');
-}
-function renderApprovalInbox(){
+async function openApprovalInboxModal(){
   const list = document.getElementById('approval-inbox-list');
-  const pending = loadInboxLobby().filter(i => i.status === 'pending');
-  if(!pending.length){
-    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待審申請</div>';
-    return;
-  }
-  list.innerHTML = pending.map(i => {
-    const detailsHtml = i.details.map(d => `<div style="display:flex;gap:8px;font-size:11px;line-height:1.6;"><span style="color:var(--ink-lo);min-width:50px;">${d.label}</span><span style="color:var(--ink);">${d.val}</span></div>`).join('');
-    return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);background:#fef2f2;':''}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
-        <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:${TYPE_COLOR[i.type]||'var(--ink-lo)'}22;color:${TYPE_COLOR[i.type]||'var(--ink-lo)'};">${TYPE_LABEL[i.type]||i.type}</span>
-            ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;">⚠ 緊急</span>':''}
+  document.getElementById('approval-inbox-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  const kind = user === 'leo' ? 'leo-approve' : 'yangzi-approve';
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/${kind}?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || '讀取失敗');
+    window._approvalInboxCache = d.items || [];
+    if (!d.items.length){
+      list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待審申請</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(i => {
+      const typeColor = TYPE_COLOR_MAP[i.ip] || 'var(--ink-lo)';
+      const dateStr = i.date ? new Date(i.date).toLocaleDateString('zh-TW') : '';
+      const meta = [i.designer, i.stage, dateStr].filter(Boolean).join(' · ');
+      const amt = _fmtAmount(i.amount, i.currency);
+      return `<div data-rid="${i.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);background:#fef2f2;':''}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+              <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:${typeColor}22;color:${typeColor};">${i.ip || '其他'}</span>
+              ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;">⚠ 緊急</span>':''}
+            </div>
+            <div style="font-size:13px;font-weight:700;color:var(--ink);">${i.name || '(未命名)'}</div>
+            <div style="font-size:11px;color:var(--ink-mid);margin-top:2px;">${meta}</div>
           </div>
-          <div style="font-size:13px;font-weight:700;color:var(--ink);">${i.name}</div>
-          <div style="font-size:11px;color:var(--ink-mid);margin-top:2px;">${i.meta}</div>
+          <div style="font-size:14px;font-weight:800;color:var(--ink);text-align:right;white-space:nowrap;margin-left:12px;">${amt}</div>
         </div>
-        <div style="font-size:14px;font-weight:800;color:var(--ink);text-align:right;white-space:nowrap;margin-left:12px;">${i.amount}</div>
-      </div>
-      <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;margin-bottom:10px;">${detailsHtml}</div>
-      <div style="display:flex;gap:6px;">
-        <button onclick="doInboxApprove('${i.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准</button>
-        <button onclick="doInboxReject('${i.id}')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">退回</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-function doInboxApprove(id){
-  const arr = loadInboxLobby();
-  const item = arr.find(x => x.id === id);
-  if(item){ item.status = 'approved'; saveInboxLobby(arr); }
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:name, to:'yuming',
-    msg:`${name} 已核准：${item ? item.name : id} · 送躍明入帳`});
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  renderApprovalInbox();
-  markCurrentTodoDone();
-  showQaToast(`✓ 已核准 · 送躍明入帳`);
-}
-function doInboxReject(id){
-  const arr = loadInboxLobby();
-  const item = arr.find(x => x.id === id);
-  if(item){ item.status = 'rejected'; saveInboxLobby(arr); }
-  // 通知申請人補單據（Phase 1 補洞）
-  if(item){
-    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-    notif.unshift({ts:Date.now(), from:name, to:'applicant',
-      msg:`⚠ 你的申請被退回：${item.name} · 請補單據後重送`});
-    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+        ${i.detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:11px;color:var(--ink-mid);">${i.detail}</div>` : ''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doInboxApprove('${i.record_id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准 · 送躍明入帳</button>
+          <button onclick="doInboxReject('${i.record_id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message || e}<br><button onclick="openApprovalInboxModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
   }
-  renderApprovalInbox();
-  markCurrentTodoDone();
-  showQaToast(`已退回 · 通知申請人補單據`);
 }
+function closeApprovalInboxModal(){ document.getElementById('approval-inbox-modal').classList.remove('show'); }
+async function _doInboxAction(recordId, action){
+  const item = window._approvalInboxCache.find(x => x.record_id === recordId);
+  if (!item) { showQaToast('找不到項目'); return; }
+  let note = '';
+  if (action === 'reject') {
+    note = prompt('退回原因（會通知申請人）：') || '';
+    if (!note.trim()) { showQaToast('未輸入原因，取消'); return; }
+  }
+  const kind = user === 'leo' ? 'leo-approve' : 'yangzi-approve';
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/${kind}/action`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      if (r.status === 409) { showQaToast('⚠ 版本衝突，重新載入'); openApprovalInboxModal(); }
+      else showQaToast('動作失敗：' + (d.error || r.status));
+      return;
+    }
+    showQaToast(action === 'approve' ? '✓ 已核准 · 送躍明入帳' : '已退回 · 通知申請人補單據');
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if (action === 'approve') notif.unshift({ts:Date.now(), from:name, to:'yuming', msg:`${name} 已核准：${item.name} · 送躍明入帳`});
+    else notif.unshift({ts:Date.now(), from:name, to:item.submitted_by || 'applicant', msg:`⚠ 你的申請被退回：${item.name} · ${note}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openApprovalInboxModal();
+  } catch (e) {
+    showQaToast('網路錯誤：' + (e.message || e));
+  }
+}
+function doInboxApprove(rid){ return _doInboxAction(rid, 'approve'); }
+function doInboxReject(rid){ return _doInboxAction(rid, 'reject'); }
 
 // ── OPEX 預算規劃 modal（楊子 / Leo）──
 const OPEX_BUDGET_DEFAULT = {
