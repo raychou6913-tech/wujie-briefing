@@ -2009,34 +2009,58 @@ const STALE_SLA = {
 };
 const DOMAIN_OWNER_NAME = {anran:'安然', bevis:'Bevis', shawn:'Shawn', ray:'Ray'};
 
+// 已接飛書 Worker 的 inbox key（local detectStaleItems 跳過，避免雙重計算）
+const WIRED_INBOX_KEYS = new Set(['bevis_design_approve_v1', 'shetong_design_task_v1', 'peilin_approval_track_v1', 'yangzi_inbox_v1']);
+
 function detectStaleItems(){
   const stale = [];
   const _hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
   Object.entries(STALE_SLA).forEach(([key, cfg]) => {
+    if (WIRED_INBOX_KEYS.has(key)) return;  // 已上飛書，由 Worker /erp/inbox/shawn-chase 統一掃
     let arr;
     try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return; }
     if(!Array.isArray(arr)) return;
     arr.filter(cfg.filter).forEach(item => {
-      // 沒 submittedAt 的舊 seed：預設 5 天前（讓 demo 看得到效果）
       const submittedAt = item.submittedAt || (Date.now() - 5*86400000);
       const ageDays = (Date.now() - submittedAt) / 86400000;
       const slaDays = cfg.sla[item.urgency === 'high' ? 'high' : 'normal'];
       if(ageDays <= slaDays) return;
-      // 暫掛 24 hr 內的跳過
       const hideKey = key + ':' + item.id;
       if(_hidden[hideKey] && Date.now() < _hidden[hideKey]) return;
       stale.push({
-        key, item,
-        source: cfg.source,
-        who: cfg.who, whoUser: cfg.whoUser,
+        _origin: 'local', _key: key, _itemId: item.id,
+        item, source: cfg.source, who: cfg.who, whoUser: cfg.whoUser,
         domain: cfg.domain, domainOwner: cfg.domainOwner,
-        daysLate: Math.floor(ageDays - slaDays),
-        age: Math.floor(ageDays),
+        daysLate: Math.floor(ageDays - slaDays), age: Math.floor(ageDays),
         urgency: item.urgency || 'normal',
+        name: item.name || item.title || item.task || item.ip || item.po || item.client || item.order || '(unnamed)',
+        detail: item.detail || item.meta || '',
       });
     });
   });
-  return stale.sort((a, b) => b.daysLate - a.daysLate);
+  return stale;
+}
+
+// fetch Worker 端 stale（已接飛書的 inbox）
+async function fetchWorkerStale(){
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/shawn-chase`);
+    const d = await r.json();
+    if (!d.ok) return [];
+    const _hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
+    return (d.items || [])
+      .filter(it => {
+        const hideKey = it.kind + ':' + it.record_id;
+        return !_hidden[hideKey] || Date.now() >= _hidden[hideKey];
+      })
+      .map(it => ({
+        _origin: 'worker', _kind: it.kind, _recordId: it.record_id,
+        source: it.source, who: it.who, whoUser: it.whoUser,
+        domain: it.domain, domainOwner: it.domainOwner,
+        daysLate: it.daysLate, age: it.age, urgency: it.urgency,
+        name: it.name, detail: '',
+      }));
+  } catch(e){ return []; }
 }
 
 // ── Sidebar 動作的待處理數量 helper ──
@@ -2380,119 +2404,101 @@ function doWholesale(id, action){
   showQaToast(`✓ ${item ? item.client : id} · ${labels[action]}`);
 }
 
-// 待催辦改 dynamic — 從所有 inbox 跑 STALE_DETECTOR
-function openChaseModal(){
-  const stale = detectStaleItems();
+// 待催辦：Worker 飛書 stale + localStorage 未上飛書 inbox stale 合併
+window._chaseStaleCache = [];
+async function openChaseModal(){
   const list = document.getElementById('chase-list');
+  document.getElementById('chase-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  // 並行撈 Worker + local
+  const [workerStale, localStale] = [await fetchWorkerStale(), detectStaleItems()];
+  const stale = [...workerStale, ...localStale].sort((a, b) => b.daysLate - a.daysLate);
+  window._chaseStaleCache = stale;
   if(!stale.length){
     list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 全公司任務都準時，沒有需要催的</div>';
-  } else {
-    list.innerHTML = stale.map((s, idx) => {
-      const itemTitle = s.item.name || s.item.title || s.item.task || s.item.ip || s.item.po || s.item.client || s.item.order || '(unnamed)';
-      const detail = s.item.detail || s.item.meta || '';
-
-      // 第二顆按鈕邏輯（gg 拍板 + Ray 邏輯：當事者 == domain owner 不重複知會自己）
-      const whoIsOwner = s.whoUser === s.domainOwner;
-      let secondBtn = '', tagText = '';
-      if(whoIsOwner){
-        // 安然自己卡 / Bevis 自己卡 / Ray 自己卡 — 只能催本人，沒人可知會升級
-        secondBtn = '';
-        tagText = `${s.who} 本人卡住 · 只能催不能跨級`;
-      } else if(s.domain === 'shawn'){
-        // Shawn 自己 domain（高維/春雷/佳音）→ 可升 Ray
-        secondBtn = `<button onclick="doChaseEscalate('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">⬆️ 升級 Ray</button>`;
-        tagText = `Shawn 自己 domain · 可決策升級`;
-      } else {
-        // 跨人 domain（楊子→安然 / 賴哥→安然 / 詩彤→Bevis 等）
-        const ownerName = DOMAIN_OWNER_NAME[s.domain];
-        secondBtn = `<button onclick="doChaseKnow('${s.key}','${s.item.id}','${s.domain}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">💬 知會 ${ownerName}</button>`;
-        tagText = `催 ${s.who}（${s.who} 主管：${ownerName}）`;
-      }
-
-      return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
-        <div style="margin-bottom:6px;">
-          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--paper-soft);color:var(--ink-mid);margin-right:6px;">${s.source}</span>
-          <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.who} · ${itemTitle}</span>
-          <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ 延遲 ${s.daysLate} 天（送來已 ${s.age} 天）</div>
-          <div style="font-size:9px;color:var(--ink-lo);margin-top:2px;">${tagText}</div>
-        </div>
-        ${detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${detail}</div>` : ''}
-        <div style="display:flex;gap:6px;">
-          <button onclick="doChasePush('${s.key}','${s.item.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 飛書催 ${s.who}</button>
-          ${secondBtn}
-          <button onclick="doChaseHide('${s.key}','${s.item.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫掛 24h</button>
-        </div>
-      </div>`;
-    }).join('');
+    return;
   }
-  document.getElementById('chase-modal').classList.add('show');
+  list.innerHTML = stale.map((s, idx) => {
+    const whoIsOwner = s.whoUser === s.domainOwner;
+    let secondBtn = '', tagText = '';
+    if(whoIsOwner){
+      tagText = `${s.who} 本人卡住 · 只能催不能跨級`;
+    } else if(s.domain === 'shawn'){
+      secondBtn = `<button onclick="doChaseEscalate(${idx})" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">⬆️ 升級 Ray</button>`;
+      tagText = `Shawn 自己 domain · 可決策升級`;
+    } else {
+      const ownerName = DOMAIN_OWNER_NAME[s.domain];
+      secondBtn = `<button onclick="doChaseKnow(${idx})" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">💬 知會 ${ownerName}</button>`;
+      tagText = `催 ${s.who}（主管：${ownerName}）`;
+    }
+    const originBadge = s._origin === 'worker' ? '<span style="font-size:8px;color:var(--brand);font-weight:700;margin-left:4px;">飛書</span>' : '';
+    return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
+      <div style="margin-bottom:6px;">
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--paper-soft);color:var(--ink-mid);margin-right:6px;">${s.source}</span>${originBadge}
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.who} · ${s.name}</span>
+        <div style="font-size:11px;color:var(--warn);margin-top:3px;font-weight:700;">⚠ 延遲 ${s.daysLate} 天（送來已 ${s.age} 天）</div>
+        <div style="font-size:9px;color:var(--ink-lo);margin-top:2px;">${tagText}</div>
+      </div>
+      ${s.detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${s.detail}</div>` : ''}
+      <div style="display:flex;gap:6px;">
+        <button onclick="doChasePush(${idx})" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔔 飛書催 ${s.who}</button>
+        ${secondBtn}
+        <button onclick="doChaseHide(${idx})" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫掛 24h</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 function closeChaseModal(){ document.getElementById('chase-modal').classList.remove('show'); }
-function _findStaleItem(key, id){
-  const arr = JSON.parse(localStorage.getItem(key)||'[]');
-  return arr.find(x => x.id === id);
-}
-function doChasePush(key, id){
-  const cfg = STALE_SLA[key];
-  const item = _findStaleItem(key, id);
-  if(!item || !cfg) return;
-  const itemTitle = item.name || item.title || item.task || item.ip || item.po || item.client || item.order || '(unnamed)';
+// 統一 hidden key — Worker 用 kind:record_id；local 用 key:itemId
+function _chaseHideKey(s){ return s._origin === 'worker' ? (s._kind + ':' + s._recordId) : (s._key + ':' + s._itemId); }
+const NAME_TO_USER = {'楊子':'yangzi','Leo':'leo','安然':'anran','賴哥':'laige','木子':'muzi','Bevis':'bevis','珮玲':'peilin','詩彤':'shetong','高維':'gaowei','春雷':'chunlei','佳音':'jiaying','Ray':'ray'};
+
+function doChasePush(idx){
+  const s = window._chaseStaleCache[idx]; if(!s) return;
   const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  // who 是中文名，要 reverse map 到 user id
-  const NAME_TO_USER = {'楊子':'yangzi','Leo':'leo','安然':'anran','賴哥':'laige','木子':'muzi','Bevis':'bevis','珮玲':'peilin','詩彤':'shetong','高維':'gaowei','春雷':'chunlei','佳音':'jiaying','Ray':'ray'};
-  const targetUser = NAME_TO_USER[cfg.who] || cfg.who;
-  notif.unshift({ts:Date.now(), from:'Shawn', to:targetUser, msg:`🔔 Shawn 催：${itemTitle}（已延遲）`});
+  notif.unshift({ts:Date.now(), from:'Shawn', to: NAME_TO_USER[s.who] || s.whoUser, msg:`🔔 Shawn 催：${s.name}（已延遲 ${s.daysLate} 天）`});
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   openChaseModal();
-  showQaToast(`🔔 已飛書催 ${cfg.who}`);
+  showQaToast(`🔔 已飛書催 ${s.who}`);
 }
-function doChaseKnow(key, id, domain){
-  const cfg = STALE_SLA[key];
-  const item = _findStaleItem(key, id);
-  if(!item || !cfg) return;
-  const itemTitle = item.name || item.title || item.task || item.ip || item.po || item.client || item.order || '(unnamed)';
-  const target = domain === 'anran' ? 'anran' : 'bevis';
-  const targetName = domain === 'anran' ? '安然' : 'Bevis';
+function doChaseKnow(idx){
+  const s = window._chaseStaleCache[idx]; if(!s) return;
+  const ownerName = DOMAIN_OWNER_NAME[s.domain];
   const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:'Shawn', to:target, msg:`💬 Shawn 知會：${cfg.who} ${itemTitle} 已延遲，請處理`});
+  notif.unshift({ts:Date.now(), from:'Shawn', to: s.domainOwner, msg:`💬 Shawn 知會：${s.who} 卡 ${s.name}（${s.daysLate} 天）`});
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  // 同時暫掛 24h 避免重複看到
   const hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
-  hidden[key+':'+id] = Date.now() + 86400000;
+  hidden[_chaseHideKey(s)] = Date.now() + 86400000;
   localStorage.setItem('shawn_chase_hidden_v1', JSON.stringify(hidden));
   openChaseModal();
-  showQaToast(`💬 已知會 ${targetName} · 24h 不重提`);
+  showQaToast(`💬 已知會 ${ownerName} · 24h 不重提`);
 }
-function doChaseHide(key, id){
+function doChaseHide(idx){
+  const s = window._chaseStaleCache[idx]; if(!s) return;
   const hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
-  hidden[key+':'+id] = Date.now() + 86400000;
+  hidden[_chaseHideKey(s)] = Date.now() + 86400000;
   localStorage.setItem('shawn_chase_hidden_v1', JSON.stringify(hidden));
   openChaseModal();
   showQaToast('✓ 暫掛 24 小時');
 }
-// 升級 Ray — 加 UI 摩擦（必填理由 modal，gg 拍板）
-function doChaseEscalate(key, id){
-  const cfg = STALE_SLA[key];
-  const item = _findStaleItem(key, id);
-  if(!item || !cfg) return;
-  const reason = prompt(`升級給 Ray — 請簡述原因（必填）：\n\n項目：${cfg.who} · ${item.name || item.title || item.task || item.order || ''}\n延遲狀態：已超 SLA`);
+function doChaseEscalate(idx){
+  const s = window._chaseStaleCache[idx]; if(!s) return;
+  const reason = prompt(`升級給 Ray — 請簡述原因（必填）：\n\n項目：${s.who} · ${s.name}\n延遲：${s.daysLate} 天`);
   if(!reason || !reason.trim()){ showQaToast('已取消（必填原因）'); return; }
-  // 寫進 ray_approval_v1
-  const itemTitle = item.name || item.title || item.task || item.po || item.order || '(escalated)';
+  // ray_approval_v1 仍走 localStorage（V1 不在 Phase A 試用範圍）
   const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
   rayArr.unshift({
     id:'esc-' + Date.now(), type:'escalation',
-    title:`[Shawn 升級] ${itemTitle}`, from:'Shawn', urgency:'high',
-    detail:`Shawn 升級原因：${reason.trim()}\n原 source：${cfg.source} · ${cfg.who}`,
+    title:`[Shawn 升級] ${s.name}`, from:'Shawn', urgency:'high',
+    detail:`Shawn 升級原因：${reason.trim()}\n原 source：${s.source} · ${s.who}`,
     submittedAt: Date.now(),
   });
   localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
   const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:'Shawn', to:'ray', msg:`⬆️ Shawn 升級：${itemTitle} · ${reason.trim()}`});
+  notif.unshift({ts:Date.now(), from:'Shawn', to:'ray', msg:`⬆️ Shawn 升級：${s.name} · ${reason.trim()}`});
   localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  // 同時暫掛
   const hidden = JSON.parse(localStorage.getItem('shawn_chase_hidden_v1')||'{}');
-  hidden[key+':'+id] = Date.now() + 86400000;
+  hidden[_chaseHideKey(s)] = Date.now() + 86400000;
   localStorage.setItem('shawn_chase_hidden_v1', JSON.stringify(hidden));
   openChaseModal();
   showQaToast(`⬆️ 已升級給 Ray`);
