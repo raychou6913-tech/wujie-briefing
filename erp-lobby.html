@@ -2778,41 +2778,76 @@ async function doApprovalTrack(recordId, action){
   }
 }
 
-// 詩彤：我的設計任務
-const DESIGN_TASK_SEED = [
-  {id:'dt1', task:'Snoopy 城市系列 — 紐約 / 巴黎 主稿', assignedBy:'Bevis', deadline:'今天 18:00', urgency:'high', detail:'10 城市系列前 2 城；下午要交 Bevis Review。'},
-  {id:'dt2', task:'貓福珊迪文創包裝 第 2 輪修改', assignedBy:'Bevis', deadline:'明天', urgency:'med', detail:'依 Bevis 意見調整色調 + 字體。'},
-  {id:'dt3', task:'Opanchu 公仔配色提案 × 3', assignedBy:'Bevis', deadline:'本週五', urgency:'low', detail:'發想新配色組合，給 Bevis 選。'},
-];
-function openDesignTaskModal(){
-  const items = _seedKey('shetong_design_task_v1', DESIGN_TASK_SEED);
-  _genericListRender(document.getElementById('design-task-list'), items, t => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${t.urgency==='high'?'border-color:var(--danger);':''}">
-    <div style="margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:700;color:var(--ink);">${t.task}</span>
-      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${t.assignedBy} 派發 · 截止 ${t.deadline}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${t.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doDesignTask('${t.id}','submitted')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已交給 Bevis</button>
-      <button onclick="doDesignTask('${t.id}','delay')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需延期</button>
-    </div>
-  </div>`, '✨ 任務全部完成');
-  document.getElementById('design-task-modal').classList.add('show');
+// 詩彤：我的設計任務（飛書直連 2026-05-16）
+window._designTaskCache = [];
+
+async function openDesignTaskModal(){
+  const listEl = document.getElementById('design-task-list');
+  const modal = document.getElementById('design-task-modal');
+  modal.classList.add('show');
+  listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/design-task?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || '讀取失敗');
+    window._designTaskCache = d.items || [];
+    if (!d.items.length){
+      listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 任務全部完成</div>`;
+      return;
+    }
+    listEl.innerHTML = d.items.map(it => {
+      const ipBadge = it.ip ? `<span style="font-size:10px;background:var(--paper-soft);border-radius:6px;padding:2px 7px;color:var(--ink-mid);margin-left:6px;">${it.ip}</span>` : '';
+      const stage = it.stage ? `${it.stage} · ` : '';
+      const round = (it.round && Number(it.round) > 1) ? `第 ${Number(it.round)} 輪修改` : '初稿';
+      const sourceLabel = it.state === '修改中' ? 'Bevis 退回' : 'Bevis 派發';
+      return `<div data-rid="${it.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${it.urgency==='high'?'border-color:var(--danger);':''}">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${it.name || '(未命名)'}</span>${ipBadge}
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${sourceLabel} · ${stage}${round}</div>
+        </div>
+        <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${it.detail || '(無備註)'}</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="doDesignTask('${it.record_id}','submitted')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已交給 Bevis</button>
+          <button onclick="doDesignTask('${it.record_id}','delay')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需延期</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message || e}<br><button onclick="openDesignTaskModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
+  }
 }
 function closeDesignTaskModal(){ document.getElementById('design-task-modal').classList.remove('show'); }
-function doDesignTask(id, action){
-  const item = _genericDone('shetong_design_task_v1', id, '');
-  const labels = {submitted:'已交 Bevis · 等審', delay:'已標記延期 · 通知 Bevis'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'submitted'){
-    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`詩彤交件：${item ? item.task : id}`});
-  } else if(action === 'delay'){
-    // 延期 → 通知 Bevis 知道（Phase 1 補洞）
-    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`⚠ 詩彤需延期：${item ? item.task : id}`});
+async function doDesignTask(recordId, action){
+  const item = window._designTaskCache.find(x => x.record_id === recordId);
+  if (!item) { showQaToast('找不到項目，請重新整理'); return; }
+  let note = '';
+  if (action === 'delay') {
+    note = prompt('延期原因 + 新交期（會通知 Bevis）：') || '';
+    if (!note.trim()) { showQaToast('未輸入延期原因，取消'); return; }
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  openDesignTaskModal();
-  showQaToast(`✓ ${item ? item.task : id} · ${labels[action]}`);
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/design-task/action`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      if (r.status === 409) { showQaToast('⚠ 版本衝突，重新載入'); openDesignTaskModal(); }
+      else showQaToast('動作失敗：' + (d.error || r.status));
+      return;
+    }
+    const labels = {submitted:'已交 Bevis · 等審', delay:'已標記延期 · 通知 Bevis'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if (action === 'submitted') notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`詩彤交件：${item.name}`});
+    else if (action === 'delay') notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`⚠ 詩彤需延期：${item.name} · ${note}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openDesignTaskModal();
+  } catch (e) {
+    showQaToast('網路錯誤：' + (e.message || e));
+  }
 }
 
 // ── 賴哥 / 木子 採購 modal × 3：我的 PO / 備貨核對 / 付款申請 ──
