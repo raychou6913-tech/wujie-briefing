@@ -496,6 +496,61 @@ body{
   .bottom-nav{display:flex;}
   body{padding-bottom:72px;}
 }
+
+/* ── AI 助理浮動 panel (V0) ─────────────────────────── */
+#ai-fab{
+  position:fixed; right:24px; bottom:24px; width:56px; height:56px;
+  border-radius:50%; border:none; background:var(--brand); color:#fff;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  box-shadow:0 8px 24px rgba(255,107,53,.35); z-index:9000;
+  transition:transform .2s ease;
+}
+#ai-fab:hover{ transform:scale(1.05); }
+#ai-panel{
+  position:fixed; right:24px; bottom:96px; width:380px; height:520px;
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,.18); display:none; flex-direction:column;
+  z-index:9001; overflow:hidden;
+}
+#ai-panel.open{ display:flex; }
+.ai-head{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 16px; background:var(--ink); color:#fff;
+}
+.ai-msgs{
+  flex:1; overflow-y:auto; padding:16px;
+  display:flex; flex-direction:column; gap:8px;
+  background:var(--paper);
+}
+.ai-msg{
+  max-width:78%; padding:10px 12px; border-radius:12px;
+  font-size:13px; line-height:1.5; word-wrap:break-word;
+}
+.ai-msg-user{
+  align-self:flex-end; background:var(--brand); color:#fff;
+}
+.ai-msg-bot{
+  align-self:flex-start; background:#fff; border:1px solid var(--line); color:var(--ink);
+}
+.ai-typing{ opacity:.5; font-style:italic; }
+.ai-input-row{
+  display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); background:#fff;
+}
+.ai-input-row textarea{
+  flex:1; resize:none; border:1px solid var(--line); border-radius:8px;
+  padding:8px 10px; font-family:inherit; font-size:13px;
+  max-height:80px;
+}
+.ai-input-row textarea:focus{ outline:none; border-color:var(--brand); }
+.ai-send{
+  padding:0 14px; background:var(--ink); color:#fff;
+  border:none; border-radius:8px; font-size:12px; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+.ai-send:hover{ background:var(--brand); }
+@media (max-width:600px){
+  #ai-panel{ right:16px; left:16px; width:auto; bottom:80px; }
+}
 </style>
 <script src="mock-data.js"></script>
 </head>
@@ -1316,6 +1371,9 @@ body{
 const sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
 if(!sess||Date.now()-sess.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
 const {user, name, role, hall, color} = sess;
+
+// Worker proxy（飛書讀寫 + AI chat 統一走這個）
+const WORKER_BASE = 'https://feishu-proxy.raychou6913.workers.dev';
 
 // 沒有專屬廳的員工 → 送去填報中心
 const NO_HALL_USERS = [];
@@ -2570,47 +2628,78 @@ function doLogisticsShip(id){
   showQaToast(`✓ ${item ? item.order : id} 已出貨 · 通知安然 / 業務`);
 }
 
-// Bevis：設計核准
-const DESIGN_APPROVE_SEED = [
-  {id:'da1', name:'貓福珊迪夏日系列 3D 稿', designer:'外包 · 老周', round:'第 3 輪', urgency:'high', detail:'夏日海邊主題；3 個角色姿勢；已調整 IP 方意見；建議進打樣。'},
-  {id:'da2', name:'Snoopy × 城市系列 Brief', designer:'內部 · 詩彤', round:'初稿', urgency:'high', detail:'10 城市主題；已延遲 2 天；採購在等開模時程。'},
-  {id:'da3', name:'Opanchu 文創包裝', designer:'外包 · 小李', round:'第 2 輪修改', urgency:'med', detail:'依 Bevis 上輪意見修；色調 / 字體已調整。'},
-];
-function openDesignApproveModal(){
-  const items = _seedKey('bevis_design_approve_v1', DESIGN_APPROVE_SEED);
-  _genericListRender(document.getElementById('design-approve-list'), items, d => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${d.urgency==='high'?'border-color:var(--danger);':''}">
-    <div style="margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:700;color:var(--ink);">${d.name}</span>
-      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${d.designer} · ${d.round}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${d.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doDesignAction('${d.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准 · 進打樣</button>
-      <button onclick="doDesignAction('${d.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回修改</button>
-      <button onclick="doDesignAction('${d.id}','meeting')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需開會</button>
-    </div>
-  </div>`, '✨ 沒有待核准設計稿');
-  document.getElementById('design-approve-modal').classList.add('show');
+// Bevis：設計核准（飛書直連，2026-05-16 起接 tblSgCcB2aFcsPaw 設計送審）
+window._designApproveCache = []; // 暫存目前列表，doDesignAction 撈 record_id + version
+
+async function openDesignApproveModal(){
+  const listEl = document.getElementById('design-approve-list');
+  const modal = document.getElementById('design-approve-modal');
+  modal.classList.add('show');
+  listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/design-approve?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || '讀取失敗');
+    window._designApproveCache = d.items || [];
+    if (!d.items.length){
+      listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 沒有待核准設計稿</div>`;
+      return;
+    }
+    listEl.innerHTML = d.items.map(it => {
+      const round = (it.round && Number(it.round) > 1) ? `第 ${Number(it.round)} 輪` : '初稿';
+      const stage = it.stage ? ` · ${it.stage}` : '';
+      const meta = [it.designer, round + stage].filter(Boolean).join(' · ');
+      const ipBadge = it.ip ? `<span style="font-size:10px;background:var(--paper-soft);border-radius:6px;padding:2px 7px;color:var(--ink-mid);margin-left:6px;">${it.ip}</span>` : '';
+      return `<div data-rid="${it.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${it.urgency==='high'?'border-color:var(--danger);':''}">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${it.name || '(未命名)'}</span>${ipBadge}
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${meta}</div>
+        </div>
+        <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${it.detail || '(無備註)'}</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="doDesignAction('${it.record_id}','approve')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准 · 進打樣</button>
+          <button onclick="doDesignAction('${it.record_id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回修改</button>
+          <button onclick="doDesignAction('${it.record_id}','meeting')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需開會</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message || e}<br><button onclick="openDesignApproveModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
+  }
 }
 function closeDesignApproveModal(){ document.getElementById('design-approve-modal').classList.remove('show'); }
-function doDesignAction(id, action){
-  const item = _genericDone('bevis_design_approve_v1', id, '');
-  const labels = {approved:'已核准 · 通知賴哥準備打樣', revise:'已退回設計師修改', meeting:'已安排會議 · 通知設計師'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'approved'){
-    notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`Bevis 核准設計：${item ? item.name : id} · 可準備打樣`});
-  } else if(action === 'revise'){
-    // 退回 → 通知設計師重做（Phase 1 補洞）
-    const designer = item && item.designer ? item.designer : 'shetong';
-    const to = designer.includes('外包') ? 'shetong' : (designer === '內部 · 詩彤' ? 'shetong' : 'shetong');
-    notif.unshift({ts:Date.now(), from:name, to, msg:`⚠ Bevis 退回需修改：${item ? item.name : id}`});
-  } else if(action === 'meeting'){
-    // 開會 → 通知設計師排會議（Phase 1 補洞）
-    notif.unshift({ts:Date.now(), from:name, to:'shetong', msg:`📅 Bevis 安排會議討論：${item ? item.name : id}`});
+async function doDesignAction(recordId, action){
+  const item = window._designApproveCache.find(x => x.record_id === recordId);
+  if (!item) { showQaToast('找不到項目，請重新整理'); return; }
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/design-approve/action`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      if (r.status === 409) {
+        showQaToast('⚠ 版本衝突，重新載入');
+        openDesignApproveModal();
+      } else {
+        showQaToast('動作失敗：' + (d.error || r.status));
+      }
+      return;
+    }
+    const labels = {approve:'已核准 · 通知賴哥準備打樣', revise:'已退回設計師修改', meeting:'已安排會議 · 通知設計師'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    // notif queue 仍寫 localStorage（下游接力暫不動，Phase 2 改）
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if (action === 'approve') notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`Bevis 核准設計：${item.name} · 可準備打樣`});
+    else if (action === 'revise') notif.unshift({ts:Date.now(), from:name, to:item.submitted_by || 'shetong', msg:`⚠ Bevis 退回需修改：${item.name}`});
+    else if (action === 'meeting') notif.unshift({ts:Date.now(), from:name, to:item.submitted_by || 'shetong', msg:`📅 Bevis 安排會議討論：${item.name}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openDesignApproveModal();
+  } catch (e) {
+    showQaToast('網路錯誤：' + (e.message || e));
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  openDesignApproveModal();
-  showQaToast(`✓ ${item ? item.name : id} · ${labels[action]}`);
 }
 
 // 珮玲：送審追蹤
@@ -3698,6 +3787,94 @@ function showToast(msg){
   clearTimeout(t._timer);
   t._timer=setTimeout(()=>t.style.opacity='0',2000);
 }
+
+// ── AI Assistant Floating Panel (V0 prototype, 2026-05-16) ──
+// 浮動按鈕 + 對話面板。歷史存 localStorage per user。
+const AI_CHAT_KEY = 'ai_chat_history_' + user;
+function _aiHist(){ try { return JSON.parse(localStorage.getItem(AI_CHAT_KEY) || '[]'); } catch(e){ return []; } }
+function _aiHistSet(arr){ localStorage.setItem(AI_CHAT_KEY, JSON.stringify(arr.slice(-30))); }
+
+function toggleAiPanel(){
+  const p = document.getElementById('ai-panel');
+  if(!p) return;
+  const open = p.classList.toggle('open');
+  if(open){
+    renderAiMessages();
+    setTimeout(() => document.getElementById('ai-input').focus(), 200);
+  }
+}
+function renderAiMessages(){
+  const box = document.getElementById('ai-msgs');
+  if(!box) return;
+  const hist = _aiHist();
+  if(!hist.length){
+    const greet = (new Date().getHours() < 12 ? '早安' : new Date().getHours() < 17 ? '午安' : '晚安');
+    box.innerHTML = `<div class="ai-msg ai-msg-bot">${greet}${name}，我是 MJ 助理。<br>需要看你今天的待辦嗎？打字問我就好。</div>`;
+    return;
+  }
+  box.innerHTML = hist.filter(m => typeof m.content === 'string' || (Array.isArray(m.content) && m.content.some(c => c.type === 'text')))
+    .map(m => {
+      const text = typeof m.content === 'string' ? m.content : m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
+      if(!text.trim()) return '';
+      const cls = m.role === 'user' ? 'ai-msg-user' : 'ai-msg-bot';
+      return `<div class="ai-msg ${cls}">${escapeHtml(text).replace(/\n/g,'<br>')}</div>`;
+    }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sendAiMessage(){
+  const input = document.getElementById('ai-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  const box = document.getElementById('ai-msgs');
+  // optimistic render user msg
+  const hist = _aiHist();
+  hist.push({ role:'user', content: text });
+  _aiHistSet(hist);
+  renderAiMessages();
+  // typing indicator
+  box.insertAdjacentHTML('beforeend', '<div class="ai-msg ai-msg-bot ai-typing" id="ai-typing">思考中...</div>');
+  box.scrollTop = box.scrollHeight;
+  try {
+    const r = await fetch(`${WORKER_BASE}/ai-chat`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user, userName:name, userRole:role, message: text, history: _aiHist().slice(0,-1) })
+    });
+    const d = await r.json();
+    document.getElementById('ai-typing')?.remove();
+    if(!d.ok){ box.insertAdjacentHTML('beforeend', `<div class="ai-msg ai-msg-bot" style="color:var(--danger)">錯誤：${escapeHtml(d.error || '未知')}</div>`); return; }
+    // server returns full history including assistant turn; save it
+    _aiHistSet(d.history || _aiHist().concat({ role:'assistant', content: d.reply }));
+    renderAiMessages();
+  } catch (e) {
+    document.getElementById('ai-typing')?.remove();
+    box.insertAdjacentHTML('beforeend', `<div class="ai-msg ai-msg-bot" style="color:var(--danger)">網路錯誤：${escapeHtml(e.message || String(e))}</div>`);
+  }
+}
+
+(function buildAiPanel(){
+  if(document.getElementById('ai-fab')) return;
+  const html = `
+    <button id="ai-fab" onclick="toggleAiPanel()" aria-label="AI 助理">
+      <span style="font-size:24px;">🤖</span>
+    </button>
+    <div id="ai-panel">
+      <div class="ai-head">
+        <span style="font-size:13px;font-weight:700;letter-spacing:.1em;">MJ 助理 · V0</span>
+        <button onclick="toggleAiPanel()" style="background:none;border:none;color:inherit;font-size:18px;cursor:pointer;line-height:1;">×</button>
+      </div>
+      <div class="ai-msgs" id="ai-msgs"></div>
+      <div class="ai-input-row">
+        <textarea id="ai-input" placeholder="問我問題、看待辦、找東西..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendAiMessage();}"></textarea>
+        <button onclick="sendAiMessage()" class="ai-send">送出</button>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', html);
+})();
 
 // ── Init ──────────────────────────────────────────────
 // Pulse 4 格全部 hardcoded demo 數據（員工視角，毛利+季度尺度）；之後接飛書時改 sync。
