@@ -344,7 +344,7 @@ Ray 策略：**「項目啟動者 + 行政人事」兩端切入**
 |---|---|
 | **Schema 先定** | 每表加 `owner / created_at / updated_at / version`；樂觀鎖用 version 防並發覆蓋 |
 | **Backup 策略** | 試用前 snapshot 飛書 raw data，方便 revert |
-| **分批啟用** | Week 1 楊子 → Week 2 安然賴哥 → Week 3 全部，局部出包不影響其他 |
+| **分批啟用** ⭐ Ray 修正 | Week 1 **上游項目啟動者**（Shawn/Bevis/珮玲/詩彤）→ Week 2 下游 reporting line（安然/賴哥/木子/高維）→ Week 3 行政+業務員+Ray（楊子/Leo/業務員/電商/Ray/躍明）。上游動才有下游事，項目啟動端用順了下游必須跟 |
 | **過渡規劃** | 試用 OK 通知全公司「明天正式啟用」+ 第一週 Shawn 待催辦密集監控 |
 | **核心架構** | 26 modal + AI tool 用同一個 Worker endpoint（AI 跟人類用一樣後端）|
 
