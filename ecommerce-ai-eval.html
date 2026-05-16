@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一件代發電商 — AI 自動化評估表</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fafaf8;
+    --ink: #0a0a0a;
+    --ink-2: #4a4a4a;
+    --ink-3: #8a8a8a;
+    --brand: #ff6b35;
+    --line: #e8e8e3;
+    --card: #ffffff;
+    --good: #1f8a3d;
+    --warn: #c87b00;
+    --bad: #c43a3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', 'Helvetica Neue', -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 80px 32px 120px; }
+
+  h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 38px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+  h2 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 56px 0 20px;
+    letter-spacing: -0.005em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 28px 0 12px;
+    color: var(--ink);
+  }
+  p { margin-bottom: 14px; color: var(--ink-2); }
+
+  .lead {
+    font-size: 16px;
+    color: var(--ink-2);
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .meta {
+    font-size: 13px;
+    color: var(--ink-3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .brand-dot { color: var(--brand); }
+
+  /* 自評題卡片 */
+  .quiz-section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .question {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .question:last-child { border-bottom: none; }
+  .question-title {
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .option:hover { background: rgba(255, 107, 53, 0.05); }
+  .option input[type="radio"] {
+    margin-top: 4px;
+    accent-color: var(--brand);
+    cursor: pointer;
+  }
+  .option label {
+    cursor: pointer;
+    flex: 1;
+    font-size: 14.5px;
+    color: var(--ink-2);
+  }
+
+  /* 三條路對比 */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .compare-table th {
+    background: #f0f0eb;
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--line);
+    font-size: 14px;
+  }
+  .compare-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    color: var(--ink-2);
+  }
+  .compare-table tr:hover td { background: rgba(255, 107, 53, 0.03); }
+  .path-name { font-weight: 600; color: var(--ink); }
+
+  /* 推薦 box */
+  .recommendation {
+    background: linear-gradient(135deg, #fff8f4 0%, #fff 100%);
+    border: 2px solid var(--brand);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 32px 0;
+    display: none;
+  }
+  .recommendation.show { display: block; }
+
+  /* AI 深度分析區塊 */
+  .ai-analysis {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 24px 0;
+    display: none;
+    position: relative;
+  }
+  .ai-analysis.show { display: block; }
+  .ai-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ai-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+  }
+  .ai-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .ai-subtitle { font-size: 13px; color: var(--ink-3); }
+  .ai-body p {
+    margin-bottom: 14px;
+    color: var(--ink);
+    line-height: 1.85;
+    font-size: 15px;
+  }
+  .ai-body strong { color: var(--brand); }
+  .ai-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-3);
+    font-size: 14px;
+    padding: 8px 0;
+  }
+  .dot-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .dot-pulse:nth-child(2) { animation-delay: 0.2s; }
+  .dot-pulse:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+  .rec-label {
+    font-size: 12px;
+    color: var(--brand);
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .rec-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  .rec-score {
+    display: inline-block;
+    background: var(--brand);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+
+  .submit-btn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 24px 0;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .submit-btn:hover {
+    background: var(--brand);
+    transform: translateY(-1px);
+  }
+
+  /* 行動清單 */
+  .action-list {
+    list-style: none;
+    counter-reset: action;
+  }
+  .action-list li {
+    counter-increment: action;
+    padding: 16px 16px 16px 56px;
+    margin-bottom: 8px;
+    background: var(--card);
+    border-left: 3px solid var(--brand);
+    border-radius: 4px;
+    position: relative;
+  }
+  .action-list li::before {
+    content: counter(action);
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    width: 28px;
+    height: 28px;
+    background: var(--brand);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .callout {
+    background: #fffbe6;
+    border-left: 3px solid var(--warn);
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .callout strong { color: var(--ink); }
+
+  .num {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--brand);
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 48px 0;
+  }
+
+  .footer {
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="meta">For internal evaluation · 一件代發電商</div>
+  <h1>該請員工，還是<span class="brand-dot">培養一個 AI</span>？</h1>
+  <p class="lead">
+    這份評估表幫你判斷 —— 你的電商生意（SHOPLINE + 淘寶一件代發），現階段該走哪條路：
+    <strong>用現成 ERP / 培養 AI 自動化 / 混合</strong>。看完 10 題自評 + 三條路對比，自己就能下判斷。
+  </p>
+
+  <!-- ===== Part 0：背景 ===== -->
+  <h2>一、先搞清楚：AI 能替代什麼人？不能替代什麼人？</h2>
+  <p>
+    這是最關鍵的認知。AI（不管是 ChatGPT、Claude、還是自己訓練的）能做的是「<strong>重複勞動 + 規則明確</strong>」的工作，不是所有工作都能取代。
+  </p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th style="width:30%">員工類型</th>
+        <th style="width:20%">AI 能替代？</th>
+        <th>原因</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>下單員</strong>（看 SHOPLINE 訂單 → 去淘寶下 → 貼物流單號）</td>
+        <td style="color:var(--good)"><strong>✅ 70-90%</strong></td>
+        <td>純重複勞動、規則明確</td>
+      </tr>
+      <tr>
+        <td><strong>客服</strong>（回「我的貨到哪」「能不能退」）</td>
+        <td style="color:var(--good)"><strong>✅ 60-80%</strong></td>
+        <td>80% 是 FAQ，AI 直接回；20% 異常人接手</td>
+      </tr>
+      <tr>
+        <td><strong>選品 / 數據分析</strong></td>
+        <td style="color:var(--warn)"><strong>⚠️ 50% 輔助</strong></td>
+        <td>AI 抓數據做圖表，人做最終判斷</td>
+      </tr>
+      <tr>
+        <td><strong>跟淘寶賣家談判</strong></td>
+        <td style="color:var(--bad)"><strong>❌</strong></td>
+        <td>要人</td>
+      </tr>
+      <tr>
+        <td><strong>客戶投訴 / 退換貨</strong></td>
+        <td style="color:var(--warn)"><strong>⚠️ AI 寫初稿</strong></td>
+        <td>要有溫度，AI 寫稿、人發送</td>
+      </tr>
+      <tr>
+        <td><strong>異常判斷</strong>（賣家下架要不要切備案？）</td>
+        <td style="color:var(--bad)"><strong>❌</strong></td>
+        <td>要人判斷</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>核心邏輯：</strong>AI 不是「請一個員工」，而是「把員工的重複勞動部分自動化」。你還是需要人，但需要的人變少 + 等級變高（從執行型變判斷型）。
+  </div>
+
+  <!-- ===== Part 1：業務現況自評 ===== -->
+  <h2>二、你的業務現況自評（5 題）</h2>
+
+  <div class="quiz-section">
+    <div class="question">
+      <div class="question-title">1. 你目前每天平均處理多少訂單？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q1" value="1" id="q1a"><label for="q1a">少於 20 單 — 自己處理綽綽有餘</label></div>
+        <div class="option"><input type="radio" name="q1" value="2" id="q1b"><label for="q1b">20-50 單 — 開始有點累，但還能撐</label></div>
+        <div class="option"><input type="radio" name="q1" value="3" id="q1c"><label for="q1c">50-150 單 — 一定需要員工，不然忙不過來</label></div>
+        <div class="option"><input type="radio" name="q1" value="4" id="q1d"><label for="q1d">150+ 單 — 已經請了 1-2 個員工</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">2. 你店裡的 SKU（商品種類）大概多少？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q2" value="1" id="q2a"><label for="q2a">少於 50 個 — 精品店模式</label></div>
+        <div class="option"><input type="radio" name="q2" value="2" id="q2b"><label for="q2b">50-300 個 — 中等規模</label></div>
+        <div class="option"><input type="radio" name="q2" value="3" id="q2c"><label for="q2c">300-1000 個 — 大量上架測爆款</label></div>
+        <div class="option"><input type="radio" name="q2" value="4" id="q2d"><label for="q2d">1000+ 個 — 鋪貨型店家</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">3. 客服訊息每天平均處理多少則？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q3" value="1" id="q3a"><label for="q3a">少於 10 則</label></div>
+        <div class="option"><input type="radio" name="q3" value="2" id="q3b"><label for="q3b">10-30 則 — 自己回應付得來</label></div>
+        <div class="option"><input type="radio" name="q3" value="3" id="q3c"><label for="q3c">30-100 則 — 開始吃時間</label></div>
+        <div class="option"><input type="radio" name="q3" value="4" id="q3d"><label for="q3d">100+ 則 — 需要專職客服</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">4. 你的毛利率大概多少？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q4" value="1" id="q4a"><label for="q4a">10% 以下 — 薄利多銷，省一塊是一塊</label></div>
+        <div class="option"><input type="radio" name="q4" value="2" id="q4b"><label for="q4b">10-25% — 一般水準</label></div>
+        <div class="option"><input type="radio" name="q4" value="3" id="q4c"><label for="q4c">25-50% — 健康</label></div>
+        <div class="option"><input type="radio" name="q4" value="4" id="q4d"><label for="q4d">50%+ — 有定價權</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">5. 你目前用什麼工具管理採購和庫存？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q5" value="1" id="q5a"><label for="q5a">純手動 / Excel — 自己記帳</label></div>
+        <div class="option"><input type="radio" name="q5" value="2" id="q5b"><label for="q5b">SHOPLINE 後台 + 手抄筆記</label></div>
+        <div class="option"><input type="radio" name="q5" value="3" id="q5c"><label for="q5c">已用現成 ERP（店小秘等）但有痛點</label></div>
+        <div class="option"><input type="radio" name="q5" value="4" id="q5d"><label for="q5d">用過多套都不滿意</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Part 2：個人條件 ===== -->
+  <h2>三、你個人條件自評（5 題）</h2>
+
+  <div class="quiz-section">
+    <div class="question">
+      <div class="question-title">6. 你對「跟 AI 對話寫程式」這件事的態度？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q6" value="1" id="q6a"><label for="q6a">完全沒興趣，看到就頭痛</label></div>
+        <div class="option"><input type="radio" name="q6" value="2" id="q6b"><label for="q6b">有興趣但沒時間學</label></div>
+        <div class="option"><input type="radio" name="q6" value="3" id="q6c"><label for="q6c">願意花時間學新工具</label></div>
+        <div class="option"><input type="radio" name="q6" value="4" id="q6d"><label for="q6d">已經在用 ChatGPT / Claude，覺得很有用</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">7. 你每天能投入多少時間學新東西？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q7" value="1" id="q7a"><label for="q7a">幾乎沒時間 — 整天都在處理訂單</label></div>
+        <div class="option"><input type="radio" name="q7" value="2" id="q7b"><label for="q7b">每天 30 分鐘左右</label></div>
+        <div class="option"><input type="radio" name="q7" value="3" id="q7c"><label for="q7c">每天 1-2 小時</label></div>
+        <div class="option"><input type="radio" name="q7" value="4" id="q7d"><label for="q7d">願意密集投入（前 1-2 個月每天 3-4 小時）</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">8. 你對自家業務 SOP（流程）的清晰度？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q8" value="1" id="q8a"><label for="q8a">沒想過這問題，大部分靠經驗</label></div>
+        <div class="option"><input type="radio" name="q8" value="2" id="q8b"><label for="q8b">心裡有譜，但沒寫下來</label></div>
+        <div class="option"><input type="radio" name="q8" value="3" id="q8c"><label for="q8c">寫過 SOP，正常單流程清楚</label></div>
+        <div class="option"><input type="radio" name="q8" value="4" id="q8d"><label for="q8d">連異常情況怎麼處理都列出來了</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">9. 踩雷 / 失敗時你的接受度？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q9" value="1" id="q9a"><label for="q9a">害怕踩雷，希望一次到位</label></div>
+        <div class="option"><input type="radio" name="q9" value="2" id="q9b"><label for="q9b">可以接受小錯，大錯難受</label></div>
+        <div class="option"><input type="radio" name="q9" value="3" id="q9c"><label for="q9c">能接受試錯，當作學費</label></div>
+        <div class="option"><input type="radio" name="q9" value="4" id="q9d"><label for="q9d">本來就是邊做邊改的個性</label></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-title">10. 你願意投入的月度預算？</div>
+      <div class="options">
+        <div class="option"><input type="radio" name="q10" value="1" id="q10a"><label for="q10a">少於 NT$2,000/月 — 越省越好</label></div>
+        <div class="option"><input type="radio" name="q10" value="2" id="q10b"><label for="q10b">NT$2,000-8,000/月 — 可接受工具費</label></div>
+        <div class="option"><input type="radio" name="q10" value="3" id="q10c"><label for="q10c">NT$8,000-20,000/月 — 願意投資基礎建設</label></div>
+        <div class="option"><input type="radio" name="q10" value="4" id="q10d"><label for="q10d">NT$20,000+/月 — 把它當長期投資</label></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="calculateScore()">看我的分數 + 推薦路線</button>
+
+  <div class="recommendation" id="result"></div>
+  <div class="ai-analysis" id="ai-analysis"></div>
+
+  <!-- ===== Part 3：三條路詳細對比 ===== -->
+  <h2>四、三條路詳細對比</h2>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th style="width:25%">維度</th>
+        <th style="width:25%">A. 100% 用現成 ERP</th>
+        <th style="width:25%">B. 100% 培養 AI 自建</th>
+        <th style="width:25%">C. 混合（推薦給多數人）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="path-name">代表方案</td>
+        <td>店小秘、易境通、易仓 ERP</td>
+        <td>自己用 Claude Code 寫一套</td>
+        <td>店小秘 + 用 AI 補強</td>
+      </tr>
+      <tr>
+        <td class="path-name">月度成本</td>
+        <td>NT$1,200-4,000</td>
+        <td>NT$640（Claude Pro）或 NT$6,400（Max）+ 自學時間</td>
+        <td>NT$2,000-8,000</td>
+      </tr>
+      <tr>
+        <td class="path-name">啟動時間</td>
+        <td>1 週內可用</td>
+        <td>1-3 個月學 + 1-3 個月開發</td>
+        <td>1 週用現成 + 1-2 個月加 AI 模組</td>
+      </tr>
+      <tr>
+        <td class="path-name">客製化</td>
+        <td>❌ 只能用人家有的功能</td>
+        <td>✅ 想做啥做啥</td>
+        <td>⚠️ 主流程不能改，邊緣可加</td>
+      </tr>
+      <tr>
+        <td class="path-name">維護成本</td>
+        <td>不用維護（廠商負責）</td>
+        <td>自己維護，出 bug 自己修</td>
+        <td>主流程不用維護，AI 模組自己顧</td>
+      </tr>
+      <tr>
+        <td class="path-name">能省幾個員工</td>
+        <td>0.5-1 人（基本自動化）</td>
+        <td>1-2 人（深度自動化）</td>
+        <td>1-1.5 人（中度自動化）</td>
+      </tr>
+      <tr>
+        <td class="path-name">適合誰</td>
+        <td>業務標準、不想折騰</td>
+        <td>業務有特殊邏輯、願意學</td>
+        <td>大部分中小型賣家</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ===== Part 4：如果走 B/C，第一個月怎麼開始 ===== -->
+  <h2>五、如果決定走 B 或 C，第一個月怎麼起步？</h2>
+
+  <ol class="action-list">
+    <li>
+      <strong>第 1 週：先把自家 SOP 寫清楚</strong><br>
+      用文件 / Excel 列出：客戶下單 → 你做什麼 → 然後做什麼 → 完成。<strong>異常情況也要列：</strong>賣家缺貨怎辦？客戶要退貨怎辦？地址寫錯怎辦？這份文件是 AI 工作的基礎。
+    </li>
+    <li>
+      <strong>第 2 週：訂閱 Claude Pro 或 Max（NT$640-6,400/月）+ 安裝 Claude Code</strong><br>
+      每天花 1 小時跟 AI 對話，從「幫我寫一段把 SHOPLINE 訂單匯出成 Excel 的腳本」這種小事開始。重點是培養跟 AI 協作的感覺。
+    </li>
+    <li>
+      <strong>第 3 週：先做最簡單的自動化 —— SHOPLINE 訂單通知</strong><br>
+      設定 SHOPLINE webhook，新訂單進來自動推到你的 LINE / 微信。這是 30 分鐘能做完的事，但會給你信心 ——「原來 AI 真的能幫我做事」。
+    </li>
+    <li>
+      <strong>第 4 週：做「半自動下單助手」</strong><br>
+      AI 幫你把 SHOPLINE 訂單對應到淘寶商品連結 + 把客戶地址格式化好，你只要 copy paste 到淘寶。<strong>不要一上來就做全自動下單，太危險。</strong>
+    </li>
+    <li>
+      <strong>第 2 個月：做客服 AI 回覆草稿</strong><br>
+      接 SHOPLINE 客服訊息，AI 自動寫回覆草稿，你 review 後發送。先不要讓 AI 自己發 ——「人類監督層」是必要的。
+    </li>
+    <li>
+      <strong>第 3 個月：根據 2 個月經驗，決定下一步</strong><br>
+      到這時你會很清楚：哪些痛點 AI 真的解了、哪些其實沒必要做、哪些需要更深入。<strong>不要一開始就規劃 6 個月後的事，那都是空想。</strong>
+    </li>
+  </ol>
+
+  <div class="callout">
+    <strong>最關鍵的心態：</strong>培養 AI 不是「裝個工具」，是「老闆要學會跟 AI 協作」。你會踩雷、會失敗、會被自動下單機器人下錯單嚇到。但只要堅持 3 個月，回頭看會發現自己已經省下相當於 1 個全職員工的工作量。
+  </div>
+
+  <!-- ===== Part 5：最後提醒 ===== -->
+  <h2>六、三個一定要記住的事</h2>
+
+  <div class="callout">
+    <strong>1. 自動化會放大錯誤。</strong>員工下錯 1 單會自己發現喊停；腳本下錯可能一夜下出 100 張錯單。<strong>必須有人類 review 層</strong>—— 每天花 30 分鐘看異常 dashboard。
+  </div>
+
+  <div class="callout">
+    <strong>2. 淘寶帳號有風控。</strong>自動下單太激進會被封號，要做得像人（隨機間隔、不同時段、避開深夜批量操作）。
+  </div>
+
+  <div class="callout">
+    <strong>3. SOP 不清楚 = AI 做出方向錯的東西。</strong>「請員工」不需要你想清楚每個流程，員工會邊做邊問；「請 AI」必須你先把流程想清楚，否則 AI 做出來的不是你要的。
+  </div>
+
+  <div class="footer">
+    <p>這份評估表只是起點 —— 你的判斷比任何分數重要。<br>
+    如果評估後想試 B 或 C 路線，可以從第五段的第 1 週開始。</p>
+  </div>
+
+</div>
+
+<script>
+function calculateScore() {
+  const questions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10'];
+  let businessScore = 0; // q1-q5：業務規模
+  let personalScore = 0; // q6-q10：個人條件
+  let answered = 0;
+
+  questions.forEach((q, i) => {
+    const selected = document.querySelector(`input[name="${q}"]:checked`);
+    if (selected) {
+      answered++;
+      const val = parseInt(selected.value);
+      if (i < 5) businessScore += val;
+      else personalScore += val;
+    }
+  });
+
+  if (answered < 10) {
+    alert(`還有 ${10 - answered} 題沒答，全部答完再看結果`);
+    return;
+  }
+
+  const total = businessScore + personalScore;
+  let recommendation = '';
+  let label = '';
+  let title = '';
+
+  // 決策邏輯：
+  // - 個人條件低（personalScore < 12）→ 不管業務多大，都走 A
+  // - 業務小（businessScore < 10）+ 個人條件中等以上 → A 起步
+  // - 業務中等（10-15）+ 個人條件好（>=14）→ C
+  // - 業務大（>15）+ 個人條件很好（>=17）→ B 或 C
+  // - 業務大 + 個人條件普通 → C
+  // - 業務小 + 個人條件超好 → C（拿來學）
+
+  if (personalScore < 12) {
+    label = '推薦路線';
+    title = 'A. 100% 用現成 ERP';
+    recommendation = `<p>你的個人條件分數 <span class="num">${personalScore}/20</span>，意思是你對技術沒興趣、沒時間、或不願意踩雷。<strong>這完全沒問題</strong> —— 你的時間應該花在選品、行銷、跟賣家談判這些「人才能做的事」上。</p>
+    <p>建議直接訂閱 <strong>店小秘</strong>（月費約 NT$1,200-1,500），這個方案：</p>
+    <ul style="margin-left:20px;color:var(--ink-2)">
+      <li>1 週內就能上手</li>
+      <li>SHOPLINE + 淘寶整合是它的強項</li>
+      <li>能省下 0.5-1 個員工的工作量</li>
+      <li>有問題打客服就行，不用自己解決</li>
+    </ul>
+    <p style="margin-top:16px"><strong>什麼時候該重新考慮？</strong>等你業務變大（每天 200+ 單）或發現店小秘有滿足不了的特殊需求時，再來看 B 或 C。</p>`;
+  } else if (businessScore < 10 && personalScore < 16) {
+    label = '推薦路線';
+    title = 'A. 用現成 ERP 起步';
+    recommendation = `<p>業務分數 <span class="num">${businessScore}/20</span>，個人條件 <span class="num">${personalScore}/20</span>。你的業務還小，現階段培養 AI 的投入產出比不高。</p>
+    <p>建議：<strong>先用店小秘把業務做大</strong>，到每天 50+ 單再重新評估。在那之前，AI 自動化能省的人力不夠抵掉學習成本。</p>`;
+  } else if (businessScore >= 15 && personalScore >= 17) {
+    label = '推薦路線';
+    title = 'B. 培養 AI 自建（或 C 混合）';
+    recommendation = `<p>業務分數 <span class="num">${businessScore}/20</span>，個人條件 <span class="num">${personalScore}/20</span> —— <strong>你是少數適合走 B 路線的人</strong>。業務規模夠大、個人條件齊備、預算充足。</p>
+    <p>但我還是建議 <strong>先走 C（混合）3-6 個月</strong>：</p>
+    <ul style="margin-left:20px;color:var(--ink-2)">
+      <li>用店小秘解決 80% 標準流程（不重複造輪子）</li>
+      <li>用 AI 補上店小秘做不到的特殊需求</li>
+      <li>3-6 個月後你會非常清楚自己真正的瓶頸在哪</li>
+      <li>那時再決定要不要全面自建</li>
+    </ul>
+    <p style="margin-top:16px"><strong>第一個月的行動，看第五段。</strong></p>`;
+  } else if (businessScore >= 10 && personalScore >= 14) {
+    label = '推薦路線';
+    title = 'C. 混合（現成 ERP + AI 補強）';
+    recommendation = `<p>業務分數 <span class="num">${businessScore}/20</span>，個人條件 <span class="num">${personalScore}/20</span> —— <strong>你是 C 路線的標準對象</strong>。</p>
+    <p>業務規模有了，個人也願意學新東西。最佳策略是：</p>
+    <ul style="margin-left:20px;color:var(--ink-2)">
+      <li><strong>第 1-2 週：</strong>訂閱店小秘，解決基礎自動化（80% 工作量）</li>
+      <li><strong>第 3-4 週：</strong>同步開始學 Claude Code，做客服 AI 草稿</li>
+      <li><strong>第 2-3 個月：</strong>逐步把店小秘做不到的部分用 AI 補上（選品分析、特殊客服流程）</li>
+    </ul>
+    <p style="margin-top:16px">這條路能省下 1-1.5 個員工的工作量，又不會一開始就 all-in 自建。<strong>第一個月的行動，看第五段。</strong></p>`;
+  } else {
+    label = '推薦路線';
+    title = 'C. 混合起步（謹慎版）';
+    recommendation = `<p>業務分數 <span class="num">${businessScore}/20</span>，個人條件 <span class="num">${personalScore}/20</span>。</p>
+    <p>建議走 C 路線，但比一般 C 路線更謹慎一點：</p>
+    <ul style="margin-left:20px;color:var(--ink-2)">
+      <li><strong>主力先用店小秘</strong>，把訂單流穩定下來</li>
+      <li><strong>AI 只先做一件事</strong>：客服回覆草稿（不要野心太大）</li>
+      <li>做出第一個成功案例（哪怕只省了 30 分鐘/天）後，再決定要不要做第二個</li>
+    </ul>
+    <p style="margin-top:16px"><strong>關鍵：不要一次想太多，先跑通一個再說。</strong></p>`;
+  }
+
+  const resultBox = document.getElementById('result');
+  resultBox.innerHTML = `
+    <div class="rec-label">${label}</div>
+    <div class="rec-title">${title} <span class="rec-score">總分 ${total}/40</span></div>
+    ${recommendation}
+  `;
+  resultBox.classList.add('show');
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // 收集 10 題的「文字答案」給 AI 分析
+  const answers = [];
+  const labels = [
+    '訂單量', 'SKU 數', '客服訊息量', '毛利率', '現用工具',
+    '對 AI 工具態度', '每天能學習的時間', '業務 SOP 清晰度', '抗壓 / 接受踩雷能力', '月度預算'
+  ];
+  questions.forEach((q, i) => {
+    const sel = document.querySelector(`input[name="${q}"]:checked`);
+    if (sel) {
+      const lblText = sel.parentElement.querySelector('label').textContent.trim();
+      answers.push(`${i + 1}. ${labels[i]}：${lblText}`);
+    }
+  });
+
+  fetchAIAnalysis(answers, title, businessScore, personalScore);
+}
+
+async function fetchAIAnalysis(answers, recommendedPath, bizScore, perScore) {
+  const aiBox = document.getElementById('ai-analysis');
+  aiBox.innerHTML = `
+    <div class="ai-header">
+      <div class="ai-avatar">MJ</div>
+      <div>
+        <div class="ai-title">MJ 深度分析（量身定做）</div>
+        <div class="ai-subtitle">基於你的 10 題答案，AI 顧問正在為你寫個人化建議⋯</div>
+      </div>
+    </div>
+    <div class="ai-loading">
+      <span class="dot-pulse"></span><span class="dot-pulse"></span><span class="dot-pulse"></span>
+      <span style="margin-left:8px">分析中（約 10-20 秒）⋯</span>
+    </div>
+  `;
+  aiBox.classList.add('show');
+
+  const prompt = `你是 MJ，蕪解創意的 AI 戰略幕僚。現在幫一位台灣的 SHOPLINE + 淘寶一件代發電商賣家做個人化評估。
+
+【這位賣家的 10 題自評答案】
+${answers.join('\n')}
+
+【規則式系統的推薦】
+路線：${recommendedPath}
+業務規模分：${bizScore}/20
+個人條件分：${perScore}/20
+
+【請你寫個人化深度分析】
+1. 第一段：用一句話精準描述這人的真實處境（不是恭維，要切中要害）
+2. 第二段：為什麼這條推薦路線適合（或不適合）他 — 結合他具體的答案
+3. 第三段：第一個月最關鍵的 3 個具體動作（要可執行、不要空話）
+4. 第四段：一個他大概率沒想到的盲點 / 風險
+
+【格式要求】
+- 用台灣繁體中文
+- 語氣直接像顧問跟老闆講話，不客套不寒暄
+- 不要用 markdown 標題（不要 # 不要 ##）
+- 重點字可以用 **粗體**
+- 每段 80-150 字，總長 400-600 字
+- 不要結尾「祝你成功」這種廢話`;
+
+  try {
+    const r = await fetch('https://feishu-proxy.raychou6913.workers.dev/ai/text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7 }
+      })
+    });
+    const data = await r.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!text) throw new Error('AI 沒回應，可能 quota 用完或服務暫時不穩，過幾分鐘再試。');
+
+    const html = text
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0)
+      .map(p => `<p>${p.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>`)
+      .join('');
+
+    aiBox.innerHTML = `
+      <div class="ai-header">
+        <div class="ai-avatar">MJ</div>
+        <div>
+          <div class="ai-title">MJ 深度分析（量身定做）</div>
+          <div class="ai-subtitle">基於你的答案，由 Gemini 2.5 Flash 提供</div>
+        </div>
+      </div>
+      <div class="ai-body">${html}</div>
+    `;
+  } catch (e) {
+    aiBox.innerHTML = `
+      <div class="ai-header">
+        <div class="ai-avatar">MJ</div>
+        <div>
+          <div class="ai-title">MJ 深度分析</div>
+          <div class="ai-subtitle" style="color:var(--bad)">分析暫時失敗</div>
+        </div>
+      </div>
+      <div class="ai-body">
+        <p>${e.message}</p>
+        <p style="font-size:13px;color:var(--ink-3)">你可以稍後重整頁面重試。上面的規則式推薦已經能給你 80% 的判斷。</p>
+      </div>
+    `;
+  }
+}
+</script>
+
+</body>
+</html>
