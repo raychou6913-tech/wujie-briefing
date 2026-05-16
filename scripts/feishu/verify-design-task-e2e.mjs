@@ -30,14 +30,14 @@ async function bevisReviseFirst() {
   console.log('[setup] reset + seed 1 筆 + Bevis revise');
   await resetAndSeed();
   await bevisReviseFirst();
-  const t = await (await fetch(`${WORKER}/erp/inbox/design-task?owner=shitong`)).json();
-  console.log(`  → shitong pending: ${t.items.length}（預期 1）`);
+  const t = await (await fetch(`${WORKER}/erp/inbox/design-task?owner=shetong`)).json();
+  console.log(`  → shetong pending: ${t.items.length}（預期 1）`);
   if (t.items.length !== 1) throw new Error('handoff failed');
 
   console.log('\n[browser] 登入 shitong 開 modal');
   const browser = await chromium.launch({ headless: true });
   const page = await (await browser.newContext({ viewport: { width: 1400, height: 900 } })).newPage();
-  const sess = { user: 'shitong', name: '詩彤', role: '設計師', hall: 'erp-pipeline.html', color: '#7d4cdb', ts: Date.now() };
+  const sess = { user: 'shetong', name: '詩彤', role: '設計師', hall: 'erp-pipeline.html', color: '#7d4cdb', ts: Date.now() };
   const errs = [];
   page.on('pageerror', (e) => errs.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error') errs.push('console:' + m.text()); });
