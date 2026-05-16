@@ -2702,45 +2702,80 @@ async function doDesignAction(recordId, action){
   }
 }
 
-// 珮玲：送審追蹤
-const APPROVAL_TRACK_SEED = [
-  {id:'at1', ip:'Snoopy 秋冬運動款', sent:'2026-04-28', counterparty:'Peanuts Worldwide', urgency:'high', detail:'已送 IP 方 18 天，正常 14 天回覆；今天應主動追問。'},
-  {id:'at2', ip:'Mofusand 夏日海邊主題', sent:'2026-05-08', counterparty:'貓福珊迪 IP 方', urgency:'med', detail:'第 1 輪意見：請調整背景色彩；設計師已修，本週送第 2 輪。'},
-  {id:'at3', ip:'吉依卡哇 12 城市系列', sent:'2026-05-12', counterparty:'吉依卡哇 IP 方', urgency:'low', detail:'剛送出 3 天，正常等候期。'},
-];
-function openApprovalTrackModal(){
-  const items = _seedKey('peilin_approval_track_v1', APPROVAL_TRACK_SEED);
-  _genericListRender(document.getElementById('approval-track-list'), items, a => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${a.urgency==='high'?'border-color:var(--warn);':''}">
-    <div style="margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:700;color:var(--ink);">${a.ip}</span>
-      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">已送 ${a.counterparty} · ${a.sent}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${a.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doApprovalTrack('${a.id}','pass')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 通過</button>
-      <button onclick="doApprovalTrack('${a.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需修改</button>
-      <button onclick="doApprovalTrack('${a.id}','chase')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">主動追問</button>
-    </div>
-  </div>`, '✨ 沒有送審待追蹤');
-  document.getElementById('approval-track-modal').classList.add('show');
+// 珮玲：送審追蹤（飛書直連 2026-05-16）
+window._approvalTrackCache = [];
+
+async function openApprovalTrackModal(){
+  const listEl = document.getElementById('approval-track-list');
+  const modal = document.getElementById('approval-track-modal');
+  modal.classList.add('show');
+  listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/approval-track?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || '讀取失敗');
+    window._approvalTrackCache = d.items || [];
+    if (!d.items.length){
+      listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 沒有送審待追蹤</div>`;
+      return;
+    }
+    listEl.innerHTML = d.items.map(it => {
+      const ipBadge = it.ip ? `<span style="font-size:10px;background:var(--paper-soft);border-radius:6px;padding:2px 7px;color:var(--ink-mid);margin-left:6px;">${it.ip}</span>` : '';
+      const designer = it.designer ? `（${it.designer}）` : '';
+      const stage = it.stage ? ` · ${it.stage}` : '';
+      return `<div data-rid="${it.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${it.urgency==='high'?'border-color:var(--warn);':''}">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${it.name || '(未命名)'}</span>${ipBadge}
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">送 IP 方等回覆${stage}${designer}</div>
+        </div>
+        <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${it.detail || '(無備註)'}</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="doApprovalTrack('${it.record_id}','pass')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 通過</button>
+          <button onclick="doApprovalTrack('${it.record_id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需修改</button>
+          <button onclick="doApprovalTrack('${it.record_id}','chase')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">主動追問</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message || e}<br><button onclick="openApprovalTrackModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
+  }
 }
 function closeApprovalTrackModal(){ document.getElementById('approval-track-modal').classList.remove('show'); }
-function doApprovalTrack(id, action){
-  const item = _genericDone('peilin_approval_track_v1', id, '');
-  const labels = {pass:'已通過 · 通知 Bevis 進下一階段', revise:'已記錄修改意見 · 通知 Bevis 改設計', chase:'已發信追問版權方'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'pass'){
-    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`版權方通過：${item ? item.ip : id} · 可進下一階段`});
-  } else if(action === 'revise'){
-    // 需修改 → 通知 Bevis 改設計（Phase 1 補洞）
-    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`⚠ 版權方需修改：${item ? item.ip : id} · 請 Bevis 改設計`});
-  } else if(action === 'chase'){
-    // 主動追問 → 自動排下次追問（Phase 1 補洞，V2 接飛書真的發信）
-    notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`珮玲追問版權方：${item ? item.ip : id} · 已超期`});
+async function doApprovalTrack(recordId, action){
+  const item = window._approvalTrackCache.find(x => x.record_id === recordId);
+  if (!item) { showQaToast('找不到項目，請重新整理'); return; }
+  let note = '';
+  if (action === 'revise') {
+    note = prompt('IP 方修改意見（會通知設計師）：') || '';
+    if (!note.trim()) { showQaToast('未輸入意見，取消'); return; }
+  } else if (action === 'chase') {
+    note = prompt('追問記錄（可選）：例如「已發信給對方窗口」') || '';
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  openApprovalTrackModal();
-  showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/approval-track/action`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      if (r.status === 409) { showQaToast('⚠ 版本衝突，重新載入'); openApprovalTrackModal(); }
+      else showQaToast('動作失敗：' + (d.error || r.status));
+      return;
+    }
+    const labels = {pass:'IP 方通過 · 可進下一階段', revise:'已記錄 IP 方意見 · 通知設計師改', chase:'追問記錄已存'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    // 通知 queue 仍走 localStorage（Phase 2 才改）
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if (action === 'pass') notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`版權方通過：${item.name}`});
+    else if (action === 'revise') notif.unshift({ts:Date.now(), from:name, to:item.submitted_by || 'shetong', msg:`⚠ 版權方需修改：${item.name} · ${note}`});
+    else if (action === 'chase') notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`珮玲追問版權方：${item.name}${note?' · '+note:''}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openApprovalTrackModal();
+  } catch (e) {
+    showQaToast('網路錯誤：' + (e.message || e));
+  }
 }
 
 // 詩彤：我的設計任務
