@@ -190,7 +190,7 @@ body{
 .wf-card:hover{border-color:var(--brand);}
 .wf-card.selected{
   border-color:var(--brand);background:var(--brand-soft);
-  width:240px;z-index:50;
+  z-index:50;box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 .wf-card.dragging{
   box-shadow:0 12px 32px rgba(0,0,0,.15);border-color:var(--brand);
@@ -205,12 +205,22 @@ body{
 .wf-card .wf-sla [contenteditable]{outline:none;cursor:text;}
 .wf-card [contenteditable]:focus{background:#fff8f3;border-radius:4px;outline:1px solid var(--brand);outline-offset:1px;}
 .wf-card .wf-action-icon{
-  position:absolute;top:6px;right:10px;font-size:11px;
+  position:absolute;top:6px;left:10px;font-size:11px;
   color:var(--brand);font-weight:700;pointer-events:none;
 }
 .wf-card .wf-note-icon{
-  position:absolute;top:6px;left:10px;font-size:12px;pointer-events:none;
+  position:absolute;top:6px;left:28px;font-size:12px;pointer-events:none;
 }
+.wf-card-close{
+  position:absolute;top:4px;right:4px;
+  background:#fff;border:1px solid var(--ink-faint);border-radius:50%;
+  width:20px;height:20px;padding:0;font-size:10px;color:var(--ink-mid);
+  cursor:pointer;font-family:inherit;
+  display:none;line-height:1;
+  z-index:51;
+}
+.wf-card.selected .wf-card-close{display:flex;align-items:center;justify-content:center;}
+.wf-card-close:hover{border-color:var(--danger);color:var(--danger);background:#fff;}
 
 /* 展開區（selected 時顯示） */
 .wf-card-details{display:none;}
@@ -664,6 +674,7 @@ function renderCanvas(){
     card.innerHTML = `
       ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
       ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
+      <button class="wf-card-close" data-close-btn title="收起">✕</button>
       <div class="wf-title" contenteditable="true" spellcheck="false">${escapeHtml(n.title)}</div>
       <div class="wf-owner" contenteditable="true" spellcheck="false">${escapeHtml(n.owner)}</div>
       <div class="wf-sla">SLA: <span data-field="sla" contenteditable="true" spellcheck="false">${escapeHtml(n.sla)}</span></div>
@@ -695,6 +706,12 @@ function renderCanvas(){
         renderCanvas();
       });
     });
+    // 收起按鈕
+    const closeBtn = card.querySelector('[data-close-btn]');
+    if (closeBtn) closeBtn.addEventListener('click', ev => {
+      ev.stopPropagation();
+      selectNode(null);
+    });
     // 卡片 click：非編輯區 + 非互動元素 → 選取/取消
     card.addEventListener('click', e => {
       if (e.target.closest('[contenteditable="true"]')) return;
@@ -712,6 +729,13 @@ function renderCanvas(){
 
   // Edges
   flow.edges.forEach(e => drawEdge(svgEl, hostEl, flow, e));
+
+  // 點空白處（host / canvas-area）→ 收起 selected
+  hostEl.addEventListener('click', e => {
+    if (e.target === hostEl || e.target.tagName === 'svg' || e.target.tagName === 'SVG') {
+      if (selectedNodeId) selectNode(null);
+    }
+  });
 }
 
 function drawEdge(svgEl, hostEl, flow, e){
