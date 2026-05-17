@@ -46,9 +46,9 @@ body{
 .tb-sub{font-size:10px;color:var(--ink-lo);margin-left:6px;letter-spacing:.06em;}
 .tb-right{display:flex;align-items:center;gap:12px;}
 
-.main{display:flex;height:calc(100vh - 56px);}
+.main{height:calc(100vh - 56px);}
 .canvas-wrap{
-  flex:1;background:var(--paper-soft);position:relative;overflow:auto;
+  background:var(--paper-soft);position:relative;overflow:auto;height:100%;
 }
 .flow-tabs{
   position:sticky;top:0;background:var(--paper);
@@ -184,32 +184,86 @@ body{
 .wf-card{
   position:absolute;width:172px;background:#fff;
   border:1.5px solid var(--ink-faint);border-radius:10px;
-  padding:18px 12px 10px;font-size:11px;
-  transition:border-color .2s var(--ease), box-shadow .2s var(--ease);
+  padding:10px 12px;font-size:11px;cursor:grab;
+  transition:border-color .2s var(--ease), box-shadow .2s var(--ease), width .2s var(--ease);
 }
 .wf-card:hover{border-color:var(--brand);}
-.wf-card.selected{border-color:var(--brand);background:var(--brand-soft);}
-.wf-card.dragging{box-shadow:0 12px 32px rgba(0,0,0,.15);border-color:var(--brand);z-index:100;cursor:grabbing;}
-.wf-card .wf-drag-handle{
-  position:absolute;top:0;left:0;right:0;height:14px;
-  cursor:grab;border-radius:10px 10px 0 0;
-  background:linear-gradient(to bottom, var(--paper-soft), transparent);
+.wf-card.selected{
+  border-color:var(--brand);background:var(--brand-soft);
+  width:240px;z-index:50;
 }
-.wf-card .wf-drag-handle:active{cursor:grabbing;}
+.wf-card.dragging{
+  box-shadow:0 12px 32px rgba(0,0,0,.15);border-color:var(--brand);
+  z-index:100;cursor:grabbing;
+}
 .wf-card .wf-title{
   font-size:13px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
-  outline:none;line-height:1.3;margin-bottom:4px;
+  outline:none;line-height:1.3;margin-bottom:4px;cursor:text;
 }
-.wf-card .wf-owner{font-size:10px;font-weight:700;color:var(--brand);outline:none;}
-.wf-card .wf-sla{font-size:10px;color:var(--ink-lo);margin-top:1px;outline:none;}
+.wf-card .wf-owner{font-size:10px;font-weight:700;color:var(--brand);outline:none;cursor:text;}
+.wf-card .wf-sla{font-size:10px;color:var(--ink-lo);margin-top:1px;cursor:text;}
+.wf-card .wf-sla [contenteditable]{outline:none;cursor:text;}
 .wf-card [contenteditable]:focus{background:#fff8f3;border-radius:4px;outline:1px solid var(--brand);outline-offset:1px;}
 .wf-card .wf-action-icon{
-  position:absolute;top:4px;right:10px;font-size:11px;
-  color:var(--brand);font-weight:700;
+  position:absolute;top:6px;right:10px;font-size:11px;
+  color:var(--brand);font-weight:700;pointer-events:none;
 }
 .wf-card .wf-note-icon{
-  position:absolute;top:4px;left:10px;font-size:12px;
+  position:absolute;top:6px;left:10px;font-size:12px;pointer-events:none;
 }
+
+/* 展開區（selected 時顯示） */
+.wf-card-details{display:none;}
+.wf-card.selected .wf-card-details{
+  display:block;margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--line);
+}
+.wf-card-label{
+  font-size:9px;font-weight:700;color:var(--ink-lo);
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px;
+}
+.wf-card-desc{
+  font-size:11px;color:var(--ink-mid);line-height:1.6;
+  background:#fff;border-radius:6px;padding:8px 9px;
+  outline:none;cursor:text;
+  border:1px solid var(--line);min-height:36px;
+}
+.wf-card-desc:focus{background:#fff8f3;border-color:var(--brand);}
+.wf-card-action{
+  display:flex;align-items:center;gap:6px;
+  margin-top:8px;padding:7px 9px;background:#fff;border:1px solid var(--line);
+  border-radius:6px;font-size:11px;color:var(--ink);
+  text-decoration:none;cursor:pointer;
+}
+.wf-card-action:hover{border-color:var(--brand);color:var(--brand);}
+.wf-card-action-arrow{margin-left:auto;color:var(--ink-lo);}
+.wf-card-opt{margin-top:10px;}
+.wf-card-opt textarea{
+  width:100%;background:#fff;border:1px solid var(--line);
+  border-radius:6px;padding:6px 8px;font-size:11px;
+  font-family:inherit;color:var(--ink);resize:vertical;
+  min-height:42px;outline:none;
+}
+.wf-card-opt textarea:focus{border-color:var(--brand);}
+.wf-card-opt-btn{
+  width:100%;background:var(--brand);color:#fff;
+  border:none;border-radius:6px;padding:6px;
+  font-size:11px;font-weight:700;cursor:pointer;
+  margin-top:5px;font-family:inherit;
+}
+.wf-card-opt-btn:hover{opacity:.85;}
+.wf-card-notes{margin-top:8px;}
+.wf-card-note{
+  background:#fff;border:1px solid var(--line);border-radius:6px;
+  padding:6px 8px;margin-bottom:4px;font-size:10px;
+  color:var(--ink-mid);line-height:1.55;position:relative;
+}
+.wf-card-note .meta{font-size:9px;color:var(--ink-lo);margin-bottom:2px;}
+.wf-card-note .del{
+  position:absolute;top:4px;right:6px;background:none;border:none;
+  color:var(--ink-faint);font-size:10px;cursor:pointer;
+}
+.wf-card-note .del:hover{color:var(--danger);}
 
 .wf-edge-label{
   position:absolute;background:#fff;
@@ -260,17 +314,6 @@ body{
   <div class="canvas-wrap">
     <div class="flow-tabs" id="flow-tabs"></div>
     <div id="canvas-area"></div>
-  </div>
-  <div class="detail-panel" id="detail-panel">
-    <div class="panel-resize" id="panel-resize"></div>
-    <button class="panel-toggle" onclick="togglePanel()" title="收合 / 展開"><span class="panel-toggle-icon"></span></button>
-    <div class="detail-content" id="detail-content">
-      <div class="detail-empty">
-        <span class="detail-empty-emoji">👈</span>
-        點左邊任一節點看細節<br>
-        <span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -520,7 +563,6 @@ function switchFlow(key){
   selectedNodeId = null;
   renderTabs();
   renderCanvas();
-  renderDetail();
 }
 
 // ── 編輯狀態 localStorage（每個流程獨立） ──
@@ -574,7 +616,7 @@ function renderCanvas(){
 
   host.innerHTML = `
     <div class="wf-toolbar">
-      <span>📌 ${flow.title} · ${flow.sub} · 提示：拖拉卡片上緣移動，雙擊文字編輯，箭頭中點「+」加註解</span>
+      <span>📌 ${flow.title} · ${flow.sub} · 點卡片展開細節，拖整張卡移動，雙擊文字編輯，箭頭中點加註</span>
       <span style="flex:1"></span>
       <button onclick="resetFlow()">重設此流程</button>
     </div>
@@ -593,32 +635,78 @@ function renderCanvas(){
   // Cards
   flow.nodes.forEach(n => {
     const isSelected = n.id === selectedNodeId;
-    const hasNote = notes.some(no => no.flow === currentFlow && no.nodeId === n.id);
+    const nodeNotes = notes.filter(no => no.flow === currentFlow && no.nodeId === n.id);
     const card = document.createElement('div');
     card.className = 'wf-card' + (isSelected?' selected':'');
     card.style.left = n.x + 'px';
     card.style.top  = n.y + 'px';
     card.dataset.id = n.id;
+    const detailsHtml = `
+      <div class="wf-card-details">
+        <div class="wf-card-label">細節</div>
+        <div class="wf-card-desc" contenteditable="true" spellcheck="false" data-field="desc">${escapeHtml(n.desc || '')}</div>
+        ${n.action ? `<a class="wf-card-action" href="erp-lobby.html#action-${n.action}"><span>⚡</span><span>跳大廳 · 開「${n.action}」</span><span class="wf-card-action-arrow">→</span></a>` : ''}
+        <div class="wf-card-opt">
+          <div class="wf-card-label">💡 優化建議</div>
+          <textarea data-opt-input placeholder="這環節要怎麼優化？"></textarea>
+          <button class="wf-card-opt-btn" data-opt-btn>記下優化想法</button>
+          <div class="wf-card-notes">
+            ${nodeNotes.length === 0 ? '<div style="font-size:10px;color:var(--ink-lo);text-align:center;padding:8px;">尚無優化建議</div>' : nodeNotes.map(no => `
+              <div class="wf-card-note">
+                <button class="del" data-note-ts="${no.ts}">✕</button>
+                <div class="meta">${no.by} · ${new Date(no.ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                <div>${escapeHtml(no.text)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
     card.innerHTML = `
-      <div class="wf-drag-handle" title="拖拉移動"></div>
       ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
-      ${hasNote ? '<span class="wf-note-icon">💡</span>' : ''}
+      ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
       <div class="wf-title" contenteditable="true" spellcheck="false">${escapeHtml(n.title)}</div>
       <div class="wf-owner" contenteditable="true" spellcheck="false">${escapeHtml(n.owner)}</div>
       <div class="wf-sla">SLA: <span data-field="sla" contenteditable="true" spellcheck="false">${escapeHtml(n.sla)}</span></div>
+      ${detailsHtml}
     `;
-    // click（非編輯區）→ 選取
-    card.addEventListener('click', e => {
-      if(e.target.closest('[contenteditable="true"]')) return;
-      if(e.target.closest('.wf-drag-handle')) return;
-      selectNode(n.id);
-    });
-    // 編輯儲存
+    // 編輯儲存（全部 ce 欄位）
     card.querySelector('.wf-title').addEventListener('blur', ev => patchNode(currentFlow, n.id, {title: ev.target.textContent.trim()}));
     card.querySelector('.wf-owner').addEventListener('blur', ev => patchNode(currentFlow, n.id, {owner: ev.target.textContent.trim()}));
     card.querySelector('[data-field="sla"]').addEventListener('blur', ev => patchNode(currentFlow, n.id, {sla: ev.target.textContent.trim()}));
-    // 拖拉
-    card.querySelector('.wf-drag-handle').addEventListener('mousedown', ev => startDrag(card, n.id, ev));
+    const descEl = card.querySelector('[data-field="desc"]');
+    if (descEl) descEl.addEventListener('blur', ev => patchNode(currentFlow, n.id, {desc: ev.target.textContent.trim()}));
+    // 優化按鈕
+    const optBtn = card.querySelector('[data-opt-btn]');
+    if (optBtn) optBtn.addEventListener('click', () => {
+      const inp = card.querySelector('[data-opt-input]');
+      const text = inp.value.trim();
+      if (!text) return;
+      const arr = loadNotes();
+      arr.push({flow: currentFlow, nodeId: n.id, text, by: name, ts: Date.now()});
+      saveNotes(arr);
+      renderCanvas();
+    });
+    // 刪 note
+    card.querySelectorAll('[data-note-ts]').forEach(b => {
+      b.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const ts = +b.dataset.noteTs;
+        saveNotes(loadNotes().filter(no => no.ts !== ts));
+        renderCanvas();
+      });
+    });
+    // 卡片 click：非編輯區 + 非互動元素 → 選取/取消
+    card.addEventListener('click', e => {
+      if (e.target.closest('[contenteditable="true"]')) return;
+      if (e.target.closest('textarea, button, a')) return;
+      selectNode(n.id === selectedNodeId ? null : n.id);
+    });
+    // 拖拉：整張卡 mousedown 都觸發（除了編輯區 / 互動元素）
+    card.addEventListener('mousedown', ev => {
+      if (ev.target.closest('[contenteditable="true"]')) return;
+      if (ev.target.closest('textarea, button, a, .wf-card-note')) return;
+      startDrag(card, n.id, ev);
+    });
     hostEl.appendChild(card);
   });
 
@@ -717,90 +805,6 @@ document.addEventListener('mouseup', () => {
 function selectNode(id){
   selectedNodeId = id;
   renderCanvas();
-  renderDetail();
-}
-
-// ── Toggle / resize panel ──
-function togglePanel(){
-  document.getElementById('detail-panel').classList.toggle('collapsed');
-}
-// Drag-to-resize
-(function(){
-  const handle = document.getElementById('panel-resize');
-  const panel = document.getElementById('detail-panel');
-  if(!handle || !panel) return;
-  let startX = 0, startW = 0, dragging = false;
-  handle.addEventListener('mousedown', e => {
-    if(panel.classList.contains('collapsed')) return;
-    dragging = true;
-    startX = e.clientX;
-    startW = panel.offsetWidth;
-    document.body.style.userSelect = 'none';
-    document.body.style.cursor = 'col-resize';
-  });
-  document.addEventListener('mousemove', e => {
-    if(!dragging) return;
-    const newW = Math.max(220, Math.min(640, startW + (startX - e.clientX)));
-    panel.style.width = newW + 'px';
-  });
-  document.addEventListener('mouseup', () => {
-    if(dragging){
-      dragging = false;
-      document.body.style.userSelect = '';
-      document.body.style.cursor = '';
-    }
-  });
-})();
-
-// ── Render detail panel ──
-function renderDetail(){
-  const panel = document.getElementById('detail-content');
-  if(!selectedNodeId){
-    panel.innerHTML = `<div class="detail-empty"><span class="detail-empty-emoji">👈</span>點左邊任一節點看細節<br><span style="font-size:11px;color:var(--ink-faint);">每個節點都可以標記「要優化」</span></div>`;
-    return;
-  }
-  const flow = WORKFLOWS[currentFlow];
-  const n = flow.nodes.find(x => x.id === selectedNodeId);
-  if(!n) return;
-  const notes = loadNotes().filter(no => no.flow === currentFlow && no.nodeId === selectedNodeId);
-  panel.innerHTML = `
-    <div class="detail-section">
-      <div class="detail-label">流程環節</div>
-      <div class="detail-title">${n.title}</div>
-      <div>
-        <span class="detail-owner">${n.owner}</span>
-        <span class="detail-sla">⏱ SLA ${n.sla}</span>
-      </div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-label">細節說明</div>
-      <div class="detail-desc">${n.desc}</div>
-    </div>
-    ${n.action ? `
-    <div class="detail-section">
-      <div class="detail-label">對應 ERP 動作</div>
-      <a class="detail-action" href="erp-lobby.html#action-${n.action}">
-        <span class="detail-action-icon">⚡</span>
-        <span>跳到大廳 · 開「${n.action}」modal</span>
-        <span class="detail-action-arrow">→</span>
-      </a>
-    </div>
-    ` : ''}
-    <div class="optimize-box">
-      <div class="detail-label">💡 我覺得這環節要優化</div>
-      <textarea class="optimize-textarea" id="opt-input" placeholder="例：這環節等太久 / 該開發新工具 / 簡化流程..."></textarea>
-      <button class="optimize-btn" onclick="addNote()">記下這個優化想法</button>
-      <div class="notes-list" id="notes-list">
-        ${notes.length === 0 ? '<div style="font-size:11px;color:var(--ink-lo);text-align:center;padding:14px;">尚無優化想法</div>' : notes.map(no => `
-          <div class="note-item">
-            <button class="note-del" onclick="delNote(${no.ts})">✕</button>
-            <div class="note-meta">${no.by} · ${new Date(no.ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
-            <div>${no.text.replace(/</g,'&lt;')}</div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
 }
 
 // ── Notes management ──
@@ -811,31 +815,15 @@ function saveNotes(arr){
   localStorage.setItem('workflow_notes_v1', JSON.stringify(arr));
   updateOptCount();
 }
-function addNote(){
-  const text = document.getElementById('opt-input').value.trim();
-  if(!text) return;
-  const notes = loadNotes();
-  notes.push({flow:currentFlow, nodeId:selectedNodeId, text, by:name, ts:Date.now()});
-  saveNotes(notes);
-  document.getElementById('opt-input').value = '';
-  renderCanvas();
-  renderDetail();
-}
-function delNote(ts){
-  const notes = loadNotes().filter(no => no.ts !== ts);
-  saveNotes(notes);
-  renderCanvas();
-  renderDetail();
-}
 function updateOptCount(){
   const cnt = loadNotes().length;
-  document.getElementById('optimize-count-display').textContent = `${cnt} 個優化建議`;
+  const el = document.getElementById('optimize-count-display');
+  if(el) el.textContent = `${cnt} 個優化建議`;
 }
 
 // ── Init ──
 renderTabs();
 renderCanvas();
-renderDetail();
 updateOptCount();
 </script>
 <script src="erp-sidebar.js"></script>

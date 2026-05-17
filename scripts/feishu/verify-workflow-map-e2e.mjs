@@ -21,10 +21,11 @@ const SITE = 'https://raychou6913-tech.github.io/wujie-briefing/';
   console.log(`cards rendered: ${cardCount}（預期 wholesale 流程 13 張）`);
   if (cardCount < 5) throw new Error('cards 沒渲染');
 
-  // 拖拉第一張卡
+  // 拖拉第一張卡（按卡片右下角空白處拖，避開 contenteditable）
   const firstCard = page.locator('.wf-card').first();
   const beforeBox = await firstCard.boundingBox();
-  await page.locator('.wf-card').first().locator('.wf-drag-handle').hover();
+  // 從卡片右側邊緣的空白（避開 title/owner/sla 文字區）
+  await page.mouse.move(beforeBox.x + beforeBox.width - 8, beforeBox.y + beforeBox.height - 8);
   await page.mouse.down();
   await page.mouse.move(beforeBox.x + 200, beforeBox.y + 100);
   await page.mouse.up();
