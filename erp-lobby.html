@@ -2997,77 +2997,89 @@ function submitPaymentReq(){
 }
 
 // ── 安然 modal × 3：合約待批 / 跨境款項 / IP 維護 ──
-const CONTRACT_INBOX_SEED = [
-  {id:'c1', title:'PNUTS Snoopy 北京代理 — 續簽', urgency:'high',
-   counterparty:'Peanuts Worldwide', amount:'USD $65,000 MG', deadline:'2026-06-30 到期',
-   detail:'前約 2024-2026，續簽 2 年；保底金 USD 65k；版稅 13%；首批 200k pcs 起。'},
-  {id:'c2', title:'Mofusand 年度合約 — 簽署確認', urgency:'med',
-   counterparty:'貓福珊迪 IP 方', amount:'¥304,000 MG', deadline:'2026-05-25',
-   detail:'年度授權；MG ¥304k；版稅 14% 批發；首批已備貨。'},
-  {id:'c3', title:'東莞達豐 NDA — 新供應商', urgency:'low',
-   counterparty:'東莞達豐玩具', amount:'—', deadline:'本週確認',
-   detail:'新合作供應商保密協議；採購已開始打樣。'},
-];
-function loadContractInbox(){
-  const stored = localStorage.getItem('anran_contract_inbox_v1');
-  if(stored) return JSON.parse(stored);
-  localStorage.setItem('anran_contract_inbox_v1', JSON.stringify(CONTRACT_INBOX_SEED));
-  return CONTRACT_INBOX_SEED;
-}
-function openContractModal(){
-  renderContractInbox();
+// 安然 合約待批（飛書直連 2026-05-17）
+window._contractInboxCache = [];
+async function openContractModal(){
+  const list = document.getElementById('contract-inbox-list');
   document.getElementById('contract-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/anran-contract?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error||'讀取失敗');
+    window._contractInboxCache = d.items || [];
+    if(!d.items.length){
+      list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待批合約</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(i => {
+      const ddl = i.deadline ? new Date(i.deadline).toLocaleDateString('zh-TW') + ' 到期' : '';
+      const meta = [i.counterparty, ddl].filter(Boolean).join(' · ');
+      const amt = i.amount ? _fmtAmount(i.amount, i.currency) : '';
+      const ipBadge = i.ip ? `<span style="font-size:10px;background:var(--paper-soft);border-radius:6px;padding:2px 7px;color:var(--ink-mid);margin-left:6px;">${i.ip}</span>` : '';
+      return `<div data-rid="${i.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="flex:1;">
+            ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;margin-right:6px;">⚠ 急</span>':''}
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.name}</span>${ipBadge}
+            <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${meta} · <span style="color:var(--ink-lo);">${i.state}</span></div>
+          </div>
+          ${amt?`<div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${amt}</div>`:''}
+        </div>
+        ${i.detail?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>`:''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doContractAction('${i.record_id}','approve')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准 · 生效</button>
+          <button onclick="doContractAction('${i.record_id}','need_ray')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">需 Ray 親簽</button>
+          <button onclick="doContractAction('${i.record_id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}<br><button onclick="openContractModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
+  }
+}
+async function doContractAction(recordId, action){
+  const item = window._contractInboxCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'revise'){
+    note = prompt('退回原因（會通知起草人）：') || '';
+    if(!note.trim()){ showQaToast('未輸入原因，取消'); return; }
+  } else if(action === 'need_ray'){
+    note = prompt('附給 Ray 的說明（必填）：例如「金額超 50 萬，建議親簽」') || '';
+    if(!note.trim()){ showQaToast('未輸入說明，取消'); return; }
+  }
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/anran-contract/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){
+      if(r.status === 409){ showQaToast('⚠ 版本衝突，重新載入'); openContractModal(); }
+      else showQaToast('動作失敗：' + (d.error||r.status));
+      return;
+    }
+    const labels = {approve:'已核准 · 合約生效', need_ray:'已轉 Ray 親簽 · 等批核', revise:'已退回 · 待修改'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if(action === 'need_ray'){
+      // Ray 待批核 V1 仍走 localStorage（Ray 還沒接飛書）
+      const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
+      rayArr.unshift({ id:'ra-'+Date.now(), type:'contract', title:item.name, from:'安然', urgency:item.urgency, detail:item.detail+' · 對象：'+(item.counterparty||'')+' · 金額：'+(item.amount?item.amount+' '+item.currency:'—')+' · '+note, submittedAt:Date.now() });
+      localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
+      notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`📜 安然轉 Ray 親簽：${item.name} · ${note}`});
+    } else if(action === 'revise'){
+      notif.unshift({ts:Date.now(), from:name, to:item.submitted_by||'laige', msg:`⚠ 合約退回：${item.name} · ${note}`});
+    } else if(action === 'approve'){
+      notif.unshift({ts:Date.now(), from:name, to:item.counterparty||'相關方', msg:`✓ 合約核准生效：${item.name}`});
+    }
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openContractModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 function closeContractModal(){ document.getElementById('contract-modal').classList.remove('show'); }
-function renderContractInbox(){
-  const list = document.getElementById('contract-inbox-list');
-  const arr = loadContractInbox().filter(i => !i.status);
-  if(!arr.length){
-    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待批合約</div>';
-    return;
-  }
-  list.innerHTML = arr.map(i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);':''}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-      <div style="flex:1;">
-        ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;margin-right:6px;">⚠ 急</span>':''}
-        <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.title}</span>
-        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.counterparty} · ${i.deadline}</div>
-      </div>
-      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${i.amount}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doContractAction('${i.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 核准</button>
-      <button onclick="doContractAction('${i.id}','need-ray')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">需 Ray 親簽</button>
-      <button onclick="doContractAction('${i.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回</button>
-    </div>
-  </div>`).join('');
-}
-function doContractAction(id, action){
-  const arr = loadContractInbox();
-  const item = arr.find(x => x.id === id);
-  if(item){ item.status = action; localStorage.setItem('anran_contract_inbox_v1', JSON.stringify(arr)); }
-  const labels = {approved:'已核准 · 走簽署流程', 'need-ray':'已寫進 Ray 待批核 · 等親簽', revise:'已退回 · 待修改重送'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'need-ray' && item){
-    // 轉 Ray 親簽 → 寫進 ray_approval_v1（Phase 1 補洞）
-    const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
-    rayArr.unshift({
-      id:'ra-' + Date.now(), type:'contract',
-      title:item.title, from:'安然', urgency:item.urgency,
-      detail:item.detail + ' · 對象：' + item.counterparty + ' · 金額：' + item.amount,
-      submittedAt: Date.now(),
-    });
-    localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
-    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`📜 安然轉 Ray 親簽：${item.title}`});
-  } else if(action === 'revise' && item){
-    notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`⚠ 安然退回合約：${item.title} · 待修改`});
-  }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  renderContractInbox();
-  markCurrentTodoDone();
-  showQaToast(`✓ ${item ? item.title : id} · ${labels[action]}`);
-}
 
 const XBORDER_INBOX_SEED = [
   {id:'x1', from:'北京蕪解', to:'香港 JV', ccy:'CNY→HKD', amount:'¥ 850,000 (≈HK$ 935,000)',
@@ -3910,13 +3922,14 @@ async function sendAiMessage(){
     });
     const d = await r.json();
     document.getElementById('ai-typing')?.remove();
-    if(!d.ok){ box.insertAdjacentHTML('beforeend', `<div class="ai-msg ai-msg-bot" style="color:var(--danger)">錯誤：${escapeHtml(d.error || '未知')}</div>`); return; }
+    if(!d.ok){ box.insertAdjacentHTML('beforeend', `<div style="align-self:flex-start;max-width:78%;padding:10px 12px;border-radius:12px;font-size:13px;background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;">⚠ ${escapeHtml(d.error || '未知')}</div>`); box.scrollTop = box.scrollHeight; return; }
     // server returns full history including assistant turn; save it
     _aiHistSet(d.history || _aiHist().concat({ role:'assistant', content: d.reply }));
     renderAiMessages();
   } catch (e) {
     document.getElementById('ai-typing')?.remove();
-    box.insertAdjacentHTML('beforeend', `<div class="ai-msg ai-msg-bot" style="color:var(--danger)">網路錯誤：${escapeHtml(e.message || String(e))}</div>`);
+    box.insertAdjacentHTML('beforeend', `<div style="align-self:flex-start;max-width:78%;padding:10px 12px;border-radius:12px;font-size:13px;background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;">⚠ 網路錯誤：${escapeHtml(e.message || String(e))}</div>`);
+    box.scrollTop = box.scrollHeight;
   }
 }
 
