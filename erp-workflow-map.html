@@ -558,6 +558,42 @@ const WORKFLOWS = {
       {from:'j1', to:'j3'}, {from:'j2', to:'j3'}, {from:'j3', to:'j4'}, {from:'j3', to:'j5'},
     ],
   },
+
+  project_init:{
+    title:'11. 項目建立 ⭐',
+    sub:'所有下游流程的起點 · 開項目 / 編預算都是 Shawn 主場（多元入口）',
+    width:1280, height:380,
+    nodes:[
+      // 多元入口（dashed lines from these）
+      {id:'k1a', title:'Ray 戰略 idea', owner:'Ray', sla:'-', x:30, y:30, desc:'CEO 看到的新 IP / 新區域 / 新模式機會'},
+      {id:'k1b', title:'IP 方主動找', owner:'安然', sla:'-', x:30, y:120, desc:'PNUTS / Mofusand / Sanrio / Kakao 等 IP 授權方主動推案'},
+      {id:'k1c', title:'客戶詢主題', owner:'業務員', sla:'-', x:30, y:210, desc:'KA / 品牌方 / 流通通路問「能不能做 XX 主題」'},
+      {id:'k1d', title:'Bevis 內部 idea', owner:'Bevis', sla:'-', x:30, y:300, desc:'設計團隊原創主題提案'},
+      // 主路徑
+      {id:'k2', title:'Shawn 收集 idea', owner:'Shawn', sla:'即時', x:280, y:165, desc:'Shawn 是所有 idea 的收件箱 — 不論來源，都到他這裡彙整。'},
+      {id:'k3', title:'Shawn 初篩', owner:'Shawn', sla:'3 天', x:490, y:165, desc:'IP 授權範圍 / 預算可行性 / 市場 / 工廠 capacity 四項評估。淘汰明顯不可行的。'},
+      {id:'k4', title:'Ray 拍板', owner:'Ray', sla:'24 hr', x:700, y:165, desc:'同意做 / 暫緩 / 棄案。同意 → 進立項。'},
+      {id:'k5', title:'Shawn 立項', owner:'Shawn', sla:'當天', x:910, y:60, desc:'填 erp-project-new 表 → 寫進飛書「項目排期」表。專案號 + 主題 + 時程 baseline。', action:'new-project'},
+      {id:'k6', title:'Shawn 編預算', owner:'Shawn', sla:'3 天', x:910, y:270, desc:'進 budget-planner 編 V1 預算（OPEX + 採購 + 物流 + IP MG）→ 寫進「預算管理」表。'},
+      {id:'k7', title:'安然 IP 對接', owner:'安然', sla:'1-2 週', x:1120, y:60, desc:'若是新 IP 授權項目 → 安然跟版權方談 MG / 版稅 / 期限 / 地區 → 簽合約。'},
+      {id:'k8', title:'推下游', owner:'Shawn', sla:'立項後即', x:1120, y:270, desc:'通知設計（Bevis）/ 採購（賴哥）/ 物流（高維）/ 業務（安然+業務員）→ 連到下游 10 條流程。'},
+    ],
+    edges:[
+      {from:'k1a', to:'k2', label:'Ray'},
+      {from:'k1b', to:'k2', label:'IP 方'},
+      {from:'k1c', to:'k2', label:'客戶'},
+      {from:'k1d', to:'k2', label:'Bevis'},
+      {from:'k2', to:'k3'},
+      {from:'k3', to:'k4', label:'建議做'},
+      {from:'k3', to:'k2', label:'資訊不足退回', alt:true},
+      {from:'k4', to:'k5', label:'批准 → 立項'},
+      {from:'k4', to:'k3', label:'暫緩 / 棄案', alt:true},
+      {from:'k5', to:'k6', label:'同時'},
+      {from:'k5', to:'k7', label:'若 IP 授權'},
+      {from:'k6', to:'k8'},
+      {from:'k7', to:'k8'},
+    ],
+  },
 };
 
 // ── State ──
