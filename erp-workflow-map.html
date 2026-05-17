@@ -172,41 +172,70 @@ body{
 }
 .note-del:hover{color:var(--danger);}
 
-/* SVG node styles */
-.node{cursor:pointer;}
-.node-rect{
-  fill:#fff;stroke:var(--ink-faint);stroke-width:1.5;
-  transition:all .18s var(--ease);
+/* Card-based workflow map */
+.wf-canvas-host{
+  position:relative;margin:24px auto;background:#fff;
+  border:1px solid var(--line);border-radius:14px;
 }
-.node:hover .node-rect{stroke:var(--brand);}
-.node.selected .node-rect{stroke:var(--brand);stroke-width:2.5;fill:var(--brand-soft);}
-.node.stale .node-rect{stroke:var(--warn);}
-.node-title{
-  font-size:13px;font-weight:700;fill:var(--ink);
+.wf-arrows{
+  position:absolute;top:0;left:0;
   pointer-events:none;
 }
-.node-owner{
-  font-size:10px;fill:var(--brand);font-weight:700;
-  pointer-events:none;
+.wf-card{
+  position:absolute;width:172px;background:#fff;
+  border:1.5px solid var(--ink-faint);border-radius:10px;
+  padding:18px 12px 10px;font-size:11px;
+  transition:border-color .2s var(--ease), box-shadow .2s var(--ease);
 }
-.node-sla{
-  font-size:10px;fill:var(--ink-lo);
-  pointer-events:none;
+.wf-card:hover{border-color:var(--brand);}
+.wf-card.selected{border-color:var(--brand);background:var(--brand-soft);}
+.wf-card.dragging{box-shadow:0 12px 32px rgba(0,0,0,.15);border-color:var(--brand);z-index:100;cursor:grabbing;}
+.wf-card .wf-drag-handle{
+  position:absolute;top:0;left:0;right:0;height:14px;
+  cursor:grab;border-radius:10px 10px 0 0;
+  background:linear-gradient(to bottom, var(--paper-soft), transparent);
 }
-.node-actor-tag{
-  font-size:9px;fill:var(--ink-mid);font-weight:600;
-  pointer-events:none;
+.wf-card .wf-drag-handle:active{cursor:grabbing;}
+.wf-card .wf-title{
+  font-size:13px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
+  outline:none;line-height:1.3;margin-bottom:4px;
+}
+.wf-card .wf-owner{font-size:10px;font-weight:700;color:var(--brand);outline:none;}
+.wf-card .wf-sla{font-size:10px;color:var(--ink-lo);margin-top:1px;outline:none;}
+.wf-card [contenteditable]:focus{background:#fff8f3;border-radius:4px;outline:1px solid var(--brand);outline-offset:1px;}
+.wf-card .wf-action-icon{
+  position:absolute;top:4px;right:10px;font-size:11px;
+  color:var(--brand);font-weight:700;
+}
+.wf-card .wf-note-icon{
+  position:absolute;top:4px;left:10px;font-size:12px;
 }
 
-.edge{
-  fill:none;stroke:var(--ink-faint);stroke-width:1.5;
+.wf-edge-label{
+  position:absolute;background:#fff;
+  border:1px solid var(--line);border-radius:6px;
+  padding:1px 6px;font-size:10px;color:var(--ink-mid);
+  cursor:text;outline:none;white-space:nowrap;
+  transform:translate(-50%, -50%);
+  transition:opacity .15s, border-color .15s;
 }
-.edge.alt{stroke:var(--danger);stroke-dasharray:5,3;stroke-width:1;}
-.edge-label{
-  font-size:10px;fill:var(--ink-mid);
-  pointer-events:none;
+.wf-edge-label.alt{color:var(--danger);border-color:#fca5a5;background:#fef2f2;}
+.wf-edge-label.empty{opacity:.25;font-size:14px;line-height:.9;padding:2px 5px;}
+.wf-edge-label.empty:hover{opacity:.6;}
+.wf-edge-label:focus{border-color:var(--brand);opacity:1;background:#fff;}
+
+.wf-toolbar{
+  display:flex;gap:8px;align-items:center;
+  padding:8px 20px;background:var(--paper-soft);
+  border-bottom:1px solid var(--line);font-size:11px;color:var(--ink-mid);
 }
-.edge-label.alt{fill:var(--danger);}
+.wf-toolbar button{
+  background:#fff;border:1px solid var(--line);border-radius:6px;
+  padding:4px 10px;font-size:11px;color:var(--ink-mid);
+  cursor:pointer;font-family:inherit;
+  transition:border-color .15s;
+}
+.wf-toolbar button:hover{border-color:var(--brand);color:var(--brand);}
 
 .empty-flow{
   text-align:center;color:var(--ink-lo);font-size:13px;
@@ -494,80 +523,195 @@ function switchFlow(key){
   renderDetail();
 }
 
-// ── Render SVG canvas ──
-function renderCanvas(){
-  const flow = WORKFLOWS[currentFlow];
-  if(!flow){ document.getElementById('canvas-area').innerHTML = '<div class="empty-flow">這個流程還沒畫</div>'; return; }
-  const W = flow.width, H = flow.height;
-  // Build SVG
-  let svg = `<svg id="canvas" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
-  // arrow markers
-  svg += `<defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/>
-    </marker>
-    <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
-    </marker>
-  </defs>`;
-  // 流程標題 + 副標
-  svg += `<text x="20" y="30" font-size="15" font-weight="800" fill="#0a0a0a" letter-spacing="-0.02em">${flow.title}</text>`;
-  svg += `<text x="20" y="48" font-size="11" fill="#999">${flow.sub}</text>`;
-  // Edges first (so nodes overlay)
-  flow.edges.forEach(e => {
-    const fromN = flow.nodes.find(n => n.id === e.from);
-    const toN = flow.nodes.find(n => n.id === e.to);
-    if(!fromN || !toN) return;
-    const NW = 160, NH = 80;
-    const fx = fromN.x + NW/2;
-    const fy = fromN.y + NH/2;
-    const tx = toN.x + NW/2;
-    const ty = toN.y + NH/2;
-    // edge from box edge to box edge (simple approximation)
-    let x1, y1, x2, y2;
-    const dx = tx - fx, dy = ty - fy;
-    if(Math.abs(dx) > Math.abs(dy)){
-      // horizontal
-      x1 = fx + (dx > 0 ? NW/2 : -NW/2);
-      y1 = fy;
-      x2 = tx + (dx > 0 ? -NW/2 : NW/2);
-      y2 = ty;
-    } else {
-      // vertical or diagonal
-      x1 = fx;
-      y1 = fy + (dy > 0 ? NH/2 : -NH/2);
-      x2 = tx;
-      y2 = ty + (dy > 0 ? -NH/2 : NH/2);
-    }
-    const markerId = e.alt ? 'arrow-alt' : 'arrow';
-    svg += `<line class="edge ${e.alt?'alt':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#${markerId})"/>`;
-    if(e.label){
-      const mx = (x1+x2)/2, my = (y1+y2)/2 - 4;
-      svg += `<text class="edge-label ${e.alt?'alt':''}" x="${mx}" y="${my}" text-anchor="middle">${e.label}</text>`;
-    }
-  });
-  // Nodes
-  const notes = loadNotes();
-  flow.nodes.forEach(n => {
-    const NW = 160, NH = 80;
-    const hasNote = notes.filter(no => no.flow === currentFlow && no.nodeId === n.id).length > 0;
-    const isSelected = n.id === selectedNodeId;
-    svg += `<g class="node ${isSelected?'selected':''}" data-id="${n.id}" onclick="selectNode('${n.id}')">`;
-    svg += `<rect class="node-rect" x="${n.x}" y="${n.y}" width="${NW}" height="${NH}" rx="10"/>`;
-    svg += `<text class="node-title" x="${n.x+NW/2}" y="${n.y+24}" text-anchor="middle">${n.title}</text>`;
-    svg += `<text class="node-owner" x="${n.x+NW/2}" y="${n.y+44}" text-anchor="middle">${n.owner}</text>`;
-    svg += `<text class="node-sla" x="${n.x+NW/2}" y="${n.y+60}" text-anchor="middle">SLA: ${n.sla}</text>`;
-    if(hasNote){
-      svg += `<text x="${n.x+NW-12}" y="${n.y+16}" text-anchor="middle" font-size="13">💡</text>`;
-    }
-    if(n.action){
-      svg += `<text x="${n.x+12}" y="${n.y+16}" font-size="10" fill="#ff6b35" font-weight="700">⚡</text>`;
-    }
-    svg += `</g>`;
-  });
-  svg += `</svg>`;
-  document.getElementById('canvas-area').innerHTML = svg;
+// ── 編輯狀態 localStorage（每個流程獨立） ──
+const NW = 172, NH = 92;
+function getFlowOverrides(flowKey){
+  try { return JSON.parse(localStorage.getItem('workflow_edits_'+flowKey+'_v1')||'{}'); } catch(e){ return {}; }
 }
+function saveFlowOverrides(flowKey, edits){
+  localStorage.setItem('workflow_edits_'+flowKey+'_v1', JSON.stringify(edits));
+}
+function getMergedFlow(flowKey){
+  const f = WORKFLOWS[flowKey];
+  if(!f) return null;
+  const o = getFlowOverrides(flowKey);
+  const nodes = f.nodes.map(n => Object.assign({}, n, (o.nodes||{})[n.id] || {}));
+  const edges = f.edges.map(e => {
+    const k = e.from + '|' + e.to;
+    return Object.assign({}, e, (o.edges||{})[k] || {});
+  });
+  return Object.assign({}, f, {nodes, edges});
+}
+function patchNode(flowKey, nodeId, patch){
+  const o = getFlowOverrides(flowKey);
+  o.nodes = o.nodes || {};
+  o.nodes[nodeId] = Object.assign({}, o.nodes[nodeId]||{}, patch);
+  saveFlowOverrides(flowKey, o);
+}
+function patchEdge(flowKey, fromId, toId, patch){
+  const o = getFlowOverrides(flowKey);
+  o.edges = o.edges || {};
+  o.edges[fromId+'|'+toId] = Object.assign({}, o.edges[fromId+'|'+toId]||{}, patch);
+  saveFlowOverrides(flowKey, o);
+}
+function resetFlow(){
+  if(!confirm('重設這個流程到原始版本？你的編輯會清掉。')) return;
+  localStorage.removeItem('workflow_edits_'+currentFlow+'_v1');
+  renderCanvas();
+}
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Render card-based canvas ──
+function renderCanvas(){
+  const flow = getMergedFlow(currentFlow);
+  const host = document.getElementById('canvas-area');
+  if(!flow){ host.innerHTML = '<div class="empty-flow">這個流程還沒畫</div>'; return; }
+  // 計算 canvas 範圍（cards + padding）
+  const maxX = Math.max(...flow.nodes.map(n => n.x)) + NW + 40;
+  const maxY = Math.max(...flow.nodes.map(n => n.y)) + NH + 40;
+  const W = Math.max(maxX, flow.width || 800);
+  const H = Math.max(maxY, flow.height || 400) + 70; // +70 for top title
+
+  host.innerHTML = `
+    <div class="wf-toolbar">
+      <span>📌 ${flow.title} · ${flow.sub} · 提示：拖拉卡片上緣移動，雙擊文字編輯，箭頭中點「+」加註解</span>
+      <span style="flex:1"></span>
+      <button onclick="resetFlow()">重設此流程</button>
+    </div>
+    <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
+      <svg class="wf-arrows" id="wf-arrows" width="${W}" height="${H}">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/></marker>
+          <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
+        </defs>
+      </svg>
+    </div>`;
+  const hostEl = document.getElementById('wf-host');
+  const svgEl  = document.getElementById('wf-arrows');
+  const notes  = loadNotes();
+
+  // Cards
+  flow.nodes.forEach(n => {
+    const isSelected = n.id === selectedNodeId;
+    const hasNote = notes.some(no => no.flow === currentFlow && no.nodeId === n.id);
+    const card = document.createElement('div');
+    card.className = 'wf-card' + (isSelected?' selected':'');
+    card.style.left = n.x + 'px';
+    card.style.top  = n.y + 'px';
+    card.dataset.id = n.id;
+    card.innerHTML = `
+      <div class="wf-drag-handle" title="拖拉移動"></div>
+      ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
+      ${hasNote ? '<span class="wf-note-icon">💡</span>' : ''}
+      <div class="wf-title" contenteditable="true" spellcheck="false">${escapeHtml(n.title)}</div>
+      <div class="wf-owner" contenteditable="true" spellcheck="false">${escapeHtml(n.owner)}</div>
+      <div class="wf-sla">SLA: <span data-field="sla" contenteditable="true" spellcheck="false">${escapeHtml(n.sla)}</span></div>
+    `;
+    // click（非編輯區）→ 選取
+    card.addEventListener('click', e => {
+      if(e.target.closest('[contenteditable="true"]')) return;
+      if(e.target.closest('.wf-drag-handle')) return;
+      selectNode(n.id);
+    });
+    // 編輯儲存
+    card.querySelector('.wf-title').addEventListener('blur', ev => patchNode(currentFlow, n.id, {title: ev.target.textContent.trim()}));
+    card.querySelector('.wf-owner').addEventListener('blur', ev => patchNode(currentFlow, n.id, {owner: ev.target.textContent.trim()}));
+    card.querySelector('[data-field="sla"]').addEventListener('blur', ev => patchNode(currentFlow, n.id, {sla: ev.target.textContent.trim()}));
+    // 拖拉
+    card.querySelector('.wf-drag-handle').addEventListener('mousedown', ev => startDrag(card, n.id, ev));
+    hostEl.appendChild(card);
+  });
+
+  // Edges
+  flow.edges.forEach(e => drawEdge(svgEl, hostEl, flow, e));
+}
+
+function drawEdge(svgEl, hostEl, flow, e){
+  const fromN = flow.nodes.find(n => n.id === e.from);
+  const toN   = flow.nodes.find(n => n.id === e.to);
+  if(!fromN || !toN) return;
+  const fx = fromN.x + NW/2, fy = fromN.y + NH/2;
+  const tx = toN.x + NW/2,   ty = toN.y + NH/2;
+  let x1, y1, x2, y2;
+  const dx = tx - fx, dy = ty - fy;
+  if(Math.abs(dx) > Math.abs(dy)){
+    x1 = fx + (dx > 0 ? NW/2 : -NW/2); y1 = fy;
+    x2 = tx + (dx > 0 ? -NW/2 : NW/2); y2 = ty;
+  } else {
+    x1 = fx; y1 = fy + (dy > 0 ? NH/2 : -NH/2);
+    x2 = tx; y2 = ty + (dy > 0 ? -NH/2 : NH/2);
+  }
+  const NS = 'http://www.w3.org/2000/svg';
+  const line = document.createElementNS(NS, 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', e.alt ? '#ef4444' : '#ccc');
+  line.setAttribute('stroke-width', e.alt ? 1 : 1.5);
+  if(e.alt) line.setAttribute('stroke-dasharray', '5,3');
+  line.setAttribute('marker-end', e.alt ? 'url(#arrow-alt)' : 'url(#arrow)');
+  line.setAttribute('fill', 'none');
+  svgEl.appendChild(line);
+
+  // Editable label
+  const mx = (x1+x2)/2, my = (y1+y2)/2;
+  const labelEl = document.createElement('span');
+  const isEmpty = !e.label;
+  labelEl.className = 'wf-edge-label' + (e.alt?' alt':'') + (isEmpty?' empty':'');
+  labelEl.contentEditable = 'true';
+  labelEl.spellcheck = false;
+  labelEl.textContent = e.label || '+';
+  labelEl.style.left = mx + 'px';
+  labelEl.style.top  = my + 'px';
+  labelEl.addEventListener('focus', () => {
+    if(labelEl.classList.contains('empty')){
+      labelEl.textContent = '';
+      labelEl.classList.remove('empty');
+    }
+  });
+  labelEl.addEventListener('blur', () => {
+    const v = labelEl.textContent.trim();
+    patchEdge(currentFlow, e.from, e.to, {label: v});
+    if(!v){
+      labelEl.classList.add('empty');
+      labelEl.textContent = '+';
+    }
+  });
+  hostEl.appendChild(labelEl);
+}
+
+// ── 拖拉 state ──
+let dragState = null;
+function startDrag(card, nodeId, ev){
+  ev.preventDefault();
+  const host = document.getElementById('wf-host');
+  const hostRect = host.getBoundingClientRect();
+  const cardRect = card.getBoundingClientRect();
+  dragState = {
+    card, nodeId,
+    offsetX: ev.clientX - cardRect.left,
+    offsetY: ev.clientY - cardRect.top,
+    hostRect,
+  };
+  card.classList.add('dragging');
+  document.body.style.userSelect = 'none';
+}
+document.addEventListener('mousemove', ev => {
+  if(!dragState) return;
+  const x = Math.max(0, ev.clientX - dragState.hostRect.left - dragState.offsetX);
+  const y = Math.max(0, ev.clientY - dragState.hostRect.top - dragState.offsetY);
+  dragState.card.style.left = x + 'px';
+  dragState.card.style.top  = y + 'px';
+});
+document.addEventListener('mouseup', () => {
+  if(!dragState) return;
+  const x = parseFloat(dragState.card.style.left) || 0;
+  const y = parseFloat(dragState.card.style.top) || 0;
+  patchNode(currentFlow, dragState.nodeId, {x, y});
+  dragState.card.classList.remove('dragging');
+  document.body.style.userSelect = '';
+  dragState = null;
+  renderCanvas(); // 重畫箭頭
+});
 
 // ── Select node ──
 function selectNode(id){
