@@ -198,12 +198,16 @@ body{
 }
 .wf-card .wf-title{
   font-size:13px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
-  outline:none;line-height:1.3;margin-bottom:4px;cursor:text;
+  outline:none;line-height:1.3;margin-bottom:4px;cursor:inherit;
 }
-.wf-card .wf-owner{font-size:10px;font-weight:700;color:var(--brand);outline:none;cursor:text;}
-.wf-card .wf-sla{font-size:10px;color:var(--ink-lo);margin-top:1px;cursor:text;}
-.wf-card .wf-sla [contenteditable]{outline:none;cursor:text;}
-.wf-card [contenteditable]:focus{background:#fff8f3;border-radius:4px;outline:1px solid var(--brand);outline-offset:1px;}
+.wf-card .wf-owner{font-size:10px;font-weight:700;color:var(--brand);outline:none;cursor:inherit;}
+.wf-card .wf-sla{font-size:10px;color:var(--ink-lo);margin-top:1px;cursor:inherit;}
+.wf-card .wf-sla [contenteditable]{outline:none;cursor:inherit;}
+/* 展開後才能編輯 */
+.wf-card.selected .wf-title,
+.wf-card.selected .wf-owner,
+.wf-card.selected .wf-sla [contenteditable]{cursor:text;}
+.wf-card.selected [contenteditable="true"]:focus{background:#fff8f3;border-radius:4px;outline:1px solid var(--brand);outline-offset:1px;}
 .wf-card .wf-action-icon{
   position:absolute;top:6px;left:10px;font-size:11px;
   color:var(--brand);font-weight:700;pointer-events:none;
@@ -671,13 +675,14 @@ function renderCanvas(){
           </div>
         </div>
       </div>`;
+    const ce = isSelected ? 'true' : 'false';  // 展開後才能編輯
     card.innerHTML = `
       ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
       ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
       <button class="wf-card-close" data-close-btn title="收起">✕</button>
-      <div class="wf-title" contenteditable="true" spellcheck="false">${escapeHtml(n.title)}</div>
-      <div class="wf-owner" contenteditable="true" spellcheck="false">${escapeHtml(n.owner)}</div>
-      <div class="wf-sla">SLA: <span data-field="sla" contenteditable="true" spellcheck="false">${escapeHtml(n.sla)}</span></div>
+      <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(n.title)}</div>
+      <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(n.owner)}</div>
+      <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(n.sla)}</span></div>
       ${detailsHtml}
     `;
     // 編輯儲存（全部 ce 欄位）
@@ -794,7 +799,6 @@ function drawEdge(svgEl, hostEl, flow, e){
 // ── 拖拉 state ──
 let dragState = null;
 function startDrag(card, nodeId, ev){
-  ev.preventDefault();
   const host = document.getElementById('wf-host');
   const hostRect = host.getBoundingClientRect();
   const cardRect = card.getBoundingClientRect();
@@ -803,12 +807,19 @@ function startDrag(card, nodeId, ev){
     offsetX: ev.clientX - cardRect.left,
     offsetY: ev.clientY - cardRect.top,
     hostRect,
+    startX: ev.clientX, startY: ev.clientY,
+    moved: false,
   };
-  card.classList.add('dragging');
   document.body.style.userSelect = 'none';
 }
 document.addEventListener('mousemove', ev => {
   if(!dragState) return;
+  // 移動超過 4px 才算真的拖拉（避免單純 click 也觸發）
+  if (!dragState.moved) {
+    if (Math.abs(ev.clientX - dragState.startX) < 4 && Math.abs(ev.clientY - dragState.startY) < 4) return;
+    dragState.moved = true;
+    dragState.card.classList.add('dragging');
+  }
   const x = Math.max(0, ev.clientX - dragState.hostRect.left - dragState.offsetX);
   const y = Math.max(0, ev.clientY - dragState.hostRect.top - dragState.offsetY);
   dragState.card.style.left = x + 'px';
@@ -816,13 +827,16 @@ document.addEventListener('mousemove', ev => {
 });
 document.addEventListener('mouseup', () => {
   if(!dragState) return;
-  const x = parseFloat(dragState.card.style.left) || 0;
-  const y = parseFloat(dragState.card.style.top) || 0;
-  patchNode(currentFlow, dragState.nodeId, {x, y});
-  dragState.card.classList.remove('dragging');
+  const wasMoved = dragState.moved;
+  if (wasMoved){
+    const x = parseFloat(dragState.card.style.left) || 0;
+    const y = parseFloat(dragState.card.style.top) || 0;
+    patchNode(currentFlow, dragState.nodeId, {x, y});
+    dragState.card.classList.remove('dragging');
+  }
   document.body.style.userSelect = '';
   dragState = null;
-  renderCanvas(); // 重畫箭頭
+  if (wasMoved) renderCanvas(); // 真的拖了才重畫；沒拖讓 click 自然觸發 selectNode
 });
 
 // ── Select node ──
