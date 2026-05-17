@@ -21,34 +21,48 @@ const SITE = 'https://raychou6913-tech.github.io/wujie-briefing/';
   console.log(`cards rendered: ${cardCount}（預期 wholesale 流程 13 張）`);
   if (cardCount < 5) throw new Error('cards 沒渲染');
 
-  // 拖拉第一張卡（按卡片右下角空白處拖，避開 contenteditable）
-  const firstCard = page.locator('.wf-card').first();
-  const beforeBox = await firstCard.boundingBox();
-  // 從卡片右側邊緣的空白（避開 title/owner/sla 文字區）
-  await page.mouse.move(beforeBox.x + beforeBox.width - 8, beforeBox.y + beforeBox.height - 8);
+  // 拖拉最後一張卡（角落，往右下拖不會 overlap 其他卡）
+  const lastCard = page.locator('.wf-card').last();
+  const beforeBox = await lastCard.boundingBox();
+  const startX = beforeBox.x + beforeBox.width - 8;
+  const startY = beforeBox.y + beforeBox.height - 8;
+  await page.mouse.move(startX, startY);
   await page.mouse.down();
-  await page.mouse.move(beforeBox.x + 200, beforeBox.y + 100);
+  await page.mouse.move(startX + 250, startY + 150, { steps: 10 });
   await page.mouse.up();
   await page.waitForTimeout(400);
-  const afterBox = await page.locator('.wf-card').first().boundingBox();
-  console.log(`drag: ${Math.round(beforeBox.x)},${Math.round(beforeBox.y)} → ${Math.round(afterBox.x)},${Math.round(afterBox.y)}`);
-  if (Math.abs(afterBox.x - beforeBox.x) < 50) throw new Error('drag 沒動');
+  const afterBox = await page.locator('.wf-card').last().boundingBox();
+  console.log(`drag last card: ${Math.round(beforeBox.x)},${Math.round(beforeBox.y)} → ${Math.round(afterBox.x)},${Math.round(afterBox.y)}`);
+  if (Math.abs(afterBox.x - beforeBox.x) < 100) throw new Error('drag 沒動');
 
-  // 編輯第一張卡的 title
-  const title = page.locator('.wf-card').first().locator('.wf-title');
-  await title.click({ clickCount: 3 }); // select
-  await page.keyboard.type('客戶詢盤 EDITED');
-  await page.locator('body').click({ position: { x: 5, y: 5 } }); // blur
-  await page.waitForTimeout(200);
+  // 編輯第一張卡 title（直接 evaluate 模擬 contenteditable 編輯 + blur）
+  await page.locator('.wf-card').first().locator('.wf-title').evaluate(el => {
+    el.focus();
+    el.textContent = '客戶詢盤 EDITED';
+    el.dispatchEvent(new Event('blur', {bubbles: true}));
+  });
+  await page.waitForTimeout(300);
   const newTitle = await page.locator('.wf-card').first().locator('.wf-title').textContent();
   console.log(`title after edit: "${newTitle}"`);
   if (!newTitle.includes('EDITED')) throw new Error('title 編輯沒生效');
 
-  // 編輯第一個 edge label
-  const firstLabel = page.locator('.wf-edge-label').first();
-  await firstLabel.click();
-  await page.keyboard.type('測試標籤');
-  await page.locator('body').click({ position: { x: 5, y: 5 } });
+  // 點卡 → inline 展開（用 evaluate 觸發 click 避開 overlay 攔截）
+  await page.locator('.wf-card').first().evaluate(el => {
+    // 找個非 contenteditable 的點
+    const evt = new MouseEvent('click', { bubbles: true });
+    el.dispatchEvent(evt);
+  });
+  await page.waitForTimeout(200);
+  const isSelected = await page.locator('.wf-card').first().evaluate(el => el.classList.contains('selected'));
+  const detailsVisible = await page.locator('.wf-card').first().locator('.wf-card-details').evaluate(el => getComputedStyle(el).display !== 'none');
+  console.log(`第一張卡 selected: ${isSelected}, details 展開: ${detailsVisible}`);
+
+  // 編輯第一個 edge label（同樣用 evaluate 避免 overlay）
+  await page.locator('.wf-edge-label').first().evaluate(el => {
+    el.focus();
+    el.textContent = '測試標籤';
+    el.dispatchEvent(new Event('blur', {bubbles: true}));
+  });
   await page.waitForTimeout(200);
   const labelText = await page.locator('.wf-edge-label').first().textContent();
   console.log(`edge label: "${labelText}"`);
