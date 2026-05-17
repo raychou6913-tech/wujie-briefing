@@ -196,6 +196,15 @@ body{
   box-shadow:0 12px 32px rgba(0,0,0,.15);border-color:var(--brand);
   z-index:100;cursor:grabbing;
 }
+/* 全景卡：只讀視覺，淡藍底提示「衍生視圖」 */
+.wf-card.wf-overview{background:#f8fafc;}
+.wf-card.wf-overview.selected{background:#eff6ff;border-color:#3b82f6;}
+.wf-card.wf-overview .wf-title,
+.wf-card.wf-overview .wf-owner,
+.wf-card.wf-overview .wf-sla [contenteditable],
+.wf-card.wf-overview .wf-card-desc{
+  cursor:inherit !important;background:transparent !important;
+}
 .wf-card .wf-title{
   font-size:13px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
   outline:none;line-height:1.3;margin-bottom:4px;cursor:inherit;
@@ -710,9 +719,13 @@ function renderCanvas(){
   const W = Math.max(maxX, flow.width || 800);
   const H = Math.max(maxY, flow.height || 400) + 70; // +70 for top title
 
+  const isOverview = currentFlow === 'overview';
+  const toolbarMsg = isOverview
+    ? '📌 全景圖 · 內容從各流程自動同步（只讀）· 拖卡片重排位置 / 點 ✕ 收起 / 點卡片看細節跳對應 tab'
+    : `📌 ${flow.title} · ${flow.sub} · 點卡片展開細節，拖整張卡移動，雙擊文字編輯，箭頭中點加註`;
   host.innerHTML = `
     <div class="wf-toolbar">
-      <span>📌 ${flow.title} · ${flow.sub} · 點卡片展開細節，拖整張卡移動，雙擊文字編輯，箭頭中點加註</span>
+      <span>${toolbarMsg}</span>
       <span style="flex:1"></span>
       <button onclick="resetFlow()">重設此流程</button>
     </div>
@@ -730,21 +743,37 @@ function renderCanvas(){
 
   // Cards
   flow.nodes.forEach(n => {
+    // 全景圖：title/desc 從源頭流程 metadata 自動同步
+    let displayTitle = n.title;
+    let displayDesc = n.desc || '';
+    let displayOwner = n.owner;
+    let displaySla = n.sla;
+    if (isOverview && n.action && n.action.startsWith('flow:')) {
+      const srcKey = n.action.slice(5);
+      const src = WORKFLOWS[srcKey];
+      if (src) {
+        displayTitle = src.title;       // 從源頭 title
+        displayDesc = src.sub || displayDesc;  // 從源頭副標
+        // owner / sla 在源頭沒對等欄位，用 overview 自定義摘要值
+      }
+    }
     const isSelected = n.id === selectedNodeId;
     const nodeNotes = notes.filter(no => no.flow === currentFlow && no.nodeId === n.id);
     const card = document.createElement('div');
-    card.className = 'wf-card' + (isSelected?' selected':'');
+    card.className = 'wf-card' + (isSelected?' selected':'') + (isOverview?' wf-overview':'');
     card.style.left = n.x + 'px';
     card.style.top  = n.y + 'px';
     card.dataset.id = n.id;
+    const ce = (isSelected && !isOverview) ? 'true' : 'false';  // 全景全 read-only
     const detailsHtml = `
       <div class="wf-card-details">
-        <div class="wf-card-label">細節</div>
-        <div class="wf-card-desc" contenteditable="true" spellcheck="false" data-field="desc">${escapeHtml(n.desc || '')}</div>
+        <div class="wf-card-label">細節${isOverview?'（自動同步自源頭流程）':''}</div>
+        <div class="wf-card-desc" contenteditable="${ce}" spellcheck="false" data-field="desc">${escapeHtml(displayDesc)}</div>
         ${n.action ? (n.action.startsWith('flow:')
           ? `<button class="wf-card-action" data-jump-flow="${n.action.slice(5)}" style="border:1px solid var(--line);background:#fff;cursor:pointer;width:100%;text-align:left;"><span>🗺</span><span>看「${WORKFLOWS[n.action.slice(5)]?.title || n.action.slice(5)}」細節</span><span class="wf-card-action-arrow">→</span></button>`
           : `<a class="wf-card-action" href="erp-lobby.html#action-${n.action}"><span>⚡</span><span>跳大廳 · 開「${n.action}」</span><span class="wf-card-action-arrow">→</span></a>`)
         : ''}
+        ${isOverview ? '' : `
         <div class="wf-card-opt">
           <div class="wf-card-label">💡 優化建議</div>
           <textarea data-opt-input placeholder="這環節要怎麼優化？"></textarea>
@@ -758,24 +787,25 @@ function renderCanvas(){
               </div>
             `).join('')}
           </div>
-        </div>
+        </div>`}
       </div>`;
-    const ce = isSelected ? 'true' : 'false';  // 展開後才能編輯
     card.innerHTML = `
       ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
       ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
       <button class="wf-card-close" data-close-btn title="收起">✕</button>
-      <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(n.title)}</div>
-      <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(n.owner)}</div>
-      <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(n.sla)}</span></div>
+      <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayTitle)}</div>
+      <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayOwner)}</div>
+      <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(displaySla)}</span></div>
       ${detailsHtml}
     `;
-    // 編輯儲存（全部 ce 欄位）
-    card.querySelector('.wf-title').addEventListener('blur', ev => patchNode(currentFlow, n.id, {title: ev.target.textContent.trim()}));
-    card.querySelector('.wf-owner').addEventListener('blur', ev => patchNode(currentFlow, n.id, {owner: ev.target.textContent.trim()}));
-    card.querySelector('[data-field="sla"]').addEventListener('blur', ev => patchNode(currentFlow, n.id, {sla: ev.target.textContent.trim()}));
-    const descEl = card.querySelector('[data-field="desc"]');
-    if (descEl) descEl.addEventListener('blur', ev => patchNode(currentFlow, n.id, {desc: ev.target.textContent.trim()}));
+    // 編輯儲存（全部 ce 欄位）— 全景只讀不掛 listener
+    if (!isOverview) {
+      card.querySelector('.wf-title').addEventListener('blur', ev => patchNode(currentFlow, n.id, {title: ev.target.textContent.trim()}));
+      card.querySelector('.wf-owner').addEventListener('blur', ev => patchNode(currentFlow, n.id, {owner: ev.target.textContent.trim()}));
+      card.querySelector('[data-field="sla"]').addEventListener('blur', ev => patchNode(currentFlow, n.id, {sla: ev.target.textContent.trim()}));
+      const descEl = card.querySelector('[data-field="desc"]');
+      if (descEl) descEl.addEventListener('blur', ev => patchNode(currentFlow, n.id, {desc: ev.target.textContent.trim()}));
+    }
     // 優化按鈕
     const optBtn = card.querySelector('[data-opt-btn]');
     if (optBtn) optBtn.addEventListener('click', () => {
