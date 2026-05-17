@@ -342,10 +342,56 @@ if(_sess && !['ray','shawn','anran'].includes(user)){
   location.href = 'erp-lobby.html';
 }
 
-// ── 10 個工作流 data ──
+// ── 工作流 data ──
 // 每節點 {id, title, owner, sla, x, y, desc, action?, stale?, comment?}
+//   action 'flow:KEY' = 跳對應流程 tab；其他 = 跳 lobby modal
 // 每邊 {from, to, label?, alt?(退回流程用 dashed red)}
 const WORKFLOWS = {
+  overview: {
+    title:'⭐ 全景圖（11 流程串接）',
+    sub:'從 idea 到入帳的全鏈路 · 點任一節點看該流程細節',
+    width:1320, height:480,
+    nodes:[
+      // 主路徑：項目建立 → 設計 → 送審 → 採購 → 批發
+      {id:'o11', title:'#11 項目建立 ⭐', owner:'Shawn', sla:'多階段', x:30, y:60, desc:'所有下游起點 — Shawn 收集 idea / 初篩 / Ray 拍板 / 立項 / 編預算。', action:'flow:project_init'},
+      {id:'o4', title:'#4 設計流程', owner:'Bevis / 詩彤', sla:'2-4 週', x:280, y:60, desc:'從 brief 到打樣稿；Bevis 核准後送 IP 方。', action:'flow:design'},
+      {id:'o5', title:'#5 IP 送審', owner:'珮玲', sla:'14 天', x:530, y:60, desc:'送 IP 版權方審核；通過進量產，需修改踢回設計。', action:'flow:ip_approval'},
+      {id:'o3', title:'#3 採購 PO', owner:'賴哥 / 木子', sla:'30-100 天', x:780, y:60, desc:'從詢比價 / 打樣 / 大貨 / 工廠付款。', action:'flow:procurement'},
+      {id:'o1', title:'#1 批發訂單', owner:'業務 / 安然', sla:'6 個月周期', x:1030, y:60, desc:'最高頻流程 · 客戶詢盤 → 報價 → 出貨 → 收款 11 棒。', action:'flow:wholesale'},
+
+      // 立項分支 + 銷售平行
+      {id:'o7', title:'#7 快閃店', owner:'Shawn / 安然', sla:'3 個月籌備', x:780, y:200, desc:'場地 + IP 主題確定 → 多人並行（採購 / 設計 / 物流）。', action:'flow:popup'},
+      {id:'o8', title:'#8 拜訪客戶', owner:'業務員', sla:'拜訪當天', x:1030, y:200, desc:'寫進 CRM；feed 批發訂單機會。', action:'flow:visit'},
+
+      // 結算層
+      {id:'o2', title:'#2 費用報銷', owner:'全員', sla:'48hr+3天', x:30, y:340, desc:'個人 / 業務 / OPEX 三類分流；最後到躍明。', action:'flow:expense'},
+      {id:'o9', title:'#9 跨境結算', owner:'安然 → 躍明', sla:'發生時', x:280, y:340, desc:'北京→香港/台灣/泰國 款項對齊。', action:'flow:xborder'},
+      {id:'o10', title:'#10 月結', owner:'躍明', sla:'每月 1-5 日', x:530, y:340, desc:'損益表 / 現金流 / VAM 計入。', action:'flow:monthend'},
+
+      // 時間驅動（不掛項目）
+      {id:'o6', title:'#6 IP 續簽', owner:'安然', sla:'到期前 6 個月', x:1030, y:340, desc:'時間驅動 · 平行流程；續簽後可能重啟項目。', action:'flow:contract_renew'},
+    ],
+    edges:[
+      // 主流
+      {from:'o11', to:'o4', label:'派設計'},
+      {from:'o4', to:'o5', label:'送審'},
+      {from:'o5', to:'o3', label:'通過 → 打樣 / 大貨'},
+      {from:'o3', to:'o1', label:'貨備齊'},
+      // 立項分支
+      {from:'o11', to:'o7', label:'快閃立項'},
+      {from:'o11', to:'o2', label:'OPEX 編列'},
+      // Feed 批發
+      {from:'o8', to:'o1', label:'CRM feed'},
+      // 結算流
+      {from:'o1', to:'o10', label:'入帳'},
+      {from:'o7', to:'o10', label:'快閃結算'},
+      {from:'o2', to:'o10', label:'費用入帳'},
+      {from:'o9', to:'o10', label:'跨境對齊'},
+      // 續簽影響立項
+      {from:'o6', to:'o11', label:'續簽 → 重啟', alt:true},
+    ],
+  },
+
   wholesale: {
     title:'1. 批發訂單流程',
     sub:'最高頻 · 從客戶詢盤到躍明入帳，11 棒接力',
@@ -597,7 +643,7 @@ const WORKFLOWS = {
 };
 
 // ── State ──
-let currentFlow = 'wholesale';
+let currentFlow = 'overview';   // 預設打開全景圖
 let selectedNodeId = null;
 
 // ── Render flow tabs ──
@@ -695,7 +741,10 @@ function renderCanvas(){
       <div class="wf-card-details">
         <div class="wf-card-label">細節</div>
         <div class="wf-card-desc" contenteditable="true" spellcheck="false" data-field="desc">${escapeHtml(n.desc || '')}</div>
-        ${n.action ? `<a class="wf-card-action" href="erp-lobby.html#action-${n.action}"><span>⚡</span><span>跳大廳 · 開「${n.action}」</span><span class="wf-card-action-arrow">→</span></a>` : ''}
+        ${n.action ? (n.action.startsWith('flow:')
+          ? `<button class="wf-card-action" data-jump-flow="${n.action.slice(5)}" style="border:1px solid var(--line);background:#fff;cursor:pointer;width:100%;text-align:left;"><span>🗺</span><span>看「${WORKFLOWS[n.action.slice(5)]?.title || n.action.slice(5)}」細節</span><span class="wf-card-action-arrow">→</span></button>`
+          : `<a class="wf-card-action" href="erp-lobby.html#action-${n.action}"><span>⚡</span><span>跳大廳 · 開「${n.action}」</span><span class="wf-card-action-arrow">→</span></a>`)
+        : ''}
         <div class="wf-card-opt">
           <div class="wf-card-label">💡 優化建議</div>
           <textarea data-opt-input placeholder="這環節要怎麼優化？"></textarea>
@@ -752,6 +801,12 @@ function renderCanvas(){
     if (closeBtn) closeBtn.addEventListener('click', ev => {
       ev.stopPropagation();
       selectNode(null);
+    });
+    // 跳對應 flow tab
+    const jumpBtn = card.querySelector('[data-jump-flow]');
+    if (jumpBtn) jumpBtn.addEventListener('click', ev => {
+      ev.stopPropagation();
+      switchFlow(jumpBtn.dataset.jumpFlow);
     });
     // 卡片 click：非編輯區 + 非互動元素 → 選取/取消
     card.addEventListener('click', e => {
