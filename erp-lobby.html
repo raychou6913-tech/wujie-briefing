@@ -2444,50 +2444,80 @@ function submitMonthlyData(){
   showQaToast(`✓ ${rec.platform} ${rec.month} 數據已送 Shawn`);
 }
 
-// ── Shawn × 3 / Ray × 1 / visit-log（業務員+Shawn 共用）──
-const WHOLESALE_SEED = [
-  {id:'w1', client:'深圳 LOG-ON', sales:'安然', product:'Snoopy 夏季盲盒', qty:'860 箱', amount:'¥199 萬', urgency:'high', detail:'客戶要求 5/30 前到貨，需確認工廠 capacity；30/70 分期付款。'},
-  {id:'w2', client:'廣州博騰', sales:'老董', product:'Mofusand', qty:'120 箱', amount:'¥18 萬', urgency:'med', detail:'新客戶第 1 筆，需先確認 IP 授權範圍 + 客戶資質。'},
-  {id:'w3', client:'首爾 SMTOWN COEX', sales:'老董', product:'Snoopy 夏季 + 限定組合', qty:'樣品中', amount:'待報價', urgency:'med', detail:'韓市場首次，先報價 + 樣品確認，需 Ray 拍板定價策略。'},
-];
-function openWholesaleModal(){
-  const items = _seedKey('shawn_wholesale_v1', WHOLESALE_SEED);
-  _genericListRender(document.getElementById('wholesale-list'), items, w => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${w.urgency==='high'?'border-color:var(--warn);':''}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-      <div style="flex:1;">
-        <span style="font-size:13px;font-weight:700;color:var(--ink);">${w.client}</span>
-        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${w.sales} · ${w.product} · ${w.qty}</div>
-      </div>
-      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${w.amount}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${w.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doWholesale('${w.id}','can-do')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 可執行 · 轉 Ray 確認</button>
-      <button onclick="doWholesale('${w.id}','need-info')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需更多資訊</button>
-      <button onclick="doWholesale('${w.id}','reject')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">不接</button>
-    </div>
-  </div>`, '✨ 沒有待核可批發訂單');
+// 安然 批發核准（飛書直連 — 銷售進度表）
+window._wholesaleCache = [];
+async function openWholesaleModal(){
+  const list = document.getElementById('wholesale-list');
   document.getElementById('wholesale-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/anran-wholesale-approve?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error || '讀取失敗');
+    window._wholesaleCache = d.items || [];
+    if(!d.items.length){
+      list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 沒有待核准批發訂單</div>';
+      return;
+    }
+    list.innerHTML = d.items.map(w => {
+      const amt = w.amount ? `${w.currency || ''} ${Number(w.amount).toLocaleString()}` : '';
+      const meta = [w.designer, w.ip, w.stage, w.round ? '數量 '+w.round : ''].filter(Boolean).join(' · ');
+      const term = w.extra_term ? `<span style="font-size:10px;background:var(--paper-soft);border-radius:6px;padding:2px 7px;color:var(--ink-mid);margin-left:6px;">帳期 ${w.extra_term}</span>` : '';
+      return `<div data-rid="${w.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${w.urgency==='high'?'border-color:var(--warn);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="flex:1;">
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">${w.counterparty || '?客戶'}</span>${term}
+            <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${w.name || ''}${meta?' · '+meta:''}</div>
+          </div>
+          ${amt ? `<div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${amt}</div>` : ''}
+        </div>
+        ${w.detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${w.detail}</div>` : ''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doWholesale('${w.record_id}','can_do')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 可執行 · 轉 Ray 確認</button>
+          <button onclick="doWholesale('${w.record_id}','need_info')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">需補資訊</button>
+          <button onclick="doWholesale('${w.record_id}','reject')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">不接</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}<br><button onclick="openWholesaleModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
+  }
 }
 function closeWholesaleModal(){ document.getElementById('wholesale-modal').classList.remove('show'); }
-function doWholesale(id, action){
-  const item = _genericDone('shawn_wholesale_v1', id, '');
-  const labels = {'can-do':'已轉 Ray 確認', 'need-info':'已通知業務補資訊', 'reject':'已通知業務不接 · 請告知客戶'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'can-do'){
-    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`${name} 確認可執行：${item ? item.client+' · '+item.product+' · '+item.amount : id}`});
-  } else if(action === 'need-info'){
-    // 需資訊 → 通知業務員補（Phase 1 補洞）
-    const salesUser = item && item.sales ? {'老董':'laodong','德寶':'debao','安然':'anran'}[item.sales] : 'laodong';
-    notif.unshift({ts:Date.now(), from:name, to:salesUser, msg:`⚠ ${name} 需更多資訊：${item ? item.client : id} · 請補`});
-  } else if(action === 'reject'){
-    // 不接 → 通知業務員告知客戶（Phase 1 補洞）
-    const salesUser = item && item.sales ? {'老董':'laodong','德寶':'debao','安然':'anran'}[item.sales] : 'laodong';
-    notif.unshift({ts:Date.now(), from:name, to:salesUser, msg:`❌ ${name} 不接此單：${item ? item.client : id} · 請告知客戶`});
+async function doWholesale(recordId, action){
+  const item = window._wholesaleCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'need_info' || action === 'reject'){
+    note = prompt(action === 'need_info' ? '缺什麼資訊（會通知業務員補）：' : '不接原因（會通知業務員告知客戶）：') || '';
+    if(!note.trim()){ showQaToast('未輸入原因，取消'); return; }
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  openWholesaleModal();
-  showQaToast(`✓ ${item ? item.client : id} · ${labels[action]}`);
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/anran-wholesale-approve/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){
+      if(r.status === 409){ showQaToast('⚠ 版本衝突'); openWholesaleModal(); }
+      else showQaToast('動作失敗：' + (d.error || r.status));
+      return;
+    }
+    const labels = {can_do:'已轉 Ray 確認', need_info:'已通知業務補資訊', reject:'已通知業務不接 · 請告知客戶'};
+    showQaToast(`✓ ${item.counterparty || item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    const salesUser = item.designer ? ({'老董':'laodong','董亮':'laodong','德寶':'debao','安然':'anran'}[item.designer] || 'laodong') : 'laodong';
+    if(action === 'can_do'){
+      notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`${name} 確認可執行：${item.counterparty} · ${item.name} · ${item.amount||'?'} ${item.currency||''}`});
+    } else if(action === 'need_info'){
+      notif.unshift({ts:Date.now(), from:name, to:salesUser, msg:`⚠ ${name} 需更多資訊：${item.counterparty} · ${note}`});
+    } else if(action === 'reject'){
+      notif.unshift({ts:Date.now(), from:name, to:salesUser, msg:`❌ ${name} 不接此單：${item.counterparty} · ${note}`});
+    }
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openWholesaleModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 
 // 待催辦：Worker 飛書 stale + localStorage 未上飛書 inbox stale 合併
