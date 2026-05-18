@@ -2712,42 +2712,63 @@ function _genericDone(key, id, toastMsg){
   return item;
 }
 
-// 高維：物流批次
-const LOGISTICS_SEED = [
-  {id:'lg1', order:'#BKK240 曼谷倉 → Central Department', urgency:'high', stage:'今日預計出貨', detail:'JJK 盲盒 × 80 箱；曼谷倉備齊，待物流公司提貨。'},
-  {id:'lg2', order:'#BKK241 廠端 → LOG-ON 深圳', urgency:'med', stage:'廠端已備齊，待提貨', detail:'貓福珊迪盲盒 × 500 pcs；木子已確認備齊，可安排出貨。'},
-  {id:'lg3', order:'#BKK242 永盛 → 名創優品', urgency:'med', stage:'生產中', detail:'Snoopy 大貨 180 箱；預計下週備齊。'},
-];
 function _seedKey(key, seed){
   if(!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(seed));
   return JSON.parse(localStorage.getItem(key));
 }
-function openLogisticsModal(){
-  const items = _seedKey('gaowei_logistics_v1', LOGISTICS_SEED);
-  _genericListRender(document.getElementById('logistics-list'), items, l => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${l.urgency==='high'?'border-color:var(--warn);':''}">
-    <div style="margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:700;color:var(--ink);">${l.order}</span>
-      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${l.stage}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${l.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <input id="lg-track-${l.id}" placeholder="填入快遞單號" style="flex:1;font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-family:inherit;">
-      <button onclick="doLogisticsShip('${l.id}')" style="padding:8px 14px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已出貨</button>
-    </div>
-  </div>`, '✨ 所有訂單已出貨');
+// 高維 物流批次（飛書直連 — 庫存物流表）
+window._logisticsCache = [];
+async function openLogisticsModal(){
+  const list = document.getElementById('logistics-list');
   document.getElementById('logistics-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/gaowei-logistics?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error||'讀取失敗');
+    window._logisticsCache = d.items || [];
+    if(!d.items.length){ list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 所有物流批次都跑完了</div>'; return; }
+    list.innerHTML = d.items.map(l => `<div data-rid="${l.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${l.urgency==='high'?'border-color:var(--warn);':''}">
+      <div style="margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:700;color:var(--ink);">${l.name || '(未命名)'}${l.ip?' · '+l.ip:''}</span>
+        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${l.stage||''} ${l.designer?'· '+l.designer:''} ${l.round?'· 庫存 '+l.round:''} ${l.state?'· '+l.state:''}</div>
+      </div>
+      ${l.detail?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${l.detail}</div>`:''}
+      <div style="display:flex;gap:6px;">
+        <button onclick="doLogisticsAction('${l.record_id}','shipped')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已出貨</button>
+        <button onclick="doLogisticsAction('${l.record_id}','arrived')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">已到貨</button>
+        <button onclick="doLogisticsAction('${l.record_id}','anomaly')" style="padding:8px 12px;background:transparent;color:var(--danger);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">異常</button>
+      </div>
+    </div>`).join('');
+  } catch(e){ list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}<br><button onclick="openLogisticsModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`; }
 }
 function closeLogisticsModal(){ document.getElementById('logistics-modal').classList.remove('show'); }
-function doLogisticsShip(id){
-  const trackInp = document.getElementById('lg-track-'+id);
-  const track = trackInp ? trackInp.value.trim() : '';
-  const item = _genericDone('gaowei_logistics_v1', id, '');
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:name, to:'anran',
-    msg:`${item ? item.order : id} 已出貨${track?' · 單號 '+track:''}`});
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  openLogisticsModal();  // re-render
-  showQaToast(`✓ ${item ? item.order : id} 已出貨 · 通知安然 / 業務`);
+async function doLogisticsAction(recordId, action){
+  const item = window._logisticsCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'anomaly'){
+    note = prompt('異常狀況（必填，會通知 Shawn）：') || '';
+    if(!note.trim()){ showQaToast('未輸入，取消'); return; }
+  } else if(action === 'shipped'){
+    note = prompt('快遞單號（選填）：') || '';
+  }
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/gaowei-logistics/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){ showQaToast(r.status===409?'⚠ 版本衝突':('動作失敗：'+(d.error||r.status))); openLogisticsModal(); return; }
+    const labels = {shipped:'已出貨 · 通知安然', arrived:'已到貨', anomaly:'已通知 Shawn 處理異常'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if(action === 'shipped') notif.unshift({ts:Date.now(),from:name,to:'anran',msg:`${item.name} 已出貨${note?' · 單號 '+note:''}`});
+    else if(action === 'anomaly') notif.unshift({ts:Date.now(),from:name,to:'shawn',msg:`⚠ 物流異常：${item.name} · ${note}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openLogisticsModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 
 // Bevis：設計核准（飛書直連，2026-05-16 起接 tblSgCcB2aFcsPaw 設計送審）
@@ -2972,116 +2993,124 @@ async function doDesignTask(recordId, action){
   }
 }
 
-// ── 賴哥 / 木子 採購 modal × 3：我的 PO / 備貨核對 / 付款申請 ──
-const MY_PO_SEED = [
-  {id:'po1', name:'PO#320 Snoopy 大貨', supplier:'永盛玩具', stage:'生產中 · 60%', deadline:'2026-06-10 交貨', amount:'¥ 78 萬', detail:'第 2 批大貨；20% 訂金已付；尾款待出貨前付。'},
-  {id:'po2', name:'PO#321 Mofusand 盲袋', supplier:'東莞達豐', stage:'打樣 · 第 3 輪', deadline:'2026-05-25 樣品截止', amount:'¥ 32 萬', detail:'盲袋包裝模具修改中，等廠端確認樣品後正式下單。'},
-  {id:'po3', name:'PO#322 Opanchu 公仔', supplier:'永盛玩具', stage:'已發貨', deadline:'2026-05-20 到貨', amount:'¥ 18 萬', detail:'追加 80 箱滿足 LOG-ON 補單；快遞單號已給高維。'},
-];
-function loadMyPo(){
-  const stored = localStorage.getItem('laige_po_v1');
-  if(stored) return JSON.parse(stored);
-  localStorage.setItem('laige_po_v1', JSON.stringify(MY_PO_SEED));
-  return MY_PO_SEED;
-}
-function openMyPoModal(){ renderMyPo(); document.getElementById('my-po-modal').classList.add('show'); }
-function closeMyPoModal(){ document.getElementById('my-po-modal').classList.remove('show'); }
-function renderMyPo(){
+// ── 賴哥 我的 PO（飛書直連 — 採購詢比價表）──
+window._myPoCache = [];
+async function openMyPoModal(){
   const list = document.getElementById('my-po-list');
-  const arr = loadMyPo().filter(p => !p.archived);
-  list.innerHTML = arr.map(p => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-      <div style="flex:1;">
-        <span style="font-size:13px;font-weight:700;color:var(--ink);">${p.name}</span>
-        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${p.supplier} · ${p.stage} · ${p.deadline}</div>
-      </div>
-      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${p.amount}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${p.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="showQaToast('${p.name} 進度更新 modal · V2 開發中')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">更新進度</button>
-      <button onclick="doPoArchive('${p.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">已完成歸檔</button>
-    </div>
-  </div>`).join('') + `<div style="text-align:center;padding:12px;"><button onclick="showQaToast('+ 新增 PO modal · V2 開發中')" style="padding:10px 22px;background:transparent;color:var(--brand);border:1.5px dashed var(--brand);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">+ 新 PO</button></div>`;
+  document.getElementById('my-po-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/laige-po?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error||'讀取失敗');
+    window._myPoCache = d.items || [];
+    if(!d.items.length){ list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 沒有 PO 待跟進</div>'; return; }
+    list.innerHTML = d.items.map(p => {
+      const ddl = p.deadline ? new Date(p.deadline).toLocaleDateString('zh-TW') + ' 到貨' : '';
+      const meta = [p.ip, p.designer, p.round?'數量 '+p.round:'', ddl].filter(Boolean).join(' · ');
+      return `<div data-rid="${p.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${p.name||'(未命名 PO)'}</span>
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${meta}</div>
+        </div>
+        ${p.detail?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${p.detail}</div>`:''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doMyPoAction('${p.record_id}','received')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已收貨 · 轉木子核對</button>
+          <button onclick="doMyPoAction('${p.record_id}','delay')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">延交提醒</button>
+          <button onclick="doMyPoAction('${p.record_id}','cancel')" style="padding:8px 12px;background:transparent;color:var(--danger);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">取消 PO</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}<br><button onclick="openMyPoModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`; }
 }
-function doPoArchive(id){
-  const arr = loadMyPo();
-  const p = arr.find(x => x.id === id);
-  if(p){ p.archived = true; localStorage.setItem('laige_po_v1', JSON.stringify(arr)); }
-  renderMyPo();
-  markCurrentTodoDone();
-  showQaToast(`✓ ${p ? p.name : id} 已歸檔`);
+function closeMyPoModal(){ document.getElementById('my-po-modal').classList.remove('show'); }
+async function doMyPoAction(recordId, action){
+  const item = window._myPoCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'delay'){
+    note = prompt('延交原因 + 新交期（會通知安然）：') || '';
+    if(!note.trim()){ showQaToast('未輸入，取消'); return; }
+  } else if(action === 'cancel'){
+    note = prompt('取消 PO 原因（必填）：') || '';
+    if(!note.trim()){ showQaToast('未輸入，取消'); return; }
+  }
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/laige-po/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){ showQaToast(r.status===409?'⚠ 版本衝突':('動作失敗：'+(d.error||r.status))); openMyPoModal(); return; }
+    const labels = {received:'已收貨 · 轉木子核對', delay:'已記錄延交 · 通知安然', cancel:'已取消 PO'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if(action === 'received') notif.unshift({ts:Date.now(),from:name,to:'muzi',msg:`${item.name} 已收貨 · 請核對備貨`});
+    else if(action === 'delay') notif.unshift({ts:Date.now(),from:name,to:'anran',msg:`⚠ PO 延交：${item.name} · ${note}`});
+    else if(action === 'cancel') notif.unshift({ts:Date.now(),from:name,to:'anran',msg:`❌ PO 取消：${item.name} · ${note}`});
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openMyPoModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 
-const STOCK_CHECK_SEED = [
-  {id:'s1', po:'PO#318 Mofusand 公仔', supplier:'東莞達豐', expected:1200, received:null, urgency:'high', detail:'廠端通知今日備齊，預期 1200 pcs。'},
-  {id:'s2', po:'PO#320 Snoopy 大貨第二批', supplier:'永盛玩具', expected:9600, received:null, urgency:'med', detail:'分 3 批出，第 1 批 9600 pcs 預期下週備齊。'},
-  {id:'s3', po:'PO#322 Opanchu 補單', supplier:'永盛玩具', expected:80, received:80, urgency:'low', detail:'廠端已確認 80 箱備齊，待木子核對後發貨。', confirmed:false},
-];
-function loadStockCheck(){
-  const stored = localStorage.getItem('muzi_stock_check_v1');
-  if(stored) return JSON.parse(stored);
-  localStorage.setItem('muzi_stock_check_v1', JSON.stringify(STOCK_CHECK_SEED));
-  return STOCK_CHECK_SEED;
-}
-function openStockCheckModal(){ renderStockCheck(); document.getElementById('stock-check-modal').classList.add('show'); }
-function closeStockCheckModal(){ document.getElementById('stock-check-modal').classList.remove('show'); }
-function renderStockCheck(){
+// 木子 備貨核對（飛書直連 — 採購詢比價表，已收貨 → 待木子核對）
+window._stockCheckCache = [];
+async function openStockCheckModal(){
   const list = document.getElementById('stock-check-list');
-  const arr = loadStockCheck().filter(s => !s.confirmed);
-  if(!arr.length){
-    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 所有 PO 已核對完成</div>';
-    return;
-  }
-  list.innerHTML = arr.map(s => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-      <div style="flex:1;">
-        <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.po}</span>
-        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${s.supplier} · 應收 ${s.expected.toLocaleString()} pcs</div>
-      </div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${s.detail}</div>
-    <div style="display:flex;gap:6px;align-items:center;">
-      <span style="font-size:11px;color:var(--ink-lo);">實收：</span>
-      <input id="sc-input-${s.id}" type="number" value="${s.received||''}" placeholder="${s.expected}" style="width:90px;text-align:right;font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;">
-      <button onclick="doStockMatch('${s.id}')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 數量吻合</button>
-      <button onclick="doStockDiff('${s.id}')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">有差異</button>
-    </div>
-  </div>`).join('');
+  document.getElementById('stock-check-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/muzi-stock-check?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error||'讀取失敗');
+    window._stockCheckCache = d.items || [];
+    if(!d.items.length){ list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 沒有待核對的 PO</div>'; return; }
+    list.innerHTML = d.items.map(s => {
+      const meta = [s.designer, s.ip, s.round?'應收 '+s.round:''].filter(Boolean).join(' · ');
+      return `<div data-rid="${s.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${s.urgency==='high'?'border-color:var(--warn);':''}">
+        <div style="margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">${s.name||'(未命名 PO)'}</span>
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${meta}</div>
+        </div>
+        ${s.detail?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${s.detail}</div>`:''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doStockCheck('${s.record_id}','confirm')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 吻合 · 轉高維出貨</button>
+          <button onclick="doStockCheck('${s.record_id}','dispute')" style="padding:8px 12px;background:transparent;color:var(--danger);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">有差異</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}</div>`; }
 }
-function doStockMatch(id){
-  const arr = loadStockCheck();
-  const s = arr.find(x => x.id === id);
-  const inp = document.getElementById('sc-input-'+id);
-  if(s){
-    s.received = Number(inp.value) || s.expected;
-    s.confirmed = true;
-    localStorage.setItem('muzi_stock_check_v1', JSON.stringify(arr));
+function closeStockCheckModal(){ document.getElementById('stock-check-modal').classList.remove('show'); }
+async function doStockCheck(recordId, action){
+  const item = window._stockCheckCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'dispute'){
+    note = prompt('差異說明（應收 vs 實收 / 缺多少 / 哪批 — 會通知賴哥跟廠商確認）：') || '';
+    if(!note.trim()){ showQaToast('未輸入，取消'); return; }
   }
-  // 通知賴哥 + 高維
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子核對：${s.po} 數量吻合 ✓`});
-  notif.unshift({ts:Date.now(), from:name, to:'gaowei', msg:`${s.po} 廠端備齊，可安排出貨`});
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  renderStockCheck();
-  markCurrentTodoDone();
-  showQaToast(`✓ ${s ? s.po : id} 已核對 · 通知賴哥+高維`);
-}
-function doStockDiff(id){
-  const arr = loadStockCheck();
-  const s = arr.find(x => x.id === id);
-  const inp = document.getElementById('sc-input-'+id);
-  if(s){
-    s.received = Number(inp.value) || 0;
-    s.confirmed = true;
-    localStorage.setItem('muzi_stock_check_v1', JSON.stringify(arr));
-  }
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子核對：${s.po} ⚠ 應收 ${s.expected} 實收 ${s.received}，需跟廠商確認`});
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  renderStockCheck();
-  markCurrentTodoDone();
-  showQaToast(`⚠ ${s ? s.po : id} 有差異 · 已通知賴哥`);
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/muzi-stock-check/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){ showQaToast(r.status===409?'⚠ 版本衝突':('動作失敗：'+(d.error||r.status))); openStockCheckModal(); return; }
+    const labels = {confirm:'吻合 · 轉高維出貨', dispute:'已通知賴哥跟廠商確認'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if(action === 'confirm'){
+      notif.unshift({ts:Date.now(),from:name,to:'gaowei',msg:`${item.name} 廠端備齊，可安排出貨`});
+      notif.unshift({ts:Date.now(),from:name,to:'laige',msg:`木子核對：${item.name} 數量吻合 ✓`});
+    } else if(action === 'dispute') {
+      notif.unshift({ts:Date.now(),from:name,to:'laige',msg:`⚠ ${item.name} 數量有差異：${note}`});
+    }
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openStockCheckModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 
 function openPaymentReqModal(){
