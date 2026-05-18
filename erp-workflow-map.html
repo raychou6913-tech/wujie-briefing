@@ -479,14 +479,13 @@ const WORKFLOWS = {
       {id:'a7', title:'客戶意向 → 報價', owner:'業務員', sla:'1-2 週', x:280, y:220, desc:'業務員報價 / 客戶確認數量 + 折扣 + 出貨日。'},
       {id:'a8', title:'安然把關', owner:'安然', sla:'24 hr', x:530, y:220, desc:'IP 授權範圍 / 客戶資質 / 庫存夠不夠 — 三項確認。大金額轉 Ray 確認。', action:'wholesale-approve'},
       {id:'a9', title:'Ray 確認大單', owner:'Ray', sla:'24 hr', x:780, y:220, desc:'金額 > X 萬 / 戰略客戶 / 特殊折扣 → 須 Ray 親確認。小單安然自己過。', action:'ray-approval'},
-      {id:'a10', title:'客戶付款（依條件）', owner:'客戶 → 楊子/Leo', sla:'依條件', x:1030, y:220, desc:'付款時點依客戶屬性走，5 種條件詳見變量卡 💰。系統建單時自動帶該客戶的付款條件 + 計算對應收款 SLA。'},
+      {id:'a10', title:'客戶下訂金 30%', owner:'客戶 → 楊子/Leo', sla:'3-7 天', x:1030, y:220, desc:'客戶匯訂金到帳 / 楊子（北京）或 Leo（台灣）確認收款。'},
       // Row 3：出貨 + 入帳
-      {id:'a11', title:'高維工廠直發', owner:'高維', sla:'2 天', x:30, y:380, desc:'從工廠倉直接發客戶（不經北京/泰國倉）→ 自動通知安然 + 業務員 + 客戶。出貨時點也看付款條件：訂金型必須先收訂金才出；全款預付必須收全款才出；帳期型可直接出。', action:'logistics-batch'},
-      {id:'a12', title:'收款追蹤（依條件）', owner:'楊子/Leo → 躍明', sla:'依條件', x:280, y:380, desc:'追剩餘款項依客戶付款條件：訂金型追尾款 70% / 帳期型追到期款 / 寄售型追實際銷售結算。系統依客戶屬性自動算到期日 + 逾期 alert。', action:'my-approval'},
-      {id:'a13', title:'躍明入帳 → VAM 計入', owner:'躍明', sla:'3 天', x:530, y:380, desc:'寫進財務 + 月結對齊 + VAM 800 萬目標計入（JV/深圳子公司）。', action:'my-pending'},
-      // 變量說明卡：付款條件
-      {id:'b2', title:'💰 付款條件變量', owner:'客戶屬性（5 種）', sla:'建單自動帶', x:780, y:380, desc:'5 種付款模式（依客戶名單表「付款條件」屬性自動套）：\n\n① 全款預付：收 100% → 才出貨（新客戶 / 高風險）\n② 訂金 + 尾款：30% → 出貨 → 70%（一般合作）\n③ 帳期 30 天：出貨 → 30 天後付（既有 KA）\n④ 帳期 60-90 天：出貨 → N 天後付（大型 KA / 流通通路）\n⑤ 寄售：出貨不結帳 → 賣掉才結（特殊通路）\n\nERP 改造點：客戶名單表加「付款條件」欄位 → 建訂單時自動帶 → a10 / a11 / a12 三棒邏輯依此走。'},
-      // MTO 例外（右下角註解節點）
+      {id:'a11', title:'高維工廠直發', owner:'高維', sla:'2 天', x:30, y:380, desc:'從工廠倉直接發客戶（不經北京/泰國倉）→ 自動通知安然 + 業務員 + 客戶。', action:'logistics-batch'},
+      {id:'a12', title:'客戶收貨 → 付尾款 70%', owner:'客戶', sla:'-', x:280, y:380, desc:'客戶簽收 / 確認品質 / 付尾款。'},
+      {id:'a13', title:'楊子/Leo 確認收款', owner:'楊子/Leo', sla:'當天', x:530, y:380, desc:'銀行入帳核對 → 送躍明入帳。', action:'my-approval'},
+      {id:'a14', title:'躍明入帳 → VAM 計入', owner:'躍明', sla:'3 天', x:780, y:380, desc:'寫進財務 + 月結對齊 + VAM 800 萬目標計入（JV/深圳子公司）。', action:'my-pending'},
+      // MTO 例外（左下角註解節點）
       {id:'b1', title:'⚙ MTO 例外', owner:'同款追單 / 試水新品 / 自有 IP', sla:'-', x:1030, y:380, desc:'例外 3 種：① 同款第二批追單（版權打樣都過了）② 公司想試的新品類 ③ 公司自有 IP 商品 — 邏輯改成「先收意向 → 內部判斷 → commit 工廠」。'},
     ],
     edges:[
@@ -506,12 +505,9 @@ const WORKFLOWS = {
       {from:'a10', to:'a11'},
       {from:'a11', to:'a12'},
       {from:'a12', to:'a13'},
+      {from:'a13', to:'a14'},
       // MTO 例外
       {from:'b1', to:'a3', label:'例外 → 仍走 commit', alt:true},
-      // 付款條件變量 → 影響 3 棒
-      {from:'b2', to:'a10', label:'套用', alt:true},
-      {from:'b2', to:'a11', label:'套用', alt:true},
-      {from:'b2', to:'a12', label:'套用', alt:true},
     ],
   },
 
