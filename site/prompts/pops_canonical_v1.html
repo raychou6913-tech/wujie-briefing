@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POPS Canonical Lock · Gemini Prompt v1</title>
+<style>
+  :root {
+    --bg: #1A1428;
+    --paper: #FFF8E7;
+    --red: #FF4A75;
+    --peach: #FF8B5C;
+    --cyan: #2E8BC9;
+    --gold: #FFC542;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--paper);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    padding: 40px 24px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--peach);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Shippori Mincho", serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--paper);
+  }
+  .sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 28px;
+  }
+  .goal {
+    background: rgba(255, 139, 92, 0.08);
+    border: 1px solid rgba(255, 139, 92, 0.25);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+  }
+  .goal strong { color: var(--peach); }
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--peach);
+    color: var(--bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  button:hover { background: var(--gold); transform: translateY(-1px); }
+  button.copied { background: var(--cyan); color: var(--paper); }
+  .secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .secondary:hover { background: rgba(255,255,255,0.05); color: var(--paper); }
+  pre {
+    background: #0E0A1B;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: "JetBrains Mono", ui-monospace, "Menlo", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+  .footer-note {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+  }
+  .footer-note a { color: var(--cyan); text-decoration: none; }
+  .footer-note a:hover { color: var(--peach); }
+  .swap-row {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0 0;
+    flex-wrap: wrap;
+  }
+  .swap-row code {
+    background: rgba(255,255,255,0.06);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--gold);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">— UNIPOP CAST · POPS Canonical Lock · v1 —</div>
+  <h1>POPS 單隻定版咒語</h1>
+  <div class="sub">先生 1 隻桃橘 POPS → 確認設計鎖定 → 之後 12 色合照／cameo 都用同一個 design DNA。</div>
+
+  <div class="goal">
+    <strong>目標</strong>：跑出 1 張單隻 Peach POPS 的 hero portrait（靠近、清楚、可作為日後 reference）。設計鎖定後，把這張 PNG 餵給 Gemini 做 image-to-image / multi-image reference 拉一致性。<br><br>
+    <strong>步驟</strong>：① 點下方 Copy Prompt → ② 貼到 <a href="https://gemini.google.com/" style="color:var(--cyan);">gemini.google.com</a> 新 chat → ③ 跑 → ④ 不滿意 in-chat 微調（不要重 zero-shot）→ ⑤ 滿意了下載丟給我 → ⑥ 我命名 + 提交 + 開下一輪 12 色合照
+  </div>
+
+  <div class="actions">
+    <button id="copyBtn" onclick="copyPrompt()">📋 Copy Prompt</button>
+    <button class="secondary" onclick="window.open('https://gemini.google.com/','_blank')">Open Gemini ↗</button>
+  </div>
+
+  <pre id="promptText">POP MART blind box flat illustration — a single small Ghibli-style sprite creature called "PEACH POPS", centered hero portrait on a solid wine-purple background (#1A1428). Aspect ratio 1:1.
+
+═══ POPS DESIGN DNA (lock these properties exactly — every future POPS will share this) ═══
+
+SHAPE: round egg-shaped body, slightly taller than wide (height : width ≈ 1.15 : 1). Soft rounded silhouette, no sharp corners. Body fills about 70% of the canvas height (large hero portrait, not tiny).
+
+PROPORTIONS: the entire creature is one rounded body — NO neck, NO arms, NO ears. Head and body merge into one egg shape. At the bottom, two tiny stub feet poke out (about 8% of body height), close together.
+
+EYES: two large round shiny black pupils, positioned in the upper-middle of the body (eye line at about 45% from top). Each eye has a small white catchlight reflection in the upper-left corner of the pupil. Eye spacing: about 1 eye-width apart. Eye size: each eye about 18% of body width.
+
+MOUTH: tiny "u"-shaped smile, drawn in the same black outline weight as the body line, positioned centered below and between the two eyes, about 12% of body width. Closed smile, no teeth, no tongue.
+
+OUTLINE: 3-4px thick HAND-DRAWN black outline around the entire body and around each feature (eyes, mouth, feet). Lines have subtle wobble / imperfect quality — NOT perfect vector. Outline is a warm dark color, near-black but slightly softer than pure black.
+
+COLOR: solid saturated peach orange (#FF8B5C). FLAT 2-tone shading only — main color + ONE darker peach shade (#E66E45) applied as a soft shadow on the bottom 30% of the body and underneath the eyes/mouth area. NO gradients, NO highlights other than the eye catchlights, NO anime gloss, NO photorealistic rendering.
+
+FEET: two small stub feet at the bottom, drawn in the darker peach shadow color (#E66E45), each foot about 12% of body width, close together, slightly visible from front.
+
+POSE: standing facing viewer, body very slightly tilted backward (head looking up about 5°), shy but content expression.
+
+═══ BACKGROUND ═══
+
+Solid wine-purple #1A1428, completely flat, NO scenery, NO gradient, NO texture. Just one solid color filling the entire canvas. The POPS sits centered with generous padding (about 15% margin on all sides).
+
+═══ DO NOT ═══
+
+— NO arms, NO hands, NO ears, NO antenna, NO horns, NO hat, NO accessories
+— NO sharp corners or angular shapes
+— NO gradients in body color
+— NO photorealistic rendering or 3D look
+— NO white background, NO gradient background
+— NO multiple POPS — only ONE
+
+═══ STYLE REFERENCES ═══
+
+POP MART blind box × Studio Ghibli soot sprites (Susuwatari) × 80s Japanese sticker book × DIMOO designer toy outline quality.
+
+DOLL FEASIBILITY: this design must be moldable as a vinyl figure — single solid blob with two stub feet for stability, no thin protrusions, no transparent parts, no flowing elements.</pre>
+
+  <div class="footer-note">
+    <strong>之後 12 色變奏</strong>：同個 chat 跑出 Peach 後，下一句直接打：「再生 11 隻一樣的 POPS，分別是這些顏色，body 設計 100% 一樣，只換顏色和 shadow tone」<br>
+    <div class="swap-row">
+      <code>#FF4A75 hot pink</code><code>#2E8BC9 sky cyan</code><code>#5946A3 royal purple</code><code>#FFC542 sun gold</code><code>#8FA968 sage</code><code>#FFF8E7 cream</code><code>#E84855 coral red</code><code>#C9A9DD lavender</code><code>#7FC7B5 mint</code><code>#D4A744 mustard</code><code>#5A5560 charcoal</code>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyPrompt() {
+  const text = document.getElementById('promptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
