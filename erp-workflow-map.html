@@ -314,6 +314,69 @@ body{
 }
 .wf-toolbar button:hover{border-color:var(--brand);color:var(--brand);}
 
+/* 確認狀態系統 */
+.wf-progress{
+  display:inline-flex;gap:10px;align-items:center;
+  padding:3px 12px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;font-size:11px;
+}
+.wf-progress span{font-weight:700;}
+.wf-progress .ok{color:#22c55e;}
+.wf-progress .fix{color:#ef4444;}
+.wf-progress .pending{color:var(--ink-lo);}
+.wf-progress-bar{
+  width:80px;height:6px;background:var(--paper-soft);
+  border-radius:3px;overflow:hidden;display:inline-block;
+}
+.wf-progress-bar .fill-ok{height:100%;background:#22c55e;float:left;}
+.wf-progress-bar .fill-fix{height:100%;background:#ef4444;float:left;}
+
+.wf-status{
+  position:absolute;bottom:5px;right:5px;
+  display:flex;gap:3px;
+}
+.wf-status-chip{
+  font-size:9px;padding:2px 7px;border-radius:8px;line-height:1.2;
+  border:1px solid var(--line);background:#fff;color:var(--ink-lo);
+  cursor:pointer;user-select:none;font-weight:600;
+  transition:all .15s var(--ease);
+}
+.wf-status-chip:hover{transform:scale(1.05);}
+.wf-status-chip.active.ok{background:#dcfce7;color:#22c55e;border-color:#22c55e;}
+.wf-status-chip.active.fix{background:#fef2f2;color:#ef4444;border-color:#ef4444;}
+.wf-card.status-ok{border-color:#22c55e;background:#f0fdf4;}
+.wf-card.status-fix{border-color:#ef4444;background:#fef2f2;}
+
+/* 全景圖卡片完成率 badge */
+.wf-overview-badge{
+  position:absolute;top:6px;right:30px;
+  font-size:10px;font-weight:700;
+  padding:1px 7px;border-radius:8px;
+  background:var(--paper-soft);color:var(--ink-mid);
+}
+.wf-overview-badge.done{background:#dcfce7;color:#22c55e;}
+.wf-overview-badge.partial{background:#fff4ef;color:var(--brand);}
+.wf-overview-badge.fix{background:#fef2f2;color:#ef4444;}
+
+/* 待議清單 modal */
+.wf-todo-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.wf-todo-modal-inner{
+  background:#fff;border-radius:14px;max-width:720px;width:100%;
+  max-height:80vh;overflow-y:auto;padding:24px;
+}
+.wf-todo-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:8px;margin-bottom:6px;
+  cursor:pointer;font-size:12px;
+}
+.wf-todo-item:hover{border-color:var(--brand);background:var(--paper-soft);}
+.wf-todo-item .flow-name{font-size:10px;color:var(--ink-lo);font-weight:700;width:120px;}
+.wf-todo-item .card-name{flex:1;font-weight:700;}
+.wf-todo-item .owner-tag{font-size:10px;color:var(--brand);}
+
 .empty-flow{
   text-align:center;color:var(--ink-lo);font-size:13px;
   padding:60px 20px;line-height:1.8;
@@ -708,6 +771,78 @@ function resetFlow(){
 }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── 確認狀態系統（per flow+node，存 localStorage）──
+const STATUS_KEY = 'workflow_card_status_v1';
+function loadStatusMap(){ try { return JSON.parse(localStorage.getItem(STATUS_KEY) || '{}'); } catch(e){ return {}; } }
+function saveStatusMap(m){ localStorage.setItem(STATUS_KEY, JSON.stringify(m)); }
+function getCardStatus(flow, nodeId){ return loadStatusMap()[flow+':'+nodeId] || 'pending'; }
+function setCardStatus(flow, nodeId, status){
+  const m = loadStatusMap();
+  const k = flow+':'+nodeId;
+  if (status === 'pending') delete m[k]; else m[k] = status;
+  saveStatusMap(m);
+}
+function flowProgress(flowKey){
+  const flow = WORKFLOWS[flowKey];
+  if (!flow) return { ok:0, fix:0, pending:0, total:0 };
+  const m = loadStatusMap();
+  let ok=0, fix=0, pending=0;
+  flow.nodes.forEach(n => {
+    const s = m[flowKey+':'+n.id] || 'pending';
+    if (s === 'ok') ok++; else if (s === 'fix') fix++; else pending++;
+  });
+  return { ok, fix, pending, total: flow.nodes.length };
+}
+
+// ── 待議清單 modal（跨所有流程的 fix + pending 卡）──
+function openTodoListModal(){
+  const m = loadStatusMap();
+  const items = [];
+  Object.entries(WORKFLOWS).forEach(([k, flow]) => {
+    if (k === 'overview') return;
+    flow.nodes.forEach(n => {
+      const s = m[k+':'+n.id] || 'pending';
+      if (s !== 'ok') items.push({ flowKey:k, flowTitle:flow.title, node:n, status:s });
+    });
+  });
+  // 優先排 fix → 然後 pending
+  items.sort((a,b) => (a.status==='fix'?0:1) - (b.status==='fix'?0:1));
+  const fixCount = items.filter(it => it.status === 'fix').length;
+  const pendCount = items.filter(it => it.status === 'pending').length;
+  const html = `
+    <div class="wf-todo-modal" id="wf-todo-modal" onclick="if(event.target===this)this.remove()">
+      <div class="wf-todo-modal-inner">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div style="font-size:16px;font-weight:800;">⚠ 待確認 / 需議清單</div>
+            <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">需議 ${fixCount} 件 · 待確認 ${pendCount} 件 · 點任一筆跳該流程</div>
+          </div>
+          <button onclick="document.getElementById('wf-todo-modal').remove()" style="background:none;border:1px solid var(--line);border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;">關閉</button>
+        </div>
+        ${items.length === 0 ? '<div style="padding:40px;text-align:center;color:var(--ink-lo);">✨ 全部確認完成</div>' :
+          items.map(it => `
+            <div class="wf-todo-item" onclick="closeTodoAndJump('${it.flowKey}','${it.node.id}')">
+              <span class="flow-name">${it.flowTitle.split(' ').slice(0,2).join(' ')}</span>
+              <span style="font-size:14px;">${it.status === 'fix' ? '🔴' : '⚪'}</span>
+              <span class="card-name">${it.node.title}</span>
+              <span class="owner-tag">${it.node.owner}</span>
+            </div>
+          `).join('')
+        }
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+function closeTodoAndJump(flowKey, nodeId){
+  document.getElementById('wf-todo-modal')?.remove();
+  if (currentFlow !== flowKey) switchFlow(flowKey);
+  setTimeout(() => {
+    selectedNodeId = nodeId;
+    renderCanvas();
+    document.querySelector(`.wf-card[data-id="${nodeId}"]`)?.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 100);
+}
+
 // ── Render card-based canvas ──
 function renderCanvas(){
   const flow = getMergedFlow(currentFlow);
@@ -720,13 +855,45 @@ function renderCanvas(){
   const H = Math.max(maxY, flow.height || 400) + 70; // +70 for top title
 
   const isOverview = currentFlow === 'overview';
+  // 計算全公司或本流程進度
+  let progressBlock = '';
+  if (isOverview) {
+    let totalOk=0, totalFix=0, totalAll=0;
+    Object.keys(WORKFLOWS).forEach(k => {
+      if (k === 'overview') return;
+      const p = flowProgress(k);
+      totalOk += p.ok; totalFix += p.fix; totalAll += p.total;
+    });
+    const totalPend = totalAll - totalOk - totalFix;
+    const pctOk = totalAll ? (totalOk/totalAll*100) : 0;
+    const pctFix = totalAll ? (totalFix/totalAll*100) : 0;
+    progressBlock = `<span class="wf-progress">
+      <span class="ok">✓ ${totalOk}</span>
+      <span class="fix">⚠ ${totalFix}</span>
+      <span class="pending">○ ${totalPend}</span>
+      <span class="wf-progress-bar"><span class="fill-ok" style="width:${pctOk}%"></span><span class="fill-fix" style="width:${pctFix}%"></span></span>
+    </span>`;
+  } else {
+    const p = flowProgress(currentFlow);
+    const pctOk = p.total ? (p.ok/p.total*100) : 0;
+    const pctFix = p.total ? (p.fix/p.total*100) : 0;
+    progressBlock = `<span class="wf-progress">
+      <span class="ok">✓ ${p.ok}</span>
+      <span class="fix">⚠ ${p.fix}</span>
+      <span class="pending">○ ${p.pending}</span>
+      <span style="color:var(--ink-lo);">/ ${p.total}</span>
+      <span class="wf-progress-bar"><span class="fill-ok" style="width:${pctOk}%"></span><span class="fill-fix" style="width:${pctFix}%"></span></span>
+    </span>`;
+  }
   const toolbarMsg = isOverview
-    ? '📌 全景圖 · 內容從各流程自動同步（只讀）· 拖卡片重排位置 / 點 ✕ 收起 / 點卡片看細節跳對應 tab'
-    : `📌 ${flow.title} · ${flow.sub} · 點卡片展開細節，拖整張卡移動，雙擊文字編輯，箭頭中點加註`;
+    ? '📌 全景圖 · 內容從各流程自動同步 · 拖卡片重排 / 看流程細節跳對應 tab'
+    : `📌 ${flow.title} · ${flow.sub} · 點卡片展開 / 拖移 / 編輯 / 右下角 ✓ 需議標確認狀態`;
   host.innerHTML = `
     <div class="wf-toolbar">
       <span>${toolbarMsg}</span>
       <span style="flex:1"></span>
+      ${progressBlock}
+      <button onclick="openTodoListModal()" title="跨流程列出待確認 / 需議卡">⚠ 待議清單</button>
       <button onclick="resetFlow()">重設此流程</button>
     </div>
     <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
@@ -759,12 +926,28 @@ function renderCanvas(){
     }
     const isSelected = n.id === selectedNodeId;
     const nodeNotes = notes.filter(no => no.flow === currentFlow && no.nodeId === n.id);
+    const cardStatus = isOverview ? 'pending' : getCardStatus(currentFlow, n.id);
+    // 全景卡 — 顯示對應流程 progress
+    let overviewBadge = '';
+    if (isOverview && n.action && n.action.startsWith('flow:')) {
+      const srcKey = n.action.slice(5);
+      const p = flowProgress(srcKey);
+      if (p.total > 0) {
+        const cls = p.fix > 0 ? 'fix' : (p.ok === p.total ? 'done' : (p.ok > 0 ? 'partial' : ''));
+        overviewBadge = `<span class="wf-overview-badge ${cls}">${p.ok}/${p.total}${p.fix?' ⚠'+p.fix:''}</span>`;
+      }
+    }
     const card = document.createElement('div');
-    card.className = 'wf-card' + (isSelected?' selected':'') + (isOverview?' wf-overview':'');
+    card.className = 'wf-card' + (isSelected?' selected':'') + (isOverview?' wf-overview':'') + (cardStatus !== 'pending' ? ' status-'+cardStatus : '');
     card.style.left = n.x + 'px';
     card.style.top  = n.y + 'px';
     card.dataset.id = n.id;
     const ce = (isSelected && !isOverview) ? 'true' : 'false';  // 全景全 read-only
+    const statusChipsHtml = isOverview ? '' : `
+      <div class="wf-status">
+        <span class="wf-status-chip ok ${cardStatus==='ok'?'active':''}" data-status="ok" title="點此標 OK（已確認）">✓</span>
+        <span class="wf-status-chip fix ${cardStatus==='fix'?'active':''}" data-status="fix" title="點此標需議">⚠</span>
+      </div>`;
     const detailsHtml = `
       <div class="wf-card-details">
         <div class="wf-card-label">細節${isOverview?'（自動同步自源頭流程）':''}</div>
@@ -792,11 +975,13 @@ function renderCanvas(){
     card.innerHTML = `
       ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
       ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
+      ${overviewBadge}
       <button class="wf-card-close" data-close-btn title="收起">✕</button>
       <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayTitle)}</div>
       <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayOwner)}</div>
       <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(displaySla)}</span></div>
       ${detailsHtml}
+      ${statusChipsHtml}
     `;
     // 編輯儲存（全部 ce 欄位）— 全景只讀不掛 listener
     if (!isOverview) {
@@ -838,16 +1023,27 @@ function renderCanvas(){
       ev.stopPropagation();
       switchFlow(jumpBtn.dataset.jumpFlow);
     });
+    // 狀態 chip：點切換
+    card.querySelectorAll('.wf-status-chip').forEach(chip => {
+      chip.addEventListener('click', ev => {
+        ev.stopPropagation();
+        const target = chip.dataset.status;
+        const current = getCardStatus(currentFlow, n.id);
+        // 點同狀態 = 清回 pending；點不同 = 切到新狀態
+        setCardStatus(currentFlow, n.id, current === target ? 'pending' : target);
+        renderCanvas();
+      });
+    });
     // 卡片 click：非編輯區 + 非互動元素 → 選取/取消
     card.addEventListener('click', e => {
       if (e.target.closest('[contenteditable="true"]')) return;
-      if (e.target.closest('textarea, button, a')) return;
+      if (e.target.closest('textarea, button, a, .wf-status-chip')) return;
       selectNode(n.id === selectedNodeId ? null : n.id);
     });
     // 拖拉：整張卡 mousedown 都觸發（除了編輯區 / 互動元素）
     card.addEventListener('mousedown', ev => {
       if (ev.target.closest('[contenteditable="true"]')) return;
-      if (ev.target.closest('textarea, button, a, .wf-card-note')) return;
+      if (ev.target.closest('textarea, button, a, .wf-card-note, .wf-status-chip')) return;
       startDrag(card, n.id, ev);
     });
     hostEl.appendChild(card);
