@@ -384,6 +384,17 @@ if(!CAN_MARK_DONE){
 
 <div class="main">
 
+  <!-- ⓪ AI 解析上傳：拖整理好的進度 PDF / Excel / 截圖 → 自動比對 + 預覽變更 -->
+  <div style="background:linear-gradient(135deg,#fff 0%,#fff4ef 100%);border:1px solid var(--accent);border-radius:14px;padding:18px 20px;margin-bottom:16px;">
+    <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px;">⚡ 整理好進度 PDF / Excel？拖進來自動比對 + 預覽變更</div>
+    <div style="font-size:11px;color:var(--txt-mid);line-height:1.6;margin-bottom:10px;">珮玲：你可以把週進度整理成 PDF（不需要表格、寫文字也行）拖進來。MJ 用 AI 識別後會做：① 自動 fuzzy match 對應產品 record ② 顯示差異 diff 預覽（沒 match 到的 flag 出來）③ 你逐筆 confirm 後批次更新飛書。風險可控 + 比手填快 5 倍。</div>
+    <input type="file" id="ai-pl-file" accept=".pdf,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.heic" style="display:none;">
+    <label for="ai-pl-file" id="ai-pl-label" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:20px;background:#fff;border:2px dashed var(--accent);border-radius:10px;font-size:13px;color:var(--accent);font-weight:700;cursor:pointer;">
+      📎 點此選擇檔案，或拖進來
+    </label>
+    <div id="ai-pl-status" style="margin-top:10px;font-size:12px;color:var(--txt-mid);display:none;"></div>
+  </div>
+
   <!-- KPI ROW -->
   <div class="sec-head" style="margin-top:0;margin-bottom:10px;">
     <span class="sec-title">流水線核心指標</span>
@@ -2088,6 +2099,183 @@ function closeLightbox(){
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
+// ── AI 進度更新：上傳 PDF / Excel / 截圖 → fuzzy match → diff 預覽 → 批次更新 ──
+window._aiPipelineMatches = []; // 解析結果暫存
+
+const AI_PL_FIELDS = ['當前階段','版權送審狀態','版權回饋說明','送審輪次','採購詢價狀態','打樣狀態','3D建模狀態','包裝設計狀態','展架設計狀態','立項備註'];
+
+function _plScore(a, b){
+  // 簡易 fuzzy score：完全相等=100；包含=70；共同字 count
+  if (!a || !b) return 0;
+  const aa = String(a).toLowerCase().trim();
+  const bb = String(b).toLowerCase().trim();
+  if (aa === bb) return 100;
+  if (aa.includes(bb) || bb.includes(aa)) return 70;
+  const setA = new Set(aa.split(''));
+  let common = 0;
+  bb.split('').forEach(c => { if (setA.has(c)) common++; });
+  return Math.round(common / Math.max(aa.length, bb.length) * 50);
+}
+
+async function _aiPlMatchAndDiff(updates){
+  // 撈全部既有 records
+  const tk = await (async () => {
+    const r = await fetch(`${_P}/auth/token`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    return (await r.json()).tenant_access_token;
+  })();
+  const r = await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records?page_size=200`, {
+    headers:{Authorization:'Bearer '+tk}
+  });
+  const d = await r.json();
+  const existing = (d.data?.items || []).map(rec => ({
+    record_id: rec.record_id,
+    name: (Array.isArray(rec.fields['產品名稱']) ? rec.fields['產品名稱'][0]?.text : rec.fields['產品名稱']) || '',
+    fields: rec.fields,
+  }));
+
+  const matches = updates.map(u => {
+    const candidates = existing.map(ex => ({ ex, score: _plScore(u['產品名稱'], ex.name) })).sort((a,b) => b.score - a.score);
+    const best = candidates[0];
+    return {
+      update: u,
+      matchType: best && best.score >= 70 ? 'match' : (best && best.score >= 40 ? 'fuzzy' : 'none'),
+      matched: best && best.score >= 40 ? best.ex : null,
+      score: best?.score || 0,
+      confirm: best && best.score >= 70, // 高 score 預設勾選
+    };
+  });
+  return matches;
+}
+
+function _aiPlRenderDiffModal(matches){
+  window._aiPipelineMatches = matches;
+  const html = `
+    <div id="ai-pl-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="background:#fff;border-radius:14px;max-width:980px;width:100%;max-height:88vh;overflow-y:auto;padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div style="font-size:16px;font-weight:800;color:#0a0a0a;">AI 解析結果預覽（${matches.length} 筆）</div>
+            <div style="font-size:11px;color:#666;margin-top:3px;">勾選要套用的變更 · ⚠ 沒 match 到的會 flag 出來 · 確認後批次寫飛書</div>
+          </div>
+          <button onclick="document.getElementById('ai-pl-modal').remove()" style="background:none;border:1px solid #e8e8e3;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;">取消</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:#f8f8f6;text-align:left;">
+              <th style="padding:6px 8px;border:1px solid #e8e8e3;width:30px;">✓</th>
+              <th style="padding:6px 8px;border:1px solid #e8e8e3;">PDF 中產品名</th>
+              <th style="padding:6px 8px;border:1px solid #e8e8e3;">Match 對應</th>
+              <th style="padding:6px 8px;border:1px solid #e8e8e3;">變更欄位</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${matches.map((m, i) => {
+              const u = m.update;
+              const matchBadge = m.matchType === 'match' ? `<span style="color:#22c55e;font-weight:700;">✅ ${m.matched.name}</span>` :
+                               m.matchType === 'fuzzy' ? `<span style="color:#f59e0b;font-weight:700;">⚠ 模糊 ${m.matched.name} (${m.score}%)</span>` :
+                               `<span style="color:#ef4444;font-weight:700;">✗ 沒 match — 將跳過</span>`;
+              const changes = AI_PL_FIELDS.filter(f => u[f] != null && u[f] !== '').map(f => {
+                const old = m.matched ? (m.matched.fields[f]?.value || m.matched.fields[f]?.text || m.matched.fields[f] || '—') : '—';
+                return `<div style="margin-bottom:2px;"><span style="color:#666;">${f}:</span> <span style="color:#999;text-decoration:line-through;">${old}</span> → <span style="color:#22c55e;font-weight:700;">${u[f]}</span></div>`;
+              }).join('') || '<span style="color:#999;">(無變更)</span>';
+              const disabled = m.matchType === 'none';
+              return `<tr>
+                <td style="padding:6px 8px;border:1px solid #e8e8e3;text-align:center;"><input type="checkbox" data-idx="${i}" ${m.confirm && !disabled?'checked':''} ${disabled?'disabled':''}></td>
+                <td style="padding:6px 8px;border:1px solid #e8e8e3;font-weight:700;">${u['產品名稱'] || '?'}</td>
+                <td style="padding:6px 8px;border:1px solid #e8e8e3;">${matchBadge}</td>
+                <td style="padding:6px 8px;border:1px solid #e8e8e3;font-size:10px;line-height:1.5;">${changes}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end;">
+          <button onclick="document.getElementById('ai-pl-modal').remove()" style="background:#fff;border:1px solid #e8e8e3;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;">取消</button>
+          <button onclick="_aiPlApplyConfirmed()" style="background:#ff6b35;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;">套用勾選的變更</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function _aiPlApplyConfirmed(){
+  const checks = document.querySelectorAll('#ai-pl-modal input[type=checkbox]:checked');
+  const idxs = [...checks].map(c => +c.dataset.idx);
+  const tk = await (async () => {
+    const r = await fetch(`${_P}/auth/token`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    return (await r.json()).tenant_access_token;
+  })();
+  let ok = 0, fail = 0;
+  for (const i of idxs) {
+    const m = window._aiPipelineMatches[i];
+    if (!m.matched) { fail++; continue; }
+    const fields = {};
+    AI_PL_FIELDS.forEach(f => {
+      if (m.update[f] != null && m.update[f] !== '') fields[f] = m.update[f];
+    });
+    try {
+      const r = await fetch(`${_P}/open-apis/bitable/v1/apps/${_AT}/tables/${_TBL}/records/${m.matched.record_id}`, {
+        method: 'PUT', headers: {Authorization:'Bearer '+tk, 'Content-Type':'application/json'},
+        body: JSON.stringify({fields})
+      });
+      const d = await r.json();
+      if (d.code === 0) ok++; else fail++;
+    } catch(e){ fail++; }
+  }
+  document.getElementById('ai-pl-modal').remove();
+  alert(`✓ 已套用 ${ok} 筆變更${fail?'，失敗 '+fail+' 筆':''}`);
+  if (typeof loadProjects === 'function') loadProjects();
+}
+
+async function _handleAiPlUpload(file){
+  const status = document.getElementById('ai-pl-status');
+  status.style.display = 'block';
+  status.style.color = '#666';
+  status.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(0)} KB) · MJ 解析中...`;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const base64 = ev.target.result.split(',')[1];
+    try {
+      const r = await fetch(`${_P}/ai/parse-pipeline-progress`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ file_base64: base64, mime_type: file.type || 'application/octet-stream' })
+      });
+      const d = await r.json();
+      if (!d.ok) { status.style.color = '#ef4444'; status.textContent = '✗ 解析失敗：' + (d.error || '未知'); return; }
+      const updates = d.updates || [];
+      if (!updates.length) { status.style.color = '#f59e0b'; status.textContent = '⚠ AI 沒從檔案抽出任何進度，請確認檔案內容'; return; }
+      status.style.color = '#22c55e';
+      status.textContent = `✓ 解析出 ${updates.length} 筆進度 · 比對既有 record 中...`;
+      const matches = await _aiPlMatchAndDiff(updates);
+      status.textContent = `✓ 解析完成 · 開預覽：match ${matches.filter(m=>m.matchType==='match').length} / 模糊 ${matches.filter(m=>m.matchType==='fuzzy').length} / 沒 match ${matches.filter(m=>m.matchType==='none').length}`;
+      _aiPlRenderDiffModal(matches);
+    } catch(e){
+      status.style.color = '#ef4444';
+      status.textContent = '✗ 網路錯誤：' + (e.message || e);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+(function _bindAiPlUpload(){
+  const input = document.getElementById('ai-pl-file');
+  const label = document.getElementById('ai-pl-label');
+  if (!input || !label) return;
+  input.addEventListener('change', () => {
+    if (input.files && input.files[0]) _handleAiPlUpload(input.files[0]);
+  });
+  ['dragenter','dragover'].forEach(ev => label.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation();
+    label.style.background = '#fff4ef';
+  }));
+  ['dragleave','drop'].forEach(ev => label.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation();
+    label.style.background = '#fff';
+  }));
+  label.addEventListener('drop', e => {
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) _handleAiPlUpload(e.dataTransfer.files[0]);
+  });
+})();
 </script>
 
 <script src="erp-sidebar.js"></script>
