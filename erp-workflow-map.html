@@ -421,39 +421,38 @@ if(_sess && !['ray','shawn','anran'].includes(user)){
 const WORKFLOWS = {
   overview: {
     title:'⭐ 全景圖（11 流程串接）',
-    sub:'從 idea 到入帳的全鏈路 · 點任一節點看該流程細節',
-    width:1320, height:480,
+    sub:'make-to-stock 模式：項目立項 → 設計+送審+打樣 → 三人 commit 大貨 → 業務帶貨況銷售 → 客戶下單 → 工廠直發',
+    width:1320, height:540,
     nodes:[
-      // 主路徑：項目建立 → 設計 → 送審 → 採購 → 批發
-      {id:'o11', title:'#11 項目建立 ⭐', owner:'Shawn', sla:'多階段', x:30, y:60, desc:'所有下游起點 — Shawn 收集 idea / 初篩 / Ray 拍板 / 立項 / 編預算。', action:'flow:project_init'},
+      // 上層：立項 + 創意 + IP
+      {id:'o11', title:'#11 項目建立 ⭐', owner:'Shawn', sla:'多階段', x:30, y:60, desc:'起點 — Shawn 收 idea / 初篩 / Ray 拍板 / 立項 / 編預算。', action:'flow:project_init'},
       {id:'o4', title:'#4 設計流程', owner:'Bevis / 詩彤', sla:'2-4 週', x:280, y:60, desc:'從 brief 到打樣稿；Bevis 核准後送 IP 方。', action:'flow:design'},
-      {id:'o5', title:'#5 IP 送審', owner:'珮玲', sla:'14 天', x:530, y:60, desc:'送 IP 版權方審核；通過進量產，需修改踢回設計。', action:'flow:ip_approval'},
-      {id:'o3', title:'#3 採購 PO', owner:'賴哥 / 木子', sla:'30-100 天', x:780, y:60, desc:'從詢比價 / 打樣 / 大貨 / 工廠付款。', action:'flow:procurement'},
-      {id:'o1', title:'#1 批發訂單', owner:'業務 / 安然', sla:'6 個月周期', x:1030, y:60, desc:'最高頻流程 · 客戶詢盤 → 報價 → 出貨 → 收款 11 棒。', action:'flow:wholesale'},
+      {id:'o5', title:'#5 IP 送審', owner:'珮玲', sla:'14 天', x:530, y:60, desc:'送 IP 版權方審核；通過才能進打樣。', action:'flow:ip_approval'},
+      {id:'o3', title:'#3 採購 PO ⭐', owner:'賴哥 / 木子', sla:'30-100 天', x:780, y:60, desc:'打樣 → 三方確認 → 三人 commit 大貨 → 工廠寄存等銷售。', action:'flow:procurement'},
+      {id:'o1', title:'#1 批發訂單 ⭐', owner:'業務 / 安然 / Ray', sla:'貨備好後銷售', x:1030, y:60, desc:'⭐ make-to-stock：帶著貨況談客戶 → 客戶下單 → 工廠直發。', action:'flow:wholesale'},
 
-      // 立項分支 + 銷售平行
-      {id:'o7', title:'#7 快閃店', owner:'Shawn / 安然', sla:'3 個月籌備', x:780, y:200, desc:'場地 + IP 主題確定 → 多人並行（採購 / 設計 / 物流）。', action:'flow:popup'},
-      {id:'o8', title:'#8 拜訪客戶', owner:'業務員', sla:'拜訪當天', x:1030, y:200, desc:'寫進 CRM；feed 批發訂單機會。', action:'flow:visit'},
+      // 中層：銷售相關
+      {id:'o8', title:'#8 拜訪客戶', owner:'業務員', sla:'拜訪當天', x:30, y:230, desc:'平時情報收集 → feed 三人 commit 決策。', action:'flow:visit'},
+      {id:'o7', title:'#7 快閃店', owner:'Shawn / 安然', sla:'3 個月籌備', x:780, y:230, desc:'場地 + IP 主題確定 → 採購+設計+物流並行。', action:'flow:popup'},
 
-      // 結算層
-      {id:'o2', title:'#2 費用報銷', owner:'全員', sla:'48hr+3天', x:30, y:340, desc:'個人 / 業務 / OPEX 三類分流；最後到躍明。', action:'flow:expense'},
-      {id:'o9', title:'#9 跨境結算', owner:'安然 → 躍明', sla:'發生時', x:280, y:340, desc:'北京→香港/台灣/泰國 款項對齊。', action:'flow:xborder'},
-      {id:'o10', title:'#10 月結', owner:'躍明', sla:'每月 1-5 日', x:530, y:340, desc:'損益表 / 現金流 / VAM 計入。', action:'flow:monthend'},
-
-      // 時間驅動（不掛項目）
-      {id:'o6', title:'#6 IP 續簽', owner:'安然', sla:'到期前 6 個月', x:1030, y:340, desc:'時間驅動 · 平行流程；續簽後可能重啟項目。', action:'flow:contract_renew'},
+      // 下層：結算 + 後台
+      {id:'o2', title:'#2 費用報銷', owner:'全員', sla:'48hr+3天', x:30, y:400, desc:'個人 / 業務 / OPEX 三類分流；最後到躍明。', action:'flow:expense'},
+      {id:'o9', title:'#9 跨境結算', owner:'安然 → 躍明', sla:'發生時', x:280, y:400, desc:'北京→香港/台灣/泰國 款項對齊。', action:'flow:xborder'},
+      {id:'o10', title:'#10 月結', owner:'躍明', sla:'每月 1-5 日', x:530, y:400, desc:'損益表 / 現金流 / VAM 計入。', action:'flow:monthend'},
+      {id:'o6', title:'#6 IP 續簽', owner:'安然', sla:'到期前 6 個月', x:1030, y:400, desc:'時間驅動 · 平行流程；續簽後可能重啟項目。', action:'flow:contract_renew'},
     ],
     edges:[
-      // 主流
+      // 主流：項目 → 設計 → 送審 → 採購(含打樣+commit) → 批發(銷售+出貨)
       {from:'o11', to:'o4', label:'派設計'},
       {from:'o4', to:'o5', label:'送審'},
-      {from:'o5', to:'o3', label:'通過 → 打樣 / 大貨'},
-      {from:'o3', to:'o1', label:'貨備齊'},
+      {from:'o5', to:'o3', label:'通過 → 打樣'},
+      {from:'o3', to:'o1', label:'貨寄存 → 銷售'},
+      // 業務情報 feed
+      {from:'o8', to:'o3', label:'情報 feed commit'},
+      {from:'o8', to:'o1', label:'業務帶貨況談客戶'},
       // 立項分支
       {from:'o11', to:'o7', label:'快閃立項'},
       {from:'o11', to:'o2', label:'OPEX 編列'},
-      // Feed 批發
-      {from:'o8', to:'o1', label:'CRM feed'},
       // 結算流
       {from:'o1', to:'o10', label:'入帳'},
       {from:'o7', to:'o10', label:'快閃結算'},
@@ -466,34 +465,49 @@ const WORKFLOWS = {
 
   wholesale: {
     title:'1. 批發訂單流程',
-    sub:'最高頻 · 從客戶詢盤到躍明入帳，11 棒接力',
-    width:1100, height:480,
+    sub:'⭐ make-to-stock 模式：先 commit 工廠 → 帶著貨況做業務 → 客戶下單後工廠直發',
+    width:1200, height:520,
     nodes:[
-      {id:'a1', title:'客戶詢盤', owner:'業務員', sla:'立即', x:30, y:60, desc:'客戶（KA / 品牌方 / 流通渠道）詢問 IP 商品。'},
-      {id:'a2', title:'填新訂單', owner:'業務員', sla:'當天', x:230, y:60, desc:'lobby「+新訂單」填客戶 / 產品 / 數量 / 金額 / 出貨日 → 自動通知 安然+賴哥+高維+躍明。', action:'new-order'},
-      {id:'a3', title:'安然把關', owner:'安然', sla:'24 hr', x:430, y:60, desc:'IP 授權範圍 / 客戶資質 / 工廠 capacity 三項確認。退回或不接會通知業務員。', action:'wholesale-approve'},
-      {id:'a4', title:'Ray 拍板', owner:'Ray', sla:'24 hr', x:630, y:60, desc:'定價 + 是否做。安然推上來的事 Ray 直接決策。', action:'ray-approval'},
-      {id:'a5', title:'業務員報價', owner:'業務員', sla:'當天', x:830, y:60, desc:'業務員把 Ray 拍板的價回給客戶。'},
-      {id:'a6', title:'客戶下訂金', owner:'客戶', sla:'3-7 天', x:30, y:200, desc:'30% 訂金到帳（楊子/Leo 確認收款）。'},
-      {id:'a7', title:'賴哥開 PO', owner:'賴哥', sla:'3 天內', x:230, y:200, desc:'發單給工廠生產。新供應商先比價。', action:'my-po'},
-      {id:'a8', title:'工廠生產', owner:'工廠', sla:'30-100 天', x:430, y:200, desc:'依品類：盲袋 30 天 / 公仔 60-100 天。木子盯進度。'},
-      {id:'a9', title:'木子備貨核對', owner:'木子', sla:'到貨當天', x:630, y:200, desc:'PO 數量 vs 廠端實收。吻合 → 通知賴哥+高維；有差異 → 通知賴哥跟廠商確認。', action:'stock-check'},
-      {id:'a10', title:'高維出貨', owner:'高維', sla:'2 天', x:830, y:200, desc:'安排物流 / 填單號 → 自動通知安然+業務員。', action:'logistics-batch'},
-      {id:'a11', title:'客戶付尾款', owner:'客戶', sla:'-', x:30, y:340, desc:'收到貨後付 70% 尾款。'},
-      {id:'a12', title:'楊子確認收款', owner:'楊子/Leo', sla:'當天', x:230, y:340, desc:'銀行入款核對後送躍明。', action:'my-approval'},
-      {id:'a13', title:'躍明入帳', owner:'躍明', sla:'3 天', x:430, y:340, desc:'寫進財務 + VAM 計入。', action:'my-pending'},
+      // Row 1：前置決策
+      {id:'a1', title:'業務情報收集', owner:'業務員 + 安然', sla:'持續', x:30, y:60, desc:'KA 詢盤 / 品牌方意向 / 流通通路反饋 / IP 熱度監控 — 不下單只蒐情報，feed 給內部 commit 決策。'},
+      {id:'a2', title:'設計 + 送審 + 打樣 OK', owner:'前置條件', sla:'2-4 個月', x:280, y:60, desc:'必須先：① 設計 #4 完成 ② IP 版權送審 #5 通過 ③ 打樣 #3 三方確認過 — 才能 commit 大貨。'},
+      {id:'a3', title:'🚨 三人 commit 決策', owner:'Ray + Shawn + 安然', sla:'會議拍板', x:530, y:60, desc:'三人共識：要做多少數量 / 何時要貨 / 鎖工廠 + 模具 + IP 授權。這是承擔庫存風險的關鍵決策點。', action:'ray-approval'},
+      {id:'a4', title:'賴哥開大貨 PO', owner:'賴哥', sla:'3 天內', x:780, y:60, desc:'PO 發工廠 → 工廠確認數量 + 交期 + 開模 + 大貨。詳見 #3 採購流程。', action:'my-po'},
+      {id:'a5', title:'工廠大貨完成 → 寄存', owner:'工廠', sla:'30-100 天', x:1030, y:60, desc:'大貨生產完寄存工廠倉（不進北京/泰國倉 — 那兩個倉是給快閃剩貨 / 滯銷品）。'},
+      // Row 2：銷售
+      {id:'a6', title:'業務員正式銷售', owner:'業務員', sla:'同步進行', x:30, y:220, desc:'業務員手上有「X 月有 Y 件可賣」的明確資訊 → 主動接觸客戶（KA / 品牌方 / 流通通路）。', action:'visit-log'},
+      {id:'a7', title:'客戶意向 → 報價', owner:'業務員', sla:'1-2 週', x:280, y:220, desc:'業務員報價 / 客戶確認數量 + 折扣 + 出貨日。'},
+      {id:'a8', title:'安然把關', owner:'安然', sla:'24 hr', x:530, y:220, desc:'IP 授權範圍 / 客戶資質 / 庫存夠不夠 — 三項確認。大金額轉 Ray 確認。', action:'wholesale-approve'},
+      {id:'a9', title:'Ray 確認大單', owner:'Ray', sla:'24 hr', x:780, y:220, desc:'金額 > X 萬 / 戰略客戶 / 特殊折扣 → 須 Ray 親確認。小單安然自己過。', action:'ray-approval'},
+      {id:'a10', title:'客戶下訂金 30%', owner:'客戶 → 楊子/Leo', sla:'3-7 天', x:1030, y:220, desc:'客戶匯訂金到帳 / 楊子（北京）或 Leo（台灣）確認收款。'},
+      // Row 3：出貨 + 入帳
+      {id:'a11', title:'高維工廠直發', owner:'高維', sla:'2 天', x:30, y:380, desc:'從工廠倉直接發客戶（不經北京/泰國倉）→ 自動通知安然 + 業務員 + 客戶。', action:'logistics-batch'},
+      {id:'a12', title:'客戶收貨 → 付尾款 70%', owner:'客戶', sla:'-', x:280, y:380, desc:'客戶簽收 / 確認品質 / 付尾款。'},
+      {id:'a13', title:'楊子/Leo 確認收款', owner:'楊子/Leo', sla:'當天', x:530, y:380, desc:'銀行入帳核對 → 送躍明入帳。', action:'my-approval'},
+      {id:'a14', title:'躍明入帳 → VAM 計入', owner:'躍明', sla:'3 天', x:780, y:380, desc:'寫進財務 + 月結對齊 + VAM 800 萬目標計入（JV/深圳子公司）。', action:'my-pending'},
+      // MTO 例外（左下角註解節點）
+      {id:'b1', title:'⚙ MTO 例外', owner:'同款追單 / 試水新品 / 自有 IP', sla:'-', x:1030, y:380, desc:'例外 3 種：① 同款第二批追單（版權打樣都過了）② 公司想試的新品類 ③ 公司自有 IP 商品 — 邏輯改成「先收意向 → 內部判斷 → commit 工廠」。'},
     ],
     edges:[
-      {from:'a1', to:'a2'}, {from:'a2', to:'a3'},
-      {from:'a3', to:'a4', label:'可執行'},
-      {from:'a3', to:'a2', label:'退回', alt:true},
-      {from:'a4', to:'a5', label:'批准'},
-      {from:'a4', to:'a3', label:'退回', alt:true},
-      {from:'a5', to:'a6'},
-      {from:'a6', to:'a7'}, {from:'a7', to:'a8'}, {from:'a8', to:'a9'},
-      {from:'a9', to:'a10', label:'吻合'},
-      {from:'a9', to:'a8', label:'有差異', alt:true},
-      {from:'a10', to:'a11'}, {from:'a11', to:'a12'}, {from:'a12', to:'a13'},
+      // 主流
+      {from:'a1', to:'a3', label:'情報 feed'},
+      {from:'a2', to:'a3', label:'前置 OK'},
+      {from:'a3', to:'a4', label:'commit'},
+      {from:'a4', to:'a5'},
+      {from:'a5', to:'a6', label:'有貨可賣'},
+      {from:'a6', to:'a7'},
+      {from:'a7', to:'a8'},
+      {from:'a8', to:'a9', label:'大單 → Ray'},
+      {from:'a8', to:'a10', label:'小單 OK'},
+      {from:'a8', to:'a7', label:'退回', alt:true},
+      {from:'a9', to:'a10', label:'核准'},
+      {from:'a9', to:'a8', label:'退回', alt:true},
+      {from:'a10', to:'a11'},
+      {from:'a11', to:'a12'},
+      {from:'a12', to:'a13'},
+      {from:'a13', to:'a14'},
+      // MTO 例外
+      {from:'b1', to:'a3', label:'例外 → 仍走 commit', alt:true},
     ],
   },
 
@@ -525,25 +539,33 @@ const WORKFLOWS = {
 
   procurement:{
     title:'3. 供應商 PO 採購',
-    sub:'從 Ray 批准到付尾款',
-    width:1000, height:380,
+    sub:'⭐ 順序：設計+送審 → 打樣三方確認 → 三人 commit → 大貨 PO → 寄存工廠 → 等客戶下單後出貨 → 付尾款',
+    width:1200, height:440,
     nodes:[
-      {id:'c1', title:'Ray 批准訂單', owner:'Ray', sla:'-', x:30, y:60, desc:'批發訂單流程進到這一棒'},
-      {id:'c2', title:'賴哥詢比價', owner:'賴哥', sla:'-', x:230, y:60, desc:'新供應商三家比價；既有供應商直接發單', action:'my-quote'},
-      {id:'c3', title:'發 PO', owner:'賴哥', sla:'3 天', x:430, y:60, desc:'PO 發給工廠 + 30% 訂金', action:'my-po'},
-      {id:'c4', title:'打樣', owner:'工廠', sla:'14 天', x:630, y:60, desc:'小批量打樣', action:'sampling-track'},
-      {id:'c5', title:'賴哥核樣', owner:'賴哥', sla:'3 天', x:830, y:60, desc:'樣品確認 / 給 Bevis 看品質', action:'sampling-track'},
-      {id:'c6', title:'大貨生產', owner:'工廠', sla:'30-100 天', x:30, y:230, desc:'木子每週 check 廠端進度'},
-      {id:'c7', title:'木子核對備貨', owner:'木子', sla:'到貨當天', x:230, y:230, desc:'數量核對 → 賴哥+高維', action:'stock-check'},
-      {id:'c8', title:'付工廠尾款', owner:'木子', sla:'出貨後 3 天', x:430, y:230, desc:'付款申請 → 賴哥審 → Ray 核准 → 躍明付', action:'payment-request'},
-      {id:'c9', title:'Ray 核准付款', owner:'Ray', sla:'24 hr', x:630, y:230, desc:'大額需 Ray 拍板', action:'ray-approval'},
-      {id:'c10', title:'躍明付款', owner:'躍明', sla:'2 天', x:830, y:230, desc:'銀行轉帳給工廠', action:'my-pending'},
+      // Row 1：前置 → 打樣 → commit
+      {id:'c1', title:'設計 + 送審 完成', owner:'前置', sla:'-', x:30, y:60, desc:'必須先：設計 #4 完成 + IP 版權送審 #5 通過 — 才能進打樣。'},
+      {id:'c2', title:'賴哥找工廠', owner:'賴哥', sla:'1-2 週', x:280, y:60, desc:'新供應商三家詢比價；既有供應商直接下打樣。', action:'my-quote'},
+      {id:'c3', title:'工廠打樣', owner:'工廠', sla:'14 天', x:530, y:60, desc:'小批量打樣 — 賴哥追進度。', action:'sampling-track'},
+      {id:'c4', title:'三方確認打樣', owner:'賴哥 + Bevis + 珮玲', sla:'3-7 天', x:780, y:60, desc:'賴哥（量產可行性）+ Bevis（設計品質）+ 珮玲（IP 方確認）三方都過 → 才能 commit 大貨。', action:'sampling-track'},
+      {id:'c5', title:'🚨 三人 commit 大貨', owner:'Ray + Shawn + 安然', sla:'會議拍板', x:1030, y:60, desc:'三人共識：大貨數量 / 交期 / 工廠 / 模具 / 預算。承擔庫存風險的關鍵決策點。', action:'ray-approval'},
+      // Row 2：大貨 → 寄存 → 出貨 → 付款
+      {id:'c6', title:'賴哥開大貨 PO', owner:'賴哥', sla:'3 天', x:30, y:240, desc:'PO 給工廠 + 30% 訂金（賴哥審 → Ray 核 → 躍明付）。', action:'my-po'},
+      {id:'c7', title:'工廠大貨生產', owner:'工廠', sla:'30-100 天', x:280, y:240, desc:'木子每週盯進度；木子確認備貨後通知賴哥+高維可出貨。', action:'stock-check'},
+      {id:'c8', title:'寄存工廠 → 等銷售', owner:'工廠', sla:'-', x:530, y:240, desc:'大貨完成寄存工廠（不進北京/泰國倉）。業務員此時手上有貨況可賣。'},
+      {id:'c9', title:'客戶下單 → 工廠直發', owner:'高維', sla:'2 天', x:780, y:240, desc:'客戶下訂金 30% 後高維安排出貨（詳見 #1 批發流程）。', action:'logistics-batch'},
+      {id:'c10', title:'付工廠尾款', owner:'木子 → 賴哥 → Ray → 躍明', sla:'出貨後 3 天', x:1030, y:240, desc:'70% 尾款 — 木子付款申請 → 賴哥審 → Ray 核 → 躍明銀行轉。', action:'payment-request'},
     ],
     edges:[
-      {from:'c1', to:'c2'}, {from:'c2', to:'c3'}, {from:'c3', to:'c4'},
-      {from:'c4', to:'c5'}, {from:'c5', to:'c6', label:'核准'},
-      {from:'c5', to:'c4', label:'退回', alt:true},
-      {from:'c6', to:'c7'}, {from:'c7', to:'c8'}, {from:'c8', to:'c9'}, {from:'c9', to:'c10'},
+      {from:'c1', to:'c2', label:'前置 OK'},
+      {from:'c2', to:'c3'},
+      {from:'c3', to:'c4'},
+      {from:'c4', to:'c5', label:'三方 OK'},
+      {from:'c4', to:'c3', label:'需重打', alt:true},
+      {from:'c5', to:'c6', label:'commit'},
+      {from:'c6', to:'c7'},
+      {from:'c7', to:'c8'},
+      {from:'c8', to:'c9', label:'客戶下單'},
+      {from:'c9', to:'c10'},
     ],
   },
 
