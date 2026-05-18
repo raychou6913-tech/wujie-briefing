@@ -90,6 +90,17 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <div id="popup-mode-banner" style="display:none;background:#fff7ed;border-bottom:2px solid #f59e0b;padding:9px 20px;font-size:13px;font-weight:700;color:#92400e">🏪 快閃店模式 — 類別已切換為快閃店專屬</div>
 <div class="wrap">
 
+<!-- ⓪ AI 解析上傳（拖檔案進來自動填表）-->
+<div class="card" style="border-top:3px solid #ff6b35;background:linear-gradient(135deg,#fff 0%,#fff4ef 100%);">
+  <div class="ctitle" style="color:#ff6b35">⚡ 已有預算 Excel / PDF / 截圖？拖進來自動填表</div>
+  <div style="font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.6">支援 Excel / PDF / 截圖 / 報價單；MJ 用 AI 視覺解析 → 自動填項目資訊 + 多筆預算明細 → 你檢查調整再送出。</div>
+  <input type="file" id="ai-budget-file" accept=".pdf,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.heic" style="display:none;">
+  <label for="ai-budget-file" id="ai-budget-label" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:24px;background:#fff;border:2px dashed #ff6b35;border-radius:10px;font-size:13px;color:#ff6b35;font-weight:700;cursor:pointer;">
+    📎 點此選擇檔案，或拖進來
+  </label>
+  <div id="ai-budget-status" style="margin-top:10px;font-size:12px;color:#64748b;display:none;"></div>
+</div>
+
 <!-- ① 項目基本資訊 -->
 <div class="card" style="border-top:3px solid #8b5cf6">
   <div class="ctitle">📋 項目資訊（套用至所有明細）</div>
@@ -184,8 +195,26 @@ body{background:#f1f5f9;color:#0f172a;font-family:-apple-system,BlinkMacSystemFo
 <script>
 
 const _PROXY="https://feishu-proxy.raychou6913.workers.dev";
-const _AT="YlVkb0ACjacJVqsgRT5j4c6gpeh";
-const _TABLES={"project": "tblYBjAlemYPuNGy", "cashflow": "tblxaiogh3tYlZUz", "budget": "tblteo2QEO0jP8j9", "sales": "tblRtqmbO9TO3sYZ", "design": "tblTEoNLDvtYi4pX", "procure": "tblae5v8pGMXleJZ", "stock": "tblsmZ7S5cNiYN4Y", "contract": "tbltnJNDhRNwVkZC", "approval": "tblD6acV3m2ZXJHe", "product": "tblH1pYYlHBGSBHc", "ip_db": "tblHPNUTdcFa7tqs", "supplier": "tblgpiqW1yOa2DR4", "customer": "tblXMXDGZKw8KOsl", "design_vendor": "tblc8uH2yHbOAI4l", "logistics": "tbl1MeP2wUWHwenW", "daily_sales": "tblz7zvgbzOqknzm", "popup_venue": "tbldKRVsE4RcoZrD", "consignment": "tblypFKMeOARPFT1", "visit_log": "tblUzRSQgKLhlttk", "notice_board": "tblPtgudsOOlmJAx", "feedback": "tbl68ofUGp7FTjx8", "meeting": "tblEf71rCbLy3GGO", "venue_db": "tblHSG9gEJ53iO1l", "daily_briefing": "tbliwX6nFg6rryn7", "expense": "tblu2NkqBWyBSskG", "follow_up": "tblyO9Cz2nUx6q46", "roles": "tblEj5GSDYUrKGY9", "product_pipeline": "tblfX6fsMshb7KL0", "ip_studio_assets": "tblq1Zl3oo0lYby5", "ip_studio_themes": "tblEBClCNZyCSxNb"};
+// 2026-05-18 升新 base（舊 base YlVkb0ACjacJVqsgRT5j4c6gpeh 已廢棄）
+const _AT="Sg7ObNELHaAdZzshGIFjWPVhpce";
+const _TABLES={
+  "project": "tblPLJ2dLkdkWUAa",      // 項目排期
+  "budget": "tblmlUoyZ6Bip6S3",        // 預算管理
+  "ip_db": "tblt9DOm4hf5Mr5r",          // IP版權資料庫
+  "sales": "tblndRlEjmOgh5lk",         // 銷售進度
+  "cashflow": "tblN0AwYtb2IvOcq",      // 現金流追蹤
+  "design": "tblSgCcB2aFcsPaw",        // 設計送審
+  "procure": "tblnebGJduwUrBoz",        // 採購詢比價
+  "stock": "tblR6pW8BsGhSmAe",          // 庫存物流
+  "contract": "tblWn4PwOVRgt7c1",       // 合約管理
+  "approval": "tbl4OBNvsNkqS4mQ",       // 審批記錄
+  "product": "tblc9Vs1zbHmtLpr",        // 產品明細
+  "supplier": "tblwsHBor9fN7jXz",       // 採購供應商
+  "customer": "tbl9HpW9Wc6kDOwu",       // 客戶名單
+  "expense": "tblvGsQpXPHtkp1C",        // 費用實報
+  "product_pipeline": "tblTqAZIdt2ViAma",// 產品開發流程
+  "daily_sales": "tblq9KZowawQ647J",    // 每日銷售快報
+};
 
 async function _getToken(){
   const r=await fetch(_PROXY+"/auth/token",{
@@ -830,6 +859,86 @@ async function submitAll(){
   }
   }); // end _showConfirm
 }
+
+// ── AI 解析上傳檔案 → 預填表單 ──
+const _AI_GLOBAL_MAP = {
+  '批次': 'g-batch',
+  '年度': 'g-year',
+  '季度': 'g-quarter',
+  '團隊辦公地': 'g-loc',
+  '幣別': 'g-defcur',
+};
+async function _handleAiBudgetUpload(file){
+  const status = document.getElementById('ai-budget-status');
+  status.style.display = 'block';
+  status.style.color = '#64748b';
+  status.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(0)} KB) · MJ 解析中...`;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const base64 = ev.target.result.split(',')[1];
+    try {
+      const r = await fetch(`${_PROXY}/ai/parse-budget`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ file_base64: base64, mime_type: file.type || 'application/octet-stream' })
+      });
+      const d = await r.json();
+      if (!d.ok) { status.style.color = '#ef4444'; status.textContent = '✗ 解析失敗：' + (d.error || '未知'); return; }
+      // 預填 global
+      const g = d.global || {};
+      let globalFilled = 0;
+      Object.entries(g).forEach(([k, v]) => {
+        if (k === '項目名稱') { /* 項目 select 從飛書撈，AI 給的名字可能不完全 match，先放 placeholder */ return; }
+        const id = _AI_GLOBAL_MAP[k];
+        if (id && v != null && v !== '') {
+          const el = document.getElementById(id);
+          if (el) { el.value = v; el.style.background = '#fff8f3'; setTimeout(() => el.style.background='', 3000); globalFilled++; }
+        }
+      });
+      // 清空現有 3 列預設行
+      document.getElementById('line-tbody').innerHTML = '';
+      // 加 AI parsed lines
+      const lines = d.lines || [];
+      lines.forEach(line => {
+        const nat = (line['預算性質'] === '收入' || line['預算性質'] === '收入目標') ? '收入' : '支出';
+        addRow(
+          line['類別'] || '其他',
+          line['預算名稱'] || '',
+          nat,
+          null,
+          line['幣別'] || g['幣別'] || '',
+          line['計算說明'] || '',
+          line['單價'] || '',
+          line['數量'] || ''
+        );
+      });
+      status.style.color = '#10b981';
+      status.textContent = `✓ 解析完成，項目資訊 ${globalFilled} 欄 + ${lines.length} 筆明細已預填 — 請檢查 / 修正後送出`;
+    } catch(e){
+      status.style.color = '#ef4444';
+      status.textContent = '✗ 網路錯誤：' + (e.message || e);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+(function _bindAiBudget(){
+  const input = document.getElementById('ai-budget-file');
+  const label = document.getElementById('ai-budget-label');
+  if (!input || !label) return;
+  input.addEventListener('change', () => {
+    if (input.files && input.files[0]) _handleAiBudgetUpload(input.files[0]);
+  });
+  ['dragenter','dragover'].forEach(ev => label.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation();
+    label.style.background = '#fff4ef';
+  }));
+  ['dragleave','drop'].forEach(ev => label.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation();
+    label.style.background = '#fff';
+  }));
+  label.addEventListener('drop', e => {
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) _handleAiBudgetUpload(e.dataTransfer.files[0]);
+  });
+})();
 
 // init
 _loadProjectSelect('proj-sel',window._ctxTypeFilter||null);
