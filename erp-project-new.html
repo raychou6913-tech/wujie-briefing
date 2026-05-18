@@ -180,6 +180,17 @@ textarea{resize:vertical;min-height:60px;}
     </div>
   </div>
 
+  <!-- STEP 0：AI 解析上傳（可選） -->
+  <div class="card" id="card-ai-upload" style="background:linear-gradient(135deg,#fff 0%,#fff8f3 100%);border-color:var(--brand);">
+    <div class="card-title">⚡ 已有預算 Excel / PDF / 截圖？拖進來自動填表</div>
+    <div class="card-sub">支援 Excel / PDF / 截圖 / 報價單；MJ 用 AI 視覺解析 → 自動填下面所有欄位 → 你檢查調整再送出。</div>
+    <input type="file" id="ai-file-input" accept=".pdf,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.heic" style="display:none;">
+    <label for="ai-file-input" id="ai-upload-label" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:24px;background:#fff;border:2px dashed var(--brand);border-radius:10px;font-size:13px;color:var(--brand);font-weight:700;cursor:pointer;">
+      📎 點此選擇檔案，或拖進來
+    </label>
+    <div id="ai-upload-status" style="margin-top:10px;font-size:12px;color:var(--ink-mid);display:none;"></div>
+  </div>
+
   <!-- STEP 1：基本資料 -->
   <div class="card" id="card-1">
     <div class="card-title">📋 Step 1 · 基本資料</div>
@@ -843,6 +854,88 @@ async function submitProject(){
     btn.textContent = '✓ 確認建立項目';
   }
 }
+
+// ── AI 解析上傳檔案 → 預填表單 ──
+const AI_FIELD_MAP = {
+  '項目名稱': 'f-name',
+  '類別': 'f-category',
+  '業務類型': 'f-biztype',
+  'IP品牌': 'f-ip',
+  '所在地': 'f-region',
+  '開始日期': 'f-start',
+  '截止日期': 'f-end',
+  '預計收入': 'f-income',
+  '預計支出': 'f-expense',
+  '幣別': 'f-currency',
+  '備註': 'f-notes',
+};
+function prefillFromAi(fields){
+  let filledCount = 0;
+  Object.entries(fields).forEach(([k, v]) => {
+    const id = AI_FIELD_MAP[k];
+    if (!id || v == null || v === '') return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = v;
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+    // 視覺強調剛填的欄位
+    el.style.background = '#fff8f3';
+    el.style.borderColor = 'var(--brand)';
+    setTimeout(() => { el.style.background = ''; el.style.borderColor = ''; }, 3000);
+    filledCount++;
+  });
+  return filledCount;
+}
+async function handleAiUpload(file){
+  const status = document.getElementById('ai-upload-status');
+  status.style.display = 'block';
+  status.style.color = 'var(--ink-mid)';
+  status.textContent = `📄 ${file.name} (${(file.size/1024).toFixed(0)} KB) · MJ 解析中...`;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const base64 = ev.target.result.split(',')[1];
+    try {
+      const r = await fetch(`${PROXY}/ai/parse-project`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ file_base64: base64, mime_type: file.type || 'application/octet-stream' })
+      });
+      const d = await r.json();
+      if (!d.ok) {
+        status.style.color = 'var(--danger)';
+        status.textContent = '✗ 解析失敗：' + (d.error || '未知');
+        return;
+      }
+      const filled = prefillFromAi(d.fields);
+      status.style.color = 'var(--ok)';
+      status.textContent = `✓ 解析完成，${filled} 個欄位已預填 — 請檢查 / 修正後送出`;
+    } catch(e){
+      status.style.color = 'var(--danger)';
+      status.textContent = '✗ 網路錯誤：' + (e.message || e);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+(function bindAiUpload(){
+  const input = document.getElementById('ai-file-input');
+  const label = document.getElementById('ai-upload-label');
+  if (!input || !label) return;
+  input.addEventListener('change', () => {
+    if (input.files && input.files[0]) handleAiUpload(input.files[0]);
+  });
+  // drag-and-drop
+  ['dragenter','dragover'].forEach(ev => label.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation();
+    label.style.background = '#fff4ef';
+  }));
+  ['dragleave','drop'].forEach(ev => label.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation();
+    label.style.background = '#fff';
+  }));
+  label.addEventListener('drop', e => {
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleAiUpload(e.dataTransfer.files[0]);
+  });
+})();
 </script>
 <script src="erp-sidebar.js"></script>
 </body>
