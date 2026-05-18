@@ -331,18 +331,42 @@ a:hover { color: var(--red); }
 
 /* ═════ FAMILY PHOTO + POPS IMG ═════ */
 .family-photo {
-  max-width: 1100px;
+  max-width: 1500px;
   margin: -20px auto 80px;
   padding: 0 24px;
   text-align: center;
 }
-.family-photo img {
-  width: 100%;
-  height: auto;
+.family-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0;
   border-radius: 16px;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08);
   box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  background: var(--bg);
+}
+.family-row img {
+  width: 100%;
+  height: auto;
   display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.family-name-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0;
+  margin-top: 14px;
+  padding: 0 4px;
+}
+.family-name-row span {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--paper);
+  text-align: center;
 }
 .family-caption {
   font-family: "JetBrains Mono", monospace;
@@ -350,7 +374,16 @@ a:hover { color: var(--red); }
   letter-spacing: 0.3em;
   color: rgba(255,255,255,0.5);
   text-transform: uppercase;
-  margin-top: 18px;
+  margin-top: 14px;
+}
+@media (max-width: 900px) {
+  .family-row,
+  .family-name-row { grid-template-columns: repeat(4, 1fr); }
+  .family-row { gap: 1px; }
+}
+@media (max-width: 500px) {
+  .family-row,
+  .family-name-row { grid-template-columns: repeat(2, 1fr); }
 }
 .pops-lineup-img,
 .pops-cameo-img {
@@ -599,8 +632,20 @@ footer a { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spa
 
 <!-- ═══ HERO · FAMILY PHOTO ═══ -->
 <section class="family-photo">
-  <img src="assets/uniqpop_cast/cast_group_8_v1.png" alt="UNIPOP CAST 8 隻全員合影">
-  <div class="family-caption">全員 8 隻 · TOFU · NOKO · MIKA · SOLO · BEEPO · NOVA · MOMO · GARLIC</div>
+  <div class="family-row">
+    <img src="assets/uniqpop_cast/char_01_mika_v5.1_FINAL.png" alt="MIKA">
+    <img src="assets/uniqpop_cast/char_02_tofu_v4_FINAL.png" alt="TOFU">
+    <img src="assets/uniqpop_cast/char_03_beepo_v5_FINAL.png" alt="BEEPO">
+    <img src="assets/uniqpop_cast/char_04_noko_v3.2_FINAL.png" alt="NOKO">
+    <img src="assets/uniqpop_cast/char_05_nova_v2_astrology_FINAL.png" alt="NOVA">
+    <img src="assets/uniqpop_cast/char_06_momo_v3_battery_FINAL.png" alt="MOMO">
+    <img src="assets/uniqpop_cast/char_07_solo_v12_FINAL.png" alt="SOLO">
+    <img src="assets/uniqpop_cast/char_08_garlic_v3_FINAL.png" alt="GARLIC">
+  </div>
+  <div class="family-name-row">
+    <span>MIKA</span><span>TOFU</span><span>BEEPO</span><span>NOKO</span><span>NOVA</span><span>MOMO</span><span>SOLO</span><span>GARLIC</span>
+  </div>
+  <div class="family-caption">— 全員合影 · 8 角色定版 —</div>
 </section>
 
 <!-- ═══ ABOUT + TIER FRAMEWORK ═══ -->
