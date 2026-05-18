@@ -497,6 +497,75 @@ body{
   body{padding-bottom:72px;}
 }
 
+/* ── AI 對話 hero（中央化 2026-05-18）─────────────── */
+.ai-hero{
+  background:linear-gradient(135deg, #fff 0%, #fff8f3 100%);
+  border:1px solid var(--line);border-radius:16px;
+  padding:20px 24px;margin:24px 0 28px;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+}
+.ai-hero-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.ai-hero-ava{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--brand);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.ai-hero-title{
+  font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
+}
+.ai-hero-sub{font-size:11px;color:var(--ink-lo);margin-top:1px;}
+.ai-hero-msgs{
+  max-height:340px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:12px;padding-right:4px;
+}
+.ai-hero-msg{
+  max-width:88%;padding:12px 14px;border-radius:12px;
+  font-size:13px;line-height:1.65;word-wrap:break-word;
+}
+.ai-hero-msg.bot{
+  align-self:flex-start;background:#fff;
+  border:1px solid var(--line);color:var(--ink);
+}
+.ai-hero-msg.user{
+  align-self:flex-end;background:var(--brand);color:#fff;
+}
+.ai-hero-msg.error{
+  align-self:flex-start;background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;
+}
+.ai-hero-msg table{
+  border-collapse:collapse;margin:6px 0;font-size:12px;
+}
+.ai-hero-msg th, .ai-hero-msg td{
+  border:1px solid var(--line);padding:5px 9px;text-align:left;
+}
+.ai-hero-msg th{background:var(--paper-soft);font-weight:700;}
+.ai-hero-msg strong{font-weight:700;color:var(--ink);}
+.ai-hero-msg code{
+  background:var(--paper-soft);padding:1px 5px;border-radius:4px;
+  font-family:Menlo,monospace;font-size:11px;
+}
+.ai-hero-input-row{
+  display:flex;gap:8px;align-items:flex-end;
+  padding-top:12px;border-top:1px solid var(--line);
+}
+.ai-hero-input-row textarea{
+  flex:1;resize:none;border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;font-family:inherit;font-size:13px;
+  outline:none;max-height:120px;min-height:42px;
+}
+.ai-hero-input-row textarea:focus{border-color:var(--brand);}
+.ai-hero-send{
+  padding:11px 18px;background:var(--ink);color:#fff;
+  border:none;border-radius:10px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;height:42px;
+}
+.ai-hero-send:hover{background:var(--brand);}
+.ai-hero-typing{opacity:.5;font-style:italic;font-size:12px;}
+
 /* ── AI 助理浮動 panel (V0) ─────────────────────────── */
 #ai-fab{
   position:fixed; right:24px; bottom:24px; width:56px; height:56px;
@@ -615,6 +684,22 @@ body{
     <div class="h-time" id="h-time"></div>
     <div class="h-greet" id="h-greet">午安，<span class="name">—</span></div>
     <div class="h-sub serif" id="h-sub">載入中...</div>
+
+    <!-- AI 對話 hero（中央化 2026-05-18）-->
+    <div class="ai-hero" id="ai-hero">
+      <div class="ai-hero-head">
+        <div class="ai-hero-ava">🤖</div>
+        <div>
+          <div class="ai-hero-title">MJ 助理</div>
+          <div class="ai-hero-sub">跟我講話，我幫你看待辦 / 跳對應動作 · 也可以問問題</div>
+        </div>
+      </div>
+      <div class="ai-hero-msgs" id="ai-hero-msgs"></div>
+      <div class="ai-hero-input-row">
+        <textarea id="ai-hero-input" placeholder="跟 MJ 講話：「我今天有什麼待辦」「幫我看設計核准」「Snoopy 合約進度」..." rows="1"></textarea>
+        <button class="ai-hero-send" onclick="sendAiHero()">送出</button>
+      </div>
+    </div>
 
     <!-- COMPANY PULSE -->
     <div class="sec-hdr">
@@ -3865,11 +3950,131 @@ function showToast(msg){
   t._timer=setTimeout(()=>t.style.opacity='0',2000);
 }
 
-// ── AI Assistant Floating Panel (V0 prototype, 2026-05-16) ──
-// 浮動按鈕 + 對話面板。歷史存 localStorage per user。
+// ── AI Assistant（中央 hero + 浮動 panel 雙模式 共用 history）──
 const AI_CHAT_KEY = 'ai_chat_history_' + user;
 function _aiHist(){ try { return JSON.parse(localStorage.getItem(AI_CHAT_KEY) || '[]'); } catch(e){ return []; } }
 function _aiHistSet(arr){ localStorage.setItem(AI_CHAT_KEY, JSON.stringify(arr.slice(-30))); }
+
+// ── 簡易 Markdown 渲染（table / **bold** / `code` / list） ──
+function renderMd(text){
+  let s = escapeHtml(text);
+  // 表格：連續的 |...| 行（含 |---| 分隔行）
+  const lines = s.split('\n');
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    if (/^\s*\|.+\|\s*$/.test(lines[i]) && i+1 < lines.length && /^\s*\|[\s\-:|]+\|\s*$/.test(lines[i+1])) {
+      // 表格起點
+      const header = lines[i].trim().slice(1,-1).split('|').map(s=>s.trim());
+      i += 2; // skip separator
+      const rows = [];
+      while (i < lines.length && /^\s*\|.+\|\s*$/.test(lines[i])) {
+        rows.push(lines[i].trim().slice(1,-1).split('|').map(s=>s.trim()));
+        i++;
+      }
+      let tbl = '<table><tr>' + header.map(h=>`<th>${h}</th>`).join('') + '</tr>';
+      rows.forEach(r => { tbl += '<tr>' + r.map(c=>`<td>${c}</td>`).join('') + '</tr>'; });
+      tbl += '</table>';
+      out.push(tbl);
+    } else {
+      out.push(lines[i]);
+      i++;
+    }
+  }
+  s = out.join('\n');
+  // **bold** / *italic* / `code`
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // 列表：- 開頭 → bullet
+  s = s.replace(/^\s*-\s+(.+)$/gm, '• $1');
+  // newline → <br>（但 table 內已是 HTML，要保留）
+  s = s.replace(/\n/g, '<br>');
+  s = s.replace(/<br>(<table|<\/table>)/g, '$1').replace(/(<table>|<\/table>)<br>/g, '$1');
+  return s;
+}
+
+// ── 規則化開場語（沒 Claude 也能跑）──
+function buildOpeningGreeting(){
+  const hour = new Date().getHours();
+  const g = hour < 12 ? '早安' : hour < 17 ? '午安' : '晚安';
+  // 從 sidebar action counts 撈待辦數量
+  let counts = [];
+  try {
+    const actions = (MY_ACTIONS[user] || []).concat(MY_ACTIONS.all);
+    actions.forEach(a => {
+      if (a.action === 'my-sent' || a.action === 'expense') return;
+      const c = getActionCount(a.action);
+      if (c && c > 0) counts.push({label: a.label, n: c});
+    });
+  } catch(e){}
+  const total = counts.reduce((s,c) => s+c.n, 0);
+  if (total === 0) {
+    return `${g}${name}，今天沒有待辦事項，一切順利。\n\n要找什麼資料、看流程，或要我幫忙做什麼都可以跟我講。`;
+  }
+  const top = counts.sort((a,b) => b.n - a.n).slice(0, 3);
+  const summary = top.map(c => `**${c.label}** ${c.n} 件`).join(' · ');
+  return `${g}${name}，今天有 **${total} 件待辦**：${summary}${counts.length > 3 ? ` 等共 ${counts.length} 類` : ''}\n\n要從哪一個開始？或想知道更詳細的，直接問我。`;
+}
+
+function renderAiHeroMessages(){
+  const box = document.getElementById('ai-hero-msgs');
+  if(!box) return;
+  const hist = _aiHist();
+  if(!hist.length){
+    // 第一次：規則化開場
+    box.innerHTML = `<div class="ai-hero-msg bot">${renderMd(buildOpeningGreeting())}</div>`;
+    return;
+  }
+  box.innerHTML = hist
+    .filter(m => typeof m.content === 'string' || (Array.isArray(m.content) && m.content.some(c => c.type === 'text')))
+    .map(m => {
+      const text = typeof m.content === 'string' ? m.content : m.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
+      if(!text.trim()) return '';
+      const cls = m.role === 'user' ? 'user' : 'bot';
+      return `<div class="ai-hero-msg ${cls}">${cls==='bot'?renderMd(text):escapeHtml(text).replace(/\n/g,'<br>')}</div>`;
+    }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendAiHero(){
+  const input = document.getElementById('ai-hero-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  const box = document.getElementById('ai-hero-msgs');
+  const hist = _aiHist();
+  hist.push({ role:'user', content: text });
+  _aiHistSet(hist);
+  renderAiHeroMessages();
+  box.insertAdjacentHTML('beforeend', '<div class="ai-hero-msg bot ai-hero-typing" id="ai-hero-typing">思考中...</div>');
+  box.scrollTop = box.scrollHeight;
+  try {
+    const r = await fetch(`${WORKER_BASE}/ai-chat`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user, userName:name, userRole:role, message: text, history: _aiHist().slice(0,-1) })
+    });
+    const d = await r.json();
+    document.getElementById('ai-hero-typing')?.remove();
+    if(!d.ok){
+      box.insertAdjacentHTML('beforeend', `<div class="ai-hero-msg error">⚠ ${escapeHtml(d.error || '未知')}</div>`);
+      box.scrollTop = box.scrollHeight; return;
+    }
+    _aiHistSet(d.history || _aiHist().concat({ role:'assistant', content: d.reply }));
+    renderAiHeroMessages();
+  } catch(e){
+    document.getElementById('ai-hero-typing')?.remove();
+    box.insertAdjacentHTML('beforeend', `<div class="ai-hero-msg error">⚠ 網路錯誤：${escapeHtml(e.message||String(e))}</div>`);
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+// Enter 送出 / Shift+Enter 換行（script 在 body 結尾，DOM 已 ready）
+(function bindAiHeroInput(){
+  const inp = document.getElementById('ai-hero-input');
+  if (inp) inp.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); sendAiHero(); }
+  });
+})();
 
 function toggleAiPanel(){
   const p = document.getElementById('ai-panel');
@@ -3963,6 +4168,8 @@ function togglePulse(card){
 const WAR_ROOM_ROLES = ['ray','shawn','anran','yuming'];
 
 renderTodos(false);
+// 開場 AI 對話卡（在 sidebar build 跑完後，getActionCount 已可用）
+setTimeout(() => renderAiHeroMessages(), 50);
 </script>
 </body>
 </html>
