@@ -3224,80 +3224,85 @@ function doXborderAction(id, action){
   showQaToast(action === 'confirmed' ? '✓ 已送躍明入帳' : '已擱置 · 通知躍明');
 }
 
-const IP_REMINDERS_SEED = [
-  {id:'r1', ip:'PNUTS Snoopy 北京代理', deadline:'2026-06-30 到期 · 距 46 天',
-   urgency:'high', fee:'USD $65,000 MG', status:'待續簽', detail:'年度合約到期，需提前 3 個月啟動續簽談判（已晚）。'},
-  {id:'r2', ip:'Mofusand 年度授權', deadline:'2026-06-15 年費',
-   urgency:'med', fee:'¥ 304,000', status:'待付款', detail:'年度授權金，需提前 1 個月付清。'},
-  {id:'r3', ip:'吉依卡哇授權', deadline:'已過期 12 天',
-   urgency:'high', fee:'¥ 180,000', status:'⚠ 逾期', detail:'已停止新訂單收單，需立即處理避免影響採購。'},
-];
-function loadIpReminders(){
-  const stored = localStorage.getItem('anran_ip_reminders_v1');
-  if(stored) return JSON.parse(stored);
-  localStorage.setItem('anran_ip_reminders_v1', JSON.stringify(IP_REMINDERS_SEED));
-  return IP_REMINDERS_SEED;
-}
-function openIpRemindersModal(){ renderIpReminders(); document.getElementById('ip-reminders-modal').classList.add('show'); }
-function closeIpRemindersModal(){ document.getElementById('ip-reminders-modal').classList.remove('show'); }
-function renderIpReminders(){
+// 安然 IP 維護提醒（飛書直連 — 從合約管理表，按到期日 < 180 天驅動）
+window._ipReminderCache = [];
+async function openIpRemindersModal(){
   const list = document.getElementById('ip-reminders-list');
-  const arr = loadIpReminders().filter(i => !i.cleared);
-  if(!arr.length){
-    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有 IP 維護提醒</div>';
-    return;
+  document.getElementById('ip-reminders-modal').classList.add('show');
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/anran-ip-reminder?owner=*`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error || '讀取失敗');
+    window._ipReminderCache = d.items || [];
+    if(!d.items.length){
+      list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有 IP 合約即將到期（180 天內）</div>';
+      return;
+    }
+    const now = Date.now();
+    list.innerHTML = d.items.map(i => {
+      const daysLeft = i.deadline ? Math.floor((i.deadline - now) / 86400000) : null;
+      const urg = daysLeft != null && daysLeft <= 30 ? 'high' : (daysLeft != null && daysLeft <= 90 ? 'med' : 'low');
+      const ddlText = daysLeft != null ? (daysLeft >= 0 ? `${daysLeft} 天到期` : `⚠ 已逾期 ${-daysLeft} 天`) : '到期日未填';
+      const amtStr = i.amount ? `${i.currency || ''} ${Number(i.amount).toLocaleString()}` : '';
+      return `<div data-rid="${i.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${urg==='high'?'border-color:var(--danger);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="flex:1;">
+            ${urg==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;margin-right:6px;">⚠ 急</span>':''}
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.name}</span>
+            <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.ip ? i.ip + ' · ' : ''}${i.counterparty || '?'} · <span style="color:var(--danger);font-weight:700;">${ddlText}</span></div>
+          </div>
+          ${amtStr ? `<div style="font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${amtStr}</div>` : ''}
+        </div>
+        ${i.detail ? `<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>` : ''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doIpReminderAction('${i.record_id}','start_renew')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 啟動續簽談判</button>
+          <button onclick="doIpReminderAction('${i.record_id}','need_ray')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Ray 親談</button>
+          <button onclick="doIpReminderAction('${i.record_id}','defer')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫不處理</button>
+          <button onclick="doIpReminderAction('${i.record_id}','terminate')" style="padding:8px 12px;background:transparent;color:var(--danger);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">不續簽</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message || e}<br><button onclick="openIpRemindersModal()" style="margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;font-family:inherit;cursor:pointer;">重試</button></div>`;
   }
-  list.innerHTML = arr.map(i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--danger);':''}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-      <div style="flex:1;">
-        ${i.urgency==='high'?'<span style="font-size:9px;color:var(--danger);font-weight:700;margin-right:6px;">⚠</span>':''}
-        <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.ip}</span>
-        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.deadline} · ${i.status}</div>
-      </div>
-      <div style="font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${i.fee}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doIpReminderAction('${i.id}','started')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已啟動處理</button>
-      <button onclick="doIpReminderAction('${i.id}','to-peilin')" style="flex:1;padding:8px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">轉珮玲</button>
-      <button onclick="doIpReminderAction('${i.id}','to-ray')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">Ray 親談</button>
-    </div>
-  </div>`).join('');
 }
-function doIpReminderAction(id, action){
-  const arr = loadIpReminders();
-  const item = arr.find(x => x.id === id);
-  if(item){ item.cleared = true; localStorage.setItem('anran_ip_reminders_v1', JSON.stringify(arr)); }
-  const labels = {started:'已啟動處理', 'to-peilin':'已寫進珮玲送審追蹤 list', 'to-ray':'已寫進 Ray 待批核 list'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'to-peilin' && item){
-    // 轉珮玲 → 寫進 peilin_approval_track_v1（Phase 1 補洞）
-    const ptArr = JSON.parse(localStorage.getItem('peilin_approval_track_v1')||'[]');
-    ptArr.unshift({
-      id:'pt-' + Date.now(),
-      ip:item.ip, sent: new Date().toISOString().slice(0,10),
-      counterparty:'安然轉介', urgency:item.urgency,
-      detail:'安然轉珮玲處理 IP 維護 · ' + item.detail,
-      submittedAt: Date.now(),
-    });
-    localStorage.setItem('peilin_approval_track_v1', JSON.stringify(ptArr));
-    notif.unshift({ts:Date.now(), from:name, to:'peilin', msg:`🖋 安然轉你處理：${item.ip}`});
-  } else if(action === 'to-ray' && item){
-    // 轉 Ray 親談 → 寫進 ray_approval_v1（Phase 1 補洞）
-    const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
-    rayArr.unshift({
-      id:'ra-' + Date.now(), type:'contract',
-      title:'IP 親談：' + item.ip, from:'安然', urgency:item.urgency,
-      detail:item.detail + ' · 金額：' + item.fee,
-      submittedAt: Date.now(),
-    });
-    localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
-    notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`🔐 安然轉你親談：${item.ip}`});
+function closeIpRemindersModal(){ document.getElementById('ip-reminders-modal').classList.remove('show'); }
+async function doIpReminderAction(recordId, action){
+  const item = window._ipReminderCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'need_ray' || action === 'terminate'){
+    const promptMsg = action === 'need_ray' ? '附給 Ray 的說明（必填）：' : '不續簽原因（必填）：';
+    note = prompt(promptMsg) || '';
+    if(!note.trim()){ showQaToast('未輸入說明，取消'); return; }
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  renderIpReminders();
-  markCurrentTodoDone();
-  showQaToast(`✓ ${item ? item.ip : id} · ${labels[action]}`);
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/anran-ip-reminder/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){
+      if(r.status === 409){ showQaToast('⚠ 版本衝突'); openIpRemindersModal(); }
+      else showQaToast('動作失敗：' + (d.error || r.status));
+      return;
+    }
+    const labels = {start_renew:'已啟動續簽 · 進入續約洽談中', need_ray:'已轉 Ray 親談', defer:'已標記暫不處理', terminate:'已標記不續簽'};
+    showQaToast(`✓ ${item.name} · ${labels[action]}`);
+    const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+    if(action === 'need_ray'){
+      const rayArr = JSON.parse(localStorage.getItem('ray_approval_v1')||'[]');
+      rayArr.unshift({ id:'ra-'+Date.now(), type:'contract', title:'IP 續簽：'+item.name, from:'安然', urgency:'high', detail:(item.detail||'')+' · '+note, submittedAt:Date.now() });
+      localStorage.setItem('ray_approval_v1', JSON.stringify(rayArr));
+      notif.unshift({ts:Date.now(), from:name, to:'ray', msg:`🔐 安然轉你親談：${item.name} · ${note}`});
+    } else if(action === 'start_renew'){
+      notif.unshift({ts:Date.now(), from:name, to:item.counterparty || 'IP 方', msg:`安然啟動續簽：${item.name}`});
+    }
+    localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    markCurrentTodoDone();
+    openIpRemindersModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 
 // ── 待審 inbox modal（楊子 / Leo 共用）— 飛書直連 2026-05-17 ──
