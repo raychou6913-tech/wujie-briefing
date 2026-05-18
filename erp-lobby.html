@@ -3993,36 +3993,48 @@ function renderMd(text){
   return s;
 }
 
-// ── 規則化開場語（沒 Claude 也能跑）──
-function buildOpeningGreeting(){
+// ── 規則化開場語（async fetch Worker 拿真實待辦）──
+const USER_INBOX_MAP = {
+  bevis: ['design-approve'],
+  shetong: ['design-task'],
+  peilin: ['approval-track'],
+  yangzi: ['yangzi-approve'],
+  leo: ['leo-approve'],
+  anran: ['anran-contract'],
+};
+async function buildOpeningGreetingAsync(){
   const hour = new Date().getHours();
   const g = hour < 12 ? '早安' : hour < 17 ? '午安' : '晚安';
-  // 從 sidebar action counts 撈待辦數量
-  let counts = [];
-  try {
-    const actions = (MY_ACTIONS[user] || []).concat(MY_ACTIONS.all);
-    actions.forEach(a => {
-      if (a.action === 'my-sent' || a.action === 'expense') return;
-      const c = getActionCount(a.action);
-      if (c && c > 0) counts.push({label: a.label, n: c});
-    });
-  } catch(e){}
-  const total = counts.reduce((s,c) => s+c.n, 0);
-  if (total === 0) {
-    return `${g}${name}，今天沒有待辦事項，一切順利。\n\n要找什麼資料、看流程，或要我幫忙做什麼都可以跟我講。`;
+  const kinds = USER_INBOX_MAP[user] || [];
+  if (!kinds.length) {
+    return `${g}${name}，要看待辦、問流程，或要我幫忙做什麼，直接跟我講。`;
   }
-  const top = counts.sort((a,b) => b.n - a.n).slice(0, 3);
-  const summary = top.map(c => `**${c.label}** ${c.n} 件`).join(' · ');
-  return `${g}${name}，今天有 **${total} 件待辦**：${summary}${counts.length > 3 ? ` 等共 ${counts.length} 類` : ''}\n\n要從哪一個開始？或想知道更詳細的，直接問我。`;
+  try {
+    const results = await Promise.all(kinds.map(k =>
+      fetch(`${WORKER_BASE}/erp/inbox/${k}?owner=${encodeURIComponent(user)}`).then(r => r.json()).catch(() => ({items:[]}))
+    ));
+    const items = results.flatMap(r => r.items || []);
+    if (items.length === 0) {
+      return `${g}${name}，今天沒待辦，一切順利。 想問什麼或要我幫忙，直接跟我講。`;
+    }
+    const top = items.slice(0, 3);
+    const list = top.map(it => `- **${it.name}**${it.urgency==='high'?' ⚠ 急':''}`).join('\n');
+    const more = items.length > 3 ? `\n\n還有 ${items.length - 3} 件...` : '';
+    return `${g}${name}，今天有 **${items.length} 件待辦**：\n\n${list}${more}\n\n要先看哪一個？或想直接問我也可以。`;
+  } catch(e) {
+    return `${g}${name}，撈待辦失敗了，直接問我也行。`;
+  }
 }
 
-function renderAiHeroMessages(){
+async function renderAiHeroMessages(){
   const box = document.getElementById('ai-hero-msgs');
   if(!box) return;
   const hist = _aiHist();
   if(!hist.length){
-    // 第一次：規則化開場
-    box.innerHTML = `<div class="ai-hero-msg bot">${renderMd(buildOpeningGreeting())}</div>`;
+    // 第一次：先放 loading，async fetch 後替換
+    box.innerHTML = `<div class="ai-hero-msg bot ai-hero-typing">載入今天的待辦中...</div>`;
+    const greeting = await buildOpeningGreetingAsync();
+    box.innerHTML = `<div class="ai-hero-msg bot">${renderMd(greeting)}</div>`;
     return;
   }
   box.innerHTML = hist
