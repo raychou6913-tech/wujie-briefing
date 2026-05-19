@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POPS Canonical Lock · Gemini Prompt v2（已比對 NOKO/SOLO FINAL）</title>
+<style>
+  :root {
+    --bg: #1A1428;
+    --paper: #FFF8E7;
+    --red: #FF4A75;
+    --peach: #FF8B5C;
+    --cyan: #2E8BC9;
+    --gold: #FFC542;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--paper);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    padding: 40px 24px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--peach);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Shippori Mincho", serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--paper);
+    line-height: 1.2;
+  }
+  .sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 28px;
+  }
+  .v2-note {
+    background: rgba(255, 74, 117, 0.1);
+    border: 1px solid rgba(255, 74, 117, 0.3);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+  }
+  .v2-note strong { color: var(--red); }
+  .goal {
+    background: rgba(255, 139, 92, 0.08);
+    border: 1px solid rgba(255, 139, 92, 0.25);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+  }
+  .goal strong { color: var(--peach); }
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--peach);
+    color: var(--bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  button:hover { background: var(--gold); transform: translateY(-1px); }
+  button.copied { background: var(--cyan); color: var(--paper); }
+  .secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .secondary:hover { background: rgba(255,255,255,0.05); color: var(--paper); }
+  pre {
+    background: #0E0A1B;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: "JetBrains Mono", ui-monospace, "Menlo", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+  .footer-note {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+  }
+  .footer-note a { color: var(--cyan); text-decoration: none; }
+  .footer-note a:hover { color: var(--peach); }
+  .ref-imgs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .ref-imgs img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .ref-imgs .ref-label {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--peach);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .swap-row {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0 0;
+    flex-wrap: wrap;
+  }
+  .swap-row code {
+    background: rgba(255,255,255,0.06);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--gold);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">— UNIPOP CAST · POPS Canonical Lock · v2 —</div>
+  <h1>POPS 單隻定版咒語 v2（已比對 NOKO/SOLO FINAL）</h1>
+  <div class="sub">v1 漏了 4 個簽名特徵：頭頂 antenna / 體側雙臂 / 簡單小眼 / 臉頰 blush。v2 全部補上。</div>
+
+  <div class="v2-note">
+    <strong>v1 → v2 修正紀錄</strong><br>
+    比對 char_04 NOKO 懷裡桃橘 POPS + char_07 SOLO 肩上 sun-gold POPS（這兩張是 cast 已 lock 的 canonical reference）後發現：<br>
+    ❌ v1 寫成 perfect egg + 大 shiny 眼睛 → 完全偏離<br>
+    ✅ v2 改成：梨形/水滴 blob + 頭頂 2 antenna + 體側 2 短臂 + 簡單小眼 + 臉頰 blush
+  </div>
+
+  <div class="ref-imgs">
+    <div>
+      <div class="ref-label">— NOKO 懷裡 · 桃橘 POPS canonical —</div>
+      <img src="../assets/uniqpop_cast/char_04_noko_v3.2_FINAL.png" alt="NOKO with peach POPS canonical reference">
+    </div>
+    <div>
+      <div class="ref-label">— SOLO 肩上 · sun-gold POPS canonical —</div>
+      <img src="../assets/uniqpop_cast/char_07_solo_v12_FINAL.png" alt="SOLO with sun-gold POPS canonical reference">
+    </div>
+  </div>
+
+  <div class="goal">
+    <strong>建議做法</strong>：上面這兩張 reference 圖<strong>下載下來</strong>，跟下方咒語<strong>一起上傳給 Gemini</strong>（圖片 + 文字一起送）。Gemini 看著 reference 圖生新 POPS，比純文字穩 5 倍。<br><br>
+    <strong>下載這兩張</strong>：右鍵 → 另存圖片 → 上傳 Gemini 一併附上。
+  </div>
+
+  <div class="actions">
+    <button id="copyBtn" onclick="copyPrompt()">📋 Copy Prompt</button>
+    <button class="secondary" onclick="window.open('https://gemini.google.com/','_blank')">Open Gemini ↗</button>
+  </div>
+
+  <pre id="promptText">附上 2 張參考圖：NOKO 懷裡的桃橘 POPS、SOLO 肩上的 sun-gold POPS — 這 2 隻是 canonical 設計鎖定版，新的 POPS 必須完全照這個風格。
+
+═══ 任務 ═══
+
+生成 1 張單隻 PEACH POPS 的 hero portrait，正面站立，置中在 solid wine-purple 背景 (#1A1428)，比例 1:1。
+
+═══ POPS DESIGN DNA（必須照參考圖逐項落實）═══
+
+整體輪廓：梨形 / 水滴 blob 身體，下寬上窄。NOT a perfect egg, NOT a perfect circle. 身體略向下重一點，像剛蒸熟的麵糰。身體填滿畫布約 65-70% 高度。
+
+【頭頂 antenna · 2 根】 頭頂有 TWO thin antenna stalks，每根末端有一個小球（圓珠 bulb）。Antenna 長度約身體高度的 18-22%。兩根 antenna 微微張開（不平行），給「警覺中」的感覺。Antenna 線條粗細跟身體 outline 同樣 3-4px 手繪黑線。Antenna 跟身體連接處平滑。
+
+【體側 arms · 2 隻短手臂凸】 身體中段兩側各凸出一隻 SHORT STUB ARM，像短小的香腸狀，長度約身體寬度的 12-15%。手臂略向下垂或微微張開。手臂用主體色 + 黑色 outline 描繪。
+
+【眼睛】 兩顆 SMALL SIMPLE BLACK ROUND DOTS（**不是大眼**、**不是 shiny anime 眼**、**沒有白色 highlight 反光**）。每顆眼睛只是純黑實心小圓點，直徑約身體寬度的 8-10%。兩眼間距約 1.5 個眼寬。眼睛位於身體上半部約 35% 高度處。
+
+【嘴巴】 小巧簡單的「u」型微笑或一條短橫線。用同樣 3-4px 黑線手繪。位於兩眼中央正下方，寬度約一個眼睛大小。
+
+【臉頰 blush】 兩眼下方左右各一塊 OVAL BLUSH MARK，用比主體色深一階的暖粉色（peach 場合是 salmon pink #FF7A6E），柔邊邊緣。每塊 blush 大小約眼睛 1.5 倍。
+
+【底部腿/腳】 身體底部 2 個 small stub feet 微微凸出（不是站在腿上，是身體底部本身略凹兩個半圓造出腳的暗示）。腳同樣用主體色 + outline。
+
+【outline】 全身 3-4px HAND-DRAWN 黑線 outline，**有手繪 wobble**（不是 perfect vector），線粗細微微變化，給溫暖手繪感。
+
+【color】 主體 solid saturated peach orange (#FF8B5C)。FLAT 2-tone shading only — 主色 + 1 個 darker peach shadow tone (#E66E45) 用在身體下半 30% 和體側暗面。NO gradients, NO 多層 shading, NO anime gloss, NO photorealistic rendering。
+
+【pose】 正面站立，身體微微往後仰 5°（頭微抬），整體害羞但滿足的表情。
+
+═══ 背景 ═══
+
+Solid wine-purple #1A1428，完全平面，NO scenery, NO gradient, NO texture。畫布四週留 15% 邊距，POPS 居中。
+
+═══ 絕對禁止 ═══
+
+❌ 大 shiny 眼 / anime 圓眼 / 白色 catchlight 反光（必須是純黑小圓點）
+❌ Perfect egg / perfect circle 身體（必須是梨形/水滴 blob）
+❌ 漏畫 antenna（必須 2 根 + 球末端）
+❌ 漏畫體側 short arms（必須 2 隻）
+❌ 漏畫臉頰 blush
+❌ Gradient 漸層 / 3D 渲染 / 半透明
+❌ 帽子 / 配件 / 衣物 / 表情符號 / 對話框
+
+═══ STYLE ═══
+
+POP MART 盲盒 flat illustration × Studio Ghibli soot sprite 系列 × DIMOO designer toy outline 質感。整體手繪溫暖、簡單但有性格。
+
+DOLL FEASIBILITY：這個設計要做成 vinyl 盲盒公仔 — antenna 是可拆配件、體側 arms 是 sculpted protrusion、整體 solid blob 可注塑、無細長飄揚元素。</pre>
+
+  <div class="footer-note">
+    <strong>滿意後下一步</strong>：把這張單隻 Peach POPS 加進 cast.html canonical reference，<strong>下一輪 12 色合照</strong>直接用這張當 multi-image reference 給 Gemini 拉一致性。<br><br>
+    <strong>12 色配色清單</strong>（鎖定後接著生）：<br>
+    <div class="swap-row">
+      <code>#FF8B5C peach（本張）</code><code>#FF4A75 hot pink</code><code>#2E8BC9 sky cyan</code><code>#5946A3 royal purple</code><code>#FFC542 sun gold</code><code>#8FA968 sage</code><code>#FFF8E7 cream</code><code>#E84855 coral red</code><code>#C9A9DD lavender</code><code>#7FC7B5 mint</code><code>#D4A744 mustard</code><code>#5A5560 charcoal</code>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyPrompt() {
+  const text = document.getElementById('promptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
