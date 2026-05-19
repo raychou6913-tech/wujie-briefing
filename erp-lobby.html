@@ -2254,6 +2254,75 @@ function openGenericListModal(key){
   document.getElementById('generic-list-modal').classList.add('show');
 }
 function closeGenericListModal(){ document.getElementById('generic-list-modal').classList.remove('show'); }
+
+// ── Generic Worker inbox modal helper（給 my-quote/sampling-track 等共用 generic-list-modal 的）──
+window._workerInboxCache = [];
+window._workerInboxKind = '';
+window._workerInboxActions = [];
+async function openWorkerInboxModal(opts){
+  // opts = { kind, title, sub, actions: [{key, label, primary?, prompt?, notifyTo?, msg?}] }
+  document.getElementById('gl-title').textContent = opts.title;
+  document.getElementById('gl-sub').textContent = opts.sub;
+  document.getElementById('generic-list-modal').classList.add('show');
+  const list = document.getElementById('gl-list');
+  list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>';
+  window._workerInboxKind = opts.kind;
+  window._workerInboxActions = opts.actions;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/${opts.kind}?owner=${encodeURIComponent(user)}`);
+    const d = await r.json();
+    if(!d.ok) throw new Error(d.error||'讀取失敗');
+    window._workerInboxCache = d.items || [];
+    if(!d.items.length){ list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ ${opts.emptyMsg||'沒有待處理項目'}</div>`; return; }
+    list.innerHTML = d.items.map(it => {
+      const meta = [it.designer, it.ip, it.stage, it.round?'數量 '+it.round:''].filter(Boolean).join(' · ');
+      const amt = it.amount ? `${it.currency||''} ${Number(it.amount).toLocaleString()}` : '';
+      const btns = opts.actions.map((a, idx) => `<button onclick="doWorkerInboxAction('${it.record_id}','${a.key}')" style="${idx===0?'flex:1;background:var(--brand);color:#fff;':'background:transparent;color:var(--ink-mid);border:1px solid var(--line);'}padding:8px ${idx===0?'':'14'}px;border:${idx===0?'none':'1px solid var(--line)'};border-radius:8px;font-size:12px;font-weight:${idx===0?'700':'600'};cursor:pointer;font-family:inherit;">${a.label}</button>`).join('');
+      return `<div data-rid="${it.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${it.urgency==='high'?'border-color:var(--warn);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="flex:1;"><span style="font-size:13px;font-weight:700;color:var(--ink);">${it.name||'(未命名)'}</span>
+          <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${meta}</div></div>
+          ${amt?`<div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${amt}</div>`:''}
+        </div>
+        ${it.detail?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${it.detail}</div>`:''}
+        <div style="display:flex;gap:6px;">${btns}</div>
+      </div>`;
+    }).join('');
+  } catch(e){ list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}</div>`; }
+}
+async function doWorkerInboxAction(recordId, actionKey){
+  const item = window._workerInboxCache.find(x => x.record_id === recordId);
+  const action = window._workerInboxActions.find(a => a.key === actionKey);
+  if(!item || !action){ showQaToast('找不到項目或動作'); return; }
+  let note = '';
+  if(action.prompt){
+    note = prompt(action.prompt) || '';
+    if(action.required && !note.trim()){ showQaToast('未輸入，取消'); return; }
+  }
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/${window._workerInboxKind}/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action: actionKey, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){ showQaToast(r.status===409?'⚠ 版本衝突':('動作失敗：'+(d.error||r.status))); return; }
+    showQaToast(`✓ ${item.name} · ${action.label}`);
+    if(action.notifyTo){
+      const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
+      const msg = (action.msg || action.label).replace('{name}', item.name).replace('{note}', note);
+      notif.unshift({ts:Date.now(), from:name, to:action.notifyTo, msg});
+      localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
+    }
+    markCurrentTodoDone();
+    // 重 open 同 modal 刷新
+    const titleEl = document.getElementById('gl-title');
+    if (titleEl && titleEl.textContent) openWorkerInboxModal({
+      kind: window._workerInboxKind, title: titleEl.textContent,
+      sub: document.getElementById('gl-sub').textContent,
+      actions: window._workerInboxActions,
+    });
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
+}
 function doGenericDone(key, id, action){
   const item = _genericDone(key, id, '');
   // re-render same modal
@@ -3758,9 +3827,28 @@ function triggerAction(action){
     case 'my-approval-tracker': openApprovalTrackModal(); break;
     case 'theme-plan':        openThemePlanModal(); break;
     case 'my-design-task':    openDesignTaskModal(); break;
-    case 'my-quote':          openGenericListModal('my-quote'); break;
+    case 'my-quote':          openWorkerInboxModal({
+      kind:'laige-quote',
+      title:'🔍 我的詢比價',
+      sub:'新供應商 / 新材料報價追蹤',
+      emptyMsg:'沒有詢比價待處理',
+      actions:[
+        {key:'confirm', label:'✓ 選定供應商', prompt:'選定哪家 + 議定價格（會記錄）：', required:false},
+        {key:'po', label:'轉開 PO'},
+        {key:'reject', label:'重新詢價', prompt:'重新詢價原因：', required:false},
+      ],
+    }); break;
     case 'my-po':             openMyPoModal(); break;
-    case 'sampling-track':    openGenericListModal('sampling-track'); break;
+    case 'sampling-track':    openWorkerInboxModal({
+      kind:'laige-sampling',
+      title:'🏭 打樣追蹤',
+      sub:'打樣件追蹤 — 三方確認後才能 commit 大貨',
+      emptyMsg:'沒有打樣件待追蹤',
+      actions:[
+        {key:'pass', label:'✓ 打樣通過'},
+        {key:'reject', label:'需重打', prompt:'重打原因（必填）：', required:true},
+      ],
+    }); break;
     case 'my-sent':           openMySentModal(); break;
     case 'stock-check':       openStockCheckModal(); break;
     case 'payment-request':   openPaymentReqModal(); break;
