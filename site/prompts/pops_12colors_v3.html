@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POPS 12 色變奏 · Gemini Prompt v3（image-to-image）</title>
+<style>
+  :root {
+    --bg: #1A1428;
+    --paper: #FFF8E7;
+    --red: #FF4A75;
+    --peach: #FF8B5C;
+    --cyan: #2E8BC9;
+    --gold: #FFC542;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--paper);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    padding: 40px 24px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--peach);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Shippori Mincho", serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--paper);
+    line-height: 1.2;
+  }
+  .sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 28px;
+  }
+  .v3-note {
+    background: rgba(46, 139, 201, 0.1);
+    border: 1px solid rgba(46, 139, 201, 0.3);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+  }
+  .v3-note strong { color: var(--cyan); }
+  .ref-img-block {
+    background: rgba(255, 197, 66, 0.05);
+    border: 1px solid rgba(255, 197, 66, 0.3);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .ref-img-block img {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 12px 0;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .ref-img-block .ref-label {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .ref-img-block .download-hint {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 10px;
+  }
+  .download-btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--bg);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .download-btn:hover { background: var(--peach); transform: translateY(-1px); }
+  .steps {
+    background: rgba(255, 139, 92, 0.08);
+    border: 1px solid rgba(255, 139, 92, 0.25);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+  }
+  .steps strong { color: var(--peach); }
+  .steps ol { margin: 12px 0 0 24px; }
+  .steps li { margin-bottom: 6px; }
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--peach);
+    color: var(--bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  button:hover { background: var(--gold); transform: translateY(-1px); }
+  button.copied { background: var(--cyan); color: var(--paper); }
+  .secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .secondary:hover { background: rgba(255,255,255,0.05); color: var(--paper); }
+  pre {
+    background: #0E0A1B;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: "JetBrains Mono", ui-monospace, "Menlo", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+  .swap-row {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0 0;
+    flex-wrap: wrap;
+  }
+  .swap-row code {
+    background: rgba(255,255,255,0.06);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--gold);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">— UNIPOP CAST · POPS 12 色變奏 · v3 image-to-image —</div>
+  <h1>POPS 12 色咒語 v3（image-to-image，真正的解法）</h1>
+  <div class="sub">不再用純文字描述漂移。直接拿 SOLO 肩上 sun-gold POPS 當 reference，要 Gemini 換色保 design。</div>
+
+  <div class="v3-note">
+    <strong>為什麼這次會成功</strong>：v1/v2 都是純文字 prompt 讓 Gemini 重新詮釋 POPS — antenna 漏、arms 變內凹線、眼睛變大 anime 眼。<br>
+    v3 改用 <strong>image-to-image</strong>：上傳已 lock 的 sun-gold POPS 圖（從 SOLO FINAL 切出來的 canonical），Gemini 看圖換色就好，不需要重新發明 design。
+  </div>
+
+  <div class="ref-img-block">
+    <div class="ref-label">— Canonical Reference (上傳這張到 Gemini) —</div>
+    <img src="../assets/uniqpop_cast/pops_gold_canonical.png" alt="POPS sun-gold canonical reference">
+    <div class="download-hint">SOLO 肩上的 sun-gold POPS · 從 char_07_solo_v12_FINAL 切出</div>
+    <a class="download-btn" href="../assets/uniqpop_cast/pops_gold_canonical.png" download>⬇ 下載這張</a>
+  </div>
+
+  <div class="steps">
+    <strong>操作步驟</strong>
+    <ol>
+      <li>點上方「⬇ 下載這張」存到桌面</li>
+      <li>打開 <a href="https://gemini.google.com/" style="color:var(--cyan);">gemini.google.com</a> 新對話</li>
+      <li>把下載的 PNG 拖進對話框（上傳）</li>
+      <li>按下方「📋 Copy Prompt」貼上咒語</li>
+      <li>跑 → 拿到 12 色 PNG → 下載丟我</li>
+    </ol>
+  </div>
+
+  <div class="actions">
+    <button id="copyBtn" onclick="copyPrompt()">📋 Copy Prompt</button>
+    <button class="secondary" onclick="window.open('https://gemini.google.com/','_blank')">Open Gemini ↗</button>
+  </div>
+
+  <pre id="promptText">附圖是 "POPS" — 蕪解 UNIPOP CAST 原創世界觀的小怪生物，design 已經 LOCK。
+
+我要你保留這隻 POPS 的**完整 design DNA**（不要重新詮釋，不要簡化，不要美化）：
+- 梨形 / 水滴 blob 身體
+- 頭頂 2 根 antenna + 球狀末端
+- 體側 2 隻短小 stub arms（從身體側面凸出）
+- 小簡單黑色圓點眼（NOT 大 shiny 眼）
+- 臉頰 oval blush
+- Cream 白色腹部
+- 3-4px 手繪黑線 outline
+- Flat 2-tone shading
+
+然後**只改顏色**，生成 12 隻 POPS，排成 4 列 × 3 行 grid，每隻獨立大小一樣，背景 solid wine-purple #1A1428。
+
+12 隻顏色（依序）：
+Row 1: hot pink #FF4A75 · sky cyan #2E8BC9 · peach #FF8B5C · royal purple #5946A3
+Row 2: sun gold #FFC542（保留原色，就是附圖那隻）· sage green #8FA968 · cream ivory #FFF8E7 · coral red #E84855
+Row 3: pale lavender #C9A9DD · mint #7FC7B5 · mustard #D4A744 · charcoal grey #5A5560
+
+每隻 POPS 的 pose 可以略有變化（如 antenna 角度微調、頭轉一點），讓 12 隻不死板，但 silhouette / antenna / arms / 比例 100% 一致。
+
+NO 對話框、NO 配件、NO 表情符號 — 每隻單純就是 POPS 本身。
+
+Aspect ratio 4:3 或 16:9 寬版面。</pre>
+
+  <div style="margin-top:36px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;color:rgba(255,255,255,0.45);">
+    <strong>跑出來不對的話 in-chat 微調</strong>（同個 chat，不要新 chat）：<br><br>
+    <div class="swap-row">
+      <code>「右下角第 12 隻沒畫，補一隻 charcoal grey」</code><code>「antenna 球末端漏了，補上」</code><code>「pose 太死板，每隻換不同方向看」</code>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyPrompt() {
+  const text = document.getElementById('promptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
