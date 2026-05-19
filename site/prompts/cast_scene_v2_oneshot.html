@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cast 大合照 v2 ONESHOT · 8 隻 + POPS 一次到位</title>
+<style>
+  :root {
+    --bg: #1A1428;
+    --paper: #FFF8E7;
+    --red: #FF4A75;
+    --peach: #FF8B5C;
+    --cyan: #2E8BC9;
+    --gold: #FFC542;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--paper);
+    font-family: "Inter", -apple-system, sans-serif;
+    line-height: 1.6; padding: 40px 24px 80px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; letter-spacing: 0.35em;
+    color: var(--peach); text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1 { font-family: "Shippori Mincho", serif; font-size: 30px; font-weight: 700; line-height: 1.2; }
+  .sub { font-size: 14px; color: rgba(255,255,255,0.55); margin: 8px 0 28px; }
+  .note {
+    background: rgba(46, 139, 201, 0.1);
+    border: 1px solid rgba(46, 139, 201, 0.3);
+    border-radius: 10px; padding: 18px 22px;
+    margin-bottom: 28px; font-size: 14px;
+  }
+  .note strong { color: var(--cyan); }
+  .warning {
+    background: rgba(255, 74, 117, 0.1);
+    border: 1px solid rgba(255, 74, 117, 0.3);
+    border-radius: 10px; padding: 16px 20px;
+    margin-bottom: 28px; font-size: 13px;
+  }
+  .warning strong { color: var(--red); }
+  .ref-block {
+    background: rgba(255, 197, 66, 0.05);
+    border: 1px solid rgba(255, 197, 66, 0.3);
+    border-radius: 10px; padding: 24px;
+    margin-bottom: 28px; text-align: center;
+  }
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin: 14px 0;
+  }
+  .ref-grid img { width: 100%; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+  .ref-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; letter-spacing: 0.3em;
+    color: var(--gold); text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .download-list {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: center; margin-top: 10px;
+  }
+  .download-btn {
+    background: var(--gold); color: var(--bg);
+    padding: 6px 12px; border-radius: 4px;
+    text-decoration: none;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+  .download-btn:hover { background: var(--peach); }
+  .download-btn.canonical { background: var(--peach); }
+  .download-btn.canonical:hover { background: var(--cyan); color: var(--paper); }
+  .steps {
+    background: rgba(255, 139, 92, 0.08);
+    border: 1px solid rgba(255, 139, 92, 0.25);
+    border-radius: 10px; padding: 18px 22px;
+    margin-bottom: 28px; font-size: 14px;
+  }
+  .steps strong { color: var(--peach); }
+  .steps ol { margin: 12px 0 0 24px; }
+  .steps li { margin-bottom: 6px; }
+  .actions { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  button {
+    background: var(--peach); color: var(--bg);
+    border: none; padding: 10px 20px;
+    border-radius: 6px; font-family: "JetBrains Mono", monospace;
+    font-size: 12px; letter-spacing: 0.15em;
+    text-transform: uppercase; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  button:hover { background: var(--gold); }
+  button.copied { background: var(--cyan); color: var(--paper); }
+  .secondary {
+    background: transparent; color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  pre {
+    background: #0E0A1B;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 24px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px; line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    white-space: pre-wrap; word-break: break-word;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">— UNIPOP CAST · Cast Scene · v2 ONESHOT —</div>
+  <h1>Cast 大合照 v2 ONESHOT<br>8 隻 + POPS 一次到位</h1>
+  <div class="sub">1980s Tokyo 巷弄深夜 · 全員出場 · 不分批 · 上傳 9 張 reference 一次生成</div>
+
+  <div class="warning">
+    <strong>⚠ 風險</strong>：Gemini 一次吃 9 張 reference 跟生 8 隻角色 + POPS 是壓力測試。<br>
+    可能出現的漂移：① 角色混搭（昨晚 SOLO 拿到 NOKO 的 pose）② 個別 signature 模糊（葡萄頭飾變普通頭花）③ POPS 設計簡化。<br><br>
+    跑出來不對的部分 <strong>in-chat 微調</strong>（同個 chat 內），不要新開 chat 重 zero-shot。
+  </div>
+
+  <div class="note">
+    <strong>跟 v1 分批的差別</strong>：v1 分 2 批跑（左 4 + 右 4），part 2 用「延續前圖」邏輯。v2 oneshot 一次給 Gemini 全部 reference + 完整 8 隻 brief。優：構圖一致性高。缺：壓力大、個別細節可能模糊。
+  </div>
+
+  <div class="ref-block">
+    <div class="ref-label">— 9 張 reference 全部下載 —</div>
+    <div class="ref-grid">
+      <img src="../assets/uniqpop_cast/char_01_mika_v5.1_FINAL.png" alt="MIKA">
+      <img src="../assets/uniqpop_cast/char_02_tofu_v4_FINAL.png" alt="TOFU">
+      <img src="../assets/uniqpop_cast/char_03_beepo_v5_FINAL.png" alt="BEEPO">
+      <img src="../assets/uniqpop_cast/char_04_noko_v3.2_FINAL.png" alt="NOKO">
+      <img src="../assets/uniqpop_cast/char_05_nova_v2_astrology_FINAL.png" alt="NOVA">
+      <img src="../assets/uniqpop_cast/char_06_momo_v3_battery_FINAL.png" alt="MOMO">
+      <img src="../assets/uniqpop_cast/char_07_solo_v12_FINAL.png" alt="SOLO">
+      <img src="../assets/uniqpop_cast/char_08_garlic_v3_FINAL.png" alt="GARLIC">
+    </div>
+    <div class="download-list">
+      <a class="download-btn" href="../assets/uniqpop_cast/char_01_mika_v5.1_FINAL.png" download>⬇ MIKA</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_02_tofu_v4_FINAL.png" download>⬇ TOFU</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_03_beepo_v5_FINAL.png" download>⬇ BEEPO</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_04_noko_v3.2_FINAL.png" download>⬇ NOKO</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_05_nova_v2_astrology_FINAL.png" download>⬇ NOVA</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_06_momo_v3_battery_FINAL.png" download>⬇ MOMO</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_07_solo_v12_FINAL.png" download>⬇ SOLO</a>
+      <a class="download-btn" href="../assets/uniqpop_cast/char_08_garlic_v3_FINAL.png" download>⬇ GARLIC</a>
+    </div>
+    <div style="margin-top:14px;">
+      <a class="download-btn canonical" href="../assets/uniqpop_cast/pops_gold_canonical.png" download>⬇ POPS canonical（必上傳）</a>
+    </div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:12px;">
+      最佳：8 隻 cast + POPS canonical = <strong>9 張</strong>，全部一起拖進 Gemini。<br>
+      可選：你下載項目裡的「12 色 POPS lineup」也一起上傳（變 10 張），POPS 顏色豐富一點。
+    </div>
+  </div>
+
+  <div class="steps">
+    <strong>操作步驟</strong>
+    <ol>
+      <li>9 張全部下載到桌面（一鍵點滿）</li>
+      <li>開 <a href="https://gemini.google.com/" style="color:var(--cyan);">gemini.google.com</a> 新對話</li>
+      <li>9 張一起拖進對話框</li>
+      <li>📋 Copy Prompt → 貼上 → 跑</li>
+      <li>跑出來如有漂移，in-chat 微調（例：「GARLIC 不是大蒜頭，看一下參考圖第 8 張，把大蒜的皮紋路畫回去」）</li>
+      <li>滿意丟我嵌入 cast.html</li>
+    </ol>
+  </div>
+
+  <div class="actions">
+    <button id="copyBtn" onclick="copyPrompt()">📋 Copy Prompt（含 8 隻完整 brief）</button>
+    <button class="secondary" onclick="window.open('https://gemini.google.com/','_blank')">Open Gemini ↗</button>
+  </div>
+
+  <pre id="promptText">附 9 張參考圖（如果有 12 色 POPS lineup 是 10 張）：
+- 8 隻 UNIPOP CAST 角色 FINAL design lock 圖（MIKA / TOFU / BEEPO / NOKO / NOVA / MOMO / SOLO / GARLIC）
+- 1 隻 POPS canonical 圖（sun-gold，setting reference for all POPS）
+
+═══ 任務 ═══
+
+生成 1 張完整的 UNIPOP CAST 世界觀大合照，8 隻角色全部出場 + POPS 散落。Aspect ratio **21:9 寬版面**（cinematic letterbox）。
+
+═══ 場景 · 1980s Tokyo 後巷深夜 ═══
+
+濕潤柏油巷子，霓虹便利商店招牌（漢字 + 假名）在背景發光。中央偏右一台老式日本自動販賣機（紅白復古 + 飲料罐隱約可見），燈光從內透出暖黃。地面反射粉紫霓虹光。電線桿 + 電線交錯。夜空暮光紫漸層（#2A1F45 → #1A1428）。氛圍：Hiroshi Nagai 永井博 City Pop × Studio Ghibli 夜色。
+
+═══ 8 隻 cast 安排（左到右 / 前到後）═══
+
+1. **GARLIC**（最左，前景）— 在路燈下單手轉籃球，自以為帥的笑容，紅色 jersey + peach 短褲，BBcall 別腰間。大蒜頭（白色 + 紫色 papery 紋）。
+
+2. **TOFU**（左半中段）— 靠在自動販賣機旁的牆上，手拿 Pocari Tears 飲料罐喝，墨鏡反射霓虹（淚滴從墨鏡下沿）。豆腐方頭 + slim suit，金魚在豆腐裡若隱若現。
+
+3. **NOKO**（中前景偏左，蹲坐在低矮木箱或階梯上）— 藍色補丁 plush 身、一耳縫線、一眼鈕扣，懷裡抱**另一隻**更小更破舊的灰色 abandoned 玩偶（不是 POPS！）。氛圍：被遺棄物的共生者，安靜看著大家。
+
+4. **MIKA**（中前景偏中）— 站著拿 Polaroid 相機對巷子拍照，紫 bob + 葡萄頭飾（其中一顆是眼球！必須畫出來），pink 上衣 + 紫短褲。
+
+5. **BEEPO**（中段，便利商店門口階梯上）— 坐著玩 Game Boy，雙腿屈起。Mac 1984 螢幕頭 + Galaga 蜜蜂瞳孔 + floppy disk 嘴。
+
+6. **NOVA**（中後段，BEEPO 旁邊往右後）— 仰頭看夜空，月亮頭剛好跟天空的月亮形成「她頭就是月亮」的視覺呼應。手拿塔羅卡 + 水晶 pendulum，星空圖案 dress。
+
+7. **SOLO**（中後段中央 / 安靜站著）— 紫 bob + sun-gold 貝雷帽 + 白口罩 + navy 雙排扣 blazer。**右肩站著 sun-gold POPS**，POPS 嘴張開喊話，旁邊白色 speech bubble 寫 "?!" 或 "Hello!"。SOLO 眼神略尷尬。
+
+8. **MOMO**（最右）— 站在 MIKA 後方一點，雙 A 電池頭，拿著紅色電線插進販賣機旁牆上插座給自己充電。另一手拿小牛奶盒。
+
+═══ POPS 散落（額外 4-6 隻 canonical 設計，照 sun-gold 那張參考圖）═══
+
+- 1 隻 PEACH POPS — 蹲在 NOKO 腳邊
+- 1 隻 SKY CYAN POPS — 爬到 GARLIC 的肩膀或腰部
+- 1 隻 HOT PINK POPS — 從垃圾桶後面探頭
+- 1 隻 SAGE GREEN POPS — 趴在販賣機上方
+- 1 隻 CHARCOAL GREY POPS — 最後方陰影裡只露 antenna（神秘感）
+- 1 隻 SUN-GOLD POPS 在 SOLO 肩上（前面已提）
+
+每隻 POPS 都要照 canonical：梨形 blob + 頭頂 2 antenna 球末端 + 體側 2 stub arms + 小簡單黑點眼 + cheek blush + cream 白肚 + 3-4px hand-drawn 黑線。NO 大 shiny 眼，NO 漸層。
+
+═══ DESIGN LOCK（必須照參考圖逐一保留）═══
+
+- MIKA：紫 bob + 葡萄頭飾 + **眼球替代一顆葡萄** + Polaroid
+- TOFU：豆腐方頭 + 墨鏡 + 一滴淚 + Pocari Tears + 豆腐裡的金魚
+- BEEPO：Macintosh 1984 螢幕頭 + Galaga 蜜蜂瞳孔 + floppy disk 嘴 + Game Boy
+- NOKO：藍 plush + 縫補 + 鈕扣眼 + 抱另一隻 abandoned 玩偶
+- NOVA：crescent moon 頭 + 塔羅 + pendulum + 星空 dress
+- MOMO：雙 A 電池頭 + 紅色充電線 + 牛奶盒
+- SOLO：紫 bob + sun-gold 貝雷帽 + 白口罩 + navy 雙排扣 blazer + 右肩 POPS
+- GARLIC：大蒜頭（白 + 紫紋）+ 籃球 + 紅 jersey + BBcall
+
+每個簽名細節都不能漏。臉、配件、顏色全部照參考圖。
+
+═══ 視覺風格 ═══
+
+POP MART 盲盒 flat illustration × Hiroshi Nagai City Pop × Studio Ghibli 夜色。**3-4px 手繪黑線 outline 統一**（不能某些細某些粗）。**flat 2-tone shading 統一**（每個 surface 主色 + 1 個 shadow 色，沒有 gradient）。整體色：紫粉霓虹背景 + cast 各自 saturated 色 + 販賣機暖黃焦點光。
+
+═══ 禁止 ═══
+
+❌ 真實照片風 / 3D rendering / 油畫質感 / 漸層
+❌ 任何角色重新詮釋（必須照 reference 圖）
+❌ 把 NOKO 的 POPS 抱 pose 套到別人身上（POPS 在 SOLO 肩上 + NOKO 腳邊，NOKO 抱的是另一隻玩偶）
+❌ 對話框文字超過 SOLO 那一個（其他角色不出對話框）
+❌ 漏畫任何角色 — 必須 8 隻全在畫面裡</pre>
+</div>
+
+<script>
+function copyPrompt() {
+  const text = document.getElementById('promptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy Prompt（含 8 隻完整 brief）'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
