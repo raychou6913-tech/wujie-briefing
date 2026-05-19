@@ -761,11 +761,40 @@ function switchFlow(key){
 
 // ── 編輯狀態 localStorage（每個流程獨立） ──
 const NW = 172, NH = 92;
+// ── 雲端 state (飛書「工作流地圖狀態」表，跨人 sync) ──
+const WORKER_BASE_WF = 'https://feishu-proxy.raychou6913.workers.dev';
+window._wfState = {};
+window._wfLoaded = false;
+async function loadWorkflowStateCloud(){
+  try {
+    const r = await fetch(`${WORKER_BASE_WF}/erp/workflow-state/all`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    window._wfState = d.states || {};
+    window._wfLoaded = true;
+    console.log('[wf-state] loaded', Object.keys(window._wfState).length, 'keys');
+  } catch(e) { console.warn('[wf-state] load fail:', e); }
+}
+function _wfGet(key){
+  const entry = window._wfState[key];
+  if (!entry) return null;
+  try { return JSON.parse(entry.value); } catch(e) { return null; }
+}
+function _wfSet(key, value){
+  // 立刻 cache（UI 立即 reflect）
+  const json = typeof value === 'string' ? value : JSON.stringify(value);
+  window._wfState[key] = { value: json, edited_by: name || user, edited_at: Date.now() };
+  // 背景 POST 飛書
+  fetch(`${WORKER_BASE_WF}/erp/workflow-state`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ key, value: json, actor: name || user })
+  }).catch(e => console.warn('[wf-state] save fail:', e));
+}
 function getFlowOverrides(flowKey){
-  try { return JSON.parse(localStorage.getItem('workflow_edits_'+flowKey+'_v1')||'{}'); } catch(e){ return {}; }
+  return _wfGet('edits_'+flowKey+'_v1') || {};
 }
 function saveFlowOverrides(flowKey, edits){
-  localStorage.setItem('workflow_edits_'+flowKey+'_v1', JSON.stringify(edits));
+  _wfSet('edits_'+flowKey+'_v1', edits);
 }
 function getMergedFlow(flowKey){
   const f = WORKFLOWS[flowKey];
@@ -791,16 +820,17 @@ function patchEdge(flowKey, fromId, toId, patch){
   saveFlowOverrides(flowKey, o);
 }
 function resetFlow(){
-  if(!confirm('重設這個流程到原始版本？你的編輯會清掉。')) return;
-  localStorage.removeItem('workflow_edits_'+currentFlow+'_v1');
+  if(!confirm('重設這個流程到原始版本？你的編輯會清掉（並通知雲端）。')) return;
+  // 清雲端（POST 空值）
+  _wfSet('edits_'+currentFlow+'_v1', {});
   renderCanvas();
 }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── 確認狀態系統（per flow+node，存 localStorage）──
-const STATUS_KEY = 'workflow_card_status_v1';
-function loadStatusMap(){ try { return JSON.parse(localStorage.getItem(STATUS_KEY) || '{}'); } catch(e){ return {}; } }
-function saveStatusMap(m){ localStorage.setItem(STATUS_KEY, JSON.stringify(m)); }
+const STATUS_KEY = 'status_v1';
+function loadStatusMap(){ return _wfGet(STATUS_KEY) || {}; }
+function saveStatusMap(m){ _wfSet(STATUS_KEY, m); }
 function getCardStatus(flow, nodeId){ return loadStatusMap()[flow+':'+nodeId] || 'pending'; }
 function setCardStatus(flow, nodeId, status){
   const m = loadStatusMap();
@@ -1189,11 +1219,9 @@ function selectNode(id){
 }
 
 // ── Notes management ──
-function loadNotes(){
-  try { return JSON.parse(localStorage.getItem('workflow_notes_v1') || '[]'); } catch(e){ return []; }
-}
+function loadNotes(){ return _wfGet('notes_v1') || []; }
 function saveNotes(arr){
-  localStorage.setItem('workflow_notes_v1', JSON.stringify(arr));
+  _wfSet('notes_v1', arr);
   updateOptCount();
 }
 function updateOptCount(){
@@ -1202,10 +1230,19 @@ function updateOptCount(){
   if(el) el.textContent = `${cnt} 個優化建議`;
 }
 
-// ── Init ──
-renderTabs();
-renderCanvas();
-updateOptCount();
+// ── Init（先載雲端 state 再 render）──
+(async () => {
+  await loadWorkflowStateCloud();
+  renderTabs();
+  renderCanvas();
+  updateOptCount();
+  // 每 30 秒重新拉雲端 state（Shawn 改 Ray 半分鐘內看得到）
+  setInterval(async () => {
+    await loadWorkflowStateCloud();
+    renderCanvas();
+    updateOptCount();
+  }, 30000);
+})();
 </script>
 <script src="erp-sidebar.js"></script>
 </body>
