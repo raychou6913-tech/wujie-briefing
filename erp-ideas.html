@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蕪解 ERP · 新提案專區</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --paper:#fafaf8;
+  --paper-soft:#f2f2ef;
+  --line:#e8e8e3;
+  --ink:#0a0a0a;
+  --ink-mid:#666;
+  --ink-lo:#999;
+  --ink-faint:#ccc;
+  --brand:#ff6b35;
+  --brand-soft:#fff4ef;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+  --ok:#22c55e;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-.003em;
+  min-height:100vh;padding-bottom:80px;
+}
+.serif{font-family:"Noto Serif TC",Times,serif;}
+
+/* TOPBAR */
+.topbar{
+  background:var(--paper);border-bottom:1px solid var(--line);
+  padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.brand-dot{width:5px;height:5px;border-radius:50%;background:var(--brand);align-self:flex-end;margin-bottom:3px;}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;font-weight:900;font-size:18px;letter-spacing:-.04em;color:var(--ink);}
+.brand-sub{font-size:11px;color:var(--ink-lo);margin-left:6px;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.btn-sm{
+  font-size:11px;color:var(--ink-mid);text-decoration:none;
+  font-weight:600;padding:5px 12px;
+  border:1px solid var(--line);border-radius:20px;
+  transition:border-color .22s var(--ease);background:transparent;cursor:pointer;
+}
+.btn-sm:hover{border-color:var(--ink-faint);color:var(--ink);}
+
+/* MAIN */
+.main{max-width:880px;margin:0 auto;padding:64px 32px;}
+
+.page-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px;color:var(--brand);font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.page-title{
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:42px;font-weight:900;letter-spacing:-.04em;
+  line-height:1.05;color:var(--ink);margin-bottom:14px;
+}
+.page-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:15px;color:var(--ink-mid);line-height:1.7;
+  margin-bottom:40px;letter-spacing:.02em;
+}
+
+/* Primary CTA */
+.cta-row{margin-bottom:32px;display:flex;gap:10px;align-items:center;}
+.cta-primary{
+  background:var(--ink);color:#fff;border:none;
+  font-size:13px;font-weight:700;letter-spacing:.02em;
+  padding:12px 22px;border-radius:24px;cursor:pointer;
+  transition:transform .15s var(--ease),background .15s var(--ease);
+  display:inline-flex;align-items:center;gap:7px;
+}
+.cta-primary:hover{background:var(--brand);}
+.cta-primary:active{transform:scale(.97);}
+.cta-hint{font-size:11px;color:var(--ink-lo);}
+
+/* List */
+.list-section{margin-top:24px;}
+.list-empty{
+  text-align:center;padding:64px 20px;color:var(--ink-lo);
+  border:1px dashed var(--line);border-radius:12px;
+  font-size:13px;line-height:1.7;
+}
+.idea-card{
+  background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:18px 20px;margin-bottom:12px;
+  cursor:pointer;transition:border-color .15s var(--ease),box-shadow .15s var(--ease);
+}
+.idea-card:hover{border-color:var(--ink-faint);box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.idea-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;gap:14px;}
+.idea-title{font-size:15px;font-weight:700;color:var(--ink);line-height:1.4;}
+.idea-meta{font-size:11px;color:var(--ink-lo);white-space:nowrap;}
+.idea-desc{font-size:13px;color:var(--ink-mid);line-height:1.65;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.idea-attach{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--brand);margin-top:8px;}
+
+/* Modal */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(10,10,10,.5);
+  display:none;align-items:center;justify-content:center;z-index:1000;
+  backdrop-filter:blur(2px);
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:#fff;border-radius:16px;max-width:560px;width:92%;
+  padding:32px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+}
+.modal-title{font-size:22px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px;}
+.modal-sub{font-size:12px;color:var(--ink-lo);margin-bottom:24px;}
+.field{margin-bottom:18px;}
+.field label{
+  display:block;font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-lo);margin-bottom:7px;
+}
+.field input[type=text], .field textarea{
+  width:100%;border:1px solid var(--line);border-radius:8px;
+  padding:11px 13px;font-size:14px;font-family:inherit;color:var(--ink);
+  background:#fafaf8;outline:none;transition:border-color .15s var(--ease),background .15s var(--ease);
+}
+.field input[type=text]:focus, .field textarea:focus{border-color:var(--ink);background:#fff;}
+.field textarea{min-height:120px;resize:vertical;line-height:1.6;}
+.file-drop{
+  border:1.5px dashed var(--line);border-radius:8px;padding:24px 16px;
+  text-align:center;color:var(--ink-lo);font-size:12px;cursor:pointer;
+  transition:border-color .15s var(--ease),background .15s var(--ease);
+}
+.file-drop:hover{border-color:var(--ink-faint);background:#fafaf8;}
+.file-drop.has-file{border-style:solid;border-color:var(--brand);color:var(--brand);background:var(--brand-soft);}
+.file-drop input{display:none;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+.btn-cancel{
+  background:transparent;border:1px solid var(--line);color:var(--ink-mid);
+  font-size:13px;font-weight:600;padding:9px 18px;border-radius:22px;cursor:pointer;
+  transition:border-color .15s var(--ease);
+}
+.btn-cancel:hover{border-color:var(--ink-faint);}
+.btn-submit{
+  background:var(--ink);color:#fff;border:none;
+  font-size:13px;font-weight:700;padding:9px 22px;border-radius:22px;cursor:pointer;
+  transition:background .15s var(--ease);
+}
+.btn-submit:hover{background:var(--brand);}
+.btn-submit:disabled{background:var(--ink-faint);cursor:not-allowed;}
+
+/* Detail modal */
+.detail-title{font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:8px;line-height:1.25;}
+.detail-meta{font-size:11px;color:var(--ink-lo);margin-bottom:24px;
+  letter-spacing:.05em;}
+.detail-desc{
+  font-family:"Noto Serif TC",serif;
+  font-size:14px;color:var(--ink);line-height:1.8;
+  white-space:pre-wrap;margin-bottom:24px;
+}
+.detail-attach{
+  background:var(--paper-soft);border-radius:8px;padding:14px 16px;
+  font-size:13px;display:flex;align-items:center;gap:10px;
+  text-decoration:none;color:var(--ink);
+  transition:background .15s var(--ease);
+}
+.detail-attach:hover{background:var(--brand-soft);}
+
+.toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;padding:11px 22px;border-radius:24px;
+  font-size:13px;font-weight:600;letter-spacing:.02em;
+  opacity:0;pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease);
+  z-index:2000;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <span class="brand-name">WUJIE</span><span class="brand-dot"></span>
+    <span class="brand-sub">ERP · 新提案專區</span>
+  </div>
+  <div class="tb-right">
+    <a href="erp-lobby.html" class="btn-sm">← 回大廳</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-num">/ idea pool</div>
+  <h1 class="page-title">新提案專區</h1>
+  <p class="page-sub">全公司的「也許可以做」清單。看到有趣的 IP / 主題 / 玩法，丟進來，大家一起看。</p>
+
+  <div class="cta-row">
+    <button class="cta-primary" onclick="openCreate()">＋ 上傳新提案</button>
+    <span class="cta-hint">標題 + 一句話 + 任何附件（圖 / PDF / 連結截圖）</span>
+  </div>
+
+  <div class="list-section" id="list-section">
+    <div class="list-empty" id="list-empty" style="display:none">
+      還沒有提案。<br>
+      看到值得做的主題 / 角色 / 客戶來信，按上面的「＋ 上傳新提案」丟進來。
+    </div>
+    <div id="list-items"></div>
+  </div>
+</div>
+
+<!-- Create modal -->
+<div class="modal-bg" id="create-modal">
+  <div class="modal">
+    <div class="modal-title">上傳新提案</div>
+    <div class="modal-sub">先丟進來，不用想太完整。其他人會看到，Shawn 會逐個翻。</div>
+
+    <div class="field">
+      <label>標題 *</label>
+      <input type="text" id="f-title" placeholder="例：Muzik Tiger 春季快閃 / 抖音爆紅貓 / 客戶 A 詢的新主題">
+    </div>
+
+    <div class="field">
+      <label>描述（選填）</label>
+      <textarea id="f-desc" placeholder="補充：為什麼覺得值得做？看到什麼數據 / 客戶反應？預期合作對象？"></textarea>
+    </div>
+
+    <div class="field">
+      <label>附件（選填）</label>
+      <label class="file-drop" id="file-drop">
+        <input type="file" id="f-file" accept="image/*,.pdf,.doc,.docx,.xlsx,.pptx,.txt,.zip">
+        <span id="file-drop-text">點此選檔，或拖檔進來</span>
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCreate()">取消</button>
+      <button class="btn-submit" id="btn-submit" onclick="submitIdea()">送出提案</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-bg" id="detail-modal">
+  <div class="modal">
+    <div class="detail-title" id="d-title"></div>
+    <div class="detail-meta" id="d-meta"></div>
+    <div class="detail-desc" id="d-desc"></div>
+    <div id="d-attach-wrap"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDetail()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Session ──
+const sess = JSON.parse(localStorage.getItem('erp_sess')||'null');
+if(!sess||Date.now()-sess.ts>7*86400000){ localStorage.removeItem('erp_sess'); location.href='login.html'; }
+const {user, name} = sess;
+
+const WORKER = 'https://feishu-proxy.raychou6913.workers.dev';
+const AT = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const TBL = 'tbl62CjDdzr6X1x3';
+
+// ── Toast ──
+function toast(msg, dur=2200){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ── Token ──
+let _tk = null, _tkAt = 0;
+async function getToken(){
+  if(_tk && Date.now()-_tkAt < 90*60*1000) return _tk;
+  const r = await fetch(`${WORKER}/auth/token`);
+  const d = await r.json();
+  _tk = d.tenant_access_token; _tkAt = Date.now();
+  return _tk;
+}
+
+// ── List ──
+async function loadList(){
+  const tk = await getToken();
+  const r = await fetch(`${WORKER}/open-apis/bitable/v1/apps/${AT}/tables/${TBL}/records?page_size=100`, {
+    headers: { Authorization: `Bearer ${tk}` },
+  });
+  const d = await r.json();
+  if(d.code !== 0){ console.warn('list fail:', d); return []; }
+  const items = (d.data?.items||[]).map(r => ({
+    id: r.record_id,
+    title: textOf(r.fields['標題']),
+    desc: textOf(r.fields['描述']),
+    submitter: textOf(r.fields['提案人']),
+    ts: r.fields['上傳時間'] || 0,
+    attach: r.fields['附件'] || [],
+  }));
+  items.sort((a,b)=> (b.ts||0) - (a.ts||0));
+  return items;
+}
+function textOf(v){
+  if(!v) return '';
+  if(typeof v === 'string') return v;
+  if(Array.isArray(v)) return v.map(x=>x.text||'').join('');
+  return String(v);
+}
+function fmtTime(ts){
+  if(!ts) return '';
+  const d = new Date(ts);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dayMs = 86400000;
+  const diff = Math.floor((today.getTime() - new Date(d).setHours(0,0,0,0))/dayMs);
+  if(diff === 0) return '今天 ' + d.toTimeString().slice(0,5);
+  if(diff === 1) return '昨天 ' + d.toTimeString().slice(0,5);
+  if(diff < 7) return diff + ' 天前';
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+}
+
+async function renderList(){
+  const items = await loadList();
+  const wrap = document.getElementById('list-items');
+  const empty = document.getElementById('list-empty');
+  if(!items.length){
+    empty.style.display = 'block';
+    wrap.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  wrap.innerHTML = items.map(it => `
+    <div class="idea-card" data-id="${it.id}">
+      <div class="idea-head">
+        <div class="idea-title">${escapeHtml(it.title || '(無標題)')}</div>
+        <div class="idea-meta">${escapeHtml(it.submitter || '匿名')} · ${fmtTime(it.ts)}</div>
+      </div>
+      ${it.desc ? `<div class="idea-desc">${escapeHtml(it.desc)}</div>` : ''}
+      ${it.attach && it.attach.length ? `<div class="idea-attach">📎 ${it.attach.length} 個附件</div>` : ''}
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.idea-card').forEach(card => {
+    card.addEventListener('click', ()=> openDetail(items.find(x=>x.id===card.dataset.id)));
+  });
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ── Create ──
+function openCreate(){
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-file').value = '';
+  document.getElementById('file-drop-text').textContent = '點此選檔，或拖檔進來';
+  document.getElementById('file-drop').classList.remove('has-file');
+  document.getElementById('create-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('f-title').focus(), 100);
+}
+function closeCreate(){
+  document.getElementById('create-modal').classList.remove('open');
+}
+
+document.getElementById('f-file').addEventListener('change', ev => {
+  const f = ev.target.files[0];
+  const drop = document.getElementById('file-drop');
+  const txt = document.getElementById('file-drop-text');
+  if(f){
+    txt.textContent = `已選：${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+    drop.classList.add('has-file');
+  } else {
+    txt.textContent = '點此選檔，或拖檔進來';
+    drop.classList.remove('has-file');
+  }
+});
+
+async function uploadFile(file){
+  const tk = await getToken();
+  const fd = new FormData();
+  fd.append('file_name', file.name);
+  fd.append('parent_type', 'bitable_file');
+  fd.append('parent_node', AT);
+  fd.append('size', String(file.size));
+  fd.append('file', file);
+  const r = await fetch(`${WORKER}/open-apis/drive/v1/medias/upload_all`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tk}` },
+    body: fd,
+  });
+  const d = await r.json();
+  if(d.code !== 0) throw new Error('upload fail: ' + JSON.stringify(d));
+  return d.data.file_token;
+}
+
+async function submitIdea(){
+  const title = document.getElementById('f-title').value.trim();
+  const desc  = document.getElementById('f-desc').value.trim();
+  const file  = document.getElementById('f-file').files[0];
+  if(!title){ toast('請填標題'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = file ? '上傳中…' : '送出中…';
+
+  try {
+    let attachField;
+    if(file){
+      const fileToken = await uploadFile(file);
+      attachField = [{ file_token: fileToken }];
+    }
+    const tk = await getToken();
+    const fields = {
+      '標題': title,
+      '提案人': name || user,
+      '上傳時間': Date.now(),
+    };
+    if(desc) fields['描述'] = desc;
+    if(attachField) fields['附件'] = attachField;
+
+    const r = await fetch(`${WORKER}/open-apis/bitable/v1/apps/${AT}/tables/${TBL}/records`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields }),
+    });
+    const d = await r.json();
+    if(d.code !== 0) throw new Error(JSON.stringify(d));
+
+    toast('已送出，謝謝你的提案！');
+    closeCreate();
+    renderList();
+  } catch(e){
+    console.error(e);
+    toast('送出失敗：' + (e.message||e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '送出提案';
+  }
+}
+
+// ── Detail ──
+function openDetail(it){
+  if(!it) return;
+  document.getElementById('d-title').textContent = it.title || '(無標題)';
+  document.getElementById('d-meta').textContent = `${it.submitter || '匿名'} · ${fmtTime(it.ts)}`;
+  document.getElementById('d-desc').textContent = it.desc || '（沒有補充描述）';
+  const aw = document.getElementById('d-attach-wrap');
+  if(it.attach && it.attach.length){
+    aw.innerHTML = it.attach.map(a => `
+      <a class="detail-attach" href="${a.url||'#'}" target="_blank" rel="noopener">
+        📎 ${escapeHtml(a.name || '附件')} ${a.size ? `<span style="color:var(--ink-lo);font-size:11px;">(${(a.size/1024).toFixed(1)} KB)</span>` : ''}
+      </a>
+    `).join('');
+  } else {
+    aw.innerHTML = '';
+  }
+  document.getElementById('detail-modal').classList.add('open');
+}
+function closeDetail(){
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+// click outside modal to close
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => {
+    if(e.target === bg) bg.classList.remove('open');
+  });
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+renderList();
+</script>
+</body>
+</html>
