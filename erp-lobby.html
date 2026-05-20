@@ -500,31 +500,31 @@ body{
 /* ── AI 對話 hero（中央化 2026-05-18）─────────────── */
 .ai-hero{
   background:linear-gradient(135deg, #fff 0%, #fff8f3 100%);
-  border:1px solid var(--line);border-radius:16px;
-  padding:20px 24px;margin:24px 0 28px;
+  border:1px solid var(--line);border-radius:14px;
+  padding:14px 18px;margin:16px 0 20px;
   box-shadow:0 2px 8px rgba(0,0,0,.03);
 }
 .ai-hero-head{
-  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
 }
 .ai-hero-ava{
-  width:36px;height:36px;border-radius:50%;
+  width:28px;height:28px;border-radius:50%;
   background:var(--brand);color:#fff;
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;
+  font-size:14px;
 }
 .ai-hero-title{
-  font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
+  font-size:13px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
 }
-.ai-hero-sub{font-size:11px;color:var(--ink-lo);margin-top:1px;}
+.ai-hero-sub{font-size:10px;color:var(--ink-lo);margin-top:0;}
 .ai-hero-msgs{
-  max-height:340px;overflow-y:auto;
-  display:flex;flex-direction:column;gap:10px;
-  margin-bottom:12px;padding-right:4px;
+  max-height:200px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:8px;
+  margin-bottom:10px;padding-right:4px;
 }
 .ai-hero-msg{
-  max-width:88%;padding:12px 14px;border-radius:12px;
-  font-size:13px;line-height:1.65;word-wrap:break-word;
+  max-width:88%;padding:10px 13px;border-radius:11px;
+  font-size:13px;line-height:1.6;word-wrap:break-word;
 }
 .ai-hero-msg.bot{
   align-self:flex-start;background:#fff;
@@ -549,19 +549,19 @@ body{
   font-family:Menlo,monospace;font-size:11px;
 }
 .ai-hero-input-row{
-  display:flex;gap:8px;align-items:flex-end;
-  padding-top:12px;border-top:1px solid var(--line);
+  display:flex;gap:6px;align-items:flex-end;
+  padding-top:9px;border-top:1px solid var(--line);
 }
 .ai-hero-input-row textarea{
-  flex:1;resize:none;border:1px solid var(--line);border-radius:10px;
-  padding:10px 12px;font-family:inherit;font-size:13px;
-  outline:none;max-height:120px;min-height:42px;
+  flex:1;resize:none;border:1px solid var(--line);border-radius:9px;
+  padding:8px 11px;font-family:inherit;font-size:13px;
+  outline:none;max-height:100px;min-height:36px;
 }
 .ai-hero-input-row textarea:focus{border-color:var(--brand);}
 .ai-hero-send{
-  padding:11px 18px;background:var(--ink);color:#fff;
-  border:none;border-radius:10px;font-size:13px;font-weight:700;
-  cursor:pointer;font-family:inherit;height:42px;
+  padding:9px 16px;background:var(--ink);color:#fff;
+  border:none;border-radius:9px;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit;height:36px;
 }
 .ai-hero-send:hover{background:var(--brand);}
 .ai-hero-typing{opacity:.5;font-style:italic;font-size:12px;}
@@ -4773,11 +4773,19 @@ async function sendAiHero(){
   if(!text) return;
   input.value = '';
   const box = document.getElementById('ai-hero-msgs');
+  // 第一次送：清掉 onboarding card / greeting，從乾淨對話開始
   const hist = _aiHist();
+  if (hist.length === 0) {
+    box.innerHTML = '';
+    if (!isOnboardingDone()) localStorage.setItem(_onboardKey(), '1');
+  }
   hist.push({ role:'user', content: text });
   _aiHistSet(hist);
-  renderAiHeroMessages();
-  box.insertAdjacentHTML('beforeend', '<div class="ai-hero-msg bot ai-hero-typing" id="ai-hero-typing">思考中...</div>');
+  // 增量加 user 訊息 + typing（不全部 re-render，避免畫面跳兩次）
+  box.insertAdjacentHTML('beforeend',
+    `<div class="ai-hero-msg user">${escapeHtml(text).replace(/\n/g,'<br>')}</div>`);
+  box.insertAdjacentHTML('beforeend',
+    '<div class="ai-hero-msg bot ai-hero-typing" id="ai-hero-typing">思考中...</div>');
   box.scrollTop = box.scrollHeight;
   try {
     const r = await fetch(`${WORKER_BASE}/ai-chat`, {
@@ -4790,8 +4798,14 @@ async function sendAiHero(){
       box.insertAdjacentHTML('beforeend', `<div class="ai-hero-msg error">⚠ ${escapeHtml(d.error || '未知')}</div>`);
       box.scrollTop = box.scrollHeight; return;
     }
-    _aiHistSet(d.history || _aiHist().concat({ role:'assistant', content: d.reply }));
-    renderAiHeroMessages();
+    const newHist = d.history || _aiHist().concat({ role:'assistant', content: d.reply });
+    _aiHistSet(newHist);
+    // 增量加 assistant 訊息（不全部 re-render）
+    const reply = d.reply || '';
+    if (reply) {
+      box.insertAdjacentHTML('beforeend', `<div class="ai-hero-msg bot">${renderMd(reply)}</div>`);
+      box.scrollTop = box.scrollHeight;
+    }
   } catch(e){
     document.getElementById('ai-hero-typing')?.remove();
     box.insertAdjacentHTML('beforeend', `<div class="ai-hero-msg error">⚠ 網路錯誤：${escapeHtml(e.message||String(e))}</div>`);
