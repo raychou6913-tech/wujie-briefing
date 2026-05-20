@@ -1530,16 +1530,20 @@ function renderCanvas(){
       const descEl = card.querySelector('[data-field="desc"]');
       if (descEl) _bindEditable(descEl, v => patchNode(currentFlow, n.id, {desc: v}));
     }
-    // 優化按鈕
+    // 優化按鈕 + Enter 直接送出（Shift+Enter 換行）
     const optBtn = card.querySelector('[data-opt-btn]');
-    if (optBtn) optBtn.addEventListener('click', () => {
-      const inp = card.querySelector('[data-opt-input]');
-      const text = inp.value.trim();
+    const optInp = card.querySelector('[data-opt-input]');
+    const submitOpt = () => {
+      const text = optInp.value.trim();
       if (!text) return;
       const arr = loadNotes();
       arr.push({flow: currentFlow, nodeId: n.id, text, by: name, ts: Date.now()});
       saveNotes(arr);
       renderCanvas();
+    };
+    if (optBtn) optBtn.addEventListener('click', submitOpt);
+    if (optInp) optInp.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); submitOpt(); }
     });
     // 刪 note
     card.querySelectorAll('[data-note-ts]').forEach(b => {
@@ -1701,6 +1705,13 @@ function drawEdge(svgEl, hostEl, flow, e){
     if(!v){
       labelEl.classList.add('empty');
       labelEl.textContent = '+';
+    }
+  });
+  // Enter → commit + 跳出編輯（Shift+Enter 才換行）
+  labelEl.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && !ev.shiftKey) {
+      ev.preventDefault();
+      labelEl.blur();
     }
   });
   wrap.appendChild(labelEl);
