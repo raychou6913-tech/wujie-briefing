@@ -585,29 +585,31 @@ const WORKFLOWS = {
 
   fulfillment: {
     title:'12. 履約出貨流程（接 #1 批發 / 物流面）',
-    sub:'業務簽單成立後 → 客戶付款 → 躍明入帳 → 高維出貨 → 簽收 → 尾款追蹤 → VAM',
-    width:1200, height:400,
+    sub:'業務簽單成立 → 客戶付款 → 躍明入帳 → 業務提出庫單 → 高維出貨 → 簽收 → 尾款 → VAM',
+    width:1280, height:400,
     nodes:[
       // 邊界節點（從 #1 wholesale 跳過來）
       {id:'f0', title:'← 業務面（#1 批發）', owner:'前置：簽單成立', sla:'-', x:30, y:60, desc:'本流程是 #1 批發訂單的下半段 — 業務 / 安然 / Ray 已把關完，合同/報價成立。\n\n👉 點下方看完整業務面流程。', action:'flow:wholesale'},
       // Row 1：收款 → 入帳 → 觸發出貨
       {id:'f1', title:'客戶付款（依條件）', owner:'客戶 → 楊子 / Leo', sla:'依條件', x:280, y:60, desc:'付款時點依客戶屬性 5 種條件走（詳見變量卡 💰）。系統依客戶名單表「付款條件」自動帶並計算收款 SLA。'},
       {id:'f2', title:'躍明確認入帳', owner:'躍明', sla:'1-2 天', x:530, y:60, desc:'銀行對帳收到款項 → 標記入帳。觸發出貨條件：訂金型收 30% / 帳期型暫掛直接觸發 / 全款型收 100% / 寄售型只標出貨。', action:'my-pending'},
-      {id:'f3', title:'通知高維可出貨', owner:'系統訊號', sla:'即時', x:780, y:60, desc:'入帳/條件達標 → 系統自動推播給高維「PO#XXX 可出貨」訊號。帳期型不等收款直接觸發。'},
+      {id:'f2b', title:'銷售提交出庫申請', owner:'業務員', sla:'1-2 天', x:780, y:60, desc:'入帳達標 → 業務員依客戶要貨時間 / 拆批要求 / 指定到貨日 提交正式出庫申請給高維。可選全量 / 分批 / 指定批次。系統自動帶該訂單付款條件 + 客戶資訊。'},
+      {id:'f3', title:'通知高維可出貨', owner:'系統訊號', sla:'即時', x:1030, y:60, desc:'業務提交出庫單後 → 系統自動推播給高維「PO#XXX 可出貨 · 數量 / 客戶 / 路線 / 到貨日」訊號。'},
       // Row 2：出貨 → 簽收 → 收尾款 → VAM
       {id:'f4', title:'高維工廠直發', owner:'高維', sla:'2 天', x:30, y:220, desc:'從工廠倉直接發客戶（不經北京/泰國倉）→ 通知安然 + 業務員 + 客戶。出貨單 / 物流單號寫進「出貨進度」表。', action:'logistics-batch'},
       {id:'f5', title:'客戶簽收確認', owner:'客戶 / 高維', sla:'7 天內', x:280, y:220, desc:'確認到貨數量正確、無破損。異常（少件 / 破損）→ 高維走補貨 / 退換流程。'},
       {id:'f6', title:'尾款 / 帳期追蹤', owner:'楊子 / Leo → 躍明', sla:'依條件', x:530, y:220, desc:'帳期型：簽收後算到期日（30/60/90 天）。訂金型：簽收 7 天內追 70% 尾款。寄售型：等通路月結回報實銷數量。系統自動算到期日 + 逾期 alert。', action:'my-approval'},
       {id:'f7', title:'躍明入帳 → VAM 計入', owner:'躍明', sla:'3 天', x:780, y:220, desc:'剩餘款項全數到帳 → 寫進財務 + 月結對齊 + VAM 800 萬目標計入（JV / 深圳子公司）。', action:'my-pending'},
       // 變量卡：付款條件
-      {id:'fv1', title:'💰 付款條件變量', owner:'客戶屬性（5 種）', sla:'建單自動帶', x:1030, y:60, desc:'5 種付款模式（依客戶名單表「付款條件」屬性自動套）：\n\n① 全款預付：收 100% → 才出貨（新客戶 / 高風險）\n② 訂金 + 尾款：30% → 出貨 → 70%（一般合作）\n③ 帳期 30 天：出貨 → 30 天後付（既有 KA）\n④ 帳期 60-90 天：出貨 → N 天後付（大型 KA / 流通通路）\n⑤ 寄售：出貨不結帳 → 賣掉才結（特殊通路）\n\nERP 改造點：客戶名單表加「付款條件」欄位 → 建訂單自動帶 → f1 / f3 / f6 三棒邏輯依此走。'},
+      {id:'fv1', title:'💰 付款條件變量', owner:'客戶屬性（5 種）', sla:'建單自動帶', x:1030, y:220, desc:'5 種付款模式（依客戶名單表「付款條件」屬性自動套）：\n\n① 全款預付：收 100% → 才出貨（新客戶 / 高風險）\n② 訂金 + 尾款：30% → 出貨 → 70%（一般合作）\n③ 帳期 30 天：出貨 → 30 天後付（既有 KA）\n④ 帳期 60-90 天：出貨 → N 天後付（大型 KA / 流通通路）\n⑤ 寄售：出貨不結帳 → 賣掉才結（特殊通路）\n\nERP 改造點：客戶名單表加「付款條件」欄位 → 建訂單自動帶 → f1 / f2b / f6 三棒邏輯依此走。'},
     ],
     edges:[
       // 邊界進入
       {from:'f0', to:'f1', label:'簽單成立 → 履約'},
       // 主流
       {from:'f1', to:'f2'},
-      {from:'f2', to:'f3', label:'入帳達標'},
+      {from:'f2', to:'f2b', label:'入帳達標'},
+      {from:'f2b', to:'f3', label:'業務出庫申請'},
       {from:'f3', to:'f4'},
       {from:'f4', to:'f5'},
       {from:'f5', to:'f6'},
@@ -616,7 +618,7 @@ const WORKFLOWS = {
       {from:'f5', to:'f4', label:'異常 → 補貨', alt:true},
       // 付款條件變量 → 影響 3 棒
       {from:'fv1', to:'f1', label:'套用', alt:true},
-      {from:'fv1', to:'f3', label:'套用', alt:true},
+      {from:'fv1', to:'f2b', label:'套用', alt:true},
       {from:'fv1', to:'f6', label:'套用', alt:true},
     ],
   },
@@ -1107,6 +1109,57 @@ function patchEdge(flowKey, fromId, toId, patch){
   o.edges[fromId+'|'+toId] = Object.assign({}, o.edges[fromId+'|'+toId]||{}, patch);
   saveFlowOverrides(flowKey, o);
 }
+// 自動排版：按主流 edges 拓樸排序 → grid 4 卡/行
+// 保留所有 title / owner / desc / 邊註，只動 x / y
+function autoLayoutCurrentFlow(){
+  if (currentFlow === 'overview') { showStatusMsg('全景圖不自動排'); return; }
+  if (!confirm('自動排版會重新排列「本流程」所有卡片位置（按順序 grid 4 卡/行）。\n\n你之前的內容 / 邊註 / 連線都不會動，只動位置。\n\n（如果效果不喜歡，可以按 ↶ 還原或 Cmd+Z 回上一步）\n\n確定要排嗎？')) return;
+  const flow = getMergedFlow(currentFlow);
+  if (!flow) return;
+  const mainEdges = (flow.edges||[]).filter(e => !e.alt);
+  // BFS 拓樸層級
+  const inDeg = {}, adj = {};
+  flow.nodes.forEach(n => { inDeg[n.id] = 0; adj[n.id] = []; });
+  mainEdges.forEach(e => {
+    if (inDeg[e.to] !== undefined) inDeg[e.to]++;
+    if (adj[e.from]) adj[e.from].push(e.to);
+  });
+  const seen = new Set();
+  const ordered = [];
+  let frontier = flow.nodes.filter(n => inDeg[n.id] === 0).map(n => n.id);
+  while (frontier.length) {
+    const next = [];
+    frontier.forEach(id => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      ordered.push(id);
+      (adj[id]||[]).forEach(to => { if (!seen.has(to)) next.push(to); });
+    });
+    frontier = [...new Set(next)].filter(id => !seen.has(id));
+  }
+  // 補上孤立 / 循環卡（譬如純被 alt edge 連的變量卡）
+  flow.nodes.forEach(n => { if (!seen.has(n.id)) ordered.push(n.id); });
+  const xGap = 30, yGap = 50;
+  const margin = 30;
+  const maxCol = 4;
+  const cellW = NW + xGap;
+  const cellH = NH + yGap;
+  const newPos = {};
+  ordered.forEach((id, idx) => {
+    const row = Math.floor(idx / maxCol);
+    const col = idx % maxCol;
+    newPos[id] = { x: margin + col * cellW, y: margin + row * cellH };
+  });
+  const o = getFlowOverrides(currentFlow);
+  o.nodes = o.nodes || {};
+  Object.entries(newPos).forEach(([id, pos]) => {
+    o.nodes[id] = Object.assign({}, o.nodes[id]||{}, pos);
+  });
+  saveFlowOverrides(currentFlow, o);
+  renderCanvas();
+  showStatusMsg(`✓ 自動排版完成（${ordered.length} 卡片 / ${Math.ceil(ordered.length/maxCol)} 行）— 不滿意可 Cmd+Z 還原`);
+}
+
 function resetFlow(){
   const flow = WORKFLOWS[currentFlow];
   const msg = `⚠ 確定要還原「${flow?.title || currentFlow}」到原始版本？
@@ -1344,6 +1397,7 @@ function renderCanvas(){
       <button onclick="openTodoListModal()" title="跨流程列出待確認 / 需議卡">⚠ 待議清單</button>
       ${isOverview ? '' : '<button class="wf-add-card" onclick="addNewCard()" title="在當前流程新增一張卡片">＋ 新卡片</button>'}
       <button id="wf-undo-btn" onclick="undoCurrentFlow()" title="還原上一步動作（Cmd/Ctrl+Z 也可）" disabled>↶ 還原</button>
+      ${isOverview ? '' : '<button onclick="autoLayoutCurrentFlow()" title="自動排版：按流程順序重排卡片（保留所有文字 / 內容 / 邊註，只動位置）">✨ 自動排版</button>'}
       <button class="wf-reset" onclick="resetFlow()" title="清掉本流程所有編輯，還原到原始版本（不影響其他流程）">↺ 還原「本流程」預設</button>
     </div>
     <div class="wf-viewport" id="wf-viewport">
