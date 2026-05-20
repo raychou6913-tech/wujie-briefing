@@ -1505,12 +1505,46 @@ async function getProjectList(){
       const f = rec.fields || {};
       const name = Array.isArray(f['項目名稱']) ? (f['項目名稱'][0]?.text||'') : (f['項目名稱']||'');
       const state = typeof f['狀態'] === 'object' ? f['狀態']?.text||f['狀態']?.name||'' : (f['狀態']||'');
-      return { id: rec.record_id, name, state };
+      const cur = typeof f['幣別'] === 'object' ? (f['幣別']?.text||f['幣別']?.name||'CNY') : (f['幣別']||'CNY');
+      return {
+        id: rec.record_id, name, state,
+        expectedExpense: Number(f['預計支出'] || 0),
+        expectedRevenue: Number(f['預計收入'] || 0),
+        currency: cur,
+      };
     })
     .filter(p => p.name && !['已完成','已取消','已歸檔'].includes(p.state));
   _projectListCache = items;
   _projectListCacheAt = Date.now();
   return items;
+}
+
+// 聚合：每個項目的「費用實報」總計（pending + approved）— 給 Shawn modal 算池剩餘用
+let _expenseStatsCache = null, _expenseStatsCacheAt = 0;
+async function getProjectExpenseStats(){
+  if (_expenseStatsCache && Date.now()-_expenseStatsCacheAt < 60*1000) return _expenseStatsCache; // 1 分 cache
+  const tk = await getFeishuToken();
+  const r = await fetch(`${WORKER_BASE}/open-apis/bitable/v1/apps/${FEISHU_AT_V2}/tables/${EXPENSE_TBL}/records?page_size=500`, {
+    headers: { Authorization: `Bearer ${tk}` },
+  });
+  const d = await r.json();
+  const stats = {};
+  (d.data?.items||[]).forEach(rec => {
+    const f = rec.fields || {};
+    const proj = typeof f['關聯項目'] === 'string' ? f['關聯項目'] :
+                  Array.isArray(f['關聯項目']) ? (f['關聯項目'][0]?.text||'') : '';
+    if (!proj) return;
+    const stRaw = f['inbox_state'];
+    const st = typeof stRaw === 'object' ? (stRaw?.text||stRaw?.name||'') : (stRaw||'');
+    const amt = Number(f['實際金額'] || 0);
+    if (!stats[proj]) stats[proj] = { pending:0, approved:0, count:0 };
+    stats[proj].count++;
+    if (st === 'approved') stats[proj].approved += amt;
+    else if (st === 'pending') stats[proj].pending += amt;
+  });
+  _expenseStatsCache = stats;
+  _expenseStatsCacheAt = Date.now();
+  return stats;
 }
 async function fillProjectSelect(selectEl, includeBlank=true){
   selectEl.innerHTML = '<option value="">載入中…</option>';
@@ -2708,20 +2742,84 @@ async function openShawnProjectExpenseModal(){
     ],
   });
   // 等 modal 載入完後加上 關聯項目 + 池資訊提示（從 raw_fields 補資料）
-  setTimeout(() => enrichShawnExpenseList(), 200);
+  await enrichShawnExpenseList();
 }
-function enrichShawnExpenseList(){
+async function enrichShawnExpenseList(){
   const cache = window._workerInboxCache || [];
+  let projectList = [], expenseStats = {};
+  try {
+    [projectList, expenseStats] = await Promise.all([getProjectList(), getProjectExpenseStats()]);
+  } catch(e){ console.warn('enrich fetch fail:', e); }
+  const fmt = n => '¥' + Math.round(n).toLocaleString();
   cache.forEach(it => {
-    const proj = it.raw_fields && (typeof it.raw_fields['關聯項目'] === 'string' ? it.raw_fields['關聯項目'] : (Array.isArray(it.raw_fields['關聯項目']) ? (it.raw_fields['關聯項目'][0]?.text||'') : ''));
+    const rf = it.raw_fields || {};
+    const proj = typeof rf['關聯項目'] === 'string' ? rf['關聯項目'] :
+                  Array.isArray(rf['關聯項目']) ? (rf['關聯項目'][0]?.text||'') : '';
     if (!proj) return;
     const row = document.querySelector(`#gl-list [data-rid="${it.record_id}"]`);
     if (!row || row.querySelector('.proj-tag')) return;
+
+    const project = projectList.find(p => p.name === proj);
+    const poolTotal = project ? project.expectedExpense : 0;
+    const stats = expenseStats[proj] || { pending:0, approved:0 };
+    const used = stats.approved;
+    const remaining = Math.max(0, poolTotal - used);
+    const thisAmount = Number(rf['實際金額'] || 0);
+    const remainingAfter = remaining - thisAmount;
+    const usedPct = poolTotal > 0 ? (used / poolTotal * 100) : 0;
+    const afterPct = poolTotal > 0 ? ((used + thisAmount) / poolTotal * 100) : 0;
+    const insufficient = poolTotal > 0 && remainingAfter < 0;
+    const nearFull = !insufficient && thisAmount > 10000 && poolTotal > 0 && afterPct > 80;
+    const noBudget = poolTotal === 0;
+
+    let bg = '#fff4ef', bd = '#ff6b35', fg = '#ff6b35';
+    if (insufficient) { bg = '#fef2f2'; bd = '#ef4444'; fg = '#ef4444'; }
+    else if (nearFull) { bg = '#fffbeb'; bd = '#f59e0b'; fg = '#92400e'; }
+
     const tag = document.createElement('div');
     tag.className = 'proj-tag';
-    tag.style.cssText = 'background:#fff4ef;border:1px solid #ff6b35;border-radius:6px;padding:6px 10px;font-size:11px;color:#ff6b35;font-weight:700;margin-bottom:8px;';
-    tag.textContent = `📋 關聯項目：${proj}`;
+    tag.style.cssText = `background:${bg};border:1px solid ${bd};border-radius:6px;padding:8px 10px;font-size:11px;color:${fg};font-weight:700;margin-bottom:8px;`;
+
+    if (noBudget) {
+      tag.innerHTML = `📋 關聯項目：${proj} <span style="color:var(--ink-lo);font-weight:400;">（尚未編預算 — 無池可比對，建議升級 Ray）</span>`;
+    } else {
+      const headIcon = insufficient ? '🚨' : (nearFull ? '⚠' : '📋');
+      const afterTxt = insufficient
+        ? `<strong style="color:#ef4444;">超支 ${fmt(-remainingAfter)}（必須升級 Ray）</strong>`
+        : `剩 ${fmt(remainingAfter)}（${afterPct.toFixed(0)}%）`;
+      tag.innerHTML = `
+        ${headIcon} 關聯項目：${proj}
+        <div style="margin-top:6px;font-weight:400;font-size:10.5px;line-height:1.7;color:var(--ink-mid);">
+          項目池 ${fmt(poolTotal)} · 已用 ${fmt(used)}（${usedPct.toFixed(0)}%）· 剩 ${fmt(remaining)}
+          ${stats.pending > 0 ? `<span style="color:#f59e0b;"> · pending 中 ${fmt(stats.pending)}</span>` : ''}
+          <br>此筆 ${fmt(thisAmount)} → 扣完${afterTxt}
+          ${nearFull ? '<br><span style="color:#92400e;font-weight:700;">⚠ 大額（>¥10k）+ 池將 >80%，建議再核一次</span>' : ''}
+        </div>
+      `;
+    }
     row.insertBefore(tag, row.firstChild.nextSibling);
+
+    // 池不夠 → disable 核 OPEX 按鈕 + 凸顯 升級 Ray
+    if (insufficient || noBudget) {
+      const buttons = row.querySelectorAll('button[onclick^="doWorkerInboxAction"]');
+      buttons.forEach(btn => {
+        const onclick = btn.getAttribute('onclick') || '';
+        if (onclick.includes("'approve'")) {
+          btn.disabled = true;
+          btn.style.opacity = '.4';
+          btn.style.cursor = 'not-allowed';
+          btn.title = insufficient ? '池不夠 — 必須升級 Ray' : '本項目尚未編預算 — 建議升級 Ray';
+          btn.onclick = (e) => { e.preventDefault(); showQaToast(insufficient ? '池不夠，請點「升級 Ray」' : '尚未編預算，請點「升級 Ray」'); };
+        } else if (onclick.includes("'upgrade'")) {
+          btn.style.background = '#ef4444';
+          btn.style.color = '#fff';
+          btn.style.border = 'none';
+          btn.style.fontWeight = '700';
+          btn.style.flex = '1';
+          btn.innerHTML = '⬆ 必須升級 Ray（' + (insufficient ? '池不夠' : '無預算') + '）';
+        }
+      });
+    }
   });
 }
 
