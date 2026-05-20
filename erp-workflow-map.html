@@ -625,27 +625,48 @@ const WORKFLOWS = {
 
   expense:{
     title:'2. 員工費用報銷',
-    sub:'每人都會用 · 3 類分流（個人 / 業務 / OPEX）',
-    width:900, height:380,
+    sub:'4 類分流 · 有關聯項目走 Shawn 核 OPEX 線（Ray 5/20 拍板）',
+    width:1280, height:520,
     nodes:[
-      {id:'b1', title:'員工填單', owner:'員工', sla:'發生當天', x:30, y:60, desc:'lobby「+ 錄費用」選類型（個人報銷 / 業務相關 / OPEX）', action:'expense'},
-      {id:'b2', title:'個人報銷', owner:'-', sla:'-', x:230, y:30, desc:'出差 / 餐費 / 通勤 / 設備購置'},
-      {id:'b3', title:'業務相關', owner:'-', sla:'-', x:230, y:130, desc:'客戶招待 / 樣品費 / 場地 / 展位費'},
-      {id:'b4', title:'公司 OPEX', owner:'楊子/Leo', sla:'-', x:230, y:230, desc:'房租 / 水電 / 倉儲 / 行政耗材（楊子 / Leo 自錄）'},
-      {id:'b5', title:'直屬主管', owner:'按角色', sla:'48 hr', x:430, y:60, desc:'採購→賴哥 / 設計→Bevis / 業務→安然 / 物流電商→Shawn'},
-      {id:'b6', title:'安然複核', owner:'安然', sla:'48 hr', x:430, y:130, desc:'業務相關費用安然把關（合理性 / IP 對應）'},
-      {id:'b7', title:'楊子/Leo', owner:'楊子/Leo', sla:'3 天', x:630, y:90, desc:'初審入帳前對齊 OPEX 預算 + 票據檢查', action:'my-approval'},
-      {id:'b8', title:'躍明入帳', owner:'躍明', sla:'5 天', x:830, y:90, desc:'寫進財務 + 月結對齊', action:'my-pending'},
-      {id:'b9', title:'寫入 HR 中心', owner:'-', sla:'即時', x:430, y:230, desc:'OPEX 直接寫入「預算 vs 實際」對照表，不需審核。'},
+      // 起點
+      {id:'b1', title:'員工填單', owner:'員工', sla:'發生當天', x:30, y:200, desc:'lobby「+ 錄費用」選類型，並可選「關聯項目」（選了 → 走 Shawn 核 OPEX 線 / 不選 → 走楊子既有線）。', action:'expense'},
+      // 分流 4 類
+      {id:'b2',  title:'① 個人報銷',          owner:'員工自己',          sla:'-', x:280, y:30,  desc:'員工因公花的個人款項。\n例：出差餐費 / 通勤 / 自費耗材 / onboarding 學習費。\n→ 不掛項目（屬 OPEX 攤平）。'},
+      {id:'b3',  title:'② 供應商請款（B2B）',  owner:'採購 / 業務',       sla:'-', x:280, y:150, desc:'幫外部供應商付款 / 代墊。\n例：工廠尾款 / 樣品費 / 外包設計費 / 場地費 / 廠端材料費。\n→ 幾乎都掛項目（因項目而生）。'},
+      {id:'b3b', title:'③ 項目員工差旅 ★ 新類',  owner:'員工自己（因項目花）', sla:'-', x:280, y:270, desc:'員工因項目而出差 / 招待 / 樣品試做。\n例：曼谷快閃場勘 / 開幕值班 / 客戶拜訪。\n→ 必掛項目（這是雙軌制要解的本體）。'},
+      {id:'b4',  title:'④ 公司 OPEX',         owner:'楊子 / Leo',        sla:'-', x:280, y:390, desc:'公司固定成本，攤平不掛項目。\n例：房租 / 水電 / 倉儲 / 行政耗材。'},
+      // 核准線
+      {id:'b5',  title:'直屬主管核',           owner:'按角色',            sla:'48 hr', x:530, y:30,  desc:'設計→Bevis / 採購→賴哥 / 業務→安然 / 物流電商→Shawn — 看員工部門路由。'},
+      {id:'b6',  title:'賴哥 / 採購主管核',     owner:'賴哥',             sla:'48 hr', x:530, y:150, desc:'供應商請款由採購主管（賴哥）審核 — 看 PO 對應 / 付款條件 / 廠商記錄。\n若有掛項目 → 同時走 Shawn 核 OPEX。', action:'my-po'},
+      {id:'b6b', title:'Shawn 核 OPEX ★',      owner:'Shawn',            sla:'48 hr', x:530, y:270, desc:'有關聯項目的費用走這條 — Shawn 編預算他最知道池狀況，核准 OPEX 入帳。\n→ 池夠 → 直接送躍明\n→ 池不夠 → 強制升級 Ray\n→ 整筆 >¥10k 且池 >80% → 警示 + 通知 Shawn', action:'project-expense-approve'},
+      {id:'b9',  title:'寫入 HR 中心',          owner:'系統自動',          sla:'即時', x:530, y:390, desc:'OPEX 直接寫入「預算 vs 實際」對照表，不需審核（楊子 / Leo 自錄）。'},
+      // 第二層彙整
+      {id:'b7',  title:'楊子 / Leo 初審',       owner:'楊子 / Leo',       sla:'3 天', x:780, y:90,  desc:'初審入帳前對齊 HR 費用預算 + 票據檢查（個人報銷 + 供應商請款 走這條）。', action:'my-approval'},
+      {id:'b7b', title:'升級 Ray ★',           owner:'Ray',              sla:'24 hr', x:780, y:270, desc:'項目池不夠時 Shawn 升級 Ray 親核 — Ray 決定要不要超支動用備用預算 / 或退回業務面重議。', action:'ray-approval'},
+      // 終點
+      {id:'b8',  title:'躍明入帳',              owner:'躍明',              sla:'5 天', x:1030, y:180, desc:'全部流向最後一站 — 寫進財務 + 月結對齊 + 對應項目 P&L（若有關聯項目 → 該項目實際支出 +1 筆）。', action:'my-pending'},
     ],
     edges:[
-      {from:'b1', to:'b2', label:'個人'},
-      {from:'b1', to:'b3', label:'業務'},
-      {from:'b1', to:'b4', label:'OPEX'},
-      {from:'b2', to:'b5'}, {from:'b5', to:'b7'},
-      {from:'b3', to:'b5'}, {from:'b5', to:'b6'}, {from:'b6', to:'b7'},
-      {from:'b7', to:'b8'},
+      // 分流
+      {from:'b1', to:'b2',  label:'個人'},
+      {from:'b1', to:'b3',  label:'B2B 供應商'},
+      {from:'b1', to:'b3b', label:'項目差旅'},
+      {from:'b1', to:'b4',  label:'OPEX'},
+      // ① 個人報銷
+      {from:'b2', to:'b5'},
+      {from:'b5', to:'b7'},
+      // ② 供應商請款 (B2B)
+      {from:'b3', to:'b6'},
+      {from:'b6', to:'b7'},
+      // ③ 項目費用 (NEW) — 走 Shawn 核 OPEX
+      {from:'b3b', to:'b6b', label:'有關聯項目'},
+      {from:'b6b', to:'b8',  label:'池夠 → 直接入帳'},
+      {from:'b6b', to:'b7b', label:'池不夠 → 升級', alt:true},
+      {from:'b7b', to:'b8',  label:'Ray 核'},
+      // ④ OPEX 自動
       {from:'b4', to:'b9'},
+      // 楊子線 → 躍明
+      {from:'b7', to:'b8'},
     ],
   },
 
