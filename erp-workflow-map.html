@@ -1228,22 +1228,29 @@ function resetFlow(){
 }
 
 // ── 新增卡片到當前流程 ──
-function addNewCard(){
+function addNewCard(atX, atY){
   if (currentFlow === 'overview') { alert('全景圖唯讀，請進對應流程加卡片'); return; }
   const flow = getMergedFlow(currentFlow);
   if (!flow) return;
   const o = getFlowOverrides(currentFlow);
   const id = 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-  // 放在現有卡片右下角偏移處
-  const maxX = Math.max(...flow.nodes.map(n => n.x), 30);
-  const maxY = Math.max(...flow.nodes.map(n => n.y), 30);
+  // 若有指定座標 → 用該位置（雙擊空白）；否則放右下角偏移（按鈕新增）
+  let x, y;
+  if (typeof atX === 'number' && typeof atY === 'number') {
+    x = _snap(Math.max(0, atX - NW/2));
+    y = _snap(Math.max(0, atY - NH/2));
+  } else {
+    const maxX = Math.max(...flow.nodes.map(n => n.x), 30);
+    const maxY = Math.max(...flow.nodes.map(n => n.y), 30);
+    x = _snap(maxX + 30);
+    y = _snap(Math.min(maxY + 30, 60));
+  }
   const newNode = {
     id,
     title: '新卡片（點此編輯）',
     owner: '待定',
     sla: '-',
-    x: maxX + 30,
-    y: Math.min(maxY + 30, 60),
+    x, y,
     desc: '新增的流程環節，請編輯內容。'
   };
   o.add_nodes = o.add_nodes || [];
@@ -1463,7 +1470,7 @@ function renderCanvas(){
   }
   const toolbarMsg = isOverview
     ? '📌 全景圖 · 內容從各流程自動同步 · 拖卡片重排 / 看流程細節跳對應 tab'
-    : `📌 ${flow.title} · ${flow.sub} · 點卡片展開 / 拖移 / 編輯 / 右下角 ✓ 需議標確認狀態`;
+    : `📌 ${flow.title} · 點展開 / 拖移自動對齊 / 雙擊空白加卡 / 右下 ✓⚠ 標確認狀態`;
   // Owner 顏色 legend（hover 看顏色對應）
   const legendHtml = `
     <span class="wf-legend" title="卡片左上角顏色點 = 該卡 owner 分類">
@@ -1694,6 +1701,15 @@ function renderCanvas(){
       if (selectedNodeId) selectNode(null);
     }
   });
+  // 雙擊空白處 → 在游標位置新增卡片
+  hostEl.addEventListener('dblclick', e => {
+    if (currentFlow === 'overview') return;
+    if (e.target !== hostEl && e.target.tagName !== 'svg' && e.target.tagName !== 'SVG') return;
+    const rect = hostEl.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / _view.scale;
+    const y = (e.clientY - rect.top) / _view.scale;
+    addNewCard(x, y);
+  });
 
   // 綁 pan/zoom + 套用 view state
   bindPanZoom();
@@ -1832,12 +1848,15 @@ document.addEventListener('mousemove', ev => {
   dragState.card.style.left = Math.max(0, dragState.startLeft + dx) + 'px';
   dragState.card.style.top  = Math.max(0, dragState.startTop + dy) + 'px';
 });
+// Snap to grid（拖完自動對齊網格）— 卡寬 172 + gap 30 = step 約 50px 較順
+const SNAP_GRID = 25;
+function _snap(v){ return Math.round(v / SNAP_GRID) * SNAP_GRID; }
 document.addEventListener('mouseup', () => {
   if(!dragState) return;
   const wasMoved = dragState.moved;
   if (wasMoved){
-    const x = parseFloat(dragState.card.style.left) || 0;
-    const y = parseFloat(dragState.card.style.top) || 0;
+    const x = _snap(parseFloat(dragState.card.style.left) || 0);
+    const y = _snap(parseFloat(dragState.card.style.top) || 0);
     patchNode(currentFlow, dragState.nodeId, {x, y});
     dragState.card.classList.remove('dragging');
   }
