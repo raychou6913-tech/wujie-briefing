@@ -372,8 +372,12 @@ body.wf-connecting .wf-card[data-id]:hover{outline:2px solid var(--brand);outlin
   transition:opacity .15s, border-color .15s;
 }
 .wf-edge-label.alt{color:var(--danger);border-color:#fca5a5;background:#fef2f2;}
-.wf-edge-label.empty{opacity:.25;font-size:14px;line-height:.9;padding:2px 5px;}
-.wf-edge-label.empty:hover{opacity:.6;}
+.wf-edge-label.empty{
+  opacity:.85;font-size:14px;line-height:1;padding:3px 9px;
+  background:var(--brand-soft);color:var(--brand);
+  border-color:var(--brand);font-weight:800;cursor:pointer;
+}
+.wf-edge-label.empty:hover{opacity:1;background:#fff;}
 .wf-edge-label:focus{border-color:var(--brand);opacity:1;background:#fff;}
 
 .wf-toolbar{
@@ -859,6 +863,7 @@ function switchFlow(key){
   selectedNodeId = null;
   renderTabs();
   renderCanvas();
+  updateUndoBtn();
 }
 
 // ── 編輯狀態 localStorage（每個流程獨立） ──
@@ -931,8 +936,50 @@ function getFlowOverrides(flowKey){
   return _wfGet('edits_'+flowKey+'_v1') || {};
 }
 function saveFlowOverrides(flowKey, edits){
+  pushUndoIfNeeded(flowKey);
   _wfSet('edits_'+flowKey+'_v1', edits);
 }
+
+// ── Undo 系統（每流程獨立 stack）──
+const _undoStack = {};
+const _undoLimit = 30;
+let _undoSuppress = false;
+function pushUndoIfNeeded(flowKey){
+  if(_undoSuppress) return;
+  const cur = _wfGet('edits_'+flowKey+'_v1') || {};
+  const json = JSON.stringify(cur);
+  const stk = (_undoStack[flowKey] = _undoStack[flowKey] || []);
+  if(stk.length && stk[stk.length-1] === json) return; // dedup
+  stk.push(json);
+  if(stk.length > _undoLimit) stk.shift();
+  updateUndoBtn();
+}
+function undoCurrentFlow(){
+  const stk = _undoStack[currentFlow] || [];
+  if(stk.length === 0){ showStatusMsg('沒有可還原的動作'); return; }
+  const prev = stk.pop();
+  _undoSuppress = true;
+  _wfSet('edits_'+currentFlow+'_v1', JSON.parse(prev));
+  _undoSuppress = false;
+  renderCanvas();
+  updateUndoBtn();
+  showStatusMsg('↶ 已還原上一步');
+}
+function updateUndoBtn(){
+  const btn = document.getElementById('wf-undo-btn');
+  if(!btn) return;
+  const cnt = (_undoStack[currentFlow] || []).length;
+  btn.disabled = cnt === 0;
+  btn.textContent = cnt > 0 ? `↶ 還原（${cnt}）` : '↶ 還原';
+}
+// Cmd/Ctrl+Z 快捷鍵（focus 在 contenteditable / input / textarea 時走 native undo）
+document.addEventListener('keydown', e => {
+  if((e.metaKey || e.ctrlKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey){
+    if(document.activeElement && document.activeElement.matches('[contenteditable="true"], input, textarea')) return;
+    e.preventDefault();
+    undoCurrentFlow();
+  }
+});
 function getMergedFlow(flowKey){
   const f = WORKFLOWS[flowKey];
   if(!f) return null;
@@ -1064,7 +1111,9 @@ function resetFlow(){
   const flow = WORKFLOWS[currentFlow];
   const msg = `⚠ 確定要還原「${flow?.title || currentFlow}」到原始版本？
 
-會清掉：
+📍 範圍：只影響「${flow?.title || currentFlow}」這一個 tab。其他流程不會被動。
+
+會清掉（本流程）：
 ✗ 卡片位置（拖拉）
 ✗ 卡片內容編輯（title / owner / SLA / desc）
 ✗ 邊註文字（箭頭標籤）
@@ -1074,11 +1123,12 @@ function resetFlow(){
 不會清：
 ✓ ✓⚠ 確認狀態 chips（跨流程共用）
 ✓ 💡 優化建議 notes（跨流程共用）
+✓ 其他 tab（業務面 / 履約 / 採購 等）
 
-此操作會即時同步雲端，沒有 undo。`;
+❗ 還原後可以用「↶ 還原」按鈕或 Cmd+Z 一步一步退回；但點「再次確認」之後此狀態會立刻同步雲端。`;
   if(!confirm(msg)) return;
-  if(!confirm('再次確認：真的要還原嗎？（會立刻同步給所有人）')) return;
-  _wfSet('edits_'+currentFlow+'_v1', {});
+  if(!confirm('再次確認：真的要還原「' + (flow?.title || currentFlow) + '」嗎？（會立刻同步給所有人）')) return;
+  saveFlowOverrides(currentFlow, {});  // 走 saveFlowOverrides 才會記錄 undo
   renderCanvas();
 }
 
@@ -1293,7 +1343,8 @@ function renderCanvas(){
       </span>
       <button onclick="openTodoListModal()" title="跨流程列出待確認 / 需議卡">⚠ 待議清單</button>
       ${isOverview ? '' : '<button class="wf-add-card" onclick="addNewCard()" title="在當前流程新增一張卡片">＋ 新卡片</button>'}
-      <button class="wf-reset" onclick="resetFlow()" title="清掉所有編輯，還原流程到原始版本（沒 undo）">↺ 還原預設</button>
+      <button id="wf-undo-btn" onclick="undoCurrentFlow()" title="還原上一步動作（Cmd/Ctrl+Z 也可）" disabled>↶ 還原</button>
+      <button class="wf-reset" onclick="resetFlow()" title="清掉本流程所有編輯，還原到原始版本（不影響其他流程）">↺ 還原「本流程」預設</button>
     </div>
     <div class="wf-viewport" id="wf-viewport">
       <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
@@ -1484,6 +1535,7 @@ function renderCanvas(){
   // 綁 pan/zoom + 套用 view state
   bindPanZoom();
   applyView();
+  updateUndoBtn();
 }
 
 function drawEdge(svgEl, hostEl, flow, e){
