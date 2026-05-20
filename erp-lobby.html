@@ -1187,7 +1187,7 @@ body{
     <div class="qa-modal-hd">
       <div>
         <div class="qa-modal-title">📝 供應商付款申請</div>
-        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">送賴哥審核 → Ray 核准 → 躍明付款</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">送楊子審核 → 躍明付款</div>
       </div>
       <button class="qa-modal-close" onclick="closePaymentReqModal()">✕</button>
     </div>
@@ -1212,7 +1212,7 @@ body{
     </div>
     <div class="qa-field"><label>對應 PO 或項目</label><input id="pr-po" placeholder="例：PO#320 Snoopy 大貨 / 吉依卡哇 模具"></div>
     <div class="qa-field"><label>備註</label><textarea id="pr-notes" rows="2" placeholder="廠商開票資訊 / 付款方式 / 特殊要求"></textarea></div>
-    <button class="qa-submit" onclick="submitPaymentReq()">送出 → 賴哥審核</button>
+    <button class="qa-submit" onclick="submitPaymentReq()">送出 → 楊子審核</button>
   </div>
 </div>
 
@@ -1460,6 +1460,27 @@ const {user, name, role, hall, color} = sess;
 // Worker proxy（飛書讀寫 + AI chat 統一走這個）
 const WORKER_BASE = 'https://feishu-proxy.raychou6913.workers.dev';
 
+// 直寫飛書 helper（送楊子 inbox 用：木子付款申請 / 高維運費登錄）
+const FEISHU_AT_V2 = 'Sg7ObNELHaAdZzshGIFjWPVhpce';
+const EXPENSE_TBL = 'tblvGsQpXPHtkp1C'; // 費用實報
+let _feishuTk = null, _feishuTkAt = 0;
+async function getFeishuToken(){
+  if(_feishuTk && Date.now()-_feishuTkAt < 90*60*1000) return _feishuTk;
+  const r = await fetch(`${WORKER_BASE}/auth/token`);
+  const d = await r.json();
+  _feishuTk = d.tenant_access_token; _feishuTkAt = Date.now();
+  return _feishuTk;
+}
+async function writeExpenseRecord(fields){
+  const tk = await getFeishuToken();
+  const r = await fetch(`${WORKER_BASE}/open-apis/bitable/v1/apps/${FEISHU_AT_V2}/tables/${EXPENSE_TBL}/records`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields }),
+  });
+  return r.json();
+}
+
 // 沒有專屬廳的員工 → 送去填報中心
 const NO_HALL_USERS = [];
 const effectiveHall = NO_HALL_USERS.includes(user) ? 'forms/index.html' : hall;
@@ -1696,7 +1717,7 @@ const MY_TODOS = {
   ],
   muzi:[
     {id:'m1',icon:'📦',title:'PO#318 備貨核對 — 貓福珊迪公仔',sub:'廠端確認 · 應收 1200pcs · 立即核對',urgency:'high',status:'待確認',action:'stock-check'},
-    {id:'m2',icon:'📝',title:'供應商付款申請：東莞廠頭款',sub:'¥42,000 · 立即填單送賴哥審核',urgency:'high',status:'待填報',action:'payment-request'},
+    {id:'m2',icon:'📝',title:'供應商付款申請：東莞廠頭款',sub:'¥42,000 · 立即填單送楊子審核',urgency:'high',status:'待填報',action:'payment-request'},
   ],
   bevis:[
     {id:'b1',icon:'🎨',title:'貓福珊迪夏日系列 — 3D稿第3輪審核',sub:'外包設計師 · 等待 2 天 · 立即審核',urgency:'high',status:'待審核',action:'design-approve'},
@@ -1853,7 +1874,7 @@ function _collectMySent(){
   try {
     JSON.parse(localStorage.getItem('muzi_payment_req_v1')||'[]').forEach(p => {
       if(user === 'muzi'){
-        items.push({title:`付款申請：${p.supplier} · ${p.type}`, amt:`¥${p.amount}`, waiting:'賴哥 → Ray → 躍明', days:ago(p.ts)});
+        items.push({title:`付款申請：${p.supplier} · ${p.type}`, amt:`¥${p.amount}`, waiting:'楊子 → 躍明', days:ago(p.ts)});
       }
     });
   } catch(e){}
@@ -2348,25 +2369,53 @@ function openFreightLogModal(){
   document.getElementById('freight-log-modal').classList.add('show');
 }
 function closeFreightLogModal(){ document.getElementById('freight-log-modal').classList.remove('show'); }
-function submitFreightLog(){
+async function submitFreightLog(){
   const amount = document.getElementById('fl-amount').value.trim();
   if(!amount){ alert('請填寫運費金額'); return; }
-  const rec = {
-    vendor:document.getElementById('fl-vendor').value,
-    no:document.getElementById('fl-no').value.trim(),
-    route:document.getElementById('fl-route').value.trim(),
-    order:document.getElementById('fl-order').value.trim(),
-    amount:Number(amount),
-    date:document.getElementById('fl-date').value,
-    notes:document.getElementById('fl-notes').value.trim(),
-    by:name, ts:Date.now(),
+  const vendor = document.getElementById('fl-vendor').value;
+  const no = document.getElementById('fl-no').value.trim();
+  const route = document.getElementById('fl-route').value.trim();
+  const order = document.getElementById('fl-order').value.trim();
+  const dateStr = document.getElementById('fl-date').value;
+  const notes = document.getElementById('fl-notes').value.trim();
+  const NOW = Date.now();
+  const remark = [no && `運單：${no}`, route && `路線：${route}`, order && `對應：${order}`, notes].filter(Boolean).join(' · ');
+  const fields = {
+    '費用標題': `運費 · ${vendor}${order?' · '+order:''}`,
+    '申請人': name || user,
+    '費用類別': '運費',
+    '實際金額': Number(amount),
+    '幣別': 'CNY',
+    '金額（萬元）': Number(amount) / 10000,
+    '發生日期': dateStr ? new Date(dateStr).getTime() : NOW,
+    '備註': remark,
+    '供應商': vendor,
+    'inbox_state': 'pending',
+    'owner': 'yangzi',
+    'submitted_by': user,
+    'created_at': NOW,
+    'updated_at': NOW,
+    'version': 1,
+    'urgency': 'normal',
   };
+
+  try {
+    const d = await writeExpenseRecord(fields);
+    if (d.code !== 0) throw new Error(JSON.stringify(d));
+  } catch (e) {
+    console.error('freight-log feishu write fail:', e);
+    showQaToast('送出失敗：' + (e.message || e));
+    return;
+  }
+
+  // 本地 cache 給高維自己追蹤
+  const rec = {vendor, no, route, order, amount:Number(amount), date:dateStr, notes, by:name, ts:NOW};
   const arr = JSON.parse(localStorage.getItem('gaowei_freight_v1')||'[]');
   arr.unshift(rec);
   localStorage.setItem('gaowei_freight_v1', JSON.stringify(arr));
   closeFreightLogModal();
   markCurrentTodoDone();
-  showQaToast(`✓ 運費 ¥${amount} 已登錄（${rec.vendor}）`);
+  showQaToast(`✓ 運費 ¥${amount} 已登錄送楊子（${vendor}）`);
 }
 
 // Bevis：bedo 輸出
@@ -3198,7 +3247,7 @@ function openPaymentReqModal(){
   document.getElementById('payment-req-modal').classList.add('show');
 }
 function closePaymentReqModal(){ document.getElementById('payment-req-modal').classList.remove('show'); }
-function submitPaymentReq(){
+async function submitPaymentReq(){
   const supplier = document.getElementById('pr-supplier').value;
   const type = document.getElementById('pr-type').value;
   const amount = document.getElementById('pr-amount').value.trim();
@@ -3206,16 +3255,51 @@ function submitPaymentReq(){
   const po = document.getElementById('pr-po').value.trim();
   const notes = document.getElementById('pr-notes').value.trim();
   if(!amount){ alert('請填寫金額'); return; }
-  const rec = {supplier, type, amount:Number(amount), deadline, po, notes, submitter:name, ts:Date.now(), status:'pending-laige'};
+
+  // 緊急判斷：付款期限 ≤ 3 天 → high
+  let urgency = 'normal';
+  if (deadline) {
+    const days = Math.floor((new Date(deadline).getTime() - Date.now())/86400000);
+    if (days <= 3) urgency = 'high';
+  }
+  const remark = [po && `對應：${po}`, notes].filter(Boolean).join(' · ');
+  const NOW = Date.now();
+  const fields = {
+    '費用標題': `${supplier} · ${type}`,
+    '申請人': name || user,
+    '費用類別': '工廠尾款',
+    '實際金額': Number(amount),
+    '幣別': 'CNY',
+    '金額（萬元）': Number(amount) / 10000,
+    '發生日期': deadline ? new Date(deadline).getTime() : NOW,
+    '備註': remark,
+    '供應商': supplier,
+    'inbox_state': 'pending',
+    'owner': 'yangzi',
+    'submitted_by': user,
+    'created_at': NOW,
+    'updated_at': NOW,
+    'version': 1,
+    'urgency': urgency,
+  };
+
+  try {
+    const d = await writeExpenseRecord(fields);
+    if (d.code !== 0) throw new Error(JSON.stringify(d));
+  } catch (e) {
+    console.error('payment-req feishu write fail:', e);
+    showQaToast('送出失敗：' + (e.message || e));
+    return;
+  }
+
+  // 本地 cache 給 muzi 自己的「進行中」追蹤顯示
+  const rec = {supplier, type, amount:Number(amount), deadline, po, notes, submitter:name, ts:NOW, status:'pending-yangzi'};
   const arr = JSON.parse(localStorage.getItem('muzi_payment_req_v1')||'[]');
   arr.unshift(rec);
   localStorage.setItem('muzi_payment_req_v1', JSON.stringify(arr));
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  notif.unshift({ts:Date.now(), from:name, to:'laige', msg:`木子付款申請：${supplier} · ${type} · ¥${amount}${po?' · '+po:''}`});
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   closePaymentReqModal();
   markCurrentTodoDone();
-  showQaToast(`✓ 付款申請已送 → 賴哥審核`);
+  showQaToast(`✓ 付款申請已送 → 楊子審核`);
 }
 
 // ── 安然 modal × 3：合約待批 / 跨境款項 / IP 維護 ──
