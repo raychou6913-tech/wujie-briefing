@@ -958,7 +958,7 @@ body{
   </div>
 </div>
 
-<!-- 珮玲：主題企劃 MODAL -->
+<!-- 珮綾：主題企劃 MODAL -->
 <div class="qa-modal-bg" id="theme-plan-modal" onclick="if(event.target===this)closeThemePlanModal()">
   <div class="qa-modal" style="max-width:580px;">
     <div class="qa-modal-hd">
@@ -1125,7 +1125,7 @@ body{
   </div>
 </div>
 
-<!-- 珮玲：送審追蹤 MODAL -->
+<!-- 珮綾：送審追蹤 MODAL -->
 <div class="qa-modal-bg" id="approval-track-modal" onclick="if(event.target===this)closeApprovalTrackModal()">
   <div class="qa-modal" style="max-width:580px;">
     <div class="qa-modal-hd">
@@ -2084,8 +2084,8 @@ const STALE_SLA = {
   'ray_approval_v1':         {filter:i=>!i.done, sla:{high:1,normal:2}, source:'Ray 待批核', who:'Ray', whoUser:'ray', domain:'ray', domainOwner:'ray'},
   'bevis_design_approve_v1': {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計核准', who:'Bevis', whoUser:'bevis', domain:'bevis', domainOwner:'bevis'},
   'bevis_bedo_v1':           {filter:i=>!i.done, sla:{high:1,normal:5}, source:'bedo 輸出', who:'Bevis', whoUser:'bevis', domain:'bevis', domainOwner:'bevis'},
-  'peilin_approval_track_v1':{filter:i=>!i.done, sla:{high:7,normal:14}, source:'送審追蹤', who:'珮玲', whoUser:'peilin', domain:'bevis', domainOwner:'bevis'},
-  'peilin_theme_v1':         {filter:i=>!i.done, sla:{high:3,normal:7}, source:'主題企劃', who:'珮玲', whoUser:'peilin', domain:'bevis', domainOwner:'bevis'},
+  'peilin_approval_track_v1':{filter:i=>!i.done, sla:{high:7,normal:14}, source:'送審追蹤', who:'珮綾', whoUser:'peilin', domain:'bevis', domainOwner:'bevis'},
+  'peilin_theme_v1':         {filter:i=>!i.done, sla:{high:3,normal:7}, source:'主題企劃', who:'珮綾', whoUser:'peilin', domain:'bevis', domainOwner:'bevis'},
   'shetong_design_task_v1':  {filter:i=>!i.done, sla:{high:1,normal:3}, source:'設計任務', who:'詩彤', whoUser:'shetong', domain:'bevis', domainOwner:'bevis'},
   'laige_po_v1':             {filter:i=>!i.archived, sla:{high:3,normal:7}, source:'PO 進度', who:'賴哥', whoUser:'laige', domain:'anran', domainOwner:'anran'},
   'muzi_stock_check_v1':     {filter:i=>!i.confirmed, sla:{high:1,normal:2}, source:'備貨核對', who:'木子', whoUser:'muzi', domain:'anran', domainOwner:'anran'},
@@ -2388,7 +2388,7 @@ function doBedoAction(id, action){
   showQaToast(`✓ ${item ? item.name : id} · ${action==='approved'?'已全部核准進圖庫':'已部分核准'}`);
 }
 
-// 珮玲：主題企劃
+// 珮綾：主題企劃
 const THEME_PLAN_SEED = [
   {id:'tp1', name:'Q3 主題：Snoopy × 校園回憶', stage:'草案', urgency:'high', detail:'9 月開學季主題；參考過去吉依卡哇校園系列；需 Bevis 設計團隊評估。'},
   {id:'tp2', name:'Q4 主題：Mofusand 萬聖節', stage:'初步發想', urgency:'med', detail:'貓福珊迪萬聖節限定；需 IP 方授權確認 + 設計提案。'},
@@ -2414,7 +2414,7 @@ function doThemeAction(id, action){
   const item = _genericDone('peilin_theme_v1', id, '');
   if(action === 'to-bevis'){
     const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`珮玲轉 Bevis：${item ? item.name : id} · 進設計階段`});
+    notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`珮綾轉 Bevis：${item ? item.name : id} · 進設計階段`});
     localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
   }
   openThemePlanModal();
@@ -2636,7 +2636,7 @@ async function openChaseModal(){
 function closeChaseModal(){ document.getElementById('chase-modal').classList.remove('show'); }
 // 統一 hidden key — Worker 用 kind:record_id；local 用 key:itemId
 function _chaseHideKey(s){ return s._origin === 'worker' ? (s._kind + ':' + s._recordId) : (s._key + ':' + s._itemId); }
-const NAME_TO_USER = {'楊子':'yangzi','Leo':'leo','安然':'anran','賴哥':'laige','木子':'muzi','Bevis':'bevis','珮玲':'peilin','詩彤':'shetong','高維':'gaowei','春雷':'chunlei','佳音':'jiaying','Ray':'ray'};
+const NAME_TO_USER = {'楊子':'yangzi','Leo':'leo','安然':'anran','賴哥':'laige','木子':'muzi','Bevis':'bevis','珮綾':'peilin','詩彤':'shetong','高維':'gaowei','春雷':'chunlei','佳音':'jiaying','Ray':'ray'};
 
 function doChasePush(idx){
   const s = window._chaseStaleCache[idx]; if(!s) return;
@@ -2718,7 +2718,7 @@ function doRayApproval(id, action){
   const item = _genericDone('ray_approval_v1', id, '');
   const labels = {approved:'已批准 · 通知執行', revise:'已退回 · 通知送出者修改', hold:'已暫緩 · 通知送出者等待'};
   const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  const FROM_USER = {'Shawn':'shawn','安然':'anran','楊子':'yangzi','賴哥':'laige','躍明':'yuming','Bevis':'bevis','珮玲':'peilin'};
+  const FROM_USER = {'Shawn':'shawn','安然':'anran','楊子':'yangzi','賴哥':'laige','躍明':'yuming','Bevis':'bevis','珮綾':'peilin'};
   const toUser = item && item.from ? (FROM_USER[item.from] || 'anran') : 'anran';
   if(action === 'approved'){
     notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`✓ Ray 批准：${item ? item.title : id}`});
@@ -2762,7 +2762,7 @@ function submitVisitLog(){
   showQaToast(`✓ ${client} 拜訪記錄已寫入 CRM`);
 }
 
-// ── 高維 / Bevis / 珮玲 / 詩彤 modal × 4 ──
+// ── 高維 / Bevis / 珮綾 / 詩彤 modal × 4 ──
 // 通用 list-modal helper：render demo list with action buttons
 function _genericListRender(listEl, items, renderItem, emptyMsg){
   const arr = items.filter(i => !i.done);
@@ -2914,7 +2914,7 @@ async function doDesignAction(recordId, action){
   }
 }
 
-// 珮玲：送審追蹤（飛書直連 2026-05-16）
+// 珮綾：送審追蹤（飛書直連 2026-05-16）
 window._approvalTrackCache = [];
 
 async function openApprovalTrackModal(){
@@ -2981,7 +2981,7 @@ async function doApprovalTrack(recordId, action){
     const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
     if (action === 'pass') notif.unshift({ts:Date.now(), from:name, to:'bevis', msg:`版權方通過：${item.name}`});
     else if (action === 'revise') notif.unshift({ts:Date.now(), from:name, to:item.submitted_by || 'shetong', msg:`⚠ 版權方需修改：${item.name} · ${note}`});
-    else if (action === 'chase') notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`珮玲追問版權方：${item.name}${note?' · '+note:''}`});
+    else if (action === 'chase') notif.unshift({ts:Date.now(), from:name, to:'anran', msg:`珮綾追問版權方：${item.name}${note?' · '+note:''}`});
     localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
     markCurrentTodoDone();
     openApprovalTrackModal();
@@ -3633,7 +3633,7 @@ const PAYROLL_DATA = {
   '台灣悍草': [
     {name:'Ray',     role:'CEO',           amount:120000},
     {name:'Bevis',   role:'設計主管',      amount:75000},
-    {name:'珮玲',    role:'企劃·版權',     amount:55000},
+    {name:'珮綾',    role:'企劃·版權',     amount:55000},
     {name:'詩彤',    role:'設計師',        amount:48000},
     {name:'Leo',     role:'出納·台灣',     amount:50000},
   ],
@@ -3796,7 +3796,7 @@ function submitExpense(){
 
   closeExpenseModal();
   markCurrentTodoDone();
-  const ROLE_NAME = {ray:'Ray',shawn:'Shawn',anran:'安然',yuming:'躍明',bevis:'Bevis',peilin:'珮玲',shetong:'詩彤',laige:'賴哥',muzi:'木子',laodong:'老董',debao:'德寶',chunlei:'春雷',jiaying:'佳音',gaowei:'高維',yangzi:'楊子',leo:'Leo'};
+  const ROLE_NAME = {ray:'Ray',shawn:'Shawn',anran:'安然',yuming:'躍明',bevis:'Bevis',peilin:'珮綾',shetong:'詩彤',laige:'賴哥',muzi:'木子',laodong:'老董',debao:'德寶',chunlei:'春雷',jiaying:'佳音',gaowei:'高維',yangzi:'楊子',leo:'Leo'};
   const reviewerName = type==='opex' ? '已寫入 HR 費用中心' :
                        type==='business' ? `已送 → ${ROLE_NAME[BIZ_ROUTER_MAP[user]]||'安然'}` :
                        `已送 → ${ROLE_NAME[MGR_ROUTER_MAP[user]]||'直屬主管'}`;

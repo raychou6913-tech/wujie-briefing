@@ -350,7 +350,7 @@ function requireAuth(){
 const SESS = requireAuth();
 if(!SESS) throw new Error('redirect');
 
-// 流水線分工：珮玲 = 唯一進度更新人，Bevis = 確認主管，其餘全員查閱
+// 流水線分工：珮綾 = 唯一進度更新人，Bevis = 確認主管，其餘全員查閱
 const CAN_UPDATE  = SESS.user === 'peilin';
 const CAN_CONFIRM = SESS.user === 'bevis';
 const CAN_MARK_DONE = CAN_UPDATE || CAN_CONFIRM; // backward compat
@@ -358,7 +358,7 @@ if(!CAN_MARK_DONE){
   document.addEventListener('DOMContentLoaded',()=>{
     const banner = document.createElement('div');
     banner.style.cssText='background:#ff6b3510;border:1px solid #ff6b3530;border-radius:8px;padding:8px 14px;font-size:11px;color:var(--txt-mid);margin-bottom:16px;';
-    banner.textContent='👁 查閱視角 · 進度更新由珮玲負責，Bevis 確認後生效';
+    banner.textContent='👁 查閱視角 · 進度更新由珮綾負責，Bevis 確認後生效';
     const main = document.querySelector('.main');
     if(main) main.prepend(banner);
   });
@@ -387,7 +387,7 @@ if(!CAN_MARK_DONE){
   <!-- ⓪ AI 解析上傳：拖整理好的進度 PDF / Excel / 截圖 → 自動比對 + 預覽變更 -->
   <div style="background:linear-gradient(135deg,#fff 0%,#fff4ef 100%);border:1px solid var(--accent);border-radius:14px;padding:18px 20px;margin-bottom:16px;">
     <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px;">⚡ 整理好進度 PDF / Excel？拖進來自動比對 + 預覽變更</div>
-    <div style="font-size:11px;color:var(--txt-mid);line-height:1.6;margin-bottom:10px;">珮玲：你可以把週進度整理成 PDF（不需要表格、寫文字也行）拖進來。MJ 用 AI 識別後會做：① 自動 fuzzy match 對應產品 record ② 顯示差異 diff 預覽（沒 match 到的 flag 出來）③ 你逐筆 confirm 後批次更新飛書。風險可控 + 比手填快 5 倍。</div>
+    <div style="font-size:11px;color:var(--txt-mid);line-height:1.6;margin-bottom:10px;">珮綾：你可以把週進度整理成 PDF（不需要表格、寫文字也行）拖進來。MJ 用 AI 識別後會做：① 自動 fuzzy match 對應產品 record ② 顯示差異 diff 預覽（沒 match 到的 flag 出來）③ 你逐筆 confirm 後批次更新飛書。風險可控 + 比手填快 5 倍。</div>
     <input type="file" id="ai-pl-file" accept=".pdf,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.heic" style="display:none;">
     <label for="ai-pl-file" id="ai-pl-label" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:20px;background:#fff;border:2px dashed var(--accent);border-radius:10px;font-size:13px;color:var(--accent);font-weight:700;cursor:pointer;">
       📎 點此選擇檔案，或拖進來
@@ -463,7 +463,7 @@ if(!CAN_MARK_DONE){
   <div class="blocked-banner" id="blocked-banner">
     <div class="blocked-banner-icon">▲</div>
     <div class="blocked-banner-body">
-      <div class="blocked-banner-title">Muziktiger 版權方已 14 天未回覆 — 珮玲需升級催促管道</div>
+      <div class="blocked-banner-title">Muziktiger 版權方已 14 天未回覆 — 珮綾需升級催促管道</div>
       <div class="blocked-banner-desc">Musicdog Japan 打樣已寄出並確認收到，書面審核結果遲未給出。建議升級聯絡層級，由日本代理直接聯繫版權總監。</div>
     </div>
   </div>
@@ -495,13 +495,13 @@ if(!CAN_MARK_DONE){
               </div>
               <div class="ip-card-meta">
                 IP：Snoopy &nbsp;·&nbsp; 版權方：Peanuts 北京代理<br>
-                負責人：珮玲 + 賴哥 &nbsp;·&nbsp; 第 <strong>6/7</strong> 輪
+                負責人：珮綾 + 賴哥 &nbsp;·&nbsp; 第 <strong>6/7</strong> 輪
               </div>
             </div>
             <div class="ip-card-right">
               <div class="ip-launch-label">預計上市</div>
               <div class="ip-launch-val" style="color:var(--ok)">2026-08</div>
-              <div class="ip-owner-val">珮玲 / 賴哥</div>
+              <div class="ip-owner-val">珮綾 / 賴哥</div>
             </div>
           </div>
           <div class="card-img-wrap" id="img-wrap-snoopy" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/f59e0b?text=Snoopy+夏季盲盒+·+大貨確認中','Snoopy 夏季盲盒 · 第 6/7 輪')">
@@ -533,13 +533,13 @@ if(!CAN_MARK_DONE){
               </div>
               <div class="ip-card-meta">
                 IP：Muziktiger &nbsp;·&nbsp; 版權方：Musicdog Japan<br>
-                負責人：珮玲 + 詩彤 &nbsp;·&nbsp; 第 <strong>3/7</strong> 輪 ⚠️
+                負責人：珮綾 + 詩彤 &nbsp;·&nbsp; 第 <strong>3/7</strong> 輪 ⚠️
               </div>
             </div>
             <div class="ip-card-right">
               <div class="ip-launch-label">預計上市</div>
               <div class="ip-launch-val" style="color:var(--warn)">2026-10</div>
-              <div class="ip-owner-val">珮玲 / 詩彤</div>
+              <div class="ip-owner-val">珮綾 / 詩彤</div>
             </div>
           </div>
           <div class="card-img-wrap" id="img-wrap-muziktiger" onclick="event.stopPropagation();openLightbox('https://placehold.co/900x500/1e2130/ef4444?text=Muziktiger+公仔+·+版權審核中','Muziktiger 公仔 · 版權卡關 14 天')">
@@ -554,7 +554,7 @@ if(!CAN_MARK_DONE){
             <div class="blocked-alert-icon">⚠️</div>
             <div class="blocked-alert-text">
               <div class="blocked-alert-title">等待 Musicdog Japan 回覆</div>
-              <div class="blocked-alert-desc">版權方審核送審 14 天無回應，珮玲需升級催促管道。</div>
+              <div class="blocked-alert-desc">版權方審核送審 14 天無回應，珮綾需升級催促管道。</div>
             </div>
             <div class="blocked-days">+14天</div>
           </div>
@@ -677,7 +677,7 @@ if(!CAN_MARK_DONE){
             </div>
           </div>
           <div class="todo-expand">
-            <div class="te-text">2D 送審已寄出 8 天，Muziktiger 版權方尚未回覆。<br>珮玲負責跟進，可透過安然協助加急聯繫。</div>
+            <div class="te-text">2D 送審已寄出 8 天，Muziktiger 版權方尚未回覆。<br>珮綾負責跟進，可透過安然協助加急聯繫。</div>
             <div class="te-actions">
               <button class="te-btn te-ok" onclick="event.stopPropagation();this.textContent='✓ 已催';this.disabled=true">✓ 已發催促信</button>
               <button class="te-btn te-warn" onclick="event.stopPropagation()">請安然協助加催</button>
@@ -694,7 +694,7 @@ if(!CAN_MARK_DONE){
             </div>
           </div>
           <div class="todo-expand">
-            <div class="te-text">版權方要求修改角色頭身比例與配色，詩彤已在修改中。<br>需珮玲確認修改版符合版權方意見再送審。</div>
+            <div class="te-text">版權方要求修改角色頭身比例與配色，詩彤已在修改中。<br>需珮綾確認修改版符合版權方意見再送審。</div>
             <div class="te-actions">
               <button class="te-btn te-ok" onclick="event.stopPropagation();this.textContent='✓ 已確認送審';this.disabled=true">✓ 確認，送第3輪審</button>
               <button class="te-btn te-grey" onclick="event.stopPropagation()">需再修改</button>
@@ -748,7 +748,7 @@ if(!CAN_MARK_DONE){
         <div class="sidebar-title">設計部 · 管理分工</div>
         <!-- 流程說明 -->
         <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:var(--txt-mid);line-height:1.6;">
-          珮玲 提交進度更新 → <strong style="color:var(--accent)">Bevis 確認</strong> 後生效<br>
+          珮綾 提交進度更新 → <strong style="color:var(--accent)">Bevis 確認</strong> 後生效<br>
           其他人均為查閱視角，不操作進度
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
@@ -761,11 +761,11 @@ if(!CAN_MARK_DONE){
             </div>
             <span class="chip chip-fin" style="font-size:8px;">確認主管</span>
           </div>
-          <!-- 珮玲：主窗口 -->
+          <!-- 珮綾：主窗口 -->
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:28px;height:28px;border-radius:50%;background:#6d28d9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">珮</div>
             <div style="flex:1;min-width:0;">
-              <div style="font-size:11px;font-weight:700;">珮玲 <span style="font-size:9px;color:var(--txt-lo);">設計師</span></div>
+              <div style="font-size:11px;font-weight:700;">珮綾 <span style="font-size:9px;color:var(--txt-lo);">設計師</span></div>
               <div style="font-size:9px;color:var(--txt-lo);">唯一進度更新人 · 版權/企劃</div>
             </div>
             <span class="chip chip-danger" style="font-size:8px;">催版權</span>
@@ -832,7 +832,7 @@ if(!CAN_MARK_DONE){
           <td style="padding:10px 14px;text-align:right;color:var(--ink-mid);font-size:11px;">本週五</td>
         </tr>
         <tr style="border-top:1px solid var(--line);">
-          <td style="padding:10px 14px;font-weight:700;color:var(--ink);">珮玲</td>
+          <td style="padding:10px 14px;font-weight:700;color:var(--ink);">珮綾</td>
           <td style="padding:10px 14px;color:var(--ink-mid);">Q3 主題：Snoopy × 校園回憶 企劃</td>
           <td style="padding:10px 14px;"><span style="font-size:10px;padding:2px 8px;background:var(--paper-soft);color:var(--ink-mid);border-radius:10px;font-weight:700;">草案</span></td>
           <td style="padding:10px 14px;text-align:right;color:var(--ink-mid);font-size:11px;">下週</td>
@@ -1043,16 +1043,16 @@ async function _createRecord(fields){
 const STAGES_FIG=[
   {key:"主題確認",       label:"主題",       owner:"Ray/Shawn"},
   {key:"概念2D+送審",    label:"概念2D",     owner:"詩彤/Forge"},
-  {key:"2D設計+送審",    label:"2D設計",     owner:"珮玲"},
+  {key:"2D設計+送審",    label:"2D設計",     owner:"珮綾"},
   {key:"3D建模+送審",    label:"3D建模",     owner:"Bevis/外包"},
   {key:"打樣+上色送審",  label:"打樣",       owner:"採購"},
-  {key:"最終確認",       label:"最終確認",   owner:"珮玲/詩彤"},
+  {key:"最終確認",       label:"最終確認",   owner:"珮綾/詩彤"},
   {key:"大貨生產",       label:"大貨",       owner:"採購/設計"},
 ];
 const STAGES_NONFIG=[
   {key:"主題確認",       label:"主題",       owner:"Ray/Shawn"},
   {key:"概念2D+送審",    label:"概念2D",     owner:"詩彤/Forge"},
-  {key:"產品設計+送審",  label:"設計送審",   owner:"珮玲"},
+  {key:"產品設計+送審",  label:"設計送審",   owner:"珮綾"},
   {key:"打樣送審",       label:"打樣",       owner:"採購"},
   {key:"大貨生產",       label:"大貨",       owner:"採購/設計"},
 ];
@@ -1106,7 +1106,7 @@ function initDemoBars(){
 }
 initDemoBars();
 
-/* ─── IMAGE UPLOAD (珮玲 / Bevis only) ─── */
+/* ─── IMAGE UPLOAD (珮綾 / Bevis only) ─── */
 const _IMG_KEY = 'pipeline_imgs';
 function _getImgs(){ return JSON.parse(localStorage.getItem(_IMG_KEY)||'{}'); }
 function _saveImgs(o){ localStorage.setItem(_IMG_KEY, JSON.stringify(o)); }
@@ -1131,7 +1131,7 @@ if(CAN_UPDATE || CAN_CONFIRM){
     if(!wrap) return;
     // Restore uploaded image if any
     if(imgs[key]){ const img = wrap.querySelector('img'); if(img) img.src = imgs[key]; }
-    // Add upload button (珮玲 only writes; Bevis can also upload)
+    // Add upload button (珮綾 only writes; Bevis can also upload)
     const btn = document.createElement('button');
     btn.className = 'img-upload-btn';
     btn.textContent = '上傳設計稿';
@@ -1144,7 +1144,7 @@ if(CAN_UPDATE || CAN_CONFIRM){
   });
 }
 
-/* ─── PENDING CONFIRMATION (珮玲 → Bevis) ─── */
+/* ─── PENDING CONFIRMATION (珮綾 → Bevis) ─── */
 const _PEND_KEY = 'pipeline_pending';
 function _getPending(){ return JSON.parse(localStorage.getItem(_PEND_KEY)||'{}'); }
 function _savePending(o){ localStorage.setItem(_PEND_KEY, JSON.stringify(o)); }
@@ -1152,7 +1152,7 @@ function _savePending(o){ localStorage.setItem(_PEND_KEY, JSON.stringify(o)); }
 function markStageDone(cardKey){
   const btn = document.getElementById('mark-btn-'+cardKey);
   if(CAN_UPDATE){
-    const p = _getPending(); p[cardKey] = {by:'珮玲', ts:Date.now()}; _savePending(p);
+    const p = _getPending(); p[cardKey] = {by:'珮綾', ts:Date.now()}; _savePending(p);
     if(btn){ btn.textContent='⏳ 已提交 · 待 Bevis 確認'; btn.disabled=true; btn.style.opacity='0.6'; }
     showPipelineToast('✅ 進度已提交，待 Bevis 確認後生效');
   } else if(CAN_CONFIRM){
@@ -1216,7 +1216,7 @@ function updateBlockedBannerFromFeishu(){
   if(!blocked.length){banner.style.display="none";return;}
   banner.style.display="flex";
   const names=blocked.map(p=>fv(p.fields,"產品名稱")||"未命名").join("、");
-  banner.querySelector(".blocked-banner-title").textContent=names+" 版權方未回覆 — 珮玲需升級催促管道";
+  banner.querySelector(".blocked-banner-title").textContent=names+" 版權方未回覆 — 珮綾需升級催促管道";
 }
 
 /* ─── RENDER ALL CARDS FROM FEISHU ─── */
@@ -1267,7 +1267,7 @@ function buildIPCard(proj){
     blockedAlertHtml=`<div class="blocked-alert">
       <div class="blocked-alert-icon">⚠️</div>
       <div class="blocked-alert-text">
-        <div class="blocked-alert-title">版權方未回覆 — 珮玲需升級催促管道</div>
+        <div class="blocked-alert-title">版權方未回覆 — 珮綾需升級催促管道</div>
         <div class="blocked-alert-desc">${feedback||"等版權方書面確認，請持續追催。"}</div>
       </div>
     </div>`;
@@ -1406,7 +1406,7 @@ function renderDemoDetail(key, d){
   const totalRounds=isFig?7:5;
 
   const META={
-    snoopy:    {name:"Snoopy 秋冬盲袋",     ip:"Snoopy",    owner:"珮玲 + 賴哥", launch:"2026-Q4", price:"¥49.9", qty:"8,000件", gm:"42%"},
+    snoopy:    {name:"Snoopy 秋冬盲袋",     ip:"Snoopy",    owner:"珮綾 + 賴哥", launch:"2026-Q4", price:"¥49.9", qty:"8,000件", gm:"42%"},
     muziktiger:{name:"Muziktiger 夏季盲袋", ip:"Muziktiger",owner:"詩彤",               launch:"2026-07", price:"¥34.9", qty:"5,400件", gm:"38%"},
     opanchu:   {name:"Opanchu 夏季盲袋",    ip:"Opanchu",   owner:"詩彤",               launch:"2026-08", price:"¥34.9", qty:"4,800件", gm:"38%"},
     mofusand2: {name:"Mofusand 10月新款",   ip:"Mofusand",  owner:"詩彤",               launch:"2026-10", price:"—",     qty:"—",       gm:"40%"},
@@ -1442,7 +1442,7 @@ function renderDemoDetail(key, d){
       ${_renderStageNotes(key,i,false)}`;
     } else if(isActive){
       if(isBlocked){
-        content=`<div class="tc-desc" style="color:var(--danger);">版權方審核送出 14 天，Musicdog Japan 未給書面確認。珮玲需升級催促管道。</div>
+        content=`<div class="tc-desc" style="color:var(--danger);">版權方審核送出 14 天，Musicdog Japan 未給書面確認。珮綾需升級催促管道。</div>
         <div class="tc-actions">
           <button class="tc-btn tcb-warn-btn">📨 升級催促管道</button>
           ${i>0?`<button class="stage-rollback-btn" onclick="rollbackStage('${key}')">← 退回上一階段</button>`:''}
@@ -1460,10 +1460,10 @@ function renderDemoDetail(key, d){
             : `<button id="mark-btn-${key}" class="tc-btn tcb-primary" onclick="markStageDone('${key}')">提交進度更新 → 待 Bevis 確認</button>`;
         } else if(CAN_CONFIRM){
           _markBtnHtml = _isPending
-            ? `<button id="mark-btn-${key}" class="tc-btn tcb-primary" style="background:var(--warn);border-color:var(--warn);" onclick="markStageDone('${key}')">✅ 珮玲已提交 · 點擊確認生效</button>`
+            ? `<button id="mark-btn-${key}" class="tc-btn tcb-primary" style="background:var(--warn);border-color:var(--warn);" onclick="markStageDone('${key}')">✅ 珮綾已提交 · 點擊確認生效</button>`
             : `<button id="mark-btn-${key}" class="tc-btn tcb-primary" onclick="markStageDone('${key}')">✓ 確認此階段完成</button>`;
         } else {
-          _markBtnHtml = `<span style="font-size:10px;color:var(--txt-lo)">進度更新由珮玲負責，Bevis 確認</span>`;
+          _markBtnHtml = `<span style="font-size:10px;color:var(--txt-lo)">進度更新由珮綾負責，Bevis 確認</span>`;
         }
         content=`<div class="tc-desc">目前正在 <strong>${s.key}</strong> 階段。負責人：${s.owner}。</div>
         <div class="tc-actions">
@@ -1650,7 +1650,7 @@ function _renderStageNotes(projKey,stageIdx,readonly){
   return `<div class="stage-section">
     <div class="stage-section-label">📝 備注 · 版權反饋 · 狀態說明</div>
     <textarea class="stage-notes-ta" id="note-ta-${projKey}-${stageIdx}"
-      placeholder="例：版權方要求角色比例調整，珮玲正在修改 2D 稿。或記錄卡關原因、進度備注、版權方意見等。"
+      placeholder="例：版權方要求角色比例調整，珮綾正在修改 2D 稿。或記錄卡關原因、進度備注、版權方意見等。"
       oninput="saveStageNote('${projKey}',${stageIdx},this.value)">${note}</textarea>
     <div class="stage-notes-saved" id="note-saved-${projKey}-${stageIdx}">✓ 已儲存</div>
   </div>`;

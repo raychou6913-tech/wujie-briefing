@@ -36,7 +36,7 @@ const INBOX_STATE_FIELD = {
 const TABLES_NEED_INBOX_STATE = new Set(['tblvGsQpXPHtkp1C']); // 費用實報
 
 const DEFAULT_TABLES = [
-  'tblSgCcB2aFcsPaw', // 設計送審 — Bevis / 珮玲 / 詩彤
+  'tblSgCcB2aFcsPaw', // 設計送審 — Bevis / 珮綾 / 詩彤
 ];
 
 async function getToken() {

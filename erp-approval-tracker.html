@@ -253,7 +253,7 @@ const APPROVALS = [
     feedback:[
       {from:'Peanuts Worldwide', date:'4/28', dot:'var(--warn)',
        text:'第1輪：整體方向OK，但主色太淺，logo尺寸需放大15%，運動元素可以更活潑'},
-      {from:'珮玲', date:'4/25', dot:'var(--pur)',
+      {from:'珮綾', date:'4/25', dot:'var(--pur)',
        text:'初稿送審，5個品項：T恤/帽子/書包/水壺/玩具'},
     ],
     stages:['概念稿','初稿','2D修改','色彩樣','素模','成品'],
@@ -267,7 +267,7 @@ const APPROVALS = [
     feedback:[
       {from:'San-X 代理', date:'4/30', dot:'var(--ok)',
        text:'色彩樣通過！顏色飽和度符合品牌規範，可進入打樣階段'},
-      {from:'珮玲', date:'4/22', dot:'var(--pur)',
+      {from:'珮綾', date:'4/22', dot:'var(--pur)',
        text:'色彩樣送審，3款配色，主打海洋藍+珊瑚橙'},
     ],
     stages:['概念稿','初稿','色彩樣','素模','成品'],
@@ -277,7 +277,7 @@ const APPROVALS = [
     stage:'概念稿', stageIdx:0, status:'active',
     deadline:'2026-05-20', urgency:'yellow',
     rights_holder:'Muziktiger 官方', contact:'安然主辦',
-    notes:'老董確認泡泡瑪特有意合作，珮玲本週要完成概念稿，需先確認授權範圍含盲盒',
+    notes:'老董確認泡泡瑪特有意合作，珮綾本週要完成概念稿，需先確認授權範圍含盲盒',
     feedback:[
       {from:'安然', date:'5/1', dot:'var(--accent)',
        text:'已聯繫 Muziktiger 官方，確認盲盒品類在授權範圍內，可推進'},
@@ -421,10 +421,10 @@ function saveFeedback(){
     ip: _modalIP,
     result, notes, next,
     notify,
-    by: '珮玲',
+    by: '珮綾',
     date: `${new Date().getMonth()+1}/${new Date().getDate()}`,
     dot: 'var(--pur)',
-    from: '珮玲',
+    from: '珮綾',
     text: notes,
   };
   const arr = JSON.parse(localStorage.getItem(FB_KEY)||'[]');
@@ -435,7 +435,7 @@ function saveFeedback(){
   const item = APPROVALS.find(a=>a.id===_modalId);
   if(item){
     item.feedback = item.feedback||[];
-    item.feedback.unshift({from:'珮玲', date:entry.date, dot:'var(--pur)', text:notes});
+    item.feedback.unshift({from:'珮綾', date:entry.date, dot:'var(--pur)', text:notes});
     if(result!=='waiting') item.status = {pass:'pass',revise:'active',reject:'waiting',submitted:'active'}[result]||item.status;
   }
   renderList();
@@ -458,7 +458,7 @@ const NOTIF_KEY = 'erp_notif_queue_v1';
 function notifyTeam(id, ip, target){
   const labels = {bevis_anran:'Bevis + 安然', bevis:'Bevis', laige:'賴哥', all:'全體相關人'};
   const q = JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]');
-  q.unshift({ ts: Date.now(), from:'珮玲', to: target, ip, refId: id,
+  q.unshift({ ts: Date.now(), from:'珮綾', to: target, ip, refId: id,
     msg: target==='laige' ? `${ip} 通過送審，採購可啟動` : `${ip} 送審狀態更新，請確認` });
   localStorage.setItem(NOTIF_KEY, JSON.stringify(q));
   showToast(`→ 已通知 ${labels[target]||target}`);

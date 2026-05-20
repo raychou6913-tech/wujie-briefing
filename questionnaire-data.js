@@ -314,10 +314,10 @@ window.QUESTIONNAIRE_DEPTS = {
   },
 
   design: {
-    emoji:'🎨', name:'設計／企劃', sub:'Bevis + 珮玲 + 詩彤',
+    emoji:'🎨', name:'設計／企劃', sub:'Bevis + 珮綾 + 詩彤',
     color:'#ec4899',
     intro:'產品設計流水線 — 每階段的天數、退回原因、外包設定全部綁定到該階段。',
-    officialFillers:['Bevis','珮玲','詩彤'],
+    officialFillers:['Bevis','珮綾','詩彤'],
     questions:[
       {id:'5.1', type:'design-stage-list', vam:true, required:true,
         text:'產品設計流水線階段',

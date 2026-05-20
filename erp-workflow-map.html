@@ -500,7 +500,7 @@ const WORKFLOWS = {
       // 上層：立項 + 創意 + IP
       {id:'o11', title:'#11 項目建立 ⭐', owner:'Shawn', sla:'多階段', x:30, y:60, desc:'起點 — Shawn 收 idea / 初篩 / Ray 拍板 / 立項 / 編預算。', action:'flow:project_init'},
       {id:'o4', title:'#4 設計流程', owner:'Bevis / 詩彤', sla:'2-4 週', x:280, y:60, desc:'從 brief 到打樣稿；Bevis 核准後送 IP 方。', action:'flow:design'},
-      {id:'o5', title:'#5 IP 送審', owner:'珮玲', sla:'14 天', x:530, y:60, desc:'送 IP 版權方審核；通過才能進打樣。', action:'flow:ip_approval'},
+      {id:'o5', title:'#5 IP 送審', owner:'珮綾', sla:'14 天', x:530, y:60, desc:'送 IP 版權方審核；通過才能進打樣。', action:'flow:ip_approval'},
       {id:'o3', title:'#3 採購 PO ⭐', owner:'賴哥 / 木子', sla:'30-100 天', x:780, y:60, desc:'打樣 → 三方確認 → 三人 commit 大貨 → 工廠寄存等銷售。', action:'flow:procurement'},
       {id:'o1', title:'#1 批發訂單 ⭐', owner:'業務 / 安然 / Ray', sla:'貨備好後銷售', x:1030, y:60, desc:'⭐ make-to-stock：帶著貨況談客戶 → 客戶下單 → 工廠直發。', action:'flow:wholesale'},
 
@@ -623,7 +623,7 @@ const WORKFLOWS = {
       {id:'c1', title:'設計 + 送審 完成', owner:'前置', sla:'-', x:30, y:60, desc:'必須先：設計 #4 完成 + IP 版權送審 #5 通過 — 才能進打樣。'},
       {id:'c2', title:'賴哥找工廠', owner:'賴哥', sla:'1-2 週', x:280, y:60, desc:'新供應商三家詢比價；既有供應商直接下打樣。', action:'my-quote'},
       {id:'c3', title:'工廠打樣', owner:'工廠', sla:'14 天', x:530, y:60, desc:'小批量打樣 — 賴哥追進度。', action:'sampling-track'},
-      {id:'c4', title:'三方確認打樣', owner:'賴哥 + Bevis + 珮玲', sla:'3-7 天', x:780, y:60, desc:'賴哥（量產可行性）+ Bevis（設計品質）+ 珮玲（IP 方確認）三方都過 → 才能 commit 大貨。', action:'sampling-track'},
+      {id:'c4', title:'三方確認打樣', owner:'賴哥 + Bevis + 珮綾', sla:'3-7 天', x:780, y:60, desc:'賴哥（量產可行性）+ Bevis（設計品質）+ 珮綾（IP 方確認）三方都過 → 才能 commit 大貨。', action:'sampling-track'},
       {id:'c5', title:'🚨 三人 commit 大貨', owner:'Ray + Shawn + 安然', sla:'會議拍板', x:1030, y:60, desc:'三人共識：大貨數量 / 交期 / 工廠 / 模具 / 預算。承擔庫存風險的關鍵決策點。', action:'ray-approval'},
       // Row 2：大貨 → 寄存 → 出貨 → 付款
       {id:'c6', title:'賴哥開大貨 PO', owner:'賴哥', sla:'3 天', x:30, y:240, desc:'PO 給工廠 + 30% 訂金（賴哥審 → Ray 核 → 躍明付）。', action:'my-po'},
@@ -651,13 +651,13 @@ const WORKFLOWS = {
     sub:'Bevis 主場',
     width:900, height:300,
     nodes:[
-      {id:'d1', title:'IP 主題 brief', owner:'Ray/安然/珮玲', sla:'-', x:30, y:60, desc:'新 IP 主題提案進入設計階段'},
+      {id:'d1', title:'IP 主題 brief', owner:'Ray/安然/珮綾', sla:'-', x:30, y:60, desc:'新 IP 主題提案進入設計階段'},
       {id:'d2', title:'Bevis 派任務', owner:'Bevis', sla:'1 天', x:230, y:60, desc:'指派詩彤（內部）或外包設計師'},
       {id:'d3', title:'設計師作稿', owner:'詩彤/外包', sla:'3-7 天', x:430, y:60, desc:'依 brief 設計', action:'my-design-task'},
       {id:'d4', title:'交件 Bevis', owner:'詩彤/外包', sla:'1 天', x:630, y:60, desc:'交件給 Bevis review', action:'my-design-task'},
       {id:'d5', title:'Bevis 核准', owner:'Bevis', sla:'3 天', x:830, y:60, desc:'核准 / 退回修改 / 需開會', action:'design-approve'},
-      {id:'d6', title:'通知賴哥打樣', owner:'-', sla:'即時', x:230, y:200, desc:'Bevis 核准後自動通知賴哥 + 珮玲'},
-      {id:'d7', title:'珮玲送 IP 方', owner:'珮玲', sla:'1 週', x:430, y:200, desc:'同時送版權方審', action:'my-approval-tracker'},
+      {id:'d6', title:'通知賴哥打樣', owner:'-', sla:'即時', x:230, y:200, desc:'Bevis 核准後自動通知賴哥 + 珮綾'},
+      {id:'d7', title:'珮綾送 IP 方', owner:'珮綾', sla:'1 週', x:430, y:200, desc:'同時送版權方審', action:'my-approval-tracker'},
     ],
     edges:[
       {from:'d1', to:'d2'}, {from:'d2', to:'d3'}, {from:'d3', to:'d4'}, {from:'d4', to:'d5'},
@@ -669,15 +669,15 @@ const WORKFLOWS = {
 
   ip_approval:{
     title:'5. IP 版權送審',
-    sub:'珮玲送日本/版權方審',
+    sub:'珮綾送日本/版權方審',
     width:900, height:300,
     nodes:[
       {id:'e1', title:'Bevis 核准設計', owner:'Bevis', sla:'-', x:30, y:60, desc:'設計通過 Bevis review'},
-      {id:'e2', title:'珮玲送 IP 方', owner:'珮玲', sla:'1 週', x:230, y:60, desc:'送 PNUTS / 貓福珊迪 / Sanrio 等', action:'my-approval-tracker'},
+      {id:'e2', title:'珮綾送 IP 方', owner:'珮綾', sla:'1 週', x:230, y:60, desc:'送 PNUTS / 貓福珊迪 / Sanrio 等', action:'my-approval-tracker'},
       {id:'e3', title:'等 IP 方回覆', owner:'IP 方', sla:'14 天', x:430, y:60, desc:'日本版權方節奏，通常 14 天'},
-      {id:'e4', title:'珮玲記錄結果', owner:'珮玲', sla:'回覆當天', x:630, y:60, desc:'通過 / 需修改 / 不通過', action:'my-approval-tracker'},
+      {id:'e4', title:'珮綾記錄結果', owner:'珮綾', sla:'回覆當天', x:630, y:60, desc:'通過 / 需修改 / 不通過', action:'my-approval-tracker'},
       {id:'e5', title:'進大貨', owner:'賴哥', sla:'-', x:830, y:60, desc:'通過 → 賴哥開大貨 PO'},
-      {id:'e6', title:'7 天沒回 → 追問', owner:'珮玲', sla:'7 天', x:230, y:200, desc:'IP 方超期，珮玲主動追'},
+      {id:'e6', title:'7 天沒回 → 追問', owner:'珮綾', sla:'7 天', x:230, y:200, desc:'IP 方超期，珮綾主動追'},
       {id:'e7', title:'回設計修改', owner:'Bevis', sla:'-', x:630, y:200, desc:'需修改 → 回 Bevis 重設計'},
     ],
     edges:[
@@ -714,7 +714,7 @@ const WORKFLOWS = {
       {id:'g2', title:'Shawn 立項', owner:'Shawn', sla:'1 週', x:230, y:60, desc:'進入 3 個月備戰'},
       {id:'g3', title:'採購備貨', owner:'賴哥', sla:'2 個月', x:430, y:60, desc:'量產快閃用商品', action:'my-po'},
       {id:'g4', title:'設計道具', owner:'Bevis', sla:'1 個月', x:630, y:60, desc:'店面 / 道具 / DM', action:'design-approve'},
-      {id:'g5', title:'版權確認', owner:'珮玲', sla:'2 週', x:830, y:60, desc:'店面 / 道具版權方確認', action:'my-approval-tracker'},
+      {id:'g5', title:'版權確認', owner:'珮綾', sla:'2 週', x:830, y:60, desc:'店面 / 道具版權方確認', action:'my-approval-tracker'},
       {id:'g6', title:'物流規劃', owner:'高維', sla:'2 週', x:30, y:200, desc:'貨從哪 → 哪倉 → 店面', action:'logistics-batch'},
       {id:'g7', title:'開店', owner:'Shawn', sla:'-', x:230, y:200, desc:'啟動 + Shawn 每週 check 業績'},
       {id:'g8', title:'營運監控', owner:'Shawn', sla:'每週', x:430, y:200, desc:'日均業績 / 打平進度 / 庫存'},
