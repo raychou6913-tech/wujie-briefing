@@ -927,6 +927,8 @@ function setSaveStatus(state){
     _saveStatusFadeTimer = setTimeout(() => { el.style.opacity = '.4'; }, 4000);
   } else if (state === 'error') {
     el.innerHTML = '<span style="color:#ef4444;">✗ 儲存失敗（網路？）</span>';
+  } else if (state === 'dirty') {
+    el.innerHTML = '<span style="color:#f59e0b;">⚠ 未存 — 按 Enter 或點別處存</span>';
   }
 }
 
@@ -1256,32 +1258,40 @@ function deleteCard(nodeId){
 }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ── 可編輯欄位 binding：1.5s debounce auto-save + blur 立刻存 + Enter 立刻 commit ──
+// ── 可編輯欄位 binding：打字不自動存，等 Enter / 點別處（blur）才存 ──
+// 5/20 Ray 反饋：1.5s 自動存會在中文輸入法選字未完成時觸發，把錯字 / 半個字存進去
 function _bindEditable(el, saveFn){
   if (!el) return;
-  let timer;
   let lastSaved = el.textContent.trim();
-  const trySave = (force) => {
+  let composing = false; // IME 選字中
+  const trySave = () => {
+    if (composing) return;     // IME 還在選字 → 不存
     const v = el.textContent.trim();
     if (v === lastSaved) return;
     lastSaved = v;
     saveFn(v);
   };
+  // 打字過程只標「未存」狀態，不自動存
   el.addEventListener('input', () => {
-    clearTimeout(timer);
-    setSaveStatus('saving');
-    timer = setTimeout(() => trySave(), 1500); // 打字停 1.5 秒自動存
+    if (composing) return;
+    const v = el.textContent.trim();
+    if (v !== lastSaved) setSaveStatus('dirty');
   });
-  el.addEventListener('blur', () => {
-    clearTimeout(timer);
-    trySave();
+  // IME 選字 start / end
+  el.addEventListener('compositionstart', () => { composing = true; });
+  el.addEventListener('compositionend', () => {
+    composing = false;
+    const v = el.textContent.trim();
+    if (v !== lastSaved) setSaveStatus('dirty');
   });
+  // 點別處（blur）才存
+  el.addEventListener('blur', () => { trySave(); });
+  // 按 Enter 立刻存 + 跳出編輯
   el.addEventListener('keydown', ev => {
     if (ev.key === 'Enter' && !ev.shiftKey) {
       ev.preventDefault();
-      clearTimeout(timer);
       trySave();
-      el.blur(); // 跳出編輯
+      el.blur();
     }
   });
 }
