@@ -805,15 +805,50 @@ function _wfGet(key){
   if (!entry) return null;
   try { return JSON.parse(entry.value); } catch(e) { return null; }
 }
+
+// ── 儲存狀態指示器（toolbar 右上 #wf-save-status） ──
+let _saveStatusFadeTimer;
+let _pendingSaveCount = 0;
+function setSaveStatus(state){
+  const el = document.getElementById('wf-save-status');
+  if (!el) return;
+  el.style.opacity = '1';
+  clearTimeout(_saveStatusFadeTimer);
+  if (state === 'saving') {
+    el.innerHTML = '<span style="color:#f59e0b;">⋯ 儲存中…</span>';
+  } else if (state === 'saved') {
+    const time = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+    el.innerHTML = `<span style="color:#22c55e;">✓ 已儲存 ${time}</span>`;
+    _saveStatusFadeTimer = setTimeout(() => { el.style.opacity = '.4'; }, 4000);
+  } else if (state === 'error') {
+    el.innerHTML = '<span style="color:#ef4444;">✗ 儲存失敗（網路？）</span>';
+  }
+}
+
 function _wfSet(key, value){
   // 立刻 cache（UI 立即 reflect）
   const json = typeof value === 'string' ? value : JSON.stringify(value);
   window._wfState[key] = { value: json, edited_by: name || user, edited_at: Date.now() };
+  // 顯示「儲存中」
+  _pendingSaveCount++;
+  setSaveStatus('saving');
   // 背景 POST 飛書
-  fetch(`${WORKER_BASE_WF}/erp/workflow-state`, {
+  return fetch(`${WORKER_BASE_WF}/erp/workflow-state`, {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ key, value: json, actor: name || user })
-  }).catch(e => console.warn('[wf-state] save fail:', e));
+  }).then(r => r.json()).then(d => {
+    _pendingSaveCount--;
+    if (d.ok) {
+      if (_pendingSaveCount === 0) setSaveStatus('saved');
+    } else {
+      setSaveStatus('error');
+      console.warn('[wf-state] save fail:', d);
+    }
+  }).catch(e => {
+    _pendingSaveCount--;
+    setSaveStatus('error');
+    console.warn('[wf-state] save fail:', e);
+  });
 }
 function getFlowOverrides(flowKey){
   return _wfGet('edits_'+flowKey+'_v1') || {};
@@ -929,6 +964,36 @@ function deleteCard(nodeId){
   renderCanvas();
 }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── 可編輯欄位 binding：1.5s debounce auto-save + blur 立刻存 + Enter 立刻 commit ──
+function _bindEditable(el, saveFn){
+  if (!el) return;
+  let timer;
+  let lastSaved = el.textContent.trim();
+  const trySave = (force) => {
+    const v = el.textContent.trim();
+    if (v === lastSaved) return;
+    lastSaved = v;
+    saveFn(v);
+  };
+  el.addEventListener('input', () => {
+    clearTimeout(timer);
+    setSaveStatus('saving');
+    timer = setTimeout(() => trySave(), 1500); // 打字停 1.5 秒自動存
+  });
+  el.addEventListener('blur', () => {
+    clearTimeout(timer);
+    trySave();
+  });
+  el.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && !ev.shiftKey) {
+      ev.preventDefault();
+      clearTimeout(timer);
+      trySave();
+      el.blur(); // 跳出編輯
+    }
+  });
+}
 
 // ── 確認狀態系統（per flow+node，存 localStorage）──
 const STATUS_KEY = 'status_v1';
@@ -1052,6 +1117,7 @@ function renderCanvas(){
       <span>${toolbarMsg}</span>
       <span style="flex:1"></span>
       ${progressBlock}
+      <span id="wf-save-status" style="font-size:11px;color:var(--ink-lo);padding:0 8px;min-width:140px;text-align:center;transition:opacity .4s;"></span>
       <button onclick="openTodoListModal()" title="跨流程列出待確認 / 需議卡">⚠ 待議清單</button>
       ${isOverview ? '' : '<button class="wf-add-card" onclick="addNewCard()" title="在當前流程新增一張卡片">＋ 新卡片</button>'}
       <button class="wf-reset" onclick="resetFlow()" title="清掉所有編輯，還原流程到原始版本（沒 undo）">↺ 還原預設</button>
@@ -1146,11 +1212,11 @@ function renderCanvas(){
     `;
     // 編輯儲存（全部 ce 欄位）— 全景只讀不掛 listener
     if (!isOverview) {
-      card.querySelector('.wf-title').addEventListener('blur', ev => patchNode(currentFlow, n.id, {title: ev.target.textContent.trim()}));
-      card.querySelector('.wf-owner').addEventListener('blur', ev => patchNode(currentFlow, n.id, {owner: ev.target.textContent.trim()}));
-      card.querySelector('[data-field="sla"]').addEventListener('blur', ev => patchNode(currentFlow, n.id, {sla: ev.target.textContent.trim()}));
+      _bindEditable(card.querySelector('.wf-title'), v => patchNode(currentFlow, n.id, {title: v}));
+      _bindEditable(card.querySelector('.wf-owner'), v => patchNode(currentFlow, n.id, {owner: v}));
+      _bindEditable(card.querySelector('[data-field="sla"]'), v => patchNode(currentFlow, n.id, {sla: v}));
       const descEl = card.querySelector('[data-field="desc"]');
-      if (descEl) descEl.addEventListener('blur', ev => patchNode(currentFlow, n.id, {desc: ev.target.textContent.trim()}));
+      if (descEl) _bindEditable(descEl, v => patchNode(currentFlow, n.id, {desc: v}));
     }
     // 優化按鈕
     const optBtn = card.querySelector('[data-opt-btn]');
