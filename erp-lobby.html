@@ -939,8 +939,12 @@ body{
       <div class="qa-field"><label>金額（人民幣）</label><input id="fl-amount" type="number" placeholder="例：3800"></div>
       <div class="qa-field"><label>日期</label><input id="fl-date" type="date"></div>
     </div>
+    <div class="qa-field">
+      <label>關聯項目（選填）<span style="font-size:10px;color:var(--brand);font-weight:700;margin-left:4px;">選了 → 走 Shawn / 不選 → 走楊子</span></label>
+      <select id="fl-proj"><option value="">— 載入中…</option></select>
+    </div>
     <div class="qa-field"><label>備註</label><textarea id="fl-notes" rows="2" placeholder="特殊收費 / 異常 / 附加費"></textarea></div>
-    <button class="qa-submit" onclick="submitFreightLog()">送出 → 寫入物流費用</button>
+    <button class="qa-submit" onclick="submitFreightLog()">送出</button>
   </div>
 </div>
 
@@ -1210,9 +1214,13 @@ body{
       <div class="qa-field"><label>金額（人民幣）</label><input id="pr-amount" type="number" placeholder="例：42000"></div>
       <div class="qa-field"><label>付款期限</label><input id="pr-deadline" type="date"></div>
     </div>
-    <div class="qa-field"><label>對應 PO 或項目</label><input id="pr-po" placeholder="例：PO#320 Snoopy 大貨 / 吉依卡哇 模具"></div>
+    <div class="qa-field"><label>對應 PO 或項目代號</label><input id="pr-po" placeholder="例：PO#320 Snoopy 大貨 / 吉依卡哇 模具"></div>
+    <div class="qa-field">
+      <label>關聯項目（選填）<span style="font-size:10px;color:var(--brand);font-weight:700;margin-left:4px;">選了 → 走 Shawn / 不選 → 走楊子</span></label>
+      <select id="pr-proj"><option value="">— 載入中…</option></select>
+    </div>
     <div class="qa-field"><label>備註</label><textarea id="pr-notes" rows="2" placeholder="廠商開票資訊 / 付款方式 / 特殊要求"></textarea></div>
-    <button class="qa-submit" onclick="submitPaymentReq()">送出 → 楊子審核</button>
+    <button class="qa-submit" onclick="submitPaymentReq()">送出</button>
   </div>
 </div>
 
@@ -1481,6 +1489,41 @@ async function writeExpenseRecord(fields){
   return r.json();
 }
 
+// 項目 dropdown — 從項目排期 table fetch 進行中的項目（給費用申請的「關聯項目」用）
+const PROJECT_SCHEDULE_TBL = 'tblPLJ2dLkdkWUAa';
+let _projectListCache = null, _projectListCacheAt = 0;
+async function getProjectList(){
+  // 10 分鐘 cache（項目不會頻繁新增）
+  if (_projectListCache && Date.now()-_projectListCacheAt < 10*60*1000) return _projectListCache;
+  const tk = await getFeishuToken();
+  const r = await fetch(`${WORKER_BASE}/open-apis/bitable/v1/apps/${FEISHU_AT_V2}/tables/${PROJECT_SCHEDULE_TBL}/records?page_size=200`, {
+    headers: { Authorization: `Bearer ${tk}` },
+  });
+  const d = await r.json();
+  const items = (d.data?.items||[])
+    .map(rec => {
+      const f = rec.fields || {};
+      const name = Array.isArray(f['項目名稱']) ? (f['項目名稱'][0]?.text||'') : (f['項目名稱']||'');
+      const state = typeof f['狀態'] === 'object' ? f['狀態']?.text||f['狀態']?.name||'' : (f['狀態']||'');
+      return { id: rec.record_id, name, state };
+    })
+    .filter(p => p.name && !['已完成','已取消','已歸檔'].includes(p.state));
+  _projectListCache = items;
+  _projectListCacheAt = Date.now();
+  return items;
+}
+async function fillProjectSelect(selectEl, includeBlank=true){
+  selectEl.innerHTML = '<option value="">載入中…</option>';
+  try {
+    const list = await getProjectList();
+    selectEl.innerHTML =
+      (includeBlank ? '<option value="">— 無關聯項目（走 OPEX）</option>' : '') +
+      list.map(p => `<option value="${p.name.replace(/"/g,'&quot;')}">${p.name}</option>`).join('');
+  } catch(e){
+    selectEl.innerHTML = '<option value="">（載入失敗）</option>';
+  }
+}
+
 // 沒有專屬廳的員工 → 送去填報中心
 const NO_HALL_USERS = [];
 const effectiveHall = NO_HALL_USERS.includes(user) ? 'forms/index.html' : hall;
@@ -1577,7 +1620,7 @@ function buildSidebar(){
     gaowei:   [{icon:'🚚', label:'物流批次', action:'logistics-batch'}, {icon:'📋', label:'運費登錄', action:'freight-log'}],
     chunlei:  [{icon:'📱', label:'直播排期', action:'live-schedule'}, {icon:'📦', label:'備貨確認', action:'live-stock'}],
     jiaying:  [{icon:'🛒', label:'淘寶上架', action:'taobao-listing'}, {icon:'📊', label:'數據月報', action:'monthly-data'}],
-    shawn:    [{icon:'🔥', label:'待催辦', action:'shawn-chase'}],
+    shawn:    [{icon:'🔥', label:'待催辦', action:'shawn-chase'}, {icon:'💸', label:'項目費用核 OPEX', action:'project-expense-approve'}],
     ray:      [{icon:'✓', label:'我的待批核', action:'ray-approval'}],
   };
   const userActs = (MY_ACTIONS[user] || []).concat(MY_ACTIONS.all);  // 通用「+錄費用」永遠在
@@ -2188,6 +2231,7 @@ const ACTION_COUNT_SOURCES = {
   'my-po':               {key:'laige_po_v1',               filter:i=>!i.archived},
   'stock-check':         {key:'muzi_stock_check_v1',       filter:i=>!i.confirmed},
   'shawn-chase':         {key:'shawn_chase_v1',            filter:i=>!i.done},
+  // project-expense-approve 走 Worker，no localStorage badge — modal 點開時 fetch
   'ray-approval':        {key:'ray_approval_v1',           filter:i=>!i.done},
   'design-approve':      {key:'bevis_design_approve_v1',   filter:i=>!i.done},
   'my-approval-tracker': {key:'peilin_approval_track_v1',  filter:i=>!i.done},
@@ -2366,6 +2410,7 @@ function openFreightLogModal(){
   ['fl-no','fl-route','fl-order','fl-amount','fl-notes'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('fl-date').value = new Date().toISOString().slice(0,10);
   document.getElementById('freight-log-modal').classList.add('show');
+  fillProjectSelect(document.getElementById('fl-proj'));
 }
 function closeFreightLogModal(){ document.getElementById('freight-log-modal').classList.remove('show'); }
 async function submitFreightLog(){
@@ -2378,6 +2423,8 @@ async function submitFreightLog(){
   const dateStr = document.getElementById('fl-date').value;
   const notes = document.getElementById('fl-notes').value.trim();
   const NOW = Date.now();
+  const proj = document.getElementById('fl-proj').value;
+  const routeOwner = proj ? 'shawn' : 'yangzi';
   const remark = [no && `運單：${no}`, route && `路線：${route}`, order && `對應：${order}`, notes].filter(Boolean).join(' · ');
   const fields = {
     '費用標題': `運費 · ${vendor}${order?' · '+order:''}`,
@@ -2390,13 +2437,14 @@ async function submitFreightLog(){
     '備註': remark,
     '供應商': vendor,
     'inbox_state': 'pending',
-    'owner': 'yangzi',
+    'owner': routeOwner,
     'submitted_by': user,
     'created_at': NOW,
     'updated_at': NOW,
     'version': 1,
     'urgency': 'normal',
   };
+  if (proj) fields['關聯項目'] = proj;
 
   try {
     const d = await writeExpenseRecord(fields);
@@ -2414,7 +2462,7 @@ async function submitFreightLog(){
   localStorage.setItem('gaowei_freight_v1', JSON.stringify(arr));
   closeFreightLogModal();
   markCurrentTodoDone();
-  showQaToast(`✓ 運費 ¥${amount} 已登錄送楊子（${vendor}）`);
+  showQaToast(`✓ 運費 ¥${amount} 已登錄送${routeOwner === 'shawn' ? 'Shawn（項目核）' : '楊子'}（${vendor}）`);
 }
 
 // Bevis：bedo 輸出
@@ -2643,6 +2691,38 @@ async function doWholesale(recordId, action){
     markCurrentTodoDone();
     openWholesaleModal();
   } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
+}
+
+// Shawn 項目費用核 OPEX modal — 有關聯項目的費用走這條（Ray 5/20 拍板）
+// 用既有 generic worker inbox modal，加 raw_fields 顯示 關聯項目
+async function openShawnProjectExpenseModal(){
+  await openWorkerInboxModal({
+    kind: 'shawn-project-expense',
+    title: '💸 項目費用核 OPEX',
+    sub: '有關聯項目的費用（採購尾款 / 運費 / 出差等）· Shawn 核 OPEX 性質 · 池不夠升級 Ray',
+    emptyMsg: '沒有待核的項目費用',
+    actions: [
+      { key: 'approve', label: '✓ 核 OPEX · 送躍明入帳' },
+      { key: 'upgrade', label: '⬆ 升級 Ray（池不夠）', prompt: '附給 Ray 的說明（必填，例：本項目池僅剩 ¥X 不夠付 ¥Y）：', required: true },
+      { key: 'reject',  label: '退回', prompt: '退回原因：', required: true },
+    ],
+  });
+  // 等 modal 載入完後加上 關聯項目 + 池資訊提示（從 raw_fields 補資料）
+  setTimeout(() => enrichShawnExpenseList(), 200);
+}
+function enrichShawnExpenseList(){
+  const cache = window._workerInboxCache || [];
+  cache.forEach(it => {
+    const proj = it.raw_fields && (typeof it.raw_fields['關聯項目'] === 'string' ? it.raw_fields['關聯項目'] : (Array.isArray(it.raw_fields['關聯項目']) ? (it.raw_fields['關聯項目'][0]?.text||'') : ''));
+    if (!proj) return;
+    const row = document.querySelector(`#gl-list [data-rid="${it.record_id}"]`);
+    if (!row || row.querySelector('.proj-tag')) return;
+    const tag = document.createElement('div');
+    tag.className = 'proj-tag';
+    tag.style.cssText = 'background:#fff4ef;border:1px solid #ff6b35;border-radius:6px;padding:6px 10px;font-size:11px;color:#ff6b35;font-weight:700;margin-bottom:8px;';
+    tag.textContent = `📋 關聯項目：${proj}`;
+    row.insertBefore(tag, row.firstChild.nextSibling);
+  });
 }
 
 // 待催辦：Worker 飛書 stale + localStorage 未上飛書 inbox stale 合併
@@ -3290,6 +3370,7 @@ function openPaymentReqModal(){
   document.getElementById('pr-po').value = '';
   document.getElementById('pr-notes').value = '';
   document.getElementById('payment-req-modal').classList.add('show');
+  fillProjectSelect(document.getElementById('pr-proj'));
 }
 function closePaymentReqModal(){ document.getElementById('payment-req-modal').classList.remove('show'); }
 async function submitPaymentReq(){
@@ -3307,6 +3388,8 @@ async function submitPaymentReq(){
     const days = Math.floor((new Date(deadline).getTime() - Date.now())/86400000);
     if (days <= 3) urgency = 'high';
   }
+  const proj = document.getElementById('pr-proj').value;
+  const routeOwner = proj ? 'shawn' : 'yangzi';
   const remark = [po && `對應：${po}`, notes].filter(Boolean).join(' · ');
   const NOW = Date.now();
   const fields = {
@@ -3320,13 +3403,14 @@ async function submitPaymentReq(){
     '備註': remark,
     '供應商': supplier,
     'inbox_state': 'pending',
-    'owner': 'yangzi',
+    'owner': routeOwner,
     'submitted_by': user,
     'created_at': NOW,
     'updated_at': NOW,
     'version': 1,
     'urgency': urgency,
   };
+  if (proj) fields['關聯項目'] = proj;
 
   try {
     const d = await writeExpenseRecord(fields);
@@ -3344,7 +3428,7 @@ async function submitPaymentReq(){
   localStorage.setItem('muzi_payment_req_v1', JSON.stringify(arr));
   closePaymentReqModal();
   markCurrentTodoDone();
-  showQaToast(`✓ 付款申請已送 → 楊子審核`);
+  showQaToast(`✓ 付款申請已送 → ${routeOwner === 'shawn' ? 'Shawn（項目核 OPEX）' : '楊子'}審核`);
 }
 
 // ── 安然 modal × 3：合約待批 / 跨境款項 / IP 維護 ──
@@ -4015,6 +4099,7 @@ function triggerAction(action){
     case 'monthly-data':      openMonthlyDataModal(); break;
     case 'wholesale-approve': openWholesaleModal(); break;
     case 'shawn-chase':       openChaseModal(); break;
+    case 'project-expense-approve': openShawnProjectExpenseModal(); break;
     case 'ray-approval':      openRayApprovalModal(); break;
     default:                  showQaToast('動作 ' + action + ' 未實作');
   }
