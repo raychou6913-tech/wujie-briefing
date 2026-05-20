@@ -4558,6 +4558,112 @@ function renderMd(text){
   return s;
 }
 
+// ── 新人 onboarding（第一次登入該帳號顯示一次）──
+const ROLE_ONBOARDING = {
+  laodong: { intro:'👋 歡迎來蕪解 ERP！你是 KA 通路業務員 — 客戶訂單從你開始接力到全公司。', cta:[
+    {icon:'＋', label:'試開一張新訂單', action:'new-order', why:'會自動送安然把關，全公司接力'},
+    {icon:'📞', label:'記一筆拜訪', action:'visit-log', why:'拜訪完馬上填，腦袋還熱的時候最準'},
+  ]},
+  debao: { intro:'👋 歡迎來蕪解 ERP！你跟老董並列 — 華中/華南通路的業務員。', cta:[
+    {icon:'＋', label:'試開一張新訂單', action:'new-order', why:'自動送安然把關'},
+    {icon:'📞', label:'記一筆拜訪', action:'visit-log', why:'拜訪完馬上填'},
+  ]},
+  anran: { intro:'👋 歡迎來蕪解 ERP！你管 IP 版權 / 合約 / 批發核准 / 北京日常 — 業務面的最後一關。', cta:[
+    {icon:'✓', label:'看批發訂單核准 inbox', action:'wholesale-approve', why:'業務員開的單會直接到這裡，你 ✓ 後流到下一棒'},
+    {icon:'📜', label:'看合約待批 inbox', action:'contract-approve', why:'IP 授權 / 新合約 / 續簽 都進這裡'},
+  ]},
+  laige: { intro:'👋 歡迎來蕪解 ERP！你是採購主管 — 工廠 / 詢比價 / 大貨 PO 都你管。', cta:[
+    {icon:'🔍', label:'詢比價 inbox', action:'my-quote', why:'供應商報價結果'},
+    {icon:'📦', label:'我的 PO inbox', action:'my-po', why:'追工廠出貨進度'},
+  ]},
+  muzi: { intro:'👋 歡迎來蕪解 ERP！你是採購執行 — 跟賴哥對接、廠端到貨核對。', cta:[
+    {icon:'📦', label:'備貨核對', action:'stock-check', why:'廠端到貨數量對不對'},
+    {icon:'📝', label:'付款申請（可選關聯項目）', action:'payment-request', why:'有項目歸屬走 Shawn 核 OPEX，沒有走楊子'},
+  ]},
+  gaowei: { intro:'👋 歡迎來蕪解 ERP！你管物流 / 報關 / 跨境發貨 — 蕪解的出貨大門。', cta:[
+    {icon:'🚚', label:'物流批次', action:'logistics-batch', why:'追出貨進度'},
+    {icon:'📋', label:'運費登錄', action:'freight-log', why:'每筆運費對齊月結'},
+  ]},
+  bevis: { intro:'👋 歡迎來蕪解 ERP！你是設計主管 — 詩彤的稿、Forge bedo 輸出 都過你的眼。', cta:[
+    {icon:'🎨', label:'設計核准', action:'design-approve', why:'詩彤送來的設計稿'},
+    {icon:'✨', label:'bedo 輸出', action:'bedo-approve', why:'Forge bedo 跑出的設計變體'},
+  ]},
+  peilin: { intro:'👋 歡迎來蕪解 ERP！你管企劃 / 版權送審 — 設計過完後 IP 方那關。', cta:[
+    {icon:'🖋', label:'送審追蹤', action:'my-approval-tracker', why:'追 IP 版權方反饋'},
+    {icon:'🖼', label:'主題企劃', action:'theme-plan', why:'Q3/Q4 開發提案'},
+  ]},
+  shetong: { intro:'👋 歡迎來蕪解 ERP！你是設計師 — Bevis 派的設計任務都在這。', cta:[
+    {icon:'📤', label:'我的設計任務', action:'my-design-task', why:'看 Bevis 派的稿 + 提交完稿'},
+  ]},
+  yangzi: { intro:'👋 歡迎來蕪解 ERP！你管 HR 費用 + 台灣 OPEX 對齊 — 員工費用 / 供應商請款 的初審。', cta:[
+    {icon:'✓', label:'我的待審 inbox', action:'my-approval', why:'員工申請費用先到你這'},
+    {icon:'💰', label:'薪資任務', action:'payroll-task', why:'每月薪資'},
+  ]},
+  leo: { intro:'👋 歡迎來蕪解 ERP！你跟楊子並列 — 台灣 HR + 銀行對帳。', cta:[
+    {icon:'✓', label:'我的待審', action:'my-approval', why:'費用單初審'},
+    {icon:'🏦', label:'銀行對帳', action:'bank-recon', why:'各銀行帳戶餘額'},
+  ]},
+  yuming: { intro:'👋 歡迎來蕪解 ERP！你是財務（會計）— 入帳 / 月結 / 跨境結算 都你管。', cta:[
+    {icon:'📋', label:'我的待入帳', action:'my-pending', why:'楊子 / Shawn 核完轉來的單'},
+    {icon:'💸', label:'跨境款項', action:'xborder-confirm', why:'集團 5 法人之間打款追蹤'},
+  ]},
+  shawn: { intro:'👋 歡迎來蕪解 ERP！你是 COO — 全廳調度 + 項目編預算 + 項目費用核 OPEX。', cta:[
+    {icon:'🔥', label:'全廳卡關總覽', action:'shawn-chase', why:'哪個廳卡誰、逾期 SLA — 一鍵催'},
+    {icon:'💸', label:'項目費用核 OPEX', action:'project-expense-approve', why:'有關聯項目的費用（系統自動算池剩餘 + 阻擋邏輯）'},
+  ]},
+  ray: { intro:'👋 歡迎來戰情桌 — 全公司向你升級的事件都在這。', cta:[
+    {icon:'✓', label:'我的待批核', action:'ray-approval', why:'跨來源（合約 / 項目費用 / 大批發單）所有要你拍板的事'},
+  ]},
+  chunlei: { intro:'👋 歡迎來蕪解 ERP！你管電商直播 — 抖音 / 小紅書 直播排期 + 備貨。', cta:[
+    {icon:'📱', label:'直播排期', action:'live-schedule', why:'本週直播時間表'},
+    {icon:'📦', label:'備貨確認', action:'live-stock', why:'直播商品庫存夠不夠'},
+  ]},
+  jiaying: { intro:'👋 歡迎來蕪解 ERP！你管電商上架 + 淘寶運營。', cta:[
+    {icon:'🛒', label:'淘寶上架', action:'taobao-listing', why:'排上架商品'},
+  ]},
+};
+function _onboardKey(){ return 'erp_onboard_seen_' + user; }
+function isOnboardingDone(){ return localStorage.getItem(_onboardKey()) === '1'; }
+function dismissOnboarding(){
+  localStorage.setItem(_onboardKey(), '1');
+  // 清歷史讓 greeting 重 render
+  renderAiHeroMessages();
+}
+function onboardingCta(action){
+  localStorage.setItem(_onboardKey(), '1');
+  triggerAction(action);
+}
+function showOnboardingAgain(){
+  localStorage.removeItem(_onboardKey());
+  _aiHistSet([]);
+  renderAiHeroMessages();
+}
+function renderOnboardingCard(){
+  const cfg = ROLE_ONBOARDING[user];
+  if (!cfg) return '';
+  const ctas = cfg.cta.map(c =>
+    `<button onclick="onboardingCta('${c.action}')" style="display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;margin-bottom:8px;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:pointer;text-align:left;transition:.15s;font-family:inherit;" onmouseover="this.style.borderColor='var(--brand)';this.style.background='#fff4ef';" onmouseout="this.style.borderColor='var(--line)';this.style.background='#fff';">
+      <span style="font-size:20px;flex-shrink:0;">${c.icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);">${c.label}</div>
+        <div style="font-size:10.5px;color:var(--ink-lo);margin-top:2px;line-height:1.5;">${c.why}</div>
+      </div>
+      <span style="color:var(--brand);font-weight:700;font-size:14px;">→</span>
+    </button>`
+  ).join('');
+  return `
+    <div class="onboarding-card" style="background:linear-gradient(135deg,#fff4ef,#fafaf8);border:1px solid #ff6b35;border-radius:12px;padding:18px 20px;">
+      <div style="font-size:14px;font-weight:700;color:var(--ink);line-height:1.7;margin-bottom:14px;">${cfg.intro}</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:10px;">先試這幾個動作 ↓</div>
+      ${ctas}
+      <div style="margin-top:14px;display:flex;gap:14px;align-items:center;">
+        <button onclick="dismissOnboarding()" style="font-size:11px;color:var(--ink-lo);background:transparent;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">✓ 我懂了，不要再顯示</button>
+        <span style="font-size:10px;color:var(--ink-lo);">或直接跟我講話 ↓</span>
+      </div>
+    </div>
+  `;
+}
+
 // ── 規則化開場語（async fetch Worker 拿真實待辦）──
 const USER_INBOX_MAP = {
   bevis: ['design-approve'],
@@ -4596,10 +4702,17 @@ async function renderAiHeroMessages(){
   if(!box) return;
   const hist = _aiHist();
   if(!hist.length){
+    // 新人 onboarding（每帳號第一次顯示一次）
+    if (!isOnboardingDone() && ROLE_ONBOARDING[user]){
+      box.innerHTML = renderOnboardingCard();
+      return;
+    }
     // 第一次：先放 loading，async fetch 後替換
     box.innerHTML = `<div class="ai-hero-msg bot ai-hero-typing">載入今天的待辦中...</div>`;
     const greeting = await buildOpeningGreetingAsync();
     box.innerHTML = `<div class="ai-hero-msg bot">${renderMd(greeting)}</div>`;
+    // 加個小 link「再看一次引導」
+    box.insertAdjacentHTML('beforeend', `<div style="margin-top:6px;text-align:right;"><a onclick="showOnboardingAgain()" style="font-size:10px;color:var(--ink-lo);cursor:pointer;text-decoration:underline;">再看一次引導</a></div>`);
     return;
   }
   box.innerHTML = hist
