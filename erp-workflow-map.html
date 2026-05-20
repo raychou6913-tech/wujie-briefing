@@ -235,6 +235,31 @@ body{
 .wf-card.selected .wf-card-close{display:flex;align-items:center;justify-content:center;}
 .wf-card-close:hover{border-color:var(--danger);color:var(--danger);background:#fff;}
 
+/* 刪除卡片按鈕（hover 才出現，紅色警示）*/
+.wf-card-del{
+  position:absolute;bottom:6px;left:6px;
+  background:#fff;border:1px solid #fca5a5;border-radius:6px;
+  width:22px;height:22px;padding:0;font-size:11px;color:var(--danger);
+  cursor:pointer;font-family:inherit;
+  display:none;line-height:1;align-items:center;justify-content:center;
+  z-index:52;
+}
+.wf-card:hover .wf-card-del,
+.wf-card.selected .wf-card-del{display:flex;}
+.wf-card.wf-overview .wf-card-del{display:none !important;}  /* 全景圖不可刪 */
+.wf-card-del:hover{background:var(--danger);color:#fff;border-color:var(--danger);transform:scale(1.1);}
+
+/* toolbar 新卡片按鈕 */
+.wf-toolbar .wf-add-card{
+  background:var(--brand);color:#fff;border-color:var(--brand);
+  font-weight:700;
+}
+.wf-toolbar .wf-add-card:hover{background:#cc5420;border-color:#cc5420;color:#fff;}
+.wf-toolbar .wf-reset{
+  background:#fff;border-color:#fca5a5;color:var(--danger);
+}
+.wf-toolbar .wf-reset:hover{background:#fef2f2;border-color:var(--danger);color:var(--danger);}
+
 /* 展開區（selected 時顯示） */
 .wf-card-details{display:none;}
 .wf-card.selected .wf-card-details{
@@ -800,11 +825,23 @@ function getMergedFlow(flowKey){
   const f = WORKFLOWS[flowKey];
   if(!f) return null;
   const o = getFlowOverrides(flowKey);
-  const nodes = f.nodes.map(n => Object.assign({}, n, (o.nodes||{})[n.id] || {}));
-  const edges = f.edges.map(e => {
-    const k = e.from + '|' + e.to;
-    return Object.assign({}, e, (o.edges||{})[k] || {});
-  });
+  const deletedIds = new Set(o.deleted_node_ids || []);
+  // 過濾刪除 + apply patches
+  const baseNodes = f.nodes
+    .filter(n => !deletedIds.has(n.id))
+    .map(n => Object.assign({}, n, (o.nodes||{})[n.id] || {}));
+  // 加上 user 新增的卡（id 以 u_ 開頭）
+  const addedNodes = (o.add_nodes || []).filter(n => !deletedIds.has(n.id));
+  const nodes = [...baseNodes, ...addedNodes];
+  const nodeIds = new Set(nodes.map(n => n.id));
+  // edges：過濾掉 dangling（指向已刪卡的）+ apply label patches
+  const edges = f.edges
+    .filter(e => nodeIds.has(e.from) && nodeIds.has(e.to))
+    .map(e => {
+      const k = e.from + '|' + e.to;
+      return Object.assign({}, e, (o.edges||{})[k] || {});
+    });
+  // user 新增的 edges（V2 未實作）
   return Object.assign({}, f, {nodes, edges});
 }
 function patchNode(flowKey, nodeId, patch){
@@ -820,9 +857,73 @@ function patchEdge(flowKey, fromId, toId, patch){
   saveFlowOverrides(flowKey, o);
 }
 function resetFlow(){
-  if(!confirm('重設這個流程到原始版本？你的編輯會清掉（並通知雲端）。')) return;
-  // 清雲端（POST 空值）
+  const flow = WORKFLOWS[currentFlow];
+  const msg = `⚠ 確定要還原「${flow?.title || currentFlow}」到原始版本？
+
+會清掉：
+✗ 卡片位置（拖拉）
+✗ 卡片內容編輯（title / owner / SLA / desc）
+✗ 邊註文字（箭頭標籤）
+✗ 新增的卡片（如有）
+✗ 刪除的卡片（會復原）
+
+不會清：
+✓ ✓⚠ 確認狀態 chips（跨流程共用）
+✓ 💡 優化建議 notes（跨流程共用）
+
+此操作會即時同步雲端，沒有 undo。`;
+  if(!confirm(msg)) return;
+  if(!confirm('再次確認：真的要還原嗎？（會立刻同步給所有人）')) return;
   _wfSet('edits_'+currentFlow+'_v1', {});
+  renderCanvas();
+}
+
+// ── 新增卡片到當前流程 ──
+function addNewCard(){
+  if (currentFlow === 'overview') { alert('全景圖唯讀，請進對應流程加卡片'); return; }
+  const flow = getMergedFlow(currentFlow);
+  if (!flow) return;
+  const o = getFlowOverrides(currentFlow);
+  const id = 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  // 放在現有卡片右下角偏移處
+  const maxX = Math.max(...flow.nodes.map(n => n.x), 30);
+  const maxY = Math.max(...flow.nodes.map(n => n.y), 30);
+  const newNode = {
+    id,
+    title: '新卡片（點此編輯）',
+    owner: '待定',
+    sla: '-',
+    x: maxX + 30,
+    y: Math.min(maxY + 30, 60),
+    desc: '新增的流程環節，請編輯內容。'
+  };
+  o.add_nodes = o.add_nodes || [];
+  o.add_nodes.push(newNode);
+  saveFlowOverrides(currentFlow, o);
+  selectedNodeId = id;  // 自動選中讓使用者編輯
+  renderCanvas();
+}
+
+// ── 刪除卡片（含相關 edges 自動清掉）──
+function deleteCard(nodeId){
+  if (currentFlow === 'overview') return;
+  const flow = getMergedFlow(currentFlow);
+  const node = flow.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  if (!confirm(`⚠ 確定要刪除「${node.title}」？
+
+相連的箭頭也會自動清掉。可以「↺ 還原預設」復原原本流程的卡片（但你編輯的內容會一起清）。`)) return;
+  const o = getFlowOverrides(currentFlow);
+  if (nodeId.startsWith('u_')) {
+    // user 自加的卡 → 直接從 add_nodes 拿掉
+    o.add_nodes = (o.add_nodes || []).filter(n => n.id !== nodeId);
+  } else {
+    // 原始 hardcoded 卡 → 標記為刪除
+    o.deleted_node_ids = o.deleted_node_ids || [];
+    if (!o.deleted_node_ids.includes(nodeId)) o.deleted_node_ids.push(nodeId);
+  }
+  saveFlowOverrides(currentFlow, o);
+  if (selectedNodeId === nodeId) selectedNodeId = null;
   renderCanvas();
 }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -950,7 +1051,8 @@ function renderCanvas(){
       <span style="flex:1"></span>
       ${progressBlock}
       <button onclick="openTodoListModal()" title="跨流程列出待確認 / 需議卡">⚠ 待議清單</button>
-      <button onclick="resetFlow()">重設此流程</button>
+      ${isOverview ? '' : '<button class="wf-add-card" onclick="addNewCard()" title="在當前流程新增一張卡片">＋ 新卡片</button>'}
+      <button class="wf-reset" onclick="resetFlow()" title="清掉所有編輯，還原流程到原始版本（沒 undo）">↺ 還原預設</button>
     </div>
     <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
       <svg class="wf-arrows" id="wf-arrows" width="${W}" height="${H}">
@@ -1033,6 +1135,7 @@ function renderCanvas(){
       ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
       ${overviewBadge}
       <button class="wf-card-close" data-close-btn title="收起">✕</button>
+      ${isOverview ? '' : '<button class="wf-card-del" data-del-btn title="刪除此卡片（含相關箭頭）">🗑</button>'}
       <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayTitle)}</div>
       <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayOwner)}</div>
       <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(displaySla)}</span></div>
@@ -1073,6 +1176,12 @@ function renderCanvas(){
       ev.stopPropagation();
       selectNode(null);
     });
+    // 刪除按鈕
+    const delBtn = card.querySelector('[data-del-btn]');
+    if (delBtn) delBtn.addEventListener('click', ev => {
+      ev.stopPropagation();
+      deleteCard(n.id);
+    });
     // 跳對應 flow tab
     const jumpBtn = card.querySelector('[data-jump-flow]');
     if (jumpBtn) jumpBtn.addEventListener('click', ev => {
@@ -1093,13 +1202,13 @@ function renderCanvas(){
     // 卡片 click：非編輯區 + 非互動元素 → 選取/取消
     card.addEventListener('click', e => {
       if (e.target.closest('[contenteditable="true"]')) return;
-      if (e.target.closest('textarea, button, a, .wf-status-chip')) return;
+      if (e.target.closest('textarea, button, a, .wf-status-chip, .wf-card-del')) return;
       selectNode(n.id === selectedNodeId ? null : n.id);
     });
     // 拖拉：整張卡 mousedown 都觸發（除了編輯區 / 互動元素）
     card.addEventListener('mousedown', ev => {
       if (ev.target.closest('[contenteditable="true"]')) return;
-      if (ev.target.closest('textarea, button, a, .wf-card-note, .wf-status-chip')) return;
+      if (ev.target.closest('textarea, button, a, .wf-card-note, .wf-status-chip, .wf-card-del')) return;
       startDrag(card, n.id, ev);
     });
     hostEl.appendChild(card);
