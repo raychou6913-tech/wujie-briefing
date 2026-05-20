@@ -1272,8 +1272,8 @@ function renderCanvas(){
       <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
         <svg class="wf-arrows" id="wf-arrows" width="${W}" height="${H}">
           <defs>
-            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/></marker>
-            <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/></marker>
+            <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
           </defs>
         </svg>
       </div>
@@ -1478,12 +1478,39 @@ function drawEdge(svgEl, hostEl, flow, e){
   const line = document.createElementNS(NS, 'line');
   line.setAttribute('x1', x1); line.setAttribute('y1', y1);
   line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-  line.setAttribute('stroke', e.alt ? '#ef4444' : '#ccc');
+  const baseStroke = e.alt ? '#ef4444' : '#ccc';
+  line.setAttribute('stroke', baseStroke);
   line.setAttribute('stroke-width', e.alt ? 1 : 1.5);
   if(e.alt) line.setAttribute('stroke-dasharray', '5,3');
   line.setAttribute('marker-end', e.alt ? 'url(#arrow-alt)' : 'url(#arrow)');
   line.setAttribute('fill', 'none');
+  line.style.pointerEvents = 'none';
   svgEl.appendChild(line);
+
+  // 隱形 hit line（粗 14px 透明）→ 點線本身就能刪箭頭（全景圖除外）
+  if (currentFlow !== 'overview') {
+    const hitLine = document.createElementNS(NS, 'line');
+    hitLine.setAttribute('x1', x1); hitLine.setAttribute('y1', y1);
+    hitLine.setAttribute('x2', x2); hitLine.setAttribute('y2', y2);
+    hitLine.setAttribute('stroke', 'transparent');
+    hitLine.setAttribute('stroke-width', '14');
+    hitLine.setAttribute('fill', 'none');
+    hitLine.style.cursor = 'pointer';
+    hitLine.style.pointerEvents = 'stroke';
+    hitLine.addEventListener('mouseenter', () => {
+      line.setAttribute('stroke', '#ff6b35');
+      line.setAttribute('stroke-width', e.alt ? 2 : 2.5);
+    });
+    hitLine.addEventListener('mouseleave', () => {
+      line.setAttribute('stroke', baseStroke);
+      line.setAttribute('stroke-width', e.alt ? 1 : 1.5);
+    });
+    hitLine.addEventListener('click', ev => {
+      ev.stopPropagation();
+      deleteEdge(e.from, e.to);
+    });
+    svgEl.appendChild(hitLine);
+  }
 
   // Editable label + 刪除箭頭按鈕（wrap container hover 才出現 ✕）
   const mx = (x1+x2)/2, my = (y1+y2)/2;
