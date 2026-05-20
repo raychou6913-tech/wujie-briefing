@@ -2099,7 +2099,7 @@ function openNewOrderModal(){
 function closeNewOrderModal(){
   document.getElementById('new-order-modal').classList.remove('show');
 }
-function submitNewOrder(){
+async function submitNewOrder(){
   const client = document.getElementById('no-client').value.trim();
   const product = document.getElementById('no-product').value;
   const qty = document.getElementById('no-qty').value.trim();
@@ -2109,25 +2109,52 @@ function submitNewOrder(){
   if(!client){ alert('請填寫客戶名稱'); return; }
   if(!qty || !amt){ alert('請填寫數量與金額'); return; }
 
+  // 寫飛書 銷售進度表（owner=anran → 直接進安然批發核准 inbox）
+  const NOW = Date.now();
+  const fields = {
+    '標題': `${client} · ${product}`,
+    '產品/項目': product,
+    '數量': Number(qty),
+    '總金額': Number(amt) * 10000,  // UI 是萬元 → CNY 元
+    '幣別': 'CNY',
+    '訂單狀態': '洽談中',  // 觸發 anran-wholesale-approve inbox
+    '預計交貨日': date ? new Date(date).getTime() : null,
+    '負責業務': name || user,
+    '備註': `客戶：${client}${notes?' · '+notes:''}`,
+    'owner': 'anran',
+    'submitted_by': user,
+    'created_at': NOW,
+    'updated_at': NOW,
+    'version': 1,
+    'urgency': Number(amt) >= 50 ? 'high' : 'normal',  // ≥¥50 萬 high
+  };
+  try {
+    const tk = await getFeishuToken();
+    const r = await fetch(`${WORKER_BASE}/open-apis/bitable/v1/apps/${FEISHU_AT_V2}/tables/tblndRlEjmOgh5lk/records`, {
+      method:'POST',
+      headers:{ Authorization:`Bearer ${tk}`, 'Content-Type':'application/json' },
+      body: JSON.stringify({ fields }),
+    });
+    const d = await r.json();
+    if (d.code !== 0) throw new Error(JSON.stringify(d));
+  } catch(e){
+    console.error('new-order feishu fail:', e);
+    showQaToast('送出失敗：' + (e.message || e));
+    return;
+  }
+
+  // 本地 cache 給業務員自己「進行中」追蹤
   const order = {
     client, product, qty:qty+' 箱', amt:'¥ '+amt+' 萬', shipDate:date, notes,
-    owner:name, ownerUser:user, ts:Date.now(),
+    owner:name, ownerUser:user, ts:NOW, status:'pending-anran',
   };
   const orders = JSON.parse(localStorage.getItem('erp_new_orders_v1')||'[]');
   orders.unshift(order);
   localStorage.setItem('erp_new_orders_v1', JSON.stringify(orders));
 
-  // 通知 4 個部門
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  const msg = `新訂單：${client} · ${product} × ${qty} 箱 · ¥${amt} 萬（${name} 開單）`;
-  ['anran','laige','gaowei','yuming'].forEach(to => {
-    notif.unshift({ts:Date.now(), from:name, to, msg});
-  });
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-
   closeNewOrderModal();
   markCurrentTodoDone();
-  showQaToast(`✓ 訂單已通報 · 安然 / 賴哥 / 高維 / 躍明 收到`);
+  showQaToast(`✓ 訂單已送 → 安然批發核准（¥${amt} 萬${Number(amt)>=50?' · 高優先':''}）`);
 }
 
 function openSellThruModal(){
