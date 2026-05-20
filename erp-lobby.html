@@ -575,6 +575,15 @@ body{
   transition:transform .2s ease;
 }
 #ai-fab:hover{ transform:scale(1.05); }
+/* 使用回報浮動小按鈕（試用期用） */
+#report-fab{
+  position:fixed; right:90px; bottom:36px;
+  padding:8px 14px; border-radius:20px; border:1px solid var(--line);
+  background:#fff; color:var(--ink-mid); font-size:11px; font-weight:700;
+  cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.08); z-index:9000;
+  transition:.18s; font-family:inherit;
+}
+#report-fab:hover{ background:var(--brand-soft); color:var(--brand); border-color:var(--brand); }
 #ai-panel{
   position:fixed; right:24px; bottom:96px; width:380px; height:520px;
   background:#fff; border:1px solid var(--line); border-radius:14px;
@@ -4863,6 +4872,7 @@ async function sendAiMessage(){
 (function buildAiPanel(){
   if(document.getElementById('ai-fab')) return;
   const html = `
+    <button id="report-fab" onclick="openReportModal()" title="撞 bug / 用得卡 / 想吐槽 — 一句話送出">🐛 使用回報</button>
     <button id="ai-fab" onclick="toggleAiPanel()" aria-label="AI 助理">
       <span style="font-size:24px;">🤖</span>
     </button>
@@ -4877,9 +4887,85 @@ async function sendAiMessage(){
         <button onclick="sendAiMessage()" class="ai-send">送出</button>
       </div>
     </div>
+    <!-- 使用回報 modal -->
+    <div class="qa-modal-bg" id="report-modal" onclick="if(event.target===this)closeReportModal()">
+      <div class="qa-modal" style="max-width:480px;">
+        <div class="qa-modal-hd">
+          <div>
+            <div class="qa-modal-title">🐛 使用回報</div>
+            <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">一句話也行 · Ray + MJ 會看到 · 試用期不批評只收集</div>
+          </div>
+          <button class="qa-modal-close" onclick="closeReportModal()">✕</button>
+        </div>
+        <div class="qa-field-row">
+          <div class="qa-field"><label>類型</label><select id="rep-type">
+            <option value="bug">🐛 撞到 bug / 不能用</option>
+            <option value="confused">❓ 不懂怎麼用 / 找不到東西</option>
+            <option value="suggest">💡 想要 / 建議優化</option>
+            <option value="mood">💬 想吐槽 / 用得感覺</option>
+          </select></div>
+          <div class="qa-field"><label>心情（1-5）</label><select id="rep-mood">
+            <option value="3">3 · 還行</option>
+            <option value="5">5 · 順 ✨</option>
+            <option value="4">4 · OK</option>
+            <option value="2">2 · 卡卡的</option>
+            <option value="1">1 · 很挫折 😤</option>
+          </select></div>
+        </div>
+        <div class="qa-field"><label>內容 *</label><textarea id="rep-content" rows="4" placeholder="例：點開『新訂單』後送出沒反應 / 不知道『關聯項目』是什麼意思 / 希望加個 XXX 按鈕"></textarea></div>
+        <button class="qa-submit" onclick="submitReport()">送出回報</button>
+      </div>
+    </div>
   `;
   document.body.insertAdjacentHTML('beforeend', html);
 })();
+
+// ── 使用回報（POST 飛書 tblHadqJd7zjqZai）──
+function openReportModal(){
+  document.getElementById('rep-content').value = '';
+  document.getElementById('rep-type').value = 'bug';
+  document.getElementById('rep-mood').value = '3';
+  document.getElementById('report-modal').classList.add('show');
+  setTimeout(() => document.getElementById('rep-content').focus(), 100);
+}
+function closeReportModal(){ document.getElementById('report-modal').classList.remove('show'); }
+async function submitReport(){
+  const content = document.getElementById('rep-content').value.trim();
+  if (!content) { alert('請寫一下內容（一句話也行）'); return; }
+  const type = document.getElementById('rep-type').value;
+  const mood = Number(document.getElementById('rep-mood').value);
+  const TYPE_LABEL = { bug:'🐛 bug', confused:'❓ 不懂', suggest:'💡 建議', mood:'💬 吐槽' };
+  const now = new Date();
+  const pageUrl = location.pathname.split('/').pop() || 'home';
+  const fields = {
+    '多行文本': `[${TYPE_LABEL[type]}] ${content}`,
+    '填報人': name || user,
+    '部門': role || '-',
+    '日期': now.toISOString().slice(0,10),
+    '時間': now.toTimeString().slice(0,5),
+    '整體滿意度': mood,
+    '使用的表單': pageUrl,
+    '遇到的問題': type === 'bug' || type === 'confused' ? content : '',
+    '改善建議': type === 'suggest' ? content : '',
+    '心情': mood >= 4 ? '😊' : mood >= 3 ? '😐' : '😤',
+  };
+  try {
+    const tk = await getFeishuToken();
+    const r = await fetch(`${WORKER_BASE}/open-apis/bitable/v1/apps/${FEISHU_AT_V2}/tables/tblHadqJd7zjqZai/records`, {
+      method:'POST',
+      headers:{ Authorization:`Bearer ${tk}`, 'Content-Type':'application/json' },
+      body: JSON.stringify({ fields }),
+    });
+    const d = await r.json();
+    if (d.code !== 0) throw new Error(JSON.stringify(d));
+  } catch(e){
+    console.error('report fail:', e);
+    showQaToast('送出失敗，請截圖直接傳 Ray：' + (e.message||e));
+    return;
+  }
+  closeReportModal();
+  showQaToast('✓ 已收到，謝謝你的回報');
+}
 
 // ── Init ──────────────────────────────────────────────
 // Pulse 4 格全部 hardcoded demo 數據（員工視角，毛利+季度尺度）；之後接飛書時改 sync。
