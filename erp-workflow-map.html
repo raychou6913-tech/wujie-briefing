@@ -830,8 +830,10 @@ function getMergedFlow(flowKey){
   const baseNodes = f.nodes
     .filter(n => !deletedIds.has(n.id))
     .map(n => Object.assign({}, n, (o.nodes||{})[n.id] || {}));
-  // 加上 user 新增的卡（id 以 u_ 開頭）
-  const addedNodes = (o.add_nodes || []).filter(n => !deletedIds.has(n.id));
+  // 加上 user 新增的卡（id 以 u_ 開頭）— 也要 apply 編輯 patches (title/owner/sla/desc/x/y)
+  const addedNodes = (o.add_nodes || [])
+    .filter(n => !deletedIds.has(n.id))
+    .map(n => Object.assign({}, n, (o.nodes||{})[n.id] || {}));
   const nodes = [...baseNodes, ...addedNodes];
   const nodeIds = new Set(nodes.map(n => n.id));
   // edges：過濾掉 dangling（指向已刪卡的）+ apply label patches
