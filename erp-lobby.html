@@ -1048,8 +1048,8 @@ body{
   <div class="qa-modal" style="max-width:580px;">
     <div class="qa-modal-hd">
       <div>
-        <div class="qa-modal-title">🔥 待催辦</div>
-        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">系統自動偵測延遲任務 · 一鍵推送飛書催促</div>
+        <div class="qa-modal-title">🔥 全廳卡關總覽</div>
+        <div style="font-size:11px;color:var(--ink-lo);margin-top:3px;">跨廳偵測延遲 · 按「誰卡誰」分組 · 一鍵推送飛書催促</div>
       </div>
       <button class="qa-modal-close" onclick="closeChaseModal()">✕</button>
     </div>
@@ -2659,7 +2659,36 @@ async function openChaseModal(){
     list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 全公司任務都準時，沒有需要催的</div>';
     return;
   }
-  list.innerHTML = stale.map((s, idx) => {
+
+  // ── 按廳（domain）分組 ──
+  const DOMAIN_LABEL = {
+    'anran':'安然廳 · 業務/採購/IP', 'bevis':'設計組 · Bevis 線', 'shawn':'Shawn 自己 domain',
+    'ray':'Ray 親簽', 'yuming':'財務組 · 躍明線', 'peilin':'珮綾 · 企劃版權',
+  };
+  const groups = {};
+  stale.forEach((s, idx) => {
+    const key = s.domain || 'other';
+    (groups[key] = groups[key] || []).push({ s, idx });
+  });
+  const avgLate = (stale.reduce((a,b)=>a+b.daysLate,0) / stale.length).toFixed(1);
+  const highCount = stale.filter(s=>s.urgency==='high').length;
+  // 找前 2 大卡點
+  const topDomains = Object.entries(groups).sort((a,b)=>b[1].length-a[1].length).slice(0,2)
+    .map(([k,arr])=>`${(DOMAIN_LABEL[k]||k).split(' · ')[0]} (${arr.length})`).join(' / ');
+
+  const summaryHtml = `
+    <div style="background:var(--paper-soft);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:22px;font-weight:900;color:var(--warn);letter-spacing:-.02em;">${stale.length}</span>
+        <span style="font-size:11px;color:var(--ink-mid);">件卡關</span>
+        ${highCount ? `<span style="font-size:10px;color:var(--danger);font-weight:700;background:#fef2f2;padding:2px 7px;border-radius:10px;">${highCount} 件高優先</span>` : ''}
+        <span style="font-size:10px;color:var(--ink-lo);">平均延遲 ${avgLate} 天</span>
+      </div>
+      ${topDomains ? `<div style="font-size:11px;color:var(--ink-mid);margin-top:6px;">主要卡點：<strong style="color:var(--ink);">${topDomains}</strong></div>` : ''}
+    </div>
+  `;
+
+  const renderItem = (s, idx) => {
     const whoIsOwner = s.whoUser === s.domainOwner;
     let secondBtn = '', tagText = '';
     if(whoIsOwner){
@@ -2687,7 +2716,24 @@ async function openChaseModal(){
         <button onclick="doChaseHide(${idx})" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫掛 24h</button>
       </div>
     </div>`;
+  };
+
+  // 按 group 大小排序（卡最多的廳排上面）
+  const groupOrder = Object.entries(groups).sort((a,b)=>b[1].length-a[1].length);
+  const groupsHtml = groupOrder.map(([dk, arr]) => {
+    const lbl = DOMAIN_LABEL[dk] || dk;
+    arr.sort((a,b)=>b.s.daysLate - a.s.daysLate);
+    return `
+      <div style="margin-bottom:18px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-lo);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--line);">
+          ${lbl} <span style="color:var(--warn);">${arr.length}</span>
+        </div>
+        ${arr.map(({s, idx}) => renderItem(s, idx)).join('')}
+      </div>
+    `;
   }).join('');
+
+  list.innerHTML = summaryHtml + groupsHtml;
 }
 function closeChaseModal(){ document.getElementById('chase-modal').classList.remove('show'); }
 // 統一 hidden key — Worker 用 kind:record_id；local 用 key:itemId
@@ -3386,61 +3432,79 @@ async function doContractAction(recordId, action){
 }
 function closeContractModal(){ document.getElementById('contract-modal').classList.remove('show'); }
 
-const XBORDER_INBOX_SEED = [
-  {id:'x1', from:'北京蕪解', to:'香港 JV', ccy:'CNY→HKD', amount:'¥ 850,000 (≈HK$ 935,000)',
-   purpose:'Q2 貨款結算', urgency:'high', detail:'4 月份批發 LOG-ON 訂單貨款撥付，已上 SWIFT，待躍明入帳記錄。'},
-  {id:'x2', from:'北京蕪解', to:'台灣悍草', ccy:'CNY→TWD', amount:'¥ 120,000 (≈NT$ 528,000)',
-   purpose:'服務費 Q1', urgency:'med', detail:'悍草為北京蕪解提供設計 / 行政服務的 Q1 結算。'},
-  {id:'x3', from:'台灣悍草', to:'UJ BKK', ccy:'TWD→THB', amount:'NT$ 100,000 (≈฿ 109,000)',
-   purpose:'曼谷展場費代墊', urgency:'low', detail:'JJK 曼谷快閃場地費悍草代墊，BKK 月結補回。'},
-];
-function loadXborderInbox(){
-  const stored = localStorage.getItem('anran_xborder_inbox_v1');
-  if(stored) return JSON.parse(stored);
-  localStorage.setItem('anran_xborder_inbox_v1', JSON.stringify(XBORDER_INBOX_SEED));
-  return XBORDER_INBOX_SEED;
-}
-function openXborderModal(){ renderXborderInbox(); document.getElementById('xborder-modal').classList.add('show'); }
-function closeXborderModal(){ document.getElementById('xborder-modal').classList.remove('show'); }
-function renderXborderInbox(){
+// 跨境款項：飛書直連（5/20 從安然搬到躍明）
+window._xborderInboxCache = [];
+async function openXborderModal(){
+  document.getElementById('xborder-modal').classList.add('show');
   const list = document.getElementById('xborder-inbox-list');
-  const arr = loadXborderInbox().filter(i => !i.status);
-  if(!arr.length){
-    list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待確認跨境款項</div>';
-    return;
+  list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>`;
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/yuming-xborder?owner=yuming`);
+    const d = await r.json();
+    if(!d.ok){ list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${d.error||r.status}</div>`; return; }
+    const items = (d.items||[]).map(it => {
+      const f = it.raw_fields || {};
+      return {
+        record_id: it.record_id, version: it.version,
+        from: _xbTxt(f['出方主體']), to: _xbTxt(f['入方主體']),
+        amount: f['金額'] || 0, ccy: _xbTxt(f['幣別']) || 'CNY',
+        cny: f['折合人民幣'] || 0,
+        purpose: _xbTxt(f['用途']), project: _xbTxt(f['對應項目']),
+        detail: _xbTxt(f['備註']),
+        urgency: it.urgency,
+      };
+    });
+    window._xborderInboxCache = items;
+    if(!items.length){
+      list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 目前沒有待確認跨境款項</div>';
+      return;
+    }
+    list.innerHTML = items.map(i => {
+      const amtText = `${i.ccy === 'CNY' ? '¥' : i.ccy + ' '}${(i.amount||0).toLocaleString()}` + (i.cny && i.ccy !== 'CNY' ? `<span style="font-size:10px;color:var(--ink-lo);font-weight:400;"> (≈¥${i.cny.toLocaleString()})</span>` : '');
+      return `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--warn);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="flex:1;">
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.from} → ${i.to}</span>
+            <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.purpose}${i.project?' · '+i.project:''}</div>
+          </div>
+          <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${amtText}</div>
+        </div>
+        ${i.detail?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>`:''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doXborderAction('${i.record_id}','confirm')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 已入帳</button>
+          <button onclick="doXborderAction('${i.record_id}','hold')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">擱置</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">網路錯誤：${e.message||e}</div>`;
   }
-  list.innerHTML = arr.map(i => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${i.urgency==='high'?'border-color:var(--warn);':''}">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-      <div style="flex:1;">
-        <span style="font-size:13px;font-weight:700;color:var(--ink);">${i.from} → ${i.to}</span>
-        <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${i.purpose} · ${i.ccy}</div>
-      </div>
-      <div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${i.amount}</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${i.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doXborderAction('${i.id}','confirmed')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 確認 · 送躍明入帳</button>
-      <button onclick="doXborderAction('${i.id}','hold')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">擱置</button>
-    </div>
-  </div>`).join('');
 }
-function doXborderAction(id, action){
-  const arr = loadXborderInbox();
-  const item = arr.find(x => x.id === id);
-  if(item){ item.status = action; localStorage.setItem('anran_xborder_inbox_v1', JSON.stringify(arr)); }
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  if(action === 'confirmed' && item){
-    notif.unshift({ts:Date.now(), from:name, to:'yuming',
-      msg:`安然確認跨境：${item.from+' → '+item.to+' · '+item.amount} · 入帳`});
-  } else if(action === 'hold' && item){
-    // 擱置 → 通知申請人（Phase 1 補洞，預設通知躍明知道暫不入帳）
-    notif.unshift({ts:Date.now(), from:name, to:'yuming',
-      msg:`⏸ 安然擱置跨境：${item.from+' → '+item.to} · 暫不入帳，等通知`});
+function _xbTxt(v){ if(!v) return ''; if(typeof v === 'string') return v; if(v.text) return v.text; if(Array.isArray(v)) return v.map(x=>x.text||x.name||'').join(''); if(v.name) return v.name; return String(v); }
+function closeXborderModal(){ document.getElementById('xborder-modal').classList.remove('show'); }
+async function doXborderAction(recordId, action){
+  const item = window._xborderInboxCache.find(x => x.record_id === recordId);
+  if(!item){ showQaToast('找不到項目'); return; }
+  let note = '';
+  if(action === 'hold'){
+    note = prompt('擱置原因（會通知出方）：') || '';
+    if(!note.trim()){ showQaToast('未輸入原因，取消'); return; }
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  renderXborderInbox();
-  markCurrentTodoDone();
-  showQaToast(action === 'confirmed' ? '✓ 已送躍明入帳' : '已擱置 · 通知躍明');
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/yuming-xborder/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if(!d.ok){
+      if(r.status === 409){ showQaToast('⚠ 版本衝突，重新載入'); openXborderModal(); }
+      else showQaToast('動作失敗：' + (d.error||r.status));
+      return;
+    }
+    showQaToast(action === 'confirm' ? `✓ ${item.from} → ${item.to} 已入帳` : '已擱置');
+    markCurrentTodoDone();
+    openXborderModal();
+  } catch(e){ showQaToast('網路錯誤：'+(e.message||e)); }
 }
 
 // 安然 IP 維護提醒（飛書直連 — 從合約管理表，按到期日 < 180 天驅動）

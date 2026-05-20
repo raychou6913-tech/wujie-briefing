@@ -495,8 +495,8 @@ if(_sess && !['ray','shawn','anran'].includes(user)){
 // 每邊 {from, to, label?, alt?(退回流程用 dashed red)}
 const WORKFLOWS = {
   overview: {
-    title:'⭐ 全景圖（11 流程串接）',
-    sub:'make-to-stock 模式：項目立項 → 設計+送審+打樣 → 三人 commit 大貨 → 業務帶貨況銷售 → 客戶下單 → 工廠直發',
+    title:'⭐ 全景圖（12 流程串接）',
+    sub:'make-to-stock 模式：項目立項 → 設計+送審+打樣 → 三人 commit 大貨 → 業務簽單 → 履約出貨 → 入帳',
     width:1320, height:540,
     nodes:[
       // 上層：立項 + 創意 + IP
@@ -504,24 +504,26 @@ const WORKFLOWS = {
       {id:'o4', title:'#4 設計流程', owner:'Bevis / 詩彤', sla:'2-4 週', x:280, y:60, desc:'從 brief 到打樣稿；Bevis 核准後送 IP 方。', action:'flow:design'},
       {id:'o5', title:'#5 IP 送審', owner:'珮綾', sla:'14 天', x:530, y:60, desc:'送 IP 版權方審核；通過才能進打樣。', action:'flow:ip_approval'},
       {id:'o3', title:'#3 採購 PO ⭐', owner:'賴哥 / 木子', sla:'30-100 天', x:780, y:60, desc:'打樣 → 三方確認 → 三人 commit 大貨 → 工廠寄存等銷售。', action:'flow:procurement'},
-      {id:'o1', title:'#1 批發訂單 ⭐', owner:'業務 / 安然 / Ray', sla:'貨備好後銷售', x:1030, y:60, desc:'⭐ make-to-stock：帶著貨況談客戶 → 客戶下單 → 工廠直發。', action:'flow:wholesale'},
+      {id:'o1', title:'#1 批發訂單 ⭐', owner:'業務 / 安然 / Ray', sla:'貨備好後銷售', x:1030, y:60, desc:'⭐ 業務決策面：帶貨況談客戶 → 報價 → 安然/Ray 把關 → 簽單成立。', action:'flow:wholesale'},
 
-      // 中層：銷售相關
+      // 中層：銷售 + 履約
       {id:'o8', title:'#8 拜訪客戶', owner:'業務員', sla:'拜訪當天', x:30, y:230, desc:'平時情報收集 → feed 三人 commit 決策。', action:'flow:visit'},
+      {id:'o12', title:'#12 履約出貨', owner:'躍明 / 高維', sla:'下訂後即啟動', x:530, y:230, desc:'接 #1 簽單成立 → 客戶付款 → 躍明入帳 → 高維工廠直發 → 客戶簽收 → 尾款追蹤 → VAM。', action:'flow:fulfillment'},
       {id:'o7', title:'#7 快閃店', owner:'Shawn / 安然', sla:'3 個月籌備', x:780, y:230, desc:'場地 + IP 主題確定 → 採購+設計+物流並行。', action:'flow:popup'},
 
       // 下層：結算 + 後台
       {id:'o2', title:'#2 費用報銷', owner:'全員', sla:'48hr+3天', x:30, y:400, desc:'個人 / 業務 / OPEX 三類分流；最後到躍明。', action:'flow:expense'},
-      {id:'o9', title:'#9 跨境結算', owner:'安然 → 躍明', sla:'發生時', x:280, y:400, desc:'北京→香港/台灣/泰國 款項對齊。', action:'flow:xborder'},
+      {id:'o9', title:'#9 跨境結算', owner:'躍明', sla:'發生時', x:280, y:400, desc:'北京→香港/台灣/泰國 款項對齊。', action:'flow:xborder'},
       {id:'o10', title:'#10 月結', owner:'躍明', sla:'每月 1-5 日', x:530, y:400, desc:'損益表 / 現金流 / VAM 計入。', action:'flow:monthend'},
       {id:'o6', title:'#6 IP 續簽', owner:'安然', sla:'到期前 6 個月', x:1030, y:400, desc:'時間驅動 · 平行流程；續簽後可能重啟項目。', action:'flow:contract_renew'},
     ],
     edges:[
-      // 主流：項目 → 設計 → 送審 → 採購(含打樣+commit) → 批發(銷售+出貨)
+      // 主流：項目 → 設計 → 送審 → 採購(含打樣+commit) → 批發(業務) → 履約 → 月結
       {from:'o11', to:'o4', label:'派設計'},
       {from:'o4', to:'o5', label:'送審'},
       {from:'o5', to:'o3', label:'通過 → 打樣'},
       {from:'o3', to:'o1', label:'貨寄存 → 銷售'},
+      {from:'o1', to:'o12', label:'簽單成立'},
       // 業務情報 feed
       {from:'o8', to:'o3', label:'情報 feed commit'},
       {from:'o8', to:'o1', label:'業務帶貨況談客戶'},
@@ -529,7 +531,7 @@ const WORKFLOWS = {
       {from:'o11', to:'o7', label:'快閃立項'},
       {from:'o11', to:'o2', label:'OPEX 編列'},
       // 結算流
-      {from:'o1', to:'o10', label:'入帳'},
+      {from:'o12', to:'o10', label:'入帳'},
       {from:'o7', to:'o10', label:'快閃結算'},
       {from:'o2', to:'o10', label:'費用入帳'},
       {from:'o9', to:'o10', label:'跨境對齊'},
@@ -539,9 +541,9 @@ const WORKFLOWS = {
   },
 
   wholesale: {
-    title:'1. 批發訂單流程',
-    sub:'⭐ make-to-stock 模式：先 commit 工廠 → 帶著貨況做業務 → 客戶下單後工廠直發',
-    width:1200, height:520,
+    title:'1. 批發訂單流程（業務決策面）',
+    sub:'⭐ make-to-stock：commit → 帶貨況談客戶 → 報價 → 安然/Ray 把關 → 簽單成立（履約走 #12）',
+    width:1200, height:400,
     nodes:[
       // Row 1：前置決策
       {id:'a1', title:'業務情報收集', owner:'業務員 + 安然', sla:'持續', x:30, y:60, desc:'KA 詢盤 / 品牌方意向 / 流通通路反饋 / IP 熱度監控 — 不下單只蒐情報，feed 給內部 commit 決策。'},
@@ -554,15 +556,9 @@ const WORKFLOWS = {
       {id:'a7', title:'客戶意向 → 報價', owner:'業務員', sla:'1-2 週', x:280, y:220, desc:'業務員報價 / 客戶確認數量 + 折扣 + 出貨日。'},
       {id:'a8', title:'安然把關', owner:'安然', sla:'24 hr', x:530, y:220, desc:'IP 授權範圍 / 客戶資質 / 庫存夠不夠 — 三項確認。大金額轉 Ray 確認。', action:'wholesale-approve'},
       {id:'a9', title:'Ray 確認大單', owner:'Ray', sla:'24 hr', x:780, y:220, desc:'金額 > X 萬 / 戰略客戶 / 特殊折扣 → 須 Ray 親確認。小單安然自己過。', action:'ray-approval'},
-      {id:'a10', title:'客戶付款（依條件）', owner:'客戶 → 楊子/Leo', sla:'依條件', x:1030, y:220, desc:'付款時點依客戶屬性走，5 種條件詳見變量卡 💰。系統建單時自動帶該客戶的付款條件 + 計算對應收款 SLA。'},
-      // Row 3：出貨 + 入帳
-      {id:'a11', title:'高維工廠直發', owner:'高維', sla:'2 天', x:30, y:380, desc:'從工廠倉直接發客戶（不經北京/泰國倉）→ 自動通知安然 + 業務員 + 客戶。出貨時點也看付款條件：訂金型必須先收訂金才出；全款預付必須收全款才出；帳期型可直接出。', action:'logistics-batch'},
-      {id:'a12', title:'收款追蹤（依條件）', owner:'楊子/Leo → 躍明', sla:'依條件', x:280, y:380, desc:'追剩餘款項依客戶付款條件：訂金型追尾款 70% / 帳期型追到期款 / 寄售型追實際銷售結算。系統依客戶屬性自動算到期日 + 逾期 alert。', action:'my-approval'},
-      {id:'a13', title:'躍明入帳 → VAM 計入', owner:'躍明', sla:'3 天', x:530, y:380, desc:'寫進財務 + 月結對齊 + VAM 800 萬目標計入（JV/深圳子公司）。', action:'my-pending'},
-      // 變量說明卡：付款條件
-      {id:'b2', title:'💰 付款條件變量', owner:'客戶屬性（5 種）', sla:'建單自動帶', x:780, y:380, desc:'5 種付款模式（依客戶名單表「付款條件」屬性自動套）：\n\n① 全款預付：收 100% → 才出貨（新客戶 / 高風險）\n② 訂金 + 尾款：30% → 出貨 → 70%（一般合作）\n③ 帳期 30 天：出貨 → 30 天後付（既有 KA）\n④ 帳期 60-90 天：出貨 → N 天後付（大型 KA / 流通通路）\n⑤ 寄售：出貨不結帳 → 賣掉才結（特殊通路）\n\nERP 改造點：客戶名單表加「付款條件」欄位 → 建訂單時自動帶 → a10 / a11 / a12 三棒邏輯依此走。'},
+      {id:'a14', title:'✓ 簽單成立 → 進履約', owner:'交接點', sla:'即時', x:1030, y:220, desc:'業務面完成 — 合同/報價已確認、Ray/安然已核准。接下來走「履約出貨流程 #12」：客戶實際付款 + 高維出貨 + 躍明入帳。\n\n👉 點下方按鈕跳到履約流程。', action:'flow:fulfillment'},
       // MTO 例外（右下角註解節點）
-      {id:'b1', title:'⚙ MTO 例外', owner:'同款追單 / 試水新品 / 自有 IP', sla:'-', x:1030, y:380, desc:'例外 3 種：① 同款第二批追單（版權打樣都過了）② 公司想試的新品類 ③ 公司自有 IP 商品 — 邏輯改成「先收意向 → 內部判斷 → commit 工廠」。'},
+      {id:'b1', title:'⚙ MTO 例外', owner:'同款追單 / 試水新品 / 自有 IP', sla:'-', x:30, y:380, desc:'例外 3 種：① 同款第二批追單（版權打樣都過了）② 公司想試的新品類 ③ 公司自有 IP 商品 — 邏輯改成「先收意向 → 內部判斷 → commit 工廠」。'},
     ],
     edges:[
       // 主流
@@ -574,19 +570,50 @@ const WORKFLOWS = {
       {from:'a6', to:'a7'},
       {from:'a7', to:'a8'},
       {from:'a8', to:'a9', label:'大單 → Ray'},
-      {from:'a8', to:'a10', label:'小單 OK'},
+      {from:'a8', to:'a14', label:'小單 OK · 簽單成立'},
       {from:'a8', to:'a7', label:'退回', alt:true},
-      {from:'a9', to:'a10', label:'核准'},
+      {from:'a9', to:'a14', label:'核准 · 簽單成立'},
       {from:'a9', to:'a8', label:'退回', alt:true},
-      {from:'a10', to:'a11'},
-      {from:'a11', to:'a12'},
-      {from:'a12', to:'a13'},
       // MTO 例外
       {from:'b1', to:'a3', label:'例外 → 仍走 commit', alt:true},
+    ],
+  },
+
+  fulfillment: {
+    title:'12. 履約出貨流程（接 #1 批發 / 物流面）',
+    sub:'業務簽單成立後 → 客戶付款 → 躍明入帳 → 高維出貨 → 簽收 → 尾款追蹤 → VAM',
+    width:1200, height:400,
+    nodes:[
+      // 邊界節點（從 #1 wholesale 跳過來）
+      {id:'f0', title:'← 業務面（#1 批發）', owner:'前置：簽單成立', sla:'-', x:30, y:60, desc:'本流程是 #1 批發訂單的下半段 — 業務 / 安然 / Ray 已把關完，合同/報價成立。\n\n👉 點下方看完整業務面流程。', action:'flow:wholesale'},
+      // Row 1：收款 → 入帳 → 觸發出貨
+      {id:'f1', title:'客戶付款（依條件）', owner:'客戶 → 楊子 / Leo', sla:'依條件', x:280, y:60, desc:'付款時點依客戶屬性 5 種條件走（詳見變量卡 💰）。系統依客戶名單表「付款條件」自動帶並計算收款 SLA。'},
+      {id:'f2', title:'躍明確認入帳', owner:'躍明', sla:'1-2 天', x:530, y:60, desc:'銀行對帳收到款項 → 標記入帳。觸發出貨條件：訂金型收 30% / 帳期型暫掛直接觸發 / 全款型收 100% / 寄售型只標出貨。', action:'my-pending'},
+      {id:'f3', title:'通知高維可出貨', owner:'系統訊號', sla:'即時', x:780, y:60, desc:'入帳/條件達標 → 系統自動推播給高維「PO#XXX 可出貨」訊號。帳期型不等收款直接觸發。'},
+      // Row 2：出貨 → 簽收 → 收尾款 → VAM
+      {id:'f4', title:'高維工廠直發', owner:'高維', sla:'2 天', x:30, y:220, desc:'從工廠倉直接發客戶（不經北京/泰國倉）→ 通知安然 + 業務員 + 客戶。出貨單 / 物流單號寫進「出貨進度」表。', action:'logistics-batch'},
+      {id:'f5', title:'客戶簽收確認', owner:'客戶 / 高維', sla:'7 天內', x:280, y:220, desc:'確認到貨數量正確、無破損。異常（少件 / 破損）→ 高維走補貨 / 退換流程。'},
+      {id:'f6', title:'尾款 / 帳期追蹤', owner:'楊子 / Leo → 躍明', sla:'依條件', x:530, y:220, desc:'帳期型：簽收後算到期日（30/60/90 天）。訂金型：簽收 7 天內追 70% 尾款。寄售型：等通路月結回報實銷數量。系統自動算到期日 + 逾期 alert。', action:'my-approval'},
+      {id:'f7', title:'躍明入帳 → VAM 計入', owner:'躍明', sla:'3 天', x:780, y:220, desc:'剩餘款項全數到帳 → 寫進財務 + 月結對齊 + VAM 800 萬目標計入（JV / 深圳子公司）。', action:'my-pending'},
+      // 變量卡：付款條件
+      {id:'fv1', title:'💰 付款條件變量', owner:'客戶屬性（5 種）', sla:'建單自動帶', x:1030, y:60, desc:'5 種付款模式（依客戶名單表「付款條件」屬性自動套）：\n\n① 全款預付：收 100% → 才出貨（新客戶 / 高風險）\n② 訂金 + 尾款：30% → 出貨 → 70%（一般合作）\n③ 帳期 30 天：出貨 → 30 天後付（既有 KA）\n④ 帳期 60-90 天：出貨 → N 天後付（大型 KA / 流通通路）\n⑤ 寄售：出貨不結帳 → 賣掉才結（特殊通路）\n\nERP 改造點：客戶名單表加「付款條件」欄位 → 建訂單自動帶 → f1 / f3 / f6 三棒邏輯依此走。'},
+    ],
+    edges:[
+      // 邊界進入
+      {from:'f0', to:'f1', label:'簽單成立 → 履約'},
+      // 主流
+      {from:'f1', to:'f2'},
+      {from:'f2', to:'f3', label:'入帳達標'},
+      {from:'f3', to:'f4'},
+      {from:'f4', to:'f5'},
+      {from:'f5', to:'f6'},
+      {from:'f6', to:'f7', label:'全額到帳'},
+      // 異常：簽收異常回高維
+      {from:'f5', to:'f4', label:'異常 → 補貨', alt:true},
       // 付款條件變量 → 影響 3 棒
-      {from:'b2', to:'a10', label:'套用', alt:true},
-      {from:'b2', to:'a11', label:'套用', alt:true},
-      {from:'b2', to:'a12', label:'套用', alt:true},
+      {from:'fv1', to:'f1', label:'套用', alt:true},
+      {from:'fv1', to:'f3', label:'套用', alt:true},
+      {from:'fv1', to:'f6', label:'套用', alt:true},
     ],
   },
 
