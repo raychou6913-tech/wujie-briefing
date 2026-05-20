@@ -1483,16 +1483,19 @@ function drawEdge(svgEl, hostEl, flow, e){
   line.setAttribute('fill', 'none');
   svgEl.appendChild(line);
 
-  // Editable label
+  // Editable label + 刪除箭頭按鈕（wrap container hover 才出現 ✕）
   const mx = (x1+x2)/2, my = (y1+y2)/2;
+  const wrap = document.createElement('span');
+  wrap.className = 'wf-edge-label-wrap';
+  wrap.style.left = mx + 'px';
+  wrap.style.top  = my + 'px';
   const labelEl = document.createElement('span');
   const isEmpty = !e.label;
   labelEl.className = 'wf-edge-label' + (e.alt?' alt':'') + (isEmpty?' empty':'');
   labelEl.contentEditable = 'true';
   labelEl.spellcheck = false;
   labelEl.textContent = e.label || '+';
-  labelEl.style.left = mx + 'px';
-  labelEl.style.top  = my + 'px';
+  labelEl.style.transform = 'none';  // 容器已 translate
   labelEl.addEventListener('focus', () => {
     if(labelEl.classList.contains('empty')){
       labelEl.textContent = '';
@@ -1507,7 +1510,20 @@ function drawEdge(svgEl, hostEl, flow, e){
       labelEl.textContent = '+';
     }
   });
-  hostEl.appendChild(labelEl);
+  wrap.appendChild(labelEl);
+  // 全景圖箭頭不可刪
+  if (currentFlow !== 'overview') {
+    const delBtn = document.createElement('button');
+    delBtn.className = 'wf-edge-del';
+    delBtn.textContent = '✕';
+    delBtn.title = '刪除這條箭頭';
+    delBtn.addEventListener('click', ev => {
+      ev.stopPropagation();
+      deleteEdge(e.from, e.to);
+    });
+    wrap.appendChild(delBtn);
+  }
+  hostEl.appendChild(wrap);
 }
 
 // ── 拖拉 state（含 scale 補償）──
