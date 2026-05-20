@@ -2266,7 +2266,7 @@ const ACTION_COUNT_SOURCES = {
   'stock-check':         {key:'muzi_stock_check_v1',       filter:i=>!i.confirmed},
   'shawn-chase':         {key:'shawn_chase_v1',            filter:i=>!i.done},
   // project-expense-approve 走 Worker，no localStorage badge — modal 點開時 fetch
-  'ray-approval':        {key:'ray_approval_v1',           filter:i=>!i.done},
+  // ray-approval 走 Worker /erp/inbox/ray-pending-all（跨表 owner=ray），no localStorage badge
   'design-approve':      {key:'bevis_design_approve_v1',   filter:i=>!i.done},
   'my-approval-tracker': {key:'peilin_approval_track_v1',  filter:i=>!i.done},
   'my-design-task':      {key:'shetong_design_task_v1',    filter:i=>!i.done},
@@ -2971,47 +2971,94 @@ function doChaseEscalate(idx){
 
 // 舊 doChase 函數已拿掉（hardcoded CHASE_SEED 已停用，改 dynamic STALE_DETECTOR）
 
-const RAY_APPROVAL_SEED = [
-  {id:'r1', type:'pricing', title:'Snoopy LOG-ON 訂單定價', from:'Shawn', urgency:'high', detail:'860 箱 / ¥199 萬 / 客戶要 5/30 前到貨；Shawn 已確認可執行，請拍板定價。'},
-  {id:'r2', type:'contract', title:'PNUTS Snoopy 北京代理 — 續簽', from:'安然', urgency:'high', detail:'USD $65k MG / 6/30 到期；安然轉來，需 Ray 親自核准續簽條款。'},
-  {id:'r3', type:'expense', title:'Shawn 5月差旅', from:'楊子', urgency:'med', detail:'NT$ 145,000 — 曼谷快閃 + 雅加達展會考察；主管級費用直達 Ray。'},
-];
-function openRayApprovalModal(){
-  const items = _seedKey('ray_approval_v1', RAY_APPROVAL_SEED);
-  _genericListRender(document.getElementById('ray-approval-list'), items, r => `<div style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${r.urgency==='high'?'border-color:var(--danger);':''}">
-    <div style="margin-bottom:6px;">
-      <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--brand)22;color:var(--brand);margin-right:6px;">${({pricing:'定價',contract:'合約',expense:'費用'})[r.type]||r.type}</span>
-      <span style="font-size:13px;font-weight:700;color:var(--ink);">${r.title}</span>
-      <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${r.from} 送來</div>
-    </div>
-    <div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;">${r.detail}</div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="doRayApproval('${r.id}','approved')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 批准</button>
-      <button onclick="doRayApproval('${r.id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回修改</button>
-      <button onclick="doRayApproval('${r.id}','hold')" style="padding:8px 12px;background:transparent;color:var(--ink-lo);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">暫緩</button>
-    </div>
-  </div>`, '✨ 沒有待批核項目');
+// Ray 待批核統一視角（飛書直連 — 2026-05-20 加）
+// 跨 INBOX_CONFIG 撈所有 owner=ray 的 record（合約轉 Ray / 項目費用升級 Ray / 其他）
+window._rayApprovalCache = [];
+async function openRayApprovalModal(){
+  const list = document.getElementById('ray-approval-list');
   document.getElementById('ray-approval-modal').classList.add('show');
+  list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">載入中...</div>';
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/ray-pending-all`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || '讀取失敗');
+    window._rayApprovalCache = d.items || [];
+    if (!d.items.length) {
+      list.innerHTML = '<div style="padding:32px 16px;text-align:center;color:var(--ink-lo);font-size:13px;">✨ 沒有待批核項目</div>';
+      return;
+    }
+    const KIND_LABEL = {
+      'anran-contract':         { type:'合約',       color:'#8b5cf6', icon:'📜' },
+      'shawn-project-expense':  { type:'項目費用',   color:'#ff6b35', icon:'💸' },
+      'anran-wholesale-approve':{ type:'批發訂單',   color:'#22c55e', icon:'📦' },
+      'anran-ip-reminder':      { type:'IP 維護',    color:'#f59e0b', icon:'🔐' },
+    };
+    list.innerHTML = d.items.map(it => {
+      const k = KIND_LABEL[it.kind] || { type: it.kind, color:'#666', icon:'📋' };
+      const rf = it.raw_fields || {};
+      const amtRaw = rf['實際金額'] || rf['合約金額'] || rf['總金額'];
+      const amt = amtRaw ? '¥' + Math.round(Number(amtRaw)).toLocaleString() : '';
+      const projRaw = rf['關聯項目'];
+      const proj = typeof projRaw === 'string' ? projRaw : Array.isArray(projRaw) ? (projRaw[0]?.text||'') : '';
+      const remarkRaw = rf['備註'] || rf['注意事項'] || rf['重點摘要'];
+      const remark = typeof remarkRaw === 'string' ? remarkRaw : Array.isArray(remarkRaw) ? (remarkRaw[0]?.text||'') : '';
+      const submitter = it.submitted_by || k.type + '線';
+      return `<div data-rid="${it.record_id}" style="border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;${it.urgency==='high'?'border-color:var(--danger);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div style="flex:1;">
+            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:${k.color}22;color:${k.color};margin-right:6px;">${k.icon} ${k.type}</span>
+            <span style="font-size:13px;font-weight:700;color:var(--ink);">${it.name||'(未命名)'}</span>
+            <div style="font-size:11px;color:var(--ink-mid);margin-top:3px;">${submitter} 送來${proj?' · 🔗 '+proj:''}</div>
+          </div>
+          ${amt?`<div style="font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;margin-left:12px;">${amt}</div>`:''}
+        </div>
+        ${remark?`<div style="background:var(--paper-soft);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink-mid);margin-bottom:10px;line-height:1.6;">${remark}</div>`:''}
+        <div style="display:flex;gap:6px;">
+          <button onclick="doRayPendingAction('${it.kind}','${it.record_id}','approve')" style="flex:1;padding:8px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✓ 批准</button>
+          <button onclick="doRayPendingAction('${it.kind}','${it.record_id}','revise')" style="padding:8px 12px;background:transparent;color:var(--ink-mid);border:1px solid var(--line);border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">退回</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<div style="padding:32px 16px;text-align:center;color:var(--danger);font-size:13px;">讀取失敗：${e.message||e}</div>`;
+  }
 }
 function closeRayApprovalModal(){ document.getElementById('ray-approval-modal').classList.remove('show'); }
-function doRayApproval(id, action){
-  const item = _genericDone('ray_approval_v1', id, '');
-  const labels = {approved:'已批准 · 通知執行', revise:'已退回 · 通知送出者修改', hold:'已暫緩 · 通知送出者等待'};
-  const notif = JSON.parse(localStorage.getItem('erp_notif_queue_v1')||'[]');
-  const FROM_USER = {'Shawn':'shawn','安然':'anran','楊子':'yangzi','賴哥':'laige','躍明':'yuming','Bevis':'bevis','珮綾':'peilin'};
-  const toUser = item && item.from ? (FROM_USER[item.from] || 'anran') : 'anran';
-  if(action === 'approved'){
-    notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`✓ Ray 批准：${item ? item.title : id}`});
-  } else if(action === 'revise'){
-    // 退回 → 通知送出者修改（Phase 1 補洞）
-    notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`⚠ Ray 退回需修改：${item ? item.title : id}`});
-  } else if(action === 'hold'){
-    // 暫緩 → 通知送出者（Phase 1 補洞）
-    notif.unshift({ts:Date.now(), from:'Ray', to:toUser, msg:`⏸ Ray 暫緩：${item ? item.title : id} · 暫時不批`});
+
+// 每個 kind 的 action 名字不同 — Ray 視角的「批准 / 退回」映射到各 kind 對應的 action key
+const RAY_ACTION_MAP = {
+  'anran-contract':         { approve:'approve', revise:'revise'  },
+  'shawn-project-expense':  { approve:'approve', revise:'reject'  },
+  'anran-wholesale-approve':{ approve:'can_do',  revise:'need_info' },
+  'anran-ip-reminder':      { approve:'start_renew', revise:'defer' },
+};
+
+async function doRayPendingAction(kind, recordId, uiAction){
+  const item = (window._rayApprovalCache||[]).find(x => x.kind === kind && x.record_id === recordId);
+  if (!item) { showQaToast('找不到項目'); return; }
+  const map = RAY_ACTION_MAP[kind] || { approve:'approve', revise:'reject' };
+  const realAction = map[uiAction] || uiAction;
+  let note = '';
+  if (uiAction === 'revise') {
+    note = prompt('退回原因（必填 · 會通知送出者）：') || '';
+    if (!note.trim()) { showQaToast('未輸入原因，取消'); return; }
   }
-  localStorage.setItem('erp_notif_queue_v1', JSON.stringify(notif));
-  openRayApprovalModal();
-  showQaToast(`✓ ${item ? item.title : id} · ${labels[action]}`);
+  try {
+    const r = await fetch(`${WORKER_BASE}/erp/inbox/${kind}/action`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ record_id: recordId, action: realAction, version: item.version, actor: user, note })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      if (r.status === 409) { showQaToast('⚠ 版本衝突，重新載入'); openRayApprovalModal(); }
+      else showQaToast('動作失敗：' + (d.error||r.status));
+      return;
+    }
+    showQaToast(uiAction === 'approve' ? `✓ 批准：${item.name}` : `⚠ 退回：${item.name}`);
+    openRayApprovalModal();
+  } catch(e){
+    showQaToast('網路錯誤：' + (e.message||e));
+  }
 }
 
 function openVisitLogModal(){
