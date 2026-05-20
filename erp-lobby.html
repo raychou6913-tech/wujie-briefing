@@ -4559,68 +4559,108 @@ function renderMd(text){
 }
 
 // ── 新人 onboarding（第一次登入該帳號顯示一次）──
+// Ray 5/20 拍板：剛上線時沒事做，AI 不要逼人試動作。
+// 改成「環境介紹 + 等事情發生我會 ping 你」的輕觸感。等真有資料流動後才轉個性化。
 const ROLE_ONBOARDING = {
-  laodong: { intro:'👋 歡迎來蕪解 ERP！你是 KA 通路業務員 — 客戶訂單從你開始接力到全公司。', cta:[
-    {icon:'＋', label:'試開一張新訂單', action:'new-order', why:'會自動送安然把關，全公司接力'},
-    {icon:'📞', label:'記一筆拜訪', action:'visit-log', why:'拜訪完馬上填，腦袋還熱的時候最準'},
-  ]},
-  debao: { intro:'👋 歡迎來蕪解 ERP！你跟老董並列 — 華中/華南通路的業務員。', cta:[
-    {icon:'＋', label:'試開一張新訂單', action:'new-order', why:'自動送安然把關'},
-    {icon:'📞', label:'記一筆拜訪', action:'visit-log', why:'拜訪完馬上填'},
-  ]},
-  anran: { intro:'👋 歡迎來蕪解 ERP！你管 IP 版權 / 合約 / 批發核准 / 北京日常 — 業務面的最後一關。', cta:[
-    {icon:'✓', label:'看批發訂單核准 inbox', action:'wholesale-approve', why:'業務員開的單會直接到這裡，你 ✓ 後流到下一棒'},
-    {icon:'📜', label:'看合約待批 inbox', action:'contract-approve', why:'IP 授權 / 新合約 / 續簽 都進這裡'},
-  ]},
-  laige: { intro:'👋 歡迎來蕪解 ERP！你是採購主管 — 工廠 / 詢比價 / 大貨 PO 都你管。', cta:[
-    {icon:'🔍', label:'詢比價 inbox', action:'my-quote', why:'供應商報價結果'},
-    {icon:'📦', label:'我的 PO inbox', action:'my-po', why:'追工廠出貨進度'},
-  ]},
-  muzi: { intro:'👋 歡迎來蕪解 ERP！你是採購執行 — 跟賴哥對接、廠端到貨核對。', cta:[
-    {icon:'📦', label:'備貨核對', action:'stock-check', why:'廠端到貨數量對不對'},
-    {icon:'📝', label:'付款申請（可選關聯項目）', action:'payment-request', why:'有項目歸屬走 Shawn 核 OPEX，沒有走楊子'},
-  ]},
-  gaowei: { intro:'👋 歡迎來蕪解 ERP！你管物流 / 報關 / 跨境發貨 — 蕪解的出貨大門。', cta:[
-    {icon:'🚚', label:'物流批次', action:'logistics-batch', why:'追出貨進度'},
-    {icon:'📋', label:'運費登錄', action:'freight-log', why:'每筆運費對齊月結'},
-  ]},
-  bevis: { intro:'👋 歡迎來蕪解 ERP！你是設計主管 — 詩彤的稿、Forge bedo 輸出 都過你的眼。', cta:[
-    {icon:'🎨', label:'設計核准', action:'design-approve', why:'詩彤送來的設計稿'},
-    {icon:'✨', label:'bedo 輸出', action:'bedo-approve', why:'Forge bedo 跑出的設計變體'},
-  ]},
-  peilin: { intro:'👋 歡迎來蕪解 ERP！你管企劃 / 版權送審 — 設計過完後 IP 方那關。', cta:[
-    {icon:'🖋', label:'送審追蹤', action:'my-approval-tracker', why:'追 IP 版權方反饋'},
-    {icon:'🖼', label:'主題企劃', action:'theme-plan', why:'Q3/Q4 開發提案'},
-  ]},
-  shetong: { intro:'👋 歡迎來蕪解 ERP！你是設計師 — Bevis 派的設計任務都在這。', cta:[
-    {icon:'📤', label:'我的設計任務', action:'my-design-task', why:'看 Bevis 派的稿 + 提交完稿'},
-  ]},
-  yangzi: { intro:'👋 歡迎來蕪解 ERP！你管 HR 費用 + 台灣 OPEX 對齊 — 員工費用 / 供應商請款 的初審。', cta:[
-    {icon:'✓', label:'我的待審 inbox', action:'my-approval', why:'員工申請費用先到你這'},
-    {icon:'💰', label:'薪資任務', action:'payroll-task', why:'每月薪資'},
-  ]},
-  leo: { intro:'👋 歡迎來蕪解 ERP！你跟楊子並列 — 台灣 HR + 銀行對帳。', cta:[
-    {icon:'✓', label:'我的待審', action:'my-approval', why:'費用單初審'},
-    {icon:'🏦', label:'銀行對帳', action:'bank-recon', why:'各銀行帳戶餘額'},
-  ]},
-  yuming: { intro:'👋 歡迎來蕪解 ERP！你是財務（會計）— 入帳 / 月結 / 跨境結算 都你管。', cta:[
-    {icon:'📋', label:'我的待入帳', action:'my-pending', why:'楊子 / Shawn 核完轉來的單'},
-    {icon:'💸', label:'跨境款項', action:'xborder-confirm', why:'集團 5 法人之間打款追蹤'},
-  ]},
-  shawn: { intro:'👋 歡迎來蕪解 ERP！你是 COO — 全廳調度 + 項目編預算 + 項目費用核 OPEX。', cta:[
-    {icon:'🔥', label:'全廳卡關總覽', action:'shawn-chase', why:'哪個廳卡誰、逾期 SLA — 一鍵催'},
-    {icon:'💸', label:'項目費用核 OPEX', action:'project-expense-approve', why:'有關聯項目的費用（系統自動算池剩餘 + 阻擋邏輯）'},
-  ]},
-  ray: { intro:'👋 歡迎來戰情桌 — 全公司向你升級的事件都在這。', cta:[
-    {icon:'✓', label:'我的待批核', action:'ray-approval', why:'跨來源（合約 / 項目費用 / 大批發單）所有要你拍板的事'},
-  ]},
-  chunlei: { intro:'👋 歡迎來蕪解 ERP！你管電商直播 — 抖音 / 小紅書 直播排期 + 備貨。', cta:[
-    {icon:'📱', label:'直播排期', action:'live-schedule', why:'本週直播時間表'},
-    {icon:'📦', label:'備貨確認', action:'live-stock', why:'直播商品庫存夠不夠'},
-  ]},
-  jiaying: { intro:'👋 歡迎來蕪解 ERP！你管電商上架 + 淘寶運營。', cta:[
-    {icon:'🛒', label:'淘寶上架', action:'taobao-listing', why:'排上架商品'},
-  ]},
+  laodong: `Hi 老董，我是 MJ — 蕪解 ERP 的 AI 助理。
+
+你的工作主場是 KA 通路客戶開發。能做的事（新訂單 / 動銷回報 / 拜訪記錄）都在左邊 sidebar，要用的時候點就好。
+
+系統剛上線，可能還沒有事進你的 inbox。等真的開始跑之後，我會在這裡跟你 update — 譬如「客戶今天有 X 個 ping」或「上週某筆訂單卡在某一棒」。
+
+平常不用一直盯著，有事我會找你；想問東西也直接打字。`,
+
+  debao: `Hi 德寶，我是 MJ — 蕪解 ERP 的 AI 助理。
+
+你跟老董並列 — 主場在華中/華南通路。能用的工具（新訂單 / 動銷 / 拜訪）都在左邊 sidebar。
+
+系統剛開始跑，現在還沒事不奇怪。等客戶資料 / 訂單真的流動起來，我會在這提醒你要追什麼 / 哪一單卡了。`,
+
+  anran: `安然，我是 MJ。
+
+你管 IP 版權 / 合約 / 批發核准 / 北京日常 — 蕪解業務面的把關角色。左邊 sidebar 列了你能進的 inbox（合約待批 / 批發核准 / IP 維護提醒），現在點開可能還是空的，這正常。
+
+等業務員開始開單、合約進進出出，我會在這裡告訴你「今天有什麼新進的、誰卡你」。`,
+
+  laige: `賴哥，我是 MJ。
+
+你是採購主管，工廠那一條都你管。左邊 sidebar 的詢比價 / 我的 PO / 打樣追蹤 是你的主要工具。
+
+系統剛開始跑，可能還沒 PO 進你的 inbox。等真有訂單推下來，我會在這幫你看「哪家工廠該回了、哪批打樣該收了」。`,
+
+  muzi: `木子，我是 MJ。
+
+你跟賴哥對接、管廠端到貨核對 + 付款申請。左邊有「備貨核對」「付款申請」兩個入口。
+
+順帶提一下：付款申請有個新欄位「關聯項目」（可選）— 選了會走 Shawn 核 OPEX，沒選走楊子。等真的有需要付款的時候會用到，這裡先講一下。`,
+
+  gaowei: `高維，我是 MJ。
+
+你管物流 / 報關 / 跨境發貨 — 蕪解的出貨大門。左邊 sidebar 是物流批次 + 運費登錄。
+
+等業務員開始開單，安然核准之後，會推給你「PO#XXX 可出貨」訊號。現在還沒事，等系統跑起來。`,
+
+  bevis: `Bevis，我是 MJ。
+
+你管設計團隊 — 詩彤的稿、Forge bedo 輸出都過你眼。左邊 sidebar 是設計核准 + bedo 輸出待確認。
+
+等詩彤開始上稿、Forge 輸出設計變體，我會在這裡告訴你「有 N 件等你看」。`,
+
+  peilin: `珮綾，我是 MJ。
+
+你管企劃 + 版權送審 — Bevis 線往下的那段。左邊 sidebar 是送審追蹤 + 主題企劃。
+
+等 Bevis 核完開始送 IP 版權方，我會在這跟你 update「PNUTS / Sanrio / Mofusand 哪家回了 / 還沒回」。`,
+
+  shetong: `詩彤，我是 MJ。
+
+你是設計師，Bevis 派的稿子都會進你的「我的設計任務」inbox。
+
+現在還沒任務也正常。等 Bevis 開始派稿，我會在這提醒「有新派 / 該交了」。`,
+
+  yangzi: `楊子，我是 MJ。
+
+你管 HR 費用 + 台灣 OPEX 對齊 — 員工申請費用 / 供應商請款的初審。左邊 sidebar 是我的待審 + 薪資任務 + OPEX 預算。
+
+等員工開始錄費用、供應商開始請款，我會在這幫你看「今天有 X 件等你」。`,
+
+  leo: `Leo，我是 MJ。
+
+你跟楊子並列 — 台灣 HR + 銀行對帳。左邊 sidebar 是我的待審 + 薪資任務 + 銀行對帳 + OPEX 預算。
+
+等費用 / 對帳活動開始流動，我會在這 update 你。`,
+
+  yuming: `躍明，我是 MJ。
+
+你是財務（會計）— 蕪解的最後一棒：入帳 / 月結 / 跨境結算。左邊 sidebar 是我的待入帳 + 跨境款項 + 月結任務。
+
+等楊子 / Shawn 核完費用轉過來、或集團 5 法人之間有跨境款項，我會在這跟你 update。`,
+
+  shawn: `Shawn，我是 MJ。
+
+你是 COO — 全廳調度 / 項目編預算 / 項目費用核 OPEX。左邊 sidebar 是全廳卡關總覽 + 項目費用核 OPEX。
+
+「全廳卡關總覽」會跨表撈逾期 SLA 的事，現在沒資料是空的；等員工開始用 ERP 累積實際 SLA 資料，這裡就會自動有東西。
+
+順帶提一下：項目費用核 OPEX 是 5/20 拍板的新邏輯 — 有「關聯項目」的費用會直接進你 inbox（系統自動算池剩餘 + 池不夠強制升級 Ray）。等真的有人申請會看到。`,
+
+  ray: `Ray，我是 MJ。
+
+戰情桌已經就位 — 全公司向你升級的事件統一進「我的待批核」inbox（跨來源：合約 / 項目費用 / 大批發單 / IP 維護到期）。
+
+系統剛開始跑可能還沒人升級到你；等真的有事，我會在這 update 進度。VAM 進度條也會隨真實數據流動。`,
+
+  chunlei: `春雷，我是 MJ。
+
+你管電商直播 — 抖音 / 小紅書 直播排期 + 備貨確認。左邊 sidebar 是直播排期 + 備貨確認。
+
+等開始排直播 / 備貨確認流程上線，我會在這裡 update。`,
+
+  jiaying: `佳音，我是 MJ。
+
+你管電商上架 + 淘寶運營。左邊 sidebar 是淘寶上架 + 數據月報。
+
+系統剛開始跑，等開始上架商品流動起來，我會在這裡跟你互動。`,
 };
 function _onboardKey(){ return 'erp_onboard_seen_' + user; }
 function isOnboardingDone(){ return localStorage.getItem(_onboardKey()) === '1'; }
@@ -4639,26 +4679,18 @@ function showOnboardingAgain(){
   renderAiHeroMessages();
 }
 function renderOnboardingCard(){
-  const cfg = ROLE_ONBOARDING[user];
-  if (!cfg) return '';
-  const ctas = cfg.cta.map(c =>
-    `<button onclick="onboardingCta('${c.action}')" style="display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;margin-bottom:8px;background:#fff;border:1px solid var(--line);border-radius:8px;cursor:pointer;text-align:left;transition:.15s;font-family:inherit;" onmouseover="this.style.borderColor='var(--brand)';this.style.background='#fff4ef';" onmouseout="this.style.borderColor='var(--line)';this.style.background='#fff';">
-      <span style="font-size:20px;flex-shrink:0;">${c.icon}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:700;color:var(--ink);">${c.label}</div>
-        <div style="font-size:10.5px;color:var(--ink-lo);margin-top:2px;line-height:1.5;">${c.why}</div>
-      </div>
-      <span style="color:var(--brand);font-weight:700;font-size:14px;">→</span>
-    </button>`
+  const text = ROLE_ONBOARDING[user];
+  if (!text) return '';
+  // 用 ai-hero-msg.bot 樣式，看起來就是 MJ 跟你說話（不是另一個 promo card）
+  // intro 文字裡的 \n\n 段落 → 加段落間距
+  const paragraphs = text.split(/\n\n+/).map(p =>
+    `<div style="margin-bottom:10px;line-height:1.75;">${escapeHtml(p).replace(/\n/g,'<br>')}</div>`
   ).join('');
   return `
-    <div class="onboarding-card" style="background:linear-gradient(135deg,#fff4ef,#fafaf8);border:1px solid #ff6b35;border-radius:12px;padding:18px 20px;">
-      <div style="font-size:14px;font-weight:700;color:var(--ink);line-height:1.7;margin-bottom:14px;">${cfg.intro}</div>
-      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:10px;">先試這幾個動作 ↓</div>
-      ${ctas}
-      <div style="margin-top:14px;display:flex;gap:14px;align-items:center;">
-        <button onclick="dismissOnboarding()" style="font-size:11px;color:var(--ink-lo);background:transparent;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">✓ 我懂了，不要再顯示</button>
-        <span style="font-size:10px;color:var(--ink-lo);">或直接跟我講話 ↓</span>
+    <div class="ai-hero-msg bot" style="line-height:1.75;">
+      ${paragraphs}
+      <div style="margin-top:8px;text-align:right;">
+        <button onclick="dismissOnboarding()" style="font-size:10px;color:var(--ink-lo);background:transparent;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">✓ 知道了</button>
       </div>
     </div>
   `;
