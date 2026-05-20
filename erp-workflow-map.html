@@ -203,6 +203,25 @@ body.wf-connecting .wf-card[data-id]:hover{outline:2px solid var(--brand);outlin
   transition:border-color .2s var(--ease), box-shadow .2s var(--ease), width .2s var(--ease);
 }
 .wf-card:hover{border-color:var(--brand);}
+/* Owner 顏色 dot — 一眼看誰負責這環節 */
+.wf-owner-dot{
+  position:absolute;top:9px;left:9px;
+  width:7px;height:7px;border-radius:50%;
+  box-shadow:0 0 0 1.5px #fff;
+}
+/* 跨 tab 上下游 refs chip */
+.wf-card-refs{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
+.wf-card-ref-chip{
+  font-size:9px;padding:2px 7px;border-radius:9px;
+  background:#fff;border:1px solid var(--line);color:var(--ink-mid);
+  cursor:pointer;transition:.15s;font-family:inherit;line-height:1.4;
+  white-space:nowrap;
+}
+.wf-card-ref-chip:hover{background:var(--brand-soft);color:var(--brand);border-color:var(--brand);}
+/* Owner 顏色 legend（toolbar 內）*/
+.wf-legend{display:inline-flex;gap:10px;font-size:10px;color:var(--ink-mid);padding:0 6px;}
+.wf-legend-item{display:inline-flex;align-items:center;gap:3px;}
+.wf-legend-dot{display:inline-block;width:7px;height:7px;border-radius:50%;}
 .wf-card.selected{
   border-color:var(--brand);background:var(--brand-soft);
   z-index:50;box-shadow:0 8px 20px rgba(0,0,0,.08);
@@ -1369,6 +1388,38 @@ function closeTodoAndJump(flowKey, nodeId){
 }
 
 // ── Render card-based canvas ──
+// Owner 顏色（依關鍵字判斷）— 一眼看誰負責
+function getOwnerColor(owner){
+  const s = String(owner || '');
+  if (/業務員|老董|德寶|安然/.test(s)) return '#22c55e';      // 業務 綠
+  if (/賴哥|木子|採購/.test(s))         return '#f59e0b';      // 採購 橘
+  if (/Bevis|詩彤|珮綾|設計/.test(s))   return '#a855f7';      // 設計 紫
+  if (/高維|物流/.test(s))              return '#06b6d4';      // 物流 青
+  if (/楊子|Leo|躍明|財務|HR/.test(s))  return '#3b82f6';      // 財務 藍
+  if (/春雷|佳音|電商/.test(s))         return '#ec4899';      // 電商 粉
+  if (/Ray|Shawn|COO|股東|管理|拍板/.test(s)) return '#ef4444'; // 管理 紅
+  if (/工廠|系統|客戶|前置|交接點/.test(s))    return '#94a3b8'; // 外部/系統 灰
+  return '#94a3b8';
+}
+
+// 跨 tab refs：desc 裡的 #N 數字 → 對應流程
+const FLOW_NUM_TO_KEY = {
+  '1':'wholesale','2':'expense','3':'procurement','4':'design',
+  '5':'ip_approval','6':'contract_renew','7':'popup','8':'visit',
+  '9':'xborder','10':'monthend','11':'project_init','12':'fulfillment',
+};
+function extractFlowRefs(desc, currentFlowKey){
+  if (!desc) return [];
+  const found = new Map();
+  for (const m of String(desc).matchAll(/#(\d{1,2})\b/g)) {
+    const num = m[1];
+    const key = FLOW_NUM_TO_KEY[num];
+    if (!key || key === currentFlowKey) continue;
+    if (!found.has(num)) found.set(num, key);
+  }
+  return [...found.entries()].map(([num, key]) => ({ num, key }));
+}
+
 function renderCanvas(){
   const flow = getMergedFlow(currentFlow);
   const host = document.getElementById('canvas-area');
@@ -1413,10 +1464,22 @@ function renderCanvas(){
   const toolbarMsg = isOverview
     ? '📌 全景圖 · 內容從各流程自動同步 · 拖卡片重排 / 看流程細節跳對應 tab'
     : `📌 ${flow.title} · ${flow.sub} · 點卡片展開 / 拖移 / 編輯 / 右下角 ✓ 需議標確認狀態`;
+  // Owner 顏色 legend（hover 看顏色對應）
+  const legendHtml = `
+    <span class="wf-legend" title="卡片左上角顏色點 = 該卡 owner 分類">
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#22c55e;"></span>業務</span>
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#f59e0b;"></span>採購</span>
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#a855f7;"></span>設計</span>
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#06b6d4;"></span>物流</span>
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#3b82f6;"></span>財務</span>
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#ef4444;"></span>管理</span>
+      <span class="wf-legend-item"><span class="wf-legend-dot" style="background:#ec4899;"></span>電商</span>
+    </span>`;
   host.innerHTML = `
     <div class="wf-toolbar">
       <span>${toolbarMsg}</span>
       <span style="flex:1"></span>
+      ${legendHtml}
       ${progressBlock}
       <span id="wf-save-status" style="font-size:11px;color:var(--ink-lo);padding:0 8px;min-width:140px;text-align:center;transition:opacity .4s;"></span>
       <span class="wf-zoom-group" title="拖背景平移 / Ctrl+滾輪縮放">
@@ -1509,7 +1572,16 @@ function renderCanvas(){
           </div>
         </div>`}
       </div>`;
+    // Owner dot 顏色（依 owner 文字）
+    const ownerColor = getOwnerColor(displayOwner);
+    // 跨 tab refs（desc 內 #N 提到的其他流程）
+    const refs = extractFlowRefs(displayDesc, currentFlow);
+    const refsHtml = refs.length ? `
+      <div class="wf-card-refs">
+        ${refs.map(r => `<button class="wf-card-ref-chip" data-jump-flow="${r.key}" title="跳到 ${WORKFLOWS[r.key]?.title||r.key}">↗ #${r.num} ${(WORKFLOWS[r.key]?.title||r.key).replace(/^\d+\.\s*/,'').slice(0,8)}</button>`).join('')}
+      </div>` : '';
     card.innerHTML = `
+      <span class="wf-owner-dot" style="background:${ownerColor};" title="${escapeHtml(displayOwner)}"></span>
       ${n.action ? '<span class="wf-action-icon">⚡</span>' : ''}
       ${nodeNotes.length ? '<span class="wf-note-icon">💡</span>' : ''}
       ${overviewBadge}
@@ -1519,6 +1591,7 @@ function renderCanvas(){
       <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayTitle)}</div>
       <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayOwner)}</div>
       <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(displaySla)}</span></div>
+      ${refsHtml}
       ${detailsHtml}
       ${statusChipsHtml}
     `;
@@ -1572,11 +1645,12 @@ function renderCanvas(){
       ev.stopPropagation();
       startConnectMode(n.id);
     });
-    // 跳對應 flow tab
-    const jumpBtn = card.querySelector('[data-jump-flow]');
-    if (jumpBtn) jumpBtn.addEventListener('click', ev => {
-      ev.stopPropagation();
-      switchFlow(jumpBtn.dataset.jumpFlow);
+    // 跳對應 flow tab — 看細節按鈕 + 跨 tab refs chips 都會綁
+    card.querySelectorAll('[data-jump-flow]').forEach(btn => {
+      btn.addEventListener('click', ev => {
+        ev.stopPropagation();
+        switchFlow(btn.dataset.jumpFlow);
+      });
     });
     // 狀態 chip：點切換
     card.querySelectorAll('.wf-status-chip').forEach(chip => {
