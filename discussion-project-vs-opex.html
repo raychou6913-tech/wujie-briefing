@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>項目預算 vs 員工費用 — 給 Ray / Shawn 拍板</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --paper:#fafaf8; --paper-soft:#f2f2ef;
+  --line:#e8e8e3; --ink:#0a0a0a; --ink-mid:#666; --ink-lo:#999; --ink-faint:#ccc;
+  --brand:#ff6b35; --brand-soft:#fff4ef;
+  --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Inter","Helvetica Neue","PingFang TC","Noto Sans TC",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased; letter-spacing:-.003em;
+  min-height:100vh; padding-bottom:80px; line-height:1.65;
+}
+.serif{font-family:"Noto Serif TC",Times,serif;}
+
+.topbar{
+  background:var(--paper); border-bottom:1px solid var(--line);
+  padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.brand-name{font-family:"Helvetica Neue","Arial Black",sans-serif;font-weight:900;font-size:18px;letter-spacing:-.04em;color:var(--ink);}
+.brand-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--brand);vertical-align:bottom;margin-bottom:3px;margin-left:2px;}
+.brand-sub{font-size:11px;color:var(--ink-lo);margin-left:6px;}
+.btn-sm{
+  font-size:11px; color:var(--ink-mid); text-decoration:none;
+  font-weight:600; padding:5px 12px;
+  border:1px solid var(--line); border-radius:20px;
+  transition:border-color .22s var(--ease);
+}
+.btn-sm:hover{border-color:var(--ink-faint);color:var(--ink);}
+
+.main{max-width:780px;margin:0 auto;padding:64px 32px;}
+
+.page-num{
+  font-family:"Helvetica Neue",sans-serif;
+  font-size:10px; color:var(--brand); font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:14px;
+}
+.page-title{
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:38px; font-weight:900; letter-spacing:-.04em;
+  line-height:1.1; color:var(--ink); margin-bottom:16px;
+}
+.page-sub{
+  font-family:"Noto Serif TC",serif;
+  font-size:15px; color:var(--ink-mid); line-height:1.8;
+  margin-bottom:48px; letter-spacing:.02em;
+}
+
+h2{
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:22px; font-weight:900; letter-spacing:-.02em;
+  margin-top:56px; margin-bottom:18px; color:var(--ink);
+  padding-top:24px; border-top:1px solid var(--line);
+}
+h2:first-of-type{padding-top:0;border-top:none;}
+h3{
+  font-family:"Inter","Helvetica Neue",sans-serif;
+  font-size:16px; font-weight:800; letter-spacing:-.01em;
+  margin-top:28px; margin-bottom:10px; color:var(--ink);
+}
+
+p{font-size:14px;color:var(--ink-mid);margin-bottom:14px;line-height:1.85;}
+p strong{color:var(--ink);font-weight:700;}
+
+.q-block{
+  background:var(--brand-soft); border-left:3px solid var(--brand);
+  padding:16px 20px; margin-bottom:14px; border-radius:0 8px 8px 0;
+}
+.q-label{
+  font-size:10px;font-weight:800;color:var(--brand);
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;
+}
+.q-text{font-size:14px;color:var(--ink);line-height:1.7;}
+
+.opt-card{
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  padding:22px 24px; margin-bottom:16px;
+  transition:border-color .15s var(--ease);
+}
+.opt-card.recommended{border-color:var(--brand);background:var(--brand-soft);}
+.opt-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;}
+.opt-letter{
+  font-family:"Helvetica Neue","Arial Black",sans-serif;
+  font-size:30px;font-weight:900;color:var(--ink);letter-spacing:-.04em;
+  line-height:1;
+}
+.opt-card.recommended .opt-letter{color:var(--brand);}
+.opt-title{font-size:16px;font-weight:800;color:var(--ink);}
+.opt-tag{
+  font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 10px;border-radius:11px;background:var(--ink);color:#fff;margin-left:auto;
+}
+.opt-card.recommended .opt-tag{background:var(--brand);}
+.opt-desc{font-size:13px;color:var(--ink-mid);line-height:1.75;margin-bottom:12px;}
+.opt-pros, .opt-cons{font-size:12.5px;line-height:1.8;}
+.opt-pros span:first-child{color:var(--ok);font-weight:700;}
+.opt-cons span:first-child{color:var(--danger);font-weight:700;}
+
+table{
+  width:100%;border-collapse:collapse;
+  font-size:13px;margin:14px 0;
+}
+th, td{
+  text-align:left;padding:10px 14px;
+  border-bottom:1px solid var(--line);
+}
+th{
+  font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-lo);background:var(--paper-soft);
+}
+td{color:var(--ink);}
+td.num{font-family:"Helvetica Neue",sans-serif;font-weight:700;text-align:right;}
+tr.highlight td{background:var(--brand-soft);font-weight:700;}
+tr.total td{border-top:2px solid var(--ink);font-weight:900;color:var(--ink);background:var(--paper-soft);}
+
+.step{
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:20px;margin-bottom:14px;
+}
+.step-num{
+  display:inline-block;width:24px;height:24px;border-radius:12px;
+  background:var(--ink);color:#fff;font-weight:800;font-size:12px;
+  text-align:center;line-height:24px;margin-right:8px;
+}
+.step-title{font-size:15px;font-weight:800;display:inline-block;vertical-align:middle;}
+.step-owner{font-size:10px;color:var(--brand);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-left:8px;}
+.step-body{margin-top:12px;font-size:13px;color:var(--ink-mid);line-height:1.75;}
+
+.mock{
+  background:var(--paper-soft);border-radius:10px;padding:16px 20px;margin:10px 0;
+  font-family:"Menlo","Monaco",monospace;font-size:12px;line-height:1.8;
+  border:1px dashed var(--line);
+}
+.mock .field-name{color:var(--ink-mid);}
+.mock .field-val{color:var(--ink);font-weight:700;}
+.mock .new{color:var(--brand);}
+.mock .note{color:var(--ink-lo);font-style:italic;}
+
+.callout{
+  background:#fff;border:1px solid var(--line);border-left:3px solid var(--ink);
+  padding:16px 20px;margin:14px 0;border-radius:0 8px 8px 0;
+  font-size:13px;line-height:1.7;color:var(--ink);
+}
+.callout.warn{border-left-color:var(--warn);background:#fffbeb;}
+.callout-label{font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-lo);margin-bottom:6px;}
+
+.decision{
+  background:var(--ink);color:#fff;border-radius:14px;padding:28px 30px;margin-top:32px;
+}
+.decision h2{color:#fff;border:none;padding:0;margin:0 0 16px 0;}
+.decision ol{padding-left:20px;margin-top:10px;}
+.decision li{font-size:14px;line-height:1.8;color:#e8e8e3;margin-bottom:10px;}
+.decision strong{color:#fff;}
+.decision .ans{color:var(--brand);font-weight:800;}
+
+ul.simple{padding-left:20px;}
+ul.simple li{font-size:13px;color:var(--ink-mid);line-height:1.85;margin-bottom:6px;}
+ul.simple li strong{color:var(--ink);}
+
+.compare-pill{
+  display:inline-block;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:11px;color:#fff;margin-right:6px;
+}
+.compare-pill.a{background:#999;}
+.compare-pill.b{background:var(--brand);}
+.compare-pill.c{background:#444;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <span class="brand-name">WUJIE</span><span class="brand-dot"></span>
+    <span class="brand-sub">給 Ray / Shawn 拍板：項目預算 vs 員工費用</span>
+  </div>
+  <a href="erp-lobby.html" class="btn-sm">← 回大廳</a>
+</div>
+
+<div class="main">
+  <div class="page-num">/ 拍板文件 · 2026-05-20</div>
+  <h1 class="page-title">項目預算 vs 員工費用<br>該怎麼分？</h1>
+  <p class="page-sub">Ray 跟 Shawn 在做批發 / 快閃項目的預算編列時遇到分類問題。本文檔提供 3 條方案 + 推薦方向，看完一起拍板再進工程。</p>
+
+  <h2>遇到的兩個問題</h2>
+
+  <div class="q-block">
+    <div class="q-label">問題 1</div>
+    <div class="q-text">編項目預算時，**該不該把這段期間的「人員成本」（項目相關差旅 / 招待 / 樣品試做工時）算進項目預算**？</div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">問題 2</div>
+    <div class="q-text">員工申請費用時，**項目相關差旅怎麼跟一般個人報銷分開？** 以及，怎麼確認該筆費用**沒超出當初編預算時的標準**？</div>
+  </div>
+
+  <p>表面看是兩個問題，本質是<strong>同一個</strong>：項目實際 P&L 該包含哪些成本、員工申請費用怎麼歸屬。</p>
+
+  <h2>先釐清現況分類（Ray 提醒的重點）</h2>
+
+  <p>我們之前定義費用申請是兩類，但**「業務費用申請」當初的定義是「幫供應商請款」**（B2B 代墊 / 供應商請款），<strong>不是</strong>員工因項目產生的差旅。所以現在這個項目差旅根本沒有正確的 bucket：</p>
+
+  <table>
+    <thead>
+      <tr><th>類別</th><th>誰申請</th><th>對象是誰</th><th>典型例子</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>① 個人報銷</td><td>員工</td><td>員工自己</td><td>個人出差餐費 / 通勤 / 自費耗材</td></tr>
+      <tr><td>② 供應商請款（既有「業務支出」）</td><td>採購 / 業務</td><td>外部供應商 / 代墊對象</td><td>工廠尾款 / 樣品費 / 外包設計費 / 場地費</td></tr>
+      <tr class="highlight"><td>③ 項目員工差旅 ★ 新類別</td><td>員工</td><td>員工自己（但因項目而花）</td><td>場勘出差 / 開幕值班 / 客戶拜訪</td></tr>
+    </tbody>
+  </table>
+
+  <p>過去我們把③ 硬塞進①「個人報銷」走，導致 — 項目成本看不到、員工自己分不清是工作還是私事。</p>
+
+  <div class="callout">
+    <div class="callout-label">本文件聚焦 ③ 怎麼處理</div>
+    ① 個人報銷（員工日常） + ② 供應商請款（B2B）流程都 OK 不動，純粹討論：<strong>因項目而生的員工差旅，怎麼納管 + 怎麼跟項目預算對齊</strong>。
+  </div>
+
+  <h2>三條路線</h2>
+
+  <div class="opt-card">
+    <div class="opt-head">
+      <span class="opt-letter">A</span>
+      <span class="opt-title">兩本帳分開（現況）</span>
+      <span class="opt-tag">最沒紀律</span>
+    </div>
+    <div class="opt-desc">項目預算<strong>只算硬成本</strong>（採購 + IP 版權 + 物流 + 場地）。所有人員 / 差旅 / 招待 → 全部歸 OPEX。員工申請費用一律走「個人報銷」流程，跟項目脫鉤。</div>
+    <div class="opt-pros"><span>✓ 員工最簡單</span> — 不用想項目代碼</div>
+    <div class="opt-cons"><span>✗ 項目 ROI 算不準</span> — 一個快閃店花了多少人力差旅，事後查不到</div>
+    <div class="opt-cons"><span>✗ OPEX 黑盒</span> — 月底 OPEX 高了，不知道是哪個項目造成的</div>
+    <div class="opt-cons"><span>✗ VAM 800 萬看不清</span> — 看到的「項目淨利」是被高估的（人力成本沒扣）</div>
+  </div>
+
+  <div class="opt-card recommended">
+    <div class="opt-head">
+      <span class="opt-letter">B</span>
+      <span class="opt-title">雙軌制 — 一筆費用兩個歸屬</span>
+      <span class="opt-tag">推薦</span>
+    </div>
+    <div class="opt-desc">員工申請費用時，<strong>多選一格「關聯項目」（可選）</strong>。有填 → 同時計入「項目實際成本」+「OPEX 差旅池」；不填 → 只算 OPEX。Shawn 編項目預算時，分項加一行「人員 / 差旅」做預估。</div>
+    <div class="opt-pros"><span>✓ 項目 P&L 真實</span> — Ray 看到的是含人力成本的淨利</div>
+    <div class="opt-pros"><span>✓ OPEX 流向可查</span> — 月底能看「OPEX 差旅 → 哪些項目吃掉了」</div>
+    <div class="opt-pros"><span>✓ 員工負擔小</span> — 只多選一格，不用走兩套流程</div>
+    <div class="opt-pros"><span>✓ 會計界 standard</span> — Xero / QuickBooks / SAP 都這樣設計（cost center + nature 雙軸歸屬）</div>
+    <div class="opt-cons"><span>✗ 員工要記項目代碼</span> — 但系統 dropdown 帶出來，非完全憑記憶</div>
+  </div>
+
+  <div class="opt-card">
+    <div class="opt-head">
+      <span class="opt-letter">C</span>
+      <span class="opt-title">純項目歸屬制</span>
+      <span class="opt-tag">最嚴</span>
+    </div>
+    <div class="opt-desc">所有費用必須掛項目代碼，沒項目 → 系統拒收。員工日常拜訪 / 內部會議 / 學習出差也得想辦法掛上去。</div>
+    <div class="opt-pros"><span>✓ 紀律最強</span> — 沒項目不能花錢</div>
+    <div class="opt-cons"><span>✗ 太僵化</span> — 員工 onboarding / 跨項目培訓 / 一般辦公差旅 真的沒項目可掛</div>
+    <div class="opt-cons"><span>✗ 員工會「亂掛項目」湊數</span> — 反而把資料弄髒，跟現況沒兩樣</div>
+    <div class="opt-cons"><span>✗ 對小公司過重</span> — 蕪解 15 人不需要這麼緊</div>
+  </div>
+
+  <h2>為什麼推 B</h2>
+
+  <p>三條理由：</p>
+  <ul class="simple">
+    <li><strong>會計界共識</strong>：成本歸屬走兩軸是常識 — 「性質」（差旅 / 餐費 / 招待）+「歸屬」（哪個項目 / 哪個部門 / 公司 OPEX）。一筆費用同時有兩個 label，不衝突。</li>
+    <li><strong>對員工負擔最小</strong>：費用申請已經有 5-6 個欄位，多一個 dropdown 不會更累。而且關聯項目可選不必填，按下「無關項目」走 OPEX 也行。</li>
+    <li><strong>VAM 800 萬看得清</strong>：Ray 在戰情室要看「批發貢獻多少淨利、快閃貢獻多少淨利」— 沒有人力成本的版本是假帳，要看真的。</li>
+  </ul>
+
+  <h2>B 方案具體怎麼跑</h2>
+
+  <div class="step">
+    <span class="step-num">1</span><span class="step-title">編預算</span><span class="step-owner">Shawn</span>
+    <div class="step-body">
+      <p>進「項目預算編列」時，預算分項加一行 <strong>人員 / 差旅池</strong>：</p>
+      <table>
+        <thead>
+          <tr><th>預算分項</th><th style="text-align:right;">預估金額</th><th>備註</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>採購（PO）</td><td class="num">¥ 240,000</td><td>盲盒 × 5000 件</td></tr>
+          <tr><td>IP 版權費</td><td class="num">¥ 35,000</td><td>本批 MG 折抵</td></tr>
+          <tr><td>物流</td><td class="num">¥ 18,000</td><td>工廠直發 + 報關</td></tr>
+          <tr><td>場地</td><td class="num">¥ 40,000</td><td>快閃才有</td></tr>
+          <tr class="highlight"><td>人員 / 差旅池 ★ 新增</td><td class="num">¥ 25,000</td><td>場勘 2 趟 + 開幕 3 人</td></tr>
+          <tr class="total"><td>項目總預算</td><td class="num">¥ 358,000</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">2</span><span class="step-title">員工申請費用</span><span class="step-owner">員工 / 詩彤 / 高維 etc.</span>
+    <div class="step-body">
+      <p>費用申請 modal 加一格「關聯項目」（可選 dropdown）：</p>
+      <div class="mock">
+<span class="field-name">費用類別：</span><span class="field-val">差旅</span><br>
+<span class="field-name">金額：　　</span><span class="field-val">¥ 3,400</span><br>
+<span class="field-name">備註：　　</span><span class="field-val">曼谷快閃場勘 · 高鐵 + 住宿</span><br>
+<span class="field-name">歸屬主體：</span><span class="field-val">台灣悍草</span><br>
+<span class="new">關聯項目： BKK-JJK-快閃 2026 ▾　★ 新增（可選）</span><br>
+<span class="note">  — 系統檢查該項目「人員/差旅」池剩餘額度</span><br>
+<span class="note">  — 不選 = 走純 OPEX，不關聯任何項目</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">3</span><span class="step-title">楊子審批時</span><span class="step-owner">楊子</span>
+    <div class="step-body">
+      <p>楊子 inbox 看到費用時，<strong>同時顯示對應項目預算池剩餘額度</strong>：</p>
+      <div class="mock">
+<span class="field-val">詩彤 · 曼谷快閃場勘 · ¥ 3,400</span><br>
+<span class="field-name">費用類別：</span> 差旅<br>
+<span class="field-name">關聯項目：</span> BKK-JJK-快閃 2026<br>
+<span class="new">  ┗ 人員/差旅池 ¥25,000 / 已用 ¥18,200（73%）</span><br>
+<span class="new">  ┗ 此筆扣減後剩 ¥3,400 (14%)</span><br>
+<br>
+<span class="field-val">[✓ 核准]</span>　<span class="field-name">[退回]</span>　<span class="field-name">[預算不夠 → 升級 Ray]</span>
+      </div>
+      <div class="callout warn" style="margin-top:14px;">
+        <div class="callout-label">超預算邏輯</div>
+        若申請金額 > 該項目池剩餘 → 楊子<strong>無法直接核准</strong>，必須走升級 Ray 流程（避免靜默超支）。
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">4</span><span class="step-title">月底結算 · 項目結案</span><span class="step-owner">躍明 / Shawn</span>
+    <div class="step-body">
+      <p>月底兩個視角同時可看：</p>
+      <ul class="simple">
+        <li><strong>躍明月結報表</strong>：OPEX 差旅總 ¥XXX，其中 ¥XXX 來自項目（含關聯項目 breakdown）</li>
+        <li><strong>Shawn 戰情室</strong>：項目實際 P&L = 採購 + IP + 物流 + 場地 + <strong>人員（已含）</strong> vs 收入 → 真實項目淨利</li>
+        <li><strong>項目結案</strong>：對比編預算時各分項 vs 實際支出，超支 / 節省的原因留記錄供下次預估</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>ERP 哪些地方要動</h2>
+
+  <table>
+    <thead>
+      <tr><th>模組</th><th>動作</th><th style="text-align:right;">工時</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>項目預算編列頁</td><td>預算分項加「人員/差旅池」</td><td class="num">1 hr</td></tr>
+      <tr><td>費用申請 modal</td><td>加「關聯項目」dropdown</td><td class="num">30 min</td></tr>
+      <tr><td>楊子核准 modal</td><td>顯示項目池剩餘額度 + 超預算阻擋</td><td class="num">2 hr</td></tr>
+      <tr><td>飛書「費用實報」表</td><td>加「關聯項目」欄位</td><td class="num">5 min</td></tr>
+      <tr><td>月結報表 + 戰情室</td><td>加「按項目分組」+ 項目真實 P&L 視角</td><td class="num">3 hr</td></tr>
+      <tr class="total"><td>總計</td><td>5 處修改</td><td class="num">~7 hr</td></tr>
+    </tbody>
+  </table>
+
+  <h2>給 Ray + Shawn 拍板的 4 個問題</h2>
+
+  <div class="decision">
+    <h2 style="font-size:18px;">需要你跟 Shawn 一起拍板</h2>
+
+    <ol>
+      <li><strong>確認推 B 雙軌制？</strong>　<span class="ans">→ 是 / 否 / 想做 C 嚴格版</span></li>
+
+      <li><strong>員工申請時「關聯項目」是可選還必填？</strong>　<span class="ans">建議：可選</span>。理由：不是所有費用都跟項目有關（內部培訓 / onboarding / 跨項目拜訪），必填會逼員工亂掛。</li>
+
+      <li><strong>哪些費用類別會掛項目？</strong>　<span class="ans">建議：</span>
+        <ul style="padding-left:20px;margin-top:6px;color:#ccc;">
+          <li>② 供應商請款 → <strong>幾乎都掛項目</strong>（工廠 PO / 樣品費 / 場地費 / 外包設計費 都是因項目而生）</li>
+          <li>③ 項目員工差旅 → <strong>掛項目</strong>（這就是要解的問題本身）</li>
+          <li>① 個人報銷 → <strong>不掛項目</strong>（內部會議 / onboarding / 一般辦公差旅 → 走 OPEX）</li>
+        </ul>
+      </li>
+
+      <li><strong>超預算門檻 — 多少要升級 Ray？</strong>　<span class="ans">建議：</span>
+        <ul style="padding-left:20px;margin-top:6px;color:#ccc;">
+          <li>該項目對應池<strong>還有額度</strong> → 楊子核准</li>
+          <li>該項目對應池<strong>不夠</strong> → 強制升級 Ray（不分金額）</li>
+          <li>整筆 &gt; ¥10,000 同時項目池超 80% → 額外通知 Shawn 一聲</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <h2>看完拍板後我會做的事</h2>
+
+  <ul class="simple">
+    <li>飛書「費用實報」表加「關聯項目」欄位</li>
+    <li>飛書「項目預算」表加「人員/差旅池」欄位</li>
+    <li>費用申請 modal × 全公司（木子 / 高維 / 詩彤 / Bevis / 業務員）統一加 dropdown</li>
+    <li>楊子核准 modal 顯示項目池 + 超預算阻擋</li>
+    <li>Shawn 預算編列頁的 budget planner 加分項</li>
+    <li>戰情室 / 月結報表新增「項目真實 P&L」視角</li>
+  </ul>
+
+  <p style="margin-top:48px;text-align:center;color:var(--ink-lo);font-size:12px;">
+    MJ · 2026-05-20<br>
+    看完後直接告訴我「拍 B」+ 4 個問題答案就動工 →
+  </p>
+</div>
+
+</body>
+</html>
