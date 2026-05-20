@@ -1565,8 +1565,8 @@ function buildSidebar(){
     all:      [{icon:'＋', label:'錄費用', action:'expense'}, {icon:'📤', label:'我送出的', action:'my-sent'}],
     laodong:  [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
     debao:    [{icon:'＋', label:'新訂單', action:'new-order'}, {icon:'📊', label:'回報動銷', action:'sellthru'}, {icon:'📞', label:'拜訪記錄', action:'visit-log'}],
-    anran:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
-    yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'📊', label:'月結任務', action:'monthend'}],
+    anran:    [{icon:'✓', label:'核准批發訂單', action:'wholesale-approve'}, {icon:'📜', label:'合約待批', action:'contract-approve'}, {icon:'🔐', label:'IP 維護提醒', action:'ip-reminders'}],
+    yuming:   [{icon:'📋', label:'我的待入帳', action:'my-pending'}, {icon:'💸', label:'跨境款項', action:'xborder-confirm'}, {icon:'📊', label:'月結任務', action:'monthend'}],
     yangzi:   [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}],
     leo:      [{icon:'✓', label:'我的待審', action:'my-approval'}, {icon:'💰', label:'薪資任務', action:'payroll-task'}, {icon:'📋', label:'OPEX 預算', action:'opex-budget'}, {icon:'🏦', label:'銀行對帳', action:'bank-recon'}],
     bevis:    [{icon:'🎨', label:'設計核准', action:'design-approve'}, {icon:'✨', label:'bedo 輸出待確認', action:'bedo-approve'}],
@@ -1707,7 +1707,6 @@ const MY_TODOS = {
   ],
   anran:[
     {id:'an1',icon:'📜',title:'Snoopy 北京代理合約 — 續簽啟動',sub:'PNUTS · 版權費截止 2026-06-30，立即進入續簽談判',urgency:'high',status:'待處理',action:'contract-approve'},
-    {id:'an2',icon:'💸',title:'北京→香港跨境打款記錄',sub:'¥850,000 貨款 · 立即確認入帳',urgency:'high',status:'待記錄',action:'xborder-confirm'},
     {id:'an3',icon:'📋',title:'Miffy 授權年費提醒追蹤',sub:'8月到期，立即處理避免逾期',urgency:'med',status:'待確認',action:'ip-reminders'},
   ],
   laige:[
@@ -1734,7 +1733,8 @@ const MY_TODOS = {
   ],
   yuming:[
     {id:'y1',icon:'💰',title:'5月北京現金流報表',sub:'截止明天 · 北京蕪解 + 深圳子公司',urgency:'high',status:'進行中',options:['已完成 ✓','今天完成','需延期，原因...']},
-    {id:'y2',icon:'📊',title:'上月損益表整理',sub:'配合 Shawn 月報，截止本週五',urgency:'high',status:'待確認',options:['已完成 ✓','有問題，需討論']},
+    {id:'y2',icon:'💸',title:'北京→香港跨境打款核對',sub:'¥850,000 貨款 · 立即確認入帳',urgency:'high',status:'待記錄',action:'xborder-confirm'},
+    {id:'y3',icon:'📊',title:'上月損益表整理',sub:'配合 Shawn 月報，截止本週五',urgency:'high',status:'待確認',options:['已完成 ✓','有問題，需討論']},
   ],
   laodong:[
     {id:'ld1',icon:'📞',title:'跟進華糖 Q3 補貨意向',sub:'上週電話有意向，未確認數量',urgency:'high',status:'待跟進',options:['已跟進，填入系統 ✓','今天致電','下週再跟']},
@@ -1808,7 +1808,6 @@ const MY_WORK = {
   // yuming 不走 MY_WORK quick action grid（用下方 ym-inbox-section inline 處理）
   anran: [
     {icon:'📜', title:'合約待批', sub:'授權續簽 / 新合約審查',                href:'erp-anran.html#contracts'},
-    {icon:'💸', title:'跨境款項', sub:'北京 → 香港 / 北京 → 台灣 確認',       href:'erp-anran.html#xborder'},
     {icon:'🔐', title:'IP 授權',  sub:'PNUTS / Sanrio / Mofusand 維護',       href:'erp-anran.html#ip'},
   ],
   laige: [
@@ -2107,7 +2106,7 @@ function showQaToast(msg){
 const STALE_SLA = {
   'yangzi_inbox_v1':         {filter:i=>i.status==='pending', sla:{high:1,normal:3}, source:'楊子待審', who:'楊子', whoUser:'yangzi', domain:'anran', domainOwner:'anran'},
   'anran_contract_inbox_v1': {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然合約待批', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
-  'anran_xborder_inbox_v1':  {filter:i=>!i.status, sla:{high:1,normal:3}, source:'安然跨境', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
+  'anran_xborder_inbox_v1':  {filter:i=>!i.status, sla:{high:1,normal:3}, source:'跨境款項', who:'躍明', whoUser:'yuming', domain:'yuming', domainOwner:'yuming'},
   'anran_ip_reminders_v1':   {filter:i=>!i.cleared, sla:{high:1,normal:7}, source:'IP 維護', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
   'shawn_wholesale_v1':      {filter:i=>!i.done, sla:{high:1,normal:3}, source:'批發核准', who:'安然', whoUser:'anran', domain:'anran', domainOwner:'anran'},
   'ray_approval_v1':         {filter:i=>!i.done, sla:{high:1,normal:2}, source:'Ray 待批核', who:'Ray', whoUser:'ray', domain:'ray', domainOwner:'ray'},
