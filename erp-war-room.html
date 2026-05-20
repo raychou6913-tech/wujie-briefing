@@ -875,6 +875,18 @@ body{
     </div>
   </div>
 
+  <!-- 項目實際 P&L（5/20 Ray 拍板雙軌制後上線：含關聯項目的所有費用會計入該項目實際支出）-->
+  <div class="section-title">📊 項目實際 P&L · 雙軌制版（含人員/差旅成本）</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:24px;" id="proj-pl-block">
+    <div style="font-size:11px;color:var(--txt-lo);line-height:1.6;margin-bottom:10px;">
+      項目實際支出 = 預算管理 + 所有「關聯項目」費用實報（含員工差旅 / 招待 / 樣品費）。<br>
+      <span style="color:var(--brand);font-weight:700;">紅色行 = 已超支</span> · <span style="color:var(--warn);font-weight:700;">黃色 = 使用 >80%</span>
+    </div>
+    <div id="proj-pl-list" style="font-size:11px;">
+      <div style="text-align:center;color:var(--txt-lo);padding:24px 0;">載入中…</div>
+    </div>
+  </div>
+
   </div><!-- /vam-content -->
 
   <!-- 📍 子主體健康度（北京/台灣/UJ BKK 費用 vs 收入監控，永遠可見） -->
@@ -1006,6 +1018,8 @@ const _TBLS  = {
   sales:           "tblndRlEjmOgh5lk",
   contract:        "tblWn4PwOVRgt7c1",
   popup_stores:    "tblPopupStores2026",
+  project_schedule:"tblPLJ2dLkdkWUAa",
+  expense:         "tblvGsQpXPHtkp1C",
 };
 let _tk = null;
 
@@ -2145,12 +2159,93 @@ function switchSubject(btn, subject){
   }
 }
 
+/* ── 項目實際 P&L（含人員/差旅成本 — 5/20 雙軌制拍板上線）── */
+async function loadProjectPL(){
+  const el = document.getElementById('proj-pl-list');
+  if (!el) return;
+  try {
+    const [projects, expenses] = await Promise.all([
+      _fetchAll(_TBLS.project_schedule),
+      _fetchAll(_TBLS.expense),
+    ]);
+    // 聚合費用 by 關聯項目（只算 approved）
+    const expByProj = {};
+    expenses.forEach(rec => {
+      const f = rec.fields || {};
+      const projRaw = f['關聯項目'];
+      const proj = typeof projRaw === 'string' ? projRaw : Array.isArray(projRaw) ? (projRaw[0]?.text||'') : '';
+      if (!proj) return;
+      const st = typeof f['inbox_state'] === 'object' ? (f['inbox_state']?.text||f['inbox_state']?.name||'') : (f['inbox_state']||'');
+      if (st !== 'approved') return;
+      const amt = Number(f['實際金額']||0);
+      expByProj[proj] = (expByProj[proj]||0) + amt;
+    });
+    // 過濾進行中項目
+    const inProgress = projects.map(rec => {
+      const f = rec.fields || {};
+      const name = Array.isArray(f['項目名稱']) ? (f['項目名稱'][0]?.text||'') : (f['項目名稱']||'');
+      const stRaw = f['狀態'];
+      const st = typeof stRaw === 'object' ? (stRaw?.text||stRaw?.name||'') : (stRaw||'');
+      return {
+        name, state: st,
+        expectedRev: Number(f['預計收入']||0),
+        expectedExp: Number(f['預計支出']||0),
+        actualRev: Number(f['實際收入']||0),
+        actualExp: Math.max(Number(f['實際支出']||0), expByProj[name]||0), // 取 max — 因為費用實報雙軌制後才開始累加
+        expensesFromInbox: expByProj[name]||0,
+      };
+    }).filter(p => p.name && !['已完成','已取消','已歸檔'].includes(p.state));
+    if (!inProgress.length) {
+      el.innerHTML = '<div style="text-align:center;color:var(--txt-lo);padding:20px 0;">目前沒有進行中項目</div>';
+      return;
+    }
+    const fmt = n => '¥' + Math.round(n).toLocaleString();
+    const pct = (a,b) => b > 0 ? Math.round(a/b*100) : 0;
+    inProgress.sort((a,b) => b.expectedExp - a.expectedExp);
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:8px 10px;font-size:10px;font-weight:700;color:var(--txt-lo);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border);">
+        <span>項目</span>
+        <span style="text-align:right;">預計支出</span>
+        <span style="text-align:right;">實際支出</span>
+        <span style="text-align:right;">用量</span>
+        <span style="text-align:right;">預計淨利</span>
+        <span style="text-align:right;">實際淨利</span>
+      </div>
+      ${inProgress.map(p => {
+        const usedPct = pct(p.actualExp, p.expectedExp);
+        const expectedNet = p.expectedRev - p.expectedExp;
+        const actualNet = p.actualRev - p.actualExp;
+        const overspend = p.expectedExp > 0 && p.actualExp > p.expectedExp;
+        const nearFull = !overspend && usedPct > 80;
+        const bg = overspend ? 'background:rgba(239,68,68,.06);' : nearFull ? 'background:rgba(245,158,11,.06);' : '';
+        const usageColor = overspend ? 'color:#ef4444;font-weight:800;' : nearFull ? 'color:#f59e0b;font-weight:700;' : 'color:var(--txt-mid);';
+        return `
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);${bg}">
+          <span style="color:var(--txt-hi);font-weight:600;font-size:11px;" title="${p.name}">${p.name.length>16?p.name.slice(0,15)+'…':p.name}</span>
+          <span style="text-align:right;color:var(--txt-mid);">${p.expectedExp ? fmt(p.expectedExp) : '—'}</span>
+          <span style="text-align:right;color:var(--txt-hi);font-weight:600;">${p.actualExp ? fmt(p.actualExp) : '—'}</span>
+          <span style="text-align:right;${usageColor}">${p.expectedExp ? usedPct + '%' : '—'}</span>
+          <span style="text-align:right;color:var(--txt-mid);">${expectedNet ? fmt(expectedNet) : '—'}</span>
+          <span style="text-align:right;color:${actualNet>=0?'var(--ok)':'#ef4444'};font-weight:700;">${actualNet !== 0 || p.actualRev > 0 ? fmt(actualNet) : '—'}</span>
+        </div>`;
+      }).join('')}
+      <div style="font-size:10px;color:var(--txt-lo);padding:8px 10px;line-height:1.6;">
+        📌 用量 = 實際支出 / 預計支出。實際支出 = 項目排期表「實際支出」與「核准費用實報」總和取大值（過渡期數據雙源容錯）。
+      </div>
+    `;
+  } catch(e){
+    console.error('loadProjectPL', e);
+    el.innerHTML = '<div style="text-align:center;color:#ef4444;padding:20px 0;">載入失敗：' + (e.message||e) + '</div>';
+  }
+}
+
 /* ── INIT ── */
 // 戰情室收緊定位（2026-05-14 Ray 拍板）：只留 VAM hero（核心高層 lens）+ V1/V2/V3 + 計劃覆蓋率。
 // 其他內容（待批/現金流/JV應付/動銷/流水線）已搬到對應頁面。對應 load 函數定義保留但不呼叫，避免 throw。
 loadVAM();
 loadVamProgress().then(() => loadPipelineCoverage());
 loadSellThruWarRoom();
+loadProjectPL();
 
 /* ── 處理 URL ?approval=record_id / ?project=record_id（從 lobby 點過來定位）── */
 function handleQueryParam(){
