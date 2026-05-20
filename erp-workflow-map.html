@@ -173,9 +173,22 @@ body{
 .note-del:hover{color:var(--danger);}
 
 /* Card-based workflow map */
-.wf-canvas-host{
-  position:relative;margin:24px auto;background:#fff;
+.wf-viewport{
+  position:relative;overflow:hidden;
+  background:var(--paper-soft);
   border:1px solid var(--line);border-radius:14px;
+  height:calc(100vh - 180px);
+  cursor:grab;
+  margin:12px;
+}
+.wf-viewport.panning{cursor:grabbing;}
+body.wf-connecting .wf-viewport{cursor:crosshair;}
+body.wf-connecting .wf-card{cursor:crosshair !important;}
+body.wf-connecting .wf-card[data-id]:hover{outline:2px solid var(--brand);outline-offset:2px;}
+.wf-canvas-host{
+  position:relative;background:#fff;
+  border:1px solid var(--line);border-radius:14px;
+  transform-origin:0 0;
 }
 .wf-arrows{
   position:absolute;top:0;left:0;
@@ -249,6 +262,32 @@ body{
 .wf-card.wf-overview .wf-card-del{display:none !important;}  /* 全景圖不可刪 */
 .wf-card-del:hover{background:var(--danger);color:#fff;border-color:var(--danger);transform:scale(1.1);}
 
+/* 連線按鈕（hover 才出現，藍色）*/
+.wf-card-connect{
+  position:absolute;bottom:6px;left:34px;
+  background:#fff;border:1px solid #93c5fd;border-radius:6px;
+  width:22px;height:22px;padding:0;font-size:11px;color:#3b82f6;
+  cursor:pointer;font-family:inherit;
+  display:none;line-height:1;align-items:center;justify-content:center;
+  z-index:52;
+}
+.wf-card:hover .wf-card-connect,
+.wf-card.selected .wf-card-connect{display:flex;}
+.wf-card.wf-overview .wf-card-connect{display:none !important;}
+.wf-card-connect:hover{background:#3b82f6;color:#fff;border-color:#3b82f6;transform:scale(1.1);}
+
+/* 箭頭刪除按鈕（label 旁，hover 才出現）*/
+.wf-edge-label-wrap{position:absolute;display:flex;align-items:center;gap:2px;transform:translate(-50%,-50%);}
+.wf-edge-del{
+  background:#fff;border:1px solid #fca5a5;border-radius:50%;
+  width:14px;height:14px;font-size:9px;line-height:1;
+  color:var(--danger);cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+  padding:0;font-family:inherit;
+}
+.wf-edge-label-wrap:hover .wf-edge-del{display:flex;}
+.wf-edge-del:hover{background:var(--danger);color:#fff;}
+
 /* toolbar 新卡片按鈕 */
 .wf-toolbar .wf-add-card{
   background:var(--brand);color:#fff;border-color:var(--brand);
@@ -259,6 +298,15 @@ body{
   background:#fff;border-color:#fca5a5;color:var(--danger);
 }
 .wf-toolbar .wf-reset:hover{background:#fef2f2;border-color:var(--danger);color:var(--danger);}
+
+/* Zoom controls */
+.wf-zoom-group{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:6px;background:#fff;}
+.wf-zoom-group button{
+  background:transparent;border:none;border-radius:0;padding:4px 8px;
+  font-size:13px;color:var(--ink-mid);cursor:pointer;
+}
+.wf-zoom-group button:hover{background:var(--paper-soft);color:var(--brand);}
+.wf-zoom-group span{font-size:10px;color:var(--ink-mid);padding:0 6px;min-width:36px;text-align:center;font-weight:700;}
 
 /* 展開區（selected 時顯示） */
 .wf-card-details{display:none;}
@@ -861,6 +909,7 @@ function getMergedFlow(flowKey){
   if(!f) return null;
   const o = getFlowOverrides(flowKey);
   const deletedIds = new Set(o.deleted_node_ids || []);
+  const deletedEdgeKeys = new Set(o.deleted_edge_ids || []);
   // 過濾刪除 + apply patches
   const baseNodes = f.nodes
     .filter(n => !deletedIds.has(n.id))
@@ -871,15 +920,104 @@ function getMergedFlow(flowKey){
     .map(n => Object.assign({}, n, (o.nodes||{})[n.id] || {}));
   const nodes = [...baseNodes, ...addedNodes];
   const nodeIds = new Set(nodes.map(n => n.id));
-  // edges：過濾掉 dangling（指向已刪卡的）+ apply label patches
-  const edges = f.edges
+  // edges：過濾掉 dangling（指向已刪卡的）+ 已刪 edge + apply label patches
+  const baseEdges = f.edges
     .filter(e => nodeIds.has(e.from) && nodeIds.has(e.to))
+    .filter(e => !deletedEdgeKeys.has(e.from + '|' + e.to))
     .map(e => {
       const k = e.from + '|' + e.to;
       return Object.assign({}, e, (o.edges||{})[k] || {});
     });
-  // user 新增的 edges（V2 未實作）
+  // user 新增的 edges（add_edges array）
+  const userEdges = (o.add_edges || [])
+    .filter(e => nodeIds.has(e.from) && nodeIds.has(e.to))
+    .filter(e => !deletedEdgeKeys.has(e.from + '|' + e.to))
+    .map(e => {
+      const k = e.from + '|' + e.to;
+      return Object.assign({}, e, (o.edges||{})[k] || {}, { _user_added: true });
+    });
+  const edges = [...baseEdges, ...userEdges];
   return Object.assign({}, f, {nodes, edges});
+}
+
+// ── 新增 / 刪除箭頭 ──
+function addEdge(fromId, toId){
+  if (fromId === toId) { showStatusMsg('不能連到自己'); return; }
+  const o = getFlowOverrides(currentFlow);
+  o.add_edges = o.add_edges || [];
+  // 檢查重複
+  const existsSet = new Set([
+    ...(WORKFLOWS[currentFlow].edges||[]).map(e => e.from+'|'+e.to),
+    ...(o.add_edges||[]).map(e => e.from+'|'+e.to),
+  ]);
+  if (existsSet.has(fromId+'|'+toId)) { showStatusMsg('這條連線已存在'); return; }
+  // 如果刪過反向 edge 也清掉 dual-delete
+  o.deleted_edge_ids = (o.deleted_edge_ids || []).filter(k => k !== fromId+'|'+toId);
+  o.add_edges.push({from: fromId, to: toId});
+  saveFlowOverrides(currentFlow, o);
+  renderCanvas();
+}
+function deleteEdge(fromId, toId){
+  if (!confirm('刪除這條箭頭？')) return;
+  const o = getFlowOverrides(currentFlow);
+  // user 加的 → 從 add_edges 移除
+  if ((o.add_edges||[]).find(e => e.from === fromId && e.to === toId)) {
+    o.add_edges = o.add_edges.filter(e => !(e.from === fromId && e.to === toId));
+  } else {
+    // 原始 → 加 deleted_edge_ids
+    o.deleted_edge_ids = o.deleted_edge_ids || [];
+    if (!o.deleted_edge_ids.includes(fromId+'|'+toId)) o.deleted_edge_ids.push(fromId+'|'+toId);
+  }
+  saveFlowOverrides(currentFlow, o);
+  renderCanvas();
+}
+// 暫存連線中（pan/zoom 訊息浮動）
+function showStatusMsg(msg){
+  const el = document.getElementById('wf-save-status');
+  if (el) { el.innerHTML = '<span style="color:#666">'+msg+'</span>'; setTimeout(() => { el.style.opacity='.4'; }, 2500); }
+}
+
+// ── 連線模式 ──
+window._connectFromId = null;
+function startConnectMode(fromId){
+  window._connectFromId = fromId;
+  document.body.classList.add('wf-connecting');
+  showStatusMsg('連線中：點目標卡片 / ESC 取消');
+}
+function endConnectMode(){
+  window._connectFromId = null;
+  document.body.classList.remove('wf-connecting');
+}
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && window._connectFromId) endConnectMode();
+});
+
+// ── Pan / Zoom 視圖控制 ──
+window._view = { x: 0, y: 0, scale: 1 };
+function applyView(){
+  const host = document.getElementById('wf-host');
+  if (host) host.style.transform = `translate(${_view.x}px, ${_view.y}px) scale(${_view.scale})`;
+  const lbl = document.getElementById('wf-zoom-label');
+  if (lbl) lbl.textContent = Math.round(_view.scale*100) + '%';
+}
+function zoomBy(delta, originX, originY){
+  const old = _view.scale;
+  const ns = Math.max(0.3, Math.min(2.5, +(old + delta).toFixed(2)));
+  if (ns === old) return;
+  _view.x = originX - (originX - _view.x) * ns / old;
+  _view.y = originY - (originY - _view.y) * ns / old;
+  _view.scale = ns;
+  applyView();
+}
+function zoomFromCenter(delta){
+  const vp = document.getElementById('wf-viewport');
+  if (!vp) return;
+  const rect = vp.getBoundingClientRect();
+  zoomBy(delta, rect.width/2, rect.height/2);
+}
+function resetView(){
+  _view = { x: 0, y: 0, scale: 1 };
+  applyView();
 }
 function patchNode(flowKey, nodeId, patch){
   const o = getFlowOverrides(flowKey);
@@ -1118,17 +1256,25 @@ function renderCanvas(){
       <span style="flex:1"></span>
       ${progressBlock}
       <span id="wf-save-status" style="font-size:11px;color:var(--ink-lo);padding:0 8px;min-width:140px;text-align:center;transition:opacity .4s;"></span>
+      <span class="wf-zoom-group" title="拖背景平移 / Ctrl+滾輪縮放">
+        <button onclick="zoomFromCenter(-0.1)" title="縮小">−</button>
+        <span id="wf-zoom-label">100%</span>
+        <button onclick="zoomFromCenter(0.1)" title="放大">+</button>
+        <button onclick="resetView()" title="重置視圖">⌂</button>
+      </span>
       <button onclick="openTodoListModal()" title="跨流程列出待確認 / 需議卡">⚠ 待議清單</button>
       ${isOverview ? '' : '<button class="wf-add-card" onclick="addNewCard()" title="在當前流程新增一張卡片">＋ 新卡片</button>'}
       <button class="wf-reset" onclick="resetFlow()" title="清掉所有編輯，還原流程到原始版本（沒 undo）">↺ 還原預設</button>
     </div>
-    <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
-      <svg class="wf-arrows" id="wf-arrows" width="${W}" height="${H}">
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/></marker>
-          <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
-        </defs>
-      </svg>
+    <div class="wf-viewport" id="wf-viewport">
+      <div class="wf-canvas-host" id="wf-host" style="width:${W}px;height:${H}px;">
+        <svg class="wf-arrows" id="wf-arrows" width="${W}" height="${H}">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ccc"/></marker>
+            <marker id="arrow-alt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
+          </defs>
+        </svg>
+      </div>
     </div>`;
   const hostEl = document.getElementById('wf-host');
   const svgEl  = document.getElementById('wf-arrows');
@@ -1204,6 +1350,7 @@ function renderCanvas(){
       ${overviewBadge}
       <button class="wf-card-close" data-close-btn title="收起">✕</button>
       ${isOverview ? '' : '<button class="wf-card-del" data-del-btn title="刪除此卡片（含相關箭頭）">🗑</button>'}
+      ${isOverview ? '' : '<button class="wf-card-connect" data-connect-btn title="連線到別張卡">⟶</button>'}
       <div class="wf-title" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayTitle)}</div>
       <div class="wf-owner" contenteditable="${ce}" spellcheck="false">${escapeHtml(displayOwner)}</div>
       <div class="wf-sla">SLA: <span data-field="sla" contenteditable="${ce}" spellcheck="false">${escapeHtml(displaySla)}</span></div>
@@ -1250,6 +1397,12 @@ function renderCanvas(){
       ev.stopPropagation();
       deleteCard(n.id);
     });
+    // 連線按鈕
+    const connBtn = card.querySelector('[data-connect-btn]');
+    if (connBtn) connBtn.addEventListener('click', ev => {
+      ev.stopPropagation();
+      startConnectMode(n.id);
+    });
     // 跳對應 flow tab
     const jumpBtn = card.querySelector('[data-jump-flow]');
     if (jumpBtn) jumpBtn.addEventListener('click', ev => {
@@ -1268,9 +1421,16 @@ function renderCanvas(){
       });
     });
     // 卡片 click：非編輯區 + 非互動元素 → 選取/取消
+    // 連線模式中：點卡 = 設目標
     card.addEventListener('click', e => {
+      if (window._connectFromId) {
+        e.stopPropagation();
+        addEdge(window._connectFromId, n.id);
+        endConnectMode();
+        return;
+      }
       if (e.target.closest('[contenteditable="true"]')) return;
-      if (e.target.closest('textarea, button, a, .wf-status-chip, .wf-card-del')) return;
+      if (e.target.closest('textarea, button, a, .wf-status-chip, .wf-card-del, .wf-card-connect')) return;
       selectNode(n.id === selectedNodeId ? null : n.id);
     });
     // 拖拉：整張卡 mousedown 都觸發（除了編輯區 / 互動元素）
@@ -1291,6 +1451,10 @@ function renderCanvas(){
       if (selectedNodeId) selectNode(null);
     }
   });
+
+  // 綁 pan/zoom + 套用 view state
+  bindPanZoom();
+  applyView();
 }
 
 function drawEdge(svgEl, hostEl, flow, e){
@@ -1346,34 +1510,33 @@ function drawEdge(svgEl, hostEl, flow, e){
   hostEl.appendChild(labelEl);
 }
 
-// ── 拖拉 state ──
+// ── 拖拉 state（含 scale 補償）──
 let dragState = null;
 function startDrag(card, nodeId, ev){
-  const host = document.getElementById('wf-host');
-  const hostRect = host.getBoundingClientRect();
-  const cardRect = card.getBoundingClientRect();
   dragState = {
     card, nodeId,
-    offsetX: ev.clientX - cardRect.left,
-    offsetY: ev.clientY - cardRect.top,
-    hostRect,
-    startX: ev.clientX, startY: ev.clientY,
+    startMouseX: ev.clientX, startMouseY: ev.clientY,
+    startLeft: parseFloat(card.style.left) || 0,
+    startTop: parseFloat(card.style.top) || 0,
     moved: false,
   };
   document.body.style.userSelect = 'none';
 }
 document.addEventListener('mousemove', ev => {
   if(!dragState) return;
-  // 移動超過 4px 才算真的拖拉（避免單純 click 也觸發）
+  // 移動超過 4px（scale 補償後）才算真拖拉
+  const rawDx = ev.clientX - dragState.startMouseX;
+  const rawDy = ev.clientY - dragState.startMouseY;
   if (!dragState.moved) {
-    if (Math.abs(ev.clientX - dragState.startX) < 4 && Math.abs(ev.clientY - dragState.startY) < 4) return;
+    if (Math.abs(rawDx) < 4 && Math.abs(rawDy) < 4) return;
     dragState.moved = true;
     dragState.card.classList.add('dragging');
   }
-  const x = Math.max(0, ev.clientX - dragState.hostRect.left - dragState.offsetX);
-  const y = Math.max(0, ev.clientY - dragState.hostRect.top - dragState.offsetY);
-  dragState.card.style.left = x + 'px';
-  dragState.card.style.top  = y + 'px';
+  // 鼠標移動量 / scale → host 內邏輯座標的移動量
+  const dx = rawDx / _view.scale;
+  const dy = rawDy / _view.scale;
+  dragState.card.style.left = Math.max(0, dragState.startLeft + dx) + 'px';
+  dragState.card.style.top  = Math.max(0, dragState.startTop + dy) + 'px';
 });
 document.addEventListener('mouseup', () => {
   if(!dragState) return;
@@ -1386,7 +1549,49 @@ document.addEventListener('mouseup', () => {
   }
   document.body.style.userSelect = '';
   dragState = null;
-  if (wasMoved) renderCanvas(); // 真的拖了才重畫；沒拖讓 click 自然觸發 selectNode
+  if (wasMoved) renderCanvas();
+});
+
+// ── Pan / Zoom 綁定（每次 renderCanvas 後重新綁）──
+let _panState = null;
+function bindPanZoom(){
+  const vp = document.getElementById('wf-viewport');
+  if (!vp) return;
+  // wheel zoom (Ctrl/Meta + wheel)
+  vp.addEventListener('wheel', ev => {
+    if (!ev.ctrlKey && !ev.metaKey) return;
+    ev.preventDefault();
+    const rect = vp.getBoundingClientRect();
+    zoomBy(-ev.deltaY * 0.0015, ev.clientX - rect.left, ev.clientY - rect.top);
+  }, { passive: false });
+  // drag-pan：點 viewport 背景（非 card / button / edge label）
+  vp.addEventListener('mousedown', ev => {
+    if (window._connectFromId) return;
+    if (ev.target.closest('.wf-card, .wf-edge-label, .wf-toolbar, .wf-edge-label-wrap, button')) return;
+    if (ev.button !== 0 && ev.button !== 1) return;
+    _panState = { sx: ev.clientX, sy: ev.clientY, ox: _view.x, oy: _view.y };
+    vp.classList.add('panning');
+    ev.preventDefault();
+  });
+  // 點 viewport 空白處 → cancel connect mode
+  vp.addEventListener('click', ev => {
+    if (window._connectFromId && !ev.target.closest('.wf-card')) {
+      endConnectMode();
+    }
+  });
+}
+document.addEventListener('mousemove', ev => {
+  if (!_panState) return;
+  _view.x = _panState.ox + (ev.clientX - _panState.sx);
+  _view.y = _panState.oy + (ev.clientY - _panState.sy);
+  applyView();
+});
+document.addEventListener('mouseup', () => {
+  if (_panState) {
+    _panState = null;
+    const vp = document.getElementById('wf-viewport');
+    if (vp) vp.classList.remove('panning');
+  }
 });
 
 // ── Select node ──
